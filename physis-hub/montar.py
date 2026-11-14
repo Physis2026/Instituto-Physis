@@ -23,7 +23,7 @@ import zipfile
 from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
-MODULOS = ("monitoramento", "agua", "zonas", "animais", "sustainkit", "supervisao", "gestao")
+MODULOS = ("monitoramento", "agua", "zonas", "animais", "sustainkit", "supervisao", "gestao", "painel", "planejador")
 LICENCA_PADRAO = "[LICENÇA A DEFINIR PELA PHYSIS]"
 
 GUIA = """# Sua plataforma Physis
@@ -67,7 +67,8 @@ Todo o código está nesta pasta e pode ser estudado e adaptado. Licença: {lice
 
 
 def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Path | None, licenca: str,
-           supervisao: Path | None = None, gestao: Path | None = None) -> Path:
+           supervisao: Path | None = None, gestao: Path | None = None, planejador: Path | None = None,
+           pesquisa: bool = False, nome: str = "") -> Path:
     if not re.fullmatch(r"[a-z0-9][a-z0-9._-]{1,63}", org):
         raise SystemExit("org: use de 2 a 64 letras minúsculas, números, ponto, hífen ou sublinhado")
     desconhecidos = [m for m in modulos if m not in MODULOS]
@@ -77,6 +78,8 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         raise SystemExit("o módulo sustainkit precisa de --sustainkit apontando para o arquivo HTML do SustainKit")
     if "supervisao" in modulos and (supervisao is None or not supervisao.is_file()):
         raise SystemExit("o módulo supervisao precisa de --supervisao apontando para o arquivo HTML da supervisão")
+    if "planejador" in modulos and (planejador is None or not planejador.is_file()):
+        raise SystemExit("o módulo planejador precisa de --planejador apontando para o arquivo HTML do Planejador")
     pasta = saida / f"physis-{org}"
     if pasta.exists():
         shutil.rmtree(pasta)
@@ -89,11 +92,17 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         shutil.copy2(sustainkit, pasta / "web" / "sustainkit.html")
     if "supervisao" in modulos:
         shutil.copy2(supervisao, pasta / "web" / "supervisao.html")
+    if "planejador" in modulos:
+        shutil.copy2(planejador, pasta / "web" / "planejador.html")
     if gestao is not None and gestao.is_file():      # só o pacote interno da Physis leva o programa de gestão interna
         shutil.copy2(gestao, pasta / "web" / "gestao.html")
-    (pasta / "instancia.json").write_text(json.dumps(
-        {"org": org, "lugar": lugar, "modulos": modulos, "login": True, "licenca": licenca,
-         "montada_em": time.strftime("%Y-%m-%dT%H:%M:%S")}, ensure_ascii=False, indent=2), encoding="utf-8")
+    inst = {"org": org, "lugar": lugar, "modulos": modulos, "login": True, "licenca": licenca,
+            "montada_em": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    if nome:
+        inst["nome"] = nome
+    if pesquisa:      # instalação de pesquisa: mostra também o que está em desenvolvimento, marcado como tal
+        inst["pesquisa"] = True
+    (pasta / "instancia.json").write_text(json.dumps(inst, ensure_ascii=False, indent=2), encoding="utf-8")
     (pasta / "LICENSE").write_text(licenca + "\n", encoding="utf-8")
     sk = ("- **SustainKit:** já funciona, sem equipamento. Abra pela aba SustainKit.\n"
           if "sustainkit" in modulos else "")
@@ -115,11 +124,15 @@ def main() -> None:
     ap.add_argument("--sustainkit", type=Path)
     ap.add_argument("--supervisao", type=Path, help="arquivo HTML da supervisão (physis-scada-demo.html)")
     ap.add_argument("--gestao", type=Path, help="arquivo HTML da gestão (gestao-physis.html)")
+    ap.add_argument("--planejador", type=Path, help="arquivo HTML do Planejador Physis")
+    ap.add_argument("--pesquisa", action="store_true", help="instalação de pesquisa: mostra também o que está em desenvolvimento")
+    ap.add_argument("--nome", default="", help="nome do cliente para a tela")
     ap.add_argument("--licenca", default=LICENCA_PADRAO)
     ap.add_argument("--saida", type=Path, default=Path("entregas"))
     a = ap.parse_args()
     a.saida.mkdir(parents=True, exist_ok=True)
-    pacote = montar(a.org, a.lugar, [m.strip() for m in a.modulos.split(",") if m.strip()], a.saida, a.sustainkit, a.licenca, a.supervisao, a.gestao)
+    pacote = montar(a.org, a.lugar, [m.strip() for m in a.modulos.split(",") if m.strip()], a.saida, a.sustainkit, a.licenca,
+                    a.supervisao, a.gestao, a.planejador, a.pesquisa, a.nome)
     print(f"Montado: {pacote} ({pacote.stat().st_size // 1024} kB)")
 
 

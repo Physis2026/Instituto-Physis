@@ -240,7 +240,7 @@ html.px-conforto *{transition:none!important;animation:none!important}
 var EN = false;
 var T = {
   pt:{
-    titulo:"SCADA · fazenda net zero", sub:"Fazenda simulada · o dado não é real",
+    titulo:"SCADA", sub:"Simulação · o dado não é real",
     aviso:"Fazenda simulada. Nenhum sensor está conectado, e o relógio corre acelerado — um segundo aqui é um minuto na fazenda, então um dia passa em 24 minutos. Demonstração que finge ser planta real é o tipo de coisa que se descobre na pergunta do cliente. O saldo de carbono mostrado cobre só o que o SCADA mede: energia, diesel e biogás.",
     abaSin:"Sinótico",
     sinNota:"O desenho da planta, não uma lista de números. Um SCADA que só mostra tabela obriga a pessoa a montar a planta na cabeça toda vez. Verde é escoando, cinza é parado, vermelho é fora da faixa — e não há animação: cano tracejado em movimento distrai e não informa.",
@@ -303,7 +303,7 @@ var T = {
     idioma:"EN"
   },
   en:{
-    titulo:"SCADA · net zero farm", sub:"Simulated farm · the data is not real",
+    titulo:"SCADA", sub:"Simulation · the data is not real",
     aviso:"Simulated farm. No sensor is connected, and the clock runs fast — one second here is one minute on site, so a day passes in 24 minutes. A demo that pretends to be a real plant is the kind of thing that surfaces in the client's question. The carbon balance covers only what the SCADA measures: electricity, diesel and biogas.",
     abaSin:"Mimic",
     sinNota:"The drawing of the plant, not a list of numbers. A SCADA that only shows tables makes the operator rebuild the plant in their head every time. Green is flowing, grey is stopped, red is out of range — and there is no animation: a moving dashed pipe distracts and informs nothing.",
@@ -1376,11 +1376,20 @@ window.PhysisScadaDemo = {
 })();
 </script>
 <script>
-/* physis-exportar.js v1 · 14/11/2026
+/* physis-exportar.js v2 · 14/11/2026
  *
  * Baixar a tela em Word (.docx), Excel (.xlsx) e PDF, e encaminhar a colegas.
  * Sem dependência externa e sem internet: os três arquivos são montados aqui.
  * A mesma biblioteca vai embutida na Gestão Physis, no Hub Physis e nos protótipos.
+ * ORIGINAL ÚNICO: mude só este arquivo e rode `python ferramentas/sincronizar.py`.
+ *
+ * v2: todo documento sai com a identidade Physis (regra da Physis, 14/11/2026):
+ *   Word  - cabeçalho "PHYSIS ENGINEERING", marca d'água "PHYSIS" na diagonal, rodapé com página X de Y,
+ *           tabelas com cabeçalho verde e bordas da paleta.
+ *   PDF   - faixa verde no topo, marca d'água diagonal suave em toda página, cabeçalho de tabela verde, rodapé com linha.
+ *   Excel - faixa "PHYSIS ENGINEERING" no topo, cabeçalho de tabela verde, bordas da paleta e cabeçalho e rodapé de impressão.
+ *           (O Excel não tem marca d'água de verdade; a faixa e o cabeçalho de impressão fazem esse papel.)
+ * Paleta: verde ação #33512F, marca #4B7547, texto #1C2B21, secundário #4A4F44, linha #C9D2C4, areia #EFE8D6.
  *
  * Uso:  PhysisExportar.barra({ raiz: function () { return elemento; },
  *                              titulo: function () { return "Propostas"; },
@@ -1449,27 +1458,37 @@ window.PhysisScadaDemo = {
       if (b.h) corpo += par(b.t, "Heading" + Math.min(3, Math.max(1, b.h - 1)));
       else if (b.tabela) {
         var cols = Math.max.apply(null, [b.tabela.cab.length].concat(b.tabela.linhas.map(function (l) { return l.length; })));
-        var cel = function (t, negrito) { return '<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/></w:tcPr><w:p><w:r>' + (negrito ? "<w:rPr><w:b/></w:rPr>" : "") + '<w:t xml:space="preserve">' + xml(t) + "</w:t></w:r></w:p></w:tc>"; };
+        var cel = function (t, negrito) { return '<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/>' + (negrito ? '<w:shd w:val="clear" w:color="auto" w:fill="33512F"/>' : "") + '</w:tcPr><w:p><w:r>' + (negrito ? '<w:rPr><w:b/><w:color w:val="FFFFFF"/></w:rPr>' : "") + '<w:t xml:space="preserve">' + xml(t) + "</w:t></w:r></w:p></w:tc>"; };
         var lin = function (l, cab) { var s = "<w:tr>" + (cab ? "<w:trPr><w:tblHeader/></w:trPr>" : ""); for (var i = 0; i < cols; i++) s += cel(l[i] == null ? "" : l[i], cab); return s + "</w:tr>"; };
         corpo += '<w:tbl><w:tblPr><w:tblStyle w:val="Grade"/><w:tblW w:w="5000" w:type="pct"/><w:tblLook w:firstRow="1"/></w:tblPr>' + (b.tabela.cab.length ? lin(b.tabela.cab, true) : "") + b.tabela.linhas.map(function (l) { return lin(l, false); }).join("") + "</w:tbl>" + par("", null);
       } else corpo += par(b.t, b.lista ? "Lista" : null);
     });
-    var doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ' + W + "><w:body>" + corpo + '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>';
+    var R = 'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+    var doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ' + W + " " + R + "><w:body>" + corpo + '<w:sectPr><w:headerReference w:type="default" r:id="rId2"/><w:footerReference w:type="default" r:id="rId3"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1418" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr></w:body></w:document>';
+    // Cabeçalho com a marca e marca d'água "PHYSIS" na diagonal (forma de texto padrão do Word, lida também pelo LibreOffice)
+    var VML = 'xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"';
+    var dagua = '<w:r><w:pict><v:shapetype id="_x0000_t136" coordsize="21600,21600" o:spt="136" adj="10800" path="m@7,l@8,m@5,21600l@6,21600e"><v:formulas><v:f eqn="sum #0 0 10800"/><v:f eqn="prod #0 2 1"/><v:f eqn="sum 21600 0 @1"/><v:f eqn="sum 0 0 @2"/><v:f eqn="sum 21600 0 @3"/><v:f eqn="if @0 @3 0"/><v:f eqn="if @0 21600 @1"/><v:f eqn="if @0 0 @2"/><v:f eqn="if @0 @4 21600"/><v:f eqn="mid @5 @6"/><v:f eqn="mid @8 @5"/><v:f eqn="mid @7 @8"/><v:f eqn="mid @6 @7"/><v:f eqn="sum @6 0 @5"/></v:formulas><v:path textpathok="t" o:connecttype="custom" o:connectlocs="@9,0;@10,10800;@11,21600;@12,10800" o:connectangles="270,180,90,0"/><v:textpath on="t" fitshape="t"/><v:handles><v:h position="#0,bottomRight" xrange="6629,14971"/></v:handles><o:lock v:ext="edit" text="t" shapetype="t"/></v:shapetype>' +
+      '<v:shape id="PhysisMarcaDagua" o:spid="_x0000_s2049" type="#_x0000_t136" style="position:absolute;margin-left:0;margin-top:0;width:440pt;height:110pt;rotation:315;z-index:-251654144;mso-position-horizontal:center;mso-position-horizontal-relative:margin;mso-position-vertical:center;mso-position-vertical-relative:margin" o:allowincell="f" fillcolor="#DCEBD8" stroked="f"><v:fill opacity=".55"/><v:textpath style="font-family:&quot;Arial&quot;;font-size:1pt;font-weight:bold" string="PHYSIS"/></v:shape></w:pict></w:r>';
+    var cabec = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ' + W + " " + VML + '><w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="8" w:space="4" w:color="33512F"/></w:pBdr><w:tabs><w:tab w:val="right" w:pos="9638"/></w:tabs><w:spacing w:after="0"/></w:pPr><w:r><w:rPr><w:b/><w:color w:val="33512F"/><w:spacing w:val="20"/><w:sz w:val="18"/></w:rPr><w:t>PHYSIS ENGINEERING</w:t></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:tab/><w:t xml:space="preserve">' + xml(titulo) + "</w:t></w:r>" + dagua + "</w:p></w:hdr>";
+    var campo = function (instr) { return '<w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:instrText xml:space="preserve"> ' + instr + ' </w:instrText></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:t>1</w:t></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:fldChar w:fldCharType="end"/></w:r>'; };
+    var cinza = function (t) { return '<w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve">' + xml(t) + "</w:t></w:r>"; };
+    var rodape = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr ' + W + '><w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="4" w:space="4" w:color="C9D2C4"/></w:pBdr><w:tabs><w:tab w:val="right" w:pos="9638"/></w:tabs></w:pPr>' + cinza("Physis Engineering · " + TX.gerado + " " + agora()) + '<w:r><w:tab/></w:r>' + cinza(EN ? "Page " : "Página ") + campo("PAGE") + cinza(EN ? " of " : " de ") + campo("NUMPAGES") + "</w:p></w:ftr>";
     var est = function (id, nome, tam, negrito, cor, antes, extra) { return '<w:style w:type="paragraph" w:styleId="' + id + '"><w:name w:val="' + nome + '"/><w:basedOn w:val="Normal"/>' + (extra || "") + '<w:pPr><w:spacing w:before="' + antes + '" w:after="120"/></w:pPr><w:rPr>' + (negrito ? "<w:b/>" : "") + '<w:color w:val="' + cor + '"/><w:sz w:val="' + tam + '"/></w:rPr></w:style>'; };
     var estilos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles ' + W + '><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="22"/><w:lang w:val="' + (EN ? "en-GB" : "pt-BR") + '"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="300" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>' +
       '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>' +
       est("Title", "Title", 40, true, "33512F", 0) + est("Subtle", "Subtitle", 18, false, "4A4F44", 0) +
-      est("Heading1", "heading 1", 30, true, "1C2B21", 360, '<w:next w:val="Normal"/>').replace("</w:pPr>", '<w:keepNext/><w:outlineLvl w:val="0"/></w:pPr>') +
-      est("Heading2", "heading 2", 26, true, "1C2B21", 280, '<w:next w:val="Normal"/>').replace("</w:pPr>", '<w:keepNext/><w:outlineLvl w:val="1"/></w:pPr>') +
+      est("Heading1", "heading 1", 30, true, "33512F", 360, '<w:next w:val="Normal"/>').replace("</w:pPr>", '<w:keepNext/><w:outlineLvl w:val="0"/></w:pPr>') +
+      est("Heading2", "heading 2", 26, true, "33512F", 280, '<w:next w:val="Normal"/>').replace("</w:pPr>", '<w:keepNext/><w:outlineLvl w:val="1"/></w:pPr>') +
       est("Heading3", "heading 3", 23, true, "33512F", 200, '<w:next w:val="Normal"/>').replace("</w:pPr>", '<w:keepNext/><w:outlineLvl w:val="2"/></w:pPr>') +
       '<w:style w:type="paragraph" w:styleId="Lista"><w:name w:val="List Paragraph"/><w:basedOn w:val="Normal"/><w:pPr><w:ind w:left="360"/></w:pPr></w:style>' +
-      '<w:style w:type="table" w:styleId="Grade"><w:name w:val="Table Grid"/><w:tblPr><w:tblBorders><w:top w:val="single" w:sz="4" w:color="8A9284"/><w:left w:val="single" w:sz="4" w:color="8A9284"/><w:bottom w:val="single" w:sz="4" w:color="8A9284"/><w:right w:val="single" w:sz="4" w:color="8A9284"/><w:insideH w:val="single" w:sz="4" w:color="8A9284"/><w:insideV w:val="single" w:sz="4" w:color="8A9284"/></w:tblBorders><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>';
+      '<w:style w:type="table" w:styleId="Grade"><w:name w:val="Table Grid"/><w:tblPr><w:tblBorders><w:top w:val="single" w:sz="4" w:color="C9D2C4"/><w:left w:val="single" w:sz="4" w:color="C9D2C4"/><w:bottom w:val="single" w:sz="4" w:color="C9D2C4"/><w:right w:val="single" w:sz="4" w:color="C9D2C4"/><w:insideH w:val="single" w:sz="4" w:color="C9D2C4"/><w:insideV w:val="single" w:sz="4" w:color="C9D2C4"/></w:tblBorders><w:tblCellMar><w:top w:w="40" w:type="dxa"/><w:left w:w="100" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/><w:right w:w="100" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>';
     return zip([
-      { nome: "[Content_Types].xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>' },
+      { nome: "[Content_Types].xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>' },
       { nome: "_rels/.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>' },
       { nome: "docProps/core.xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>' + xml(titulo) + "</dc:title><dc:creator>Physis Engineering</dc:creator><dc:language>" + (EN ? "en-GB" : "pt-BR") + "</dc:language></cp:coreProperties>" },
-      { nome: "word/_rels/document.xml.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' },
-      { nome: "word/document.xml", dados: doc }, { nome: "word/styles.xml", dados: estilos }]);
+      { nome: "word/_rels/document.xml.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/></Relationships>' },
+      { nome: "word/document.xml", dados: doc }, { nome: "word/styles.xml", dados: estilos },
+      { nome: "word/header1.xml", dados: cabec }, { nome: "word/footer1.xml", dados: rodape }]);
   }
 
   /* ───────── Excel ───────── */
@@ -1481,25 +1500,42 @@ window.PhysisScadaDemo = {
   }
   function xlsx(titulo, blocos) {
     var linhas = [], col = function (n) { var s = ""; n++; while (n > 0) { var r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); } return s; };
-    linhas.push([{ v: titulo, e: 2 }]); linhas.push([{ v: TX.gerado + " " + agora(), e: 0 }]); linhas.push([]);
+    // faixa da marca no topo (o Excel não tem marca d'água; a faixa e o cabeçalho de impressão fazem esse papel)
+    linhas.push([{ v: "PHYSIS ENGINEERING", e: 6 }]); linhas.push([{ v: titulo, e: 2 }]); linhas.push([{ v: TX.gerado + " " + agora(), e: 8 }]); linhas.push([]);
     var larg = [];
     blocos.forEach(function (b) {
       if (b.h) { linhas.push([]); linhas.push([{ v: b.t, e: 1 }]); }
-      else if (b.tabela) { if (b.tabela.cab.length) linhas.push(b.tabela.cab.map(function (c) { return { v: c, e: 1 }; }));
+      else if (b.tabela) { if (b.tabela.cab.length) linhas.push(b.tabela.cab.map(function (c) { return { v: c, e: 7 }; }));
         b.tabela.linhas.forEach(function (l) { linhas.push(l.map(function (c) { var dt = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(limpo(c));
           if (dt) return { v: Math.round((Date.UTC(+dt[3], +dt[2] - 1, +dt[1]) - Date.UTC(1899, 11, 30)) / 86400000), e: 5, n: true, larg: 12 };
-          var n = numero(c); return n === null ? { v: c, e: 0 } : { v: n, e: /R\$/.test(c) ? 3 : /%\s*$/.test(c) ? 4 : 0, n: true, larg: /R\$/.test(c) ? Math.max(14, limpo(c).length + 4) : 10 }; })); }); linhas.push([]); }
+          var n = numero(c); return n === null ? { v: c, e: 9 } : { v: n, e: /R\$/.test(c) ? 10 : /%\s*$/.test(c) ? 11 : 9, n: true, larg: /R\$/.test(c) ? Math.max(14, limpo(c).length + 4) : 10 }; })); }); linhas.push([]); }
       else linhas.push([{ v: b.t, e: 0 }]);
     });
     var dados = linhas.map(function (l, i) {
       return '<row r="' + (i + 1) + '">' + l.map(function (c, j) { var t = String(c.v == null ? "" : c.v); larg[j] = Math.max(larg[j] || 12, c.larg || Math.min(60, (i < 2 || (l.length === 1 && j === 0) ? 12 : t.length) + 2));
-        var ref = col(j) + (i + 1); if (t === "") return "";
+        var ref = col(j) + (i + 1); if (t === "" && c.e !== 6) return "";
         return c.n ? '<c r="' + ref + '" s="' + c.e + '"><v>' + c.v + "</v></c>" : '<c r="' + ref + '" s="' + c.e + '" t="inlineStr"><is><t xml:space="preserve">' + xml(t) + "</t></is></c>"; }).join("") + "</row>";
     }).join("");
     var M = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"';
-    var folha = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ' + M + "><cols>" + larg.map(function (w, j) { return '<col min="' + (j + 1) + '" max="' + (j + 1) + '" width="' + (w || 10) + '" customWidth="1"/>'; }).join("") + "</cols><sheetData>" + dados + "</sheetData></worksheet>";
+    // a faixa da marca ocupa a largura de todas as colunas usadas
+    var nCols = Math.max(1, larg.length), mescla = nCols > 1 ? '<mergeCells count="1"><mergeCell ref="A1:' + col(nCols - 1) + '1"/></mergeCells>' : "";
+    dados = dados.replace('<row r="1">', '<row r="1" ht="22" customHeight="1">');
+    var impressao = '<pageMargins left="0.6" right="0.6" top="0.9" bottom="0.8" header="0.4" footer="0.4"/><pageSetup paperSize="9" orientation="' + (nCols > 6 ? "landscape" : "portrait") + '" fitToWidth="1" fitToHeight="0"/>' +
+      "<headerFooter><oddHeader>" + xml('&L&"Arial,Bold"&K33512FPHYSIS ENGINEERING&R&"Arial,Regular"&K4A4F44' + String(titulo || "").replace(/&/g, "&&")) + "</oddHeader><oddFooter>" + xml("&L&K4A4F44Physis Engineering&R&K4A4F44" + (EN ? "Page &P of &N" : "Página &P de &N")) + "</oddFooter></headerFooter>";
+    var folha = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ' + M + '><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><cols>' + larg.map(function (w, j) { return '<col min="' + (j + 1) + '" max="' + (j + 1) + '" width="' + (w || 10) + '" customWidth="1"/>'; }).join("") + "</cols><sheetData>" + dados + "</sheetData>" + mescla + impressao + "</worksheet>";
     if (!larg.length) folha = folha.replace("<cols></cols>", "");
-    var estilos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet ' + M + '><numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;R$&quot;\\ #,##0.00"/></numFmts><fonts count="3"><font><sz val="10"/><name val="Arial"/></font><font><b/><sz val="10"/><name val="Arial"/></font><font><b/><sz val="14"/><name val="Arial"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="6"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+    // estilos: 0 normal · 1 negrito · 2 título verde · 3 R$ · 4 % · 5 data · 6 faixa da marca · 7 cabeçalho de tabela · 8 nota cinza · 9 célula com borda · 10 R$ com borda · 11 % com borda
+    var estilos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet ' + M + '><numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;R$&quot;\\ #,##0.00"/></numFmts>' +
+      '<fonts count="6"><font><sz val="10"/><color rgb="FF1C2B21"/><name val="Arial"/></font><font><b/><sz val="10"/><color rgb="FF1C2B21"/><name val="Arial"/></font><font><b/><sz val="14"/><color rgb="FF33512F"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><sz val="9"/><color rgb="FF4A4F44"/><name val="Arial"/></font></fonts>' +
+      '<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF33512F"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FF4B7547"/><bgColor indexed="64"/></patternFill></fill></fills>' +
+      '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFC9D2C4"/></left><right style="thin"><color rgb="FFC9D2C4"/></right><top style="thin"><color rgb="FFC9D2C4"/></top><bottom style="thin"><color rgb="FFC9D2C4"/></bottom><diagonal/></border></borders>' +
+      '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="12">' +
+      '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+      '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
+      '<xf numFmtId="0" fontId="3" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"><alignment vertical="center"/></xf><xf numFmtId="0" fontId="4" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"><alignment vertical="center" wrapText="1"/></xf>' +
+      '<xf numFmtId="0" fontId="5" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment vertical="top" wrapText="1"/></xf>' +
+      '<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="10" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>' +
+      '</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
     var aba = xml(String(titulo || "Physis").replace(/[\\\/\?\*\[\]:]/g, " ").slice(0, 31)) || "Physis";
     return zip([
       { nome: "[Content_Types].xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>' },
@@ -1522,8 +1558,8 @@ window.PhysisScadaDemo = {
     }); return out;
   }
   function pdf(titulo, blocos) {
-    var LW = 595, LH = 842, M = 48, util = LW - 2 * M, paginas = [], cur = [], y = LH - M;
-    var nova = function () { if (cur.length) paginas.push(cur); cur = []; y = LH - M; };
+    var LW = 595, LH = 842, M = 48, TOPO = 66, util = LW - 2 * M, paginas = [], cur = [], y = LH - TOPO;
+    var nova = function () { if (cur.length) paginas.push(cur); cur = []; y = LH - TOPO; };
     var texto = function (linha, fonte, tam, x, cor) { cur.push("BT /" + fonte + " " + tam + " Tf " + (cor || "0.11 0.17 0.13") + " rg " + (x || M).toFixed(1) + " " + y.toFixed(1) + " Td " + pdfStr(linha) + " Tj ET"); };
     var escrever = function (t, fonte, tam, larg, antes, depois, cor, recuo) {
       var passo = tam * 1.38, max = Math.max(8, Math.floor((util - (recuo || 0)) / (tam * larg))), ls = quebrar(latin(t), max);
@@ -1532,7 +1568,7 @@ window.PhysisScadaDemo = {
     escrever(titulo, "F2", 18, 0.56, 0, 2, "0.2 0.32 0.18");
     escrever(TX.gerado + " " + agora() + " - Physis Engineering", "F1", 9, 0.5, 0, 10, "0.29 0.31 0.27");
     blocos.forEach(function (b) {
-      if (b.h) { if (y < M + 70) nova(); escrever(b.t, "F2", b.h <= 2 ? 14 : 12, 0.56, 10, 3); }
+      if (b.h) { if (y < M + 70) nova(); escrever(b.t, "F2", b.h <= 2 ? 14 : 12, 0.56, 10, 3, "0.2 0.32 0.18"); }
       else if (b.tabela) {
         var tam = 8, cw = tam * 0.6, linhasT = (b.tabela.cab.length ? [b.tabela.cab] : []).concat(b.tabela.linhas), n = Math.max.apply(null, linhasT.map(function (l) { return l.length; }).concat([1]));
         var maxChars = Math.floor(util / cw) - (n - 1) * 2, quer = [];
@@ -1543,8 +1579,11 @@ window.PhysisScadaDemo = {
         linhasT.forEach(function (l, i) {
           var cels = quer.map(function (w, j) { return quebrar(latin(l[j] == null ? "" : l[j]), w); }), alt = Math.max.apply(null, cels.map(function (c) { return c.length; })), passo = tam * 1.35;
           if (y - alt * passo - 6 < M) nova();
-          for (var k = 0; k < alt; k++) { y -= passo; var x = M; cels.forEach(function (c, j) { if (c[k]) texto(c[k], i === 0 && b.tabela.cab.length ? "F4" : "F3", tam, x); x += (quer[j] + 2) * cw; }); }
-          y -= 3; cur.push((i === 0 && b.tabela.cab.length ? "0.8" : "0.3") + " w 0.54 0.57 0.52 RG " + M + " " + y.toFixed(1) + " m " + (LW - M) + " " + y.toFixed(1) + " l S"); y -= 2;
+          var eCab = i === 0 && b.tabela.cab.length;
+          // cabeçalho da tabela: faixa verde Physis com texto branco
+          if (eCab) cur.push("0.2 0.318 0.184 rg " + (M - 3) + " " + (y - alt * passo - 4).toFixed(1) + " " + (util + 6) + " " + (alt * passo + 5).toFixed(1) + " re f");
+          for (var k = 0; k < alt; k++) { y -= passo; var x = M; cels.forEach(function (c, j) { if (c[k]) texto(c[k], eCab ? "F4" : "F3", tam, x, eCab ? "1 1 1" : null); x += (quer[j] + 2) * cw; }); }
+          y -= 3; cur.push((eCab ? "0.8" : "0.4") + " w 0.79 0.82 0.77 RG " + M + " " + y.toFixed(1) + " m " + (LW - M) + " " + y.toFixed(1) + " l S"); y -= 2;
         });
         y -= 8;
       } else escrever((b.lista ? "- " : "") + b.t, "F1", 10.5, 0.5, 0, 4, null, b.lista ? 10 : 0);
@@ -1553,11 +1592,18 @@ window.PhysisScadaDemo = {
     var objs = [], add = function (s) { objs.push(s); return objs.length; };
     var fonte = function (n) { return add("<< /Type /Font /Subtype /Type1 /BaseFont /" + n + " /Encoding /WinAnsiEncoding >>"); };
     var f1 = fonte("Helvetica"), f2 = fonte("Helvetica-Bold"), f3 = fonte("Courier"), f4 = fonte("Courier-Bold");
+    var gs = add("<< /Type /ExtGState /ca 0.07 /CA 0.07 >>");     // transparência da marca d'água
     var pagsId = objs.length + 1 + paginas.length * 2, kids = [];
     paginas.forEach(function (p, i) {
-      var rod = "BT /F1 8 Tf 0.29 0.31 0.27 rg " + M + " 28 Td " + pdfStr(latin(titulo).slice(0, 70) + " - " + (i + 1) + "/" + paginas.length) + " Tj ET";
-      var conteudo = p.join("\n") + "\n" + rod, c = add("<< /Length " + conteudo.length + " >>\nstream\n" + conteudo + "\nendstream");
-      kids.push(add("<< /Type /Page /Parent " + pagsId + " 0 R /MediaBox [0 0 " + LW + " " + LH + "] /Contents " + c + " 0 R /Resources << /Font << /F1 " + f1 + " 0 R /F2 " + f2 + " 0 R /F3 " + f3 + " 0 R /F4 " + f4 + " 0 R >> >> >>"));
+      // marca d'água "PHYSIS" na diagonal, atrás do conteúdo, em verde Physis bem claro
+      var agua = "q /GS1 gs 0.29 0.46 0.28 rg BT /F2 120 Tf 0.7071 0.7071 -0.7071 0.7071 150 210 Tm (PHYSIS) Tj ET Q";
+      // faixa verde no topo com a marca e o título
+      var faixa = "0.2 0.318 0.184 rg 0 " + (LH - 34) + " " + LW + " 34 re f BT /F2 9.5 Tf 1 1 1 rg " + M + " " + (LH - 22) + " Td " + pdfStr("PHYSIS ENGINEERING") + " Tj ET" +
+        " BT /F1 8.5 Tf 0.86 0.92 0.85 rg " + (LW - M - Math.min(60, latin(titulo).length) * 4.3).toFixed(1) + " " + (LH - 22) + " Td " + pdfStr(latin(titulo).slice(0, 60)) + " Tj ET";
+      var rod = "0.4 w 0.79 0.82 0.77 RG " + M + " 40 m " + (LW - M) + " 40 l S BT /F1 8 Tf 0.29 0.31 0.27 rg " + M + " 28 Td " + pdfStr("Physis Engineering - " + latin(titulo).slice(0, 60)) + " Tj ET" +
+        " BT /F1 8 Tf 0.29 0.31 0.27 rg " + (LW - M - 52) + " 28 Td " + pdfStr((EN ? "Page " : "Pagina ") + (i + 1) + "/" + paginas.length) + " Tj ET";
+      var conteudo = agua + "\n" + faixa + "\n" + p.join("\n") + "\n" + rod, c = add("<< /Length " + conteudo.length + " >>\nstream\n" + conteudo + "\nendstream");
+      kids.push(add("<< /Type /Page /Parent " + pagsId + " 0 R /MediaBox [0 0 " + LW + " " + LH + "] /Contents " + c + " 0 R /Resources << /Font << /F1 " + f1 + " 0 R /F2 " + f2 + " 0 R /F3 " + f3 + " 0 R /F4 " + f4 + " 0 R >> /ExtGState << /GS1 " + gs + " 0 R >> >> >>"));
     });
     add("<< /Type /Pages /Kids [" + kids.map(function (k) { return k + " 0 R"; }).join(" ") + "] /Count " + kids.length + " >>");
     var cat = add("<< /Type /Catalog /Pages " + pagsId + " 0 R /Lang (" + (EN ? "en-GB" : "pt-BR") + ") /ViewerPreferences << /DisplayDocTitle true >> >>");

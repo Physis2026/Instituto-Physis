@@ -216,6 +216,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     "nome": q["nome"] if q else None, "papel": q["papel"] if q else None,
                     "licenca": instancia.get("licenca"), "sustainkit": (WEB / "sustainkit.html").exists(),
                     "supervisao": (WEB / "supervisao.html").exists(), "gestao": (WEB / "gestao.html").exists(),
+                    "planejador": (WEB / "planejador.html").exists(), "pesquisa": bool(instancia.get("pesquisa")),
+                    "nome_cliente": instancia.get("nome"),
                     "senha_min": hub.SENHA_MIN}
 
         def _arquivo(self, arq: Path, tipo: str) -> None:
@@ -242,6 +244,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if not self._quem():
                     return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
                 return self._json(200, hub.loja_catalogo(interno=True))
+            if u.path in ("/demo", "/demo/"):
+                # demonstração gratuita: roda inteira no navegador, com dados simulados; não lê nada do servidor
+                return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
             if u.path in ("/loja/interna", "/loja/interna/"):
                 # a pagina em si nao tem dado; os dados internos so vem com sessao
                 return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
@@ -274,6 +279,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if self._barrado():
                     return
                 return self._arquivo(WEB / "gestao.html", "text/html; charset=utf-8")
+            if u.path in ("/planejador", "/planejador/") and (WEB / "planejador.html").exists():
+                if self._barrado():
+                    return
+                return self._arquivo(WEB / "planejador.html", "text/html; charset=utf-8")
             if u.path in ("/supervisao", "/supervisao/") and (WEB / "supervisao.html").exists():
                 if self._barrado():
                     return

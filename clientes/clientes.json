@@ -1,0 +1,42 @@
+{
+  "_leia": "Uma ficha por cliente. O código é um só; cada plataforma é montada a partir desta ficha com: python physis-hub/montar_clientes.py --saida <pasta>. Mudou um módulo? Mude aqui e monte de novo.",
+  "clientes": [
+    {
+      "org": "physis-site",
+      "nome": "Physis Engineering",
+      "lugar": "servidor-physis",
+      "projeto": "Servidor do site da Physis: loja (/loja/), área interna da loja (/loja/interna/), demonstração gratuita (/demo/) e Gestão Physis (/gestao/)",
+      "modulos": ["gestao"],
+      "gestao_interna": true,
+      "pesquisa": false,
+      "confirmar": "Pacote do servidor da Physis, para o Erick Oliveira. A primeira conta criada vira administradora: criar logo após subir, antes de abrir ao público. Exige HTTPS na frente (Caddy)."
+    },
+    {
+      "org": "fazenda-mf",
+      "nome": "Fazenda MF",
+      "lugar": "sede",
+      "projeto": "Monitoramento Verde (projeto 1 da Physis), já instalado",
+      "modulos": ["monitoramento", "zonas", "animais", "supervisao", "gestao"],
+      "pesquisa": false,
+      "confirmar": "Módulos escolhidos a partir dos equipamentos da pasta do projeto (Receptor e Transmissor V6, Caixinha, SmartColar, AutoFeeder). Confirmar com a Physis se o SustainKit também entra."
+    },
+    {
+      "org": "fazenda-santa-clara",
+      "nome": "Fazenda Santa Clara",
+      "lugar": "itirapua-sp",
+      "projeto": "Sensores de solo e clima, qualidade da água (pH) e, depois, energia solar",
+      "modulos": ["monitoramento", "agua", "supervisao", "gestao"],
+      "pesquisa": false,
+      "confirmar": "Solar ainda não tem módulo (em desenvolvimento): entra quando estiver pronto. A proposta de sensores fala em LoRaWAN; o Hub hoje fala V6 (decisão em aberto no documento 04)."
+    },
+    {
+      "org": "casa-physis",
+      "nome": "Casa Physis · Net Zero",
+      "lugar": "lote-168",
+      "projeto": "Projeto de pesquisa: modelo do sistema net zero",
+      "modulos": ["monitoramento", "agua", "zonas", "animais", "sustainkit", "supervisao", "gestao", "painel", "planejador"],
+      "pesquisa": true,
+      "confirmar": "Instalação de pesquisa: mostra também o que está em desenvolvimento, sempre marcado como tal."
+    }
+  ]
+}
