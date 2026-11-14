@@ -656,7 +656,7 @@ class Hub:
             pacote = None
             if modulos and fabricar is not None:
                 try:
-                    pacote = str(fabricar(org, modulos, nome))
+                    pacote = str(fabricar(org, modulos, nome, cursos))
                 except Exception as e:          # a instalação existe mesmo sem pacote; a equipe vê o motivo
                     self.registrar("instalacao", numero, {"o_que": "pacote nao montado", "erro": str(e)[:200]})
             self._db.execute("INSERT INTO instalacao(numero,compra,org,nome,email,modulos,sal,resumo,pacote,criado) VALUES(?,?,?,?,?,?,?,?,?,?)",

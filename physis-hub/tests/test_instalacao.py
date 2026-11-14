@@ -40,7 +40,7 @@ class InstalacaoNoHub(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def fabricar(self, org, modulos, nome):
+    def fabricar(self, org, modulos, nome, cursos=None):
         self.feitos.append((org, modulos, nome))
         p = Path(self.tmp.name) / f"physis-{org}.zip"
         p.write_bytes(b"PK\x05\x06" + b"\x00" * 18)

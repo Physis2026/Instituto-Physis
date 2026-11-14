@@ -140,9 +140,9 @@ def fabricante(instancia: dict):
         return None
     sk, sup = achar("SustainKit_Definitivo.html"), achar("physis-scada-demo.html")
     saida = Path(os.environ.get("PHYSIS_ENTREGAS") or (raiz / "entregas"))
-    def fabricar(org: str, modulos: list[str], nome: str) -> Path:
+    def fabricar(org: str, modulos: list[str], nome: str, cursos: list | None = None) -> Path:
         saida.mkdir(parents=True, exist_ok=True)
-        return mod.montar(org, "lugar01", modulos, saida, sk, instancia.get("licenca") or mod.LICENCA_PADRAO, sup, None, None, False, nome)
+        return mod.montar(org, "lugar01", modulos, saida, sk, instancia.get("licenca") or mod.LICENCA_PADRAO, sup, None, None, False, nome, cursos)
     return fabricar
 
 
@@ -317,6 +317,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     "supervisao": (WEB / "supervisao.html").exists(), "gestao": (WEB / "gestao.html").exists(),
                     "planejador": (WEB / "planejador.html").exists(), "pesquisa": bool(instancia.get("pesquisa")),
                     "nome_cliente": instancia.get("nome"),
+                    "cursos": [c for c in (instancia.get("cursos") or []) if isinstance(c, dict)] if q else [],
                     "senha_min": hub.SENHA_MIN}
 
         def _arquivo(self, arq: Path, tipo: str) -> None:

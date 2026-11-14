@@ -68,7 +68,7 @@ Todo o código está nesta pasta e pode ser estudado e adaptado. Licença: {lice
 
 def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Path | None, licenca: str,
            supervisao: Path | None = None, gestao: Path | None = None, planejador: Path | None = None,
-           pesquisa: bool = False, nome: str = "") -> Path:
+           pesquisa: bool = False, nome: str = "", cursos: list | None = None) -> Path:
     if not re.fullmatch(r"[a-z0-9][a-z0-9._-]{1,63}", org):
         raise SystemExit("org: use de 2 a 64 letras minúsculas, números, ponto, hífen ou sublinhado")
     desconhecidos = [m for m in modulos if m not in MODULOS]
@@ -108,6 +108,8 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         inst["nome"] = nome
     if pesquisa:      # instalação de pesquisa: mostra também o que está em desenvolvimento, marcado como tal
         inst["pesquisa"] = True
+    # cursos da aba Cursos: comprados ou liberados gratuitamente pela Physis ({nome, link https, gratuito, carga...})
+    inst["cursos"] = [c for c in (cursos or []) if isinstance(c, dict) and c.get("nome")]
     (pasta / "instancia.json").write_text(json.dumps(inst, ensure_ascii=False, indent=2), encoding="utf-8")
     (pasta / "LICENSE").write_text(licenca + "\n", encoding="utf-8")
     sk = ("- **SustainKit:** já funciona, sem equipamento. Abra pela aba SustainKit.\n"
