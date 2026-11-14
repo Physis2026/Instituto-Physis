@@ -10,6 +10,7 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import secrets
 import sqlite3
 import threading
@@ -52,6 +53,8 @@ CREATE TABLE IF NOT EXISTS central (
 CREATE TABLE IF NOT EXISTS central_arquivo (
   id TEXT PRIMARY KEY, pedido TEXT NOT NULL, nome TEXT NOT NULL, tamanho INTEGER NOT NULL,
   dados BLOB NOT NULL, criado REAL NOT NULL);
+CREATE TABLE IF NOT EXISTS loja_item (
+  id TEXT PRIMARY KEY, dados TEXT NOT NULL, revisado TEXT, publicado TEXT, atualizado REAL NOT NULL);
 CREATE TABLE IF NOT EXISTS envio (
   seq INTEGER PRIMARY KEY AUTOINCREMENT, registro INTEGER NOT NULL, enviado INTEGER NOT NULL DEFAULT 0);
 """
@@ -470,6 +473,118 @@ class Hub:
                 self.registrar("central", numero, {"o_que": f"{tipo} {estado}", "quem": quem})
             self._db.commit()
             return cur.rowcount > 0
+
+    # ── Catálogo da loja: o servidor é quem diz o que o cliente vê ────────────
+    # Regra: tudo nasce interno. Primeiro alguém da Physis revisa (fixa situação e preço);
+    # só depois um item em funcionamento pode ir ao público. Mudar conteúdo, preço ou
+    # situação depois disso desfaz a revisão e tira do público: precisa revisar de novo.
+    LOJA_ID = re.compile(r"^[A-Za-z0-9_-]{1,40}$")
+    LOJA_PUBLICAVEL = ("func",)                      # "Em funcionamento"; desenvolvimento, simulação e parcerias não
+    LOJA_SITUACOES = ("func", "sim", "dev", "par")
+    LOJA_CATEGORIAS = ("", "campo", "agua", "energia", "cert", "cuidado", "mat", "cursos")
+    LOJA_TEXTOS = {"nome": 120, "cod": 20, "sub": 400, "carga": 40, "modalidade": 60, "link": 300, "resumo": 2000}
+
+    def _loja_ler(self, ident: str) -> dict | None:
+        r = self._db.execute("SELECT dados, revisado, publicado FROM loja_item WHERE id=?", (ident,)).fetchone()
+        if not r:
+            return None
+        d = json.loads(r[0])
+        d["revisado"] = json.loads(r[1]) if r[1] else None
+        d["publicado"] = json.loads(r[2]) if r[2] else None
+        return d
+
+    def loja_gravar(self, ident: str, campos: dict, quem: str) -> dict:
+        """Cria ou altera um item. Campos aceitos: st, preco (número ou null = sob consulta), categ, e,
+        para produto novo ou curso, nome, cod, sub, carga, modalidade, link, resumo."""
+        if not self.LOJA_ID.match(ident or ""):
+            return {"ok": False, "erro": "identificador invalido"}
+        novo_d: dict = {}
+        if "st" in campos:
+            if campos["st"] not in self.LOJA_SITUACOES:
+                return {"ok": False, "erro": "situacao invalida"}
+            novo_d["st"] = campos["st"]
+        if "preco" in campos:
+            p = campos["preco"]
+            if p is not None and (isinstance(p, bool) or not isinstance(p, (int, float)) or p < 0 or p > 10_000_000):
+                return {"ok": False, "erro": "preco invalido"}
+            novo_d["preco"] = p
+        if "categ" in campos:
+            if campos["categ"] not in self.LOJA_CATEGORIAS:
+                return {"ok": False, "erro": "assunto invalido"}
+            novo_d["categ"] = campos["categ"]
+        if "novo" in campos:
+            novo_d["novo"] = bool(campos["novo"])
+        for k, lim in self.LOJA_TEXTOS.items():
+            if k in campos:
+                v = campos[k]
+                if v is not None and (not isinstance(v, str) or len(v) > lim):
+                    return {"ok": False, "erro": f"{k} invalido"}
+                if k == "link" and v and not v.startswith("https://"):
+                    return {"ok": False, "erro": "o link precisa comecar com https://"}
+                novo_d[k] = (v or "").strip()
+        with self._trava:
+            atual = self._loja_ler(ident)
+            d = {k: v for k, v in (atual or {}).items() if k not in ("revisado", "publicado")}
+            if novo_d.get("novo") and not (d.get("nome") or novo_d.get("nome")):
+                return {"ok": False, "erro": "produto novo precisa de nome"}
+            mudou = any(d.get(k) != v for k, v in novo_d.items())
+            d.update(novo_d)
+            revisado = None if mudou else (atual or {}).get("revisado")
+            publicado = None if mudou else (atual or {}).get("publicado")
+            self._db.execute("INSERT INTO loja_item(id,dados,revisado,publicado,atualizado) VALUES(?,?,?,?,?) "
+                             "ON CONFLICT(id) DO UPDATE SET dados=excluded.dados, revisado=excluded.revisado, "
+                             "publicado=excluded.publicado, atualizado=excluded.atualizado",
+                             (ident, json.dumps(d, ensure_ascii=False), json.dumps(revisado) if revisado else None,
+                              json.dumps(publicado) if publicado else None, self.relogio()))
+            if mudou:
+                self.registrar("loja", quem, {"o_que": "item alterado", "id": ident, "campos": sorted(novo_d)})
+            self._db.commit()
+            return {"ok": True, "item": self._loja_ler(ident), "revisao_desfeita": mudou and bool((atual or {}).get("revisado"))}
+
+    def loja_revisar(self, ident: str, quem: str, revisado: bool = True) -> dict:
+        """Primeira revisão: a pessoa confirma a situação e o preço como estão gravados."""
+        with self._trava:
+            atual = self._loja_ler(ident)
+            if not atual or "st" not in atual:
+                return {"ok": False, "erro": "grave a situacao do item antes de revisar"}
+            rev = {"por": quem, "em": self.relogio()} if revisado else None
+            pub = atual.get("publicado") if revisado else None      # desfazer a revisão tira do público
+            self._db.execute("UPDATE loja_item SET revisado=?, publicado=?, atualizado=? WHERE id=?",
+                             (json.dumps(rev) if rev else None, json.dumps(pub) if pub else None, self.relogio(), ident))
+            self.registrar("loja", quem, {"o_que": "revisado" if revisado else "revisao desfeita", "id": ident})
+            self._db.commit()
+            return {"ok": True, "item": self._loja_ler(ident)}
+
+    def loja_publicar(self, ident: str, quem: str, publico: bool = True) -> dict:
+        with self._trava:
+            atual = self._loja_ler(ident)
+            if not atual:
+                return {"ok": False, "erro": "item desconhecido"}
+            if publico:
+                if not atual.get("revisado"):
+                    return {"ok": False, "erro": "o item precisa da primeira revisao antes de ir ao publico"}
+                if atual.get("st") not in self.LOJA_PUBLICAVEL:
+                    return {"ok": False, "erro": "so item em funcionamento vai ao publico; em desenvolvimento fica interno"}
+            pub = {"por": quem, "em": self.relogio()} if publico else None
+            self._db.execute("UPDATE loja_item SET publicado=?, atualizado=? WHERE id=?",
+                             (json.dumps(pub) if pub else None, self.relogio(), ident))
+            self.registrar("loja", quem, {"o_que": "publicado" if publico else "retirado do publico", "id": ident})
+            self._db.commit()
+            return {"ok": True, "item": self._loja_ler(ident)}
+
+    def loja_catalogo(self, interno: bool = False) -> dict:
+        """Público: só itens revisados, em funcionamento e publicados, sem dados de revisão.
+        Interno: tudo, com quem revisou e publicou."""
+        with self._trava:
+            ids = [r[0] for r in self._db.execute("SELECT id FROM loja_item ORDER BY id")]
+            itens = {i: self._loja_ler(i) for i in ids}
+        if interno:
+            return {"ok": True, "itens": itens}
+        visiveis = {}
+        for i, d in itens.items():
+            if d.get("publicado") and d.get("revisado") and d.get("st") in self.LOJA_PUBLICAVEL:
+                visiveis[i] = {k: v for k, v in d.items() if k not in ("revisado", "publicado")}
+        return {"ok": True, "itens": visiveis}
 
     def fechar(self) -> None:
         with self._trava:

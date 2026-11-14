@@ -235,6 +235,16 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 # publico de proposito: a loja so pergunta se a propria compra ja foi aprovada
                 est = hub.central_estado("compra", u.path.rsplit("/", 1)[-1])
                 return self._json(200 if est else 404, {"ok": bool(est), "estado": est})
+            if u.path == "/api/loja/catalogo":
+                # publico: so o que foi revisado e posto no ar pela equipe
+                return self._json(200, hub.loja_catalogo(interno=False))
+            if u.path == "/api/loja/catalogo/interno":
+                if not self._quem():
+                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                return self._json(200, hub.loja_catalogo(interno=True))
+            if u.path in ("/loja/interna", "/loja/interna/"):
+                # a pagina em si nao tem dado; os dados internos so vem com sessao
+                return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
             if u.path.startswith("/api/") and self._barrado():
                 return
             if u.path in ("/sustainkit", "/sustainkit/") and (WEB / "sustainkit.html").exists():
@@ -375,6 +385,30 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     return self._json(429 if r.get("espera") else 401, r)
                 tk = r.pop("token")
                 return self._json_cookie(200, r, f"physis_sessao={tk}; Path=/; Max-Age={hub.SESSAO_S}; HttpOnly; SameSite=Strict")
+            if u.path.startswith("/api/loja/item/"):
+                # catálogo da loja: sempre exige sessão, mesmo em instalação sem login
+                q = self._quem()
+                if not q:
+                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                partes = u.path.split("/")          # ['', 'api', 'loja', 'item', <id>, (acao)]
+                if len(partes) not in (5, 6):
+                    return self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                try:
+                    d = json.loads(corpo or "{}")
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                if not isinstance(d, dict):
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                ident, acao = partes[4], (partes[5] if len(partes) == 6 else "")
+                if acao == "":
+                    r = hub.loja_gravar(ident, d, q["usuario"])
+                elif acao == "revisar":
+                    r = hub.loja_revisar(ident, q["usuario"], bool(d.get("revisado", True)))
+                elif acao == "publicar":
+                    r = hub.loja_publicar(ident, q["usuario"], bool(d.get("publico", True)))
+                else:
+                    return self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                return self._json(200 if r["ok"] else 400, r)
             if u.path == "/api/comando":
                 if self._barrado():
                     return
