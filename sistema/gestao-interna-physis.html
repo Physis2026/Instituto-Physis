@@ -58,6 +58,143 @@ html.px-conforto *{transition:none!important;animation:none!important}
   var l=document.createElement("link");l.rel="manifest";l.href=u;document.head.appendChild(l);
 }catch(e){}})();
 </script>
+<script id="gp-ponte">
+/* gestao-ponte.js · 14/11/2026 · ORIGINAL ÚNICO: vai embutido na Gestão Physis (sincronizar.py).
+ *
+ * Ponte entre a Gestão Physis e o servidor da Physis (Hub). Roda ANTES do aplicativo:
+ *  1. Busca no servidor os dados da Gestão (atividades, painel administrativo, reuniões, documentos...).
+ *  2. Junta com o que houver neste navegador (por exemplo, o que a pessoa fez antes de existir o servidor)
+ *     e grava no navegador, para o aplicativo já abrir atualizado.
+ *  3. Depois, a casca envia cada mudança ao servidor e busca as mudanças das outras pessoas.
+ *
+ * Aberta como arquivo (sem servidor), não faz nada: tudo continua no navegador, como antes.
+ *
+ * Junção de mudanças (juntar3): compara a última versão combinada com o servidor (base), a deste navegador
+ * (local) e a do servidor. Registros com "id" são juntados um a um: novo de um lado entra, apagado de um
+ * lado sai, alterado nos dois tem os campos juntados. No mesmo campo alterado dos dois lados, vale o local.
+ */
+(function (g) {
+  "use strict";
+  var LOCAIS = /^gestao-physis:(ultima-copia|melhorias-oferecidas|melhorias-2026-11-14)$/;   // só deste aparelho
+  var rastreada = function (k) { return /^gestao-physis:/.test(k) && !LOCAIS.test(k); };
+  var setRaw = Storage.prototype.setItem.bind(localStorage);
+  function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function gravar(k, v) { try { setRaw(k, v); return true; } catch (e) { return false; } }
+  function meta() { try { return JSON.parse(ler("physis-ponte:versoes") || "{}"); } catch (e) { return {}; } }
+
+  function idDe(x) { return x && typeof x === "object" && !Array.isArray(x) ? (x.id != null ? "id:" + x.id : x.numero != null ? "n:" + x.numero : x.chave != null ? "c:" + x.chave : null) : null; }
+  function igual(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  function juntar3(B, L, S) {
+    if (igual(L, S) || igual(L, B)) return S;
+    if (igual(S, B)) return L;
+    if (Array.isArray(L) && Array.isArray(S)) {
+      var comId = function (a) { return a.every(function (x) { return idDe(x) !== null; }); };
+      if (comId(L) && comId(S) && (!Array.isArray(B) || comId(B))) {
+        var mapa = function (a) { var m = {}; (a || []).forEach(function (x) { m[idDe(x)] = x; }); return m; };
+        var mb = mapa(Array.isArray(B) ? B : []), ml = mapa(L), out = [], vistos = {};
+        S.forEach(function (x) { var k = idDe(x); vistos[k] = true;
+          if (!(k in ml)) { if (!(k in mb)) out.push(x); return; }          // novo no servidor entra; apagado aqui sai
+          out.push(juntar3(mb[k], ml[k], x)); });
+        L.forEach(function (x) { var k = idDe(x); if (!vistos[k] && !(k in mb)) out.push(x); });   // novo aqui entra; apagado no servidor sai
+        return out;
+      }
+      return L;
+    }
+    if (L && S && typeof L === "object" && typeof S === "object" && !Array.isArray(L) && !Array.isArray(S)) {
+      var b = B && typeof B === "object" && !Array.isArray(B) ? B : {}, o = {}, ks = {};
+      Object.keys(S).concat(Object.keys(L)).forEach(function (k) { ks[k] = true; });
+      Object.keys(ks).forEach(function (k) { var inL = k in L, inS = k in S, inB = k in b;
+        if (inL && inS) o[k] = juntar3(b[k], L[k], S[k]);
+        else if (inL) { if (!inB || !igual(L[k], b[k])) o[k] = L[k]; }
+        else if (inS) { if (!inB || !igual(S[k], b[k])) o[k] = S[k]; } });
+      return o;
+    }
+    return L;
+  }
+  function parse(t) { if (t == null) return undefined; try { return JSON.parse(t); } catch (e) { return t; } }
+  function juntarTexto(b, l, s) {
+    var B = parse(b), L = parse(l), S = parse(s);
+    if (typeof L === "string" || typeof S === "string") return l != null && l !== b ? l : s;
+    return JSON.stringify(juntar3(B, L, S));
+  }
+
+  var P = g.PHYSIS_PONTE = { ativa: false, rastreada: rastreada, juntar3: juntar3, juntarTexto: juntarTexto, setRaw: setRaw, sujas: {}, mudou: false };
+  if (!/^https?:$/.test(location.protocol)) return;
+  var x = new XMLHttpRequest();
+  try { x.open("GET", "/api/gestao/estado", false); x.send(); } catch (e) { P.erro = "sem servidor"; return; }
+  if (x.status === 401) { location.reload(); return; }           // a página de entrada aparece
+  if (x.status !== 200) { P.erro = "servidor sem Gestão (" + x.status + ")"; return; }
+  var j; try { j = JSON.parse(x.responseText); } catch (e) { P.erro = "resposta inválida"; return; }
+  var it = j.itens || {}, m = meta();
+  P.ativa = true; P.conta = j.conta || {}; P.desde = j.agora || 0;
+  // o que o servidor tem
+  Object.keys(it).forEach(function (k) { if (!rastreada(k)) return;
+    var s = it[k], l = ler(k), b = ler("physis-ponte:base:" + k), v = m[k] || 0;
+    if (l === null || l === b || l === s.valor || (v === s.versao && l === b)) { gravar(k, s.valor); }
+    else { var junto = juntarTexto(b, l, s.valor); gravar(k, junto); if (junto !== s.valor) P.sujas[k] = true; }
+    gravar("physis-ponte:base:" + k, s.valor); m[k] = s.versao; });
+  // o que só este navegador tem (por exemplo, dados de antes do servidor): sobe para o servidor
+  for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (rastreada(k) && !(k in it)) P.sujas[k] = true; }
+  gravar("physis-ponte:versoes", JSON.stringify(m));
+
+  /* ───────── durante o uso ───────── */
+  var timers = {}, avisoCb = null;
+  function avisar(t, recarregar) { P.ultimoAviso = { texto: t, recarregar: !!recarregar }; if (avisoCb) avisoCb(P.ultimoAviso); }
+  P.aoAvisar = function (cb) { avisoCb = cb; if (P.ultimoAviso) cb(P.ultimoAviso); };
+  function enviar(k, tentativa) {
+    var mm = meta(), valor = ler(k); if (valor === null) return;
+    fetch("/api/gestao/estado/" + encodeURIComponent(k), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ valor: valor, versao: mm[k] || 0 }) })
+      .then(function (r) { return r.json().then(function (j) { return { st: r.status, j: j }; }); })
+      .then(function (o) {
+        var m2 = meta();
+        if (o.st === 200) { m2[k] = o.j.versao; gravar("physis-ponte:versoes", JSON.stringify(m2)); gravar("physis-ponte:base:" + k, valor); delete P.sujas[k]; return; }
+        if (o.st === 409 && (tentativa || 0) < 4) {
+          // outra pessoa gravou antes: junta as duas versões e tenta de novo
+          var junto = juntarTexto(ler("physis-ponte:base:" + k), ler(k), o.j.valor);
+          if (junto !== ler(k)) { gravar(k, junto); avisar("Juntamos mudanças de " + (o.j.por || "outra pessoa") + ". Recarregue para ver tudo atualizado.", true); }
+          m2[k] = o.j.versao; gravar("physis-ponte:versoes", JSON.stringify(m2)); gravar("physis-ponte:base:" + k, o.j.valor);
+          return enviar(k, (tentativa || 0) + 1);
+        }
+        if (o.st === 401) return avisar("A sessão terminou. Entre de novo para continuar salvando no servidor.", true);
+        avisar("Não foi possível salvar no servidor: " + ((o.j && o.j.erro) || o.st) + ". O dado continua neste navegador.", false);
+      })
+      .catch(function () { P.sujas[k] = true; avisar("Sem ligação com o servidor. As mudanças ficam neste navegador e sobem quando a ligação voltar.", false); });
+  }
+  P.agendar = function (k) { P.sujas[k] = true; clearTimeout(timers[k]); timers[k] = setTimeout(function () { delete timers[k]; enviar(k); }, 800); };
+  P.buscar = function () {
+    return fetch("/api/gestao/estado?desde=" + encodeURIComponent(P.desde), { cache: "no-store" }).then(function (r) { if (r.status === 401) { avisar("A sessão terminou. Entre de novo.", true); return null; } return r.json(); })
+      .then(function (j2) { if (!j2 || !j2.itens) return; P.desde = j2.agora || P.desde; var mm = meta(), quem = {}, mudou = 0;
+        Object.keys(j2.itens).forEach(function (k) { var s = j2.itens[k]; if (!rastreada(k) || s.versao <= (mm[k] || 0)) return;
+          if (P.sujas[k]) return;                                       // mudança local a caminho: a gravação junta
+          if (ler(k) !== s.valor) { gravar(k, s.valor); mudou++; quem[s.por] = true; }
+          gravar("physis-ponte:base:" + k, s.valor); mm[k] = s.versao; });
+        gravar("physis-ponte:versoes", JSON.stringify(mm));
+        if (mudou) avisar("Há novidades de " + Object.keys(quem).join(", ") + ". Recarregue para ver.", true);
+        Object.keys(P.sujas).forEach(function (k) { if (!timers[k]) P.agendar(k); }); })
+      .catch(function () {});
+  };
+  P.iniciarUso = function () {
+    if (!P.ativa || P.emUso) return; P.emUso = true;
+    // toda gravação da Gestão neste navegador também vai para o servidor
+    var orig = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (k, v) { orig.call(this, k, v); if (this === localStorage && rastreada(k)) P.agendar(k); };
+    Object.keys(P.sujas).forEach(function (k) { P.agendar(k); });
+    setInterval(function () { if (!document.hidden) P.buscar(); }, 15000);
+    window.addEventListener("online", function () { Object.keys(P.sujas).forEach(function (k) { P.agendar(k); }); });
+  };
+  /* arquivos (anexos, comprovantes, gravações): também no servidor */
+  P.subirArquivo = function (id, f) {
+    return fetch("/api/gestao/arquivo/" + encodeURIComponent(id), { method: "PUT", headers: { "Content-Type": (f && f.type) || "application/octet-stream", "X-Nome": encodeURIComponent((f && f.name) || "arquivo") }, body: f })
+      .then(function (r) { if (!r.ok) avisar("Um arquivo não subiu para o servidor; ele continua neste navegador.", false); return r.ok; }).catch(function () { return false; });
+  };
+  P.baixarArquivo = function (id) {
+    return fetch("/api/gestao/arquivo/" + encodeURIComponent(id), { cache: "no-store" }).then(function (r) { if (!r.ok) return null;
+      var nome = decodeURIComponent(((r.headers.get("Content-Disposition") || "").split("''")[1] || "arquivo"));
+      return r.blob().then(function (b) { try { return new File([b], nome, { type: b.type }); } catch (e) { return b; } }); }).catch(function () { return null; });
+  };
+  P.apagarArquivo = function (id) { return fetch("/api/gestao/arquivo/" + encodeURIComponent(id), { method: "DELETE" }).catch(function () {}); };
+})(window);
+</script>
 <script id="gp-melhorias">
 /* Melhorias do Sistema Physis (14/11/2026), uma vez só. Usadas pela semente do aplicativo
    (navegador novo) e pela junção da casca (navegador que já tem dados). `depende` é pessoa. */
@@ -2871,16 +3008,20 @@ react/cjs/react-jsx-runtime.production.js:
       r.onerror = function () { feito(null); };
     } catch (e) { feito(null); }
   }
+  // Com o servidor da Physis, o arquivo também sobe para o servidor e, em outro aparelho, é baixado dele (gestao-ponte).
+  var PT = window.PHYSIS_PONTE && window.PHYSIS_PONTE.ativa ? window.PHYSIS_PONTE : null;
   function guardarAnexo(id, arquivo, feito) {
     bancoAnexos(function (db) { if (!db) return feito(false);
-      try { var t = db.transaction("arquivos", "readwrite"); t.objectStore("arquivos").put(arquivo, id); t.oncomplete = function () { feito(true); }; t.onerror = t.onabort = function () { feito(false); }; } catch (e) { feito(false); } });
+      try { var t = db.transaction("arquivos", "readwrite"); t.objectStore("arquivos").put(arquivo, id); t.oncomplete = function () { if (PT) PT.subirArquivo("anx-" + id, arquivo); feito(true); }; t.onerror = t.onabort = function () { feito(false); }; } catch (e) { feito(false); } });
   }
   function lerAnexo(id, feito) {
-    bancoAnexos(function (db) { if (!db) return feito(null);
-      try { var q = db.transaction("arquivos").objectStore("arquivos").get(id); q.onsuccess = function () { feito(q.result || null); }; q.onerror = function () { feito(null); }; } catch (e) { feito(null); } });
+    var doServidor = function () { if (!PT) return feito(null); PT.baixarArquivo("anx-" + id).then(function (f) { if (f) bancoAnexos(function (db) { try { db.transaction("arquivos", "readwrite").objectStore("arquivos").put(f, id); } catch (e) {} }); feito(f); }); };
+    bancoAnexos(function (db) { if (!db) return doServidor();
+      try { var q = db.transaction("arquivos").objectStore("arquivos").get(id); q.onsuccess = function () { if (q.result) feito(q.result); else doServidor(); }; q.onerror = doServidor; } catch (e) { doServidor(); } });
   }
   function apagarAnexos(ids) {
     if (!ids || !ids.length) return;
+    if (PT) ids.forEach(function (i) { PT.apagarArquivo("anx-" + i); });
     bancoAnexos(function (db) { if (!db) return; try { var s = db.transaction("arquivos", "readwrite").objectStore("arquivos"); ids.forEach(function (i) { s.delete(i); }); } catch (e) {} });
   }
   function tamanho(n) { return n >= 1048576 ? (n / 1048576).toFixed(1).replace(".", EN ? "." : ",") + " MB" : Math.max(1, Math.round(n / 1024)) + " kB"; }
@@ -4070,6 +4211,13 @@ html.gp .gp-sec h1{font:500 1.7em Fraunces,Georgia,serif;margin:0 0 6px;color:#3
 /* todos os títulos no verde Physis (14/11/2026) */
 html.gp .gp-sec h2, html.gp .gp-sec h3, html.gp #gp-cursos h1, html.gp #app h1, html.gp #app h2, html.gp #app h3, html.gp #physis-adm h2, html.gp #physis-adm h3{color:#33512F !important}
 html.gp:not(.gp-v-mails) #gp-mails, html.gp.gp-v-mails main#px-conteudo{display:none}
+html.gp:not(.gp-v-contas) #gp-contas, html.gp.gp-v-contas main#px-conteudo, html.gp #gp-m-contas{display:none !important}
+html.gp #gp-menu .gp-conta{display:grid;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid #C9D2C4}
+html.gp #gp-menu .gp-conta button{font-weight:500}
+#gp-sinc{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:2147483600;max-width:min(92vw,640px);background:#1C2B21;color:#F4F6F1;border-radius:10px;padding:10px 14px;font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 4px 18px rgba(0,0,0,.2)}
+#gp-sinc[hidden]{display:none}
+#gp-sinc button{font:inherit;font-weight:600;min-height:40px;padding:0 12px;border-radius:8px;border:1px solid #DCEBD8;background:transparent;color:#F4F6F1;cursor:pointer}
+#gp-sinc button:focus-visible{outline:3px solid #DCEBD8;outline-offset:2px}
 html.gp:not(.gp-v-reun) #gp-reun, html.gp:not(.gp-v-reun) #gp-reun-topo, html.gp:not(.gp-v-reun) #gp-chamada, html.gp:not(.gp-v-docs) #gp-docs{display:none}
 html.gp #gp-reun-topo{padding-bottom:14px} html.gp #gp-chamada{padding-top:0;padding-bottom:0} html.gp #gp-reun{padding-top:0}
 html.gp #gp-chamada :focus-visible{outline:3px solid #33512F;outline-offset:2px}
@@ -4132,11 +4280,12 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     ["forn", "Fornecedores", ["forn"]],
     // Alertas saiu do menu (14/11/2026): fica no topo de Atividades, ver pintarAlertas()
     ["mails", "E-mails a enviar", null],
+    ["contas", "Conta", null],          // aberta pelos botões da conta no menu (Minha senha, Contas da equipe)
     ["reun", "Reuniões", null],
     ["docs", "Documentos", null],
     ["cursos", "Cursos", null]
   ];
-  var EN_MENU = { mails:"E-mails to send", atv:"Activities", mapa:"Team map", dir:"Leadership", org:"Tasks and projects", prop:"Proposals", cont:"Contracts", fin:"Finance", forn:"Suppliers", alert:"Alerts", reun:"Meetings", docs:"Documents", cursos:"Courses", meus:"My contracts" };
+  var EN_MENU = { contas:"Account", mails:"E-mails to send", atv:"Activities", mapa:"Team map", dir:"Leadership", org:"Tasks and projects", prop:"Proposals", cont:"Contracts", fin:"Finance", forn:"Suppliers", alert:"Alerts", reun:"Meetings", docs:"Documents", cursos:"Courses", meus:"My contracts" };
   function emIngles() { var bs = document.querySelectorAll("#app button"); for (var i = 0; i < bs.length; i++) if (bs[i].textContent.trim() === "PT") return true; return false; }
   function rotular() { var en = emIngles(); document.documentElement.lang = en ? "en" : "pt-BR"; ITENS.forEach(function (i) { var b = document.getElementById("gp-m-" + i[0]); if (b) b.textContent = en ? EN_MENU[i[0]] : i[1]; });
     var m = document.getElementById("gp-m-meus"); if (m) m.textContent = en ? EN_MENU.meus : "Meus contratos"; var l = document.querySelector("#gp-menu .gp-quem label"); if (l) l.textContent = en ? "Who is using" : "Quem está usando";
@@ -4148,8 +4297,8 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
   var raiz = document.documentElement, menu, atual = "atv";
 
   function topo() { var f = document.querySelector(".px-faixa"); if (menu && f && window.innerWidth > 860) menu.style.top = Math.max(0, Math.round(f.getBoundingClientRect().bottom)) + "px"; else if (menu) menu.style.top = ""; }
-  function marcar(id) { atual = id; raiz.classList.toggle("gp-v-adm", !!(ITENS.filter(function (i) { return i[0] === id; })[0] || [])[2]); ["atv","cursos","reun","docs","mails"].forEach(function (n) { raiz.classList.toggle("gp-v-" + n, id === n); });
-    if (id === "atv") pintarAlertas(); if (id === "mails") pintarEmails();
+  function marcar(id) { atual = id; raiz.classList.toggle("gp-v-adm", !!(ITENS.filter(function (i) { return i[0] === id; })[0] || [])[2]); ["atv","cursos","reun","docs","mails","contas"].forEach(function (n) { raiz.classList.toggle("gp-v-" + n, id === n); });
+    if (id === "atv") pintarAlertas(); if (id === "mails") pintarEmails(); if (id === "contas") { estC.msg = ""; if (estC.modo === "contas") carregarContas(); else pintarContas(); }
     ITENS.forEach(function (i) { var b = document.getElementById("gp-m-" + i[0]); if (b) { if (i[0] === id) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); } }); }
   function ir(id, focar) {
     var item = ITENS.filter(function (i) { return i[0] === id; })[0]; if (!item) return;
@@ -4161,7 +4310,7 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     } else {
       var f = document.getElementById("adm-fechar"), pp = document.getElementById("physis-adm"); if (f && pp && pp.style.display !== "none") f.click();
       marcar(id); if (["atv","mapa","dir"].indexOf(id) >= 0) telaDoApp(id); if (id === "reun") pintarReunioes(); if (id === "docs") pintarDocs();
-      if (focar) { var alvo = document.getElementById({ cursos: "gp-cursos", reun: "gp-reun-topo", docs: "gp-docs", mails: "gp-mails" }[id] || "px-conteudo"); if (alvo) alvo.focus(); }
+      if (focar) { var alvo = document.getElementById({ cursos: "gp-cursos", reun: "gp-reun-topo", docs: "gp-docs", mails: "gp-mails", contas: "gp-contas" }[id] || "px-conteudo"); if (alvo) alvo.focus(); }
     }
     window.scrollTo(0, 0);
   }
@@ -4180,9 +4329,12 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
   function ler(k) { try { var v = JSON.parse(localStorage.getItem(k) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
   function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
   function banco(feito) { try { var r = indexedDB.open("gestao-physis-arquivos", 1); r.onupgradeneeded = function () { r.result.createObjectStore("arq"); }; r.onsuccess = function () { feito(r.result); }; r.onerror = function () { feito(null); }; } catch (e) { feito(null); } }
-  function arqPor(id, f, feito) { banco(function (db) { if (!db) return feito(false); try { var t = db.transaction("arq", "readwrite"); t.objectStore("arq").put(f, id); t.oncomplete = function () { feito(true); }; t.onerror = t.onabort = function () { feito(false); }; } catch (e) { feito(false); } }); }
-  function arqLer(id, feito) { banco(function (db) { if (!db) return feito(null); try { var q = db.transaction("arq").objectStore("arq").get(id); q.onsuccess = function () { feito(q.result || null); }; q.onerror = function () { feito(null); }; } catch (e) { feito(null); } }); }
-  function arqApagar(id) { banco(function (db) { if (!db) return; try { db.transaction("arq", "readwrite").objectStore("arq").delete(id); } catch (e) {} }); }
+  // Com o servidor da Physis, os arquivos de reuniões e documentos também ficam no servidor (gestao-ponte).
+  var PTA = window.PHYSIS_PONTE && window.PHYSIS_PONTE.ativa ? window.PHYSIS_PONTE : null;
+  function arqPor(id, f, feito) { banco(function (db) { if (!db) return feito(false); try { var t = db.transaction("arq", "readwrite"); t.objectStore("arq").put(f, id); t.oncomplete = function () { if (PTA) PTA.subirArquivo("arq-" + id, f); feito(true); }; t.onerror = t.onabort = function () { feito(false); }; } catch (e) { feito(false); } }); }
+  function arqLer(id, feito) { var doServidor = function () { if (!PTA) return feito(null); PTA.baixarArquivo("arq-" + id).then(function (f) { if (f) banco(function (db) { try { db.transaction("arq", "readwrite").objectStore("arq").put(f, id); } catch (e) {} }); feito(f); }); };
+    banco(function (db) { if (!db) return doServidor(); try { var q = db.transaction("arq").objectStore("arq").get(id); q.onsuccess = function () { if (q.result) feito(q.result); else doServidor(); }; q.onerror = doServidor; } catch (e) { doServidor(); } }); }
+  function arqApagar(id) { if (PTA) PTA.apagarArquivo("arq-" + id); banco(function (db) { if (!db) return; try { db.transaction("arq", "readwrite").objectStore("arq").delete(id); } catch (e) {} }); }
   function baixar(id, nome) { arqLer(id, function (f) { if (!f) return dizer(L("O arquivo não está mais neste navegador.", "The file is no longer in this browser."), true);
     if (window.PhysisExportar && window.PhysisExportar.baixar) { f.arrayBuffer().then(function (b) { window.PhysisExportar.baixar(nome, new Uint8Array(b), f.type || "application/octet-stream"); dizer(nome + L(" baixado.", " downloaded."), false); }); }
     else { var u = URL.createObjectURL(f), a = document.createElement("a"); a.href = u; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 2000); } }); }
@@ -4577,6 +4729,73 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     } catch (x) { /* sem localStorage: segue sem juntar */ }
   }
 
+  /* ══ Servidor da Physis: conta, avisos de sincronização e contas da equipe (14/11/2026) ══ */
+  var PP = window.PHYSIS_PONTE && window.PHYSIS_PONTE.ativa ? window.PHYSIS_PONTE : null;
+  function montarConta() {
+    if (!PP) return;
+    var c = PP.conta || {}, admin = c.papel === "administrador";
+    // quem entrou é quem usa: o seletor segue a conta; só a direção pode olhar como outra pessoa
+    var trava = function () { var o = document.querySelector("#app select"), s = document.getElementById("gp-pessoa"); if (!o || !c.pessoa) return;
+      if (o.value !== c.pessoa && !admin) { var set = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value").set; set.call(o, c.pessoa); o.dispatchEvent(new Event("change", { bubbles: true })); }
+      if (s) { s.disabled = !admin; s.title = admin ? "" : L("Você está usando a sua conta.", "You are using your own account."); } };
+    var primeira = true; setInterval(function () { if (primeira && document.querySelector("#app select") && c.pessoa) { var o = document.querySelector("#app select"), set = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value").set; set.call(o, c.pessoa); o.dispatchEvent(new Event("change", { bubbles: true })); primeira = false; } trava(); }, 700);
+    var cx = document.createElement("div"); cx.className = "gp-conta"; cx.innerHTML = "<div style='font-size:13px;color:#4A4F44'>" + esc(L("Conta: ", "Account: ")) + "<strong style='color:#1C2B21'>" + esc(c.nome || c.usuario || "") + "</strong>" + (admin ? " · " + esc(L("direção", "management")) : "") + "</div>" +
+      "<button type='button' id='gp-c-senha'>" + esc(L("Minha senha", "My password")) + "</button>" + (admin ? "<button type='button' id='gp-c-contas'>" + esc(L("Contas da equipe", "Team accounts")) + "</button>" : "") +
+      "<button type='button' id='gp-c-sair'>" + esc(L("Sair", "Sign out")) + "</button>";
+    menu.appendChild(cx);
+    document.getElementById("gp-c-sair").onclick = function () { fetch("/api/conta/sair", { method: "POST", body: "{}" }).then(function () { location.reload(); }); };
+    document.getElementById("gp-c-senha").onclick = function () { ir("contas", true); estC.modo = "senha"; pintarContas(); };
+    if (admin) document.getElementById("gp-c-contas").onclick = function () { ir("contas", true); estC.modo = "contas"; pintarContas(); };
+    // faixa de avisos da sincronização
+    var av = document.createElement("div"); av.id = "gp-sinc"; av.setAttribute("role", "status"); av.hidden = true; document.body.appendChild(av);
+    PP.aoAvisar(function (a) { av.hidden = false; av.innerHTML = "<span>" + esc(a.texto) + "</span>" + (a.recarregar ? " <button type='button' id='gp-sinc-rec'>" + esc(L("Recarregar", "Reload")) + "</button>" : "") + " <button type='button' id='gp-sinc-x' aria-label='" + esc(L("Fechar o aviso", "Close the notice")) + "'>×</button>";
+      var r = document.getElementById("gp-sinc-rec"); if (r) r.onclick = function () { location.reload(); }; document.getElementById("gp-sinc-x").onclick = function () { av.hidden = true; }; });
+    PP.iniciarUso();
+  }
+  var estC = { modo: "senha", msg: "", erro: false, lista: [] };
+  function pintarContas() {
+    var s = document.getElementById("gp-contas"); if (!s || !PP) return;
+    var c = PP.conta || {}, admin = c.papel === "administrador", equipe = [];
+    try { var e = window.PhysisAnexo && window.PhysisAnexo.lerEstado(); equipe = (e && e.equipe) || []; } catch (x) {}
+    if (!equipe.length) Array.prototype.forEach.call(document.querySelectorAll("#app select option"), function (o) { equipe.push({ id: o.value, nome: o.textContent }); });
+    var opPessoa = function (sel) { return "<option value=''>" + esc(L("(nenhuma)", "(none)")) + "</option>" + equipe.map(function (p) { return "<option value='" + esc(p.id) + "'" + (sel === p.id ? " selected" : "") + ">" + esc(p.nome) + "</option>"; }).join(""); };
+    var msg = "<p role='status' style='font-weight:600;min-height:1.4em;color:" + (estC.erro ? "#7A2214" : "#1F4A1C") + "'>" + esc(estC.msg) + "</p>";
+    var h = "<h1 id='gp-h-contas'>" + esc(estC.modo === "contas" ? L("Contas da equipe", "Team accounts") : L("Minha senha", "My password")) + "</h1>" + msg;
+    if (estC.modo === "senha" || !admin) {
+      h += "<div style='" + CART + ";max-width:520px;display:grid;gap:10px'><div><label for='gc-atual' style='font-weight:600'>" + esc(L("Senha atual", "Current password")) + "</label><input id='gc-atual' type='password' autocomplete='current-password' style='" + CAMPO + "'></div>" +
+        "<div><label for='gc-nova' style='font-weight:600'>" + esc(L("Senha nova (10 caracteres ou mais)", "New password (10+ characters)")) + "</label><input id='gc-nova' type='password' autocomplete='new-password' style='" + CAMPO + "'></div>" +
+        "<div><button type='button' id='gc-trocar' style='" + BOTP + "'>" + esc(L("Trocar a senha", "Change password")) + "</button></div></div>";
+      s.innerHTML = h; return;
+    }
+    h += "<div style='" + CART + "'><h2 style='font-size:1.1em;margin:0 0 10px'>" + esc(L("Nova conta", "New account")) + "</h2><div style='" + GRADE + "'>" +
+      "<div><label for='gc-nome' style='font-weight:600'>" + esc(L("Nome", "Name")) + "</label><input id='gc-nome' style='" + CAMPO + "'></div>" +
+      "<div><label for='gc-email' style='font-weight:600'>" + esc(L("E-mail da Physis", "Physis e-mail")) + "</label><input id='gc-email' type='email' style='" + CAMPO + "'></div>" +
+      "<div><label for='gc-pessoa' style='font-weight:600'>" + esc(L("Quem é na equipe", "Who in the team")) + "</label><select id='gc-pessoa' style='" + CAMPO + "'>" + opPessoa("") + "</select></div>" +
+      "<div><label for='gc-papel' style='font-weight:600'>" + esc(L("Papel", "Role")) + "</label><select id='gc-papel' style='" + CAMPO + "'><option value='operador'>" + esc(L("Equipe", "Team")) + "</option><option value='administrador'>" + esc(L("Direção", "Management")) + "</option></select></div>" +
+      "<div><label for='gc-senha' style='font-weight:600'>" + esc(L("Senha inicial (10+)", "Initial password (10+)")) + "</label><input id='gc-senha' type='text' autocomplete='off' style='" + CAMPO + "'></div></div>" +
+      "<p style='font-size:13.5px;color:#4A4F44'>" + esc(L("Combine a senha inicial pessoalmente ou por telefone; a pessoa troca em “Minha senha”.", "Agree on the initial password in person or by phone; the person changes it in “My password”.")) + "</p>" +
+      "<button type='button' id='gc-criar' style='" + BOTP + "'>" + esc(L("Criar conta", "Create account")) + "</button></div>";
+    h += "<div style='" + CART + "'><h2 style='font-size:1.1em;margin:0 0 10px'>" + esc(L("Contas", "Accounts")) + " (" + estC.lista.length + ")</h2>" + estC.lista.map(function (a, i) {
+      return "<div style='border-top:1px solid #C9D2C4;padding:10px 0;display:grid;gap:6px'><div><strong>" + esc(a.nome) + "</strong> · " + esc(a.usuario) + " · " + esc(a.papel === "administrador" ? L("direção", "management") : L("equipe", "team")) + (a.ativa ? "" : " · <strong style='color:#7A2214'>" + esc(L("desativada", "disabled")) + "</strong>") + "</div>" +
+        "<div style='display:flex;gap:8px;flex-wrap:wrap;align-items:end'><div><label for='gc-p-" + i + "' style='font-size:13px'>" + esc(L("Quem é na equipe", "Who in the team")) + "</label><select id='gc-p-" + i + "' data-gc-pessoa='" + esc(a.usuario) + "' style='" + CAMPO + ";width:auto'>" + opPessoa(a.pessoa) + "</select></div>" +
+        "<button type='button' data-gc-senha='" + esc(a.usuario) + "' style='" + BOT + "'>" + esc(L("Nova senha", "New password")) + "</button>" +
+        (a.usuario !== c.usuario ? "<button type='button' data-gc-ativa='" + esc(a.usuario) + "' data-v='" + (a.ativa ? "0" : "1") + "' style='" + BOT + "'>" + esc(a.ativa ? L("Desativar", "Disable") : L("Reativar", "Enable")) + "</button>" : "") + "</div></div>"; }).join("") + "</div>";
+    s.innerHTML = h;
+  }
+  function carregarContas() { fetch("/api/contas", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) { estC.lista = j.contas || []; pintarContas(); }); }
+  function ligarContas() {
+    var s = document.getElementById("gp-contas");
+    var post = function (rota, corpo, ok) { fetch(rota, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) }).then(function (r) { return r.json(); })
+      .then(function (j) { estC.erro = !j.ok; estC.msg = j.ok ? ok : (j.erro || L("Não foi possível.", "Could not.")); if (estC.modo === "contas") carregarContas(); else pintarContas(); }); };
+    s.addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return; var v = function (id) { var x = document.getElementById(id); return x ? x.value : ""; };
+      if (b.id === "gc-trocar") return post("/api/conta/senha", { atual: v("gc-atual"), nova: v("gc-nova") }, L("Senha trocada.", "Password changed."));
+      if (b.id === "gc-criar") return post("/api/contas", { nome: v("gc-nome").trim(), usuario: v("gc-email").trim(), pessoa: v("gc-pessoa"), papel: v("gc-papel"), senha: v("gc-senha") }, L("Conta criada.", "Account created."));
+      var u;
+      if ((u = b.getAttribute("data-gc-senha"))) { var n = window.prompt(L("Nova senha para ", "New password for ") + u + L(" (10 caracteres ou mais):", " (10+ characters):")); if (n) post("/api/contas/" + encodeURIComponent(u), { senha: n }, L("Senha redefinida. As sessões abertas dessa conta foram encerradas.", "Password reset. Open sessions were closed.")); return; }
+      if ((u = b.getAttribute("data-gc-ativa"))) return post("/api/contas/" + encodeURIComponent(u), { ativa: b.getAttribute("data-v") === "1" }, L("Conta atualizada.", "Account updated.")); });
+    s.addEventListener("change", function (ev) { var u = ev.target.getAttribute && ev.target.getAttribute("data-gc-pessoa"); if (u !== null && u !== undefined && ev.target.hasAttribute("data-gc-pessoa")) post("/api/contas/" + encodeURIComponent(u), { pessoa: ev.target.value }, L("Pessoa da conta atualizada.", "Account person updated.")); });
+  }
+
   function montar() {
     if (document.getElementById("gp-menu") || !document.getElementById("app")) return;
     juntarMelhorias();
@@ -4604,7 +4823,8 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     var topoR = document.createElement("div"); topoR.id = "gp-reun-topo"; topoR.className = "gp-sec"; topoR.tabIndex = -1; reunS.parentNode.insertBefore(topoR, reunS);
     var chS = document.createElement("section"); chS.id = "gp-chamada"; chS.className = "gp-sec"; chS.setAttribute("aria-labelledby", "gp-h-ch"); reunS.parentNode.insertBefore(chS, reunS);
     var mailsS = document.createElement("section"); mailsS.id = "gp-mails"; mailsS.className = "gp-sec"; mailsS.tabIndex = -1; mailsS.setAttribute("aria-labelledby", "gp-h-mails"); document.body.appendChild(mailsS);
-    ligarReunioes(); ligarDocs(); ligarChamada(); ligarEmails();
+    var contasS = document.createElement("section"); contasS.id = "gp-contas"; contasS.className = "gp-sec"; contasS.tabIndex = -1; contasS.setAttribute("aria-labelledby", "gp-h-contas"); document.body.appendChild(contasS);
+    ligarReunioes(); ligarDocs(); ligarChamada(); ligarEmails(); ligarContas(); montarConta();
     var app = document.getElementById("app"), al = document.createElement("section"); al.id = "gp-alertas"; al.setAttribute("aria-labelledby", "gp-h-alertas"); al.hidden = true;
     // sem o cabeçalho do aplicativo, Atividades precisa do próprio h1 para o leitor de tela
     var h1 = document.createElement("h1"); h1.id = "gp-h-atv"; h1.className = "gp-so-leitor"; h1.textContent = "Atividades";

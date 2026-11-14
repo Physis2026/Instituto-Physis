@@ -54,8 +54,23 @@ def trocar_exportar(texto: str, novo: str) -> str:
     return texto[:i] + novo + texto[j + len(FIM):]
 
 
+# Outros originais embutidos como bloco <script id="..."> (o conteúdo do bloco é o arquivo, igual).
+BLOCOS = {"gp-ponte": RAIZ / "sistema" / "gestao-ponte.js"}
+
+
+def trocar_blocos(texto: str) -> str:
+    for ident, fonte in BLOCOS.items():
+        abre = f'<script id="{ident}">\n'
+        i = texto.find(abre)
+        if i < 0:
+            continue
+        j = texto.find("</script>", i)
+        texto = texto[:i + len(abre)] + fonte.read_text(encoding="utf-8").replace("\r\n", "\n") + texto[j:]
+    return texto
+
+
 def tratar(texto: str, novo: str) -> str:
-    texto = trocar_exportar(texto, novo)
+    texto = trocar_blocos(trocar_exportar(texto, novo))
     for a, b in TROCAS:
         texto = texto.replace(a, b)
     return texto

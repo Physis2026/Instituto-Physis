@@ -28,7 +28,7 @@ import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, quote, urlparse
+from urllib.parse import parse_qs, quote, unquote, urlparse
 
 import re
 
@@ -171,6 +171,33 @@ return r.json().then(function(j){dizer(j.ok?"Código conferido. A equipe Physis 
 </script></body></html>"""
 
 
+PAGINA_ENTRAR = """<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Entrar · Gestão Physis</title><style>
+body{margin:0;background:#F4F6F1;color:#1C2B21;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:460px;margin:0 auto;padding:40px 16px}h1{font:500 1.9em Fraunces,Georgia,serif;color:#33512F;margin:0 0 6px}
+.cartao{background:#fff;border:1px solid #C9D2C4;border-radius:12px;padding:18px;margin-top:14px;display:grid;gap:10px}
+label{font-weight:600}input{font:inherit;width:100%;box-sizing:border-box;min-height:46px;padding:6px 12px;border:1px solid #8A9284;border-radius:8px}
+button{font:inherit;font-weight:600;min-height:46px;padding:0 20px;border-radius:8px;border:1px solid #33512F;background:#33512F;color:#fff;cursor:pointer}
+:focus-visible{outline:3px solid #33512F;outline-offset:2px}#msg{min-height:1.5em;font-weight:600;margin:0}.t2{color:#4A4F44;margin:0}
+</style></head><body><main><h1>Gestão Physis</h1><p class="t2" id="sub">Entre com o seu e-mail da Physis e a sua senha.</p>
+<div class="cartao"><div id="caixa-nome" hidden><label for="nome">Seu nome</label><input id="nome" autocomplete="name"></div>
+<div><label for="usuario">E-mail</label><input id="usuario" type="email" autocomplete="username" inputmode="email"></div>
+<div><label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password"></div>
+<button type="button" id="ok">Entrar</button><p id="msg" role="status" aria-live="polite"></p></div>
+<p class="t2" style="margin-top:12px">Esqueceu a senha? Peça à direção da Physis para criar uma nova.</p></main><script>
+var criar=false,b=document.getElementById("ok"),m=document.getElementById("msg");
+function dizer(t,e){m.textContent=t;m.style.color=e?"#7A2214":"#1F4A1C";}
+fetch("/api/instancia",{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){if(j&&j.tem_conta===false){criar=true;document.getElementById("caixa-nome").hidden=false;
+document.getElementById("sub").textContent="Primeira entrada neste servidor: quem criar esta conta passa a ser da direção (administradora).";document.getElementById("senha").autocomplete="new-password";b.textContent="Criar conta e entrar";}});
+["usuario","senha","nome"].forEach(function(i){document.getElementById(i).addEventListener("keydown",function(e){if(e.key==="Enter")b.click();});});
+b.onclick=function(){var u=document.getElementById("usuario").value.trim(),s=document.getElementById("senha").value,n=document.getElementById("nome").value.trim();
+if(!u||!s){dizer("Informe o e-mail e a senha.",true);return;}b.disabled=true;dizer("Conferindo…",false);
+fetch(criar?"/api/conta/criar":"/api/conta/entrar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nome:n||u,usuario:u,senha:s})})
+.then(function(r){return r.json();}).then(function(j){if(j.ok){dizer("Entrando…",false);location.reload();}else{dizer(j.erro||"E-mail ou senha não conferem.",true);b.disabled=false;}})
+.catch(function(){dizer("Sem resposta do servidor.",true);b.disabled=false;});};
+</script></body></html>"""
+
+
 def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None):
     instancia = instancia if instancia is not None else ler_instancia()
     exige_login = bool(instancia.get("login"))
@@ -245,6 +272,22 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return None
             return self.rfile.read(n).decode("utf-8", errors="replace")
 
+        def _corpo_grande(self, limite: int) -> bytes | None:
+            """Corpo maior que o normal (dados e arquivos da Gestão). None = ausente ou acima do limite."""
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                return None
+            if n <= 0 or n > limite:
+                return None
+            return self.rfile.read(n)
+
+        def _sessao_ou_401(self) -> dict | None:
+            q = self._quem()
+            if not q:
+                self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+            return q
+
         def _autorizado(self) -> bool:
             return token is None or self.headers.get("X-Physis-Token") == token
 
@@ -311,6 +354,37 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 self.end_headers()
                 self.wfile.write(pagina)
                 return
+            if u.path == "/api/gestao/estado":
+                q = self._sessao_ou_401()
+                if not q:
+                    return
+                try:
+                    desde = float((q2 := parse_qs(u.query)).get("desde", ["0"])[0])
+                except ValueError:
+                    desde = 0.0
+                return self._json(200, {"ok": True, "agora": time.time(), "conta": {k: q[k] for k in ("nome", "usuario", "papel", "pessoa")},
+                                        "itens": hub.gestao_ler(desde)})
+            if u.path.startswith("/api/gestao/arquivo/"):
+                if not self._sessao_ou_401():
+                    return
+                arq = hub.gestao_arquivo(u.path.rsplit("/", 1)[-1])
+                if not arq:
+                    return self._json(404, {"ok": False})
+                self.send_response(200)
+                self.send_header("Content-Type", arq[1])
+                self.send_header("Content-Disposition", "attachment; filename*=UTF-8''" + quote(arq[0]))
+                self.send_header("Content-Length", str(len(arq[2])))
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                self.wfile.write(arq[2])
+                return
+            if u.path == "/api/contas":
+                q = self._sessao_ou_401()
+                if not q:
+                    return
+                if q["papel"] != "administrador":
+                    return self._json(403, {"ok": False, "erro": "so a direcao ve as contas"})
+                return self._json(200, {"ok": True, "contas": hub.contas()})
             if u.path in ("/api/central/emails", "/api/central/instalacoes"):
                 if not self._quem():
                     return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
@@ -349,7 +423,15 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             if u.path == "/api/central/caixa":
                 return self._json(200, {"ok": True, "itens": hub.central_listar()})
             if u.path in ("/gestao", "/gestao/") and (WEB / "gestao.html").exists():
-                if self._barrado():
+                # sem sessão, a página de entrada; a Gestão (e o que ela traz embutido) só depois do login
+                if not self._quem():
+                    pagina = PAGINA_ENTRAR.encode("utf-8")
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html; charset=utf-8")
+                    self.send_header("Content-Length", str(len(pagina)))
+                    self.send_header("Cache-Control", "no-store")
+                    self.end_headers()
+                    self.wfile.write(pagina)
                     return
                 return self._arquivo(WEB / "gestao.html", "text/html; charset=utf-8")
             if u.path in ("/planejador", "/planejador/") and (WEB / "planejador.html").exists():
@@ -388,8 +470,65 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return
             self._json(404, {"ok": False, "erro": "rota desconhecida"})
 
+        def do_PUT(self):
+            u = urlparse(self.path)
+            if u.path.startswith("/api/gestao/arquivo/"):
+                q = self._sessao_ou_401()
+                if not q:
+                    return
+                dados = self._corpo_grande(hub.GESTAO_ARQ_MAX)
+                if dados is None:
+                    return self._recusar_corpo("arquivo vazio ou maior que 20 MB")
+                nome = unquote(self.headers.get("X-Nome") or "arquivo")
+                r = hub.gestao_arquivo_por(u.path.rsplit("/", 1)[-1], nome, self.headers.get("Content-Type") or "", dados, q["usuario"])
+                return self._json(200 if r["ok"] else 400, r)
+            self._json(404, {"ok": False, "erro": "rota desconhecida"})
+
+        def do_DELETE(self):
+            u = urlparse(self.path)
+            if u.path.startswith("/api/gestao/arquivo/"):
+                q = self._sessao_ou_401()
+                if not q:
+                    return
+                return self._json(200, {"ok": hub.gestao_arquivo_apagar(u.path.rsplit("/", 1)[-1], q["usuario"])})
+            self._json(404, {"ok": False, "erro": "rota desconhecida"})
+
         def do_POST(self):
             u = urlparse(self.path)
+            # ── Gestão no servidor: dados, contas e senha (sempre com sessão) ──
+            if u.path.startswith("/api/gestao/estado/"):
+                q = self._sessao_ou_401()
+                if not q:
+                    return
+                bruto = self._corpo_grande(hub.GESTAO_VALOR_MAX + 4096)
+                if bruto is None:
+                    return self._recusar_corpo("dados ausentes ou grandes demais")
+                try:
+                    d = json.loads(bruto.decode("utf-8"))
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                r = hub.gestao_gravar(unquote(u.path[len("/api/gestao/estado/"):]), d.get("valor"), d.get("versao") or 0, q["usuario"])
+                return self._json(409 if r.get("conflito") else (200 if r["ok"] else 400), r)
+            if u.path in ("/api/contas", "/api/conta/senha") or (u.path.startswith("/api/contas/") and u.path.count("/") == 3):
+                q = self._sessao_ou_401()
+                if not q:
+                    return
+                try:
+                    d = json.loads(self._corpo() or "{}")
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                if u.path == "/api/conta/senha":
+                    r = hub.trocar_senha(q["id"], str(d.get("atual", "")), str(d.get("nova", "")))
+                elif u.path == "/api/contas":
+                    r = hub.criar_conta(str(d.get("nome", "")), str(d.get("usuario", "")), str(d.get("senha", "")), q["id"],
+                                        str(d.get("pessoa", "")), str(d.get("papel", "operador")))
+                else:
+                    alvo = unquote(u.path.rsplit("/", 1)[-1])
+                    r = hub.alterar_conta(q["id"], alvo, senha=d.get("senha") if isinstance(d.get("senha"), str) else None,
+                                          ativa=d.get("ativa") if isinstance(d.get("ativa"), bool) else None,
+                                          papel=d.get("papel") if isinstance(d.get("papel"), str) else None,
+                                          pessoa=d.get("pessoa") if isinstance(d.get("pessoa"), str) else None)
+                return self._json(200 if r["ok"] else 400, r)
             if u.path == "/api/central/arquivo":
                 # arquivo de apoio do pedido: corpo binario, ate 20 MB; publico como o proprio pedido
                 q = parse_qs(u.query)

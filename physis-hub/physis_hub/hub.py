@@ -54,6 +54,11 @@ CREATE TABLE IF NOT EXISTS central (
 CREATE TABLE IF NOT EXISTS central_arquivo (
   id TEXT PRIMARY KEY, pedido TEXT NOT NULL, nome TEXT NOT NULL, tamanho INTEGER NOT NULL,
   dados BLOB NOT NULL, criado REAL NOT NULL);
+CREATE TABLE IF NOT EXISTS gestao_estado (
+  chave TEXT PRIMARY KEY, valor TEXT NOT NULL, versao INTEGER NOT NULL, atualizado REAL NOT NULL, por TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS gestao_arquivo (
+  id TEXT PRIMARY KEY, nome TEXT NOT NULL, tipo TEXT NOT NULL, dados BLOB NOT NULL, tamanho INTEGER NOT NULL,
+  criado REAL NOT NULL, por TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS instalacao (
   numero TEXT PRIMARY KEY, compra TEXT NOT NULL UNIQUE, org TEXT NOT NULL, nome TEXT NOT NULL,
   email TEXT NOT NULL, modulos TEXT NOT NULL, sal BLOB NOT NULL, resumo BLOB NOT NULL, pacote TEXT,
@@ -85,6 +90,13 @@ class Hub:
         self._trava = threading.RLock()
         self._db = sqlite3.connect(caminho, check_same_thread=False)
         self._db.executescript(ESQUEMA)
+        # migração: contas ganham a pessoa da equipe a que pertencem e podem ser desativadas
+        cols = {r[1] for r in self._db.execute("PRAGMA table_info(conta)")}
+        if "pessoa" not in cols:
+            self._db.execute("ALTER TABLE conta ADD COLUMN pessoa TEXT NOT NULL DEFAULT ''")
+        if "ativa" not in cols:
+            self._db.execute("ALTER TABLE conta ADD COLUMN ativa INTEGER NOT NULL DEFAULT 1")
+        self._db.commit()
         self._db.execute("PRAGMA journal_mode=WAL")
         self._db.execute("PRAGMA synchronous=NORMAL")
         self.nos: dict[int, dict] = {}
@@ -338,30 +350,149 @@ class Hub:
         with self._trava:
             return self._db.execute("SELECT COUNT(*) FROM conta").fetchone()[0] > 0
 
-    def criar_conta(self, nome: str, usuario: str, senha: str, autor: int | None = None) -> dict:
-        """A primeira conta e criada por quem abre a instalacao; as demais, por um administrador."""
+    def _eh_admin(self, autor: int | None) -> bool:
+        r = self._db.execute("SELECT papel, ativa FROM conta WHERE id=?", (autor or -1,)).fetchone()
+        return bool(r) and r[0] == "administrador" and bool(r[1])
+
+    def criar_conta(self, nome: str, usuario: str, senha: str, autor: int | None = None,
+                    pessoa: str = "", papel: str = "operador") -> dict:
+        """A primeira conta e criada por quem abre a instalacao e vira administradora; as demais, por um administrador.
+
+        Com PHYSIS_DOMINIO_EMAIL definido (ex.: physisengineering.com), as contas novas precisam ser e-mails desse dominio."""
         nome, usuario = (nome or "").strip(), (usuario or "").strip().lower()
         if not nome or not usuario:
             return {"ok": False, "erro": "Informe o nome e o usuario."}
         if len(senha or "") < self.SENHA_MIN:
             return {"ok": False, "erro": f"A senha precisa de pelo menos {self.SENHA_MIN} caracteres."}
+        dominio = (os.environ.get("PHYSIS_DOMINIO_EMAIL") or "").strip().lower().lstrip("@")
+        if dominio and not usuario.endswith("@" + dominio):
+            return {"ok": False, "erro": f"Use um e-mail @{dominio}."}
+        if papel not in ("operador", "administrador"):
+            return {"ok": False, "erro": "Papel invalido."}
         with self._trava:
             primeira = not self.tem_conta()
-            if not primeira:
-                papel_autor = self._db.execute("SELECT papel FROM conta WHERE id=?", (autor or -1,)).fetchone()
-                if not papel_autor or papel_autor[0] != "administrador":
-                    return {"ok": False, "erro": "So um administrador cria novas contas."}
+            if not primeira and not self._eh_admin(autor):
+                return {"ok": False, "erro": "So um administrador cria novas contas."}
+            papel = "administrador" if primeira else papel
             sal = os.urandom(16)
             try:
-                self._db.execute("INSERT INTO conta(nome,usuario,papel,sal,resumo,criado) VALUES(?,?,?,?,?,?)",
-                                 (nome, usuario, "administrador" if primeira else "operador", sal,
-                                  self._resumir(senha, sal), self.relogio()))
+                self._db.execute("INSERT INTO conta(nome,usuario,papel,sal,resumo,criado,pessoa) VALUES(?,?,?,?,?,?,?)",
+                                 (nome, usuario, papel, sal, self._resumir(senha, sal), self.relogio(), (pessoa or "")[:40]))
             except sqlite3.IntegrityError:
                 return {"ok": False, "erro": "Ja existe uma conta com esse usuario."}
             self._db.commit()
-            self.registrar("conta", usuario, {"o_que": "conta criada", "papel": "administrador" if primeira else "operador"})
+            self.registrar("conta", usuario, {"o_que": "conta criada", "papel": papel, "pessoa": pessoa or ""})
             self._db.commit()
             return {"ok": True, "primeira": primeira}
+
+    def contas(self) -> list[dict]:
+        with self._trava:
+            linhas = self._db.execute("SELECT nome, usuario, papel, pessoa, ativa, criado FROM conta ORDER BY nome").fetchall()
+        return [{"nome": n, "usuario": u, "papel": p, "pessoa": pe, "ativa": bool(a), "criado": c} for n, u, p, pe, a, c in linhas]
+
+    def alterar_conta(self, autor: int | None, usuario: str, *, senha: str | None = None, ativa: bool | None = None,
+                      papel: str | None = None, pessoa: str | None = None) -> dict:
+        """Só administrador. Desativar ou trocar a senha encerra as sessões abertas da conta."""
+        usuario = (usuario or "").strip().lower()
+        with self._trava:
+            if not self._eh_admin(autor):
+                return {"ok": False, "erro": "So um administrador altera contas."}
+            alvo = self._db.execute("SELECT id, papel FROM conta WHERE usuario=?", (usuario,)).fetchone()
+            if not alvo:
+                return {"ok": False, "erro": "Conta nao encontrada."}
+            if alvo[0] == autor and (ativa is False or papel == "operador"):
+                return {"ok": False, "erro": "Voce nao pode desativar nem rebaixar a propria conta."}
+            if senha is not None:
+                if len(senha) < self.SENHA_MIN:
+                    return {"ok": False, "erro": f"A senha precisa de pelo menos {self.SENHA_MIN} caracteres."}
+                sal = os.urandom(16)
+                self._db.execute("UPDATE conta SET sal=?, resumo=? WHERE id=?", (sal, self._resumir(senha, sal), alvo[0]))
+            if ativa is not None:
+                self._db.execute("UPDATE conta SET ativa=? WHERE id=?", (1 if ativa else 0, alvo[0]))
+            if papel is not None:
+                if papel not in ("operador", "administrador"):
+                    return {"ok": False, "erro": "Papel invalido."}
+                self._db.execute("UPDATE conta SET papel=? WHERE id=?", (papel, alvo[0]))
+            if pessoa is not None:
+                self._db.execute("UPDATE conta SET pessoa=? WHERE id=?", (pessoa[:40], alvo[0]))
+            if senha is not None or ativa is False:
+                self._db.execute("DELETE FROM sessao WHERE conta=?", (alvo[0],))
+            self.registrar("conta", usuario, {"o_que": "conta alterada", "senha": senha is not None, "ativa": ativa, "papel": papel, "pessoa": pessoa})
+            self._db.commit()
+            return {"ok": True}
+
+    def trocar_senha(self, conta_id: int, atual: str, nova: str) -> dict:
+        with self._trava:
+            r = self._db.execute("SELECT usuario, sal, resumo FROM conta WHERE id=?", (conta_id,)).fetchone()
+            if not r or not hmac.compare_digest(self._resumir(atual or "", r[1]), r[2]):
+                return {"ok": False, "erro": "A senha atual nao confere."}
+            if len(nova or "") < self.SENHA_MIN:
+                return {"ok": False, "erro": f"A senha nova precisa de pelo menos {self.SENHA_MIN} caracteres."}
+            sal = os.urandom(16)
+            self._db.execute("UPDATE conta SET sal=?, resumo=? WHERE id=?", (sal, self._resumir(nova, sal), conta_id))
+            self.registrar("conta", r[0], {"o_que": "senha trocada pela propria pessoa"})
+            self._db.commit()
+            return {"ok": True}
+
+    # ── Dados da Gestão Physis no servidor ────────────────────────────────────
+    # Cada parte da Gestão (atividades, painel administrativo, reuniões, documentos...) é guardada como
+    # um texto JSON por chave, com número de versão. Quem grava informa a versão em que se baseou; se outra
+    # pessoa gravou antes, o servidor recusa (conflito) e devolve a versão atual, e a tela junta as duas.
+    GESTAO_CHAVE = re.compile(r"^gestao-physis:[A-Za-z0-9_.:-]{1,80}$")
+    GESTAO_VALOR_MAX = 8 * 1024 * 1024
+    GESTAO_ARQ_MAX = 20 * 1024 * 1024
+
+    def gestao_ler(self, desde: float = 0.0) -> dict:
+        with self._trava:
+            linhas = self._db.execute("SELECT chave, valor, versao, atualizado, por FROM gestao_estado WHERE atualizado > ?", (desde,)).fetchall()
+        return {c: {"valor": v, "versao": n, "atualizado": a, "por": p} for c, v, n, a, p in linhas}
+
+    def gestao_gravar(self, chave: str, valor: str, versao_base: int, por: str) -> dict:
+        if not self.GESTAO_CHAVE.match(chave or ""):
+            return {"ok": False, "erro": "chave invalida"}
+        if not isinstance(valor, str) or len(valor.encode("utf-8")) > self.GESTAO_VALOR_MAX:
+            return {"ok": False, "erro": "valor invalido ou grande demais"}
+        with self._trava:
+            r = self._db.execute("SELECT valor, versao, por, atualizado FROM gestao_estado WHERE chave=?", (chave,)).fetchone()
+            atual = r[1] if r else 0
+            if int(versao_base or 0) != atual:
+                return {"ok": False, "conflito": True, "valor": r[0] if r else None, "versao": atual, "por": r[2] if r else ""}
+            if r and r[0] == valor:
+                return {"ok": True, "versao": atual, "igual": True}
+            agora = max(self.relogio(), (r[3] if r else 0) + 1e-6)
+            self._db.execute("INSERT INTO gestao_estado(chave,valor,versao,atualizado,por) VALUES(?,?,?,?,?) "
+                             "ON CONFLICT(chave) DO UPDATE SET valor=excluded.valor, versao=excluded.versao, atualizado=excluded.atualizado, por=excluded.por",
+                             (chave, valor, atual + 1, agora, por))
+            self.registrar("gestao", por, {"o_que": "gravou", "chave": chave, "versao": atual + 1, "bytes": len(valor)})
+            self._db.commit()
+            return {"ok": True, "versao": atual + 1, "atualizado": agora}
+
+    def gestao_arquivo_por(self, ident: str, nome: str, tipo: str, dados: bytes, por: str) -> dict:
+        if not re.fullmatch(r"[A-Za-z0-9_-]{4,80}", ident or ""):
+            return {"ok": False, "erro": "identificador invalido"}
+        if not dados or len(dados) > self.GESTAO_ARQ_MAX:
+            return {"ok": False, "erro": "arquivo vazio ou maior que 20 MB"}
+        nome = (nome or "arquivo").replace("\\", "/").rsplit("/", 1)[-1][:120]
+        tipo = tipo if re.fullmatch(r"[\w.+-]+/[\w.+-]+", tipo or "") else "application/octet-stream"
+        with self._trava:
+            self._db.execute("INSERT OR REPLACE INTO gestao_arquivo(id,nome,tipo,dados,tamanho,criado,por) VALUES(?,?,?,?,?,?,?)",
+                             (ident, nome, tipo, dados, len(dados), self.relogio(), por))
+            self.registrar("gestao", por, {"o_que": "arquivo guardado", "id": ident, "nome": nome, "bytes": len(dados)})
+            self._db.commit()
+            return {"ok": True}
+
+    def gestao_arquivo(self, ident: str) -> tuple[str, str, bytes] | None:
+        with self._trava:
+            r = self._db.execute("SELECT nome, tipo, dados FROM gestao_arquivo WHERE id=?", (ident,)).fetchone()
+        return (r[0], r[1], bytes(r[2])) if r else None
+
+    def gestao_arquivo_apagar(self, ident: str, por: str) -> bool:
+        with self._trava:
+            cur = self._db.execute("DELETE FROM gestao_arquivo WHERE id=?", (ident,))
+            if cur.rowcount:
+                self.registrar("gestao", por, {"o_que": "arquivo apagado", "id": ident})
+            self._db.commit()
+            return cur.rowcount > 0
 
     def entrar(self, usuario: str, senha: str) -> dict:
         usuario = (usuario or "").strip().lower()
@@ -372,7 +503,7 @@ class Hub:
             n, ate = falhas.get(usuario, (0, 0.0))
             if agora < ate:
                 return {"ok": False, "erro": f"Muitas tentativas. Tente de novo em {int(ate - agora) + 1} s.", "espera": True}
-            linha = self._db.execute("SELECT id, nome, papel, sal, resumo FROM conta WHERE usuario=?", (usuario,)).fetchone()
+            linha = self._db.execute("SELECT id, nome, papel, sal, resumo FROM conta WHERE usuario=? AND ativa=1", (usuario,)).fetchone()
             certo = bool(linha) and hmac.compare_digest(self._resumir(senha or "", linha[3]), linha[4])
             if not certo:
                 n += 1
@@ -389,9 +520,9 @@ class Hub:
         if not token:
             return None
         with self._trava:
-            r = self._db.execute("SELECT c.id, c.nome, c.usuario, c.papel FROM sessao s JOIN conta c ON c.id = s.conta "
-                                 "WHERE s.token=? AND s.expira > ?", (token, self.relogio())).fetchone()
-        return dict(zip(("id", "nome", "usuario", "papel"), r)) if r else None
+            r = self._db.execute("SELECT c.id, c.nome, c.usuario, c.papel, c.pessoa FROM sessao s JOIN conta c ON c.id = s.conta "
+                                 "WHERE s.token=? AND s.expira > ? AND c.ativa=1", (token, self.relogio())).fetchone()
+        return dict(zip(("id", "nome", "usuario", "papel", "pessoa"), r)) if r else None
 
     def sair(self, token: str | None) -> None:
         with self._trava:
