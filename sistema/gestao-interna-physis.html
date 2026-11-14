@@ -3077,10 +3077,13 @@ react/cjs/react-jsx-runtime.production.js:
     if (!j || !j.numero || d.contratos.some(function (c) { return c.compraNumero === j.numero; })) return false;
     var cid = novoId(), quem = (j.pagador && j.pagador.nome) || "—", dia = String(j.data || "").slice(0, 10) || hoje();
     var itens = (j.itens || []).map(function (i) { return i.qtd + " × " + i.d; }).join("; ");
-    d.contratos.push({ id: cid, parte: "cliente", nome: quem, pessoa: "", tipo: "licenca", assinado: dia, validade: "", situacao: "assinado", valor: String(j.total),
-      compraNumero: j.numero, uso: "aguardando", modulos: j.modulos || [], obs: T3.compra + " " + j.numero + " · " + T3.recibo + " " + (j.fatura ? "nº " + j.fatura : (j.recibo || "—")) + (itens ? " · " + itens.slice(0, 200) : "") });
-    d.lancamentos.push({ id: novoId(), data: dia, area: "financeiro", projeto: quem, descricao: T3.compra + " " + j.numero + " · " + T3.recibo + " " + (j.fatura ? "nº " + j.fatura : (j.recibo || "—")) + " · " + (j.forma || ""),
-      tipo: "entrada", valor: String(j.total), situacao: "liquidado", contratoId: cid });
+    // Pedido do site real (modo "pedido"): ainda não foi pago. Entra a receber e com contrato pendente;
+    // a equipe envia os dados de pagamento, marca o recebimento no Financeiro e só então libera o uso.
+    var pedido = j.modo === "pedido";
+    d.contratos.push({ id: cid, parte: "cliente", nome: quem, pessoa: "", tipo: "licenca", assinado: pedido ? "" : dia, validade: "", situacao: pedido ? "pendente" : "assinado", valor: String(j.total),
+      compraNumero: j.numero, uso: "aguardando", modulos: j.modulos || [], obs: (pedido ? (EN ? "Order " : "Pedido ") : T3.compra + " ") + j.numero + " · " + T3.recibo + " " + (j.fatura ? "nº " + j.fatura : (j.recibo || "—")) + (pedido ? (EN ? " · awaiting payment" : " · aguardando pagamento") : "") + (j.pagador && j.pagador.email ? " · " + j.pagador.email : "") + (j.pagador && j.pagador.telefone ? " · " + j.pagador.telefone : "") + (itens ? " · " + itens.slice(0, 200) : "") });
+    d.lancamentos.push({ id: novoId(), data: dia, area: "financeiro", projeto: quem, descricao: (pedido ? (EN ? "Order " : "Pedido ") : T3.compra + " ") + j.numero + " · " + T3.recibo + " " + (j.fatura ? "nº " + j.fatura : (j.recibo || "—")) + " · " + (j.forma || ""),
+      tipo: "entrada", valor: String(j.total), situacao: pedido ? "previsto" : "liquidado", contratoId: cid });
     if (Number(j.anual) > 0) d.lancamentos.push({ id: novoId(), data: dia, area: "financeiro", projeto: quem, descricao: T3.compra + " " + j.numero + (EN ? " · yearly charge" : " · cobrança anual"),
       tipo: "entrada", valor: String(j.anual), situacao: "previsto", contratoId: cid });
     destaque = cid; return true;
