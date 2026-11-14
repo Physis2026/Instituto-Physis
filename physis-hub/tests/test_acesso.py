@@ -199,3 +199,35 @@ class ArquivosDoPedido(unittest.TestCase):
         with urllib.request.urlopen(req, timeout=5) as resp:
             self.assertEqual(resp.read(), b"PK\x03\x04planilha")
             self.assertIn("attachment", resp.headers["Content-Disposition"])
+
+
+class CorpoGrande(unittest.TestCase):
+    """Corpo grande demais volta 413 legivel, em qualquer sistema operacional (antes, no Windows, a conexao caia)."""
+    PORTA = 8789
+
+    @classmethod
+    def setUpClass(cls):
+        cls.hub = Hub()
+        cls.srv = iniciar(cls.hub, cls.PORTA, endereco="127.0.0.1")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.srv.shutdown()
+
+    def enviar(self, rota, dados):
+        req = urllib.request.Request(f"http://127.0.0.1:{self.PORTA}{rota}", data=dados, method="POST",
+                                     headers={"Content-Type": "text/plain"})
+        try:
+            with urllib.request.urlopen(req, timeout=10) as r:
+                return r.status, json.loads(r.read().decode())
+        except urllib.error.HTTPError as e:
+            return e.code, json.loads(e.read().decode() or "{}")
+
+    def test_lote_grande_do_receptor_recebe_413(self):
+        st, r = self.enviar("/api/gateway/webhook", b"ID:01,U1:1.0\n" * 20000)
+        self.assertEqual((st, r["ok"]), (413, False))
+
+    def test_servidor_segue_atendendo_depois_da_recusa(self):
+        self.enviar("/api/gateway/webhook", b"x" * (200 * 1024))
+        st, r = self.enviar("/api/gateway/webhook", b"ID:01,U1:30.0\n")
+        self.assertEqual(st, 200)

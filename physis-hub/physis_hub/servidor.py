@@ -35,6 +35,11 @@ from .protocolo import para_int, validar_telemetria
 from .simulador import Simulador
 
 CORPO_MAX = 64 * 1024
+# Ao recusar um corpo grande, o servidor ainda le e descarta ate este tanto antes de fechar.
+# Sem isso, o Windows (e as vezes o Linux) corta a conexao com RST e quem enviou nunca ve o 413.
+# O teto e o tempo limite impedem que alguem prenda o servidor mandando um corpo sem fim.
+DRENAR_MAX = 24 * 1024 * 1024
+DRENAR_SEGUNDOS = 5
 WEB = Path(__file__).resolve().parent.parent / "web"
 INSTANCIA = Path(__file__).resolve().parent.parent / "instancia.json"
 
@@ -123,6 +128,32 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(corpo)
+
+        def _recusar_corpo(self, erro: str) -> None:
+            """Responde 413 e fecha sem cortar a conexao na cara de quem enviou."""
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                n = 0
+            self.close_connection = True
+            corpo = json.dumps({"ok": False, "erro": erro}, ensure_ascii=False).encode("utf-8")
+            self.send_response(413)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(corpo)))
+            self.send_header("Connection", "close")
+            self.end_headers()
+            self.wfile.write(corpo)
+            try:
+                self.wfile.flush()
+                self.connection.settimeout(DRENAR_SEGUNDOS)
+                restam = min(max(n, 0), DRENAR_MAX)
+                while restam > 0:
+                    pedaco = self.rfile.read(min(65536, restam))
+                    if not pedaco:
+                        break
+                    restam -= len(pedaco)
+            except OSError:
+                pass
 
         def _corpo(self) -> str | None:
             try:
@@ -250,12 +281,12 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 except ValueError:
                     n = -1
                 if n <= 0 or n > hub.ARQUIVO_MAX:
-                    return self._json(413, {"ok": False, "erro": "arquivo vazio ou maior que 20 MB"})
+                    return self._recusar_corpo("arquivo vazio ou maior que 20 MB")
                 r = hub.arquivo_por((q.get("pedido") or [""])[0], (q.get("nome") or [""])[0], self.rfile.read(n))
                 return self._json(200 if r["ok"] else 400, r)
             corpo = self._corpo()
             if corpo is None:
-                return self._json(413, {"ok": False, "erro": "corpo invalido ou grande demais"})
+                return self._recusar_corpo("corpo invalido ou grande demais")
             # Entrega do receptor: o firmware atual nao manda token; fica aberta
             # na rede local ate a F0 (memo, secao 6).
             if u.path in ("/api/gateway/webhook", "/api/hardware/gateway"):
