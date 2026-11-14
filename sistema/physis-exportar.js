@@ -44,6 +44,29 @@
     return "physis-" + b + "-" + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate());
   }
 
+  /* ───────── cabeçalho do sistema: logo e nome, tirados da própria tela ─────────
+     O documento reproduz o cabeçalho do sistema de onde saiu: a árvore da Physis e o nome do sistema
+     ("Gestão Physis", "Sistema Physis", "Loja Physis"...). A imagem vem do cabeçalho da página; quando a
+     imagem é a marca larga (árvore + PHYSIS), só a árvore, à esquerda, é usada. Sem imagem, sai só o texto. */
+  function nomeSistema() { var t = document.querySelector(".px-faixa .px-tit"); return limpo(t && t.textContent) || "Physis"; }
+  var LOGO = null;
+  function b64bytes(d) { var s = atob(d.split(",")[1]), u = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
+  function logo() {
+    if (LOGO !== null) return LOGO;
+    LOGO = false;
+    try {
+      var img = document.querySelector(".px-faixa .px-id img, .px-faixa img");
+      if (!img || !img.complete || !img.naturalWidth) return LOGO;
+      var w = img.naturalWidth, h = img.naturalHeight, lado = Math.min(w, h), L = 160;
+      var cv = document.createElement("canvas"); cv.width = L; cv.height = L; var cx = cv.getContext("2d");
+      var fundo = function (cor) { cx.clearRect(0, 0, L, L); if (cor) { cx.fillStyle = cor; cx.fillRect(0, 0, L, L); } cx.drawImage(img, 0, (h - lado) / 2, lado, lado, 0, 0, L, L); };
+      fundo(null); var png = b64bytes(cv.toDataURL("image/png"));
+      fundo("#FFFFFF"); var jpg = b64bytes(cv.toDataURL("image/jpeg", 0.92));
+      LOGO = { png: png, jpg: jpg, lado: L };
+    } catch (e) { LOGO = false; }      // imagem de outra origem ou navegador sem canvas: segue sem logo
+    return LOGO;
+  }
+
   /* ───────── zip sem compressão (docx e xlsx são zips) ───────── */
   var TAB = null;
   function crc32(u8) {
@@ -91,10 +114,15 @@
     var VML = 'xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"';
     var dagua = '<w:r><w:pict><v:shapetype id="_x0000_t136" coordsize="21600,21600" o:spt="136" adj="10800" path="m@7,l@8,m@5,21600l@6,21600e"><v:formulas><v:f eqn="sum #0 0 10800"/><v:f eqn="prod #0 2 1"/><v:f eqn="sum 21600 0 @1"/><v:f eqn="sum 0 0 @2"/><v:f eqn="sum 21600 0 @3"/><v:f eqn="if @0 @3 0"/><v:f eqn="if @0 21600 @1"/><v:f eqn="if @0 0 @2"/><v:f eqn="if @0 @4 21600"/><v:f eqn="mid @5 @6"/><v:f eqn="mid @8 @5"/><v:f eqn="mid @7 @8"/><v:f eqn="mid @6 @7"/><v:f eqn="sum @6 0 @5"/></v:formulas><v:path textpathok="t" o:connecttype="custom" o:connectlocs="@9,0;@10,10800;@11,21600;@12,10800" o:connectangles="270,180,90,0"/><v:textpath on="t" fitshape="t"/><v:handles><v:h position="#0,bottomRight" xrange="6629,14971"/></v:handles><o:lock v:ext="edit" text="t" shapetype="t"/></v:shapetype>' +
       '<v:shape id="PhysisMarcaDagua" o:spid="_x0000_s2049" type="#_x0000_t136" style="position:absolute;margin-left:0;margin-top:0;width:440pt;height:110pt;rotation:315;z-index:-251654144;mso-position-horizontal:center;mso-position-horizontal-relative:margin;mso-position-vertical:center;mso-position-vertical-relative:margin" o:allowincell="f" fillcolor="#DCEBD8" stroked="f"><v:fill opacity=".55"/><v:textpath style="font-family:&quot;Arial&quot;;font-size:1pt;font-weight:bold" string="PHYSIS"/></v:shape></w:pict></w:r>';
-    var cabec = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ' + W + " " + VML + '><w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="8" w:space="4" w:color="33512F"/></w:pBdr><w:tabs><w:tab w:val="right" w:pos="9638"/></w:tabs><w:spacing w:after="0"/></w:pPr><w:r><w:rPr><w:b/><w:color w:val="33512F"/><w:spacing w:val="20"/><w:sz w:val="18"/></w:rPr><w:t>PHYSIS ENGINEERING</w:t></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:tab/><w:t xml:space="preserve">' + xml(titulo) + "</w:t></w:r>" + dagua + "</w:p></w:hdr>";
+    // Cabeçalho = réplica do cabeçalho do sistema: árvore + nome do sistema em serifada verde; título do documento à direita
+    var lg = logo(), EMU = 457200;   // 1,27 cm
+    var desenho = lg ? '<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="114300"><wp:extent cx="' + EMU + '" cy="' + EMU + '"/><wp:docPr id="1" name="Logo Physis" descr="Logo da Physis"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="logo-physis.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rIdLogo"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + EMU + '" cy="' + EMU + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>' : "";
+    var cabec = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ' + W + " " + VML + ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="8" w:space="4" w:color="33512F"/></w:pBdr><w:tabs><w:tab w:val="right" w:pos="9638"/></w:tabs><w:spacing w:after="0"/></w:pPr>' + desenho +
+      '<w:r><w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia" w:cs="Georgia"/><w:color w:val="33512F"/><w:position w:val="10"/><w:sz w:val="32"/></w:rPr><w:t xml:space="preserve">' + xml(nomeSistema()) + '</w:t></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:position w:val="12"/><w:sz w:val="16"/></w:rPr><w:tab/><w:t xml:space="preserve">' + xml(titulo) + "</w:t></w:r>" + dagua + "</w:p></w:hdr>";
     var campo = function (instr) { return '<w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:instrText xml:space="preserve"> ' + instr + ' </w:instrText></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:t>1</w:t></w:r><w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:fldChar w:fldCharType="end"/></w:r>'; };
     var cinza = function (t) { return '<w:r><w:rPr><w:color w:val="4A4F44"/><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve">' + xml(t) + "</w:t></w:r>"; };
     var rodape = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr ' + W + '><w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="4" w:space="4" w:color="C9D2C4"/></w:pBdr><w:tabs><w:tab w:val="right" w:pos="9638"/></w:tabs></w:pPr>' + cinza("Physis Engineering · " + TX.gerado + " " + agora()) + '<w:r><w:tab/></w:r>' + cinza(EN ? "Page " : "Página ") + campo("PAGE") + cinza(EN ? " of " : " de ") + campo("NUMPAGES") + "</w:p></w:ftr>";
+    var relsCab = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + (lg ? '<Relationship Id="rIdLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo-physis.png"/>' : "") + "</Relationships>";
     var est = function (id, nome, tam, negrito, cor, antes, extra) { return '<w:style w:type="paragraph" w:styleId="' + id + '"><w:name w:val="' + nome + '"/><w:basedOn w:val="Normal"/>' + (extra || "") + '<w:pPr><w:spacing w:before="' + antes + '" w:after="120"/></w:pPr><w:rPr>' + (negrito ? "<w:b/>" : "") + '<w:color w:val="' + cor + '"/><w:sz w:val="' + tam + '"/></w:rPr></w:style>'; };
     var estilos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles ' + W + '><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="22"/><w:lang w:val="' + (EN ? "en-GB" : "pt-BR") + '"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="300" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>' +
       '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>' +
@@ -105,12 +133,13 @@
       '<w:style w:type="paragraph" w:styleId="Lista"><w:name w:val="List Paragraph"/><w:basedOn w:val="Normal"/><w:pPr><w:ind w:left="360"/></w:pPr></w:style>' +
       '<w:style w:type="table" w:styleId="Grade"><w:name w:val="Table Grid"/><w:tblPr><w:tblBorders><w:top w:val="single" w:sz="4" w:color="C9D2C4"/><w:left w:val="single" w:sz="4" w:color="C9D2C4"/><w:bottom w:val="single" w:sz="4" w:color="C9D2C4"/><w:right w:val="single" w:sz="4" w:color="C9D2C4"/><w:insideH w:val="single" w:sz="4" w:color="C9D2C4"/><w:insideV w:val="single" w:sz="4" w:color="C9D2C4"/></w:tblBorders><w:tblCellMar><w:top w:w="40" w:type="dxa"/><w:left w:w="100" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/><w:right w:w="100" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>';
     return zip([
-      { nome: "[Content_Types].xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>' },
+      { nome: "[Content_Types].xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>' },
       { nome: "_rels/.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>' },
       { nome: "docProps/core.xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>' + xml(titulo) + "</dc:title><dc:creator>Physis Engineering</dc:creator><dc:language>" + (EN ? "en-GB" : "pt-BR") + "</dc:language></cp:coreProperties>" },
       { nome: "word/_rels/document.xml.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/></Relationships>' },
       { nome: "word/document.xml", dados: doc }, { nome: "word/styles.xml", dados: estilos },
-      { nome: "word/header1.xml", dados: cabec }, { nome: "word/footer1.xml", dados: rodape }]);
+      { nome: "word/header1.xml", dados: cabec }, { nome: "word/footer1.xml", dados: rodape }, { nome: "word/_rels/header1.xml.rels", dados: relsCab }]
+      .concat(lg ? [{ nome: "word/media/logo-physis.png", dados: lg.png }] : []));
   }
 
   /* ───────── Excel ───────── */
@@ -123,7 +152,8 @@
   function xlsx(titulo, blocos) {
     var linhas = [], col = function (n) { var s = ""; n++; while (n > 0) { var r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); } return s; };
     // faixa da marca no topo (o Excel não tem marca d'água; a faixa e o cabeçalho de impressão fazem esse papel)
-    linhas.push([{ v: "PHYSIS ENGINEERING", e: 6 }]); linhas.push([{ v: titulo, e: 2 }]); linhas.push([{ v: TX.gerado + " " + agora(), e: 8 }]); linhas.push([]);
+    var lg = logo();
+    linhas.push([{ v: nomeSistema(), e: 6 }]); linhas.push([{ v: titulo, e: 2 }]); linhas.push([{ v: TX.gerado + " " + agora(), e: 8 }]); linhas.push([]);
     var larg = [];
     blocos.forEach(function (b) {
       if (b.h) { linhas.push([]); linhas.push([{ v: b.t, e: 1 }]); }
@@ -141,30 +171,37 @@
     var M = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"';
     // a faixa da marca ocupa a largura de todas as colunas usadas
     var nCols = Math.max(1, larg.length), mescla = nCols > 1 ? '<mergeCells count="1"><mergeCell ref="A1:' + col(nCols - 1) + '1"/></mergeCells>' : "";
-    dados = dados.replace('<row r="1">', '<row r="1" ht="22" customHeight="1">');
+    dados = dados.replace('<row r="1">', '<row r="1" ht="34" customHeight="1">');
     var impressao = '<pageMargins left="0.6" right="0.6" top="0.9" bottom="0.8" header="0.4" footer="0.4"/><pageSetup paperSize="9" orientation="' + (nCols > 6 ? "landscape" : "portrait") + '" fitToWidth="1" fitToHeight="0"/>' +
       "<headerFooter><oddHeader>" + xml('&L&"Arial,Bold"&K33512FPHYSIS ENGINEERING&R&"Arial,Regular"&K4A4F44' + String(titulo || "").replace(/&/g, "&&")) + "</oddHeader><oddFooter>" + xml("&L&K4A4F44Physis Engineering&R&K4A4F44" + (EN ? "Page &P of &N" : "Página &P de &N")) + "</oddFooter></headerFooter>";
-    var folha = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ' + M + '><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><cols>' + larg.map(function (w, j) { return '<col min="' + (j + 1) + '" max="' + (j + 1) + '" width="' + (w || 10) + '" customWidth="1"/>'; }).join("") + "</cols><sheetData>" + dados + "</sheetData>" + mescla + impressao + "</worksheet>";
+    var folha = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ' + M + ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><cols>' + larg.map(function (w, j) { return '<col min="' + (j + 1) + '" max="' + (j + 1) + '" width="' + (w || 10) + '" customWidth="1"/>'; }).join("") + "</cols><sheetData>" + dados + "</sheetData>" + mescla + impressao + (lg ? '<drawing r:id="rId1"/>' : "") + "</worksheet>";
+    // a árvore da Physis no canto do cabeçalho, como nas telas
+    var desenho = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:oneCellAnchor><xdr:from><xdr:col>0</xdr:col><xdr:colOff>57150</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>47625</xdr:rowOff></xdr:from><xdr:ext cx="333375" cy="333375"/><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="2" name="Logo Physis" descr="Logo da Physis"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="333375" cy="333375"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:oneCellAnchor></xdr:wsDr>';
     if (!larg.length) folha = folha.replace("<cols></cols>", "");
     // estilos: 0 normal · 1 negrito · 2 título verde · 3 R$ · 4 % · 5 data · 6 faixa da marca · 7 cabeçalho de tabela · 8 nota cinza · 9 célula com borda · 10 R$ com borda · 11 % com borda
     var estilos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet ' + M + '><numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;R$&quot;\\ #,##0.00"/></numFmts>' +
-      '<fonts count="6"><font><sz val="10"/><color rgb="FF1C2B21"/><name val="Arial"/></font><font><b/><sz val="10"/><color rgb="FF1C2B21"/><name val="Arial"/></font><font><b/><sz val="14"/><color rgb="FF33512F"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><sz val="9"/><color rgb="FF4A4F44"/><name val="Arial"/></font></fonts>' +
-      '<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF33512F"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FF4B7547"/><bgColor indexed="64"/></patternFill></fill></fills>' +
-      '<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFC9D2C4"/></left><right style="thin"><color rgb="FFC9D2C4"/></right><top style="thin"><color rgb="FFC9D2C4"/></top><bottom style="thin"><color rgb="FFC9D2C4"/></bottom><diagonal/></border></borders>' +
+      '<fonts count="7"><font><sz val="10"/><color rgb="FF1C2B21"/><name val="Arial"/></font><font><b/><sz val="10"/><color rgb="FF1C2B21"/><name val="Arial"/></font><font><b/><sz val="14"/><color rgb="FF33512F"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><sz val="9"/><color rgb="FF4A4F44"/><name val="Arial"/></font><font><sz val="17"/><color rgb="FF33512F"/><name val="Georgia"/></font></fonts>' +
+      '<fills count="5"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF33512F"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FF4B7547"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF4F6F1"/><bgColor indexed="64"/></patternFill></fill></fills>' +
+      '<borders count="3"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFC9D2C4"/></left><right style="thin"><color rgb="FFC9D2C4"/></right><top style="thin"><color rgb="FFC9D2C4"/></top><bottom style="thin"><color rgb="FFC9D2C4"/></bottom><diagonal/></border><border><left/><right/><top/><bottom style="medium"><color rgb="FF33512F"/></bottom><diagonal/></border></borders>' +
       '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="12">' +
       '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
       '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
-      '<xf numFmtId="0" fontId="3" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"><alignment vertical="center"/></xf><xf numFmtId="0" fontId="4" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"><alignment vertical="center" wrapText="1"/></xf>' +
+      '<xf numFmtId="0" fontId="6" fillId="4" borderId="2" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" indent="' + (lg ? 4 : 0) + '"/></xf><xf numFmtId="0" fontId="4" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"><alignment vertical="center" wrapText="1"/></xf>' +
       '<xf numFmtId="0" fontId="5" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment vertical="top" wrapText="1"/></xf>' +
       '<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="10" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>' +
       '</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
     var aba = xml(String(titulo || "Physis").replace(/[\\\/\?\*\[\]:]/g, " ").slice(0, 31)) || "Physis";
     return zip([
-      { nome: "[Content_Types].xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>' },
+      { nome: "[Content_Types].xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' + (lg ? '<Default Extension="png" ContentType="image/png"/><Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>' : "") + '</Types>' },
       { nome: "_rels/.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
       { nome: "xl/workbook.xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook ' + M + ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="' + aba + '" sheetId="1" r:id="rId1"/></sheets></workbook>' },
       { nome: "xl/_rels/workbook.xml.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' },
-      { nome: "xl/worksheets/sheet1.xml", dados: folha }, { nome: "xl/styles.xml", dados: estilos }]);
+      { nome: "xl/worksheets/sheet1.xml", dados: folha }, { nome: "xl/styles.xml", dados: estilos }]
+      .concat(lg ? [
+        { nome: "xl/worksheets/_rels/sheet1.xml.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/></Relationships>' },
+        { nome: "xl/drawings/drawing1.xml", dados: desenho },
+        { nome: "xl/drawings/_rels/drawing1.xml.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/logo-physis.png"/></Relationships>' },
+        { nome: "xl/media/logo-physis.png", dados: lg.png }] : []));
   }
 
   /* ───────── PDF (A4, texto e tabelas; fontes padrão, WinAnsi) ───────── */
@@ -180,7 +217,7 @@
     }); return out;
   }
   function pdf(titulo, blocos) {
-    var LW = 595, LH = 842, M = 48, TOPO = 66, util = LW - 2 * M, paginas = [], cur = [], y = LH - TOPO;
+    var LW = 595, LH = 842, M = 48, TOPO = 82, util = LW - 2 * M, paginas = [], cur = [], y = LH - TOPO;
     var nova = function () { if (cur.length) paginas.push(cur); cur = []; y = LH - TOPO; };
     var texto = function (linha, fonte, tam, x, cor) { cur.push("BT /" + fonte + " " + tam + " Tf " + (cor || "0.11 0.17 0.13") + " rg " + (x || M).toFixed(1) + " " + y.toFixed(1) + " Td " + pdfStr(linha) + " Tj ET"); };
     var escrever = function (t, fonte, tam, larg, antes, depois, cor, recuo) {
@@ -215,17 +252,25 @@
     var fonte = function (n) { return add("<< /Type /Font /Subtype /Type1 /BaseFont /" + n + " /Encoding /WinAnsiEncoding >>"); };
     var f1 = fonte("Helvetica"), f2 = fonte("Helvetica-Bold"), f3 = fonte("Courier"), f4 = fonte("Courier-Bold");
     var gs = add("<< /Type /ExtGState /ca 0.07 /CA 0.07 >>");     // transparência da marca d'água
+    var f5 = fonte("Times-Roman");                                  // serifada do nome do sistema, como no cabeçalho das telas
+    var lg = logo(), im = 0;
+    if (lg) { var jb = ""; for (var q = 0; q < lg.jpg.length; q++) jb += String.fromCharCode(lg.jpg[q]);
+      im = add("<< /Type /XObject /Subtype /Image /Width " + lg.lado + " /Height " + lg.lado + " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + lg.jpg.length + " >>\nstream\n" + jb + "\nendstream"); }
+    var sistema = latin(nomeSistema()).slice(0, 40);
     var pagsId = objs.length + 1 + paginas.length * 2, kids = [];
     paginas.forEach(function (p, i) {
       // marca d'água "PHYSIS" na diagonal, atrás do conteúdo, em verde Physis bem claro
       var agua = "q /GS1 gs 0.29 0.46 0.28 rg BT /F2 120 Tf 0.7071 0.7071 -0.7071 0.7071 150 210 Tm (PHYSIS) Tj ET Q";
-      // faixa verde no topo com a marca e o título
-      var faixa = "0.2 0.318 0.184 rg 0 " + (LH - 34) + " " + LW + " 34 re f BT /F2 9.5 Tf 1 1 1 rg " + M + " " + (LH - 22) + " Td " + pdfStr("PHYSIS ENGINEERING") + " Tj ET" +
-        " BT /F1 8.5 Tf 0.86 0.92 0.85 rg " + (LW - M - Math.min(60, latin(titulo).length) * 4.3).toFixed(1) + " " + (LH - 22) + " Td " + pdfStr(latin(titulo).slice(0, 60)) + " Tj ET";
+      // réplica do cabeçalho do sistema: fundo claro, árvore, nome do sistema em serifada verde, título à direita, linha verde
+      var xNome = lg ? M + 38 : M;
+      var faixa = "0.957 0.965 0.945 rg 0 " + (LH - 56) + " " + LW + " 56 re f 1.2 w 0.2 0.318 0.184 RG 0 " + (LH - 56) + " m " + LW + " " + (LH - 56) + " l S" +
+        (lg ? " q 30 0 0 30 " + M + " " + (LH - 44) + " cm /Im1 Do Q" : "") +
+        " BT /F5 17 Tf 0.2 0.318 0.184 rg " + xNome + " " + (LH - 35) + " Td " + pdfStr(sistema) + " Tj ET" +
+        " BT /F1 8.5 Tf 0.29 0.31 0.27 rg " + (LW - M - Math.min(60, latin(titulo).length) * 4.3).toFixed(1) + " " + (LH - 33) + " Td " + pdfStr(latin(titulo).slice(0, 60)) + " Tj ET";
       var rod = "0.4 w 0.79 0.82 0.77 RG " + M + " 40 m " + (LW - M) + " 40 l S BT /F1 8 Tf 0.29 0.31 0.27 rg " + M + " 28 Td " + pdfStr("Physis Engineering - " + latin(titulo).slice(0, 60)) + " Tj ET" +
         " BT /F1 8 Tf 0.29 0.31 0.27 rg " + (LW - M - 52) + " 28 Td " + pdfStr((EN ? "Page " : "Pagina ") + (i + 1) + "/" + paginas.length) + " Tj ET";
       var conteudo = agua + "\n" + faixa + "\n" + p.join("\n") + "\n" + rod, c = add("<< /Length " + conteudo.length + " >>\nstream\n" + conteudo + "\nendstream");
-      kids.push(add("<< /Type /Page /Parent " + pagsId + " 0 R /MediaBox [0 0 " + LW + " " + LH + "] /Contents " + c + " 0 R /Resources << /Font << /F1 " + f1 + " 0 R /F2 " + f2 + " 0 R /F3 " + f3 + " 0 R /F4 " + f4 + " 0 R >> /ExtGState << /GS1 " + gs + " 0 R >> >> >>"));
+      kids.push(add("<< /Type /Page /Parent " + pagsId + " 0 R /MediaBox [0 0 " + LW + " " + LH + "] /Contents " + c + " 0 R /Resources << /Font << /F1 " + f1 + " 0 R /F2 " + f2 + " 0 R /F3 " + f3 + " 0 R /F4 " + f4 + " 0 R /F5 " + f5 + " 0 R >> /ExtGState << /GS1 " + gs + " 0 R >>" + (im ? " /XObject << /Im1 " + im + " 0 R >>" : "") + " >> >>"));
     });
     add("<< /Type /Pages /Kids [" + kids.map(function (k) { return k + " 0 R"; }).join(" ") + "] /Count " + kids.length + " >>");
     var cat = add("<< /Type /Catalog /Pages " + pagsId + " 0 R /Lang (" + (EN ? "en-GB" : "pt-BR") + ") /ViewerPreferences << /DisplayDocTitle true >> >>");

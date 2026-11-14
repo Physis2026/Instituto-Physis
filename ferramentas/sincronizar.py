@@ -61,12 +61,21 @@ def tratar(texto: str, novo: str) -> str:
     return texto
 
 
+# Programas embutidos que são cópia exata de um arquivo: a cópia é refeita a partir do arquivo.
+# (A "Tela do cliente" embutida tem ajustes próprios; nela só o exportador e os textos são trocados.)
+FONTES = {
+    "sustainkit": RAIZ / "sistema" / "SustainKit_Definitivo.html",
+    "supervisao": RAIZ / "sistema" / "physis-scada-demo.html",
+}
+
+
 def tratar_programas(html: str, novo: str) -> str:
     m = re.search(r"const PROGRAMAS = \{(.*?)\};\n", html, re.S)
     if not m:
         return html
     def um(mm: re.Match) -> str:
-        bruto = base64.b64decode(mm.group(2)).decode("utf-8")
+        fonte = FONTES.get(mm.group(1))
+        bruto = fonte.read_text(encoding="utf-8") if fonte else base64.b64decode(mm.group(2)).decode("utf-8")
         return f'{mm.group(1)}:"' + base64.b64encode(tratar(bruto, novo).encode("utf-8")).decode("ascii") + '"'
     corpo = re.sub(r'(\w+):"([A-Za-z0-9+/=]+)"', um, m.group(1))
     return html[:m.start(1)] + corpo + html[m.end(1):]

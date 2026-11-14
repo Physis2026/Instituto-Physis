@@ -1,0 +1,25 @@
+<!doctype html><meta charset="utf-8"><title>conferência SustainKit</title>
+<!-- Conferência das contas do SustainKit: prova que uma mudança visual não alterou nenhum resultado.
+     Uso: 1) copie a versão anterior do SustainKit para sistema/_sk_antes.html e este arquivo para sistema/;
+          2) sirva a pasta sistema/ (python -m http.server) e abra este arquivo; 3) no console:
+     const a = await rodar('_sk_antes.html'), d = await rodar('SustainKit_Definitivo.html'); a.every((x, i) => x === d[i])   // tem de dar true
+     Revisão de 14/11/2026 (ferramentas/revisar_sustainkit.py): 10 de 10 cenários idênticos. -->
+<script>
+/* Roda 10 cenários de entrada no SustainKit e guarda o texto de todos os resultados (sem emojis e sem espaços repetidos). */
+const sleep = t => new Promise(r => setTimeout(r, t));
+const EMO = /[\u{1F300}-\u{1FAFF}☀-➿⬀-⯿️]/gu;
+async function rodar(url){
+  const f = document.createElement("iframe"); f.style.width = "1200px"; f.style.height = "800px"; f.src = url; document.body.appendChild(f);
+  await new Promise(r => f.onload = r); await sleep(400);
+  const w = f.contentWindow, d = f.contentDocument, res = [];
+  for (let k = 0; k < 10; k++){
+    d.querySelectorAll("select").forEach((s, i) => { if (s.options.length){ s.selectedIndex = (k * 3 + i) % s.options.length; s.dispatchEvent(new Event("change", { bubbles:true })); } });
+    d.querySelectorAll("input").forEach((inp, i) => { if (inp.type === "checkbox"){ inp.checked = ((k + i) % 3) === 0; inp.dispatchEvent(new Event("change", { bubbles:true })); return; }
+      if (inp.type === "number" || inp.type === "range" || /^-?\d/.test(inp.value)){ const v = parseFloat(inp.value) || 1; inp.value = String(Math.round(v * (0.6 + ((k * 7 + i) % 10) / 10) * 100) / 100); inp.dispatchEvent(new Event("input", { bubbles:true })); inp.dispatchEvent(new Event("change", { bubbles:true })); } });
+    ["calcSolar","calcMat","renderMat","calcOri","renderCerts","renderAcabList","calcAcab","renderChk","renderModelos","renderAgro","calcAgro","calcCarbon","renderPrecos"].forEach(fn => { try { if (typeof w[fn] === "function") w[fn](); } catch (e){ res.push("ERRO " + fn + ": " + e.message); } });
+    const c = d.body.cloneNode(true); c.querySelectorAll("script,style").forEach(x => x.remove());
+    res.push(c.textContent.replace(EMO, "").replace(/\s+/g, " ").trim());
+  }
+  f.remove(); return res;
+}
+</script>

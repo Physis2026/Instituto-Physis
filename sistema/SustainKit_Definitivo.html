@@ -7,7 +7,7 @@
 <style>
 
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#F4F7F4;min-height:100vh}
+body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#F4F6F1;min-height:100vh}
 .header{padding:14px 20px 0;display:flex;flex-direction:column}
 .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .logo{display:flex;align-items:center;gap:10px}
@@ -17,110 +17,110 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#F4F7F4;mi
 .badge{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:3px 11px;font-size:11px;font-weight:700;color:#fff}
 .tabs{display:flex;overflow-x:auto;gap:1px}
 .tab-btn{padding:8px 14px;border:none;background:transparent;cursor:pointer;font-weight:400;font-size:12px;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.2s;display:flex;align-items:center;gap:4px;white-space:nowrap;color:rgba(255,255,255,0.5)}
-.tab-btn.active{font-weight:700;color:#fff;border-bottom-color:#81A969}
+.tab-btn.active{font-weight:700;color:#fff;border-bottom-color:#DCEBD8}
 .content{max-width:1000px;margin:14px auto;padding:0 16px}
 .tab-panel{display:none}.tab-panel.active{display:block}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.card{background:#fff;border:1px solid #D4E8D0;border-radius:12px;padding:15px 17px;box-shadow:0 2px 8px rgba(7,64,49,0.06)}
-.card-pale{background:#EEF8EB}
+.card{background:#fff;border:1px solid #C9D2C4;border-radius:12px;padding:15px 17px;box-shadow:0 2px 8px rgba(51,81,47,0.06)}
+.card-pale{background:#EEF4EA}
 .sec-title{font-weight:700;font-size:13px;margin-bottom:10px}
-.lbl{font-size:11px;font-weight:600;color:#1C2B22;margin-bottom:4px}
+.lbl{font-size:11px;font-weight:600;color:#1C2B21;margin-bottom:4px}
 .inp-row{margin-bottom:10px}
 .inp-wrap{display:flex;gap:6px;align-items:center}
-input[type=number],select{padding:7px 9px;border:2px solid #BFDBFE;border-radius:7px;font-family:inherit;outline:none;background:#EFF6FF;font-size:14px;font-weight:700;color:#1E40AF}
+input[type=number],select{padding:7px 9px;border:1px solid #8A9284;border-radius:8px;font-family:inherit;outline:none;background:#FFFFFF;font-size:14px;font-weight:700;color:#1C2B21;min-height:40px}input[type=number]:focus-visible,select:focus-visible{outline:3px solid #33512F;outline-offset:2px}
 input[type=number]{flex:1}
 select{width:100%;font-size:12px}
-.unit{font-size:11px;color:#6B7F6E;min-width:34px}
-.note{font-size:10px;color:#6B7F6E;margin-top:2px;font-style:italic}
-.res-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#F4F7F4;border-radius:7px;margin-bottom:4px}
-.res-row.hi{background:#EEF8EB;border:1px solid #81A969}
-.res-label{font-size:12px;color:#1C2B22}
-.res-value{font-size:13px;font-weight:800;color:#1C2B22}
-.res-row.hi .res-value{color:#074031}
+.unit{font-size:11px;color:#4A4F44;min-width:34px}
+.note{font-size:10px;color:#4A4F44;margin-top:2px;font-style:italic}
+.res-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#F4F6F1;border-radius:7px;margin-bottom:4px}
+.res-row.hi{background:#EEF4EA;border:1px solid #4B7547}
+.res-label{font-size:12px;color:#1C2B21}
+.res-value{font-size:13px;font-weight:800;color:#1C2B21}
+.res-row.hi .res-value{color:#33512F}
 .status-box{padding:9px;border-radius:8px;text-align:center;margin-top:6px}
-.status-ok{background:#C8E6C9}.status-ok .status-title{color:#1B5E20}
-.status-err{background:#FFCDD2}.status-err .status-title{color:#B71C1C}
+.status-ok{background:#DCEBD8}.status-ok .status-title{color:#1F4A1C}
+.status-err{background:#F5E2D7}.status-err .status-title{color:#7A2214}
 .status-title{font-weight:800;font-size:13px}
 .status-sub{font-size:11px;margin-top:2px}
-.footer{background:#fff;border-top:1px solid #D4E8D0;padding:7px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:20px}
-.footer-left{font-size:10px;color:#6B7F6E}
-.footer-right{font-size:11px;color:#51774B;font-weight:600}
+.footer{background:#fff;border-top:1px solid #C9D2C4;padding:7px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.footer-left{font-size:10px;color:#4A4F44}
+.footer-right{font-size:11px;color:#4B7547;font-weight:600}
 .pill-row{display:flex;gap:6px;margin-bottom:8px}
-.pill{flex:1;padding:5px;border-radius:7px;border:1px solid #D4E8D0;background:#fff;cursor:pointer;font-family:inherit;font-size:11px;color:#6B7F6E;font-weight:400}
-.pill.active{border-color:#074031;background:#EEF8EB;color:#074031;font-weight:700}
-.mini-info{font-size:10px;color:#6B7F6E;font-style:italic;padding:6px 8px;background:#F4F7F4;border-radius:6px;margin-top:4px}
+.pill{flex:1;padding:5px;border-radius:7px;border:1px solid #C9D2C4;background:#fff;cursor:pointer;font-family:inherit;font-size:11px;color:#4A4F44;font-weight:400}
+.pill.active{border-color:#33512F;background:#EEF4EA;color:#33512F;font-weight:700}
+.mini-info{font-size:10px;color:#4A4F44;font-style:italic;padding:6px 8px;background:#F4F6F1;border-radius:6px;margin-top:4px}
 .cert-sidebar{display:flex;flex-direction:column;gap:6px}
-.cert-btn{padding:10px 12px;border-radius:10px;border:1px solid #D4E8D0;background:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.15s}
+.cert-btn{padding:10px 12px;border-radius:10px;border:1px solid #C9D2C4;background:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.15s}
 .cert-btn.active{border-color:var(--cert-cor)}
 .cert-btn-title{font-size:11px;font-weight:700;margin-bottom:4px}
-.cert-btn-bar{height:3px;background:#F4F7F4;border-radius:2px;overflow:hidden;margin-bottom:2px}
+.cert-btn-bar{height:3px;background:#F4F6F1;border-radius:2px;overflow:hidden;margin-bottom:2px}
 .cert-btn-fill{height:100%;border-radius:2px;transition:width 0.3s}
-.cert-btn-pct{font-size:10px;color:#6B7F6E}
+.cert-btn-pct{font-size:10px;color:#4A4F44}
 .cert-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
 .cert-pct-box{padding:5px 12px;border-radius:10px;text-align:center}
 .cert-pct-num{font-size:20px;font-weight:800}
-.cert-pct-label{font-size:9px;color:#6B7F6E}
-.cert-bar{height:5px;background:#F4F7F4;border-radius:3px;margin-bottom:10px;overflow:hidden}
+.cert-pct-label{font-size:9px;color:#4A4F44}
+.cert-bar{height:5px;background:#F4F6F1;border-radius:3px;margin-bottom:10px;overflow:hidden}
 .cert-bar-fill{height:100%;border-radius:3px;transition:width 0.4s}
-.crit-row{display:flex;justify-content:space-between;align-items:center;padding:7px 9px;border-radius:7px;margin-bottom:4px;gap:8px;background:#F4F7F4;border:1px solid #D4E8D0}
-.crit-text{font-size:12px;color:#1C2B22;flex:1}
-.crit-sel{padding:3px 7px;border-radius:6px;border:1px solid #D4E8D0;font-size:11px;font-family:inherit;cursor:pointer;background:#fff;min-width:120px}
+.crit-row{display:flex;justify-content:space-between;align-items:center;padding:7px 9px;border-radius:7px;margin-bottom:4px;gap:8px;background:#F4F6F1;border:1px solid #C9D2C4}
+.crit-text{font-size:12px;color:#1C2B21;flex:1}
+.crit-sel{padding:3px 7px;border-radius:6px;border:1px solid #C9D2C4;font-size:11px;font-family:inherit;cursor:pointer;background:#fff;min-width:120px}
 .counts{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
 .count-pill{padding:2px 8px;border-radius:14px;font-size:11px;font-weight:600}
 .mat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:360px;overflow-y:auto}
-.mat-card{padding:10px 12px;background:#fff;border-radius:9px;border:1px solid #D4E8D0;cursor:pointer;transition:all 0.15s}
-.mat-card:hover{border-color:#074031;background:#EEF8EB}
-.mat-name{font-size:12px;font-weight:700;color:#074031;margin-bottom:3px}
-.mat-cat{background:#EEF8EB;padding:1px 6px;border-radius:10px;font-size:10px;color:#51774B;display:inline-block;margin-bottom:4px}
+.mat-card{padding:10px 12px;background:#fff;border-radius:9px;border:1px solid #C9D2C4;cursor:pointer;transition:all 0.15s}
+.mat-card:hover{border-color:#33512F;background:#EEF4EA}
+.mat-name{font-size:12px;font-weight:700;color:#33512F;margin-bottom:3px}
+.mat-cat{background:#EEF4EA;padding:1px 6px;border-radius:10px;font-size:10px;color:#4B7547;display:inline-block;margin-bottom:4px}
 .mat-row{display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px}
-.mat-key{color:#6B7F6E}.mat-val{font-weight:600;color:#1C2B22}
-.chk-item{display:flex;gap:6px;align-items:flex-start;padding:6px 7px;border-radius:7px;margin-bottom:3px;cursor:pointer;background:#F4F7F4;border:1px solid #D4E8D0;transition:all 0.15s}
-.chk-item.done{background:#C8E6C9;border-color:#81C784}
-.chk-box{width:13px;height:13px;border-radius:3px;flex-shrink:0;margin-top:1px;border:2px solid #D4E8D0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;background:transparent;transition:all 0.15s}
-.chk-item.done .chk-box{background:#51774B;border-color:#51774B}
-.chk-text{font-size:11px;color:#1C2B22;line-height:1.4}
-.chk-item.done .chk-text{text-decoration:line-through;color:#2E7D32}
+.mat-key{color:#4A4F44}.mat-val{font-weight:600;color:#1C2B21}
+.chk-item{display:flex;gap:6px;align-items:flex-start;padding:6px 7px;border-radius:7px;margin-bottom:3px;cursor:pointer;background:#F4F6F1;border:1px solid #C9D2C4;transition:all 0.15s}
+.chk-item.done{background:#DCEBD8;border-color:#4B7547}
+.chk-box{width:13px;height:13px;border-radius:3px;flex-shrink:0;margin-top:1px;border:2px solid #C9D2C4;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;background:transparent;transition:all 0.15s}
+.chk-item.done .chk-box{background:#4B7547;border-color:#4B7547}
+.chk-text{font-size:11px;color:#1C2B21;line-height:1.4}
+.chk-item.done .chk-text{text-decoration:line-through;color:#1F4A1C}
 .model-grid{display:flex;gap:10px;margin-bottom:12px}
-.model-btn{flex:1;padding:10px;border-radius:11px;border:2px solid #D4E8D0;background:#fff;cursor:pointer;text-align:center;font-family:inherit;transition:all 0.2s}
-.model-btn.active{border-color:#074031;background:#EEF8EB}
+.model-btn{flex:1;padding:10px;border-radius:11px;border:2px solid #C9D2C4;background:#fff;cursor:pointer;text-align:center;font-family:inherit;transition:all 0.2s}
+.model-btn.active{border-color:#33512F;background:#EEF4EA}
 .model-icon{font-size:18px;margin-bottom:3px}
-.model-name{font-size:11px;font-weight:700;color:#1C2B22}
-.model-scale{font-size:10px;color:#6B7F6E}
+.model-name{font-size:11px;font-weight:700;color:#1C2B21}
+.model-scale{font-size:10px;color:#4A4F44}
 .info-row{padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:8px;margin-bottom:5px}
-.info-lbl{font-size:10px;color:#6B7F6E}
-.info-val{font-size:13px;font-weight:700;color:#1C2B22}
-.agro-item{display:flex;gap:7px;align-items:center;padding:6px 8px;border-radius:8px;margin-bottom:4px;cursor:pointer;background:#F4F7F4;border:1px solid #D4E8D0;transition:all 0.15s}
-.agro-item.on{background:#EEF8EB;border-color:#81A969}
-.agro-chk{width:13px;height:13px;border-radius:3px;background:transparent;border:2px solid #D4E8D0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;flex-shrink:0;transition:all 0.15s}
-.agro-item.on .agro-chk{background:#51774B;border-color:#51774B}
-.agro-nome{flex:1;font-size:11px;color:#6B7F6E;font-weight:400}
-.agro-item.on .agro-nome{color:#074031;font-weight:600}
-.agro-kwh{font-size:10px;color:#6B7F6E}
+.info-lbl{font-size:10px;color:#4A4F44}
+.info-val{font-size:13px;font-weight:700;color:#1C2B21}
+.agro-item{display:flex;gap:7px;align-items:center;padding:6px 8px;border-radius:8px;margin-bottom:4px;cursor:pointer;background:#F4F6F1;border:1px solid #C9D2C4;transition:all 0.15s}
+.agro-item.on{background:#EEF4EA;border-color:#DCEBD8}
+.agro-chk{width:13px;height:13px;border-radius:3px;background:transparent;border:2px solid #C9D2C4;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;flex-shrink:0;transition:all 0.15s}
+.agro-item.on .agro-chk{background:#4B7547;border-color:#4B7547}
+.agro-nome{flex:1;font-size:11px;color:#4A4F44;font-weight:400}
+.agro-item.on .agro-nome{color:#33512F;font-weight:600}
+.agro-kwh{font-size:10px;color:#4A4F44}
 .total-box{padding:12px;border-radius:10px;text-align:center}
 .total-label{font-size:10px;margin-bottom:1px}
 .total-value{font-size:24px;font-weight:800}
 .total-sub{font-size:10px;margin-top:1px}
 .field-group{display:flex;flex-direction:column;gap:10px}
 .col-stack{display:flex;flex-direction:column;gap:10px}
-.search-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:11px 13px;background:#fff;border-radius:11px;border:1px solid #D4E8D0;margin-bottom:10px}
-.search-inp{flex:1;min-width:130px;padding:6px 10px;border:1px solid #D4E8D0;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
-.filter-btn{padding:4px 10px;border-radius:16px;border:1px solid #D4E8D0;background:transparent;font-size:11px;font-weight:600;cursor:pointer;color:#6B7F6E;font-family:inherit}
-.filter-btn.active{border-color:#074031;background:#074031;color:#fff}
+.search-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:11px 13px;background:#fff;border-radius:11px;border:1px solid #C9D2C4;margin-bottom:10px}
+.search-inp{flex:1;min-width:130px;padding:6px 10px;border:1px solid #C9D2C4;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.filter-btn{padding:4px 10px;border-radius:16px;border:1px solid #C9D2C4;background:transparent;font-size:11px;font-weight:600;cursor:pointer;color:#4A4F44;font-family:inherit}
+.filter-btn.active{border-color:#33512F;background:#33512F;color:#fff}
 @media(max-width:680px){.grid2{grid-template-columns:1fr}.model-grid{flex-wrap:wrap}}
 
-.header{background:#074031}
-.tab-btn.active{border-bottom-color:#81A969}
+.header{background:#33512F}
+.tab-btn.active{border-bottom-color:#DCEBD8}
 
 </style>
 </head>
 <body>
 
 <!-- BANNER DE POSICIONAMENTO -->
-<div style="background:#074031;border-bottom:2px solid #81A969;padding:10px 20px;text-align:center">
-  <span style="color:#81A969;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Physis SustainKit — </span>
+<div style="background:#33512F;border-bottom:2px solid #4B7547;padding:10px 20px;text-align:center">
+  <span style="display:none">Physis SustainKit — </span>
   <span style="color:rgba(255,255,255,0.85);font-size:12px">Calculador web que substitui parte da consultoria de sustentabilidade — dimensiona solar, água e materiais, e checa se o projeto atende LEED e EDGE</span>
-  <span style="margin-left:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(129,169,105,0.4);border-radius:4px;padding:2px 10px;color:#81A969;font-size:11px;font-weight:700">vs. US$ 40k de consultoria LEED</span>
+  <span style="margin-left:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(220,235,216,0.4);border-radius:4px;padding:2px 10px;color:#DCEBD8;font-size:11px;font-weight:700">vs. US$ 40k de consultoria LEED</span>
 </div>
 
 <div class="header">
@@ -135,24 +135,24 @@ select{width:100%;font-size:12px}
     <div class="badge">VERSÃO COMPLETA</div>
 
 <button onclick="toggleModoApresentacao()" id="btn-apresentacao" style="
-  background:rgba(255,255,255,0.1);border:1px solid rgba(129,169,105,0.5);
+  background:rgba(255,255,255,0.1);border:1px solid rgba(220,235,216,0.5);
   border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;
-  color:#81A969;cursor:pointer;font-family:inherit;transition:all 0.2s">
+  color:#DCEBD8;cursor:pointer;font-family:inherit;transition:all 0.2s">
   📊 Modo Apresentação
 </button>
 
   </div>
   <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('t-solar',this)">☀️ Energia + Água</button>
-    <button class="tab-btn" onclick="showTab('t-mat',this)">🧱 Materiais</button>
-    <button class="tab-btn" onclick="showTab('t-ori',this)">🌞 Orientação Solar</button>
-    <button class="tab-btn" onclick="showTab('t-certs',this)">🔍 Certificações</button>
-    <button class="tab-btn" onclick="showTab('t-acab',this)">🎨 Acabamentos</button>
-    <button class="tab-btn" onclick="showTab('t-check',this)">✅ Checklist</button>
-    <button class="tab-btn" onclick="showTab('t-modelos',this)">💼 Modelos</button>
-    <button class="tab-btn" onclick="showTab('t-agro',this)">🌾 Agro Solar</button>
-    <button class="tab-btn" onclick="showTab('t-carbono',this)">🌿 Carbono</button>
-    <button class="tab-btn" onclick="showTab('t-precos',this)">💰 Preços</button>
+    <button class="tab-btn active" onclick="showTab('t-solar',this)">Energia + Água</button>
+    <button class="tab-btn" onclick="showTab('t-mat',this)">Materiais</button>
+    <button class="tab-btn" onclick="showTab('t-ori',this)">Orientação Solar</button>
+    <button class="tab-btn" onclick="showTab('t-certs',this)">Certificações</button>
+    <button class="tab-btn" onclick="showTab('t-acab',this)">Acabamentos</button>
+    <button class="tab-btn" onclick="showTab('t-check',this)">Checklist</button>
+    <button class="tab-btn" onclick="showTab('t-modelos',this)">Modelos</button>
+    <button class="tab-btn" onclick="showTab('t-agro',this)">Agro Solar</button>
+    <button class="tab-btn" onclick="showTab('t-carbono',this)">Carbono</button>
+    <button class="tab-btn" onclick="showTab('t-precos',this)">Preços</button>
     </div>
 </div>
 
@@ -163,7 +163,7 @@ select{width:100%;font-size:12px}
   <div class="grid2">
     <div class="col-stack">
       <div class="card">
-        <div class="sec-title" style="color:#074031">☀️ Sistema Solar FV</div>
+        <div class="sec-title" style="color:#33512F">Sistema Solar FV</div>
         <div class="inp-row"><div class="lbl">Cidade</div><select id="s-cidade" onchange="calcSolar()"><option value="">Selecionar...</option></select></div>
         <div class="inp-row"><div class="lbl">Consumo diário</div><div class="inp-wrap"><input type="number" id="s-consumo" value="22" oninput="calcSolar()"><span class="unit">kWh/dia</span></div></div>
         <div class="inp-row"><div class="lbl">Potência instalada</div><div class="inp-wrap"><input type="number" id="s-pot" value="10" step="0.5" oninput="calcSolar()"><span class="unit">kWp</span></div></div>
@@ -176,7 +176,7 @@ select{width:100%;font-size:12px}
         </div>
       </div>
       <div class="card">
-        <div class="sec-title" style="color:#074031">🔋 Bateria + 💧 Água</div>
+        <div class="sec-title" style="color:#33512F">Bateria + Água</div>
         <div class="inp-row"><div class="lbl">Autonomia bateria</div><div class="inp-wrap"><input type="number" id="s-auto" value="48" step="12" oninput="calcSolar()"><span class="unit">horas</span></div></div>
         <div class="inp-row"><div class="lbl">Tecnologia</div><select id="s-dod" onchange="calcSolar()"><option value="0.90">LiFePO4 — DoD 90%</option><option value="0.85">Li-NMC — DoD 85%</option><option value="0.50">AGM — DoD 50%</option></select></div>
         <div class="inp-row"><div class="lbl">Área de captação</div><div class="inp-wrap"><input type="number" id="s-area" value="84" oninput="calcSolar()"><span class="unit">m²</span></div></div>
@@ -185,14 +185,14 @@ select{width:100%;font-size:12px}
     </div>
     <div class="col-stack">
       <div class="card card-pale">
-        <div class="sec-title" style="color:#074031">📊 Resultados Solar</div>
+        <div class="sec-title" style="color:#33512F">Resultados Solar</div>
         <div class="res-row"><span class="res-label">Potência mínima</span><span class="res-value" id="r-potmin">—</span></div>
         <div class="res-row hi"><span class="res-label">Potência instalada</span><span class="res-value" id="r-pot">—</span></div>
         <div class="res-row"><span class="res-label">Geração anual</span><span class="res-value" id="r-ger">—</span></div>
         <div id="r-nzeb" class="status-box status-ok"><div class="status-title">—</div></div>
       </div>
       <div class="card card-pale">
-        <div class="sec-title" style="color:#074031">🔋 Bateria · 💧 Água</div>
+        <div class="sec-title" style="color:#33512F">Bateria · Água</div>
         <div class="res-row hi"><span class="res-label">Capacidade bateria</span><span class="res-value" id="r-bat">—</span></div>
         <div class="res-row"><span class="res-label">Captação pluvial</span><span class="res-value" id="r-cap">—</span></div>
         <div class="res-row"><span class="res-label">Consumo água</span><span class="res-value" id="r-agua">—</span></div>
@@ -206,11 +206,11 @@ select{width:100%;font-size:12px}
 <div id="t-mat" class="tab-panel">
   <div class="grid2">
     <div class="card">
-      <div class="sec-title" style="color:#074031">🌍 Recomendação por Clima</div>
+      <div class="sec-title" style="color:#33512F">Recomendação por Clima</div>
       <div class="inp-row"><select id="m-cidade" onchange="calcMat()"><option value="">Selecionar...</option></select></div>
       <div id="m-zona-box" style="padding:10px;border-radius:10px;margin-bottom:8px">
-        <div style="font-weight:700;font-size:12px;color:#074031">Zona Bioclimática</div>
-        <div id="m-zona-label" style="font-size:11px;color:#51774B;font-weight:600">—</div>
+        <div style="font-weight:700;font-size:12px;color:#33512F">Zona Bioclimática</div>
+        <div id="m-zona-label" style="font-size:11px;color:#4B7547;font-weight:600">—</div>
       </div>
       <div id="m-rec"></div>
     </div>
@@ -228,13 +228,13 @@ select{width:100%;font-size:12px}
 <div id="t-ori" class="tab-panel">
   <div class="grid2">
     <div class="card">
-      <div class="sec-title" style="color:#074031">🌞 Localização</div>
+      <div class="sec-title" style="color:#33512F">Localização</div>
       <div class="inp-row"><div class="lbl">Latitude</div><div class="inp-wrap"><input type="number" id="o-lat" value="-22.505" step="0.001" oninput="calcOri()"><span class="unit">°</span></div><div class="note">Negativo = Hemisfério Sul</div></div>
       <div class="inp-row"><div class="lbl">Mês</div><select id="o-mes" onchange="calcOri()"><option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option><option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option><option value="7" selected>Julho</option><option value="8">Agosto</option><option value="9">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select></div>
       <div id="o-results"></div>
     </div>
     <div class="card card-pale">
-      <div class="sec-title" style="color:#074031">📊 HPS por mês</div>
+      <div class="sec-title" style="color:#33512F">HPS por mês</div>
       <div id="o-chart" style="display:flex;gap:2px;align-items:flex-end;height:90px;margin-bottom:8px"></div>
       <div id="o-fachadas"></div>
     </div>
@@ -253,7 +253,7 @@ select{width:100%;font-size:12px}
 <div id="t-acab" class="tab-panel">
   <div class="grid2">
     <div class="card">
-      <div class="sec-title" style="color:#074031">🎨 Selecionar acabamento</div>
+      <div class="sec-title" style="color:#33512F">Selecionar acabamento</div>
       <div id="acab-list"></div>
       <div class="inp-row" style="margin-top:8px"><div class="lbl">Área (m²)</div><div class="inp-wrap"><input type="number" id="acab-area" value="12" oninput="calcAcab()"><span class="unit">m²</span></div></div>
       <div class="pill-row">
@@ -262,12 +262,12 @@ select{width:100%;font-size:12px}
       </div>
     </div>
     <div class="card card-pale">
-      <div class="sec-title" style="color:#074031">💰 Orçamento</div>
+      <div class="sec-title" style="color:#33512F">Orçamento</div>
       <div class="res-row"><span class="res-label">Material + base</span><span class="res-value" id="a-mat">—</span></div>
       <div class="res-row"><span class="res-label">Ferramentas</span><span class="res-value" id="a-ferra">—</span></div>
       <div class="res-row"><span class="res-label">Mão de obra</span><span class="res-value" id="a-mo">—</span></div>
-      <div class="total-box" style="background:#074031;margin-top:8px">
-        <div class="total-label" style="color:#81A969">TOTAL ESTIMADO</div>
+      <div class="total-box" style="background:#33512F;margin-top:8px">
+        <div class="total-label" style="color:#DCEBD8">TOTAL ESTIMADO</div>
         <div class="total-value" style="color:#fff" id="a-total">—</div>
         <div class="total-sub" style="color:rgba(255,255,255,0.6)" id="a-m2">—</div>
       </div>
@@ -280,9 +280,9 @@ select{width:100%;font-size:12px}
   <div class="card" style="margin-bottom:10px;padding:11px 14px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
       <div style="font-weight:700;font-size:13px">✅ Checklist de Obra</div>
-      <div style="font-weight:800;font-size:16px;color:#51774B" id="chk-total">0/0 (0%)</div>
+      <div style="font-weight:800;font-size:16px;color:#4B7547" id="chk-total">0/0 (0%)</div>
     </div>
-    <div style="height:6px;background:#F4F7F4;border-radius:3px;overflow:hidden"><div id="chk-bar" style="height:100%;background:#51774B;border-radius:3px;width:0%;transition:width 0.4s"></div></div>
+    <div style="height:6px;background:#F4F6F1;border-radius:3px;overflow:hidden"><div id="chk-bar" style="height:100%;background:#4B7547;border-radius:3px;width:0%;transition:width 0.4s"></div></div>
   </div>
   <div class="grid2" id="chk-grid"></div>
 </div>
@@ -297,25 +297,25 @@ select{width:100%;font-size:12px}
 <div id="t-agro" class="tab-panel">
   <div class="grid2">
     <div class="card">
-      <div class="sec-title" style="color:#074031">🌾 Diagnóstico de Cargas</div>
-      <div style="font-size:11px;color:#6B7F6E;margin-bottom:8px">Marque os equipamentos presentes:</div>
+      <div class="sec-title" style="color:#33512F">Diagnóstico de Cargas</div>
+      <div style="font-size:11px;color:#4A4F44;margin-bottom:8px">Marque os equipamentos presentes:</div>
       <div id="agro-list"></div>
       <div class="inp-row" style="margin-top:8px"><div class="lbl">HPS local (pior mês)</div><div class="inp-wrap"><input type="number" id="ag-hps" value="4.5" step="0.1" oninput="calcAgro()"><span class="unit">h/dia</span></div></div>
     </div>
     <div class="col-stack">
       <div class="card card-pale">
-        <div class="sec-title" style="color:#074031">📊 Sistema Solar Agro</div>
+        <div class="sec-title" style="color:#33512F">Sistema Solar Agro</div>
         <div class="res-row"><span class="res-label">Consumo diário</span><span class="res-value" id="ag-cons">—</span></div>
         <div class="res-row hi"><span class="res-label">Potência FV mínima</span><span class="res-value" id="ag-pot">—</span></div>
         <div class="res-row hi"><span class="res-label">Bateria (48h autonomia)</span><span class="res-value" id="ag-bat">—</span></div>
       </div>
       <div class="card">
-        <div class="sec-title" style="color:#074031">🌱 AgriPV — Culturas Compatíveis</div>
-        <div style="padding:7px 9px;background:#C8E6C9;border-radius:7px;margin-bottom:4px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">🍓 Morango</span><span style="font-size:11px;color:#1B5E20">★★★★★</span></div><div style="font-size:10px;color:#6B7F6E">Ideal altitude · melhora qualidade</div></div>
-        <div style="padding:7px 9px;background:#C8E6C9;border-radius:7px;margin-bottom:4px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">🥬 Alface</span><span style="font-size:11px;color:#1B5E20">★★★★★</span></div><div style="font-size:10px;color:#6B7F6E">Evita espigamento · alta produtividade</div></div>
-        <div style="padding:7px 9px;background:#C8E6C9;border-radius:7px;margin-bottom:4px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">☕ Café</span><span style="font-size:11px;color:#2E7D32">★★★★☆</span></div><div style="font-size:10px;color:#6B7F6E">30–40% sombra · planta de sub-bosque</div></div>
-        <div style="padding:7px 9px;background:#FFE0B2;border-radius:7px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">🌾 Soja/Milho</span><span style="font-size:11px;color:#E65100">★★☆☆☆</span></div><div style="font-size:10px;color:#6B7F6E">Não recomendado como cultura única</div></div>
-        <div style="font-size:10px;color:#6B7F6E;font-style:italic;margin-top:6px">LER médio: 1,3–1,7 · Fraunhofer ISE 2023</div>
+        <div class="sec-title" style="color:#33512F">AgriPV — Culturas Compatíveis</div>
+        <div style="padding:7px 9px;background:#DCEBD8;border-radius:7px;margin-bottom:4px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">🍓 Morango</span><span style="font-size:11px;color:#1F4A1C">★★★★★</span></div><div style="font-size:10px;color:#4A4F44">Ideal altitude · melhora qualidade</div></div>
+        <div style="padding:7px 9px;background:#DCEBD8;border-radius:7px;margin-bottom:4px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">🥬 Alface</span><span style="font-size:11px;color:#1F4A1C">★★★★★</span></div><div style="font-size:10px;color:#4A4F44">Evita espigamento · alta produtividade</div></div>
+        <div style="padding:7px 9px;background:#DCEBD8;border-radius:7px;margin-bottom:4px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">☕ Café</span><span style="font-size:11px;color:#1F4A1C">★★★★☆</span></div><div style="font-size:10px;color:#4A4F44">30–40% sombra · planta de sub-bosque</div></div>
+        <div style="padding:7px 9px;background:#F6EAD0;border-radius:7px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">🌾 Soja/Milho</span><span style="font-size:11px;color:#8A6410">★★☆☆☆</span></div><div style="font-size:10px;color:#4A4F44">Não recomendado como cultura única</div></div>
+        <div style="font-size:10px;color:#4A4F44;font-style:italic;margin-top:6px">LER médio: 1,3–1,7 · Fraunhofer ISE 2023</div>
       </div>
     </div>
   </div>
@@ -330,8 +330,8 @@ select{width:100%;font-size:12px}
     <!-- Col esq: inputs -->
     <div class="col-stack">
       <div class="card">
-        <div class="sec-title" style="color:#074031">⚡ Emissões Operacionais</div>
-        <div style="font-size:10px;color:#6B7F6E;margin-bottom:10px;font-style:italic">
+        <div class="sec-title" style="color:#33512F">Emissões Operacionais</div>
+        <div style="font-size:10px;color:#4A4F44;margin-bottom:10px;font-style:italic">
           Fatores: Rede SIN 0,0289 tCO₂/MWh · Diesel 0,74 kgCO₂e/kWh · Biogás 2,75 kgCO₂e/m³
         </div>
         <div class="inp-row"><div class="lbl">Energia comprada da rede (anual)</div>
@@ -348,7 +348,7 @@ select{width:100%;font-size:12px}
         </div>
       </div>
       <div class="card">
-        <div class="sec-title" style="color:#074031">🧱 Carbono Incorporado (LCA)</div>
+        <div class="sec-title" style="color:#33512F">Carbono Incorporado (LCA)</div>
         <div class="inp-row"><div class="lbl">CLT / madeira estrutural</div>
           <div class="inp-wrap"><input type="number" id="c-clt" value="12" oninput="calcCarbon()"><span class="unit">m³</span></div></div>
         <div class="inp-row"><div class="lbl">Concreto / fundação</div>
@@ -357,7 +357,7 @@ select{width:100%;font-size:12px}
           <div class="inp-wrap"><input type="number" id="c-aco" value="500" oninput="calcCarbon()"><span class="unit">kg</span></div></div>
         <div class="inp-row"><div class="lbl">Bambu estrutural</div>
           <div class="inp-wrap"><input type="number" id="c-bambu" value="0" oninput="calcCarbon()"><span class="unit">colmos</span></div></div>
-        <div style="font-size:10px;color:#6B7F6E;font-style:italic;padding:6px 8px;background:#F4F7F4;border-radius:6px">
+        <div style="font-size:10px;color:#4A4F44;font-style:italic;padding:6px 8px;background:#F4F6F1;border-radius:6px">
           EPD: CLT −1.500 kgCO₂/m³ · Concreto +210 kgCO₂/m³ · Aço +0,9 kgCO₂/kg · Bambu −40 kgCO₂/colmo
         </div>
       </div>
@@ -365,28 +365,28 @@ select{width:100%;font-size:12px}
     <!-- Col dir: resultados -->
     <div class="col-stack">
       <div class="card card-pale">
-        <div class="sec-title" style="color:#074031">📊 Balanço de Carbono</div>
-        <div style="font-size:11px;color:#6B7F6E;margin-bottom:8px">Operacional — período anual</div>
+        <div class="sec-title" style="color:#33512F">Balanço de Carbono</div>
+        <div style="font-size:11px;color:#4A4F44;margin-bottom:8px">Operacional — período anual</div>
         <div class="res-row"><span class="res-label">Emissão — energia da rede</span><span class="res-value" id="r-em-rede">—</span></div>
         <div class="res-row"><span class="res-label">Emissão — diesel</span><span class="res-value" id="r-em-diesel">—</span></div>
         <div class="res-row"><span class="res-label">Evitado — solar (firme ✅)</span><span class="res-value" id="r-ev-solar">—</span></div>
         <div class="res-row"><span class="res-label">Evitado — biogás (contestável ⚠️)</span><span class="res-value" id="r-ev-bio">—</span></div>
         <div class="res-row hi"><span class="res-label">Saldo firme (sem biogás)</span><span class="res-value" id="r-saldo-firme">—</span></div>
         <div class="res-row hi"><span class="res-label">Saldo total (com biogás)</span><span class="res-value" id="r-saldo-total">—</span></div>
-        <div style="font-size:11px;color:#6B7F6E;margin:8px 0 4px">Incorporado — materiais</div>
+        <div style="font-size:11px;color:#4A4F44;margin:8px 0 4px">Incorporado — materiais</div>
         <div class="res-row"><span class="res-label">CO₂ incorporado líquido</span><span class="res-value" id="r-incorp">—</span></div>
         <div id="r-carbon-status" class="status-box" style="margin-top:8px"></div>
       </div>
       <div class="card">
-        <div class="sec-title" style="color:#074031">⚖️ Regimes e Metas Net Zero</div>
+        <div class="sec-title" style="color:#33512F">Regimes e Metas Net Zero</div>
         <div id="c-regimes"></div>
       </div>
     </div>
   </div>
   <!-- Metodologias -->
   <div class="card">
-    <div class="sec-title" style="color:#074031">📋 Metodologias — Status do Projeto</div>
-    <div style="font-size:11px;color:#B71C1C;font-style:italic;margin-bottom:10px;padding:8px;background:#FFCDD2;border-radius:7px">
+    <div class="sec-title" style="color:#33512F">Metodologias — Status do Projeto</div>
+    <div style="font-size:11px;color:#7A2214;font-style:italic;margin-bottom:10px;padding:8px;background:#F5E2D7;border-radius:7px">
       ⚠️ Inventário não é crédito de carbono. A calculadora estima o que a unidade emite.
       Crédito exige metodologia credenciada, adicionalidade, linha de base e verificação independente.
     </div>
@@ -398,81 +398,81 @@ select{width:100%;font-size:12px}
 <!-- PREÇOS -->
 <div id="t-precos" class="tab-panel">
   <!-- Faixa de preços SustainKit -->
-  <div class="card" style="margin-bottom:14px;padding:14px 18px;background:linear-gradient(135deg,#EEF8EB,#F4F7F4)">
-    <div style="font-weight:700;color:#074031;font-size:14px;margin-bottom:4px">💰 Tabela de Preços — Physis SustainKit</div>
-    <div style="font-size:11px;color:#6B7F6E;margin-bottom:12px;font-style:italic">Referência: consultoria LEED certificada custa US$ 30.000–50.000 (≈ R$ 156k–260k). O SustainKit entrega a ferramenta de dimensionamento e checagem a uma fração disso.</div>
+  <div class="card" style="margin-bottom:14px;padding:14px 18px;background:linear-gradient(135deg,#EEF4EA,#F4F6F1)">
+    <div style="font-weight:700;color:#33512F;font-size:14px;margin-bottom:4px">💰 Tabela de Preços — Physis SustainKit</div>
+    <div style="font-size:11px;color:#4A4F44;margin-bottom:12px;font-style:italic">Referência: consultoria LEED certificada custa US$ 30.000–50.000 (≈ R$ 156k–260k). O SustainKit entrega a ferramenta de dimensionamento e checagem a uma fração disso.</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">
-      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
-        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">⚡ Módulo Energy</div>
-        <div style="font-size:22px;font-weight:800;color:#074031">R$ 800</div>
-        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">por projeto</div>
-        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Solar FV · Bateria<br>Orientação · Resiliência</div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #C9D2C4;text-align:center">
+        <div style="font-size:11px;color:#4A4F44;margin-bottom:4px;font-weight:600">⚡ Módulo Energy</div>
+        <div style="font-size:22px;font-weight:800;color:#33512F">R$ 800</div>
+        <div style="font-size:10px;color:#4A4F44;margin-top:2px">por projeto</div>
+        <div style="margin-top:8px;font-size:10px;color:#4B7547;line-height:1.5">Solar FV · Bateria<br>Orientação · Resiliência</div>
       </div>
-      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
-        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">💧 Módulo Water</div>
-        <div style="font-size:22px;font-weight:800;color:#074031">R$ 600</div>
-        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">por projeto</div>
-        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Captação · Demandas<br>Biogás · Irrigação</div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #C9D2C4;text-align:center">
+        <div style="font-size:11px;color:#4A4F44;margin-bottom:4px;font-weight:600">💧 Módulo Water</div>
+        <div style="font-size:22px;font-weight:800;color:#33512F">R$ 600</div>
+        <div style="font-size:10px;color:#4A4F44;margin-top:2px">por projeto</div>
+        <div style="margin-top:8px;font-size:10px;color:#4B7547;line-height:1.5">Captação · Demandas<br>Biogás · Irrigação</div>
       </div>
-      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
-        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">🧱 Módulo Materials</div>
-        <div style="font-size:22px;font-weight:800;color:#074031">R$ 700</div>
-        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">por projeto</div>
-        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Banco materiais · LCA<br>Acabamentos · Ecologia</div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #C9D2C4;text-align:center">
+        <div style="font-size:11px;color:#4A4F44;margin-bottom:4px;font-weight:600">🧱 Módulo Materials</div>
+        <div style="font-size:22px;font-weight:800;color:#33512F">R$ 700</div>
+        <div style="font-size:10px;color:#4A4F44;margin-top:2px">por projeto</div>
+        <div style="margin-top:8px;font-size:10px;color:#4B7547;line-height:1.5">Banco materiais · LCA<br>Acabamentos · Ecologia</div>
       </div>
-      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
-        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">🔍 Módulo Cert</div>
-        <div style="font-size:22px;font-weight:800;color:#074031">R$ 900</div>
-        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">por projeto</div>
-        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Gap Analysis LEED/EDGE<br>Checklist · Modelos</div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #C9D2C4;text-align:center">
+        <div style="font-size:11px;color:#4A4F44;margin-bottom:4px;font-weight:600">🔍 Módulo Cert</div>
+        <div style="font-size:22px;font-weight:800;color:#33512F">R$ 900</div>
+        <div style="font-size:10px;color:#4A4F44;margin-top:2px">por projeto</div>
+        <div style="margin-top:8px;font-size:10px;color:#4B7547;line-height:1.5">Gap Analysis LEED/EDGE<br>Checklist · Modelos</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px">
-      <div style="padding:14px;background:#074031;border-radius:10px;text-align:center;border:2px solid #81A969">
-        <div style="font-size:11px;color:#81A969;margin-bottom:4px;font-weight:700">🌿 PACOTE COMPLETO</div>
+      <div style="padding:14px;background:#33512F;border-radius:10px;text-align:center;border:2px solid #4B7547">
+        <div style="font-size:11px;color:#DCEBD8;margin-bottom:4px;font-weight:700">🌿 PACOTE COMPLETO</div>
         <div style="font-size:28px;font-weight:800;color:#fff">R$ 2.800</div>
         <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:2px">por projeto · todos os módulos</div>
-        <div style="margin-top:8px;font-size:10px;color:#81A969;line-height:1.5">Energy + Water + Materials<br>+ Cert + Agro + Carbono</div>
+        <div style="margin-top:8px;font-size:10px;color:#DCEBD8;line-height:1.5">Energy + Water + Materials<br>+ Cert + Agro + Carbono</div>
         <div style="margin-top:6px;font-size:9px;color:rgba(255,255,255,0.4)">Economia de R$ 1.100 vs. módulos separados</div>
       </div>
-      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
-        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">📅 Assinatura Anual</div>
-        <div style="font-size:22px;font-weight:800;color:#074031">R$ 1.800<span style="font-size:12px;font-weight:400">/ano</span></div>
-        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">escritórios e consultores</div>
-        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Uso ilimitado · Atualizações<br>LEED/EDGE · Suporte</div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #C9D2C4;text-align:center">
+        <div style="font-size:11px;color:#4A4F44;margin-bottom:4px;font-weight:600">📅 Assinatura Anual</div>
+        <div style="font-size:22px;font-weight:800;color:#33512F">R$ 1.800<span style="font-size:12px;font-weight:400">/ano</span></div>
+        <div style="font-size:10px;color:#4A4F44;margin-top:2px">escritórios e consultores</div>
+        <div style="margin-top:8px;font-size:10px;color:#4B7547;line-height:1.5">Uso ilimitado · Atualizações<br>LEED/EDGE · Suporte</div>
       </div>
-      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
-        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">🏢 Consultoria + Ferramenta</div>
-        <div style="font-size:22px;font-weight:800;color:#074031">R$ 15k–50k</div>
-        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">por projeto completo</div>
-        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Laudo técnico · Memória<br>de cálculo · Relatório banco</div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #C9D2C4;text-align:center">
+        <div style="font-size:11px;color:#4A4F44;margin-bottom:4px;font-weight:600">🏢 Consultoria + Ferramenta</div>
+        <div style="font-size:22px;font-weight:800;color:#33512F">R$ 15k–50k</div>
+        <div style="font-size:10px;color:#4A4F44;margin-top:2px">por projeto completo</div>
+        <div style="margin-top:8px;font-size:10px;color:#4B7547;line-height:1.5">Laudo técnico · Memória<br>de cálculo · Relatório banco</div>
       </div>
     </div>
   </div>
   <!-- Referências de preço dos sistemas -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
     <div class="card">
-      <div style="font-weight:700;color:#074031;font-size:13px;margin-bottom:10px">🏗️ Referências de Custo — Chalé Sustentável</div>
-      <div style="font-size:10px;color:#6B7F6E;font-style:italic;margin-bottom:8px">Fonte: Memória de Cálculo Physis · Abril 2025 · Petrópolis RJ</div>
+      <div style="font-weight:700;color:#33512F;font-size:13px;margin-bottom:10px">🏗️ Referências de Custo — Chalé Sustentável</div>
+      <div style="font-size:10px;color:#4A4F44;font-style:italic;margin-bottom:8px">Fonte: Memória de Cálculo Physis · Abril 2025 · Petrópolis RJ</div>
       <div id="ref-items"></div>
     </div>
     <div class="card">
-      <div style="font-weight:700;color:#074031;font-size:13px;margin-bottom:10px">📊 Retorno do Investimento</div>
-      <div style="font-size:10px;color:#6B7F6E;font-style:italic;margin-bottom:8px">Base: chalé 84m² · Petrópolis RJ · CAPEX R$ 520k</div>
+      <div style="font-weight:700;color:#33512F;font-size:13px;margin-bottom:10px">📊 Retorno do Investimento</div>
+      <div style="font-size:10px;color:#4A4F44;font-style:italic;margin-bottom:8px">Base: chalé 84m² · Petrópolis RJ · CAPEX R$ 520k</div>
       <div id="roi-items"></div>
-      <div style="margin-top:10px;padding:10px;background:#EEF8EB;border-radius:8px;border:1px solid #D4E8D0">
-        <div style="font-size:11px;color:#074031;font-weight:700">🎯 Por que o SustainKit justifica o investimento</div>
-        <div style="font-size:10px;color:#6B7F6E;margin-top:4px;line-height:1.6">
-          Certificação LEED com consultora externa: <strong style="color:#074031">US$ 30k–50k</strong><br>
-          Prêmio de diária com badge sustentável: <strong style="color:#074031">+35%</strong> (Booking 2024)<br>
-          Economia anual em energia + água: <strong style="color:#074031">≈ R$ 18.000/ano</strong><br>
-          Valorização imobiliária (EDGE/LEED): <strong style="color:#074031">+18–30%</strong>
+      <div style="margin-top:10px;padding:10px;background:#EEF4EA;border-radius:8px;border:1px solid #C9D2C4">
+        <div style="font-size:11px;color:#33512F;font-weight:700">🎯 Por que o SustainKit justifica o investimento</div>
+        <div style="font-size:10px;color:#4A4F44;margin-top:4px;line-height:1.6">
+          Certificação LEED com consultora externa: <strong style="color:#33512F">US$ 30k–50k</strong><br>
+          Prêmio de diária com badge sustentável: <strong style="color:#33512F">+35%</strong> (Booking 2024)<br>
+          Economia anual em energia + água: <strong style="color:#33512F">≈ R$ 18.000/ano</strong><br>
+          Valorização imobiliária (EDGE/LEED): <strong style="color:#33512F">+18–30%</strong>
         </div>
       </div>
     </div>
   </div>
   <!-- Modo apresentação -->
-  <div style="margin-top:12px;padding:10px 14px;background:#FFF8E1;border-radius:8px;border:1px solid #FFB74D;font-size:11px;color:#E65100">
+  <div style="margin-top:12px;padding:10px 14px;background:#F6EAD0;border-radius:8px;border:1px solid #8A6410;font-size:11px;color:#8A6410">
     ⚠️ <strong>Nota:</strong> Os preços acima são referências provisórias — Abril 2025, Petrópolis RJ. 
     Número errado a gente corrige; número ausente trava o plano de negócios.
   </div>
@@ -519,15 +519,15 @@ const CIDADES={
   'Amsterdã — Holanda':{hps:2.68,hpsMin:0.81,zona:0,prec:900},
 };
 const MAT_ZONA={
-  0:{e:'CLT + SIP',v:'Análise local',i:'Verificar',c:'Verificar',es:'Vidro duplo',l:'Internacional',cor:'#F3E5F5'},
-  1:{e:'CLT + SIP 150mm',v:'SIP + BTC + hempcrete',i:'Lã rocha 100mm',c:'Sanduíche 80mm + telhado verde',es:'Vidro triplo argônio',l:'Frio — Zona 1',cor:'#DBEAFE'},
-  2:{e:'CLT + SIP 100mm',v:'SIP + BTC',i:'Lã rocha 75mm',c:'Sanduíche 60mm + telhado verde',es:'Vidro triplo argônio',l:'Muito frio — Zona 2',cor:'#DBEAFE'},
-  3:{e:'CLT + SIP 100mm',v:'SIP + BTC / Hempcrete',i:'Lã PET 50mm',c:'Sanduíche 50mm + telhado verde',es:'Vidro duplo câmara ar',l:'Temperado — Zona 3',cor:'#EDE7F6'},
-  4:{e:'CLT ou SIP',v:'SIP ou BTC',i:'Lã PET cobertura',c:'Telhado verde',es:'Vidro duplo Low-E',l:'Subquente — Zona 4',cor:'#E8F5E9'},
-  5:{e:'CLT ou geopolímero',v:'BTC + alta inércia',i:'Lã rocha cobertura',c:'Sanduíche + câmara ar',es:'Vidro duplo Low-E',l:'Quente seco — Zona 5',cor:'#FFF9C4'},
-  6:{e:'Bambu + aço reciclado',v:'Adobe ou BTC',i:'Cobertura apenas',c:'Argila + cal refletiva',es:'Vidro duplo + shutters',l:'Quente seco — Zona 6',cor:'#FFE0B2'},
-  7:{e:'Bambu + aço reciclado',v:'Adobe branco + pedra',i:'Cobertura apenas',c:'Argila + cal refletiva',es:'Vidro duplo + shutters madeira',l:'Quente e seco — Zona 7',cor:'#FFE0B2'},
-  8:{e:'Bambu Guadua + FSC',v:'Paredes abertas + venezianas',i:'Mínimo',c:'Palha / sedum',es:'Venezianas + mosquiteiro',l:'Quente e úmido — Zona 8',cor:'#FCE4EC'},
+  0:{e:'CLT + SIP',v:'Análise local',i:'Verificar',c:'Verificar',es:'Vidro duplo',l:'Internacional',cor:'#EFE8D6'},
+  1:{e:'CLT + SIP 150mm',v:'SIP + BTC + hempcrete',i:'Lã rocha 100mm',c:'Sanduíche 80mm + telhado verde',es:'Vidro triplo argônio',l:'Frio — Zona 1',cor:'#DBE7F1'},
+  2:{e:'CLT + SIP 100mm',v:'SIP + BTC',i:'Lã rocha 75mm',c:'Sanduíche 60mm + telhado verde',es:'Vidro triplo argônio',l:'Muito frio — Zona 2',cor:'#DBE7F1'},
+  3:{e:'CLT + SIP 100mm',v:'SIP + BTC / Hempcrete',i:'Lã PET 50mm',c:'Sanduíche 50mm + telhado verde',es:'Vidro duplo câmara ar',l:'Temperado — Zona 3',cor:'#EFE8D6'},
+  4:{e:'CLT ou SIP',v:'SIP ou BTC',i:'Lã PET cobertura',c:'Telhado verde',es:'Vidro duplo Low-E',l:'Subquente — Zona 4',cor:'#EEF4EA'},
+  5:{e:'CLT ou geopolímero',v:'BTC + alta inércia',i:'Lã rocha cobertura',c:'Sanduíche + câmara ar',es:'Vidro duplo Low-E',l:'Quente seco — Zona 5',cor:'#F6EAD0'},
+  6:{e:'Bambu + aço reciclado',v:'Adobe ou BTC',i:'Cobertura apenas',c:'Argila + cal refletiva',es:'Vidro duplo + shutters',l:'Quente seco — Zona 6',cor:'#F6EAD0'},
+  7:{e:'Bambu + aço reciclado',v:'Adobe branco + pedra',i:'Cobertura apenas',c:'Argila + cal refletiva',es:'Vidro duplo + shutters madeira',l:'Quente e seco — Zona 7',cor:'#F6EAD0'},
+  8:{e:'Bambu Guadua + FSC',v:'Paredes abertas + venezianas',i:'Mínimo',c:'Palha / sedum',es:'Venezianas + mosquiteiro',l:'Quente e úmido — Zona 8',cor:'#F5E2D7'},
 };
 const MATERIAIS=[
   {n:'CLT — Madeira Laminada Cruzada',c:'Estrutura',u:'0,28 W/m²K',co2:'−1,5 (negativo)',custo:'R$2.200–3.000/m³'},
@@ -555,7 +555,7 @@ const ACABAMENTOS={
   bambu:{n:'Piso Bambu (BLC)',matM2:160,base:18,ferra:120,moM2:45},
 };
 const CERTS={
-  leed:{n:'LEED v5 BD+C (Abril 2025)',cor:'#1565C0',items:[
+  leed:{n:'LEED v5 BD+C (Abril 2025)',cor:'#2C5A6E',items:[
     'Descarbonização — NZEB + eletrificação + ACV obrigatório',
     'Carbono Incorporado — LCA + EPD obrigatória (ISO 14025)',
     'Energia — M&V datalogger + Arc platform',
@@ -567,45 +567,45 @@ const CERTS={
     'Equidade Social — práticas justas na obra (NOVO v5)',
     'Registro na plataforma Arc (arc-app.gbci.org)',
   ]},
-  edge:{n:'EDGE (IFC/Banco Mundial)',cor:'#1976D2',items:[
+  edge:{n:'EDGE (IFC/Banco Mundial)',cor:'#2C5A6E',items:[
     'Energia: redução ≥20% vs. linha de base',
     'Água: redução ≥20% vs. linha de base',
     'Carbono incorporado: redução ≥20%',
     'EPDs dos materiais principais',
     'Registro em edgebuildings.com',
   ]},
-  casaazul:{n:'Selo Casa Azul — Caixa',cor:'#0D47A1',items:[
+  casaazul:{n:'Selo Casa Azul — Caixa',cor:'#2C5A6E',items:[
     'RTQ-R Nível A (PROCEL Edifica)',
     'Captação pluvial (NBR 15527)',
     'Coleta seletiva e compostagem',
     'Ventilação e iluminação natural (NBR 15575)',
     'Manual do proprietário entregue',
   ]},
-  greenkey:{n:'GreenKey — Hospitalidade',cor:'#2E7D32',items:[
+  greenkey:{n:'GreenKey — Hospitalidade',cor:'#1F4A1C',items:[
     'Política ambiental documentada',
     'Medição e redução de energia',
     '100% água sustentável',
     'Separação de resíduos + compostagem',
     'Produtos locais e orgânicos',
   ]},
-  pbqp:{n:'PBQP-H Bioconstrução',cor:'#6A1B9A',items:[
+  pbqp:{n:'PBQP-H Bioconstrução',cor:'#4A4F44',items:[
     'Materiais naturais/reciclados rastreados',
     'ART assinada em todos os projetos',
     'Conformidade NBR 15575 e NBR 15220',
   ]},
 };
 const CHECKLIST=[
-  {f:'Fase 1 — Planejamento',cor:'#0D47A1',items:['Verificar zoneamento e zona de risco','Obter LPLS','Elaborar PGRCC','Submeter ao INEA','Registrar no LEED Arc ou EDGE']},
-  {f:'Fase 2 — Pré-Produção',cor:'#1565C0',items:['Encomendar CLT, SIP e sistemas solar','Instalar cisterna e captação','Executar fundação com SPDA']},
-  {f:'Fase 3 — Montagem',cor:'#1976D2',items:['Montar estrutura CLT + SIP','Instalar sistema FV (NBR 16690)','Instalar inversor + bateria + DPS']},
-  {f:'Fase 4 — Acabamento',cor:'#2196F3',items:['Aplicar tadelakt ou cal','Aplicar tinta Arpex zero VOC','Configurar Home Assistant + IoT','Paisagismo com mudas nativas']},
-  {f:'Fase 5 — Certificação',cor:'#0288D1',items:['Solicitar Habite-se','Homologação ANEEL FV','Auditoria LEED/EDGE','Manual digital ao hóspede']},
+  {f:'Fase 1 — Planejamento',cor:'#2C5A6E',items:['Verificar zoneamento e zona de risco','Obter LPLS','Elaborar PGRCC','Submeter ao INEA','Registrar no LEED Arc ou EDGE']},
+  {f:'Fase 2 — Pré-Produção',cor:'#2C5A6E',items:['Encomendar CLT, SIP e sistemas solar','Instalar cisterna e captação','Executar fundação com SPDA']},
+  {f:'Fase 3 — Montagem',cor:'#2C5A6E',items:['Montar estrutura CLT + SIP','Instalar sistema FV (NBR 16690)','Instalar inversor + bateria + DPS']},
+  {f:'Fase 4 — Acabamento',cor:'#2C5A6E',items:['Aplicar tadelakt ou cal','Aplicar tinta Arpex zero VOC','Configurar Home Assistant + IoT','Paisagismo com mudas nativas']},
+  {f:'Fase 5 — Certificação',cor:'#2C5A6E',items:['Solicitar Habite-se','Homologação ANEEL FV','Auditoria LEED/EDGE','Manual digital ao hóspede']},
 ];
 const MODELOS=[
-  {id:'chale',icon:'🏡',n:'Chalé Individual',e:'1 un · 60–120m²',s:'8–12 kWp',c:'EDGE + LEED Gold',cor:'#E8F5E9'},
-  {id:'conjunto',icon:'🏘️',n:'Conjunto (3–5)',e:'3–5 un · terreno único',s:'25–40 kWp',c:'EDGE + LEED Gold',cor:'#EDE7F6'},
-  {id:'sede',icon:'🏢',n:'Sede Physis',e:'200–400m²',s:'15–25 kWp',c:'LEED Platinum',cor:'#FFF9C4'},
-  {id:'hotel',icon:'🏨',n:'Hotel Boutique',e:'8–15 quartos',s:'60–100 kWp',c:'LEED Gold',cor:'#FCE4EC'},
+  {id:'chale',icon:'🏡',n:'Chalé Individual',e:'1 un · 60–120m²',s:'8–12 kWp',c:'EDGE + LEED Gold',cor:'#EEF4EA'},
+  {id:'conjunto',icon:'🏘️',n:'Conjunto (3–5)',e:'3–5 un · terreno único',s:'25–40 kWp',c:'EDGE + LEED Gold',cor:'#EFE8D6'},
+  {id:'sede',icon:'🏢',n:'Sede Physis',e:'200–400m²',s:'15–25 kWp',c:'LEED Platinum',cor:'#F6EAD0'},
+  {id:'hotel',icon:'🏨',n:'Hotel Boutique',e:'8–15 quartos',s:'60–100 kWp',c:'LEED Gold',cor:'#F5E2D7'},
 ];
 const AGRO_CARGAS=[
   {n:'Bomba irrigação gotejamento',p:750,h:6,on:false},
@@ -684,7 +684,7 @@ function calcMat(){
   if(box)box.style.background=mat.cor;
   set('m-zona-label',mat.l+` · HPS: ${c.hps}h/dia`);
   const rec=$('m-rec');
-  if(rec)rec.innerHTML=[['🏗️',mat.e],['🧱',mat.v],['🌡️',mat.i],['🏠',mat.c],['🪟',mat.es]].map(([i,v])=>`<div style="padding:7px 9px;background:#F4F7F4;border-radius:8px;margin-bottom:4px"><div style="font-size:10px;color:#6B7F6E">${i}</div><div style="font-size:11px;font-weight:600;color:#074031">${v}</div></div>`).join('');
+  if(rec)rec.innerHTML=[['🏗️',mat.e],['🧱',mat.v],['🌡️',mat.i],['🏠',mat.c],['🪟',mat.es]].map(([i,v])=>`<div style="padding:7px 9px;background:#F4F6F1;border-radius:8px;margin-bottom:4px"><div style="font-size:10px;color:#4A4F44">${i}</div><div style="font-size:11px;font-weight:600;color:#33512F">${v}</div></div>`).join('');
 }
 function renderMat(){
   const busca=$('m-busca')?.value.toLowerCase()||'';
@@ -721,9 +721,9 @@ function calcOri(){
     ['Declinação solar',decl.toFixed(2)+'°'],['Duração do dia',dur+'h'],
     ['Altitude solar',alt.toFixed(1)+'°'],['HPS estimadas',+(dur*0.4).toFixed(1)+'h/dia'],
     ['Inclinação ótima',incOtima+'°'],['Fachada principal',lat<0?'Norte (0°)':'Sul (180°)'],
-  ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #D4E8D0;font-size:12px"><span style="color:#6B7F6E">${l}</span><span style="font-weight:700;color:#074031">${v}</span></div>`).join('');
-  $('o-chart').innerHTML=hpsAll.map((h,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px"><div style="font-size:7px;color:${i===mes-1?'#074031':'#6B7F6E'};font-weight:${i===mes-1?700:400}">${h}</div><div style="width:100%;height:${Math.round(h/maxH*72)}px;background:${i===mes-1?'#074031':'#81A969'};border-radius:2px 2px 0 0"></div><div style="font-size:7px;color:${i===mes-1?'#074031':'#6B7F6E'};font-weight:${i===mes-1?700:400}">${meses[i]}</div></div>`).join('');
-  $('o-fachadas').innerHTML=[['Norte','40–60% abertura · beiral 80–100cm'],['Sul','15–25% · luz difusa'],['Leste','20–30% · brise vertical'],['Oeste','≤20% · máxima proteção']].map(([f,d])=>`<div style="padding:6px 9px;background:#fff;border-radius:7px;margin-bottom:4px;border:1px solid #D4E8D0"><span style="font-size:11px;font-weight:700;color:#074031">${f}: </span><span style="font-size:11px;color:#1C2B22">${d}</span></div>`).join('');
+  ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #C9D2C4;font-size:12px"><span style="color:#4A4F44">${l}</span><span style="font-weight:700;color:#33512F">${v}</span></div>`).join('');
+  $('o-chart').innerHTML=hpsAll.map((h,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px"><div style="font-size:7px;color:${i===mes-1?'#33512F':'#4A4F44'};font-weight:${i===mes-1?700:400}">${h}</div><div style="width:100%;height:${Math.round(h/maxH*72)}px;background:${i===mes-1?'#33512F':'#DCEBD8'};border-radius:2px 2px 0 0"></div><div style="font-size:7px;color:${i===mes-1?'#33512F':'#4A4F44'};font-weight:${i===mes-1?700:400}">${meses[i]}</div></div>`).join('');
+  $('o-fachadas').innerHTML=[['Norte','40–60% abertura · beiral 80–100cm'],['Sul','15–25% · luz difusa'],['Leste','20–30% · brise vertical'],['Oeste','≤20% · máxima proteção']].map(([f,d])=>`<div style="padding:6px 9px;background:#fff;border-radius:7px;margin-bottom:4px;border:1px solid #C9D2C4"><span style="font-size:11px;font-weight:700;color:#33512F">${f}: </span><span style="font-size:11px;color:#1C2B21">${d}</span></div>`).join('');
 }
 
 // ── Certificações ──────────────────────────
@@ -734,20 +734,20 @@ function renderCerts(){
     const total=c.items.length;
     const ok=c.items.filter((_,i)=>certStatus[k+'_'+i]==='✅ Atende').length;
     const pct=Math.round(ok/total*100);
-    return `<button class="cert-btn${certAtual===k?' active':''}" style="--cert-cor:${c.cor}" onclick="certAtual='${k}';renderCerts()"><div class="cert-btn-title" style="color:${certAtual===k?c.cor:'#1C2B22'}">${c.n}</div><div class="cert-btn-bar"><div class="cert-btn-fill" style="width:${pct}%;background:${c.cor}"></div></div><div class="cert-btn-pct">${pct}%</div></button>`;
+    return `<button class="cert-btn${certAtual===k?' active':''}" style="--cert-cor:${c.cor}" onclick="certAtual='${k}';renderCerts()"><div class="cert-btn-title" style="color:${certAtual===k?c.cor:'#1C2B21'}">${c.n}</div><div class="cert-btn-bar"><div class="cert-btn-fill" style="width:${pct}%;background:${c.cor}"></div></div><div class="cert-btn-pct">${pct}%</div></button>`;
   }).join('');
   const c=CERTS[certAtual];
   const total=c.items.length;
   const ok=c.items.filter((_,i)=>certStatus[certAtual+'_'+i]==='✅ Atende').length;
   const pct=Math.round(ok/total*100);
   const statusOpts=['✅ Atende','⚠️ Parcial','❌ Não atende','⬜ N/A'];
-  const statusBg={'✅ Atende':'#C8E6C9','⚠️ Parcial':'#FFE0B2','❌ Não atende':'#FFCDD2','⬜ N/A':'#E3F2FD'};
+  const statusBg={'✅ Atende':'#DCEBD8','⚠️ Parcial':'#F6EAD0','❌ Não atende':'#F5E2D7','⬜ N/A':'#DBE7F1'};
   const counts=statusOpts.reduce((a,o)=>{a[o]=c.items.filter((_,i)=>certStatus[certAtual+'_'+i]===o).length;return a;},{});
   $('cert-panel').innerHTML=`
-    <div class="cert-header"><div><div style="font-weight:700;font-size:13px;color:#1C2B22">${c.n}</div><div style="font-size:11px;color:#6B7F6E">${total} critérios</div></div>
+    <div class="cert-header"><div><div style="font-weight:700;font-size:13px;color:#1C2B21">${c.n}</div><div style="font-size:11px;color:#4A4F44">${total} critérios</div></div>
     <div class="cert-pct-box" style="background:${c.cor}20"><div class="cert-pct-num" style="color:${c.cor}">${pct}%</div><div class="cert-pct-label">atendido</div></div></div>
     <div class="cert-bar"><div class="cert-bar-fill" style="width:${pct}%;background:${c.cor}"></div></div>
-    ${c.items.map((item,i)=>{const key=certAtual+'_'+i;const v=certStatus[key]||'';return`<div class="crit-row" style="background:${statusBg[v]||'#F4F7F4'};border-color:${v?statusBg[v]:'#D4E8D0'}"><span class="crit-text">${item}</span><select class="crit-sel" style="background:${statusBg[v]||'#fff'}" onchange="certStatus['${key}']=this.value;renderCerts()"><option value="">— selecionar —</option>${statusOpts.map(o=>`<option value="${o}"${v===o?' selected':''}>${o}</option>`).join('')}</select></div>`}).join('')}
+    ${c.items.map((item,i)=>{const key=certAtual+'_'+i;const v=certStatus[key]||'';return`<div class="crit-row" style="background:${statusBg[v]||'#F4F6F1'};border-color:${v?statusBg[v]:'#C9D2C4'}"><span class="crit-text">${item}</span><select class="crit-sel" style="background:${statusBg[v]||'#fff'}" onchange="certStatus['${key}']=this.value;renderCerts()"><option value="">— selecionar —</option>${statusOpts.map(o=>`<option value="${o}"${v===o?' selected':''}>${o}</option>`).join('')}</select></div>`}).join('')}
     <div class="counts">${statusOpts.map(o=>`<div class="count-pill" style="background:${statusBg[o]}">${o}: ${counts[o]||0}</div>`).join('')}</div>`;
 }
 
@@ -757,7 +757,7 @@ function setAplic(v){acaplic=v;$('ap-prof').classList.toggle('active',v==='prof'
 function renderAcabList(){
   const el=$('acab-list');
   if(!el)return;
-  el.innerHTML=Object.entries(ACABAMENTOS).map(([k,a])=>`<button onclick="setAcab('${k}')" style="display:flex;justify-content:space-between;width:100%;padding:8px 11px;border-radius:9px;margin-bottom:5px;text-align:left;cursor:pointer;font-family:inherit;border:1px solid ${acab===k?'#074031':'#D4E8D0'};background:${acab===k?'#EEF8EB':'#fff'}"><span style="font-size:12px;font-weight:${acab===k?700:400};color:${acab===k?'#074031':'#1C2B22'}">${a.n}</span><span style="font-size:11px;color:#6B7F6E">~R$${a.matM2}/m²</span></button>`).join('');
+  el.innerHTML=Object.entries(ACABAMENTOS).map(([k,a])=>`<button onclick="setAcab('${k}')" style="display:flex;justify-content:space-between;width:100%;padding:8px 11px;border-radius:9px;margin-bottom:5px;text-align:left;cursor:pointer;font-family:inherit;border:1px solid ${acab===k?'#33512F':'#C9D2C4'};background:${acab===k?'#EEF4EA':'#fff'}"><span style="font-size:12px;font-weight:${acab===k?700:400};color:${acab===k?'#33512F':'#1C2B21'}">${a.n}</span><span style="font-size:11px;color:#4A4F44">~R$${a.matM2}/m²</span></button>`).join('');
 }
 function calcAcab(){
   const a=ACABAMENTOS[acab]; if(!a)return;
@@ -781,7 +781,7 @@ function renderChk(){
   const pct=Math.round(done/total*100);
   set('chk-total',`${done}/${total} (${pct}%)`);
   $('chk-bar').style.width=pct+'%';
-  $('chk-bar').style.background=pct===100?'#2E7D32':'#51774B';
+  $('chk-bar').style.background=pct===100?'#1F4A1C':'#4B7547';
   grid.innerHTML=CHECKLIST.map((f,fi)=>`<div class="card" style="padding:12px 14px"><div style="font-weight:700;font-size:11px;color:${f.cor};margin-bottom:6px">${f.f}</div>${f.items.map((item,ii)=>{const key=fi+'_'+ii;const d=chkState[key];return`<div class="chk-item${d?' done':''}" onclick="chkState['${key}']=!chkState['${key}'];renderChk()"><div class="chk-box">${d?'✓':''}</div><span class="chk-text">${item}</span></div>`}).join('')}</div>`).join('');
 }
 
@@ -795,8 +795,8 @@ function renderModelos(){
       ${[['Escala',m.e],['Solar',m.s],['Certificação',m.c]].map(([l,v])=>`<div class="info-row"><div class="info-lbl">${l}</div><div class="info-val">${v}</div></div>`).join('')}
     </div>
     <div class="card">
-      <div style="font-weight:700;font-size:12px;color:#074031;margin-bottom:8px">📋 Próximos passos</div>
-      ${['Definir terreno e verificar zoneamento','Registrar no LEED Arc ou EDGE','Contratar equipe técnica especializada','Elaborar PGRCC antes das obras','Solicitar LPLS e licença INEA'].map((p,i)=>`<div style="font-size:11px;padding:5px 0;border-bottom:1px solid #D4E8D0;color:#1C2B22">${i+1}. ${p}</div>`).join('')}
+      <div style="font-weight:700;font-size:12px;color:#33512F;margin-bottom:8px">📋 Próximos passos</div>
+      ${['Definir terreno e verificar zoneamento','Registrar no LEED Arc ou EDGE','Contratar equipe técnica especializada','Elaborar PGRCC antes das obras','Solicitar LPLS e licença INEA'].map((p,i)=>`<div style="font-size:11px;padding:5px 0;border-bottom:1px solid #C9D2C4;color:#1C2B21">${i+1}. ${p}</div>`).join('')}
     </div>`;
 }
 
@@ -893,7 +893,7 @@ function calcCarbon(){
   $('r-carbon-status').className = 'status-box '+(ok?'status-ok':parcial?'':'status-err');
   $('r-carbon-status').innerHTML =
     ok ? '<div class="status-title">✅ Net Zero — saldo negativo em operação e materiais</div>' :
-    parcial ? '<div class="status-title" style="color:#E65100">⚠️ Parcialmente Net Zero — um dos balanços ainda positivo</div>' :
+    parcial ? '<div class="status-title" style="color:#8A6410">⚠️ Parcialmente Net Zero — um dos balanços ainda positivo</div>' :
     '<div class="status-title">❌ Balanço positivo — ações de redução necessárias</div>';
 
   // Regimes
@@ -904,23 +904,23 @@ function calcCarbon(){
     else if(r.campo==='leed') alcanca = solar > 0 && incorp < 0;
     else if(r.campo==='edge') alcanca = incorp < 0;
     else alcanca = saldoTotal <= 0 && incorp <= 0;
-    var bg = alcanca ? '#C8E6C9' : '#F4F7F4';
+    var bg = alcanca ? '#DCEBD8' : '#F4F6F1';
     var ic = alcanca ? '✅' : '⚠️';
     return '<div style="padding:8px 10px;background:'+bg+';border-radius:8px;margin-bottom:5px">'+
-      '<div style="font-size:12px;font-weight:600;color:#074031">'+ic+' '+r.n+'</div>'+
-      '<div style="font-size:10px;color:#6B7F6E;margin-top:2px">'+r.req+'</div></div>';
+      '<div style="font-size:12px;font-weight:600;color:#33512F">'+ic+' '+r.n+'</div>'+
+      '<div style="font-size:10px;color:#4A4F44;margin-top:2px">'+r.req+'</div></div>';
   }).join('');
 
   // Metodologias
-  var stBg = {atende:'#C8E6C9',parcial:'#FFE0B2',pendente:'#F4F7F4'};
+  var stBg = {atende:'#DCEBD8',parcial:'#F6EAD0',pendente:'#F4F6F1'};
   var stLbl = {atende:'✅ Atende',parcial:'⚠️ Parcial',pendente:'⬜ Pendente'};
   $('c-metodologias').innerHTML =
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
     METODOLOGIAS.map(function(m){
       return '<div style="padding:9px 11px;background:'+stBg[m.status]+';border-radius:8px">'+
-        '<div style="font-size:11px;font-weight:700;color:#074031">'+m.n+'</div>'+
-        '<div style="font-size:10px;color:#6B7F6E;margin:2px 0">'+m.desc+'</div>'+
-        '<div style="font-size:10px;font-weight:600;color:#374151">'+stLbl[m.status]+'</div></div>';
+        '<div style="font-size:11px;font-weight:700;color:#33512F">'+m.n+'</div>'+
+        '<div style="font-size:10px;color:#4A4F44;margin:2px 0">'+m.desc+'</div>'+
+        '<div style="font-size:10px;font-weight:600;color:#4A4F44">'+stLbl[m.status]+'</div></div>';
     }).join('')+'</div>';
 }
 
@@ -952,12 +952,12 @@ var REF_ROI = [
 function renderPrecos(){
   var el=document.getElementById('ref-items'); if(!el) return;
   el.innerHTML=REF_CUSTOS.map(function(r){
-    return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #D4E8D0;font-size:11px"><span style="color:#1C2B22">'+r[0]+'</span><span style="font-weight:700;color:#074031">'+r[1]+'</span></div>';
+    return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #C9D2C4;font-size:11px"><span style="color:#1C2B21">'+r[0]+'</span><span style="font-weight:700;color:#33512F">'+r[1]+'</span></div>';
   }).join('');
   var el2=document.getElementById('roi-items'); if(!el2) return;
   el2.innerHTML=REF_ROI.map(function(r,i){
     var hi=i===6||i===7;
-    return '<div style="display:flex;justify-content:space-between;padding:6px 8px;border-radius:6px;margin-bottom:3px;background:'+(hi?'#EEF8EB':'#F4F7F4')+'"><span style="font-size:11px;color:#1C2B22">'+r[0]+'</span><span style="font-size:12px;font-weight:800;color:'+(hi?'#074031':'#1C2B22')+'">'+r[1]+'</span></div>';
+    return '<div style="display:flex;justify-content:space-between;padding:6px 8px;border-radius:6px;margin-bottom:3px;background:'+(hi?'#EEF4EA':'#F4F6F1')+'"><span style="font-size:11px;color:#1C2B21">'+r[0]+'</span><span style="font-size:12px;font-weight:800;color:'+(hi?'#33512F':'#1C2B21')+'">'+r[1]+'</span></div>';
   }).join('');
 }
 
@@ -978,8 +978,8 @@ var ABAS_DADOS = {
 function toggleModoApresentacao(){
   modoApresAtivo = !modoApresAtivo;
   var btn = document.getElementById('btn-apresentacao');
-  if(btn) btn.style.background = modoApresAtivo ? '#81A969' : 'rgba(255,255,255,0.1)';
-  if(btn) btn.style.color = modoApresAtivo ? '#074031' : '#81A969';
+  if(btn) btn.style.background = modoApresAtivo ? '#DCEBD8' : 'rgba(255,255,255,0.1)';
+  if(btn) btn.style.color = modoApresAtivo ? '#33512F' : '#DCEBD8';
   if(btn) btn.textContent = modoApresAtivo ? '✅ Apresentação Ativa' : '📊 Modo Apresentação';
   document.querySelectorAll('.tab-btn').forEach(function(btn){
     var tabId = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];

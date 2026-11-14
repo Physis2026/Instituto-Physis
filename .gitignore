@@ -22,3 +22,6 @@ __pycache__/
 *.sqlite
 *.sqlite3
 dados/
+
+# cópias temporárias da conferência do SustainKit
+sistema/_sk_*.html
