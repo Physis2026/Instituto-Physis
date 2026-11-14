@@ -90,17 +90,42 @@ def simular(hub: Hub, sim: Simulador, parar: threading.Event, intervalo: float =
         parar.wait(intervalo)
 
 
+def origem_chamadas(valor: str | None) -> str | None:
+    """Origem do servidor de chamadas (Jitsi) da Physis, ou None se ausente ou invalida.
+
+    So aceita https://host[:porta], sem caminho, consulta nem caractere que quebre a politica
+    de seguranca. Qualquer outra coisa e recusada: a politica continua fechada."""
+    if not valor:
+        return None
+    v = valor.strip().rstrip("/")
+    if any(c in v for c in " ;,'\"\t\r\n"):
+        return None
+    u = urlparse(v)
+    if u.scheme != "https" or not u.hostname or u.path or u.query or u.fragment or u.username or u.password:
+        return None
+    return f"https://{u.netloc}"
+
+
+def politica(chamadas: str | None = None) -> str:
+    """Content-Security-Policy. Sem servidor de chamadas, nada de fora do proprio servidor e carregado.
+    Com ele, so aquela origem entra: script da API, quadro da chamada e a ligacao (https e wss)."""
+    o = origem_chamadas(chamadas)
+    s = f" {o}" if o else ""
+    w = f" {o} wss://{o[len('https://'):]}" if o else ""
+    return ("default-src 'self'; script-src 'self' 'unsafe-inline'" + s + "; style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'" + w + "; frame-src 'self' blob: data:" + s + "; "
+            "media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'")
+
+
 def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None):
     instancia = instancia if instancia is not None else ler_instancia()
     exige_login = bool(instancia.get("login"))
+    csp = politica(os.environ.get("PHYSIS_CHAMADAS") or instancia.get("chamadas"))
     class Manipulador(BaseHTTPRequestHandler):
         # Cabecalhos de seguranca em toda resposta. As telas usam script e estilo dentro da pagina,
-        # por isso 'unsafe-inline'; nada de fora do proprio servidor e carregado.
+        # por isso 'unsafe-inline'; de fora do proprio servidor, so o servidor de chamadas da Physis, se configurado.
         def end_headers(self):
-            self.send_header("Content-Security-Policy",
-                             "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
-                             "img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-src 'self' blob: data:; "
-                             "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'")
+            self.send_header("Content-Security-Policy", csp)
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
             super().end_headers()

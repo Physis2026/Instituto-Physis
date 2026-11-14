@@ -201,6 +201,32 @@ class ArquivosDoPedido(unittest.TestCase):
             self.assertIn("attachment", resp.headers["Content-Disposition"])
 
 
+class PoliticaDeChamadas(unittest.TestCase):
+    """A chamada da aba Reunioes so pode vir do servidor Jitsi da Physis; nada mais abre a politica."""
+
+    def test_sem_servidor_a_politica_fica_fechada(self):
+        from physis_hub.servidor import politica
+        p = politica(None)
+        self.assertIn("frame-src 'self' blob: data:;", p)
+        self.assertIn("connect-src 'self';", p)
+        self.assertNotIn("https://", p)
+
+    def test_servidor_valido_entra_so_onde_precisa(self):
+        from physis_hub.servidor import politica
+        p = politica("https://chamada.physis.example/")
+        self.assertIn("script-src 'self' 'unsafe-inline' https://chamada.physis.example;", p)
+        self.assertIn("frame-src 'self' blob: data: https://chamada.physis.example;", p)
+        self.assertIn("wss://chamada.physis.example", p)
+        self.assertNotIn("https://chamada.physis.example", p.split("img-src")[1].split(";")[0])
+
+    def test_valores_perigosos_sao_recusados(self):
+        from physis_hub.servidor import origem_chamadas
+        for ruim in ["http://chamada.physis.example", "https://x.example; script-src *", "https://x.example/sala",
+                     "javascript:alert(1)", "https://user:senha@x.example", "https://x.example?a=1", "*", ""]:
+            self.assertIsNone(origem_chamadas(ruim), ruim)
+        self.assertEqual(origem_chamadas("https://x.example:8443"), "https://x.example:8443")
+
+
 class CorpoGrande(unittest.TestCase):
     """Corpo grande demais volta 413 legivel, em qualquer sistema operacional (antes, no Windows, a conexao caia)."""
     PORTA = 8789
