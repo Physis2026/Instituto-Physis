@@ -99,7 +99,8 @@ class GestaoPelaRede(unittest.TestCase):
         (web / "painel.html").write_text("<!doctype html><title>x</title>", encoding="utf-8")
         servidor.WEB = web
         cls.hub = Hub()
-        cls.srv = iniciar(cls.hub, cls.PORTA, endereco="127.0.0.1", instancia={"login": False})
+        cls.srv = iniciar(cls.hub, 0, endereco="127.0.0.1", instancia={"login": False})
+        cls.PORTA = cls.srv.server_address[1]   # porta livre escolhida pelo sistema
 
     @classmethod
     def tearDownClass(cls):

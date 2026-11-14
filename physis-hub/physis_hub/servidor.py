@@ -10,6 +10,9 @@ Rotas das telas:
   GET  /api/leituras?limite=&no=   historico das leituras (tela Registros e download)
   GET  /api/saude                contadores, descartes, cadeia do registro
   POST /api/comando              {"comando":"CMD:03:LIM1:35"} ou a linha crua
+  GET  /api/clima                previsão de cada fonte guardada no hub, placar de acertos e previsão combinada
+  POST /api/clima/local          {"lat","lon","municipio","uf","ibge"} — também grava no receptor (PHYSIS_RX_URL)
+  POST /api/clima/atualizar      consulta todas as fontes agora
   GET  /                         web/painel.html
 
 Variaveis de ambiente:
@@ -32,6 +35,7 @@ from urllib.parse import parse_qs, quote, unquote, urlparse
 
 import re
 
+from . import clima as clima_mod
 from . import correio
 from .hub import Hub
 from .protocolo import para_int, validar_telemetria
@@ -198,8 +202,11 @@ fetch(criar?"/api/conta/criar":"/api/conta/entrar",{method:"POST",headers:{"Cont
 </script></body></html>"""
 
 
-def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None):
+def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None, clima=None):
     instancia = instancia if instancia is not None else ler_instancia()
+    if clima is None:
+        rx = os.environ.get("PHYSIS_RX_URL")
+        clima = clima_mod.Clima(hub, receptor_url=rx, enviar_local=clima_mod.receptor_local(rx) if rx else None)
     exige_login = bool(instancia.get("login"))
     csp = politica(os.environ.get("PHYSIS_CHAMADAS") or instancia.get("chamadas"))
     fabricar = fabricante(instancia)
@@ -445,6 +452,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return self._arquivo(WEB / "supervisao.html", "text/html; charset=utf-8")
             if u.path == "/api/painel":
                 return self._json(200, hub.painel())
+            if u.path == "/api/clima":
+                # previsão das fontes guardadas no hub (a tela nunca chama a internet)
+                return self._json(200, clima.estado())
             if u.path == "/api/saude":
                 integra, n = hub.verificar_cadeia()
                 p = hub.painel()["saude"]
@@ -496,6 +506,21 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def do_POST(self):
             u = urlparse(self.path)
+            # ── Localização do lugar e previsão do tempo ──
+            if u.path in ("/api/clima/local", "/api/clima/atualizar"):
+                q = self._quem()
+                if exige_login and not q:
+                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                if not exige_login and not self._autorizado():
+                    return self._json(401, {"ok": False, "erro": "token ausente ou invalido"})
+                if u.path.endswith("/atualizar"):
+                    return self._json(200, {"ok": True, "consultas": clima.consultar_tudo(), "estado": clima.estado()})
+                try:
+                    d = json.loads(self._corpo() or "{}")
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                r = clima.definir_local(d if isinstance(d, dict) else {}, (q or {}).get("usuario", ""))
+                return self._json(200 if r["ok"] else 400, r)
             # ── Gestão no servidor: dados, contas e senha (sempre com sessão) ──
             if u.path.startswith("/api/gestao/estado/"):
                 q = self._sessao_ou_401()
@@ -695,8 +720,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
     return Manipulador
 
 
-def iniciar(hub: Hub, porta: int = 8700, token: str | None = None, endereco: str = "0.0.0.0", instancia: dict | None = None):
-    srv = ThreadingHTTPServer((endereco, porta), criar_manipulador(hub, token, instancia))
+def iniciar(hub: Hub, porta: int = 8700, token: str | None = None, endereco: str = "0.0.0.0", instancia: dict | None = None,
+            clima=None):
+    srv = ThreadingHTTPServer((endereco, porta), criar_manipulador(hub, token, instancia, clima))
     srv.daemon_threads = True
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return srv
@@ -717,7 +743,10 @@ def main() -> None:
     if sim:
         a, b, c, d = (int(x) for x in sim.split(","))
         threading.Thread(target=simular, args=(hub, Simulador(a, b, c, d), parar), daemon=True).start()
-    srv = iniciar(hub, porta, os.environ.get("PHYSIS_TOKEN"))
+    clima = clima_mod.Clima(hub, receptor_url=rx, enviar_local=clima_mod.receptor_local(rx) if rx else None)
+    if os.environ.get("PHYSIS_CLIMA", "1") != "0":     # PHYSIS_CLIMA=0 desliga as consultas (sem internet de propósito)
+        threading.Thread(target=clima_mod.rodar, args=(clima, parar), daemon=True).start()
+    srv = iniciar(hub, porta, os.environ.get("PHYSIS_TOKEN"), clima=clima)
     print(f"Physis Hub em http://0.0.0.0:{porta}  receptor={rx or 'nao configurado'}  simulador={sim or 'desligado'}")
     try:
         while True:

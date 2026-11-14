@@ -60,8 +60,9 @@ class RotasProtegidas(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.hub = Hub()
-        cls.srv = iniciar(cls.hub, cls.PORTA, endereco="127.0.0.1",
+        cls.srv = iniciar(cls.hub, 0, endereco="127.0.0.1",
                           instancia={"login": True, "modulos": ["monitoramento", "sustainkit"], "licenca": "a definir"})
+        cls.PORTA = cls.srv.server_address[1]   # porta livre escolhida pelo sistema
 
     @classmethod
     def tearDownClass(cls):
@@ -113,7 +114,8 @@ class CaixaCentral(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.hub = Hub()
-        cls.srv = iniciar(cls.hub, cls.PORTA, endereco="127.0.0.1", instancia={"login": True})
+        cls.srv = iniciar(cls.hub, 0, endereco="127.0.0.1", instancia={"login": True})
+        cls.PORTA = cls.srv.server_address[1]   # porta livre escolhida pelo sistema
 
     @classmethod
     def tearDownClass(cls):
@@ -162,7 +164,8 @@ class ArquivosDoPedido(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.hub = Hub()
-        cls.srv = iniciar(cls.hub, cls.PORTA, endereco="127.0.0.1", instancia={"login": True})
+        cls.srv = iniciar(cls.hub, 0, endereco="127.0.0.1", instancia={"login": True})
+        cls.PORTA = cls.srv.server_address[1]   # porta livre escolhida pelo sistema
 
     @classmethod
     def tearDownClass(cls):
@@ -234,7 +237,8 @@ class CorpoGrande(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.hub = Hub()
-        cls.srv = iniciar(cls.hub, cls.PORTA, endereco="127.0.0.1")
+        cls.srv = iniciar(cls.hub, 0, endereco="127.0.0.1")
+        cls.PORTA = cls.srv.server_address[1]   # porta livre escolhida pelo sistema
 
     @classmethod
     def tearDownClass(cls):
