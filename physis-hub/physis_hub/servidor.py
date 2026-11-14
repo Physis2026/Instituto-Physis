@@ -30,6 +30,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, quote, urlparse
 
+import re
+
+from . import correio
 from .hub import Hub
 from .protocolo import para_int, validar_telemetria
 from .simulador import Simulador
@@ -117,10 +120,63 @@ def politica(chamadas: str | None = None) -> str:
             "media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'")
 
 
+def fabricante(instancia: dict):
+    """Função que monta o pacote de um cliente, ou None se este servidor não tem o montador.
+
+    Procura montar.py ao lado de physis_hub/ e os programas da Physis em programas/ (pacote do
+    servidor) ou nas pastas do repositório. Os pacotes vão para PHYSIS_ENTREGAS (padrão: entregas/)."""
+    raiz = WEB.parent
+    if not (raiz / "montar.py").exists():
+        return None
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("physis_montar", raiz / "montar.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    def achar(*nomes):
+        for n in nomes:
+            for p in (raiz / "programas" / n, raiz.parent / "sistema" / n, raiz.parent / "modulos" / "planejador" / n):
+                if p.exists():
+                    return p
+        return None
+    sk, sup = achar("SustainKit_Definitivo.html"), achar("physis-scada-demo.html")
+    saida = Path(os.environ.get("PHYSIS_ENTREGAS") or (raiz / "entregas"))
+    def fabricar(org: str, modulos: list[str], nome: str) -> Path:
+        saida.mkdir(parents=True, exist_ok=True)
+        return mod.montar(org, "lugar01", modulos, saida, sk, instancia.get("licenca") or mod.LICENCA_PADRAO, sup, None, None, False, nome)
+    return fabricar
+
+
+PAGINA_ATIVAR = """<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ativar a plataforma · Physis</title><style>
+body{margin:0;background:#F4F6F1;color:#1C2B21;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:560px;margin:0 auto;padding:32px 16px}h1{font:500 1.9em Fraunces,Georgia,serif;color:#33512F;margin:0 0 8px}
+.cartao{background:#fff;border:1px solid #C9D2C4;border-radius:12px;padding:18px;margin-top:16px}
+label{display:block;font-weight:600;margin-bottom:4px}input{font:inherit;font-size:1.15em;letter-spacing:.08em;width:100%;box-sizing:border-box;min-height:48px;padding:6px 12px;border:1px solid #8A9284;border-radius:8px;text-transform:uppercase}
+button{font:inherit;font-weight:600;min-height:48px;padding:0 20px;margin-top:12px;border-radius:8px;border:1px solid #33512F;background:#33512F;color:#fff;cursor:pointer}
+:focus-visible{outline:3px solid #33512F;outline-offset:2px}#msg{min-height:1.5em;font-weight:600;margin-top:12px}.t2{color:#4A4F44}
+</style></head><body><main><h1>Ativar a sua plataforma</h1>
+<p class="t2">Instalação <strong>__NUMERO__</strong>. Digite o código de ativação que chegou no seu e-mail.</p>
+<div class="cartao"><label for="codigo">Código de ativação</label><input id="codigo" autocomplete="one-time-code" placeholder="XXXX-XXXX-XXXX" aria-describedby="msg">
+<button type="button" id="ok">Ativar e baixar a plataforma</button><p id="msg" role="status" aria-live="polite"></p></div>
+<p class="t2">Depois de baixar: descompacte, rode <code>python3 -m physis_hub.servidor</code> e abra o endereço indicado no arquivo LEIA-ME. No primeiro acesso, crie o seu usuário e senha.</p>
+</main><script>
+var n="__NUMERO__",b=document.getElementById("ok"),m=document.getElementById("msg"),c=document.getElementById("codigo");
+function dizer(t,e){m.textContent=t;m.style.color=e?"#7A2214":"#1F4A1C";}
+c.addEventListener("keydown",function(e){if(e.key==="Enter")b.click();});
+b.onclick=function(){var v=c.value.trim();if(!v){dizer("Digite o código.",true);c.focus();return;}b.disabled=true;dizer("Conferindo…",false);
+fetch("/api/ativar/"+encodeURIComponent(n),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({codigo:v})}).then(function(r){
+var t=r.headers.get("Content-Type")||"";if(r.ok&&t.indexOf("zip")>=0)return r.blob().then(function(z){var u=URL.createObjectURL(z),a=document.createElement("a");a.href=u;a.download="physis-"+n+".zip";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);dizer("Código conferido. O download da sua plataforma começou.",false);});
+return r.json().then(function(j){dizer(j.ok?"Código conferido. A equipe Physis envia a plataforma montada para você em breve.":(j.erro==="muitas tentativas; espere alguns minutos"?"Muitas tentativas. Espere alguns minutos e tente de novo.":"Instalação ou código não conferem. Confira o e-mail."),!j.ok);});
+}).catch(function(){dizer("Sem resposta do servidor. Tente de novo.",true);}).then(function(){b.disabled=false;});};
+</script></body></html>"""
+
+
 def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None):
     instancia = instancia if instancia is not None else ler_instancia()
     exige_login = bool(instancia.get("login"))
     csp = politica(os.environ.get("PHYSIS_CHAMADAS") or instancia.get("chamadas"))
+    fabricar = fabricante(instancia)
+    url_publica = (os.environ.get("PHYSIS_URL_PUBLICA") or instancia.get("url_publica") or "").rstrip("/")
     class Manipulador(BaseHTTPRequestHandler):
         # Cabecalhos de seguranca em toda resposta. As telas usam script e estilo dentro da pagina,
         # por isso 'unsafe-inline'; de fora do proprio servidor, so o servidor de chamadas da Physis, se configurado.
@@ -244,6 +300,23 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if not self._quem():
                     return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
                 return self._json(200, hub.loja_catalogo(interno=True))
+            if u.path.startswith("/ativar/"):
+                numero = u.path.rstrip("/").rsplit("/", 1)[-1]
+                if not re.fullmatch(r"PH-\d{4,6}", numero):
+                    return self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                pagina = PAGINA_ATIVAR.replace("__NUMERO__", numero).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(pagina)))
+                self.end_headers()
+                self.wfile.write(pagina)
+                return
+            if u.path in ("/api/central/emails", "/api/central/instalacoes"):
+                if not self._quem():
+                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                if u.path.endswith("emails"):
+                    return self._json(200, {"ok": True, "configurado": correio.configurado(), "emails": hub.emails()})
+                return self._json(200, {"ok": True, "instalacoes": hub.instalacoes()})
             if u.path in ("/demo", "/demo/"):
                 # demonstração gratuita: roda inteira no navegador, com dados simulados; não lê nada do servidor
                 return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
@@ -369,11 +442,57 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 r = hub.central_gravar("alocacao", d["id"], d)
                 return self._json(200 if r["ok"] else 400, r)
             if u.path.startswith("/api/central/compra/") and u.path.endswith("/aprovar"):
-                if self._barrado():
+                q = self._quem()          # aprovar dispara a montagem e o código: sempre com sessão
+                if not q:
+                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                numero = u.path.split("/")[-2]
+                ok = hub.central_marcar("compra", numero, "aprovado", q["usuario"] if q else "")
+                if not ok:
+                    return self._json(404, {"ok": False})
+                # montagem automática: número, plataforma, código e e-mail de acesso
+                base = url_publica or (("https" if self.headers.get("X-Forwarded-Proto") == "https" else "http") + "://" + (self.headers.get("Host") or "localhost"))
+                inst = hub.instalar_compra(numero, base, fabricar, q["usuario"] if q else "")
+                if inst.get("ok") and not inst.get("repetido") and correio.configurado():
+                    threading.Thread(target=correio.enviar_fila, args=(hub, inst["numero"]), daemon=True).start()
+                    inst["email"] = "enviando"
+                return self._json(200, {"ok": True, "instalacao": inst})
+            if u.path.startswith("/api/ativar/"):
+                # o cliente digita o código do e-mail; certo -> baixa a plataforma montada para ele
+                try:
+                    d = json.loads(corpo or "{}")
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                r = hub.ativar(u.path.rsplit("/", 1)[-1], str(d.get("codigo", "")) if isinstance(d, dict) else "")
+                if not r["ok"]:
+                    return self._json(429 if r.get("espera") else 403, r)
+                pac = Path(r["pacote"]) if r.get("pacote") else None
+                if pac and pac.is_file():
+                    dados = pac.read_bytes()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/zip")
+                    self.send_header("Content-Disposition", "attachment; filename=\"physis-" + r["numero"] + ".zip\"")
+                    self.send_header("Content-Length", str(len(dados)))
+                    self.send_header("Cache-Control", "no-store")
+                    self.end_headers()
+                    self.wfile.write(dados)
                     return
+                return self._json(200, {"ok": True, "pacote": False, "numero": r["numero"]})
+            if u.path.startswith("/api/central/emails/"):
+                # a equipe marca como enviado à mão, ou manda tentar de novo pelo servidor de e-mail
                 q = self._quem()
-                ok = hub.central_marcar("compra", u.path.split("/")[-2], "aprovado", q["usuario"] if q else "")
-                return self._json(200 if ok else 404, {"ok": ok})
+                if not q:
+                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                partes = u.path.split("/")
+                if len(partes) != 6 or not partes[4].isdigit() or partes[5] not in ("enviado", "enviar"):
+                    return self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                if partes[5] == "enviado":
+                    return self._json(200, {"ok": hub.email_marcar(int(partes[4]), "enviado_a_mao")})
+                e = [x for x in hub.emails() if x["id"] == int(partes[4])]
+                if not e:
+                    return self._json(404, {"ok": False})
+                ok, erro = correio.enviar(e[0]["para"], e[0]["assunto"], e[0]["corpo"])
+                hub.email_marcar(e[0]["id"], "enviado" if ok else "falhou", erro)
+                return self._json(200 if ok else 502, {"ok": ok, "erro": erro})
             if u.path in ("/api/conta/criar", "/api/conta/entrar", "/api/conta/sair"):
                 try:
                     d = json.loads(corpo or "{}")

@@ -3175,7 +3175,15 @@ react/cjs/react-jsx-runtime.production.js:
     d.contratos.forEach(function (c) { if (c.id === id) { c.uso = "aprovado"; c.usoEm = hoje(); numero = c.compraNumero || ""; } });
     gravarAdm(d); destaque = id; dizer(T3.aprovado, false); pintar();
     /* Avisa o servidor: é por ele que a tela do cliente fica sabendo, sem ninguém repassar. */
-    if (CENTRAL && numero) fetch("/api/central/compra/" + encodeURIComponent(numero) + "/aprovar", { method: "POST", body: "{}" }).catch(function () { dizer(T3.centralFalha, true); });
+    // O servidor monta sozinho a plataforma do cliente: número, link, código e e-mail de acesso.
+    if (CENTRAL && numero) fetch("/api/central/compra/" + encodeURIComponent(numero) + "/aprovar", { method: "POST", body: "{}" })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { var i = j && j.instalacao; if (!i) return dizer(j && j.erro ? j.erro : T3.centralFalha, true);
+        if (!i.ok) return dizer((EN ? "Use approved, but the platform was not set up: " : "Uso aprovado, mas a plataforma não foi montada: ") + (i.erro || ""), true);
+        dizer(i.repetido ? (EN ? "Already set up: installation " : "Já montada: instalação ") + i.numero
+          : (EN ? "Platform set up automatically: installation " : "Plataforma montada sozinha: instalação ") + i.numero + (i.modulos && i.modulos.length ? " (" + i.modulos.join(", ") + ")" : "") +
+            (i.email === "enviando" ? (EN ? ". Access e-mail being sent." : ". E-mail de acesso saindo.") : (EN ? ". Access e-mail waiting in E-mails to send." : ". E-mail de acesso na fila: veja em E-mails a enviar.")), false); })
+      .catch(function () { dizer(T3.centralFalha, true); });
   }
 
 /* ---------------------------------------------------------------------------
@@ -4016,6 +4024,7 @@ html.gp .gp-sec{margin-left:220px;padding:22px 26px;font:16px/1.5 system-ui,-app
 html.gp .gp-sec h1{font:500 1.7em Fraunces,Georgia,serif;margin:0 0 6px;color:#33512F}
 /* todos os títulos no verde Physis (14/11/2026) */
 html.gp .gp-sec h2, html.gp .gp-sec h3, html.gp #gp-cursos h1, html.gp #app h1, html.gp #app h2, html.gp #app h3, html.gp #physis-adm h2, html.gp #physis-adm h3{color:#33512F !important}
+html.gp:not(.gp-v-mails) #gp-mails, html.gp.gp-v-mails main#px-conteudo{display:none}
 html.gp:not(.gp-v-reun) #gp-reun, html.gp:not(.gp-v-reun) #gp-reun-topo, html.gp:not(.gp-v-reun) #gp-chamada, html.gp:not(.gp-v-docs) #gp-docs{display:none}
 html.gp #gp-reun-topo{padding-bottom:14px} html.gp #gp-chamada{padding-top:0;padding-bottom:0} html.gp #gp-reun{padding-top:0}
 html.gp #gp-chamada :focus-visible{outline:3px solid #33512F;outline-offset:2px}
@@ -4077,11 +4086,12 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     ["fin", "Financeiro", ["plan", "tot"]],
     ["forn", "Fornecedores", ["forn"]],
     // Alertas saiu do menu (14/11/2026): fica no topo de Atividades, ver pintarAlertas()
+    ["mails", "E-mails a enviar", null],
     ["reun", "Reuniões", null],
     ["docs", "Documentos", null],
     ["cursos", "Cursos", null]
   ];
-  var EN_MENU = { atv:"Activities", mapa:"Team map", dir:"Leadership", org:"Tasks and projects", prop:"Proposals", cont:"Contracts", fin:"Finance", forn:"Suppliers", alert:"Alerts", reun:"Meetings", docs:"Documents", cursos:"Courses", meus:"My contracts" };
+  var EN_MENU = { mails:"E-mails to send", atv:"Activities", mapa:"Team map", dir:"Leadership", org:"Tasks and projects", prop:"Proposals", cont:"Contracts", fin:"Finance", forn:"Suppliers", alert:"Alerts", reun:"Meetings", docs:"Documents", cursos:"Courses", meus:"My contracts" };
   function emIngles() { var bs = document.querySelectorAll("#app button"); for (var i = 0; i < bs.length; i++) if (bs[i].textContent.trim() === "PT") return true; return false; }
   function rotular() { var en = emIngles(); document.documentElement.lang = en ? "en" : "pt-BR"; ITENS.forEach(function (i) { var b = document.getElementById("gp-m-" + i[0]); if (b) b.textContent = en ? EN_MENU[i[0]] : i[1]; });
     var m = document.getElementById("gp-m-meus"); if (m) m.textContent = en ? EN_MENU.meus : "Meus contratos"; var l = document.querySelector("#gp-menu .gp-quem label"); if (l) l.textContent = en ? "Who is using" : "Quem está usando";
@@ -4093,8 +4103,8 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
   var raiz = document.documentElement, menu, atual = "atv";
 
   function topo() { var f = document.querySelector(".px-faixa"); if (menu && f && window.innerWidth > 860) menu.style.top = Math.max(0, Math.round(f.getBoundingClientRect().bottom)) + "px"; else if (menu) menu.style.top = ""; }
-  function marcar(id) { atual = id; raiz.classList.toggle("gp-v-adm", !!(ITENS.filter(function (i) { return i[0] === id; })[0] || [])[2]); ["atv","cursos","reun","docs"].forEach(function (n) { raiz.classList.toggle("gp-v-" + n, id === n); });
-    if (id === "atv") pintarAlertas();
+  function marcar(id) { atual = id; raiz.classList.toggle("gp-v-adm", !!(ITENS.filter(function (i) { return i[0] === id; })[0] || [])[2]); ["atv","cursos","reun","docs","mails"].forEach(function (n) { raiz.classList.toggle("gp-v-" + n, id === n); });
+    if (id === "atv") pintarAlertas(); if (id === "mails") pintarEmails();
     ITENS.forEach(function (i) { var b = document.getElementById("gp-m-" + i[0]); if (b) { if (i[0] === id) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); } }); }
   function ir(id, focar) {
     var item = ITENS.filter(function (i) { return i[0] === id; })[0]; if (!item) return;
@@ -4106,7 +4116,7 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     } else {
       var f = document.getElementById("adm-fechar"), pp = document.getElementById("physis-adm"); if (f && pp && pp.style.display !== "none") f.click();
       marcar(id); if (["atv","mapa","dir"].indexOf(id) >= 0) telaDoApp(id); if (id === "reun") pintarReunioes(); if (id === "docs") pintarDocs();
-      if (focar) { var alvo = document.getElementById({ cursos: "gp-cursos", reun: "gp-reun-topo", docs: "gp-docs" }[id] || "px-conteudo"); if (alvo) alvo.focus(); }
+      if (focar) { var alvo = document.getElementById({ cursos: "gp-cursos", reun: "gp-reun-topo", docs: "gp-docs", mails: "gp-mails" }[id] || "px-conteudo"); if (alvo) alvo.focus(); }
     }
     window.scrollTo(0, 0);
   }
@@ -4462,6 +4472,46 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     var mais = s.querySelector("#gp-al-mais"); if (mais) mais.onclick = function () { alTodos = !alTodos; s._chave = ""; pintarAlertas(); var m2 = document.getElementById("gp-al-mais"); if (m2) m2.focus(); };
   }
 
+  /* ══ E-mails a enviar (14/11/2026) ══
+     Os e-mails de acesso que o servidor escreve sozinho ao aprovar uma compra. Com o servidor de
+     e-mail da Physis configurado, saem sozinhos; sem ele, a equipe copia, envia e marca como enviado. */
+  var mailsMsg = "";
+  function pintarEmails() {
+    var s = document.getElementById("gp-mails"); if (!s) return;
+    var cab = "<h1 id='gp-h-mails'>" + esc(L("E-mails a enviar", "E-mails to send")) + "</h1><p style='margin:0 0 14px;color:#4A4F44;max-width:760px'>" +
+      esc(L("Quando uma compra é aprovada, o servidor monta a plataforma do cliente e escreve o e-mail de acesso, com número, link e código de ativação.", "When a purchase is approved, the server sets up the client platform and writes the access e-mail, with number, link and activation code.")) + "</p>";
+    if (!/^https?:$/.test(location.protocol)) { s.innerHTML = cab + "<p>" + esc(L("Só funciona com o servidor da Physis.", "Works only with the Physis server.")) + "</p>"; return; }
+    fetch("/api/central/emails", { cache: "no-store" }).then(function (r) { return r.status === 401 ? { login: true } : r.json(); }).then(function (j) {
+      if (j.login) { s.innerHTML = cab + "<p>" + esc(L("Entre no servidor para ver os e-mails.", "Sign in to the server to see the e-mails.")) + "</p>"; return; }
+      var lista = (j.emails || []).slice().reverse(), pend = lista.filter(function (e) { return e.estado === "pendente" || e.estado === "falhou"; }).length;
+      var h = cab + "<p role='status' style='font-weight:600'>" + esc(mailsMsg) + "</p>" +
+        "<div style='" + CART + "'>" + esc(j.configurado ? L("Servidor de e-mail da Physis ligado: os e-mails saem sozinhos.", "Physis e-mail server connected: e-mails go out by themselves.")
+                                                       : L("Servidor de e-mail da Physis ainda não configurado: copie cada e-mail, envie e marque como enviado.", "Physis e-mail server not configured yet: copy each e-mail, send it and mark it as sent.")) +
+        " " + esc(pend + L(" pendente(s).", " pending.")) + "</div>";
+      if (!lista.length) h += "<p>" + esc(L("Nenhum e-mail ainda.", "No e-mails yet.")) + "</p>";
+      lista.forEach(function (e) {
+        var cor = e.estado === "pendente" ? "#5E4408" : e.estado === "falhou" ? "#7A2214" : "#1F4A1C";
+        h += "<article style='" + CART + "' aria-labelledby='gm-" + e.id + "'><h2 id='gm-" + e.id + "' style='font-size:1.1em;margin:0 0 4px'>" + esc(e.assunto) + "</h2>" +
+          "<p style='margin:0 0 8px'>" + esc(L("Para: ", "To: ") + e.para) + " · <strong style='color:" + cor + "'>" + esc({ pendente: L("pendente", "pending"), falhou: L("falhou", "failed"), enviado: L("enviado", "sent"), enviado_a_mao: L("enviado à mão", "sent by hand") }[e.estado] || e.estado) + "</strong>" + (e.erro ? " · " + esc(e.erro) : "") + "</p>" +
+          "<details><summary style='cursor:pointer;min-height:44px;display:flex;align-items:center'>" + esc(L("Ver o texto", "View the text")) + "</summary><pre style='white-space:pre-wrap;background:#F4F6F1;border:1px solid #C9D2C4;border-radius:8px;padding:10px;font:inherit' tabindex='0'>" + esc(e.corpo) + "</pre></details>" +
+          (e.estado === "pendente" || e.estado === "falhou" ? "<div style='display:flex;gap:8px;flex-wrap:wrap;margin-top:8px'><button type='button' data-gm-copiar='" + e.id + "' style='" + BOT + "'>" + esc(L("Copiar o e-mail", "Copy the e-mail")) + "</button>" +
+            "<button type='button' data-gm-feito='" + e.id + "' style='" + BOTP + "'>" + esc(L("Marcar como enviado", "Mark as sent")) + "</button>" +
+            (j.configurado ? "<button type='button' data-gm-enviar='" + e.id + "' style='" + BOT + "'>" + esc(L("Enviar de novo pelo servidor", "Send again via the server")) + "</button>" : "") + "</div>" : "") + "</article>";
+      });
+      s.innerHTML = h; s._lista = lista;
+    }).catch(function () { s.innerHTML = cab + "<p>" + esc(L("O servidor não respondeu.", "The server did not answer.")) + "</p>"; });
+  }
+  function ligarEmails() {
+    var s = document.getElementById("gp-mails");
+    s.addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return; var id;
+      if ((id = b.getAttribute("data-gm-copiar"))) { var e = (s._lista || []).filter(function (x) { return String(x.id) === id; })[0]; if (!e) return;
+        var txt = L("Para: ", "To: ") + e.para + "\n" + L("Assunto: ", "Subject: ") + e.assunto + "\n\n" + e.corpo;
+        (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { mailsMsg = L("E-mail copiado. Cole no seu programa de e-mail.", "E-mail copied. Paste it in your e-mail program."); pintarEmails(); }, function () { mailsMsg = L("Não foi possível copiar: abra 'Ver o texto' e copie.", "Could not copy: open 'View the text' and copy."); pintarEmails(); }); return; }
+      if ((id = b.getAttribute("data-gm-feito")) || (id = b.getAttribute("data-gm-enviar"))) { var feito = b.hasAttribute("data-gm-feito");
+        fetch("/api/central/emails/" + id + (feito ? "/enviado" : "/enviar"), { method: "POST", body: "{}" }).then(function (r) { return r.json(); }).then(function (j) {
+          mailsMsg = j.ok ? (feito ? L("Marcado como enviado. O código deixou de ficar guardado no servidor.", "Marked as sent. The code is no longer stored on the server.") : L("Enviado.", "Sent.")) : L("Não foi possível: ", "Could not: ") + (j.erro || ""); pintarEmails(); }); } });
+  }
+
   /* ══ Melhorias do Sistema Physis: entram uma vez num navegador que já tem dados ══
      Navegador novo recebe pela semente do aplicativo (window.PHYSIS_MELHORIAS). */
   function juntarMelhorias() {
@@ -4508,7 +4558,8 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     var reunS = document.getElementById("gp-reun");
     var topoR = document.createElement("div"); topoR.id = "gp-reun-topo"; topoR.className = "gp-sec"; topoR.tabIndex = -1; reunS.parentNode.insertBefore(topoR, reunS);
     var chS = document.createElement("section"); chS.id = "gp-chamada"; chS.className = "gp-sec"; chS.setAttribute("aria-labelledby", "gp-h-ch"); reunS.parentNode.insertBefore(chS, reunS);
-    ligarReunioes(); ligarDocs(); ligarChamada();
+    var mailsS = document.createElement("section"); mailsS.id = "gp-mails"; mailsS.className = "gp-sec"; mailsS.tabIndex = -1; mailsS.setAttribute("aria-labelledby", "gp-h-mails"); document.body.appendChild(mailsS);
+    ligarReunioes(); ligarDocs(); ligarChamada(); ligarEmails();
     var app = document.getElementById("app"), al = document.createElement("section"); al.id = "gp-alertas"; al.setAttribute("aria-labelledby", "gp-h-alertas"); al.hidden = true;
     // sem o cabeçalho do aplicativo, Atividades precisa do próprio h1 para o leitor de tela
     var h1 = document.createElement("h1"); h1.id = "gp-h-atv"; h1.className = "gp-so-leitor"; h1.textContent = "Atividades";

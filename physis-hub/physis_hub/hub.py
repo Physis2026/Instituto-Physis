@@ -15,6 +15,7 @@ import secrets
 import sqlite3
 import threading
 import time
+import unicodedata
 from collections import Counter, deque
 
 from . import adaptador, protocolo
@@ -53,6 +54,13 @@ CREATE TABLE IF NOT EXISTS central (
 CREATE TABLE IF NOT EXISTS central_arquivo (
   id TEXT PRIMARY KEY, pedido TEXT NOT NULL, nome TEXT NOT NULL, tamanho INTEGER NOT NULL,
   dados BLOB NOT NULL, criado REAL NOT NULL);
+CREATE TABLE IF NOT EXISTS instalacao (
+  numero TEXT PRIMARY KEY, compra TEXT NOT NULL UNIQUE, org TEXT NOT NULL, nome TEXT NOT NULL,
+  email TEXT NOT NULL, modulos TEXT NOT NULL, sal BLOB NOT NULL, resumo BLOB NOT NULL, pacote TEXT,
+  criado REAL NOT NULL, ativado REAL, erros INTEGER NOT NULL DEFAULT 0, bloqueado_ate REAL NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS email_saida (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, para TEXT NOT NULL, assunto TEXT NOT NULL, corpo TEXT NOT NULL,
+  estado TEXT NOT NULL, ref TEXT NOT NULL, criado REAL NOT NULL, enviado REAL, erro TEXT NOT NULL DEFAULT '');
 CREATE TABLE IF NOT EXISTS loja_item (
   id TEXT PRIMARY KEY, dados TEXT NOT NULL, revisado TEXT, publicado TEXT, atualizado REAL NOT NULL);
 CREATE TABLE IF NOT EXISTS envio (
@@ -471,6 +479,128 @@ class Hub:
             cur = self._db.execute("UPDATE central SET estado=?, atualizado=? WHERE tipo=? AND numero=?", (estado, self.relogio(), tipo, numero))
             if cur.rowcount:
                 self.registrar("central", numero, {"o_que": f"{tipo} {estado}", "quem": quem})
+            self._db.commit()
+            return cur.rowcount > 0
+
+    # ── Montagem automática depois da compra aprovada ─────────────────────────
+    # Aprovar o uso de uma compra cria, sozinho: o número da instalação, a plataforma só com os
+    # módulos comprados, um código de ativação secreto (guardado só como resumo com sal) e o
+    # e-mail de acesso na fila de saída. O código nunca aparece na loja: só no e-mail.
+    MODULOS_PLATAFORMA = ("monitoramento", "agua", "zonas", "animais", "sustainkit", "supervisao", "gestao", "painel")
+    ATIVAR_ERROS = 5
+    ATIVAR_ESPERA_S = 15 * 60
+
+    @staticmethod
+    def _codigo_ativacao() -> str:
+        abc = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"          # sem 0/O e 1/I, que se confundem
+        s = "".join(secrets.choice(abc) for _ in range(12))
+        return "-".join((s[0:4], s[4:8], s[8:12]))
+
+    @staticmethod
+    def _resumo_codigo(sal: bytes, codigo: str) -> bytes:
+        limpo = re.sub(r"[^A-Z0-9]", "", (codigo or "").upper())
+        return hashlib.pbkdf2_hmac("sha256", limpo.encode(), sal, 100_000)
+
+    def instalar_compra(self, numero_compra: str, link_base: str, fabricar=None, quem: str = "") -> dict:
+        """Monta a instalação de uma compra aprovada. Repetir não cria outra nem troca o código."""
+        with self._trava:
+            ja = self._db.execute("SELECT numero FROM instalacao WHERE compra=?", (numero_compra,)).fetchone()
+            if ja:
+                return {"ok": True, "repetido": True, "numero": ja[0]}
+            r = self._db.execute("SELECT dados FROM central WHERE tipo='compra' AND numero=?", (numero_compra,)).fetchone()
+            if not r:
+                return {"ok": False, "erro": "compra desconhecida"}
+            dados = json.loads(r[0])
+            pag = dados.get("pagador") or {}
+            email, nome = str(pag.get("email") or "").strip(), str(pag.get("nome") or "Cliente").strip()[:120]
+            if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
+                return {"ok": False, "erro": "compra sem e-mail valido"}
+            modulos = [m for m in (dados.get("modulos") or []) if m in self.MODULOS_PLATAFORMA]
+            cursos = [c for c in (dados.get("cursos") or []) if isinstance(c, dict) and str(c.get("link", "")).startswith("https://")]
+            seq = self._db.execute("SELECT COUNT(*) FROM instalacao").fetchone()[0] + 1
+            numero = "PH-%04d" % seq
+            base = re.sub(r"[^a-z0-9]+", "-", unicodedata.normalize("NFD", nome.lower()).encode("ascii", "ignore").decode()).strip("-")[:40] or "cliente"
+            org = f"{base}-{seq:04d}"
+            codigo, sal = self._codigo_ativacao(), secrets.token_bytes(16)
+            pacote = None
+            if modulos and fabricar is not None:
+                try:
+                    pacote = str(fabricar(org, modulos, nome))
+                except Exception as e:          # a instalação existe mesmo sem pacote; a equipe vê o motivo
+                    self.registrar("instalacao", numero, {"o_que": "pacote nao montado", "erro": str(e)[:200]})
+            self._db.execute("INSERT INTO instalacao(numero,compra,org,nome,email,modulos,sal,resumo,pacote,criado) VALUES(?,?,?,?,?,?,?,?,?,?)",
+                             (numero, numero_compra, org, nome, email, json.dumps(modulos), sal, self._resumo_codigo(sal, codigo), pacote, self.relogio()))
+            link = link_base.rstrip("/") + "/ativar/" + numero
+            linhas = [f"Olá, {nome}.", "",
+                      "O seu pedido " + numero_compra + " foi aprovado pela Physis Engineering.", ""]
+            if modulos:
+                linhas += ["Sua plataforma Physis está pronta:", "",
+                           f"  Número da instalação: {numero}",
+                           f"  Link de acesso: {link}",
+                           f"  Código de ativação: {codigo}", "",
+                           "Abra o link, digite o código e baixe a sua plataforma, já com os módulos comprados:",
+                           "  " + ", ".join(modulos) + ".",
+                           "No primeiro acesso, a plataforma pede o seu nome, um usuário e uma senha. A senha fica só com você.", ""]
+            if cursos:
+                linhas += ["Seus cursos:"] + [f"  {c.get('nome', 'Curso')}: {c['link']}" for c in cursos] + [""]
+            linhas += ["Guarde o código: ele é pessoal e vale só para esta instalação.",
+                       "Dúvidas: responda a este e-mail.", "", "Physis Engineering"]
+            assunto = f"Physis · seu acesso ({numero})" if modulos else f"Physis · seu pedido {numero_compra} foi aprovado"
+            self._db.execute("INSERT INTO email_saida(para,assunto,corpo,estado,ref,criado) VALUES(?,?,?,?,?,?)",
+                             (email, assunto, "\n".join(linhas), "pendente", numero, self.relogio()))
+            self.registrar("instalacao", quem or "gestao", {"o_que": "instalacao criada", "numero": numero, "compra": numero_compra,
+                                                           "modulos": modulos, "pacote": bool(pacote)})
+            self._db.commit()
+            return {"ok": True, "repetido": False, "numero": numero, "org": org, "link": link, "modulos": modulos,
+                    "pacote": bool(pacote), "email": "pendente"}
+
+    def ativar(self, numero: str, codigo: str) -> dict:
+        """Confere o código. Cinco erros seguidos bloqueiam por 15 minutos."""
+        with self._trava:
+            r = self._db.execute("SELECT sal, resumo, pacote, erros, bloqueado_ate, nome, modulos FROM instalacao WHERE numero=?", (numero,)).fetchone()
+            if not r:
+                return {"ok": False, "erro": "instalacao ou codigo nao conferem"}
+            sal, resumo, pacote, erros, ate, nome, modulos = r
+            agora = self.relogio()
+            if ate > agora:
+                return {"ok": False, "erro": "muitas tentativas; espere alguns minutos", "espera": int(ate - agora)}
+            if not hmac.compare_digest(bytes(resumo), self._resumo_codigo(bytes(sal), codigo)):
+                erros += 1
+                self._db.execute("UPDATE instalacao SET erros=?, bloqueado_ate=? WHERE numero=?",
+                                 (0 if erros >= self.ATIVAR_ERROS else erros, agora + self.ATIVAR_ESPERA_S if erros >= self.ATIVAR_ERROS else 0, numero))
+                self._db.commit()
+                return {"ok": False, "erro": "instalacao ou codigo nao conferem"}
+            self._db.execute("UPDATE instalacao SET erros=0, ativado=COALESCE(ativado, ?) WHERE numero=?", (agora, numero))
+            self.registrar("instalacao", numero, {"o_que": "ativacao conferida"})
+            self._db.commit()
+            return {"ok": True, "numero": numero, "nome": nome, "modulos": json.loads(modulos), "pacote": pacote}
+
+    def instalacoes(self) -> list[dict]:
+        with self._trava:
+            linhas = self._db.execute("SELECT numero, compra, org, nome, email, modulos, pacote, criado, ativado FROM instalacao ORDER BY criado").fetchall()
+        return [{"numero": n, "compra": c, "org": o, "nome": nm, "email": e, "modulos": json.loads(m), "pacote": bool(p),
+                 "criado": cr, "ativado": a} for n, c, o, nm, e, m, p, cr, a in linhas]
+
+    def emails(self, estado: str | None = None) -> list[dict]:
+        with self._trava:
+            q = "SELECT id, para, assunto, corpo, estado, ref, criado, enviado, erro FROM email_saida"
+            linhas = self._db.execute(q + (" WHERE estado=?" if estado else "") + " ORDER BY id", ((estado,) if estado else ())).fetchall()
+        return [{"id": i, "para": p, "assunto": a, "corpo": c, "estado": e, "ref": r, "criado": cr, "enviado": en, "erro": er}
+                for i, p, a, c, e, r, cr, en, er in linhas]
+
+    def email_marcar(self, ident: int, estado: str, erro: str = "") -> bool:
+        if estado not in ("pendente", "enviado", "falhou", "enviado_a_mao"):
+            return False
+        with self._trava:
+            cur = self._db.execute("UPDATE email_saida SET estado=?, erro=?, enviado=? WHERE id=?",
+                                   (estado, erro[:300], self.relogio() if estado.startswith("enviado") else None, ident))
+            if cur.rowcount and estado.startswith("enviado"):
+                # depois de enviado, o código de ativação não fica guardado em texto no servidor
+                self._db.execute("UPDATE email_saida SET corpo=? WHERE id=?",
+                                 (re.sub(r"(Código de ativação: )[A-Z0-9-]+", r"\1(enviado ao cliente)",
+                                         self._db.execute("SELECT corpo FROM email_saida WHERE id=?", (ident,)).fetchone()[0]), ident))
+            if cur.rowcount:
+                self.registrar("email", str(ident), {"o_que": estado})
             self._db.commit()
             return cur.rowcount > 0
 

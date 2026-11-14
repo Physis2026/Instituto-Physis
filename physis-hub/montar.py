@@ -96,6 +96,12 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         shutil.copy2(planejador, pasta / "web" / "planejador.html")
     if gestao is not None and gestao.is_file():      # só o pacote interno da Physis leva o programa de gestão interna
         shutil.copy2(gestao, pasta / "web" / "gestao.html")
+        # o servidor da Physis monta sozinho a plataforma de quem compra: leva o montador e os programas
+        shutil.copy2(AQUI / "montar.py", pasta / "montar.py")
+        (pasta / "programas").mkdir(exist_ok=True)
+        for prog in (sustainkit, supervisao, planejador):
+            if prog is not None and prog.is_file():
+                shutil.copy2(prog, pasta / "programas" / prog.name)
     inst = {"org": org, "lugar": lugar, "modulos": modulos, "login": True, "licenca": licenca,
             "montada_em": time.strftime("%Y-%m-%dT%H:%M:%S")}
     if nome:

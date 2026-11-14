@@ -11,6 +11,7 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parents[2]
 
 
+@unittest.skipUnless((RAIZ / "ferramentas" / "sincronizar.py").exists(), "só no repositório, não no pacote do cliente")
 class Sincronia(unittest.TestCase):
     def test_copias_iguais_ao_original(self):
         r = subprocess.run([sys.executable, str(RAIZ / "ferramentas" / "sincronizar.py"), "--conferir"],
