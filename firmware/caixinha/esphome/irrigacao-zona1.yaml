@@ -1,0 +1,49 @@
+# Caixinha de Automação (SustainKit 2.0) — Módulo de irrigação
+# Nó ESP32 de uma zona, publicando via MQTT
+# Status: NÃO TESTADO EM HARDWARE (fase de arquitetura / TRL 3)
+
+esphome:
+  name: irrigacao-zona1
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+mqtt:
+  broker: !secret mqtt_broker_ip
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+logger:
+
+sensor:
+  - platform: adc
+    pin: GPIO34          # pino ADC1 - não usar ADC2 (conflita com WiFi)
+    name: "Umidade Solo Zona 1"
+    id: umidade_zona1
+    attenuation: 11db
+    update_interval: 60s
+    filters:
+      - calibrate_linear:
+          # ajustar após calibrar o sensor específico, enterrado no local real
+          - 3.1 -> 0      # tensão lida com o sensor seco
+          - 1.2 -> 100    # tensão lida com o sensor saturado de água
+
+switch:
+  - platform: gpio
+    pin: GPIO26
+    name: "Valvula Zona 1"
+    id: valvula_zona1
+
+# Para mais zonas no mesmo nó: replicar sensor/switch com outros pinos ADC1
+# (GPIO32, GPIO33, GPIO35...) e outros GPIOs livres para os relés.
+# Para zonas distantes: criar irrigacao-zona2.yaml etc. com outro "name".

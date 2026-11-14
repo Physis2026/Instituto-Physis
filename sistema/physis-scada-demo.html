@@ -1,0 +1,1697 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Physis · SCADA — demonstração</title>
+<!--
+  Physis SCADA — demonstração
+  01/09/2026
+
+  O QUE ISTO É
+
+  Uma planta falsa publicando nos tópicos canônicos, e as quatro camadas da
+  arquitetura funcionando em cima dela. Serve para três coisas:
+
+    1. Mostrar no dia 20 e no dia 26 sem depender de hardware na sala.
+    2. Dar ao Erick Oliveira o modelo de dado que ele pediu na reunião de 01/09,
+       sem esperar ninguém ir à fazenda.
+    3. Provar — ou derrubar — as decisões de arquitetura antes de comprar
+       qualquer coisa.
+
+  O DADO É SIMULADO, E ISSO ESTÁ ESCRITO NA TELA. Demonstração que finge ser
+  planta real é o tipo de coisa que se descobre na pergunta do cliente.
+
+  Nada carregado da internet. Nenhuma fonte, nenhum CDN, nenhum servidor.
+-->
+<style>
+  :root{
+    --fundo:#F4F6F1; --sup:#FFFFFF; --tinta:#1C2B21; --linha:#1C2B2124;
+    --marca:#4B7547; --alerta:#A85432; --atencao:#8A6410; --frio:#546A7B;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--fundo);color:var(--tinta);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    -webkit-text-size-adjust:100%}
+  .env{max-width:1120px;margin:0 auto;padding:16px 16px 56px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-size:23px;font-weight:500;margin:0;letter-spacing:-.01em}
+  h2{font-family:Georgia,serif;font-size:17px;font-weight:500;margin:0 0 8px}
+  .topo{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--linha);padding-bottom:12px}
+  .marca{display:flex;align-items:center;gap:10px}
+  .pastilha{width:30px;height:30px;border-radius:50%;border:2px solid var(--marca);
+    display:grid;place-items:center;flex:0 0 auto}
+  .pastilha i{width:11px;height:11px;border-radius:50%;background:var(--marca);display:block}
+  button{font:inherit;font-size:14px;min-height:40px;padding:8px 13px;border-radius:3px;cursor:pointer;
+    border:1px solid var(--linha);background:transparent;color:var(--tinta)}
+  button.p{background:var(--marca);border-color:var(--marca);color:#fff;font-weight:600}
+  button.on{background:var(--tinta);border-color:var(--tinta);color:var(--fundo)}
+  .aviso{background:#C08A1E1f;border-left:3px solid var(--atencao);padding:9px 12px;
+    font-size:13px;line-height:1.5;margin:14px 0 0;border-radius:0 3px 3px 0}
+  .abas{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 4px}
+  .painel{display:none}.painel.ver{display:block}
+  .grade{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));margin-top:14px}
+  .cartao{background:var(--sup);border:1px solid var(--linha);border-top:3px solid var(--marca);
+    border-radius:4px;padding:11px 12px 13px}
+  .cartao.alto,.cartao.baixo{border-top-color:var(--alerta);background:#A854320a}
+  .cartao .nome{font-size:13px;font-weight:600}
+  .cartao .top{font-size:11px;color:#4A4F44;font-family:ui-monospace,Menlo,Consolas,monospace;
+    overflow-wrap:anywhere;margin-top:1px}
+  .cartao .val{font-family:Georgia,serif;font-size:30px;line-height:1.05;margin:7px 0 1px;
+    font-variant-numeric:tabular-nums}
+  .cartao .un{font-size:14px;color:#4A4F44}
+  .cartao .fx{font-size:11.5px;color:#4A4F44;margin-top:2px}
+  .cartao .est{font-size:11.5px;font-weight:600;margin-top:5px}
+  .spark{display:block;width:100%;height:34px;margin-top:7px}
+  table{width:100%;border-collapse:collapse;min-width:520px}
+  .rol{overflow-x:auto}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--linha);font-size:12.5px;vertical-align:top}
+  th{font-size:11px;color:#4A4F44;font-weight:600}
+  td.n{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .nota{font-size:12px;color:#4A4F44;line-height:1.5;margin:8px 0 0}
+  .barra{height:7px;border-radius:4px;background:#1C2B2114;overflow:hidden}
+  .barra i{display:block;height:100%;background:var(--marca);transition:width .5s ease}
+  .kpi{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));margin:12px 0}
+  .kpi div{background:var(--sup);border:1px solid var(--linha);border-radius:4px;padding:10px 11px}
+  .kpi b{display:block;font-family:Georgia,serif;font-size:24px;font-weight:500;margin-top:2px}
+  .kpi span{font-size:12px;color:#4A4F44}
+  .arv{display:block;margin:0 auto;max-width:290px;width:100%}
+  .cen{text-align:center}
+  .acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .msg{font-size:12.5px;min-height:1.3em;margin-top:8px;font-weight:600}
+  .sino{font-size:12.5px;padding:3px 8px;border-radius:11px;background:#F5E2D7;color:#7A2214;font-weight:600}
+  .sino.ok{background:#4B754722;color:var(--marca)}
+  footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--linha);font-size:12px;color:#4A4F44;line-height:1.6}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>
+/* ===== Padrão Physis · camada comum (não editar por app) ===== */
+:root{--px-fundo:#F4F6F1;--px-sup:#FFFFFF;--px-tinta:#1C2B21;--px-fraca:#4A4F44;--px-marca:#4B7547;
+  --px-acao:#33512F;--px-linha:#C9D2C4;--px-atencao:#8A6410;--px-alerta:#A63A28;--px-info:#2C5A6E}
+.px-pular{position:absolute;left:12px;top:-80px;z-index:1000;background:var(--px-tinta);color:#fff;
+  padding:12px 16px;border-radius:6px;font-weight:700;text-decoration:none}
+.px-pular:focus{top:12px}
+:focus-visible{outline:3px solid var(--px-acao)!important;outline-offset:2px!important}
+.px-faixa{background:#F4F6F1;border-bottom:1px solid var(--px-linha);color:var(--px-tinta);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.4}
+.px-faixa .px-in{max-width:1360px;margin:0 auto;padding:10px 20px;display:flex;flex-wrap:wrap;
+  align-items:center;justify-content:space-between;gap:10px 16px}
+.px-faixa .px-id{display:flex;align-items:center;gap:14px}
+.px-faixa img{height:44px;width:auto;display:block}
+.px-faixa .px-tit{font-weight:700;font-size:1.2em;color:var(--px-marca);padding-left:14px;
+  border-left:1px solid var(--px-linha)}
+.px-faixa nav{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.px-faixa a.px-l,.px-faixa button.px-b{font:inherit;font-size:.92em;min-height:44px;display:inline-flex;
+  align-items:center;padding:0 14px;border-radius:6px;text-decoration:none;cursor:pointer;
+  border:1px solid var(--px-linha);background:#fff;color:var(--px-tinta)}
+.px-faixa a.px-l[aria-current="page"]{background:var(--px-tinta);border-color:var(--px-tinta);color:#fff;font-weight:600}
+.px-faixa button.px-b{border-color:var(--px-acao);color:var(--px-acao);font-weight:600}
+.px-faixa button.px-b[aria-pressed="true"]{background:var(--px-acao);color:#fff}
+html.px-conforto body{font-size:115%!important;line-height:1.6!important;letter-spacing:.01em}
+html.px-conforto body, html.px-conforto body *:not(code):not(pre):not(svg *):not(.px-faixa img){
+  font-family:"Atkinson Hyperlegible",Verdana,Tahoma,sans-serif!important}
+html.px-conforto *{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<a class="px-pular" href="#px-conteudo">Ir para o conteúdo</a>
+<div class="px-faixa" role="banner"><div class="px-in"><div class="px-id"><img alt="Physis Engineering" src="data:image/png;base64,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"><span class="px-tit">Physis PDI - Sistema Integrado</span></div><nav aria-label="Sistemas Physis"><a class="px-l" href="physis-tela-cliente.html">Painel do cliente</a><a class="px-l" href="physis-scada-demo.html" aria-current="page">SCADA</a><a class="px-l" href="gestao-physis.html">Gestão</a><button type="button" class="px-b" id="px-conforto" aria-pressed="false">Modo de conforto</button></nav></div></div>
+
+<div class="env">
+
+  <header class="topo" id="px-conteudo" tabindex="-1">
+    <div class="marca">
+      
+      <div>
+        <h1 id="tTitulo">SCADA · demonstração</h1>
+        <div style="font-size:12.5px;color:#4A4F44" id="tSub">Planta simulada · dado não é real</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+      <span id="relogio" style="font-size:12.5px;color:#4A4F44;font-variant-numeric:tabular-nums"></span>
+      <span id="sino" class="sino ok">—</span>
+      <button id="btPausa">Pausar</button>
+      <button id="btIdioma">EN</button>
+    </div>
+  </header>
+
+  <p class="aviso" id="tAviso"></p>
+
+  <nav class="abas">
+    <button data-aba="sin" class="on" id="tAbaSin">Sinótico</button>
+    <button data-aba="sup" id="tAbaSup">Supervisório</button>
+    <button data-aba="cli" id="tAbaCli">Painel do cliente</button>
+    <button data-aba="his" id="tAbaHis">Historiador</button>
+    <button data-aba="aut" id="tAbaAut">Automação</button>
+    <button data-aba="exp" id="tAbaExp">Exportar</button>
+  </nav>
+
+  <!-- ================= SINÓTICO ================= -->
+  <section class="painel ver" id="p-sin">
+    <p class="nota" id="tSinNota"></p>
+    <h2 style="margin-top:14px" id="tSinAgua">Sistemas de água</h2>
+    <div class="rol"><svg id="svgAgua" viewBox="0 0 780 400" style="width:100%;min-width:640px;height:auto;display:block" role="img" aria-labelledby="lblAgua"></svg></div>
+    <h2 style="margin-top:22px" id="tSinEner">Sistema de energia</h2>
+    <div class="rol"><svg id="svgEner" viewBox="0 0 780 300" style="width:100%;min-width:640px;height:auto;display:block" role="img" aria-labelledby="lblEner"></svg></div>
+    <h2 style="margin-top:22px" id="tSinInfo">Os sistemas, um a um</h2>
+    <div class="grade" id="sistemas"></div>
+  </section>
+
+  <!-- ================= SUPERVISÓRIO ================= -->
+  <section class="painel" id="p-sup">
+    <p class="nota" id="tSupNota"></p>
+    <div class="grade" id="cartoes"></div>
+    <h2 style="margin-top:24px" id="tAlarmes">Alarmes</h2>
+    <div class="rol"><table id="tabAlarme"><thead><tr>
+      <th id="thQuando">Quando</th><th id="thAtivo">Ativo</th><th id="thGrand">Grandeza</th>
+      <th id="thValor" style="text-align:right">Valor</th><th id="thEstado">Estado</th>
+    </tr></thead><tbody></tbody></table></div>
+    <p class="nota" id="tSemAlarme"></p>
+  </section>
+
+  <!-- ================= PAINEL DO CLIENTE ================= -->
+  <section class="painel" id="p-cli">
+    <p class="nota" id="tCliNota"></p>
+    <div class="cen" style="margin-top:16px">
+      <svg class="arv" viewBox="0 0 220 200" role="img" aria-labelledby="arvLabel" id="arvore"></svg>
+      <div id="arvNome" style="font-family:Georgia,serif;font-size:20px;margin-top:8px"></div>
+      <div id="arvEstagio" style="font-size:13px;color:var(--marca);margin-top:2px"></div>
+      <div style="max-width:280px;margin:12px auto 0">
+        <div class="barra"><i id="arvBarra" style="width:0%"></i></div>
+        <div id="arvFalta" style="font-size:12px;color:#4A4F44;margin-top:6px"></div>
+      </div>
+    </div>
+    <div class="kpi" id="kpiCliente"></div>
+    <p class="nota" id="tCliRodape"></p>
+  </section>
+
+  <!-- ================= HISTORIADOR ================= -->
+  <section class="painel" id="p-his">
+    <p class="nota" id="tHisNota"></p>
+    <div class="kpi" id="kpiHis"></div>
+    <h2 style="margin-top:18px" id="tAgregado">Agregado por minuto</h2>
+    <div class="rol"><table id="tabAgg"><thead><tr>
+      <th id="thMin">Minuto</th><th id="thAtivo2">Ativo</th><th id="thGrand2">Grandeza</th>
+      <th style="text-align:right" id="thMin2">Mín</th><th style="text-align:right" id="thMed">Média</th>
+      <th style="text-align:right" id="thMax">Máx</th><th style="text-align:right" id="thFora">Fora da faixa</th>
+    </tr></thead><tbody></tbody></table></div>
+    <p class="nota" id="tHisConta"></p>
+  </section>
+
+  <!-- ================= AUTOMAÇÃO ================= -->
+  <section class="painel" id="p-aut">
+    <p class="nota" id="tAutNota"></p>
+    <h2 style="margin-top:16px" id="tTravas">Intertravamentos</h2>
+    <div class="rol"><table id="tabTravas"><thead><tr>
+      <th id="thTrava">Trava</th><th id="thProtege">O que protege</th><th id="thCond">Condição</th><th id="thAgora">Agora</th>
+    </tr></thead><tbody></tbody></table></div>
+    <h2 style="margin-top:22px" id="tRegras">Regras de acionamento</h2>
+    <div class="rol"><table id="tabRegras"><thead><tr>
+      <th id="thSistema">Sistema</th><th id="thRegra">Regra</th><th id="thPorque">Por quê</th><th id="thEstado2">Estado</th>
+    </tr></thead><tbody></tbody></table></div>
+    <h2 style="margin-top:22px" id="tHidrico">Balanço hídrico</h2>
+    <div class="kpi" id="kpiAgua"></div>
+    <p class="nota" id="tHidricoNota"></p>
+  </section>
+
+  <!-- ================= EXPORTAR ================= -->
+  <section class="painel" id="p-exp">
+    <p class="nota" id="tExpNota"></p>
+    <div class="acoes">
+      <button class="p" id="btCsvAgg">CSV agregado</button>
+      <button id="btJson">JSON · medicao</button>
+      <button id="btCsvCru">CSV cru</button>
+    </div>
+    <div class="msg" id="msgExp"></div>
+    <p class="nota" id="tExpAviso"></p>
+  </section>
+
+  <footer id="rodape"></footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* =====================================================================
+   0 · Idioma
+   ===================================================================== */
+var EN = false;
+var T = {
+  pt:{
+    titulo:"SCADA · fazenda net zero", sub:"Fazenda simulada · o dado não é real",
+    aviso:"Fazenda simulada. Nenhum sensor está conectado, e o relógio corre acelerado — um segundo aqui é um minuto na fazenda, então um dia passa em 24 minutos. Demonstração que finge ser planta real é o tipo de coisa que se descobre na pergunta do cliente. O saldo de carbono mostrado cobre só o que o SCADA mede: energia, diesel e biogás.",
+    abaSin:"Sinótico",
+    sinNota:"O desenho da planta, não uma lista de números. Um SCADA que só mostra tabela obriga a pessoa a montar a planta na cabeça toda vez. Verde é escoando, cinza é parado, vermelho é fora da faixa — e não há animação: cano tracejado em movimento distrai e não informa.",
+    sinAgua:"Sistemas de água", sinEner:"Sistema de energia", sinInfo:"Os sistemas, um a um",
+    sinAguaAlt:"Diagrama dos sistemas de água: chuva, cisterna, poço, reservatório, filtro, fertirrigação, talhão, ETE e reúso.",
+    sinEnerAlt:"Diagrama do sistema de energia: solar, rede, gerador, barramento e cargas.",
+    sChuva:"Chuva", sCisterna:"Cisterna", sPoco:"Poço", sBombaPoco:"Bomba do poço",
+    sReserv:"Reservatório", sBombaIrr:"Bomba de irrigação", sFiltro:"Filtro",
+    sRetro:"retrolavando", sFerti:"Fertirrigação", sTalhao:"Talhão 1",
+    sEte:"ETE", sReuso:"Reúso", sReusoNota:"só cultura não comida crua",
+    sSolar:"Usina solar", sRede:"Rede", sGerador:"Gerador diesel", sBarra:"Barramento",
+    sCamara:"Câmara fria", sBio:"Biodigestor",
+    sysCapt:"Captação", sysReserva:"Reserva", sysIrriga:"Irrigação",
+    sysTrata:"Tratamento e reúso", sysGera:"Geração", sysFrio:"Refrigeração",
+    sysCap:"Capacidade", sysCaptCap:"66 m³/h · 60 m³",
+    sysCaptando:"captando no poço", sysCisterna:"consumindo a cisterna", sysParado:"parado",
+    sysIrrigando:"irrigando", sysReusando:"reusando", sysTratando:"tratando",
+    sysDiesel:"no gerador", sysNoite:"noite", sysResfriando:"resfriando",
+    sysCaptRegra:"Chuva primeiro, depois reúso, poço por último — e o poço só de madrugada, salvo emergência de nível.",
+    sysReservaRegra:"Captação para em 90%. A irrigação não parte abaixo de 30% e desliga em 24%, para não rodar bomba seca.",
+    sysIrrigaRegra:"Liga abaixo de 26% de umidade do solo, desliga em 38%. Não irriga entre 18h e 21h, salvo solo abaixo de 22%.",
+    sysTrataRegra:"O efluente tratado volta para a irrigação quando há vazão. Restrição sanitária: só talhão de cultura que não se come crua.",
+    sysGeraRegra:"A solar cobre a carga; o excedente vai para a rede. O gerador diesel só entra na falta de rede, e é a única fonte fóssil da fazenda.",
+    sysFrioRegra:"Termostato com histerese: liga em +4, desliga em 0. A porta abrindo na colheita é o que mais tira a câmara da faixa.",
+    abaSup:"Supervisório", abaCli:"Painel do cliente", abaHis:"Historiador",
+    abaAut:"Automação", abaExp:"Exportar",
+    autNota:"Automação de água não se julga pela lógica de controle, e sim pelos intertravamentos. Bomba rodando seca queima a vedação em minutos; fertirrigação em linha parada concentra sal na raiz e queima a lavoura. As travas vêm antes das regras, aqui e no ladder.",
+    travas:"Intertravamentos", regras:"Regras de acionamento", hidrico:"Balanço hídrico",
+    trava:"Trava", protege:"O que protege", cond:"Condição", agora:"Agora",
+    sistema:"Sistema", regra:"Regra", porque:"Por quê",
+    livre:"livre", atuando:"atuando", inibindo:"inibindo",
+    aPoco:"Captado do poço", aChuva:"Da cisterna", aReuso:"Reúso da ETE",
+    aIrrig:"Irrigado", aRetro:"Retrolavagem", aPerda:"Não fecha",
+    hidricoNota:"Entrada menos saída deveria fechar em zero. O que sobra é vazamento — e automatizar sem o balanço é automatizar o vazamento junto. O reúso só vai para talhão de cultura que não se come crua; isso é restrição sanitária, não escolha de projeto.",
+    supNota:"Tela de quem interfere no processo. Sóbria de propósito: alarme primeiro, cor só para estado, e nada de pontuação disputando atenção com um alarme.",
+    alarmes:"Alarmes", semAlarme:"Nada fora da faixa até agora.",
+    quando:"Quando", ativo:"Ativo", grandeza:"Grandeza", valor:"Valor", estado:"Estado",
+    alto:"acima da faixa", baixo:"abaixo da faixa", ok:"na faixa",
+    pausar:"Pausar", seguir:"Continuar", pausado:"pausado",
+    cliNota:"Tela de quem é dono da fazenda. A árvore cresce com o saldo de carbono, não com eficiência genérica — e com dado medido, nunca digitado à mão.",
+    cliRodape:"A fazenda cresce contra ela mesma, no tempo. Não há comparação entre cooperados: ranking transforma a ferramenta em vigilância. E saldo negativo aqui não é declaração de net zero — declaração exige organismo verificador acreditado, que a Physis ainda não tem parceiro.",
+    hisNota:"Duas camadas de dado, com regras diferentes. O cru é curto e ninguém lê direto. O agregado é o que vai para o banco, para o Power BI e para o Excel.",
+    agregado:"Agregado por minuto", minuto:"Minuto", vmin:"Mín", vmed:"Média", vmax:"Máx", fora:"Fora da faixa",
+    expNota:"O que sai daqui entra em `medicao` com origem = 'scada'. O CSV agregado é o padrão; o cru existe e avisa o tamanho.",
+    expAviso:"O Excel para de funcionar antes de um milhão de linhas. Vinte tags a cada segundo por um ano dão 630 milhões — exportar cru para Excel é armadilha, e quem cai nela trava o computador na frente do cliente.",
+    csvAgg:"CSV agregado", json:"JSON · medicao", csvCru:"CSV cru",
+    baixou:function(n,q){return q+" · "+n+" linhas.";},
+    cruAviso:function(n){return "Cru com "+n+" linhas. Em uma planta real de um ano seriam centenas de milhões.";},
+    leituras:"Leituras cruas", linhasAgg:"Linhas agregadas", reducao:"Redução",
+    memoria:"Retenção do cru", minutos:"minutos",
+    saldo:"Saldo de carbono no período simulado", emitido:"Emitido", evitado:"Evitado",
+    saldoNota:"Medido pelo SCADA. Não inclui fertilizante, rebanho, transporte nem uso da terra — isso vem do levantamento, não do sensor.",
+    firme:"Saldo sem a evitação de biogás:", evEnergia:"Evitado · energia", evBiogas:"Evitado · biogás (contestável)",
+    kpiSolar:"Autoconsumo da solar", kpiBio:"Biogás capturado", kpiSolo:"Umidade do solo",
+    kpiRes:"Reservatório", kpiFp:"Fator de potência",
+    estagios:["Semente","Broto","Muda","Jovem","Adulta","Florida"],
+    faltam:function(n,e){return "Faltam "+n+" pontos para "+e.toLowerCase()+".";},
+    especie:"Buriti", especieNota:"Só cresce onde há água. Onde ele está, há nascente.",
+    rodape:"Physis Engineering · demonstração com planta simulada. Os tópicos e as faixas são os mesmos do physis-nucleo.js e do physis-ponte.py.",
+    idioma:"EN"
+  },
+  en:{
+    titulo:"SCADA · net zero farm", sub:"Simulated farm · the data is not real",
+    aviso:"Simulated farm. No sensor is connected, and the clock runs fast — one second here is one minute on site, so a day passes in 24 minutes. A demo that pretends to be a real plant is the kind of thing that surfaces in the client's question. The carbon balance covers only what the SCADA measures: electricity, diesel and biogas.",
+    abaSin:"Mimic",
+    sinNota:"The drawing of the plant, not a list of numbers. A SCADA that only shows tables makes the operator rebuild the plant in their head every time. Green is flowing, grey is stopped, red is out of range — and there is no animation: a moving dashed pipe distracts and informs nothing.",
+    sinAgua:"Water systems", sinEner:"Energy system", sinInfo:"The systems, one by one",
+    sinAguaAlt:"Water systems diagram: rain, cistern, well, reservoir, filter, fertigation, plot, WWTP and reuse.",
+    sinEnerAlt:"Energy system diagram: solar, grid, genset, busbar and loads.",
+    sChuva:"Rain", sCisterna:"Cistern", sPoco:"Well", sBombaPoco:"Well pump",
+    sReserv:"Reservoir", sBombaIrr:"Irrigation pump", sFiltro:"Filter",
+    sRetro:"backwashing", sFerti:"Fertigation", sTalhao:"Plot 1",
+    sEte:"WWTP", sReuso:"Reuse", sReusoNota:"crops not eaten raw only",
+    sSolar:"Solar array", sRede:"Grid", sGerador:"Diesel genset", sBarra:"Busbar",
+    sCamara:"Cold room", sBio:"Digester",
+    sysCapt:"Abstraction", sysReserva:"Storage", sysIrriga:"Irrigation",
+    sysTrata:"Treatment and reuse", sysGera:"Generation", sysFrio:"Refrigeration",
+    sysCap:"Capacity", sysCaptCap:"66 m³/h · 60 m³",
+    sysCaptando:"drawing from the well", sysCisterna:"drawing the cistern", sysParado:"stopped",
+    sysIrrigando:"irrigating", sysReusando:"reusing", sysTratando:"treating",
+    sysDiesel:"on the genset", sysNoite:"night", sysResfriando:"cooling",
+    sysCaptRegra:"Rain first, then reuse, well last — and the well only overnight, unless the level is critical.",
+    sysReservaRegra:"Abstraction stops at 90%. Irrigation will not start below 30% and stops at 24%, so the pump never runs dry.",
+    sysIrrigaRegra:"Starts below 26% soil moisture, stops at 38%. No irrigation between 18h and 21h unless soil is below 22%.",
+    sysTrataRegra:"Treated effluent returns to irrigation when there is flow. Sanitary restriction: only plots whose crop is not eaten raw.",
+    sysGeraRegra:"Solar covers the load; the surplus goes to the grid. The genset only runs on grid failure, and is the farm's only fossil source.",
+    sysFrioRegra:"Thermostat with hysteresis: on at +4, off at 0. The door opening at harvest is what takes the room out of range.",
+    abaSup:"Supervisory", abaCli:"Client panel", abaHis:"Historian",
+    abaAut:"Automation", abaExp:"Export",
+    autNota:"Water automation is not judged by its control logic but by its interlocks. A pump running dry burns its seal in minutes; fertigation into a stopped line concentrates salt at the root and burns the crop. Interlocks come before rules, here and in the ladder.",
+    travas:"Interlocks", regras:"Actuation rules", hidrico:"Water balance",
+    trava:"Interlock", protege:"What it protects", cond:"Condition", agora:"Now",
+    sistema:"System", regra:"Rule", porque:"Why",
+    livre:"clear", atuando:"acting", inibindo:"inhibiting",
+    aPoco:"Abstracted from well", aChuva:"From cistern", aReuso:"Reuse from WWTP",
+    aIrrig:"Irrigated", aRetro:"Backwash", aPerda:"Does not close",
+    hidricoNota:"In minus out should close at zero. What is left over is leakage — and automating without the balance automates the leak too. Reuse only goes to plots whose crop is not eaten raw; that is a sanitary restriction, not a design choice.",
+    supNota:"The screen for whoever interferes with the process. Sober on purpose: alarms first, colour only for state, and no score competing with an alarm for attention.",
+    alarmes:"Alarms", semAlarme:"Nothing out of range so far.",
+    quando:"When", ativo:"Asset", grandeza:"Quantity", valor:"Value", estado:"State",
+    alto:"above range", baixo:"below range", ok:"in range",
+    pausar:"Pause", seguir:"Resume", pausado:"paused",
+    cliNota:"The screen for whoever owns the farm. The tree grows with the carbon balance, not with generic efficiency — and on measured data, never hand-typed.",
+    cliRodape:"The farm grows against itself, over time. No ranking between co-op members: that turns the tool into surveillance. And a negative balance here is not a net zero claim — a claim needs an accredited verification body, which Physis does not yet have a partner for.",
+    hisNota:"Two layers of data with different rules. Raw is short and nobody reads it directly. The aggregate is what goes to the database, to Power BI and to Excel.",
+    agregado:"Aggregated by minute", minuto:"Minute", vmin:"Min", vmed:"Mean", vmax:"Max", fora:"Out of range",
+    expNota:"What leaves here lands in `medicao` with origem = 'scada'. Aggregated CSV is the default; raw exists and warns about size.",
+    expAviso:"Excel stops working before a million rows. Twenty tags every second for a year make 630 million — exporting raw to Excel is a trap, and whoever falls for it freezes the laptop in front of the client.",
+    csvAgg:"Aggregated CSV", json:"JSON · medicao", csvCru:"Raw CSV",
+    baixou:function(n,q){return q+" · "+n+" rows.";},
+    cruAviso:function(n){return "Raw with "+n+" rows. A real plant over a year would be hundreds of millions.";},
+    leituras:"Raw readings", linhasAgg:"Aggregated rows", reducao:"Reduction",
+    memoria:"Raw retention", minutos:"minutes",
+    saldo:"Carbon balance over the simulated period", emitido:"Emitted", evitado:"Avoided",
+    saldoNota:"Measured by SCADA. Excludes fertiliser, livestock, transport and land use — those come from the survey, not from a sensor.",
+    firme:"Balance without biogas avoidance:", evEnergia:"Avoided · electricity", evBiogas:"Avoided · biogas (contestable)",
+    kpiSolar:"Solar self-consumption", kpiBio:"Biogas captured", kpiSolo:"Soil moisture",
+    kpiRes:"Reservoir", kpiFp:"Power factor",
+    estagios:["Seed","Sprout","Seedling","Young","Mature","In flower"],
+    faltam:function(n,e){return n+" points to "+e.toLowerCase()+".";},
+    especie:"Moriche palm", especieNota:"Only grows where there is water. Where it stands, there is a spring.",
+    rodape:"Physis Engineering · demo on a simulated plant. Topics and ranges are the same as physis-nucleo.js and physis-ponte.py.",
+    idioma:"PT"
+  }
+};
+function t(){ return EN ? T.en : T.pt; }
+
+/* =====================================================================
+   1 · O contrato — cópia do physis-nucleo.js
+   Se um dos três mudar, os três mudam. Divergir aqui quebra a ponte
+   em silêncio, que é a pior forma de quebrar.
+   ===================================================================== */
+var ORG = "cliente-alfa-01";
+var FAIXAS = {
+  energia:[0,500,"kW"], tensao:[198,242,"V"], corrente:[0,630,"A"],
+  fp:[0.92,1,"-"], temperatura:[0,80,"C"], umidade:[20,90,"%"],
+  nivel:[5,95,"%"], pressao:[0,10,"bar"], vazao:[0,100,"m3/h"]
+};
+function montarTopico(org,g,a){ return "physis/"+org+"/"+g+"/"+a; }
+function avaliarAlarme(g,v){
+  var f = FAIXAS[g]; if(!f) return "sem_faixa";
+  if(v < f[0]) return "baixo";
+  if(v > f[1]) return "alto";
+  return "ok";
+}
+
+/* =====================================================================
+   2 · A planta simulada
+   Cada ativo tem um comportamento próprio, não ruído aleatório. Ruído puro
+   nunca dispara alarme de verdade e a demonstração fica sem graça —
+   e, pior, não testa nada.
+   ===================================================================== */
+var ATIVOS = [
+  { id:"rede-importada", pt:"Energia comprada da rede", en:"Grid import", g:"energia",
+    fx:[0,250,"kW"], v:0 },
+  { id:"rede-injetada", pt:"Energia injetada na rede", en:"Grid export", g:"energia",
+    fx:[0,120,"kW"], v:0 },
+  { id:"solar-usina", pt:"Usina solar", en:"Solar array", g:"energia",
+    fx:[0,180,"kW"], v:0 },
+  { id:"bomba-irrigacao", pt:"Bomba de irrigação", en:"Irrigation pump", g:"energia",
+    fx:[0,55,"kW"], v:0 },
+  { id:"reservatorio-01", pt:"Reservatório", en:"Reservoir", g:"nivel",
+    fx:[20,95,"%"], v:74 },
+  { id:"poco-vazao", pt:"Captação · vazão do poço", en:"Abstraction · well flow", g:"vazao",
+    fx:[0,100,"m3/h"], v:0 },
+  { id:"cisterna-chuva", pt:"Cisterna de chuva", en:"Rainwater cistern", g:"nivel",
+    fx:[0,95,"%"], v:38 },
+  { id:"filtro-dp", pt:"Filtro · pressão diferencial", en:"Filter · differential pressure", g:"pressao",
+    fx:[0,1.2,"bar"], v:0.22 },
+  { id:"fertirrigacao-ce", pt:"Fertirrigação · condutividade", en:"Fertigation · conductivity", g:"vazao",
+    fx:[1.2,2.6,"mS/cm"], v:1.8 },
+  { id:"ete-efluente", pt:"ETE · vazão de efluente", en:"WWTP · effluent flow", g:"vazao",
+    fx:[0,25,"m3/h"], v:0 },
+  { id:"reuso-vazao", pt:"Reúso para irrigação", en:"Reuse to irrigation", g:"vazao",
+    fx:[0,25,"m3/h"], v:0 },
+  { id:"umidade-solo-t1", pt:"Umidade do solo · talhão 1", en:"Soil moisture · plot 1", g:"umidade",
+    fx:[22,45,"%"], v:31 },
+  { id:"camara-fria", pt:"Câmara fria pós-colheita", en:"Post-harvest cold room", g:"temperatura",
+    fx:[-1,6,"C"], v:2.4 },
+  { id:"biodigestor-vazao", pt:"Biodigestor · vazão de biogás", en:"Digester · biogas flow", g:"vazao",
+    fx:[8,60,"m3/h"], v:26 },
+  { id:"gerador-diesel", pt:"Gerador diesel", en:"Diesel genset", g:"energia",
+    fx:[0,80,"kW"], v:0 },
+  { id:"entrada-fp", pt:"Fator de potência da entrada", en:"Incomer power factor", g:"fp",
+    fx:[0.92,1,"-"], v:0.95 }
+];
+ATIVOS.forEach(function(a){ a.topico = montarTopico(ORG, a.g, a.id); a.hist = []; });
+
+/* Relógio acelerado: 1 s de tela = 1 min de fazenda. Um dia em 24 min. */
+var minutoPlanta = 5*60;   // começa às 05:00
+var bombaLigada = false, frioLigado = true, portaAberta = 0, ciclo = 0, geradorLigado = false;
+var chovendo = 0, retrolavando = 0;
+/* Capacidades declaradas, em m³. Sem elas, nível em porcentagem não vira volume
+   e o balanço hídrico é fantasia. */
+var CAP_RES = 220, CAP_CIST = 60;
+
+function rnd(a,b){ return a + Math.random()*(b-a); }
+
+/* Índices, para não contar posição de array na mão em dez lugares. */
+var A = {};
+ATIVOS.forEach(function(a,i){ A[a.id] = a; });
+
+function passo(){
+  ciclo++;
+  minutoPlanta = (minutoPlanta + 1) % 1440;
+  var h = minutoPlanta/60;
+
+  /* SOLAR — curva de dia com nuvem. Numa fazenda a usina costuma ser maior que
+     a carga de pico, porque o objetivo não é cobrir o consumo instantâneo: é
+     fechar o balanço do ano. */
+  var solar = 0;
+  if(h > 5.5 && h < 18.5){
+    solar = 160 * Math.sin(Math.PI*(h-5.5)/13);
+    if(Math.random() < 0.04) solar *= rnd(0.2,0.55);
+  }
+  A["solar-usina"].v = solar;
+
+  /* UMIDADE DO SOLO — cai com evapotranspiração, mais rápido no calor do dia.
+     É ela que decide irrigar, e não o relógio. */
+  var solo = A["umidade-solo-t1"];
+  var evap = (h > 9 && h < 17) ? rnd(0.16,0.30) : rnd(0.03,0.08);
+  solo.v -= evap;
+
+  /* IRRIGAÇÃO — a decisão que a análise entrega e o CLP executa: irriga quando
+     o solo cai abaixo de 26%, mas NUNCA entre 18h e 21h, que é o horário de
+     ponta da tarifa. Se o solo cair muito, irriga assim mesmo — planta não
+     espera tarifa. Esta é a regra que sai do Power BI e vira ladder. */
+  var ponta = (h >= 18 && h < 21);
+  var res = A["reservatorio-01"], bomba = A["bomba-irrigacao"];
+  /* TRAVA DE BOMBA SECA: reservatório acima de 30% para partir, e desliga em
+     24%. Bomba centrífuga rodando seca queima a vedação em minutos. */
+  if(!bombaLigada && solo.v < 26 && res.v > 30 && retrolavando === 0 && (!ponta || solo.v < 22)) bombaLigada = true;
+  if(bombaLigada && (solo.v > 38 || res.v < 24)) bombaLigada = false;
+  if(bombaLigada){
+    solo.v += rnd(0.9,1.3);
+    var irrigadoM3 = rnd(1.3,1.6);              // m³ por minuto de fazenda
+    res.v -= irrigadoM3/CAP_RES*100;
+    agua.irrigado += irrigadoM3;
+    bomba.v = rnd(41,47);
+  } else {
+    bomba.v = 0;
+  }
+  if(retrolavando > 0){
+    var retroM3 = rnd(0.18,0.24);
+    res.v -= retroM3/CAP_RES*100;
+    agua.retro += retroM3;
+  }
+  solo.v = Math.max(12, Math.min(52, solo.v));
+
+  /* ---------- OS SISTEMAS DE ÁGUA, TODOS AUTOMÁTICOS ----------
+     A regra de ouro aqui não é a lógica de controle: são os intertravamentos.
+     Automação de água que roda bomba seca, transborda reservatório ou fertiliza
+     linha vazia queima equipamento e queima lavoura. Cada bloco abaixo tem a
+     sua trava escrita antes da lógica. */
+
+  /* CISTERNA — enche com chuva. Água de chuva é a mais barata que existe:
+     não custa bombeamento e não conta na outorga. Por isso ela é consumida
+     ANTES do poço, sempre. */
+  var cist = A["cisterna-chuva"];
+  /* Cisterna cheia sangra: o excesso vai embora e não entra no balanço. Fingir
+     que toda chuva foi captada é o jeito mais fácil de superestimar reúso. */
+  if(chovendo > 0){ chovendo--; cist.v = Math.min(100, cist.v + rnd(1.0,1.9)); }
+  else if(Math.random() < 0.006) chovendo = Math.round(rnd(20,70));
+  cist.v = Math.max(0, Math.min(100, cist.v));
+
+  /* ETE E REÚSO — o efluente tratado volta para a irrigação. É o que fecha o
+     ciclo, mas com restrição: só vai para talhão de cultura não comestível crua,
+     e a tela precisa dizer isso. Reúso sem essa distinção é problema sanitário,
+     não economia. */
+  var ete = A["ete-efluente"], reuso = A["reuso-vazao"];
+  ete.v = (h > 6 && h < 19) ? rnd(9,15) : rnd(1,3);
+  reuso.v = (bombaLigada && ete.v > 6) ? Math.min(ete.v, rnd(7,12)) : 0;
+
+  /* CAPTAÇÃO NO POÇO — a hierarquia é chuva, reúso, poço. E o horário é de
+     madrugada, quando a energia é barata: a decisão de QUANDO bombear vale mais
+     que a de quanto bombear, e é a maior alavanca de custo da fazenda. */
+  var poco = A["poco-vazao"];
+  var podeCaptar = res.v < 90 && cist.v < 12;      // cisterna primeiro
+  var janelaBarata = (h >= 1 && h < 5);
+  var emergencia = res.v < 25;                      // trava de segurança do reservatório
+  var repondo = podeCaptar && (janelaBarata || emergencia);
+  poco.v = repondo ? rnd(58,66) : rnd(0,0.4);
+
+  /* Entradas do reservatório, na ordem da hierarquia, e TUDO EM m³.
+     Trabalhar em porcentagem por dentro é como o balanço hídrico deixa de
+     fechar sem ninguém perceber: 1% de cisterna não é 1% de reservatório. */
+  var entradaM3 = 0;
+  if(cist.v > 12 && res.v < 90){
+    var doCist = Math.min(rnd(0.9,1.4), (cist.v-12)/100*CAP_CIST);   // m³
+    cist.v -= doCist/CAP_CIST*100;
+    entradaM3 += doCist; agua.chuva += doCist;
+  }
+  if(repondo){ var doPoco = poco.v/60; entradaM3 += doPoco; agua.poco += doPoco; }
+  if(reuso.v > 0){ entradaM3 += reuso.v/60; agua.reuso += reuso.v/60; }
+  res.v = Math.max(0, Math.min(100, res.v + entradaM3/CAP_RES*100));
+
+  /* FILTRO — a pressão diferencial sobe com a sujeira. Passou de 0,9 bar,
+     retrolava sozinho. Filtro entupido faz a bomba puxar contra pressão e
+     gastar energia sem entregar água — é perda que não aparece em lugar nenhum
+     até alguém medir os dois lados. */
+  var filtro = A["filtro-dp"];
+  if(retrolavando > 0){ retrolavando--; filtro.v -= rnd(0.10,0.18); }
+  else {
+    if(bombaLigada) filtro.v += rnd(0.006,0.014);
+    if(filtro.v > 0.9) retrolavando = Math.round(rnd(3,6));
+  }
+  filtro.v = Math.max(0.10, Math.min(1.35, filtro.v));
+
+  /* FERTIRRIGAÇÃO — dosa nutriente na linha, medindo condutividade. TRAVA:
+     só dosa com a bomba ligada e com vazão real. Dosar em linha parada
+     concentra sal na raiz e queima a planta. */
+  var ce = A["fertirrigacao-ce"];
+  var dosando = bombaLigada && retrolavando === 0 && poco.v + reuso.v > 1;
+  if(dosando) ce.v += (2.0 - ce.v)*0.12 + rnd(-0.05,0.05);
+  else ce.v += (1.5 - ce.v)*0.06 + rnd(-0.02,0.02);
+  ce.v = Math.max(0.6, Math.min(3.2, ce.v));
+
+  /* CÂMARA FRIA pós-colheita, com termostato e porta que abre na colheita. */
+  var cam = A["camara-fria"];
+  if(portaAberta > 0){ portaAberta--; cam.v += rnd(0.4,0.8); }
+  else {
+    if(!frioLigado && cam.v > 4) frioLigado = true;
+    if(frioLigado && cam.v < 0) frioLigado = false;
+    cam.v += frioLigado ? -rnd(0.2,0.4) : rnd(0.05,0.12);
+    if(h > 6 && h < 16 && Math.random() < 0.05) portaAberta = Math.round(rnd(3,8));
+  }
+  cam.v = Math.max(-3, Math.min(11, cam.v));
+
+  /* BIODIGESTOR — resíduo da produção vira biogás. Varia com a carga do dia
+     anterior, e cai quando a temperatura ambiente cai de madrugada. */
+  var bio = A["biodigestor-vazao"];
+  /* Passeio aleatório sem força de retorno acaba encostando no limite e
+     ficando em alarme para sempre — o biodigestor real tem um patamar de
+     produção, mais alto de dia porque a temperatura ajuda a digestão. */
+  var alvoBio = (h > 8 && h < 20) ? 34 : 22;
+  bio.v += (alvoBio - bio.v)*0.05 + rnd(-0.8,0.8);
+  bio.v = Math.max(4, Math.min(58, bio.v));
+
+  /* CARGA da fazenda: câmara fria, galpão, ordenha, escritório. */
+  var carga = (h > 5 && h < 20 ? rnd(28,46) : rnd(12,20))
+            + (frioLigado ? rnd(18,24) : 0) + bomba.v
+            + (repondo ? rnd(14,17) : 0);
+
+  /* BALANÇO NA REDE — as duas direções, separadas. Netzero exige as duas:
+     energia injetada não vale o mesmo que energia consumida no local, e somar
+     as duas num número só é como a conta deixa de fechar. */
+  var liquido = carga - solar;
+  var imp = A["rede-importada"], exp = A["rede-injetada"];
+  imp.v = liquido > 0 ? liquido : 0;
+  exp.v = liquido < 0 ? -liquido : 0;
+
+  /* GERADOR DIESEL — só entra quando falta rede. É a única fonte fóssil da
+     fazenda, e por isso é a que mais pesa no inventário. */
+  var ger = A["gerador-diesel"];
+  if(!geradorLigado && Math.random() < 0.0015) geradorLigado = true;
+  if(geradorLigado && Math.random() < 0.06) geradorLigado = false;
+  ger.v = geradorLigado ? Math.max(10, imp.v) : 0;
+  if(geradorLigado){ imp.v = 0; }
+
+  /* FATOR DE POTÊNCIA — cai com a carga, como na tela do cliente. */
+  var fp = A["entrada-fp"];
+  var frac = Math.min(1, carga/95);
+  /* Ruído pequeno de propósito: fator de potência real não pula centésimos de
+     segundo em segundo, e ruído grande aqui só produz alarme que pisca. */
+  fp.v = fp.v*0.6 + 0.4*Math.max(0.72, Math.min(0.99, 0.985*(1 - 0.55*Math.pow(1-frac,2)) + rnd(-0.004,0.004)));
+
+  /* Acumuladores do balanço netzero, em kWh e m³ de biogás. Um passo é um
+     minuto de fazenda, então kW × (1/60) h. */
+  balanco.solar += solar/60;
+  balanco.importada += imp.v/60;
+  balanco.injetada += exp.v/60;
+  balanco.diesel += ger.v/60;
+  balanco.biogas += bio.v/60;
+  balanco.autoconsumo += Math.min(solar, carga)/60;
+  /* Balanço hídrico, em m³. Um passo é um minuto, então vazão/60. */
+  /* Os acumuladores já foram somados onde a água de fato entrou ou saiu.
+     Somar de novo aqui, "por vazão", é como se conta a mesma água duas vezes. */
+
+  /* Grava cru e avalia alarme */
+  ATIVOS.forEach(function(a){
+    var v = Math.round(a.v*100)/100;
+    var est = estadoDe(a, v);
+    a.ultimo = v; a.estado = est;
+    a.hist.push(v); if(a.hist.length > 60) a.hist.shift();
+    cru.push({ min:minutoPlanta, topico:a.topico, ativo:a.id, g:a.g, v:v, est:est });
+    if(est !== "ok" && (!a.emAlarme || a.emAlarme !== est)){
+      alarmes.unshift({ min:minutoPlanta, ativo:a, g:a.g, v:v, est:est });
+      if(alarmes.length > 40) alarmes.pop();
+    }
+    a.emAlarme = est === "ok" ? null : est;
+  });
+
+  var limite = 30 * ATIVOS.length;
+  if(cru.length > limite) cru.splice(0, cru.length - limite);
+
+  if(ciclo % 5 === 0) agregar();
+}
+
+var balanco = { solar:0, importada:0, injetada:0, diesel:0, biogas:0, autoconsumo:0 };
+var agua = { poco:0, chuva:0, reuso:0, irrigado:0, retro:0 };
+
+/* FATORES — declarados, nunca embutidos como verdade. Um fator errado erra o
+   inventário inteiro, e por mil. Os quatro abaixo são os que a tela do cliente
+   já pede, e devem ser conferidos por engenheiro habilitado antes de virar
+   laudo. */
+var FATOR = {
+  rede: 0.0289,      // tCO2/MWh — fator médio do SIN, declarado
+  diesel: 0.7400,    // kgCO2e por kWh gerado no grupo diesel
+  biogas_evitado: 2.7500  // kgCO2e evitados por m³ de biogás que deixou de virar metano solto
+};
+
+/* Faixa por ativo, não só por grandeza. A câmara fria não tem a mesma faixa
+   de "temperatura" que uma sala de máquinas — usar a faixa genérica é como se
+   produz alarme que ninguém olha. */
+function estadoDe(a,v){
+  var f = a.fx || FAIXAS[a.g];
+  if(!f) return "sem_faixa";
+
+  /* Duas técnicas de gestão de alarme, e cada uma resolve uma metade.
+
+     BANDA MORTA NA VOLTA. Para sair do alarme, o valor precisa voltar bem
+     para dentro — 5% da faixa, no mínimo 0,02. Sem isto, um valor parado em
+     cima do limite entra e sai de alarme o dia inteiro.
+
+     RETARDO NA IDA. Para entrar em alarme, precisa estar fora por três
+     leituras seguidas. Pico de um instante é ruído, não alarme.
+
+     Juntas, elas matam o "alarme que pisca" — que é o que faz o operador
+     desligar o som e, depois, perder o alarme que importava. */
+  var banda = Math.max((f[1] - f[0]) * 0.05, 0.02);
+
+  if(a.emAlarme === "baixo"){
+    if(v < f[0] + banda) return "baixo";
+    a.foraSeguidas = 0; a.foraTipo = null; return "ok";
+  }
+  if(a.emAlarme === "alto"){
+    if(v > f[1] - banda) return "alto";
+    a.foraSeguidas = 0; a.foraTipo = null; return "ok";
+  }
+
+  var fora = (v < f[0]) ? "baixo" : (v > f[1]) ? "alto" : null;
+  if(!fora){ a.foraSeguidas = 0; a.foraTipo = null; return "ok"; }
+  a.foraSeguidas = (a.foraTipo === fora ? (a.foraSeguidas || 0) : 0) + 1;
+  a.foraTipo = fora;
+  return a.foraSeguidas >= 3 ? fora : "ok";
+}
+
+
+var cru = [], alarmes = [], agg = [], janela = {};
+
+function agregar(){
+  ATIVOS.forEach(function(a){
+    var linhas = cru.filter(function(r){ return r.ativo === a.id; }).slice(-5);
+    if(!linhas.length) return;
+    var vs = linhas.map(function(r){ return r.v; });
+    agg.unshift({
+      min: linhas[linhas.length-1].min,
+      ativo: a, g: a.g,
+      vmin: Math.min.apply(null,vs), vmax: Math.max.apply(null,vs),
+      vmed: vs.reduce(function(x,y){return x+y;},0)/vs.length,
+      fora: linhas.filter(function(r){ return r.est !== "ok"; }).length,
+      n: vs.length
+    });
+  });
+  if(agg.length > 240) agg.length = 240;
+}
+
+/* =====================================================================
+   3 · Desenho
+   ===================================================================== */
+var $ = function(s){ return document.querySelector(s); };
+function hhmm(m){
+  var h = Math.floor(m/60), mm = m%60;
+  return (h<10?"0":"")+h+":"+(mm<10?"0":"")+mm;
+}
+function nome(a){ return EN ? a.en : a.pt; }
+function fmt(v,c){
+  var s = Number(v).toFixed(c===undefined?1:c);
+  return EN ? s : s.replace(".",",");
+}
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function sparkline(a){
+  var h = a.hist; if(h.length < 2) return "";
+  var mn = Math.min.apply(null,h), mx = Math.max.apply(null,h);
+  if(mx - mn < 1e-9){ mx = mn + 1; }
+  var pts = h.map(function(v,i){
+    return (i/(h.length-1)*100).toFixed(1)+","+(30 - (v-mn)/(mx-mn)*26).toFixed(1);
+  }).join(" ");
+  var cor = a.estado === "ok" ? "var(--marca)" : "var(--alerta)";
+  return '<svg class="spark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true">'+
+    '<polyline points="'+pts+'" fill="none" stroke="'+cor+'" stroke-width="1.6" '+
+    'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>';
+}
+
+function pintarSup(){
+  var d = t();
+  $("#cartoes").innerHTML = ATIVOS.map(function(a){
+    var f = a.fx || FAIXAS[a.g];
+    var cls = a.estado === "alto" ? "alto" : a.estado === "baixo" ? "baixo" : "";
+    var rot = a.estado === "alto" ? d.alto : a.estado === "baixo" ? d.baixo : d.ok;
+    var cor = a.estado === "ok" ? "var(--marca)" : "var(--alerta)";
+    return '<div class="cartao '+cls+'">'+
+      '<div class="nome">'+esc(nome(a))+'</div>'+
+      '<div class="top">'+esc(a.topico)+'</div>'+
+      '<div class="val">'+fmt(a.ultimo, a.g==="fp"?3:1)+'<span class="un"> '+esc(f[2])+'</span></div>'+
+      '<div class="fx">'+fmt(f[0],a.g==="fp"?2:0)+' – '+fmt(f[1],a.g==="fp"?2:0)+' '+esc(f[2])+'</div>'+
+      '<div class="est" style="color:'+cor+'">'+esc(rot)+'</div>'+
+      sparkline(a)+'</div>';
+  }).join("");
+
+  var tb = $("#tabAlarme").querySelector("tbody");
+  tb.innerHTML = alarmes.slice(0,12).map(function(x){
+    var f = x.ativo.fx || FAIXAS[x.g];
+    return "<tr><td>"+hhmm(x.min)+"</td><td>"+esc(nome(x.ativo))+"</td><td>"+esc(x.g)+"</td>"+
+      '<td class="n">'+fmt(x.v, x.g==="fp"?3:1)+" "+esc(f[2])+"</td>"+
+      '<td style="color:var(--alerta);font-weight:600">'+esc(x.est==="alto"?d.alto:d.baixo)+"</td></tr>";
+  }).join("");
+  $("#tSemAlarme").textContent = alarmes.length ? "" : d.semAlarme;
+  var s = $("#sino");
+  var ativos = ATIVOS.filter(function(a){ return a.estado !== "ok"; }).length;
+  s.textContent = ativos ? ativos + (EN?" alarm(s)":" alarme(s)") : d.ok;
+  s.className = "sino" + (ativos ? "" : " ok");
+}
+
+/* --- painel do cliente: o balanço netzero, e a árvore que cresce com ele --- */
+
+var ESTAGIOS = [0,6,18,40,75,120];
+
+/* O balanço, em tCO2e no período simulado. Três parcelas medidas pelo SCADA e
+   uma quarta que o SCADA não vê. */
+function balancoCO2(){
+  // Emissão: energia comprada da rede, mais o diesel do gerador.
+  var emitido = (balanco.importada/1000) * FATOR.rede
+              + (balanco.diesel * FATOR.diesel)/1000;
+
+  /* Evitado vem em DUAS PARCELAS, e elas não têm o mesmo peso numa
+     verificação — juntar as duas num número só é o erro mais comum em
+     contabilidade de carbono no agro.
+
+     A parcela de energia é firme: cada kWh gerado no telhado é um kWh que não
+     veio da rede, e o fator da rede é público.
+
+     A parcela do biogás é EVITAÇÃO, não redução própria: você está contando o
+     metano que teria escapado se o resíduo ficasse a céu aberto. É a linha que
+     um organismo verificador questiona primeiro, e ela exige linha de base
+     documentada. Por isso aparece separada, e o saldo firme é mostrado sem
+     ela. */
+  var evEnergia = ((balanco.autoconsumo + balanco.injetada)/1000) * FATOR.rede;
+  var evBiogas  = (balanco.biogas * FATOR.biogas_evitado)/1000;
+
+  return {
+    emitido: emitido,
+    evEnergia: evEnergia, evBiogas: evBiogas,
+    evitado: evEnergia + evBiogas,
+    saldoFirme: emitido - evEnergia,
+    saldo: emitido - evEnergia - evBiogas
+  };
+}
+
+function pontos(){
+  /* A árvore cresce com o balanço, não com "eficiência" genérica. Saldo zero
+     ou negativo é o objetivo declarado da fazenda — e é isso que o cliente
+     quer ver crescer. Autoconsumo e fator de potência entram porque são o que
+     a fazenda controla no dia a dia. */
+  var b = balancoCO2(), p = 0;
+  /* A árvore cresce pelo saldo FIRME. Deixar o biogás inflar a pontuação faria
+     a tela premiar a parcela que o verificador contesta. */
+  var razao = b.emitido > 0 ? b.evEnergia / b.emitido : 0;
+  p += Math.min(70, Math.round(razao * 55));
+  p += Math.min(30, Math.round(fpBom/8));
+  p += Math.min(30, Math.round(semAlarme/12));
+  return p;
+}
+var fpBom = 0, semAlarme = 0;
+function acumular(){
+  if((A["entrada-fp"].ultimo||0) >= 0.92) fpBom++;
+  if(ATIVOS.every(function(a){ return a.estado === "ok"; })) semAlarme++; else semAlarme = 0;
+}
+
+function desenharArvore(est){
+  var o = [0,26,62,104,142,158][est], c = 176, m = c - o, esp = 1.6 + est*0.9;
+  var g = "";
+  if(est === 0){
+    g = '<ellipse cx="110" cy="170" rx="9" ry="7" fill="#8A6110" opacity=".8"/>'+
+        '<path d="M110 164 q3 -6 0 -10" stroke="#C08A1E" stroke-width="2" fill="none" stroke-linecap="round"/>';
+  } else {
+    g += '<path d="M110 '+c+' C 96 '+(c-o*0.35)+', 124 '+(c-o*0.65)+', 108 '+m+'" stroke="#8A6110" stroke-width="'+esp+'" fill="none" stroke-linecap="round"/>';
+    var n = Math.min(4, est);
+    for(var i=0;i<n;i++){
+      var y = c - 20 - i*(o/(n+0.5)), r = 12 + i*3 + est*1.4, s = i%2 ? 1 : -1;
+      g += '<ellipse cx="'+(108+s*(10+i*3))+'" cy="'+y+'" rx="'+r+'" ry="'+(r*0.66)+'" fill="#C08A1E" opacity="'+(0.32+i*0.09)+'"/>';
+    }
+    if(est >= 5){
+      [[108,m-10],[86,m+4],[130,m+2],[98,m+16],[122,m+18]].forEach(function(p){
+        for(var a=0;a<360;a+=72){
+          g += '<ellipse cx="'+p[0]+'" cy="'+(p[1]-4.6)+'" rx="3.1" ry="4.6" fill="#C08A1E" transform="rotate('+a+' '+p[0]+' '+p[1]+')"/>';
+        }
+        g += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="1.9" fill="#8A6110" opacity=".65"/>';
+      });
+    }
+  }
+  return '<title id="arvLabel">'+esc(t().especie)+'</title>'+
+    '<path d="M12 176 Q110 168 208 176 L208 190 Q110 198 12 190 Z" fill="#8A6110" opacity=".15"/>'+
+    '<path d="M12 176 Q110 168 208 176" stroke="#8A6110" stroke-width="1.5" fill="none" opacity=".5"/>'+ g;
+}
+
+function pintarCli(){
+  var d = t(), p = pontos(), est = 0;
+  ESTAGIOS.forEach(function(v,i){ if(p >= v) est = i; });
+  $("#arvore").innerHTML = desenharArvore(est);
+  $("#arvNome").textContent = d.especie;
+  $("#arvEstagio").textContent = d.estagios[est] + " · " + p + " pt";
+  var prox = ESTAGIOS[est+1];
+  if(prox){
+    $("#arvBarra").style.width = Math.min(100,(p-ESTAGIOS[est])/(prox-ESTAGIOS[est])*100)+"%";
+    $("#arvFalta").textContent = d.faltam(prox-p, d.estagios[est+1]);
+  } else {
+    $("#arvBarra").style.width = "100%";
+    $("#arvFalta").textContent = d.especieNota;
+  }
+
+  var b = balancoCO2();
+  var auto = (balanco.solar > 0) ? balanco.autoconsumo/balanco.solar*100 : 0;
+  var corSaldo = b.saldo <= 0 ? "var(--marca)" : "var(--alerta)";
+
+  $("#kpiCliente").innerHTML =
+    '<div style="grid-column:1/-1;border-top:3px solid '+corSaldo+'">'+
+      "<span>"+esc(d.saldo)+"</span>"+
+      '<b style="color:'+corSaldo+'">'+(b.saldo<=0?"−":"+")+fmt(Math.abs(b.saldo),3)+" tCO2e</b>"+
+      '<span style="display:block;margin-top:3px">'+esc(d.saldoNota)+"</span>"+
+      '<span style="display:block;margin-top:5px;font-size:12px">'+esc(d.firme)+" "+
+        (b.saldoFirme<=0?"−":"+")+fmt(Math.abs(b.saldoFirme),3)+" tCO2e</span></div>" +
+    [ [d.emitido, fmt(b.emitido,3)+" tCO2e", "var(--alerta)"],
+      [d.evEnergia, fmt(b.evEnergia,3)+" tCO2e", "var(--marca)"],
+      [d.evBiogas, fmt(b.evBiogas,3)+" tCO2e", "var(--atencao)"],
+      [d.kpiSolar, fmt(auto,0)+" %", ""],
+      [d.kpiBio, fmt(balanco.biogas,0)+" m³", ""],
+      [d.kpiSolo, fmt(A["umidade-solo-t1"].ultimo||0,0)+" %", ""],
+      [d.kpiRes, fmt(A["reservatorio-01"].ultimo||0,0)+" %", ""]
+    ].map(function(x){
+      return "<div><span>"+esc(x[0])+"</span><b"+(x[2]?' style="color:'+x[2]+'"':"")+">"+esc(x[1])+"</b></div>";
+    }).join("");
+}
+
+/* =====================================================================
+   Sinótico — o desenho da planta, não uma lista de números
+
+   Um SCADA que só mostra tabela obriga a pessoa a montar a planta na cabeça
+   toda vez. O sinótico é onde "a bomba está ligada e o reservatório está
+   caindo" vira uma coisa só, vista de uma vez.
+
+   Regras do desenho, e elas são as mesmas do supervisório:
+     · verde é escoando, cinza é parado, vermelho é fora da faixa;
+     · nada de animação — cano tracejado em movimento distrai e não informa;
+     · todo símbolo tem rótulo em texto ao lado.
+   ===================================================================== */
+
+var C_ON = "#4B7547", C_OFF = "#1C2B2140", C_AL = "#A85432", C_TX = "#1C2B21";
+
+function svgTanque(x,y,w,h,pct,rot,val,est){
+  var alt = Math.max(0, Math.min(100, pct))/100*(h-4);
+  var cor = est === "ok" ? "#4B754755" : "#A8543255";
+  var bordo = est === "ok" ? C_OFF : C_AL;
+  return '<g><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="4" fill="#fff" stroke="'+bordo+'" stroke-width="1.6"/>'+
+    '<rect x="'+(x+2)+'" y="'+(y+h-2-alt)+'" width="'+(w-4)+'" height="'+alt+'" rx="2" fill="'+cor+'"/>'+
+    '<text x="'+(x+w/2)+'" y="'+(y-8)+'" text-anchor="middle" font-size="12" fill="'+C_TX+'">'+esc(rot)+'</text>'+
+    '<text x="'+(x+w/2)+'" y="'+(y+h/2+5)+'" text-anchor="middle" font-size="14" font-weight="600" fill="'+C_TX+'">'+esc(val)+'</text></g>';
+}
+function svgBomba(cx,cy,on,rot,val){
+  return '<g><circle cx="'+cx+'" cy="'+cy+'" r="17" fill="'+(on?C_ON:"#fff")+'" stroke="'+(on?C_ON:C_OFF)+'" stroke-width="1.8"/>'+
+    '<path d="M'+(cx-6)+' '+(cy-7)+' L'+(cx+8)+' '+cy+' L'+(cx-6)+' '+(cy+7)+' Z" fill="'+(on?"#fff":C_OFF)+'"/>'+
+    '<text x="'+cx+'" y="'+(cy+33)+'" text-anchor="middle" font-size="11.5" fill="'+C_TX+'">'+esc(rot)+'</text>'+
+    (val?'<text x="'+cx+'" y="'+(cy+46)+'" text-anchor="middle" font-size="11" fill="#4A4F44">'+esc(val)+'</text>':"")+'</g>';
+}
+function svgTubo(d,on,rev){
+  var cor = on ? C_ON : C_OFF;
+  return '<path d="'+d+'" fill="none" stroke="'+cor+'" stroke-width="'+(on?4:2.5)+'" stroke-linecap="round" stroke-linejoin="round"'+
+    (on?' marker-end="url(#seta'+(rev?"R":"")+')"':"")+'/>';
+}
+function svgCaixa(x,y,w,h,rot,val,est){
+  var bordo = est === "al" ? C_AL : est === "on" ? C_ON : C_OFF;
+  return '<g><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="4" fill="#fff" stroke="'+bordo+'" stroke-width="'+(est==="off"?1.4:2)+'"/>'+
+    '<text x="'+(x+w/2)+'" y="'+(y+18)+'" text-anchor="middle" font-size="11.5" fill="#4A4F44">'+esc(rot)+'</text>'+
+    '<text x="'+(x+w/2)+'" y="'+(y+h-11)+'" text-anchor="middle" font-size="15" font-weight="600" fill="'+(est==="al"?C_AL:C_TX)+'">'+esc(val)+'</text></g>';
+}
+var DEFS = '<defs>'+
+  '<marker id="seta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">'+
+  '<path d="M0 0 L10 5 L0 10 z" fill="'+C_ON+'"/></marker>'+
+  '<marker id="setaR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">'+
+  '<path d="M0 0 L10 5 L0 10 z" fill="'+C_ON+'"/></marker></defs>';
+
+function u(id){ return A[id].ultimo; }
+function ok(id){ return A[id].estado; }
+
+function pintarSin(){
+  var d = t();
+
+  /* ---------------- ÁGUA ---------------- */
+  var cist = A["cisterna-chuva"], res = A["reservatorio-01"];
+  var transferindo = cist.ultimo > 12 && res.ultimo < 90;
+  var g = DEFS;
+
+  // chuva → cisterna
+  g += svgTubo("M62 34 L62 62", chovendo > 0);
+  g += '<text x="62" y="26" text-anchor="middle" font-size="11.5" fill="'+C_TX+'" opacity="'+(chovendo>0?1:.8)+'">'+esc(d.sChuva)+'</text>';
+  g += svgTanque(30,70,64,86, cist.ultimo, d.sCisterna, fmt(cist.ultimo,0)+"%", ok("cisterna-chuva"));
+  // cisterna → reservatório
+  g += svgTubo("M94 113 L188 113 L188 150", transferindo);
+  // poço → reservatório
+  g += '<rect x="30" y="250" width="64" height="58" rx="4" fill="#fff" stroke="'+C_OFF+'" stroke-width="1.4"/>'+
+       '<text x="62" y="272" text-anchor="middle" font-size="11.5" fill="#4A4F44">'+esc(d.sPoco)+'</text>'+
+       '<text x="62" y="295" text-anchor="middle" font-size="14" font-weight="600" fill="'+C_TX+'">'+fmt(u("poco-vazao"),0)+'</text>';
+  g += svgBomba(140,279, u("poco-vazao")>1, d.sBombaPoco, fmt(u("poco-vazao"),0)+" m³/h");
+  g += svgTubo("M94 279 L120 279", u("poco-vazao")>1);
+  g += svgTubo("M158 279 L188 279 L188 246", u("poco-vazao")>1);
+  // reservatório
+  g += svgTanque(150,150,76,96, res.ultimo, d.sReserv, fmt(res.ultimo,0)+"%", ok("reservatorio-01"));
+  // reservatório → bomba de irrigação → filtro → fertirrigação → talhão
+  g += svgTubo("M226 198 L268 198", bombaLigada);
+  g += svgBomba(292,198, bombaLigada, d.sBombaIrr, fmt(u("bomba-irrigacao"),0)+" kW");
+  g += svgTubo("M310 198 L352 198", bombaLigada);
+  g += svgCaixa(352,174,92,48, d.sFiltro, fmt(u("filtro-dp"),2)+" bar",
+        retrolavando>0 ? "al" : (ok("filtro-dp")==="ok" ? (bombaLigada?"on":"off") : "al"));
+  if(retrolavando>0){
+    g += svgTubo("M398 222 L398 262", true);
+    g += '<text x="398" y="278" text-anchor="middle" font-size="11.5" fill="'+C_AL+'" font-weight="600">'+esc(d.sRetro)+'</text>';
+  }
+  g += svgTubo("M444 198 L486 198", bombaLigada && retrolavando===0);
+  var dosando = bombaLigada && retrolavando===0;
+  g += svgCaixa(486,174,104,48, d.sFerti, fmt(u("fertirrigacao-ce"),2)+" mS/cm",
+        ok("fertirrigacao-ce")==="ok" ? (dosando?"on":"off") : "al");
+  g += svgTubo("M590 198 L648 198", bombaLigada);
+  // talhão
+  g += '<rect x="648" y="166" width="104" height="64" rx="4" fill="'+(bombaLigada?"#4B754714":"#fff")+'" stroke="'+C_OFF+'" stroke-width="1.4"/>'+
+       '<text x="700" y="186" text-anchor="middle" font-size="11.5" fill="#4A4F44">'+esc(d.sTalhao)+'</text>'+
+       '<text x="700" y="212" text-anchor="middle" font-size="15" font-weight="600" fill="'+(ok("umidade-solo-t1")==="ok"?C_TX:C_AL)+'">'+fmt(u("umidade-solo-t1"),0)+'%</text>';
+  // ETE e reúso, o laço que volta
+  g += svgCaixa(560,300,104,48, d.sEte, fmt(u("ete-efluente"),1)+" m³/h", u("ete-efluente")>1?"on":"off");
+  g += svgTubo("M560 324 L300 324 L300 246", u("reuso-vazao")>0);
+  g += '<text x="430" y="316" text-anchor="middle" font-size="11.5" fill="'+(u("reuso-vazao")>0?C_ON:C_TX)+'" opacity="'+(u("reuso-vazao")>0?1:.8)+'">'+
+       esc(d.sReuso)+' · '+fmt(u("reuso-vazao"),1)+' m³/h</text>';
+  g += '<text x="700" y="290" text-anchor="middle" font-size="11" fill="#4A4F44">'+esc(d.sReusoNota)+'</text>';
+  $("#svgAgua").innerHTML = '<title id="lblAgua">'+esc(d.sinAguaAlt)+'</title>'+g;
+
+  /* ---------------- ENERGIA ---------------- */
+  var e = DEFS;
+  var solar = u("solar-usina"), imp = u("rede-importada"), exp = u("rede-injetada"), ger = u("gerador-diesel");
+  e += svgCaixa(30,40,120,54, d.sSolar, fmt(solar,0)+" kW", solar>1?"on":"off");
+  e += svgTubo("M150 67 L300 67 L300 120", solar>1);
+  e += svgCaixa(30,140,120,54, d.sRede, (imp>0?"↓ "+fmt(imp,0):"↑ "+fmt(exp,0))+" kW",
+        (imp>0||exp>0)?"on":"off");
+  e += svgTubo("M150 167 L300 167", imp>0, false);
+  if(exp>0) e += svgTubo("M300 167 L150 167", true, true);
+  e += svgCaixa(30,240,120,54, d.sGerador, fmt(ger,0)+" kW", ger>0?"al":"off");
+  e += svgTubo("M150 267 L300 267 L300 214", ger>0);
+  // barramento
+  e += '<rect x="286" y="120" width="28" height="94" rx="3" fill="'+C_TX+'"/>'+
+       '<text x="300" y="112" text-anchor="middle" font-size="11.5" fill="'+C_TX+'">'+esc(d.sBarra)+'</text>'+
+       '<text x="300" y="232" text-anchor="middle" font-size="11" fill="#4A4F44">fp '+fmt(u("entrada-fp"),2)+'</text>';
+  // cargas
+  var cargas = [
+    [d.sBombaIrr, fmt(u("bomba-irrigacao"),0)+" kW", u("bomba-irrigacao")>1],
+    [d.sCamara, fmt(u("camara-fria"),1)+" C", frioLigado],
+    [d.sBombaPoco, fmt(u("poco-vazao"),0)+" m³/h", u("poco-vazao")>1],
+    [d.sBio, fmt(u("biodigestor-vazao"),0)+" m³/h", true]
+  ];
+  cargas.forEach(function(c,i){
+    var y = 34 + i*62;
+    e += svgTubo("M314 167 L400 167 L400 "+(y+22)+" L470 "+(y+22), c[2]);
+    e += svgCaixa(470,y,140,44, c[0], c[1], c[2]?"on":"off");
+  });
+  $("#svgEner").innerHTML = '<title id="lblEner">'+esc(d.sinEnerAlt)+'</title>'+e;
+
+  /* ---------------- cartões por sistema ---------------- */
+  var sis = [
+    [d.sysCapt, [d.sPoco, d.sCisterna], d.sysCaptCap,
+      (u("poco-vazao")>1 ? d.sysCaptando : (cist.ultimo>12 ? d.sysCisterna : d.sysParado)),
+      d.sysCaptRegra],
+    [d.sysReserva, [d.sReserv], "220 m³",
+      fmt(res.ultimo,0)+"% · "+fmt(res.ultimo/100*220,0)+" m³", d.sysReservaRegra],
+    [d.sysIrriga, [d.sBombaIrr, d.sFiltro, d.sFerti, d.sTalhao], "45 kW",
+      (bombaLigada ? d.sysIrrigando : d.sysParado), d.sysIrrigaRegra],
+    [d.sysTrata, [d.sEte, d.sReuso], "25 m³/h",
+      (u("reuso-vazao")>0 ? d.sysReusando : d.sysTratando), d.sysTrataRegra],
+    [d.sysGera, [d.sSolar, d.sGerador], "180 kW",
+      (solar>1 ? fmt(solar,0)+" kW" : (ger>0 ? d.sysDiesel : d.sysNoite)), d.sysGeraRegra],
+    [d.sysFrio, [d.sCamara], "-1 a 6 C",
+      fmt(u("camara-fria"),1)+" C · "+(frioLigado?d.sysResfriando:d.sysParado), d.sysFrioRegra]
+  ];
+  $("#sistemas").innerHTML = sis.map(function(x){
+    return '<div class="cartao">'+
+      '<div class="nome">'+esc(x[0])+'</div>'+
+      '<div class="top" style="font-family:inherit">'+esc(x[1].join(" · "))+'</div>'+
+      '<div class="val" style="font-size:20px">'+esc(x[3])+'</div>'+
+      '<div class="fx">'+esc(d.sysCap)+": "+esc(x[2])+'</div>'+
+      '<div class="est" style="font-weight:400;color:#4A4F44;line-height:1.45">'+esc(x[4])+'</div></div>';
+  }).join("");
+}
+
+function pintarAut(){
+  var d = t();
+  var res = A["reservatorio-01"], solo = A["umidade-solo-t1"], filtro = A["filtro-dp"];
+  var ce = A["fertirrigacao-ce"], cist = A["cisterna-chuva"], poco = A["poco-vazao"];
+  var h = minutoPlanta/60, ponta = (h >= 18 && h < 21);
+
+  /* Cada trava diz o que protege e qual é a condição. "Agora" mostra se ela
+     está inibindo alguma coisa neste instante — trava que nunca atua é trava
+     que ninguém sabe se funciona. */
+  var travas = [
+    ["Bomba seca", "Vedação e rotor da bomba de irrigação",
+      "reservatório acima de 30% para partir, desliga em 24%",
+      res.v <= 30 ? d.inibindo : d.livre],
+    ["Transbordo", "Reservatório e área ao redor",
+      "captação para em 90% de nível",
+      res.v >= 90 ? d.inibindo : d.livre],
+    ["Dosagem em linha parada", "Raiz da cultura",
+      "fertirrigação só com bomba ligada e vazão real",
+      bombaLigada ? d.livre : d.inibindo],
+    ["Dosagem durante retrolavagem", "Perda de insumo no dreno",
+      "sem dosar enquanto o filtro retrolava",
+      retrolavando > 0 ? d.inibindo : d.livre],
+    ["Irrigação em ponta", "Custo de energia",
+      "não irriga entre 18h e 21h, salvo solo abaixo de 22%",
+      (ponta && solo.v >= 22) ? d.inibindo : d.livre],
+    ["Cisterna antes do poço", "Outorga e energia de bombeamento",
+      "só capta no poço com a cisterna abaixo de 12%",
+      cist.v >= 12 ? d.inibindo : d.livre]
+  ];
+  $("#tabTravas").querySelector("tbody").innerHTML = travas.map(function(x){
+    var cor = x[3] === d.livre ? "color:#4A4F44" : "color:var(--atencao);font-weight:600";
+    return "<tr><td><strong>"+esc(x[0])+"</strong></td><td>"+esc(x[1])+"</td><td>"+esc(x[2])+
+      '</td><td style="'+cor+';white-space:nowrap">'+esc(x[3])+"</td></tr>";
+  }).join("");
+
+  var regras = [
+    ["Irrigação", "liga abaixo de 26% de umidade do solo, desliga em 38%",
+      "A decisão é do solo, não do relógio. Irrigar por horário rega quem não precisa.",
+      bombaLigada ? d.atuando : d.livre],
+    ["Captação do poço", "de 01h às 05h, ou a qualquer hora se o reservatório cair de 25%",
+      "Bombear na janela barata é a maior alavanca de custo da fazenda.",
+      poco.v > 1 ? d.atuando : d.livre],
+    ["Cisterna de chuva", "consumida antes do poço, sempre",
+      "Água de chuva não custa bombeamento e não entra na outorga.",
+      cist.v > 12 ? d.atuando : d.livre],
+    ["Retrolavagem do filtro", "acima de 0,9 bar de pressão diferencial",
+      "Filtro entupido faz a bomba gastar energia sem entregar água.",
+      retrolavando > 0 ? d.atuando : d.livre],
+    ["Fertirrigação", "mantém a condutividade em 2,0 mS/cm durante a irrigação",
+      "Dosar por tempo erra quando a vazão muda; por condutividade, não.",
+      Math.abs(ce.v - 2.0) < 0.35 && bombaLigada ? d.atuando : d.livre],
+    ["Reúso da ETE", "entra na irrigação quando há efluente tratado disponível",
+      "Fecha o ciclo — e só vai para cultura que não se come crua.",
+      A["reuso-vazao"].v > 0 ? d.atuando : d.livre]
+  ];
+  $("#tabRegras").querySelector("tbody").innerHTML = regras.map(function(x){
+    var cor = x[3] === d.atuando ? "color:var(--marca);font-weight:600" : "color:#4A4F44";
+    return "<tr><td><strong>"+esc(x[0])+"</strong></td><td>"+esc(x[1])+"</td><td>"+esc(x[2])+
+      '</td><td style="'+cor+';white-space:nowrap">'+esc(x[3])+"</td></tr>";
+  }).join("");
+
+  /* Reúso é água que VOLTA, não água nova. Somar reúso à entrada é o jeito
+     clássico de o balanço parecer melhor do que é — e de esconder vazamento
+     atrás de uma linha de sustentabilidade. Ele entra na conta como retorno,
+     abatendo a saída. */
+  var entraNova = agua.poco + agua.chuva;
+  var sai = agua.irrigado + agua.retro;
+  var perda = entraNova + agua.reuso - sai;
+  $("#kpiAgua").innerHTML = [
+    [d.aPoco, fmt(agua.poco,1)+" m³",""],
+    [d.aChuva, fmt(agua.chuva,1)+" m³","var(--marca)"],
+    [d.aReuso, fmt(agua.reuso,1)+" m³","var(--marca)"],
+    [d.aIrrig, fmt(agua.irrigado,1)+" m³",""],
+    [d.aRetro, fmt(agua.retro,1)+" m³",""],
+    [d.aPerda, fmt(perda,1)+" m³", Math.abs(perda) > Math.max(1,entraNova)*0.05 ? "var(--alerta)" : ""]
+  ].map(function(x){
+    return "<div><span>"+esc(x[0])+"</span><b"+(x[2]?' style="color:'+x[2]+'"':"")+">"+esc(x[1])+"</b></div>";
+  }).join("");
+}
+
+function pintarHis(){
+  var d = t();
+  var red = agg.length ? (1 - agg.length/Math.max(1,cru.length)) * 100 : 0;
+  $("#kpiHis").innerHTML = [
+    [d.leituras, String(cru.length)],
+    [d.linhasAgg, String(agg.length)],
+    [d.reducao, fmt(red,0)+" %"],
+    [d.memoria, "30 "+d.minutos]
+  ].map(function(x){ return "<div><span>"+esc(x[0])+"</span><b>"+esc(x[1])+"</b></div>"; }).join("");
+
+  $("#tabAgg").querySelector("tbody").innerHTML = agg.slice(0,14).map(function(r){
+    var f = r.ativo.fx || FAIXAS[r.g], c = r.g==="fp"?3:1;
+    return "<tr><td>"+hhmm(r.min)+"</td><td>"+esc(nome(r.ativo))+"</td><td>"+esc(r.g)+"</td>"+
+      '<td class="n">'+fmt(r.vmin,c)+"</td>"+'<td class="n">'+fmt(r.vmed,c)+"</td>"+
+      '<td class="n">'+fmt(r.vmax,c)+"</td>"+
+      '<td class="n" style="'+(r.fora?"color:var(--alerta);font-weight:600":"color:#4A4F44")+'">'+r.fora+"/"+r.n+"</td></tr>";
+  }).join("");
+  $("#tHisConta").textContent = EN
+    ? "Twenty tags every second for a year: 630 million raw rows. Aggregated by the hour: 175 thousand. That is the whole argument."
+    : "Vinte tags a cada segundo por um ano: 630 milhões de linhas cruas. Agregado por hora: 175 mil. É esse o argumento inteiro.";
+}
+
+/* =====================================================================
+   4 · Exportar
+   ===================================================================== */
+function baixar(nome, texto, tipo){
+  var b = new Blob([texto],{type:tipo}), u = URL.createObjectURL(b);
+  var a = document.createElement("a");
+  a.href = u; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(u); }, 4000);
+}
+function csvAgg(){
+  var l = ["org_id;ativo;topico;grandeza;minuto;min;media;max;unidade;fora_da_faixa;amostras"];
+  agg.forEach(function(r){
+    var f = r.ativo.fx || FAIXAS[r.g];
+    l.push([ORG,r.ativo.id,r.ativo.topico,r.g,hhmm(r.min),
+      r.vmin.toFixed(3),r.vmed.toFixed(3),r.vmax.toFixed(3),f[2],r.fora,r.n].join(";"));
+  });
+  return "\ufeff"+l.join("\r\n");
+}
+function csvCru(){
+  var l = ["org_id;topico;ativo;grandeza;minuto;valor;estado"];
+  cru.forEach(function(r){
+    l.push([ORG,r.topico,r.ativo,r.g,hhmm(r.min),r.v,r.est].join(";"));
+  });
+  return "\ufeff"+l.join("\r\n");
+}
+function jsonMedicao(){
+  /* Formato do contrato: linha de `medicao` com origem = 'scada'. É este o
+     arquivo que o Erick Oliveira pediu para montar o protótipo em Docker. */
+  var linhas = agg.map(function(r,i){
+    var f = r.ativo.fx || FAIXAS[r.g];
+    return {
+      org_id:(r.ativo.hub ? r.ativo.org : ORG), medicao_id:"scada-"+String(i+1).padStart(6,"0"),
+      grandeza:r.g, valor:+r.vmed.toFixed(3), unidade:f[2],
+      data:hhmm(r.min), ativo_id:r.ativo.id, origem:"scada",
+      topico_mqtt:r.ativo.topico,
+      extras:{ minimo:+r.vmin.toFixed(3), maximo:+r.vmax.toFixed(3),
+               amostras:r.n, fora_da_faixa:r.fora, agregacao:"minuto", simulado: !r.ativo.hub }
+    };
+  });
+  return JSON.stringify({
+    _formato:"physis/2", _gerado_em:new Date().toISOString(),
+    _gerado_por:"scada-demo", _app:"physis-scada-demo",
+    _dado_simulado:true,
+    org_id:ORG, tabelas:{ medicao: linhas }
+  }, null, 2);
+}
+function dizer(txt){ $("#msgExp").textContent = txt; }
+
+/* =====================================================================
+   5 · Ligação
+   ===================================================================== */
+var rodando = true, aba = "sin";
+
+function pintar(){
+  if(aba === "sin") pintarSin();
+  else if(aba === "sup") pintarSup();
+  else if(aba === "cli") pintarCli();
+  else if(aba === "his") pintarHis();
+  else if(aba === "aut") pintarAut();
+  $("#relogio").textContent = hhmm(minutoPlanta) + (rodando ? "" : " · " + t().pausado);
+}
+
+function idioma(){
+  var d = t();
+  document.documentElement.lang = EN ? "en" : "pt";
+  $("#tTitulo").textContent = d.titulo;
+  $("#tSub").textContent = d.sub;
+  $("#tAviso").textContent = d.aviso;
+  $("#tAbaSin").textContent = d.abaSin;
+  $("#tSinNota").textContent = d.sinNota; $("#tSinAgua").textContent = d.sinAgua;
+  $("#tSinEner").textContent = d.sinEner; $("#tSinInfo").textContent = d.sinInfo;
+  $("#tAbaSup").textContent = d.abaSup; $("#tAbaCli").textContent = d.abaCli;
+  $("#tAbaHis").textContent = d.abaHis; $("#tAbaAut").textContent = d.abaAut;
+  $("#tAbaExp").textContent = d.abaExp;
+  $("#tAutNota").textContent = d.autNota; $("#tTravas").textContent = d.travas;
+  $("#tRegras").textContent = d.regras; $("#tHidrico").textContent = d.hidrico;
+  $("#tHidricoNota").textContent = d.hidricoNota;
+  $("#thTrava").textContent = d.trava; $("#thProtege").textContent = d.protege;
+  $("#thCond").textContent = d.cond; $("#thAgora").textContent = d.agora;
+  $("#thSistema").textContent = d.sistema; $("#thRegra").textContent = d.regra;
+  $("#thPorque").textContent = d.porque; $("#thEstado2").textContent = d.estado;
+  $("#tSupNota").textContent = d.supNota; $("#tAlarmes").textContent = d.alarmes;
+  $("#tCliNota").textContent = d.cliNota; $("#tCliRodape").textContent = d.cliRodape;
+  $("#tHisNota").textContent = d.hisNota; $("#tAgregado").textContent = d.agregado;
+  $("#tExpNota").textContent = d.expNota; $("#tExpAviso").textContent = d.expAviso;
+  $("#btCsvAgg").textContent = d.csvAgg; $("#btJson").textContent = d.json;
+  $("#btCsvCru").textContent = d.csvCru;
+  $("#btPausa").textContent = rodando ? d.pausar : d.seguir;
+  $("#btIdioma").textContent = d.idioma;
+  $("#thQuando").textContent = d.quando; $("#thAtivo").textContent = d.ativo;
+  $("#thGrand").textContent = d.grandeza; $("#thValor").textContent = d.valor;
+  $("#thEstado").textContent = d.estado;
+  $("#thMin").textContent = d.minuto; $("#thAtivo2").textContent = d.ativo;
+  $("#thGrand2").textContent = d.grandeza; $("#thMin2").textContent = d.vmin;
+  $("#thMed").textContent = d.vmed; $("#thMax").textContent = d.vmax;
+  $("#thFora").textContent = d.fora;
+  $("#rodape").textContent = d.rodape;
+  document.title = "Physis · " + d.titulo;
+  pintar();
+}
+
+document.querySelectorAll("[data-aba]").forEach(function(b){
+  b.onclick = function(){
+    aba = b.getAttribute("data-aba");
+    document.querySelectorAll("[data-aba]").forEach(function(x){ x.className = x===b ? "on" : ""; });
+    document.querySelectorAll(".painel").forEach(function(p){
+      p.className = "painel" + (p.id === "p-"+aba ? " ver" : "");
+    });
+    pintar();
+  };
+});
+$("#btPausa").onclick = function(){ rodando = !rodando; idioma(); };
+$("#btIdioma").onclick = function(){ EN = !EN; idioma(); };
+$("#btCsvAgg").onclick = function(){
+  baixar("physis_scada_agregado.csv", csvAgg(), "text/csv;charset=utf-8");
+  dizer(t().baixou(agg.length, t().csvAgg));
+};
+$("#btJson").onclick = function(){
+  var j = jsonMedicao();
+  baixar("physis_scada_medicao.json", j, "application/json");
+  dizer(t().baixou(agg.length, t().json));
+};
+$("#btCsvCru").onclick = function(){
+  baixar("physis_scada_cru.csv", csvCru(), "text/csv;charset=utf-8");
+  dizer(t().cruAviso(cru.length));
+};
+
+/* Enche 40 minutos antes de mostrar, senão a primeira tela abre vazia e
+   parece quebrada. */
+for(var i=0;i<40;i++){ passo(); acumular(); }
+idioma();
+setInterval(function(){
+  if(!rodando) return;
+  passo(); acumular(); pintar();
+}, 1000);
+
+
+/* =====================================================================
+   Ponte Hub Physis -> supervisão                      (14/11/2026)
+   Quando esta página é servida pelo Hub Physis, as medições reais da rede
+   V6 entram como ativos, com tópico canônico physis/{org}/{grandeza}/{ativo},
+   e passam pelo mesmo caminho dos demais: alarme, cru, agregado e exportação.
+   A planta simulada continua ao lado, e a tela diz qual é qual.
+   Aberta como arquivo solto, nada disto roda: a demonstração fica como era.
+   ===================================================================== */
+(function(){
+  if(!/^https?:$/.test(location.protocol)) return;
+  var org = null, faixa = document.createElement("div"), ultimo = "";
+  faixa.id = "px-hub"; faixa.setAttribute("role","status");
+  faixa.style.cssText = "margin:10px 0;padding:10px 14px;border-radius:8px;border:1px solid #C3D0BD;background:#EEF4EA;color:#1C2B21;font-size:15px;line-height:1.5";
+  function dizerHub(txt, html){ if(txt === ultimo) return; ultimo = txt; if(html) faixa.innerHTML = txt; else faixa.textContent = txt; }
+  function montarFaixa(){ var alvo = document.querySelector(".env"); if(alvo && !faixa.parentNode) alvo.insertBefore(faixa, alvo.children[1] || null); }
+  function por(id, pt, en, g, fx, v){
+    var a = A[id];
+    if(!a){ a = { id:id, pt:pt, en:en, g:g, v:v, hist:[], hub:true, org:org, topico:montarTopico(org, g, id) }; ATIVOS.push(a); A[id] = a; }
+    a.v = v; if(fx) a.fx = fx; a._visto = true;
+  }
+  function aplicar(d){
+    org = d.org; ATIVOS.forEach(function(a){ if(a.hub) a._visto = false; });
+    (d.nos || []).forEach(function(n){
+      if(!n.online) return; var nn = String(n.id).padStart(2,"0");
+      if(n.tipo === "SOLO"){
+        if(n.media != null) por("campo-no"+nn+"-umidade", "Campo · nó "+nn+" · umidade do solo", "Field · node "+nn+" · soil moisture", "umidade", [n.lim1 != null ? n.lim1 : 20, 90, "%"], n.media);
+        if(n.tsolo != null) por("campo-no"+nn+"-temp-solo", "Campo · nó "+nn+" · temperatura do solo", "Field · node "+nn+" · soil temperature", "temperatura", null, n.tsolo);
+        if(n.t != null) por("campo-no"+nn+"-temp-ar", "Campo · nó "+nn+" · temperatura do ar", "Field · node "+nn+" · air temperature", "temperatura", null, n.t);
+      } else if(n.tipo === "ZONA"){
+        if(n.u1 != null) por("zonas-cx"+nn+"-z1-umidade", "Água por zonas · caixinha "+nn+" · zona 1", "Water zones · box "+nn+" · zone 1", "umidade", [n.lim1 != null ? n.lim1 : 20, 90, "%"], n.u1);
+        if(n.u2 != null) por("zonas-cx"+nn+"-z2-umidade", "Água por zonas · caixinha "+nn+" · zona 2", "Water zones · box "+nn+" · zone 2", "umidade", [n.lim2 != null ? n.lim2 : 20, 90, "%"], n.u2);
+      } else if(n.tipo === "COM"){
+        if(n.niv != null) por("animais-comedouro"+nn+"-nivel", "Animais · comedouro "+nn+" · nível de ração", "Animals · feeder "+nn+" · feed level", "nivel", [15, 100, "%"], n.niv);
+      }
+    });
+    /* Quem parou de falar sai da tela: gravar o último valor como se fosse novo seria inventar leitura. */
+    for(var i = ATIVOS.length - 1; i >= 0; i--){ var a = ATIVOS[i]; if(a.hub && !a._visto){ ATIVOS.splice(i, 1); delete A[a.id]; } }
+    var n = ATIVOS.filter(function(a){ return a.hub; }).length;
+    dizerHub(EN ? ("Connected to Hub Physis (" + org + "). " + n + " real field measurement(s), named “Field”, “Water zones” or “Animals”. Everything else on this screen is the simulated plant.")
+                : ("Ligado ao Hub Physis (" + org + "). " + n + (n === 1 ? " medição real do campo" : " medições reais do campo") + ", com nome começando por “Campo”, “Água por zonas” ou “Animais”. O restante desta tela é a planta simulada."));
+  }
+  function buscar(){
+    montarFaixa();
+    fetch("/api/painel", { cache:"no-store" }).then(function(r){
+      if(r.status === 401){ dizerHub(EN ? 'Sign in to <a href="/">Hub Physis</a> to see the real field measurements here.' : 'Entre no <a href="/">Hub Physis</a> para ver aqui as medições reais do campo.', true); return null; }
+      return r.ok ? r.json() : null;
+    }).then(function(d){ if(d && d.nos) aplicar(d); }).catch(function(){ /* sem hub: segue só a simulação */ });
+  }
+  window.PhysisScadaHub = { aplicar: aplicar };
+  buscar(); setInterval(buscar, 5000);
+})();
+
+window.PhysisScadaDemo = {
+  ATIVOS:ATIVOS, cru:function(){return cru;}, agg:function(){return agg;},
+  alarmes:function(){return alarmes;}, passo:passo, acumular:acumular,
+  csvAgg:csvAgg, csvCru:csvCru, jsonMedicao:jsonMedicao, pontos:pontos,
+  parar:function(){ rodando = false; }
+};
+})();
+</script>
+
+<script>
+/* Padrão Physis · modo de conforto: um clique, reversível, lembrado neste navegador. */
+(function(){
+  var K='physis-conforto', b=document.getElementById('px-conforto'), h=document.documentElement;
+  function ler(){ try{return localStorage.getItem(K)==='1';}catch(e){return false;} }
+  function aplicar(on){ h.classList.toggle('px-conforto',on); if(b){b.setAttribute('aria-pressed',on?'true':'false');
+    b.textContent=on?'Modo de conforto: ligado':'Modo de conforto';} }
+  aplicar(ler());
+  if(b) b.addEventListener('click',function(){ var on=!h.classList.contains('px-conforto');
+    try{localStorage.setItem(K,on?'1':'0');}catch(e){} aplicar(on); });
+})();
+/* Padrão Physis · rótulos: todo campo de tabela ganha o nome da coluna e da linha. */
+(function(){
+  function temNome(el){ return el.getAttribute('aria-label')||el.getAttribute('aria-labelledby')||el.closest('label')||
+    (el.id&&document.querySelector('label[for="'+el.id+'"]')); }
+  function rotular(){
+    document.querySelectorAll('table').forEach(function(t){
+      var ths=[].map.call(t.querySelectorAll('thead th'),function(th){return th.textContent.trim();});
+      [].forEach.call(t.querySelectorAll('tbody tr'),function(tr,ri){
+        [].forEach.call(tr.children,function(td,ci){
+          [].forEach.call(td.querySelectorAll('input,select,textarea'),function(el){
+            if(temNome(el)&&!el.hasAttribute('data-px-rot'))return;
+            var p=tr.querySelector('input'); var linha=(p&&p!==el&&p.value)?p.value:'linha '+(ri+1);
+            el.setAttribute('aria-label',(ths[ci]||'Campo')+' · '+linha); el.setAttribute('data-px-rot','');
+          });
+        });
+      });
+    });
+  }
+  var pend=null; new MutationObserver(function(){ if(pend)return; pend=setTimeout(function(){pend=null;rotular();},60); })
+    .observe(document.body,{childList:true,subtree:true});
+  rotular();
+})();
+</script>
+<script>
+/* physis-exportar.js v1 · 14/11/2026
+ *
+ * Baixar a tela em Word (.docx), Excel (.xlsx) e PDF, e encaminhar a colegas.
+ * Sem dependência externa e sem internet: os três arquivos são montados aqui.
+ * A mesma biblioteca vai embutida na Gestão Physis, no Hub Physis e nos protótipos.
+ *
+ * Uso:  PhysisExportar.barra({ raiz: function () { return elemento; },
+ *                              titulo: function () { return "Propostas"; },
+ *                              encaminhar: { pessoas: [...], enviar: function (id, nota, link) {...} } })
+ */
+(function (g) {
+  "use strict";
+  var EN = /^en/i.test((g.navigator && g.navigator.language) || "pt");
+  var TX = EN ? { baixar: "Download this screen", word: "Word", pdf: "PDF", excel: "Excel", enc: "Forward to colleagues",
+      para: "To", nota: "Note (optional)", link: "Link to this screen", enviar: "Send notice", copiar: "Copy link and note",
+      copiado: "Copied.", semCopia: "Select the text and copy it.", baixado: function (n) { return n + " saved."; },
+      falha: "The download could not be started.", vazio: "There is nothing on this screen to export.",
+      semServidor: "Without the Physis server the notice cannot be delivered straight to a colleague. Copy the link and the note and send them.",
+      gerado: "Generated on", escolha: "Choose who", cancelado: "The download was cancelled." }
+    : { baixar: "Baixar esta tela", word: "Word", pdf: "PDF", excel: "Excel", enc: "Encaminhar a colegas",
+      para: "Para", nota: "Recado (opcional)", link: "Link desta tela", enviar: "Enviar aviso", copiar: "Copiar link e recado",
+      copiado: "Copiado.", semCopia: "Selecione o texto e copie.", baixado: function (n) { return n + " baixado."; },
+      falha: "Não foi possível iniciar o download.", vazio: "Não há nada nesta tela para exportar.",
+      semServidor: "Sem o servidor Physis, o aviso não chega direto ao colega. Copie o link e o recado e envie.",
+      gerado: "Gerado em", escolha: "Escolha para quem", cancelado: "O download foi cancelado." };
+
+  /* ───────── utilidades ───────── */
+  function bytes(s) { return new TextEncoder().encode(s); }
+  function xml(s) { return String(s == null ? "" : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function limpo(s) { return String(s == null ? "" : s).replace(/\s+/g, " ").trim(); }
+  function agora() { return new Date().toLocaleString(EN ? "en-GB" : "pt-BR", { dateStyle: "short", timeStyle: "short" }); }
+  function arquivo(titulo) {
+    var b = String(titulo || "physis").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50) || "physis";
+    var d = new Date(), p = function (n) { return String(n).padStart(2, "0"); };
+    return "physis-" + b + "-" + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate());
+  }
+
+  /* ───────── zip sem compressão (docx e xlsx são zips) ───────── */
+  var TAB = null;
+  function crc32(u8) {
+    if (!TAB) { TAB = []; for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; TAB[n] = c >>> 0; } }
+    var crc = 0xFFFFFFFF; for (var i = 0; i < u8.length; i++) crc = TAB[(crc ^ u8[i]) & 0xFF] ^ (crc >>> 8); return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+  function zip(arqs) {
+    var partes = [], central = [], pos = 0;
+    var u16 = function (v) { return [v & 255, (v >>> 8) & 255]; }, u32 = function (v) { return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; };
+    arqs.forEach(function (a) {
+      var nome = bytes(a.nome), dados = typeof a.dados === "string" ? bytes(a.dados) : a.dados, crc = crc32(dados);
+      var cab = [].concat([0x50, 0x4B, 3, 4], u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(dados.length), u32(dados.length), u16(nome.length), u16(0));
+      partes.push(new Uint8Array(cab), nome, dados);
+      central.push({ nome: nome, crc: crc, tam: dados.length, pos: pos });
+      pos += cab.length + nome.length + dados.length;
+    });
+    var ini = pos, tamC = 0;
+    central.forEach(function (c) {
+      var cab = [].concat([0x50, 0x4B, 1, 2], u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(c.crc), u32(c.tam), u32(c.tam), u16(c.nome.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(c.pos));
+      partes.push(new Uint8Array(cab), c.nome); tamC += cab.length + c.nome.length;
+    });
+    partes.push(new Uint8Array([].concat([0x50, 0x4B, 5, 6], u16(0), u16(0), u16(central.length), u16(central.length), u32(tamC), u32(ini), u16(0))));
+    var total = partes.reduce(function (s, p) { return s + p.length; }, 0), out = new Uint8Array(total), o = 0;
+    partes.forEach(function (p) { out.set(p, o); o += p.length; });
+    return out;
+  }
+
+  /* ───────── Word ───────── */
+  function docx(titulo, blocos) {
+    var W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+    var par = function (txt, estilo) { return "<w:p>" + (estilo ? '<w:pPr><w:pStyle w:val="' + estilo + '"/></w:pPr>' : "") + '<w:r><w:t xml:space="preserve">' + xml(txt) + "</w:t></w:r></w:p>"; };
+    var corpo = par(titulo, "Title") + par(TX.gerado + " " + agora(), "Subtle");
+    blocos.forEach(function (b) {
+      if (b.h) corpo += par(b.t, "Heading" + Math.min(3, Math.max(1, b.h - 1)));
+      else if (b.tabela) {
+        var cols = Math.max.apply(null, [b.tabela.cab.length].concat(b.tabela.linhas.map(function (l) { return l.length; })));
+        var cel = function (t, negrito) { return '<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/></w:tcPr><w:p><w:r>' + (negrito ? "<w:rPr><w:b/></w:rPr>" : "") + '<w:t xml:space="preserve">' + xml(t) + "</w:t></w:r></w:p></w:tc>"; };
+        var lin = function (l, cab) { var s = "<w:tr>" + (cab ? "<w:trPr><w:tblHeader/></w:trPr>" : ""); for (var i = 0; i < cols; i++) s += cel(l[i] == null ? "" : l[i], cab); return s + "</w:tr>"; };
+        corpo += '<w:tbl><w:tblPr><w:tblStyle w:val="Grade"/><w:tblW w:w="5000" w:type="pct"/><w:tblLook w:firstRow="1"/></w:tblPr>' + (b.tabela.cab.length ? lin(b.tabela.cab, true) : "") + b.tabela.linhas.map(function (l) { return lin(l, false); }).join("") + "</w:tbl>" + par("", null);
+      } else corpo += par(b.t, b.lista ? "Lista" : null);
+    });
+    var doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ' + W + "><w:body>" + corpo + '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>';
+    var est = function (id, nome, tam, negrito, cor, antes, extra) { return '<w:style w:type="paragraph" w:styleId="' + id + '"><w:name w:val="' + nome + '"/><w:basedOn w:val="Normal"/>' + (extra || "") + '<w:pPr><w:spacing w:before="' + antes + '" w:after="120"/></w:pPr><w:rPr>' + (negrito ? "<w:b/>" : "") + '<w:color w:val="' + cor + '"/><w:sz w:val="' + tam + '"/></w:rPr></w:style>'; };
+    var estilos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles ' + W + '><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="22"/><w:lang w:val="' + (EN ? "en-GB" : "pt-BR") + '"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="300" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>' +
+      '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>' +
+      est("Title", "Title", 40, true, "33512F", 0) + est("Subtle", "Subtitle", 18, false, "4A4F44", 0) +
+      est("Heading1", "heading 1", 30, true, "1C2B21", 360, '<w:next w:val="Normal"/>').replace("</w:pPr>", '<w:keepNext/><w:outlineLvl w:val="0"/></w:pPr>') +
+      est("Heading2", "heading 2", 26, true, "1C2B21", 280, '<w:next w:val="Normal"/>').replace("</w:pPr>", '<w:keepNext/><w:outlineLvl w:val="1"/></w:pPr>') +
+      est("Heading3", "heading 3", 23, true, "33512F", 200, '<w:next w:val="Normal"/>').replace("</w:pPr>", '<w:keepNext/><w:outlineLvl w:val="2"/></w:pPr>') +
+      '<w:style w:type="paragraph" w:styleId="Lista"><w:name w:val="List Paragraph"/><w:basedOn w:val="Normal"/><w:pPr><w:ind w:left="360"/></w:pPr></w:style>' +
+      '<w:style w:type="table" w:styleId="Grade"><w:name w:val="Table Grid"/><w:tblPr><w:tblBorders><w:top w:val="single" w:sz="4" w:color="8A9284"/><w:left w:val="single" w:sz="4" w:color="8A9284"/><w:bottom w:val="single" w:sz="4" w:color="8A9284"/><w:right w:val="single" w:sz="4" w:color="8A9284"/><w:insideH w:val="single" w:sz="4" w:color="8A9284"/><w:insideV w:val="single" w:sz="4" w:color="8A9284"/></w:tblBorders><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>';
+    return zip([
+      { nome: "[Content_Types].xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>' },
+      { nome: "_rels/.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>' },
+      { nome: "docProps/core.xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>' + xml(titulo) + "</dc:title><dc:creator>Physis Engineering</dc:creator><dc:language>" + (EN ? "en-GB" : "pt-BR") + "</dc:language></cp:coreProperties>" },
+      { nome: "word/_rels/document.xml.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' },
+      { nome: "word/document.xml", dados: doc }, { nome: "word/styles.xml", dados: estilos }]);
+  }
+
+  /* ───────── Excel ───────── */
+  function numero(t) {
+    var s = limpo(t); if (!/^[+\-−]?\s*(R\$\s*)?[\d.]+(,\d+)?\s*%?$/.test(s) || !/\d/.test(s)) return null;
+    if (/^0\d/.test(s.replace(/[^\d]/g, "")) && !/,/.test(s)) return null;          // CEP, código com zero à esquerda
+    var neg = /^[\-−]/.test(s), n = Number(s.replace(/[^\d.,]/g, "").replace(/\./g, "").replace(",", "."));
+    if (!isFinite(n)) return null; if (/%$/.test(s)) n = n / 100; return neg ? -n : n;
+  }
+  function xlsx(titulo, blocos) {
+    var linhas = [], col = function (n) { var s = ""; n++; while (n > 0) { var r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); } return s; };
+    linhas.push([{ v: titulo, e: 2 }]); linhas.push([{ v: TX.gerado + " " + agora(), e: 0 }]); linhas.push([]);
+    var larg = [];
+    blocos.forEach(function (b) {
+      if (b.h) { linhas.push([]); linhas.push([{ v: b.t, e: 1 }]); }
+      else if (b.tabela) { if (b.tabela.cab.length) linhas.push(b.tabela.cab.map(function (c) { return { v: c, e: 1 }; }));
+        b.tabela.linhas.forEach(function (l) { linhas.push(l.map(function (c) { var dt = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(limpo(c));
+          if (dt) return { v: Math.round((Date.UTC(+dt[3], +dt[2] - 1, +dt[1]) - Date.UTC(1899, 11, 30)) / 86400000), e: 5, n: true, larg: 12 };
+          var n = numero(c); return n === null ? { v: c, e: 0 } : { v: n, e: /R\$/.test(c) ? 3 : /%\s*$/.test(c) ? 4 : 0, n: true, larg: /R\$/.test(c) ? Math.max(14, limpo(c).length + 4) : 10 }; })); }); linhas.push([]); }
+      else linhas.push([{ v: b.t, e: 0 }]);
+    });
+    var dados = linhas.map(function (l, i) {
+      return '<row r="' + (i + 1) + '">' + l.map(function (c, j) { var t = String(c.v == null ? "" : c.v); larg[j] = Math.max(larg[j] || 12, c.larg || Math.min(60, (i < 2 || (l.length === 1 && j === 0) ? 12 : t.length) + 2));
+        var ref = col(j) + (i + 1); if (t === "") return "";
+        return c.n ? '<c r="' + ref + '" s="' + c.e + '"><v>' + c.v + "</v></c>" : '<c r="' + ref + '" s="' + c.e + '" t="inlineStr"><is><t xml:space="preserve">' + xml(t) + "</t></is></c>"; }).join("") + "</row>";
+    }).join("");
+    var M = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"';
+    var folha = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ' + M + "><cols>" + larg.map(function (w, j) { return '<col min="' + (j + 1) + '" max="' + (j + 1) + '" width="' + (w || 10) + '" customWidth="1"/>'; }).join("") + "</cols><sheetData>" + dados + "</sheetData></worksheet>";
+    if (!larg.length) folha = folha.replace("<cols></cols>", "");
+    var estilos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet ' + M + '><numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;R$&quot;\\ #,##0.00"/></numFmts><fonts count="3"><font><sz val="10"/><name val="Arial"/></font><font><b/><sz val="10"/><name val="Arial"/></font><font><b/><sz val="14"/><name val="Arial"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="6"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+    var aba = xml(String(titulo || "Physis").replace(/[\\\/\?\*\[\]:]/g, " ").slice(0, 31)) || "Physis";
+    return zip([
+      { nome: "[Content_Types].xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>' },
+      { nome: "_rels/.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
+      { nome: "xl/workbook.xml", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook ' + M + ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="' + aba + '" sheetId="1" r:id="rId1"/></sheets></workbook>' },
+      { nome: "xl/_rels/workbook.xml.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' },
+      { nome: "xl/worksheets/sheet1.xml", dados: folha }, { nome: "xl/styles.xml", dados: estilos }]);
+  }
+
+  /* ───────── PDF (A4, texto e tabelas; fontes padrão, WinAnsi) ───────── */
+  var TROCA = { "\u2018": "'", "\u2019": "'", "\u201C": '"', "\u201D": '"', "\u2013": "-", "\u2014": "-", "\u2212": "-", "\u2026": "...", "\u2022": "-", "\u203A": ">", "\u00D7": "x", "\u2192": "->", "\u2264": "<=", "\u2265": ">=", "\u00A0": " ", "\u2713": "x", "\u2715": "x" };
+  function latin(s) { var o = ""; s = String(s == null ? "" : s); for (var i = 0; i < s.length; i++) { var ch = TROCA[s[i]] !== undefined ? TROCA[s[i]] : s[i]; for (var k = 0; k < ch.length; k++) { var c = ch.charCodeAt(k); o += c < 256 && (c >= 32 || c === 10) ? ch[k] : "?"; } } return o; }
+  function pdfStr(s) { var o = "("; for (var i = 0; i < s.length; i++) { var c = s.charCodeAt(i); if (c === 40 || c === 41 || c === 92) o += "\\" + s[i]; else if (c > 126) o += "\\" + c.toString(8).padStart(3, "0"); else o += s[i]; } return o + ")"; }
+  function quebrar(txt, max) {
+    var out = []; String(txt).split("\n").forEach(function (par) {
+      var linha = ""; par.split(" ").forEach(function (p) {
+        while (p.length > max) { if (linha) { out.push(linha); linha = ""; } out.push(p.slice(0, max)); p = p.slice(max); }
+        if (!linha) linha = p; else if ((linha + " " + p).length <= max) linha += " " + p; else { out.push(linha); linha = p; }
+      }); out.push(linha);
+    }); return out;
+  }
+  function pdf(titulo, blocos) {
+    var LW = 595, LH = 842, M = 48, util = LW - 2 * M, paginas = [], cur = [], y = LH - M;
+    var nova = function () { if (cur.length) paginas.push(cur); cur = []; y = LH - M; };
+    var texto = function (linha, fonte, tam, x, cor) { cur.push("BT /" + fonte + " " + tam + " Tf " + (cor || "0.11 0.17 0.13") + " rg " + (x || M).toFixed(1) + " " + y.toFixed(1) + " Td " + pdfStr(linha) + " Tj ET"); };
+    var escrever = function (t, fonte, tam, larg, antes, depois, cor, recuo) {
+      var passo = tam * 1.38, max = Math.max(8, Math.floor((util - (recuo || 0)) / (tam * larg))), ls = quebrar(latin(t), max);
+      y -= antes; ls.forEach(function (l) { if (y - passo < M) nova(); y -= passo; texto(l, fonte, tam, M + (recuo || 0), cor); }); y -= depois;
+    };
+    escrever(titulo, "F2", 18, 0.56, 0, 2, "0.2 0.32 0.18");
+    escrever(TX.gerado + " " + agora() + " - Physis Engineering", "F1", 9, 0.5, 0, 10, "0.29 0.31 0.27");
+    blocos.forEach(function (b) {
+      if (b.h) { if (y < M + 70) nova(); escrever(b.t, "F2", b.h <= 2 ? 14 : 12, 0.56, 10, 3); }
+      else if (b.tabela) {
+        var tam = 8, cw = tam * 0.6, linhasT = (b.tabela.cab.length ? [b.tabela.cab] : []).concat(b.tabela.linhas), n = Math.max.apply(null, linhasT.map(function (l) { return l.length; }).concat([1]));
+        var maxChars = Math.floor(util / cw) - (n - 1) * 2, quer = [];
+        for (var j = 0; j < n; j++) quer[j] = Math.max.apply(null, linhasT.map(function (l) { return Math.min(60, latin(l[j] == null ? "" : l[j]).length); }).concat([3]));
+        var soma = quer.reduce(function (a, c) { return a + c; }, 0);
+        if (soma > maxChars) { var sobra = maxChars, fl = 0; quer = quer.map(function (w) { var v = Math.max(4, Math.floor(w * maxChars / soma)); fl += v; return v; }); if (fl > maxChars) quer[quer.indexOf(Math.max.apply(null, quer))] -= fl - maxChars; }
+        y -= 4;
+        linhasT.forEach(function (l, i) {
+          var cels = quer.map(function (w, j) { return quebrar(latin(l[j] == null ? "" : l[j]), w); }), alt = Math.max.apply(null, cels.map(function (c) { return c.length; })), passo = tam * 1.35;
+          if (y - alt * passo - 6 < M) nova();
+          for (var k = 0; k < alt; k++) { y -= passo; var x = M; cels.forEach(function (c, j) { if (c[k]) texto(c[k], i === 0 && b.tabela.cab.length ? "F4" : "F3", tam, x); x += (quer[j] + 2) * cw; }); }
+          y -= 3; cur.push((i === 0 && b.tabela.cab.length ? "0.8" : "0.3") + " w 0.54 0.57 0.52 RG " + M + " " + y.toFixed(1) + " m " + (LW - M) + " " + y.toFixed(1) + " l S"); y -= 2;
+        });
+        y -= 8;
+      } else escrever((b.lista ? "- " : "") + b.t, "F1", 10.5, 0.5, 0, 4, null, b.lista ? 10 : 0);
+    });
+    nova();
+    var objs = [], add = function (s) { objs.push(s); return objs.length; };
+    var fonte = function (n) { return add("<< /Type /Font /Subtype /Type1 /BaseFont /" + n + " /Encoding /WinAnsiEncoding >>"); };
+    var f1 = fonte("Helvetica"), f2 = fonte("Helvetica-Bold"), f3 = fonte("Courier"), f4 = fonte("Courier-Bold");
+    var pagsId = objs.length + 1 + paginas.length * 2, kids = [];
+    paginas.forEach(function (p, i) {
+      var rod = "BT /F1 8 Tf 0.29 0.31 0.27 rg " + M + " 28 Td " + pdfStr(latin(titulo).slice(0, 70) + " - " + (i + 1) + "/" + paginas.length) + " Tj ET";
+      var conteudo = p.join("\n") + "\n" + rod, c = add("<< /Length " + conteudo.length + " >>\nstream\n" + conteudo + "\nendstream");
+      kids.push(add("<< /Type /Page /Parent " + pagsId + " 0 R /MediaBox [0 0 " + LW + " " + LH + "] /Contents " + c + " 0 R /Resources << /Font << /F1 " + f1 + " 0 R /F2 " + f2 + " 0 R /F3 " + f3 + " 0 R /F4 " + f4 + " 0 R >> >> >>"));
+    });
+    add("<< /Type /Pages /Kids [" + kids.map(function (k) { return k + " 0 R"; }).join(" ") + "] /Count " + kids.length + " >>");
+    var cat = add("<< /Type /Catalog /Pages " + pagsId + " 0 R /Lang (" + (EN ? "en-GB" : "pt-BR") + ") /ViewerPreferences << /DisplayDocTitle true >> >>");
+    var info = add("<< /Title " + pdfStr(latin(titulo)) + " /Author (Physis Engineering) /Producer (physis-exportar 1) >>");
+    var out = "%PDF-1.4\n%\u00E2\u00E3\u00CF\u00D3\n", off = [];
+    objs.forEach(function (o, i) { off.push(out.length); out += (i + 1) + " 0 obj\n" + o + "\nendobj\n"; });
+    var xref = out.length; out += "xref\n0 " + (objs.length + 1) + "\n0000000000 65535 f \n" + off.map(function (o) { return String(o).padStart(10, "0") + " 00000 n \n"; }).join("") +
+      "trailer\n<< /Size " + (objs.length + 1) + " /Root " + cat + " 0 R /Info " + info + " 0 R >>\nstartxref\n" + xref + "\n%%EOF\n";
+    var u = new Uint8Array(out.length); for (var i = 0; i < out.length; i++) u[i] = out.charCodeAt(i) & 255; return u;
+  }
+
+  /* ───────── tirar da tela o que será exportado ───────── */
+  var BLOCO = /^(DIV|P|TABLE|UL|OL|SECTION|ARTICLE|FIELDSET|H1|H2|H3|H4|H5|DL|DETAILS|PRE|LABEL|INPUT|SELECT|TEXTAREA|LI|DT|DD|FORM|MAIN|HEADER|FOOTER|ASIDE|NAV|SUMMARY|LEGEND|OUTPUT)$/;
+  function some(el) { if (el.hidden || el.getAttribute("aria-hidden") === "true" || /\b(so-leitor|px-exportar|px-fora)\b/.test(el.className || "")) return true; var s = g.getComputedStyle(el); return s.display === "none" || s.visibility === "hidden"; }
+  function valorDe(c) {
+    if (c.tagName === "SELECT") return c.selectedOptions[0] ? limpo(c.selectedOptions[0].textContent) : "";
+    if (c.type === "checkbox" || c.type === "radio") return c.checked ? (EN ? "yes" : "sim") : null;
+    if (c.type === "password" || c.type === "file" || c.type === "hidden") return null;
+    return c.value;
+  }
+  function espacar(c) {
+    c.querySelectorAll("br").forEach(function (b) { b.replaceWith(" · "); });
+    c.querySelectorAll("span,strong,b,small,code,em,a,output,dt,dd,li,p,div").forEach(function (x) { x.after(" "); });
+    return limpo(c.textContent).replace(/\s+·\s+/g, " · ").replace(/^·\s*|\s*·$/g, "").replace(/\s+([.,;:])/g, "$1");
+  }
+  function textoSemControles(el) { var c = el.cloneNode(true); c.querySelectorAll("input,select,textarea,button,script,style,.so-leitor,svg,.grafico").forEach(function (x) { x.remove(); }); return espacar(c); }
+  function celula(td) {
+    var cs = td.querySelectorAll("input,select,textarea"), v = [];
+    cs.forEach(function (c) { var x = valorDe(c); if (x !== null && x !== "") v.push(x); });
+    var c2 = td.cloneNode(true);
+    c2.querySelectorAll("input,select,textarea,button,script,style,.so-leitor,svg,.grafico").forEach(function (x) { x.remove(); });
+    var t = espacar(c2);
+    return limpo((t ? t + (v.length ? " " : "") : "") + v.join(" "));
+  }
+  function extrair(raiz) {
+    var out = [], feitos = new Set();
+    var controle = function (c) { if (feitos.has(c)) return; feitos.add(c); var v = valorDe(c); if (v === null) return; var rot = c.labels && c.labels[0] ? textoSemControles(c.labels[0]) : (c.getAttribute("aria-label") || ""); if (c.type === "checkbox" || c.type === "radio") { if (rot) out.push({ t: rot, lista: true }); return; } if (!rot && !limpo(v)) return; String(v).split("\n").forEach(function (l, i) { if (i === 0) out.push({ t: (rot ? rot + ": " : "") + limpo(l) }); else if (limpo(l)) out.push({ t: limpo(l), lista: true }); }); };
+    (function anda(el) {
+      Array.prototype.forEach.call(el.children, function (f) {
+        var tag = f.tagName; if (/^(SCRIPT|STYLE|BUTTON|NAV|SVG|svg|DATALIST|TEMPLATE)$/.test(tag) || some(f)) return;
+        if (/^H[1-5]$/.test(tag)) { var t = limpo(f.innerText); if (t) out.push({ h: Number(tag[1]), t: t }); return; }
+        if (tag === "LEGEND" || tag === "SUMMARY") { var tl = limpo(f.innerText); if (tl) out.push({ h: 3, t: tl }); return; }
+        if (tag === "TABLE") {
+          var cab = [], linhasT = [];
+          f.querySelectorAll("thead tr").forEach(function (tr) { cab = Array.prototype.map.call(tr.children, celula); });
+          f.querySelectorAll("tbody tr, table > tr").forEach(function (tr) { if (tr.closest("table") !== f) return; var l = Array.prototype.map.call(tr.children, celula); if (l.some(function (x) { return x; })) linhasT.push(l); });
+          var n = Math.max(cab.length, Math.max.apply(null, linhasT.map(function (l) { return l.length; }).concat([0])));
+          for (var j = n - 1; j >= 0; j--) { if (!(cab[j] || "") && linhasT.every(function (l) { return !(l[j] || ""); })) { if (cab.length > j) cab.splice(j, 1); linhasT.forEach(function (l) { if (l.length > j) l.splice(j, 1); }); } }
+          if (cab.length || linhasT.length) out.push({ tabela: { cab: cab, linhas: linhasT } }); return;
+        }
+        if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return controle(f);
+        if (tag === "LABEL") { var c = f.control || f.querySelector("input,select,textarea"); if (c) return controle(c); }
+        if (tag === "DETAILS" && !f.open) { var s = f.querySelector("summary"); return; }
+        if (tag === "LI") { if (f.querySelector("ul,ol,table,input,select,textarea")) return anda(f); var tli = limpo(textoSemControles(f)); if (tli) out.push({ t: tli, lista: true }); return; }
+        var temBloco = Array.prototype.some.call(f.querySelectorAll("*"), function (x) { return BLOCO.test(x.tagName); });
+        if (temBloco) return anda(f);
+        var tx = limpo(textoSemControles(f)); if (tx) out.push({ t: tx, lista: tag === "DD" });
+      });
+    })(raiz);
+    return out;
+  }
+
+  /* ───────── baixar ───────── */
+  var MIME = { docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", pdf: "application/pdf" };
+  function baixar(nome, u8, mime) {
+    var blob = new Blob([u8], { type: mime });
+    var direto = function () { var u = URL.createObjectURL(blob), a = document.createElement("a"); a.href = u; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 4000); return Promise.resolve(true); };
+    if (g.claude && typeof g.claude.use === "function") return g.claude.use("downloads").then(function (d) { return d ? d.save({ filename: nome, data: blob }).then(function () { return true; }) : direto(); });
+    return direto();
+  }
+  function gerar(formato, titulo, raiz) {
+    var blocos = extrair(raiz); if (!blocos.length) return null;
+    return { nome: arquivo(titulo) + "." + formato, mime: MIME[formato], dados: formato === "docx" ? docx(titulo, blocos) : formato === "xlsx" ? xlsx(titulo, blocos) : pdf(titulo, blocos), blocos: blocos };
+  }
+
+  /* ───────── a barra que aparece em cada tela ───────── */
+  var seq = 0;
+  function barra(op) {
+    var id = "px-exp-" + (++seq), aberto = false, el = document.createElement("section");
+    el.className = "px-exportar"; el.setAttribute("aria-label", TX.baixar);
+    el.style.cssText = "margin:18px 0 0;padding:12px 14px;border:1px solid #D6DBCF;border-radius:10px;background:transparent;display:flex;flex-direction:column;gap:10px;font:inherit";
+    var bt = "font:inherit;font-weight:600;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer";
+    var pessoas = op.encaminhar && op.encaminhar.pessoas, semEnc = op.encaminhar === false;   // encaminhar a colegas só existe na gestão interna
+    var pinta = function () {
+      el.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"><strong id="' + id + '-t" style="margin-right:4px">' + TX.baixar + '</strong>' +
+        ["docx", "pdf", "xlsx"].map(function (f) { return '<button type="button" data-px-f="' + f + '" aria-describedby="' + id + '-t" style="' + bt + '">' + TX[f === "docx" ? "word" : f === "xlsx" ? "excel" : "pdf"] + "</button>"; }).join("") +
+        (semEnc ? "" : '<button type="button" data-px-enc="1" aria-expanded="' + aberto + '" aria-controls="' + id + '-enc" style="' + bt + '">' + TX.enc + "</button>") + "</div>" +
+        (semEnc ? "" : '<div id="' + id + '-enc"' + (aberto ? "" : " hidden") + ' style="display:' + (aberto ? "grid" : "none") + ';gap:8px;max-width:640px">' +
+        (pessoas ? '<label style="display:grid;gap:3px;font-weight:600">' + TX.para + '<select data-px-para="1" style="font:inherit;min-height:44px;padding:8px 10px;border:1px solid #8A9284;border-radius:8px;background:#fff;color:#1C2B21"><option value="">' + TX.escolha + "</option>" + pessoas.map(function (p) { return '<option value="' + xml(p.id) + '">' + xml(p.nome) + "</option>"; }).join("") + "</select></label>" : '<p style="margin:0">' + TX.semServidor + "</p>") +
+        '<label style="display:grid;gap:3px;font-weight:600">' + TX.nota + '<textarea data-px-nota="1" rows="2" style="font:inherit;padding:8px 10px;border:1px solid #8A9284;border-radius:8px;background:#fff;color:#1C2B21"></textarea></label>' +
+        '<label style="display:grid;gap:3px;font-weight:600">' + TX.link + '<input data-px-link="1" readonly value="' + xml(op.link ? op.link() : g.location.href) + '" style="font:inherit;min-height:44px;padding:8px 10px;border:1px solid #8A9284;border-radius:8px;background:#fff;color:#1C2B21"></label>' +
+        '<div><button type="button" data-px-env="1" style="' + bt + '">' + (pessoas ? TX.enviar : TX.copiar) + "</button></div></div>") +
+        '<div data-px-msg="1" role="status" style="min-height:1.2em;font-weight:600"></div>';
+    };
+    var dizer = function (t) { var m = el.querySelector("[data-px-msg]"); if (m) m.textContent = t; };
+    pinta();
+    el.addEventListener("click", function (ev) {
+      var b = ev.target.closest("button"); if (!b) return;
+      if (b.dataset.pxF) { var r = gerar(b.dataset.pxF, op.titulo(), op.raiz()); if (!r) return dizer(TX.vazio);
+        baixar(r.nome, r.dados, r.mime).then(function () { dizer(TX.baixado(r.nome)); }, function (e) { dizer(e && /cancel|declin|not_granted/i.test(String(e.code || e.message || e)) ? TX.cancelado : TX.falha); }); return; }
+      if (b.dataset.pxEnc) { aberto = !aberto; pinta(); var f = el.querySelector(pessoas ? "[data-px-para]" : "[data-px-nota]"); if (aberto && f) f.focus(); else el.querySelector("[data-px-enc]").focus(); return; }
+      if (b.dataset.pxEnv) { var nota = el.querySelector("[data-px-nota]").value.trim(), link = el.querySelector("[data-px-link]").value;
+        if (pessoas) { var para = el.querySelector("[data-px-para]").value; if (!para) { dizer(TX.escolha + "."); el.querySelector("[data-px-para]").focus(); return; } dizer(op.encaminhar.enviar(para, nota, link, op.titulo()) || ""); return; }
+        var txt = op.titulo() + (nota ? "\n" + nota : "") + "\n" + link;
+        var falhou = function () { var i = el.querySelector("[data-px-link]"); i.focus(); i.select(); dizer(TX.semCopia); };
+        if (g.navigator.clipboard && g.navigator.clipboard.writeText) g.navigator.clipboard.writeText(txt).then(function () { dizer(TX.copiado); }, falhou); else falhou(); }
+    });
+    return el;
+  }
+
+  g.PhysisExportar = { docx: docx, xlsx: xlsx, pdf: pdf, extrair: extrair, gerar: gerar, baixar: baixar, barra: barra, zip: zip, numero: numero };
+})(typeof window !== "undefined" ? window : this);
+
+</script>
+<script>
+/* Padrão Physis · "Baixar esta tela" e "Encaminhar a colegas" em toda tela. */
+(function () {
+  function montar() {
+    if (!window.PhysisExportar || document.querySelector("[data-px-geral]")) return;
+    var app = document.getElementById("app"), raiz = app || document.querySelector("main#px-conteudo") || document.querySelector(".env") || document.querySelector("main");
+    if (!raiz) return;
+    var b = window.PhysisExportar.barra({ raiz: function () { return raiz; },
+      titulo: function () {
+        var base = (document.title || "Physis").split("·")[0].trim(), t = "";
+        Array.prototype.some.call(raiz.querySelectorAll("h1, h2"), function (h) { var x = (h.innerText || "").replace(/\s+/g, " ").trim(); if (x && h.offsetParent !== null) { t = x.slice(0, 60); return true; } return false; });
+        return !t || t.toLowerCase() === base.toLowerCase() ? base : (t.toLowerCase().indexOf(base.toLowerCase()) === 0 ? t : base + " · " + t); },
+      encaminhar: window.PhysisAvisos || false });
+    b.setAttribute("data-px-geral", "1"); b.style.maxWidth = "1180px"; b.style.margin = "18px auto 24px"; b.style.boxSizing = "border-box"; b.style.width = "calc(100% - 32px)";
+    (app ? app.parentNode : raiz).appendChild(b);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", montar); else montar();
+  window.addEventListener("load", function () { setTimeout(montar, 400); });
+})();
+
+</script>
+</body>
+</html>

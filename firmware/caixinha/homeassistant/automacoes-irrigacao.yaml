@@ -1,0 +1,46 @@
+# Caixinha de Automação — automações centrais (Home Assistant)
+# Status: NÃO TESTADO EM HARDWARE
+# Se a central do Raspberry Pi não for Home Assistant, replicar a mesma lógica em Node-RED/script.
+
+automation:
+  # Uma automação destas por zona
+  - alias: "Irrigação - Zona 1"
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.umidade_solo_zona_1
+        below: 30
+    condition:
+      - condition: state
+        entity_id: switch.valvula_zona1
+        state: "off"
+    action:
+      - service: switch.turn_on
+        target:
+          entity_id: switch.valvula_zona1
+      - delay: "00:05:00"   # tempo máximo de rega por ciclo - ajustar pela vazão real
+      - service: switch.turn_off
+        target:
+          entity_id: switch.valvula_zona1
+
+  # Regra de segurança obrigatória: bomba só liga com pelo menos uma válvula aberta
+  - alias: "Bomba segue as zonas"
+    trigger:
+      - platform: state
+        entity_id:
+          - switch.valvula_zona1
+          - switch.valvula_zona2   # listar todas as zonas aqui
+    action:
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >
+                  {{ ['switch.valvula_zona1','switch.valvula_zona2']
+                     | select('is_state','on') | list | count > 0 }}
+            sequence:
+              - service: switch.turn_on
+                target:
+                  entity_id: switch.sonoff_bomba
+        default:
+          - service: switch.turn_off
+            target:
+              entity_id: switch.sonoff_bomba

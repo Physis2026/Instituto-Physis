@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physis SustainKit</title>
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#F4F7F4;min-height:100vh}
+.header{padding:14px 20px 0;display:flex;flex-direction:column}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:17px}
+.logo-title{font-weight:800;font-size:16px;color:#fff;letter-spacing:-0.02em}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.7)}
+.badge{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:3px 11px;font-size:11px;font-weight:700;color:#fff}
+.tabs{display:flex;overflow-x:auto;gap:1px}
+.tab-btn{padding:8px 14px;border:none;background:transparent;cursor:pointer;font-weight:400;font-size:12px;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.2s;display:flex;align-items:center;gap:4px;white-space:nowrap;color:rgba(255,255,255,0.5)}
+.tab-btn.active{font-weight:700;color:#fff;border-bottom-color:#81A969}
+.content{max-width:1000px;margin:14px auto;padding:0 16px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.card{background:#fff;border:1px solid #D4E8D0;border-radius:12px;padding:15px 17px;box-shadow:0 2px 8px rgba(7,64,49,0.06)}
+.card-pale{background:#EEF8EB}
+.sec-title{font-weight:700;font-size:13px;margin-bottom:10px}
+.lbl{font-size:11px;font-weight:600;color:#1C2B22;margin-bottom:4px}
+.inp-row{margin-bottom:10px}
+.inp-wrap{display:flex;gap:6px;align-items:center}
+input[type=number],select{padding:7px 9px;border:2px solid #BFDBFE;border-radius:7px;font-family:inherit;outline:none;background:#EFF6FF;font-size:14px;font-weight:700;color:#1E40AF}
+input[type=number]{flex:1}
+select{width:100%;font-size:12px}
+.unit{font-size:11px;color:#6B7F6E;min-width:34px}
+.note{font-size:10px;color:#6B7F6E;margin-top:2px;font-style:italic}
+.res-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#F4F7F4;border-radius:7px;margin-bottom:4px}
+.res-row.hi{background:#EEF8EB;border:1px solid #81A969}
+.res-label{font-size:12px;color:#1C2B22}
+.res-value{font-size:13px;font-weight:800;color:#1C2B22}
+.res-row.hi .res-value{color:#074031}
+.status-box{padding:9px;border-radius:8px;text-align:center;margin-top:6px}
+.status-ok{background:#C8E6C9}.status-ok .status-title{color:#1B5E20}
+.status-err{background:#FFCDD2}.status-err .status-title{color:#B71C1C}
+.status-title{font-weight:800;font-size:13px}
+.status-sub{font-size:11px;margin-top:2px}
+.footer{background:#fff;border-top:1px solid #D4E8D0;padding:7px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.footer-left{font-size:10px;color:#6B7F6E}
+.footer-right{font-size:11px;color:#51774B;font-weight:600}
+.pill-row{display:flex;gap:6px;margin-bottom:8px}
+.pill{flex:1;padding:5px;border-radius:7px;border:1px solid #D4E8D0;background:#fff;cursor:pointer;font-family:inherit;font-size:11px;color:#6B7F6E;font-weight:400}
+.pill.active{border-color:#074031;background:#EEF8EB;color:#074031;font-weight:700}
+.mini-info{font-size:10px;color:#6B7F6E;font-style:italic;padding:6px 8px;background:#F4F7F4;border-radius:6px;margin-top:4px}
+.cert-sidebar{display:flex;flex-direction:column;gap:6px}
+.cert-btn{padding:10px 12px;border-radius:10px;border:1px solid #D4E8D0;background:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.15s}
+.cert-btn.active{border-color:var(--cert-cor)}
+.cert-btn-title{font-size:11px;font-weight:700;margin-bottom:4px}
+.cert-btn-bar{height:3px;background:#F4F7F4;border-radius:2px;overflow:hidden;margin-bottom:2px}
+.cert-btn-fill{height:100%;border-radius:2px;transition:width 0.3s}
+.cert-btn-pct{font-size:10px;color:#6B7F6E}
+.cert-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.cert-pct-box{padding:5px 12px;border-radius:10px;text-align:center}
+.cert-pct-num{font-size:20px;font-weight:800}
+.cert-pct-label{font-size:9px;color:#6B7F6E}
+.cert-bar{height:5px;background:#F4F7F4;border-radius:3px;margin-bottom:10px;overflow:hidden}
+.cert-bar-fill{height:100%;border-radius:3px;transition:width 0.4s}
+.crit-row{display:flex;justify-content:space-between;align-items:center;padding:7px 9px;border-radius:7px;margin-bottom:4px;gap:8px;background:#F4F7F4;border:1px solid #D4E8D0}
+.crit-text{font-size:12px;color:#1C2B22;flex:1}
+.crit-sel{padding:3px 7px;border-radius:6px;border:1px solid #D4E8D0;font-size:11px;font-family:inherit;cursor:pointer;background:#fff;min-width:120px}
+.counts{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.count-pill{padding:2px 8px;border-radius:14px;font-size:11px;font-weight:600}
+.mat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:360px;overflow-y:auto}
+.mat-card{padding:10px 12px;background:#fff;border-radius:9px;border:1px solid #D4E8D0;cursor:pointer;transition:all 0.15s}
+.mat-card:hover{border-color:#074031;background:#EEF8EB}
+.mat-name{font-size:12px;font-weight:700;color:#074031;margin-bottom:3px}
+.mat-cat{background:#EEF8EB;padding:1px 6px;border-radius:10px;font-size:10px;color:#51774B;display:inline-block;margin-bottom:4px}
+.mat-row{display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px}
+.mat-key{color:#6B7F6E}.mat-val{font-weight:600;color:#1C2B22}
+.chk-item{display:flex;gap:6px;align-items:flex-start;padding:6px 7px;border-radius:7px;margin-bottom:3px;cursor:pointer;background:#F4F7F4;border:1px solid #D4E8D0;transition:all 0.15s}
+.chk-item.done{background:#C8E6C9;border-color:#81C784}
+.chk-box{width:13px;height:13px;border-radius:3px;flex-shrink:0;margin-top:1px;border:2px solid #D4E8D0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;background:transparent;transition:all 0.15s}
+.chk-item.done .chk-box{background:#51774B;border-color:#51774B}
+.chk-text{font-size:11px;color:#1C2B22;line-height:1.4}
+.chk-item.done .chk-text{text-decoration:line-through;color:#2E7D32}
+.model-grid{display:flex;gap:10px;margin-bottom:12px}
+.model-btn{flex:1;padding:10px;border-radius:11px;border:2px solid #D4E8D0;background:#fff;cursor:pointer;text-align:center;font-family:inherit;transition:all 0.2s}
+.model-btn.active{border-color:#074031;background:#EEF8EB}
+.model-icon{font-size:18px;margin-bottom:3px}
+.model-name{font-size:11px;font-weight:700;color:#1C2B22}
+.model-scale{font-size:10px;color:#6B7F6E}
+.info-row{padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:8px;margin-bottom:5px}
+.info-lbl{font-size:10px;color:#6B7F6E}
+.info-val{font-size:13px;font-weight:700;color:#1C2B22}
+.agro-item{display:flex;gap:7px;align-items:center;padding:6px 8px;border-radius:8px;margin-bottom:4px;cursor:pointer;background:#F4F7F4;border:1px solid #D4E8D0;transition:all 0.15s}
+.agro-item.on{background:#EEF8EB;border-color:#81A969}
+.agro-chk{width:13px;height:13px;border-radius:3px;background:transparent;border:2px solid #D4E8D0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;flex-shrink:0;transition:all 0.15s}
+.agro-item.on .agro-chk{background:#51774B;border-color:#51774B}
+.agro-nome{flex:1;font-size:11px;color:#6B7F6E;font-weight:400}
+.agro-item.on .agro-nome{color:#074031;font-weight:600}
+.agro-kwh{font-size:10px;color:#6B7F6E}
+.total-box{padding:12px;border-radius:10px;text-align:center}
+.total-label{font-size:10px;margin-bottom:1px}
+.total-value{font-size:24px;font-weight:800}
+.total-sub{font-size:10px;margin-top:1px}
+.field-group{display:flex;flex-direction:column;gap:10px}
+.col-stack{display:flex;flex-direction:column;gap:10px}
+.search-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:11px 13px;background:#fff;border-radius:11px;border:1px solid #D4E8D0;margin-bottom:10px}
+.search-inp{flex:1;min-width:130px;padding:6px 10px;border:1px solid #D4E8D0;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.filter-btn{padding:4px 10px;border-radius:16px;border:1px solid #D4E8D0;background:transparent;font-size:11px;font-weight:600;cursor:pointer;color:#6B7F6E;font-family:inherit}
+.filter-btn.active{border-color:#074031;background:#074031;color:#fff}
+@media(max-width:680px){.grid2{grid-template-columns:1fr}.model-grid{flex-wrap:wrap}}
+
+.header{background:#074031}
+.tab-btn.active{border-bottom-color:#81A969}
+
+</style>
+</head>
+<body>
+
+<!-- BANNER DE POSICIONAMENTO -->
+<div style="background:#074031;border-bottom:2px solid #81A969;padding:10px 20px;text-align:center">
+  <span style="color:#81A969;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Physis SustainKit — </span>
+  <span style="color:rgba(255,255,255,0.85);font-size:12px">Calculador web que substitui parte da consultoria de sustentabilidade — dimensiona solar, água e materiais, e checa se o projeto atende LEED e EDGE</span>
+  <span style="margin-left:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(129,169,105,0.4);border-radius:4px;padding:2px 10px;color:#81A969;font-size:11px;font-weight:700">vs. US$ 40k de consultoria LEED</span>
+</div>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">🌿</div>
+      <div>
+        <div class="logo-title">Physis SustainKit</div>
+        <div class="logo-sub">Physis Engineering · Versão Completa · LEED v5 · PVGIS ERA5</div>
+      </div>
+    </div>
+    <div class="badge">VERSÃO COMPLETA</div>
+
+<button onclick="toggleModoApresentacao()" id="btn-apresentacao" style="
+  background:rgba(255,255,255,0.1);border:1px solid rgba(129,169,105,0.5);
+  border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;
+  color:#81A969;cursor:pointer;font-family:inherit;transition:all 0.2s">
+  📊 Modo Apresentação
+</button>
+
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('t-solar',this)">☀️ Energia + Água</button>
+    <button class="tab-btn" onclick="showTab('t-mat',this)">🧱 Materiais</button>
+    <button class="tab-btn" onclick="showTab('t-ori',this)">🌞 Orientação Solar</button>
+    <button class="tab-btn" onclick="showTab('t-certs',this)">🔍 Certificações</button>
+    <button class="tab-btn" onclick="showTab('t-acab',this)">🎨 Acabamentos</button>
+    <button class="tab-btn" onclick="showTab('t-check',this)">✅ Checklist</button>
+    <button class="tab-btn" onclick="showTab('t-modelos',this)">💼 Modelos</button>
+    <button class="tab-btn" onclick="showTab('t-agro',this)">🌾 Agro Solar</button>
+    <button class="tab-btn" onclick="showTab('t-carbono',this)">🌿 Carbono</button>
+    <button class="tab-btn" onclick="showTab('t-precos',this)">💰 Preços</button>
+    </div>
+</div>
+
+<div class="content">
+
+<!-- SOLAR -->
+<div id="t-solar" class="tab-panel active">
+  <div class="grid2">
+    <div class="col-stack">
+      <div class="card">
+        <div class="sec-title" style="color:#074031">☀️ Sistema Solar FV</div>
+        <div class="inp-row"><div class="lbl">Cidade</div><select id="s-cidade" onchange="calcSolar()"><option value="">Selecionar...</option></select></div>
+        <div class="inp-row"><div class="lbl">Consumo diário</div><div class="inp-wrap"><input type="number" id="s-consumo" value="22" oninput="calcSolar()"><span class="unit">kWh/dia</span></div></div>
+        <div class="inp-row"><div class="lbl">Potência instalada</div><div class="inp-wrap"><input type="number" id="s-pot" value="10" step="0.5" oninput="calcSolar()"><span class="unit">kWp</span></div></div>
+        <div class="inp-row"><div class="lbl">Método HPS</div>
+          <div class="pill-row">
+            <button class="pill active" id="p-pior" onclick="setModo('pior')">Pior mês ✅</button>
+            <button class="pill" id="p-media" onclick="setModo('media')">Média anual</button>
+          </div>
+          <div class="mini-info" id="s-hps-info">HPS: —  ·  PR: 0,78  ·  PVGIS ERA5</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec-title" style="color:#074031">🔋 Bateria + 💧 Água</div>
+        <div class="inp-row"><div class="lbl">Autonomia bateria</div><div class="inp-wrap"><input type="number" id="s-auto" value="48" step="12" oninput="calcSolar()"><span class="unit">horas</span></div></div>
+        <div class="inp-row"><div class="lbl">Tecnologia</div><select id="s-dod" onchange="calcSolar()"><option value="0.90">LiFePO4 — DoD 90%</option><option value="0.85">Li-NMC — DoD 85%</option><option value="0.50">AGM — DoD 50%</option></select></div>
+        <div class="inp-row"><div class="lbl">Área de captação</div><div class="inp-wrap"><input type="number" id="s-area" value="84" oninput="calcSolar()"><span class="unit">m²</span></div></div>
+        <div class="inp-row"><div class="lbl">Ocupantes</div><div class="inp-wrap"><input type="number" id="s-pess" value="2" oninput="calcSolar()"><span class="unit">pessoas</span></div></div>
+      </div>
+    </div>
+    <div class="col-stack">
+      <div class="card card-pale">
+        <div class="sec-title" style="color:#074031">📊 Resultados Solar</div>
+        <div class="res-row"><span class="res-label">Potência mínima</span><span class="res-value" id="r-potmin">—</span></div>
+        <div class="res-row hi"><span class="res-label">Potência instalada</span><span class="res-value" id="r-pot">—</span></div>
+        <div class="res-row"><span class="res-label">Geração anual</span><span class="res-value" id="r-ger">—</span></div>
+        <div id="r-nzeb" class="status-box status-ok"><div class="status-title">—</div></div>
+      </div>
+      <div class="card card-pale">
+        <div class="sec-title" style="color:#074031">🔋 Bateria · 💧 Água</div>
+        <div class="res-row hi"><span class="res-label">Capacidade bateria</span><span class="res-value" id="r-bat">—</span></div>
+        <div class="res-row"><span class="res-label">Captação pluvial</span><span class="res-value" id="r-cap">—</span></div>
+        <div class="res-row"><span class="res-label">Consumo água</span><span class="res-value" id="r-agua">—</span></div>
+        <div id="r-agua-status" class="status-box status-ok"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MATERIAIS -->
+<div id="t-mat" class="tab-panel">
+  <div class="grid2">
+    <div class="card">
+      <div class="sec-title" style="color:#074031">🌍 Recomendação por Clima</div>
+      <div class="inp-row"><select id="m-cidade" onchange="calcMat()"><option value="">Selecionar...</option></select></div>
+      <div id="m-zona-box" style="padding:10px;border-radius:10px;margin-bottom:8px">
+        <div style="font-weight:700;font-size:12px;color:#074031">Zona Bioclimática</div>
+        <div id="m-zona-label" style="font-size:11px;color:#51774B;font-weight:600">—</div>
+      </div>
+      <div id="m-rec"></div>
+    </div>
+    <div>
+      <div class="search-row">
+        <input class="search-inp" id="m-busca" placeholder="🔍 Buscar material..." oninput="renderMat()">
+        <div id="m-filters"></div>
+      </div>
+      <div class="mat-grid" id="m-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ORIENTAÇÃO -->
+<div id="t-ori" class="tab-panel">
+  <div class="grid2">
+    <div class="card">
+      <div class="sec-title" style="color:#074031">🌞 Localização</div>
+      <div class="inp-row"><div class="lbl">Latitude</div><div class="inp-wrap"><input type="number" id="o-lat" value="-22.505" step="0.001" oninput="calcOri()"><span class="unit">°</span></div><div class="note">Negativo = Hemisfério Sul</div></div>
+      <div class="inp-row"><div class="lbl">Mês</div><select id="o-mes" onchange="calcOri()"><option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option><option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option><option value="7" selected>Julho</option><option value="8">Agosto</option><option value="9">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select></div>
+      <div id="o-results"></div>
+    </div>
+    <div class="card card-pale">
+      <div class="sec-title" style="color:#074031">📊 HPS por mês</div>
+      <div id="o-chart" style="display:flex;gap:2px;align-items:flex-end;height:90px;margin-bottom:8px"></div>
+      <div id="o-fachadas"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CERTIFICAÇÕES -->
+<div id="t-certs" class="tab-panel">
+  <div style="display:grid;grid-template-columns:180px 1fr;gap:14px">
+    <div class="cert-sidebar" id="cert-sidebar"></div>
+    <div class="card" id="cert-panel"></div>
+  </div>
+</div>
+
+<!-- ACABAMENTOS -->
+<div id="t-acab" class="tab-panel">
+  <div class="grid2">
+    <div class="card">
+      <div class="sec-title" style="color:#074031">🎨 Selecionar acabamento</div>
+      <div id="acab-list"></div>
+      <div class="inp-row" style="margin-top:8px"><div class="lbl">Área (m²)</div><div class="inp-wrap"><input type="number" id="acab-area" value="12" oninput="calcAcab()"><span class="unit">m²</span></div></div>
+      <div class="pill-row">
+        <button class="pill active" id="ap-prof" onclick="setAplic('prof')">Profissional</button>
+        <button class="pill" id="ap-diy" onclick="setAplic('diy')">DIY</button>
+      </div>
+    </div>
+    <div class="card card-pale">
+      <div class="sec-title" style="color:#074031">💰 Orçamento</div>
+      <div class="res-row"><span class="res-label">Material + base</span><span class="res-value" id="a-mat">—</span></div>
+      <div class="res-row"><span class="res-label">Ferramentas</span><span class="res-value" id="a-ferra">—</span></div>
+      <div class="res-row"><span class="res-label">Mão de obra</span><span class="res-value" id="a-mo">—</span></div>
+      <div class="total-box" style="background:#074031;margin-top:8px">
+        <div class="total-label" style="color:#81A969">TOTAL ESTIMADO</div>
+        <div class="total-value" style="color:#fff" id="a-total">—</div>
+        <div class="total-sub" style="color:rgba(255,255,255,0.6)" id="a-m2">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKLIST -->
+<div id="t-check" class="tab-panel">
+  <div class="card" style="margin-bottom:10px;padding:11px 14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+      <div style="font-weight:700;font-size:13px">✅ Checklist de Obra</div>
+      <div style="font-weight:800;font-size:16px;color:#51774B" id="chk-total">0/0 (0%)</div>
+    </div>
+    <div style="height:6px;background:#F4F7F4;border-radius:3px;overflow:hidden"><div id="chk-bar" style="height:100%;background:#51774B;border-radius:3px;width:0%;transition:width 0.4s"></div></div>
+  </div>
+  <div class="grid2" id="chk-grid"></div>
+</div>
+
+<!-- MODELOS -->
+<div id="t-modelos" class="tab-panel">
+  <div class="model-grid" id="mod-btns"></div>
+  <div class="grid2" id="mod-detail"></div>
+</div>
+
+<!-- AGRO -->
+<div id="t-agro" class="tab-panel">
+  <div class="grid2">
+    <div class="card">
+      <div class="sec-title" style="color:#074031">🌾 Diagnóstico de Cargas</div>
+      <div style="font-size:11px;color:#6B7F6E;margin-bottom:8px">Marque os equipamentos presentes:</div>
+      <div id="agro-list"></div>
+      <div class="inp-row" style="margin-top:8px"><div class="lbl">HPS local (pior mês)</div><div class="inp-wrap"><input type="number" id="ag-hps" value="4.5" step="0.1" oninput="calcAgro()"><span class="unit">h/dia</span></div></div>
+    </div>
+    <div class="col-stack">
+      <div class="card card-pale">
+        <div class="sec-title" style="color:#074031">📊 Sistema Solar Agro</div>
+        <div class="res-row"><span class="res-label">Consumo diário</span><span class="res-value" id="ag-cons">—</span></div>
+        <div class="res-row hi"><span class="res-label">Potência FV mínima</span><span class="res-value" id="ag-pot">—</span></div>
+        <div class="res-row hi"><span class="res-label">Bateria (48h autonomia)</span><span class="res-value" id="ag-bat">—</span></div>
+      </div>
+      <div class="card">
+        <div class="sec-title" style="color:#074031">🌱 AgriPV — Culturas Compatíveis</div>
+        <div style="padding:7px 9px;background:#C8E6C9;border-radius:7px;margin-bottom:4px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">🍓 Morango</span><span style="font-size:11px;color:#1B5E20">★★★★★</span></div><div style="font-size:10px;color:#6B7F6E">Ideal altitude · melhora qualidade</div></div>
+        <div style="padding:7px 9px;background:#C8E6C9;border-radius:7px;margin-bottom:4px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">🥬 Alface</span><span style="font-size:11px;color:#1B5E20">★★★★★</span></div><div style="font-size:10px;color:#6B7F6E">Evita espigamento · alta produtividade</div></div>
+        <div style="padding:7px 9px;background:#C8E6C9;border-radius:7px;margin-bottom:4px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">☕ Café</span><span style="font-size:11px;color:#2E7D32">★★★★☆</span></div><div style="font-size:10px;color:#6B7F6E">30–40% sombra · planta de sub-bosque</div></div>
+        <div style="padding:7px 9px;background:#FFE0B2;border-radius:7px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;font-weight:600">🌾 Soja/Milho</span><span style="font-size:11px;color:#E65100">★★☆☆☆</span></div><div style="font-size:10px;color:#6B7F6E">Não recomendado como cultura única</div></div>
+        <div style="font-size:10px;color:#6B7F6E;font-style:italic;margin-top:6px">LER médio: 1,3–1,7 · Fraunhofer ISE 2023</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+<!-- CARBONO -->
+<div id="t-carbono" class="tab-panel">
+  <div class="grid2" style="margin-bottom:14px">
+    <!-- Col esq: inputs -->
+    <div class="col-stack">
+      <div class="card">
+        <div class="sec-title" style="color:#074031">⚡ Emissões Operacionais</div>
+        <div style="font-size:10px;color:#6B7F6E;margin-bottom:10px;font-style:italic">
+          Fatores: Rede SIN 0,0289 tCO₂/MWh · Diesel 0,74 kgCO₂e/kWh · Biogás 2,75 kgCO₂e/m³
+        </div>
+        <div class="inp-row"><div class="lbl">Energia comprada da rede (anual)</div>
+          <div class="inp-wrap"><input type="number" id="c-rede" value="12000" oninput="calcCarbon()"><span class="unit">kWh/ano</span></div></div>
+        <div class="inp-row"><div class="lbl">Geração solar (anual)</div>
+          <div class="inp-wrap"><input type="number" id="c-solar" value="15000" oninput="calcCarbon()"><span class="unit">kWh/ano</span></div></div>
+        <div class="inp-row"><div class="lbl">Energia injetada na rede</div>
+          <div class="inp-wrap"><input type="number" id="c-injeta" value="3000" oninput="calcCarbon()"><span class="unit">kWh/ano</span></div></div>
+        <div class="inp-row"><div class="lbl">Diesel consumido (gerador)</div>
+          <div class="inp-wrap"><input type="number" id="c-diesel" value="0" oninput="calcCarbon()"><span class="unit">kWh/ano</span></div></div>
+        <div class="inp-row"><div class="lbl">Biogás produzido</div>
+          <div class="inp-wrap"><input type="number" id="c-biogas" value="0" oninput="calcCarbon()"><span class="unit">m³/ano</span></div>
+          <div class="note">Evitação de metano — parcela contestável em auditoria</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec-title" style="color:#074031">🧱 Carbono Incorporado (LCA)</div>
+        <div class="inp-row"><div class="lbl">CLT / madeira estrutural</div>
+          <div class="inp-wrap"><input type="number" id="c-clt" value="12" oninput="calcCarbon()"><span class="unit">m³</span></div></div>
+        <div class="inp-row"><div class="lbl">Concreto / fundação</div>
+          <div class="inp-wrap"><input type="number" id="c-conc" value="15" oninput="calcCarbon()"><span class="unit">m³</span></div></div>
+        <div class="inp-row"><div class="lbl">Aço / estrutura metálica</div>
+          <div class="inp-wrap"><input type="number" id="c-aco" value="500" oninput="calcCarbon()"><span class="unit">kg</span></div></div>
+        <div class="inp-row"><div class="lbl">Bambu estrutural</div>
+          <div class="inp-wrap"><input type="number" id="c-bambu" value="0" oninput="calcCarbon()"><span class="unit">colmos</span></div></div>
+        <div style="font-size:10px;color:#6B7F6E;font-style:italic;padding:6px 8px;background:#F4F7F4;border-radius:6px">
+          EPD: CLT −1.500 kgCO₂/m³ · Concreto +210 kgCO₂/m³ · Aço +0,9 kgCO₂/kg · Bambu −40 kgCO₂/colmo
+        </div>
+      </div>
+    </div>
+    <!-- Col dir: resultados -->
+    <div class="col-stack">
+      <div class="card card-pale">
+        <div class="sec-title" style="color:#074031">📊 Balanço de Carbono</div>
+        <div style="font-size:11px;color:#6B7F6E;margin-bottom:8px">Operacional — período anual</div>
+        <div class="res-row"><span class="res-label">Emissão — energia da rede</span><span class="res-value" id="r-em-rede">—</span></div>
+        <div class="res-row"><span class="res-label">Emissão — diesel</span><span class="res-value" id="r-em-diesel">—</span></div>
+        <div class="res-row"><span class="res-label">Evitado — solar (firme ✅)</span><span class="res-value" id="r-ev-solar">—</span></div>
+        <div class="res-row"><span class="res-label">Evitado — biogás (contestável ⚠️)</span><span class="res-value" id="r-ev-bio">—</span></div>
+        <div class="res-row hi"><span class="res-label">Saldo firme (sem biogás)</span><span class="res-value" id="r-saldo-firme">—</span></div>
+        <div class="res-row hi"><span class="res-label">Saldo total (com biogás)</span><span class="res-value" id="r-saldo-total">—</span></div>
+        <div style="font-size:11px;color:#6B7F6E;margin:8px 0 4px">Incorporado — materiais</div>
+        <div class="res-row"><span class="res-label">CO₂ incorporado líquido</span><span class="res-value" id="r-incorp">—</span></div>
+        <div id="r-carbon-status" class="status-box" style="margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <div class="sec-title" style="color:#074031">⚖️ Regimes e Metas Net Zero</div>
+        <div id="c-regimes"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Metodologias -->
+  <div class="card">
+    <div class="sec-title" style="color:#074031">📋 Metodologias — Status do Projeto</div>
+    <div style="font-size:11px;color:#B71C1C;font-style:italic;margin-bottom:10px;padding:8px;background:#FFCDD2;border-radius:7px">
+      ⚠️ Inventário não é crédito de carbono. A calculadora estima o que a unidade emite.
+      Crédito exige metodologia credenciada, adicionalidade, linha de base e verificação independente.
+    </div>
+    <div id="c-metodologias"></div>
+  </div>
+</div>
+
+
+<!-- PREÇOS -->
+<div id="t-precos" class="tab-panel">
+  <!-- Faixa de preços SustainKit -->
+  <div class="card" style="margin-bottom:14px;padding:14px 18px;background:linear-gradient(135deg,#EEF8EB,#F4F7F4)">
+    <div style="font-weight:700;color:#074031;font-size:14px;margin-bottom:4px">💰 Tabela de Preços — Physis SustainKit</div>
+    <div style="font-size:11px;color:#6B7F6E;margin-bottom:12px;font-style:italic">Referência: consultoria LEED certificada custa US$ 30.000–50.000 (≈ R$ 156k–260k). O SustainKit entrega a ferramenta de dimensionamento e checagem a uma fração disso.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
+        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">⚡ Módulo Energy</div>
+        <div style="font-size:22px;font-weight:800;color:#074031">R$ 800</div>
+        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">por projeto</div>
+        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Solar FV · Bateria<br>Orientação · Resiliência</div>
+      </div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
+        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">💧 Módulo Water</div>
+        <div style="font-size:22px;font-weight:800;color:#074031">R$ 600</div>
+        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">por projeto</div>
+        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Captação · Demandas<br>Biogás · Irrigação</div>
+      </div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
+        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">🧱 Módulo Materials</div>
+        <div style="font-size:22px;font-weight:800;color:#074031">R$ 700</div>
+        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">por projeto</div>
+        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Banco materiais · LCA<br>Acabamentos · Ecologia</div>
+      </div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
+        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">🔍 Módulo Cert</div>
+        <div style="font-size:22px;font-weight:800;color:#074031">R$ 900</div>
+        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">por projeto</div>
+        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Gap Analysis LEED/EDGE<br>Checklist · Modelos</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px">
+      <div style="padding:14px;background:#074031;border-radius:10px;text-align:center;border:2px solid #81A969">
+        <div style="font-size:11px;color:#81A969;margin-bottom:4px;font-weight:700">🌿 PACOTE COMPLETO</div>
+        <div style="font-size:28px;font-weight:800;color:#fff">R$ 2.800</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:2px">por projeto · todos os módulos</div>
+        <div style="margin-top:8px;font-size:10px;color:#81A969;line-height:1.5">Energy + Water + Materials<br>+ Cert + Agro + Carbono</div>
+        <div style="margin-top:6px;font-size:9px;color:rgba(255,255,255,0.4)">Economia de R$ 1.100 vs. módulos separados</div>
+      </div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
+        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">📅 Assinatura Anual</div>
+        <div style="font-size:22px;font-weight:800;color:#074031">R$ 1.800<span style="font-size:12px;font-weight:400">/ano</span></div>
+        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">escritórios e consultores</div>
+        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Uso ilimitado · Atualizações<br>LEED/EDGE · Suporte</div>
+      </div>
+      <div style="padding:14px;background:#fff;border-radius:10px;border:1px solid #D4E8D0;text-align:center">
+        <div style="font-size:11px;color:#6B7F6E;margin-bottom:4px;font-weight:600">🏢 Consultoria + Ferramenta</div>
+        <div style="font-size:22px;font-weight:800;color:#074031">R$ 15k–50k</div>
+        <div style="font-size:10px;color:#6B7F6E;margin-top:2px">por projeto completo</div>
+        <div style="margin-top:8px;font-size:10px;color:#51774B;line-height:1.5">Laudo técnico · Memória<br>de cálculo · Relatório banco</div>
+      </div>
+    </div>
+  </div>
+  <!-- Referências de preço dos sistemas -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="card">
+      <div style="font-weight:700;color:#074031;font-size:13px;margin-bottom:10px">🏗️ Referências de Custo — Chalé Sustentável</div>
+      <div style="font-size:10px;color:#6B7F6E;font-style:italic;margin-bottom:8px">Fonte: Memória de Cálculo Physis · Abril 2025 · Petrópolis RJ</div>
+      <div id="ref-items"></div>
+    </div>
+    <div class="card">
+      <div style="font-weight:700;color:#074031;font-size:13px;margin-bottom:10px">📊 Retorno do Investimento</div>
+      <div style="font-size:10px;color:#6B7F6E;font-style:italic;margin-bottom:8px">Base: chalé 84m² · Petrópolis RJ · CAPEX R$ 520k</div>
+      <div id="roi-items"></div>
+      <div style="margin-top:10px;padding:10px;background:#EEF8EB;border-radius:8px;border:1px solid #D4E8D0">
+        <div style="font-size:11px;color:#074031;font-weight:700">🎯 Por que o SustainKit justifica o investimento</div>
+        <div style="font-size:10px;color:#6B7F6E;margin-top:4px;line-height:1.6">
+          Certificação LEED com consultora externa: <strong style="color:#074031">US$ 30k–50k</strong><br>
+          Prêmio de diária com badge sustentável: <strong style="color:#074031">+35%</strong> (Booking 2024)<br>
+          Economia anual em energia + água: <strong style="color:#074031">≈ R$ 18.000/ano</strong><br>
+          Valorização imobiliária (EDGE/LEED): <strong style="color:#074031">+18–30%</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modo apresentação -->
+  <div style="margin-top:12px;padding:10px 14px;background:#FFF8E1;border-radius:8px;border:1px solid #FFB74D;font-size:11px;color:#E65100">
+    ⚠️ <strong>Nota:</strong> Os preços acima são referências provisórias — Abril 2025, Petrópolis RJ. 
+    Número errado a gente corrige; número ausente trava o plano de negócios.
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-left">Physis Engineering · ASHRAE · ABNT NBR · PVGIS ERA5 · LEED v5 · FAO</div>
+  <div class="footer-right">physis.com.br</div>
+</div>
+
+<script>
+
+function $(id){return document.getElementById(id)}
+function val(id){return parseFloat($(id)?.value||0)||0}
+function sel(id){return $(id)?.value||''}
+function set(id,v){if($(id))$(id).innerText=v}
+function setHtml(id,v){if($(id))$(id).innerHTML=v}
+function cls(id,c,on){$(id)?.classList[on?'add':'remove'](c)}
+function showTab(tabId,btn,color){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  $(tabId)?.classList.add('active');
+  btn.classList.add('active');
+}
+function statusBox(id,ok,title,sub){
+  const el=$(id);if(!el)return;
+  el.className='status-box '+(ok?'status-ok':'status-err');
+  el.innerHTML=`<div class="status-title">${title}</div><div class="status-sub">${sub}</div>`;
+}
+function fmt(n){return Number(n).toLocaleString('pt-BR')}
+
+
+const CIDADES={
+  'Petrópolis — RJ':{hps:4.20,hpsMin:3.42,zona:3,prec:1520},
+  'Rio de Janeiro — RJ':{hps:4.65,hpsMin:3.71,zona:4,prec:1200},
+  'São Paulo — SP':{hps:4.40,hpsMin:3.52,zona:3,prec:1400},
+  'Brasília — DF':{hps:5.47,hpsMin:4.12,zona:4,prec:1500},
+  'Belo Horizonte — MG':{hps:4.90,hpsMin:3.85,zona:3,prec:1500},
+  'Curitiba — PR':{hps:3.90,hpsMin:2.98,zona:1,prec:1400},
+  'Salvador — BA':{hps:5.20,hpsMin:4.20,zona:7,prec:1900},
+  'João Pessoa — PB':{hps:5.80,hpsMin:4.92,zona:8,prec:1700},
+  'Manaus — AM':{hps:4.89,hpsMin:4.21,zona:8,prec:2200},
+  'Tunis — Tunísia':{hps:5.02,hpsMin:2.87,zona:0,prec:400},
+  'Amsterdã — Holanda':{hps:2.68,hpsMin:0.81,zona:0,prec:900},
+};
+const MAT_ZONA={
+  0:{e:'CLT + SIP',v:'Análise local',i:'Verificar',c:'Verificar',es:'Vidro duplo',l:'Internacional',cor:'#F3E5F5'},
+  1:{e:'CLT + SIP 150mm',v:'SIP + BTC + hempcrete',i:'Lã rocha 100mm',c:'Sanduíche 80mm + telhado verde',es:'Vidro triplo argônio',l:'Frio — Zona 1',cor:'#DBEAFE'},
+  2:{e:'CLT + SIP 100mm',v:'SIP + BTC',i:'Lã rocha 75mm',c:'Sanduíche 60mm + telhado verde',es:'Vidro triplo argônio',l:'Muito frio — Zona 2',cor:'#DBEAFE'},
+  3:{e:'CLT + SIP 100mm',v:'SIP + BTC / Hempcrete',i:'Lã PET 50mm',c:'Sanduíche 50mm + telhado verde',es:'Vidro duplo câmara ar',l:'Temperado — Zona 3',cor:'#EDE7F6'},
+  4:{e:'CLT ou SIP',v:'SIP ou BTC',i:'Lã PET cobertura',c:'Telhado verde',es:'Vidro duplo Low-E',l:'Subquente — Zona 4',cor:'#E8F5E9'},
+  5:{e:'CLT ou geopolímero',v:'BTC + alta inércia',i:'Lã rocha cobertura',c:'Sanduíche + câmara ar',es:'Vidro duplo Low-E',l:'Quente seco — Zona 5',cor:'#FFF9C4'},
+  6:{e:'Bambu + aço reciclado',v:'Adobe ou BTC',i:'Cobertura apenas',c:'Argila + cal refletiva',es:'Vidro duplo + shutters',l:'Quente seco — Zona 6',cor:'#FFE0B2'},
+  7:{e:'Bambu + aço reciclado',v:'Adobe branco + pedra',i:'Cobertura apenas',c:'Argila + cal refletiva',es:'Vidro duplo + shutters madeira',l:'Quente e seco — Zona 7',cor:'#FFE0B2'},
+  8:{e:'Bambu Guadua + FSC',v:'Paredes abertas + venezianas',i:'Mínimo',c:'Palha / sedum',es:'Venezianas + mosquiteiro',l:'Quente e úmido — Zona 8',cor:'#FCE4EC'},
+};
+const MATERIAIS=[
+  {n:'CLT — Madeira Laminada Cruzada',c:'Estrutura',u:'0,28 W/m²K',co2:'−1,5 (negativo)',custo:'R$2.200–3.000/m³'},
+  {n:'SIP 100mm (OSB+EPS+OSB)',c:'Vedação',u:'0,22 W/m²K',co2:'0,08–0,14',custo:'R$1.400–1.900/m²'},
+  {n:'BTC — Bloco Terra Comprimida',c:'Vedação',u:'0,80 W/m²K',co2:'0,01–0,03',custo:'R$80–140/m²'},
+  {n:'Hempcrete (cânhamo + cal)',c:'Vedação',u:'0,22 W/m²K',co2:'−0,4 (negativo)',custo:'R$150–250/m²'},
+  {n:'Bambu Guadua (estrutural)',c:'Estrutura',u:'—',co2:'−0,8 (negativo)',custo:'R$80–140/colmo'},
+  {n:'Lã de PET Reciclado',c:'Isolamento',u:'λ=0,038 W/mK',co2:'0,03–0,06',custo:'R$35–55/m²'},
+  {n:'Lã de Rocha Mineral',c:'Isolamento',u:'λ=0,034 W/mK',co2:'0,50–0,80',custo:'R$25–45/m²'},
+  {n:'Aerogel (painel 10mm)',c:'Isolamento',u:'λ=0,015 W/mK',co2:'2,50–4,00',custo:'R$480–960/m²'},
+  {n:'Vidro duplo câmara ar',c:'Esquadria',u:'1,20–1,80 W/m²K',co2:'1,20–1,60',custo:'R$180–320/m²'},
+  {n:'Vidro Low-E',c:'Esquadria',u:'1,00–1,40 W/m²K',co2:'1,30–1,70',custo:'R$220–380/m²'},
+  {n:'Vidro eletrocrômico',c:'Esquadria',u:'0,90–1,20 W/m²K',co2:'3,50–5,00',custo:'R$1.200–2.400/m²'},
+  {n:'Tadelakt (cal marroquina)',c:'Revestimento',u:'—',co2:'0,45',custo:'R$280–420/m²'},
+  {n:'Tinta Argila Arpex',c:'Revestimento',u:'—',co2:'0,05',custo:'R$48/m² (2 demãos)'},
+  {n:'Telhado verde extensivo',c:'Cobertura',u:'0,21 W/m²K',co2:'negativo',custo:'R$220–280/m²'},
+  {n:'Geopolímero (concreto)',c:'Estrutura',u:'—',co2:'0,06–0,10',custo:'Similar ao concreto'},
+  {n:'Madeira TMT (modificada)',c:'Revestimento',u:'—',co2:'negativo',custo:'R$280–520/m²'},
+];
+const ACABAMENTOS={
+  tadelakt:{n:'Tadelakt',matM2:115,base:42,ferra:680,moM2:280},
+  cal:{n:'Reboco Cal + Fibra',matM2:62,base:0,ferra:180,moM2:50},
+  argila:{n:'Tinta Argila Arpex',matM2:48,base:0,ferra:80,moM2:20},
+  stucco:{n:'Stucco Veneziano',matM2:220,base:0,ferra:220,moM2:320},
+  bambu:{n:'Piso Bambu (BLC)',matM2:160,base:18,ferra:120,moM2:45},
+};
+const CERTS={
+  leed:{n:'LEED v5 BD+C (Abril 2025)',cor:'#1565C0',items:[
+    'Descarbonização — NZEB + eletrificação + ACV obrigatório',
+    'Carbono Incorporado — LCA + EPD obrigatória (ISO 14025)',
+    'Energia — M&V datalogger + Arc platform',
+    'Água — Redução ≥30% + medição real',
+    'Materiais — HPD obrigatória para itens principais',
+    'Ecologia — Plano biodiversidade (NOVO v5)',
+    'Qualidade de Vida — CO₂, VOC e PM2.5 monitorados',
+    'Resiliência Climática — avaliação obrigatória (NOVO v5)',
+    'Equidade Social — práticas justas na obra (NOVO v5)',
+    'Registro na plataforma Arc (arc-app.gbci.org)',
+  ]},
+  edge:{n:'EDGE (IFC/Banco Mundial)',cor:'#1976D2',items:[
+    'Energia: redução ≥20% vs. linha de base',
+    'Água: redução ≥20% vs. linha de base',
+    'Carbono incorporado: redução ≥20%',
+    'EPDs dos materiais principais',
+    'Registro em edgebuildings.com',
+  ]},
+  casaazul:{n:'Selo Casa Azul — Caixa',cor:'#0D47A1',items:[
+    'RTQ-R Nível A (PROCEL Edifica)',
+    'Captação pluvial (NBR 15527)',
+    'Coleta seletiva e compostagem',
+    'Ventilação e iluminação natural (NBR 15575)',
+    'Manual do proprietário entregue',
+  ]},
+  greenkey:{n:'GreenKey — Hospitalidade',cor:'#2E7D32',items:[
+    'Política ambiental documentada',
+    'Medição e redução de energia',
+    '100% água sustentável',
+    'Separação de resíduos + compostagem',
+    'Produtos locais e orgânicos',
+  ]},
+  pbqp:{n:'PBQP-H Bioconstrução',cor:'#6A1B9A',items:[
+    'Materiais naturais/reciclados rastreados',
+    'ART assinada em todos os projetos',
+    'Conformidade NBR 15575 e NBR 15220',
+  ]},
+};
+const CHECKLIST=[
+  {f:'Fase 1 — Planejamento',cor:'#0D47A1',items:['Verificar zoneamento e zona de risco','Obter LPLS','Elaborar PGRCC','Submeter ao INEA','Registrar no LEED Arc ou EDGE']},
+  {f:'Fase 2 — Pré-Produção',cor:'#1565C0',items:['Encomendar CLT, SIP e sistemas solar','Instalar cisterna e captação','Executar fundação com SPDA']},
+  {f:'Fase 3 — Montagem',cor:'#1976D2',items:['Montar estrutura CLT + SIP','Instalar sistema FV (NBR 16690)','Instalar inversor + bateria + DPS']},
+  {f:'Fase 4 — Acabamento',cor:'#2196F3',items:['Aplicar tadelakt ou cal','Aplicar tinta Arpex zero VOC','Configurar Home Assistant + IoT','Paisagismo com mudas nativas']},
+  {f:'Fase 5 — Certificação',cor:'#0288D1',items:['Solicitar Habite-se','Homologação ANEEL FV','Auditoria LEED/EDGE','Manual digital ao hóspede']},
+];
+const MODELOS=[
+  {id:'chale',icon:'🏡',n:'Chalé Individual',e:'1 un · 60–120m²',s:'8–12 kWp',c:'EDGE + LEED Gold',cor:'#E8F5E9'},
+  {id:'conjunto',icon:'🏘️',n:'Conjunto (3–5)',e:'3–5 un · terreno único',s:'25–40 kWp',c:'EDGE + LEED Gold',cor:'#EDE7F6'},
+  {id:'sede',icon:'🏢',n:'Sede Physis',e:'200–400m²',s:'15–25 kWp',c:'LEED Platinum',cor:'#FFF9C4'},
+  {id:'hotel',icon:'🏨',n:'Hotel Boutique',e:'8–15 quartos',s:'60–100 kWp',c:'LEED Gold',cor:'#FCE4EC'},
+];
+const AGRO_CARGAS=[
+  {n:'Bomba irrigação gotejamento',p:750,h:6,on:false},
+  {n:'Câmara fria 10m³',p:2200,h:16,on:false},
+  {n:'Resfriador de leite',p:1800,h:6,on:false},
+  {n:'Debulhadora / trilhadora',p:3000,h:3,on:false},
+  {n:'Ordenhadeira mecânica',p:1100,h:2,on:false},
+  {n:'Iluminação LED galpão',p:200,h:12,on:false},
+  {n:'Hub IoT / monitoramento',p:5,h:24,on:false},
+];
+
+const CIDADE_OPTIONS = `<option value="Petrópolis — RJ">Petrópolis — RJ</option>
+<option value="Rio de Janeiro — RJ">Rio de Janeiro — RJ</option>
+<option value="São Paulo — SP">São Paulo — SP</option>
+<option value="Brasília — DF">Brasília — DF</option>
+<option value="Belo Horizonte — MG">Belo Horizonte — MG</option>
+<option value="Curitiba — PR">Curitiba — PR</option>
+<option value="Salvador — BA">Salvador — BA</option>
+<option value="João Pessoa — PB">João Pessoa — PB</option>
+<option value="Manaus — AM">Manaus — AM</option>
+<option value="Tunis — Tunísia">Tunis — Tunísia</option>
+<option value="Amsterdã — Holanda">Amsterdã — Holanda</option>
+`;
+
+
+// ── State ─────────────────────────────────
+let solarModo = 'pior';
+let acab = 'tadelakt';
+let acaplic = 'prof';
+let certAtual = 'leed';
+let certStatus = {};
+let chkState = {};
+let modeloSel = 'chale';
+let matCat = 'Todos';
+let agroCarg = AGRO_CARGAS.map(c=>({...c}));
+
+// ── Solar ──────────────────────────────────
+function setModo(m){
+  solarModo=m;
+  $('p-pior').classList.toggle('active',m==='pior');
+  $('p-media').classList.toggle('active',m==='media');
+  calcSolar();
+}
+function calcSolar(){
+  const cid=sel('s-cidade');
+  if(!cid||!CIDADES[cid]){set('r-potmin','—');return;}
+  const c=CIDADES[cid];
+  const hps=solarModo==='pior'?c.hpsMin:c.hps;
+  const pr=0.78, consumo=val('s-consumo'), pot=val('s-pot');
+  const auto=val('s-auto'), dod=parseFloat(sel('s-dod')||0.90);
+  const areaT=val('s-area'), pess=val('s-pess');
+  const potMin=(consumo/(hps*pr)).toFixed(1);
+  const ger=Math.round(pot*hps*365*pr);
+  const saldo=ger-consumo*365;
+  const capBat=Math.round((consumo*(auto/24))/dod*1.2);
+  const captacao=Math.round((c.prec/1000)*(areaT*0.85)*1000/365);
+  const consumoAgua=pess*130;
+  $('s-hps-info').innerText=`HPS: ${hps}h/dia · PR: ${pr} · PVGIS ERA5`;
+  set('r-potmin',potMin+' kWp');
+  set('r-pot',pot+' kWp');
+  set('r-ger',fmt(ger)+' kWh/ano');
+  set('r-bat',capBat+' kWh');
+  set('r-cap',fmt(captacao)+' L/dia');
+  set('r-agua',fmt(consumoAgua)+' L/dia');
+  statusBox('r-nzeb',saldo>=0,saldo>=0?'✅ NZEB alcançado':'⚠️ Déficit energético',`Saldo: ${saldo>0?'+':''}${fmt(saldo)} kWh/ano`);
+  statusBox('r-agua-status',captacao>=consumoAgua,captacao>=consumoAgua?'✅ Autossuficiente em água':'⚠️ Complementar com poço/rede','');
+}
+
+// ── Materiais ──────────────────────────────
+function calcMat(){
+  const cid=sel('m-cidade');
+  if(!cid||!CIDADES[cid])return;
+  const c=CIDADES[cid];
+  const mat=MAT_ZONA[c.zona];
+  const box=$('m-zona-box');
+  if(box)box.style.background=mat.cor;
+  set('m-zona-label',mat.l+` · HPS: ${c.hps}h/dia`);
+  const rec=$('m-rec');
+  if(rec)rec.innerHTML=[['🏗️',mat.e],['🧱',mat.v],['🌡️',mat.i],['🏠',mat.c],['🪟',mat.es]].map(([i,v])=>`<div style="padding:7px 9px;background:#F4F7F4;border-radius:8px;margin-bottom:4px"><div style="font-size:10px;color:#6B7F6E">${i}</div><div style="font-size:11px;font-weight:600;color:#074031">${v}</div></div>`).join('');
+}
+function renderMat(){
+  const busca=$('m-busca')?.value.toLowerCase()||'';
+  const grid=$('m-grid');
+  if(!grid)return;
+  const filtered=MATERIAIS.filter(m=>(matCat==='Todos'||m.c===matCat)&&m.n.toLowerCase().includes(busca));
+  grid.innerHTML=filtered.map(m=>`<div class="mat-card"><div class="mat-name">${m.n}</div><span class="mat-cat">${m.c}</span><div class="mat-row"><span class="mat-key">U/λ</span><span class="mat-val">${m.u}</span></div><div class="mat-row"><span class="mat-key">CO₂</span><span class="mat-val">${m.co2}</span></div><div class="mat-row"><span class="mat-key">Custo</span><span class="mat-val">${m.custo}</span></div></div>`).join('');
+  const cats=['Todos',...new Set(MATERIAIS.map(m=>m.c))];
+  const filt=$('m-filters');
+  if(filt)filt.innerHTML=cats.map(c=>`<button class="filter-btn${matCat===c?' active':''}" onclick="matCat='${c}';renderMat()">${c}</button>`).join('');
+}
+
+// ── Orientação Solar ───────────────────────
+function calcOri(){
+  const lat=val('o-lat');
+  const mes=parseInt(sel('o-mes'));
+  const N=[15,46,74,105,135,166,196,227,258,288,319,349][mes-1];
+  const decl=23.45*Math.sin(Math.PI/180*(360/365*(284+N)));
+  const latR=lat*Math.PI/180;
+  const declR=decl*Math.PI/180;
+  const ws_=Math.acos(Math.max(-1,Math.min(1,-Math.tan(latR)*Math.tan(declR))))*180/Math.PI;
+  const dur=(2*ws_/15).toFixed(1);
+  const alt=Math.asin(Math.sin(latR)*Math.sin(declR)+Math.cos(latR)*Math.cos(declR))*180/Math.PI;
+  const incOtima=Math.abs(lat).toFixed(1);
+  const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const hpsAll=meses.map((_,i)=>{
+    const nn=[15,46,74,105,135,166,196,227,258,288,319,349][i];
+    const dd=23.45*Math.sin(Math.PI/180*(360/365*(284+nn)));
+    const w2=Math.acos(Math.max(-1,Math.min(1,-Math.tan(latR)*Math.tan(dd*Math.PI/180))))*180/Math.PI;
+    return +(2*w2/15*0.4).toFixed(1);
+  });
+  const maxH=Math.max(...hpsAll);
+  $('o-results').innerHTML=[
+    ['Declinação solar',decl.toFixed(2)+'°'],['Duração do dia',dur+'h'],
+    ['Altitude solar',alt.toFixed(1)+'°'],['HPS estimadas',+(dur*0.4).toFixed(1)+'h/dia'],
+    ['Inclinação ótima',incOtima+'°'],['Fachada principal',lat<0?'Norte (0°)':'Sul (180°)'],
+  ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #D4E8D0;font-size:12px"><span style="color:#6B7F6E">${l}</span><span style="font-weight:700;color:#074031">${v}</span></div>`).join('');
+  $('o-chart').innerHTML=hpsAll.map((h,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px"><div style="font-size:7px;color:${i===mes-1?'#074031':'#6B7F6E'};font-weight:${i===mes-1?700:400}">${h}</div><div style="width:100%;height:${Math.round(h/maxH*72)}px;background:${i===mes-1?'#074031':'#81A969'};border-radius:2px 2px 0 0"></div><div style="font-size:7px;color:${i===mes-1?'#074031':'#6B7F6E'};font-weight:${i===mes-1?700:400}">${meses[i]}</div></div>`).join('');
+  $('o-fachadas').innerHTML=[['Norte','40–60% abertura · beiral 80–100cm'],['Sul','15–25% · luz difusa'],['Leste','20–30% · brise vertical'],['Oeste','≤20% · máxima proteção']].map(([f,d])=>`<div style="padding:6px 9px;background:#fff;border-radius:7px;margin-bottom:4px;border:1px solid #D4E8D0"><span style="font-size:11px;font-weight:700;color:#074031">${f}: </span><span style="font-size:11px;color:#1C2B22">${d}</span></div>`).join('');
+}
+
+// ── Certificações ──────────────────────────
+function renderCerts(){
+  const sb=$('cert-sidebar');
+  if(!sb)return;
+  sb.innerHTML=Object.entries(CERTS).map(([k,c])=>{
+    const total=c.items.length;
+    const ok=c.items.filter((_,i)=>certStatus[k+'_'+i]==='✅ Atende').length;
+    const pct=Math.round(ok/total*100);
+    return `<button class="cert-btn${certAtual===k?' active':''}" style="--cert-cor:${c.cor}" onclick="certAtual='${k}';renderCerts()"><div class="cert-btn-title" style="color:${certAtual===k?c.cor:'#1C2B22'}">${c.n}</div><div class="cert-btn-bar"><div class="cert-btn-fill" style="width:${pct}%;background:${c.cor}"></div></div><div class="cert-btn-pct">${pct}%</div></button>`;
+  }).join('');
+  const c=CERTS[certAtual];
+  const total=c.items.length;
+  const ok=c.items.filter((_,i)=>certStatus[certAtual+'_'+i]==='✅ Atende').length;
+  const pct=Math.round(ok/total*100);
+  const statusOpts=['✅ Atende','⚠️ Parcial','❌ Não atende','⬜ N/A'];
+  const statusBg={'✅ Atende':'#C8E6C9','⚠️ Parcial':'#FFE0B2','❌ Não atende':'#FFCDD2','⬜ N/A':'#E3F2FD'};
+  const counts=statusOpts.reduce((a,o)=>{a[o]=c.items.filter((_,i)=>certStatus[certAtual+'_'+i]===o).length;return a;},{});
+  $('cert-panel').innerHTML=`
+    <div class="cert-header"><div><div style="font-weight:700;font-size:13px;color:#1C2B22">${c.n}</div><div style="font-size:11px;color:#6B7F6E">${total} critérios</div></div>
+    <div class="cert-pct-box" style="background:${c.cor}20"><div class="cert-pct-num" style="color:${c.cor}">${pct}%</div><div class="cert-pct-label">atendido</div></div></div>
+    <div class="cert-bar"><div class="cert-bar-fill" style="width:${pct}%;background:${c.cor}"></div></div>
+    ${c.items.map((item,i)=>{const key=certAtual+'_'+i;const v=certStatus[key]||'';return`<div class="crit-row" style="background:${statusBg[v]||'#F4F7F4'};border-color:${v?statusBg[v]:'#D4E8D0'}"><span class="crit-text">${item}</span><select class="crit-sel" style="background:${statusBg[v]||'#fff'}" onchange="certStatus['${key}']=this.value;renderCerts()"><option value="">— selecionar —</option>${statusOpts.map(o=>`<option value="${o}"${v===o?' selected':''}>${o}</option>`).join('')}</select></div>`}).join('')}
+    <div class="counts">${statusOpts.map(o=>`<div class="count-pill" style="background:${statusBg[o]}">${o}: ${counts[o]||0}</div>`).join('')}</div>`;
+}
+
+// ── Acabamentos ────────────────────────────
+function setAcab(k){acab=k;renderAcabList();calcAcab();}
+function setAplic(v){acaplic=v;$('ap-prof').classList.toggle('active',v==='prof');$('ap-diy').classList.toggle('active',v==='diy');calcAcab();}
+function renderAcabList(){
+  const el=$('acab-list');
+  if(!el)return;
+  el.innerHTML=Object.entries(ACABAMENTOS).map(([k,a])=>`<button onclick="setAcab('${k}')" style="display:flex;justify-content:space-between;width:100%;padding:8px 11px;border-radius:9px;margin-bottom:5px;text-align:left;cursor:pointer;font-family:inherit;border:1px solid ${acab===k?'#074031':'#D4E8D0'};background:${acab===k?'#EEF8EB':'#fff'}"><span style="font-size:12px;font-weight:${acab===k?700:400};color:${acab===k?'#074031':'#1C2B22'}">${a.n}</span><span style="font-size:11px;color:#6B7F6E">~R$${a.matM2}/m²</span></button>`).join('');
+}
+function calcAcab(){
+  const a=ACABAMENTOS[acab]; if(!a)return;
+  const area=val('acab-area');
+  const mat=(a.matM2+a.base)*area;
+  const mo=acaplic==='diy'?0:a.moM2*area;
+  const total=mat+a.ferra+mo;
+  set('a-mat','R$ '+fmt(Math.round(mat)));
+  set('a-ferra','R$ '+fmt(a.ferra));
+  set('a-mo',acaplic==='diy'?'R$ 0 (DIY)':'R$ '+fmt(Math.round(mo)));
+  set('a-total','R$ '+fmt(Math.round(total)));
+  set('a-m2','R$ '+fmt(Math.round(total/area))+'/m²');
+}
+
+// ── Checklist ──────────────────────────────
+function renderChk(){
+  const grid=$('chk-grid');
+  if(!grid)return;
+  const total=CHECKLIST.reduce((a,f)=>a+f.items.length,0);
+  const done=Object.values(chkState).filter(Boolean).length;
+  const pct=Math.round(done/total*100);
+  set('chk-total',`${done}/${total} (${pct}%)`);
+  $('chk-bar').style.width=pct+'%';
+  $('chk-bar').style.background=pct===100?'#2E7D32':'#51774B';
+  grid.innerHTML=CHECKLIST.map((f,fi)=>`<div class="card" style="padding:12px 14px"><div style="font-weight:700;font-size:11px;color:${f.cor};margin-bottom:6px">${f.f}</div>${f.items.map((item,ii)=>{const key=fi+'_'+ii;const d=chkState[key];return`<div class="chk-item${d?' done':''}" onclick="chkState['${key}']=!chkState['${key}'];renderChk()"><div class="chk-box">${d?'✓':''}</div><span class="chk-text">${item}</span></div>`}).join('')}</div>`).join('');
+}
+
+// ── Modelos ────────────────────────────────
+function renderModelos(){
+  $('mod-btns').innerHTML=MODELOS.map(m=>`<button class="model-btn${modeloSel===m.id?' active':''}" onclick="modeloSel='${m.id}';renderModelos()"><div class="model-icon">${m.icon}</div><div class="model-name">${m.n}</div><div class="model-scale">${m.e}</div></button>`).join('');
+  const m=MODELOS.find(x=>x.id===modeloSel);
+  $('mod-detail').innerHTML=`
+    <div class="card" style="background:${m.cor}">
+      <div style="font-weight:700;font-size:14px;margin-bottom:10px">${m.icon} ${m.n}</div>
+      ${[['Escala',m.e],['Solar',m.s],['Certificação',m.c]].map(([l,v])=>`<div class="info-row"><div class="info-lbl">${l}</div><div class="info-val">${v}</div></div>`).join('')}
+    </div>
+    <div class="card">
+      <div style="font-weight:700;font-size:12px;color:#074031;margin-bottom:8px">📋 Próximos passos</div>
+      ${['Definir terreno e verificar zoneamento','Registrar no LEED Arc ou EDGE','Contratar equipe técnica especializada','Elaborar PGRCC antes das obras','Solicitar LPLS e licença INEA'].map((p,i)=>`<div style="font-size:11px;padding:5px 0;border-bottom:1px solid #D4E8D0;color:#1C2B22">${i+1}. ${p}</div>`).join('')}
+    </div>`;
+}
+
+// ── Agro ───────────────────────────────────
+function renderAgro(){
+  const el=$('agro-list');
+  if(!el)return;
+  el.innerHTML=agroCarg.map((c,i)=>`<div class="agro-item${c.on?' on':''}" onclick="agroCarg[${i}].on=!agroCarg[${i}].on;renderAgro();calcAgro()"><div class="agro-chk">${c.on?'✓':''}</div><span class="agro-nome">${c.n}</span><span class="agro-kwh">${(c.p*c.h/1000).toFixed(1)} kWh</span></div>`).join('');
+}
+function calcAgro(){
+  const totalKwh=agroCarg.filter(c=>c.on).reduce((a,c)=>a+c.p*c.h/1000,0);
+  const hps=val('ag-hps');
+  const potMin=(totalKwh/(hps*0.75)).toFixed(1);
+  const capBat=Math.round(totalKwh*2/0.80*1.2);
+  set('ag-cons',totalKwh.toFixed(1)+' kWh');
+  set('ag-pot',potMin+' kWp');
+  set('ag-bat',capBat+' kWh');
+}
+
+// ── Init ───────────────────────────────────
+function initApp(){
+  // Populate selects
+  ['s-cidade','m-cidade'].forEach(id=>{if($(id))$(id).innerHTML='<option value="">Selecionar...</option>'+CIDADE_OPTIONS;});
+  calcSolar(); calcMat(); calcOri(); renderCerts(); renderAcabList(); calcAcab(); renderChk(); renderModelos(); renderAgro(); calcAgro(); renderMat(); calcCarbon(); renderPrecos();
+}
+
+
+
+// ── Carbono ────────────────────────────────────────────────────
+var FATOR = {
+  rede: 0.0289,        // tCO2/MWh — fator médio SIN 2024 (MCTI/SIRENE)
+  diesel: 0.7400,      // kgCO2e/kWh gerado no gerador diesel
+  biogas: 2.7500       // kgCO2e evitados por m³ biogás que deixou de ser metano solto
+};
+
+var METODOLOGIAS = [
+  {n:'ISO 14064-1:2018',desc:'Inventário de GEE — quantificação e reporte',status:'parcial'},
+  {n:'ISO 14064-3:2019',desc:'Verificação e validação de inventário',status:'pendente'},
+  {n:'ISO 14065:2020',desc:'Norma do organismo verificador',status:'pendente'},
+  {n:'ISO 14068-1:2023',desc:'Neutralidade de carbono — publicada',status:'parcial'},
+  {n:'GHG Protocol Brasil',desc:'Registro público com selo — formato de cliente e banco',status:'parcial'},
+  {n:'IPMVP (Opções A–D)',desc:'Medição e Verificação de economia energética',status:'parcial'},
+  {n:'ASHRAE 90.1-2022',desc:'Eficiência energética — linha de base',status:'pendente'},
+  {n:'ISO 50001:2018',desc:'Sistema de Gestão de Energia',status:'parcial'},
+  {n:'ISO 14001:2015',desc:'Sistema de Gestão Ambiental',status:'pendente'},
+];
+
+var REGIMES = [
+  {n:'Carbono Neutro (ISO 14068-1)',req:'Inventário verificado + compensação do saldo',campo:'saldo'},
+  {n:'Net Zero (Science Based Targets)',req:'Redução ≥90% + compensação do restante',campo:'reducao90'},
+  {n:'GHG Protocol — Escopo 1+2',req:'Inventário Escopos 1 e 2 completo',campo:'esc12'},
+  {n:'LEED v5 — Descarbonização',req:'NZEB + LCA obrigatório',campo:'leed'},
+  {n:'EDGE — Carbono Incorporado',req:'Redução ≥20% no carbono dos materiais',campo:'edge'},
+];
+
+function fmtCO2(val){
+  var abs = Math.abs(val);
+  if(abs >= 1000) return (val/1000).toFixed(2)+' tCO₂e';
+  return val.toFixed(1)+' kgCO₂e';
+}
+
+function calcCarbon(){
+  var rede=val('c-rede'), solar=val('c-solar'), injeta=val('c-injeta');
+  var diesel=val('c-diesel'), biogas=val('c-biogas');
+  var clt=val('c-clt'), conc=val('c-conc'), aco=val('c-aco'), bambu=val('c-bambu');
+
+  // Operacional
+  var emRede   = (rede/1000) * FATOR.rede * 1000;            // kgCO2e
+  var emDiesel = diesel * FATOR.diesel;                       // kgCO2e
+  var autocons = solar - injeta;
+  var evSolar  = ((autocons + injeta)/1000) * FATOR.rede * 1000;
+  var evBiogas = biogas * FATOR.biogas;
+  var saldoFirme = emRede + emDiesel - evSolar;
+  var saldoTotal = saldoFirme - evBiogas;
+
+  // Incorporado
+  var incClt  = clt * -1500;
+  var incConc = conc * 210;
+  var incAco  = aco * 0.9;
+  var incBambu= bambu * -40;
+  var incorp  = incClt + incConc + incAco + incBambu;
+
+  // Display
+  set('r-em-rede',   fmtCO2(emRede));
+  set('r-em-diesel', fmtCO2(emDiesel));
+  set('r-ev-solar',  '−'+fmtCO2(evSolar));
+  set('r-ev-bio',    '−'+fmtCO2(evBiogas));
+  set('r-saldo-firme', fmtCO2(saldoFirme));
+  set('r-saldo-total', fmtCO2(saldoTotal));
+  set('r-incorp', fmtCO2(incorp));
+
+  var ok = saldoTotal <= 0 && incorp <= 0;
+  var parcial = saldoTotal <= 0 || incorp <= 0;
+  $('r-carbon-status').className = 'status-box '+(ok?'status-ok':parcial?'':'status-err');
+  $('r-carbon-status').innerHTML =
+    ok ? '<div class="status-title">✅ Net Zero — saldo negativo em operação e materiais</div>' :
+    parcial ? '<div class="status-title" style="color:#E65100">⚠️ Parcialmente Net Zero — um dos balanços ainda positivo</div>' :
+    '<div class="status-title">❌ Balanço positivo — ações de redução necessárias</div>';
+
+  // Regimes
+  $('c-regimes').innerHTML = REGIMES.map(function(r){
+    var alcanca = false;
+    if(r.campo==='saldo') alcanca = saldoTotal <= 0;
+    else if(r.campo==='esc12') alcanca = rede > 0;
+    else if(r.campo==='leed') alcanca = solar > 0 && incorp < 0;
+    else if(r.campo==='edge') alcanca = incorp < 0;
+    else alcanca = saldoTotal <= 0 && incorp <= 0;
+    var bg = alcanca ? '#C8E6C9' : '#F4F7F4';
+    var ic = alcanca ? '✅' : '⚠️';
+    return '<div style="padding:8px 10px;background:'+bg+';border-radius:8px;margin-bottom:5px">'+
+      '<div style="font-size:12px;font-weight:600;color:#074031">'+ic+' '+r.n+'</div>'+
+      '<div style="font-size:10px;color:#6B7F6E;margin-top:2px">'+r.req+'</div></div>';
+  }).join('');
+
+  // Metodologias
+  var stBg = {atende:'#C8E6C9',parcial:'#FFE0B2',pendente:'#F4F7F4'};
+  var stLbl = {atende:'✅ Atende',parcial:'⚠️ Parcial',pendente:'⬜ Pendente'};
+  $('c-metodologias').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+
+    METODOLOGIAS.map(function(m){
+      return '<div style="padding:9px 11px;background:'+stBg[m.status]+';border-radius:8px">'+
+        '<div style="font-size:11px;font-weight:700;color:#074031">'+m.n+'</div>'+
+        '<div style="font-size:10px;color:#6B7F6E;margin:2px 0">'+m.desc+'</div>'+
+        '<div style="font-size:10px;font-weight:600;color:#374151">'+stLbl[m.status]+'</div></div>';
+    }).join('')+'</div>';
+}
+
+
+// Dados de referência vindos da Memória de Cálculo Physis (Abril 2025)
+var REF_CUSTOS = [
+  ['Terreno (1.200m² Itaipava/Petrópolis)','R$ 80.000'],
+  ['Projetos técnicos + licenças','R$ 25.000'],
+  ['Estrutura pré-fabricada SIP + CLT (84m²)','R$ 155.000'],
+  ['Sistema solar FV (10kWp + inversor + bateria)','R$ 55.000'],
+  ['Biogás + purificação de água','R$ 28.000'],
+  ['Automação completa (hub + sensores + câmeras)','R$ 18.000'],
+  ['Acabamentos premium','R$ 65.000'],
+  ['Mobília e enxoval Airbnb','R$ 35.000'],
+  ['Paisagismo + horta + deck','R$ 22.000'],
+  ['Reserva técnica (10%)','R$ 37.000'],
+];
+var REF_ROI = [
+  ['CAPEX total','R$ 520.000'],
+  ['Diária média Ano 1','R$ 780'],
+  ['Diária média Ano 2','R$ 920'],
+  ['Taxa de ocupação Ano 2','68%'],
+  ['Receita bruta Ano 2','R$ 228.000'],
+  ['Lucro líquido Ano 2','R$ 146.000'],
+  ['Payback estimado','3,8 anos'],
+  ['TIR (5 anos)','≈ 26% a.a.'],
+  ['Valor patrimonial Ano 5','≈ R$ 820.000'],
+];
+function renderPrecos(){
+  var el=document.getElementById('ref-items'); if(!el) return;
+  el.innerHTML=REF_CUSTOS.map(function(r){
+    return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #D4E8D0;font-size:11px"><span style="color:#1C2B22">'+r[0]+'</span><span style="font-weight:700;color:#074031">'+r[1]+'</span></div>';
+  }).join('');
+  var el2=document.getElementById('roi-items'); if(!el2) return;
+  el2.innerHTML=REF_ROI.map(function(r,i){
+    var hi=i===6||i===7;
+    return '<div style="display:flex;justify-content:space-between;padding:6px 8px;border-radius:6px;margin-bottom:3px;background:'+(hi?'#EEF8EB':'#F4F7F4')+'"><span style="font-size:11px;color:#1C2B22">'+r[0]+'</span><span style="font-size:12px;font-weight:800;color:'+(hi?'#074031':'#1C2B22')+'">'+r[1]+'</span></div>';
+  }).join('');
+}
+
+// Modo Apresentação — esconde abas sem dados
+var modoApresAtivo = false;
+var ABAS_DADOS = {
+  't-solar': function(){ return document.getElementById('s-cidade')?.value !== ''; },
+  't-mat': function(){ return document.getElementById('m-cidade')?.value !== ''; },
+  't-ori': function(){ return true; },
+  't-certs': function(){ return Object.keys(certStatus).length > 0; },
+  't-acab': function(){ return true; },
+  't-check': function(){ return Object.keys(chkState).filter(function(k){return chkState[k];}).length > 0; },
+  't-modelos': function(){ return true; },
+  't-agro': function(){ return agroCarg.filter(function(c){return c.ativo;}).length > 0; },
+  't-carbono': function(){ return val('c-rede') > 0 || val('c-solar') > 0; },
+  't-precos': function(){ return true; },
+};
+function toggleModoApresentacao(){
+  modoApresAtivo = !modoApresAtivo;
+  var btn = document.getElementById('btn-apresentacao');
+  if(btn) btn.style.background = modoApresAtivo ? '#81A969' : 'rgba(255,255,255,0.1)';
+  if(btn) btn.style.color = modoApresAtivo ? '#074031' : '#81A969';
+  if(btn) btn.textContent = modoApresAtivo ? '✅ Apresentação Ativa' : '📊 Modo Apresentação';
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    var tabId = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+    if(tabId && ABAS_DADOS[tabId]){
+      if(modoApresAtivo && !ABAS_DADOS[tabId]()){
+        btn.style.display = 'none';
+      } else {
+        btn.style.display = '';
+      }
+    }
+  });
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', function(){
+  if(typeof initApp === 'function') initApp();
+});
+</script>
+</body>
+</html>

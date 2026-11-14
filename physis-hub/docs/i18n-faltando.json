@@ -1,0 +1,91 @@
+{
+ "Loja": [
+  "Português",
+  "SGI",
+  "SustainKit Cert",
+  "SustainKit Energy",
+  "SustainKit Materials",
+  "SustainKit Water"
+ ],
+ "Projeto personalizado": [
+  "Português",
+  "SGI",
+  "SustainKit Cert",
+  "SustainKit Energy",
+  "SustainKit Materials",
+  "SustainKit Water"
+ ],
+ "Pagamento": [
+  "Português"
+ ],
+ "Recibo": [
+  "Excel",
+  "Maria · 000.000.000-00",
+  "PDF",
+  "Physis Engineering",
+  "Português",
+  "Word"
+ ],
+ "Primeiro acesso": [
+  "Português"
+ ],
+ "Início · Perfil": [
+  "Excel",
+  "PDF",
+  "Português",
+  "SCADA",
+  "SustainKit",
+  "Word"
+ ],
+ "Início · Lugar": [
+  "Excel",
+  "PDF",
+  "Português",
+  "SCADA",
+  "SustainKit",
+  "Word"
+ ],
+ "Monitoramento verde": [
+  "13,1 min",
+  "24,2 min",
+  "24,3 min",
+  "33,2 min",
+  "49,6 min",
+  "8,3 min",
+  "Excel",
+  "ID:01,U1:39.5,IR1:0,U2:40.2,IR2:0,T:27.2,UAR:62.7,TSOLO:23.2,P1:13.1,P2:13.1,LIM1:30.0,LIM2:30.0,BAT:4.07,TS:1794672477,RSSI:-108.4,SNR:1.5",
+  "PDF",
+  "Português",
+  "SCADA",
+  "SustainKit",
+  "Word"
+ ],
+ "Qualidade da água": [
+  "0,003 pH por °C",
+  "Excel",
+  "PDF",
+  "Português",
+  "Quatro calibrações de exemplo carregadas.",
+  "SCADA",
+  "SustainKit",
+  "Word"
+ ],
+ "Gestão": [
+  "Excel",
+  "PDF",
+  "Português",
+  "Quatro calibrações de exemplo carregadas.",
+  "SCADA",
+  "SustainKit",
+  "Word"
+ ],
+ "Resumo": [
+  "Excel",
+  "PDF",
+  "Português",
+  "Quatro calibrações de exemplo carregadas.",
+  "SCADA",
+  "SustainKit",
+  "Word"
+ ]
+}

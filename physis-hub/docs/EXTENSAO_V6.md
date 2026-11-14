@@ -1,0 +1,79 @@
+# Extensao da linha V6 para outros dispositivos via ESP
+
+Versao 0.1 · 13/11/2026 · proposta para aprovacao. Fonte normativa da linha base:
+`controle-central/PROTOCOLO.md` e os dois `protocolo.cpp` (revisao de 26/10/2026).
+
+## 1. Principio
+
+O Receptor V6 ja aceita chaves desconhecidas e repassa a linha inteira ao Raspberry
+(`lora.cpp`: a linha vai para a fila do Pi como chegou, com `RSSI` e `SNR` ao fim).
+Entao um dispositivo novo entra na rede **sem mudar o firmware do receptor**, desde que:
+
+1. envie `ID:<01..99>` unico no receptor (gravado na NVS, como no Transmissor V6);
+2. envie `TIPO:<codigo>` para dizer o que e;
+3. use ponto decimal, `-` para "sem leitura" e uma mensagem por linha;
+4. caiba em 240 caracteres;
+5. se for LoRa, entre no TDMA (ouve o beacon, transmite so no proprio slot);
+6. se tiver atuador, feche sozinho por tempo, dentro do proprio dispositivo.
+
+Sem `TIPO`, a linha e do no de solo e irrigacao (compatibilidade com o que esta em campo).
+
+## 2. Tipos
+
+| TIPO | Dispositivo | Chaves | Exemplo |
+|---|---|---|---|
+| (ausente) ou `SOLO` | Transmissor V6 | `U1 IR1 U2 IR2 T UAR TSOLO P1 P2 LIM1 LIM2 BAT TS` | `ID:03,U1:45.2,IR1:1,U2:50.0,IR2:0,T:27.5,UAR:63.5,TSOLO:23.1,P1:12.5,P2:-1,LIM1:30.0,LIM2:30.0,BAT:3.87,TS:1786000000` |
+| `ZONA` | Caixinha: 2 zonas e 1 bomba | `U1 IR1 U2 IR2 BOMBA TMAX LIM1 LIM2 BAT TS` | `ID:21,TIPO:ZONA,U1:41.0,IR1:1,U2:38.5,IR2:0,BOMBA:1,TMAX:15,LIM1:35.0,LIM2:35.0,BAT:-,TS:1794600000` |
+| `COL` | Coleira | `LAT LON GPS ATV IMP BAT TS` | `ID:41,TIPO:COL,LAT:-22.51003,LON:-43.18012,GPS:1,ATV:1,IMP:0,BAT:3.92,TS:1794600000` |
+| `COM` | Comedouro | `NIV PORC TAG BLOQ BAT TS` | `ID:71,TIPO:COM,NIV:62.0,PORC:3,TAG:A1B2,BLOQ:0,BAT:-,TS:1794600000` |
+
+Significados novos:
+
+- `BOMBA` 0/1. Regra do dispositivo: bomba so liga com `IR1` ou `IR2` em 1; ao fechar a
+  ultima valvula, desliga a bomba **antes**. O hub gera alarme se receber `BOMBA:1` com as
+  duas valvulas em 0.
+- `TMAX` minutos maximos de rega por acionamento, aplicado no dispositivo.
+- `ATV` 0 = repouso, 1 = caminhando, 2 = correndo. `IMP` 0/1 = impacto desde a ultima linha.
+  `GPS` 0/1 = posicao valida; com 0, `LAT`/`LON` vao como `-`.
+- `NIV` percentual de racao no reservatorio. `PORC` porcoes servidas no dia. `TAG` ultima
+  tag lida (hexadecimal, sem `,` `;` `:`). `BLOQ` 1 = limite diario atingido.
+
+## 3. Comandos
+
+Valem as 7 acoes do contrato, sem acrescimo nesta versao:
+
+| Acao | SOLO | ZONA | COL | COM |
+|---|---|---|---|---|
+| `LIM1`, `LIM2` | limite da media | limite da zona 1 e da zona 2 | ignora | ignora |
+| `IRR1` | valvula | valvula da zona 1 | ignora | ignora |
+| `IRR2` | recusa (sem segundo rele) | valvula da zona 2 | ignora | ignora |
+| `MODO` | AUTO/MANUAL | AUTO/MANUAL | ignora | ignora |
+| `SYNC`, `PING` | sim | sim | sim | sim |
+
+Acoes novas (por exemplo, servir porcao ou mudar o limite diario do comedouro) so entram
+junto nos dois `protocolo.cpp`, no `physis_hub/protocolo.py` e no `PROTOCOLO.md`.
+
+## 4. Caminhos fisicos
+
+| Dispositivo | Hoje | Caminho na primeira fase |
+|---|---|---|
+| Transmissor V6 | Heltec V3, LoRa TDMA | Sem mudanca |
+| Caixinha | ESP32 DevKit, Wi-Fi, ESPHome | Firmware proprio que fala a linha V6 por Wi-Fi com o hub: `POST /api/v6/linha` (referencia em `firmware_ref/no_wifi_v6`). A resposta do hub ja traz os comandos pendentes |
+| Coleira | T-Beam (SX1276), LoRa livre | Portar para RadioLib (aceita SX1276) com os mesmos parametros de radio e o cliente TDMA do Transmissor V6; ate la, so simulada |
+| Comedouro | Arduino Mega, sem rede | Mega envia a linha pela serial a um ESP32 que a repassa ao hub por Wi-Fi; ou portar para ESP32 |
+
+## 5. Mapeamento para physis/1
+
+Feito em `physis_hub/adaptador.py`. Ativo = `<lugar>-no<ID>` com sufixo quando ha mais de um ponto.
+
+| Chave | Grandeza | Ativo |
+|---|---|---|
+| `U1`, `U2` | `umidade_solo` | `-a`, `-b` |
+| media de `U1` e `U2` (so SOLO) | `umidade_solo` | sem sufixo |
+| `IR1`, `IR2`, `BOMBA` | `estado` | `-valvula1`, `-valvula2`, `-bomba` |
+| `P1` (quando >= 0) | `previsao_min` | sem sufixo |
+| `T`, `UAR`, `TSOLO` | `temperatura`, `umidade`, `temperatura` | `-ar`, `-ar`, `-solo` |
+| `BAT`, `RSSI`, `SNR` | `bateria`, `rssi`, `snr` | sem sufixo |
+| `LAT`, `LON` (com `GPS:1`) | `latitude`, `longitude` | sem sufixo |
+| `ATV`, `IMP` | `atividade`, `impacto` | sem sufixo |
+| `NIV`, `PORC` | `nivel`, `porcoes` | sem sufixo |

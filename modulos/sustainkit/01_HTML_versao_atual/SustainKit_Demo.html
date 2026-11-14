@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physis SustainKit — Demo</title>
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#F4F7F4;min-height:100vh}
+.header{padding:14px 20px 0;display:flex;flex-direction:column}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:17px}
+.logo-title{font-weight:800;font-size:16px;color:#fff;letter-spacing:-0.02em}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.7)}
+.badge{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:3px 11px;font-size:11px;font-weight:700;color:#fff}
+.tabs{display:flex;overflow-x:auto;gap:1px}
+.tab-btn{padding:8px 14px;border:none;background:transparent;cursor:pointer;font-weight:400;font-size:12px;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.2s;display:flex;align-items:center;gap:4px;white-space:nowrap;color:rgba(255,255,255,0.5)}
+.tab-btn.active{font-weight:700;color:#fff;border-bottom-color:#81A969}
+.content{max-width:1000px;margin:14px auto;padding:0 16px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.card{background:#fff;border:1px solid #D4E8D0;border-radius:12px;padding:15px 17px;box-shadow:0 2px 8px rgba(7,64,49,0.06)}
+.card-pale{background:#EEF8EB}
+.sec-title{font-weight:700;font-size:13px;margin-bottom:10px}
+.lbl{font-size:11px;font-weight:600;color:#1C2B22;margin-bottom:4px}
+.inp-row{margin-bottom:10px}
+.inp-wrap{display:flex;gap:6px;align-items:center}
+input[type=number],select{padding:7px 9px;border:2px solid #BFDBFE;border-radius:7px;font-family:inherit;outline:none;background:#EFF6FF;font-size:14px;font-weight:700;color:#1E40AF}
+input[type=number]{flex:1}
+select{width:100%;font-size:12px}
+.unit{font-size:11px;color:#6B7F6E;min-width:34px}
+.note{font-size:10px;color:#6B7F6E;margin-top:2px;font-style:italic}
+.res-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#F4F7F4;border-radius:7px;margin-bottom:4px}
+.res-row.hi{background:#EEF8EB;border:1px solid #81A969}
+.res-label{font-size:12px;color:#1C2B22}
+.res-value{font-size:13px;font-weight:800;color:#1C2B22}
+.res-row.hi .res-value{color:#074031}
+.status-box{padding:9px;border-radius:8px;text-align:center;margin-top:6px}
+.status-ok{background:#C8E6C9}.status-ok .status-title{color:#1B5E20}
+.status-err{background:#FFCDD2}.status-err .status-title{color:#B71C1C}
+.status-title{font-weight:800;font-size:13px}
+.status-sub{font-size:11px;margin-top:2px}
+.footer{background:#fff;border-top:1px solid #D4E8D0;padding:7px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.footer-left{font-size:10px;color:#6B7F6E}
+.footer-right{font-size:11px;color:#51774B;font-weight:600}
+.pill-row{display:flex;gap:6px;margin-bottom:8px}
+.pill{flex:1;padding:5px;border-radius:7px;border:1px solid #D4E8D0;background:#fff;cursor:pointer;font-family:inherit;font-size:11px;color:#6B7F6E;font-weight:400}
+.pill.active{border-color:#074031;background:#EEF8EB;color:#074031;font-weight:700}
+.mini-info{font-size:10px;color:#6B7F6E;font-style:italic;padding:6px 8px;background:#F4F7F4;border-radius:6px;margin-top:4px}
+.cert-sidebar{display:flex;flex-direction:column;gap:6px}
+.cert-btn{padding:10px 12px;border-radius:10px;border:1px solid #D4E8D0;background:#fff;cursor:pointer;text-align:left;font-family:inherit;transition:all 0.15s}
+.cert-btn.active{border-color:var(--cert-cor)}
+.cert-btn-title{font-size:11px;font-weight:700;margin-bottom:4px}
+.cert-btn-bar{height:3px;background:#F4F7F4;border-radius:2px;overflow:hidden;margin-bottom:2px}
+.cert-btn-fill{height:100%;border-radius:2px;transition:width 0.3s}
+.cert-btn-pct{font-size:10px;color:#6B7F6E}
+.cert-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.cert-pct-box{padding:5px 12px;border-radius:10px;text-align:center}
+.cert-pct-num{font-size:20px;font-weight:800}
+.cert-pct-label{font-size:9px;color:#6B7F6E}
+.cert-bar{height:5px;background:#F4F7F4;border-radius:3px;margin-bottom:10px;overflow:hidden}
+.cert-bar-fill{height:100%;border-radius:3px;transition:width 0.4s}
+.crit-row{display:flex;justify-content:space-between;align-items:center;padding:7px 9px;border-radius:7px;margin-bottom:4px;gap:8px;background:#F4F7F4;border:1px solid #D4E8D0}
+.crit-text{font-size:12px;color:#1C2B22;flex:1}
+.crit-sel{padding:3px 7px;border-radius:6px;border:1px solid #D4E8D0;font-size:11px;font-family:inherit;cursor:pointer;background:#fff;min-width:120px}
+.counts{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.count-pill{padding:2px 8px;border-radius:14px;font-size:11px;font-weight:600}
+.mat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:360px;overflow-y:auto}
+.mat-card{padding:10px 12px;background:#fff;border-radius:9px;border:1px solid #D4E8D0;cursor:pointer;transition:all 0.15s}
+.mat-card:hover{border-color:#074031;background:#EEF8EB}
+.mat-name{font-size:12px;font-weight:700;color:#074031;margin-bottom:3px}
+.mat-cat{background:#EEF8EB;padding:1px 6px;border-radius:10px;font-size:10px;color:#51774B;display:inline-block;margin-bottom:4px}
+.mat-row{display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px}
+.mat-key{color:#6B7F6E}.mat-val{font-weight:600;color:#1C2B22}
+.chk-item{display:flex;gap:6px;align-items:flex-start;padding:6px 7px;border-radius:7px;margin-bottom:3px;cursor:pointer;background:#F4F7F4;border:1px solid #D4E8D0;transition:all 0.15s}
+.chk-item.done{background:#C8E6C9;border-color:#81C784}
+.chk-box{width:13px;height:13px;border-radius:3px;flex-shrink:0;margin-top:1px;border:2px solid #D4E8D0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;background:transparent;transition:all 0.15s}
+.chk-item.done .chk-box{background:#51774B;border-color:#51774B}
+.chk-text{font-size:11px;color:#1C2B22;line-height:1.4}
+.chk-item.done .chk-text{text-decoration:line-through;color:#2E7D32}
+.model-grid{display:flex;gap:10px;margin-bottom:12px}
+.model-btn{flex:1;padding:10px;border-radius:11px;border:2px solid #D4E8D0;background:#fff;cursor:pointer;text-align:center;font-family:inherit;transition:all 0.2s}
+.model-btn.active{border-color:#074031;background:#EEF8EB}
+.model-icon{font-size:18px;margin-bottom:3px}
+.model-name{font-size:11px;font-weight:700;color:#1C2B22}
+.model-scale{font-size:10px;color:#6B7F6E}
+.info-row{padding:8px 10px;background:rgba(255,255,255,0.7);border-radius:8px;margin-bottom:5px}
+.info-lbl{font-size:10px;color:#6B7F6E}
+.info-val{font-size:13px;font-weight:700;color:#1C2B22}
+.agro-item{display:flex;gap:7px;align-items:center;padding:6px 8px;border-radius:8px;margin-bottom:4px;cursor:pointer;background:#F4F7F4;border:1px solid #D4E8D0;transition:all 0.15s}
+.agro-item.on{background:#EEF8EB;border-color:#81A969}
+.agro-chk{width:13px;height:13px;border-radius:3px;background:transparent;border:2px solid #D4E8D0;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;flex-shrink:0;transition:all 0.15s}
+.agro-item.on .agro-chk{background:#51774B;border-color:#51774B}
+.agro-nome{flex:1;font-size:11px;color:#6B7F6E;font-weight:400}
+.agro-item.on .agro-nome{color:#074031;font-weight:600}
+.agro-kwh{font-size:10px;color:#6B7F6E}
+.total-box{padding:12px;border-radius:10px;text-align:center}
+.total-label{font-size:10px;margin-bottom:1px}
+.total-value{font-size:24px;font-weight:800}
+.total-sub{font-size:10px;margin-top:1px}
+.field-group{display:flex;flex-direction:column;gap:10px}
+.col-stack{display:flex;flex-direction:column;gap:10px}
+.search-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:11px 13px;background:#fff;border-radius:11px;border:1px solid #D4E8D0;margin-bottom:10px}
+.search-inp{flex:1;min-width:130px;padding:6px 10px;border:1px solid #D4E8D0;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.filter-btn{padding:4px 10px;border-radius:16px;border:1px solid #D4E8D0;background:transparent;font-size:11px;font-weight:600;cursor:pointer;color:#6B7F6E;font-family:inherit}
+.filter-btn.active{border-color:#074031;background:#074031;color:#fff}
+@media(max-width:680px){.grid2{grid-template-columns:1fr}.model-grid{flex-wrap:wrap}}
+
+.header{background:#074031}
+.tab-btn.active{border-bottom-color:#81A969}
+
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">🌿</div>
+      <div>
+        <div class="logo-title">Physis SustainKit — Demo</div>
+        <div class="logo-sub">Physis Engineering · Demo Gratuita · LEED v5 · PVGIS ERA5</div>
+      </div>
+    </div>
+    <div class="badge">DEMO</div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('t-solar',this)">☀️ Energia Solar</button>
+    <button class="tab-btn" onclick="showTab('t-certs',this)">🔍 Certificações</button>
+    <button class="tab-btn" onclick="showTab('t-mat',this)">🌍 Materiais / Clima</button>
+    <button class="tab-btn" onclick="showTab('t-acab',this)">🎨 Acabamentos</button>
+    </div>
+</div>
+
+<div class="content">
+
+<!-- SOLAR DEMO -->
+<div id="t-solar" class="tab-panel active">
+  <div class="grid2">
+    <div class="card">
+      <div class="sec-title" style="color:#074031">☀️ Calculadora Solar</div>
+      <div class="inp-row"><div class="lbl">Cidade</div><select id="s-cidade" onchange="calcSolar()"><option value="">Selecionar...</option></select></div>
+      <div class="inp-row"><div class="lbl">Consumo diário</div><div class="inp-wrap"><input type="number" id="s-consumo" value="22" oninput="calcSolar()"><span class="unit">kWh/dia</span></div></div>
+      <div class="inp-row"><div class="lbl">Potência instalada</div><div class="inp-wrap"><input type="number" id="s-pot" value="10" step="0.5" oninput="calcSolar()"><span class="unit">kWp</span></div></div>
+      <div class="pill-row">
+        <button class="pill active" id="p-pior" onclick="setModo('pior')">Pior mês ✅</button>
+        <button class="pill" id="p-media" onclick="setModo('media')">Média anual</button>
+      </div>
+    </div>
+    <div class="card card-pale">
+      <div class="sec-title" style="color:#074031">📊 Resultados</div>
+      <div class="res-row"><span class="res-label">Potência mínima</span><span class="res-value" id="r-potmin">—</span></div>
+      <div class="res-row hi"><span class="res-label">Potência instalada</span><span class="res-value" id="r-pot">—</span></div>
+      <div class="res-row"><span class="res-label">Geração anual</span><span class="res-value" id="r-ger">—</span></div>
+      <div id="r-nzeb" class="status-box status-ok"></div>
+      <div style="margin-top:10px;padding:9px;background:#FFF8E1;border-radius:8px;border:1px solid #FFB74D;font-size:11px;color:#E65100">🔒 Bateria, captação pluvial e análise detalhada disponíveis na versão completa</div>
+    </div>
+  </div>
+</div>
+
+<!-- CERTS DEMO -->
+<div id="t-certs" class="tab-panel">
+  <div style="display:grid;grid-template-columns:160px 1fr;gap:14px">
+    <div class="cert-sidebar" id="cert-sidebar"></div>
+    <div class="card" id="cert-panel"></div>
+  </div>
+</div>
+
+<!-- MAT DEMO -->
+<div id="t-mat" class="tab-panel">
+  <div class="grid2">
+    <div class="card">
+      <div class="sec-title" style="color:#074031">🌍 Materiais por Clima</div>
+      <div class="inp-row"><select id="m-cidade" onchange="calcMat()"><option value="">Selecionar cidade...</option></select></div>
+      <div id="m-zona-box" style="padding:10px;border-radius:10px;margin-bottom:8px">
+        <div style="font-weight:700;font-size:12px;color:#074031">Zona Bioclimática</div>
+        <div id="m-zona-label" style="font-size:11px;color:#51774B;font-weight:600">—</div>
+      </div>
+      <div id="m-rec"></div>
+    </div>
+    <div class="card">
+      <div class="sec-title" style="color:#074031">🏆 Materiais Recomendados</div>
+      <div id="m-top"></div>
+      <div style="margin-top:8px;padding:9px;background:#FFF8E1;border-radius:8px;border:1px solid #FFB74D;font-size:11px;color:#E65100">🔒 Banco completo de 16 materiais com fichas técnicas disponível na versão completa</div>
+    </div>
+  </div>
+</div>
+
+<!-- ACAB DEMO -->
+<div id="t-acab" class="tab-panel">
+  <div class="grid2">
+    <div class="card">
+      <div class="sec-title" style="color:#074031">🎨 Calculadora de Acabamentos</div>
+      <div id="acab-list"></div>
+      <div class="inp-row" style="margin-top:8px"><div class="lbl">Área (m²)</div><div class="inp-wrap"><input type="number" id="acab-area" value="12" oninput="calcAcab()"><span class="unit">m²</span></div></div>
+      <div class="pill-row">
+        <button class="pill active" id="ap-prof" onclick="setAplic('prof')">Profissional</button>
+        <button class="pill" id="ap-diy" onclick="setAplic('diy')">DIY</button>
+      </div>
+    </div>
+    <div class="card card-pale">
+      <div class="sec-title" style="color:#074031">💰 Orçamento</div>
+      <div class="res-row"><span class="res-label">Material + base</span><span class="res-value" id="a-mat">—</span></div>
+      <div class="res-row"><span class="res-label">Ferramentas</span><span class="res-value" id="a-ferra">—</span></div>
+      <div class="res-row"><span class="res-label">Mão de obra</span><span class="res-value" id="a-mo">—</span></div>
+      <div class="total-box" style="background:#074031;margin-top:8px">
+        <div class="total-label" style="color:#81A969">TOTAL</div>
+        <div class="total-value" style="color:#fff" id="a-total">—</div>
+        <div class="total-sub" style="color:rgba(255,255,255,0.6)" id="a-m2">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-left">Physis Engineering · ASHRAE · ABNT NBR · PVGIS ERA5 · LEED v5 · FAO</div>
+  <div class="footer-right">physis.com.br</div>
+</div>
+
+<script>
+
+function $(id){return document.getElementById(id)}
+function val(id){return parseFloat($(id)?.value||0)||0}
+function sel(id){return $(id)?.value||''}
+function set(id,v){if($(id))$(id).innerText=v}
+function setHtml(id,v){if($(id))$(id).innerHTML=v}
+function cls(id,c,on){$(id)?.classList[on?'add':'remove'](c)}
+function showTab(tabId,btn,color){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  $(tabId)?.classList.add('active');
+  btn.classList.add('active');
+}
+function statusBox(id,ok,title,sub){
+  const el=$(id);if(!el)return;
+  el.className='status-box '+(ok?'status-ok':'status-err');
+  el.innerHTML=`<div class="status-title">${title}</div><div class="status-sub">${sub}</div>`;
+}
+function fmt(n){return Number(n).toLocaleString('pt-BR')}
+
+
+const CIDADES={
+  'Petrópolis — RJ':{hps:4.20,hpsMin:3.42,zona:3,prec:1520},
+  'Rio de Janeiro — RJ':{hps:4.65,hpsMin:3.71,zona:4,prec:1200},
+  'São Paulo — SP':{hps:4.40,hpsMin:3.52,zona:3,prec:1400},
+  'Brasília — DF':{hps:5.47,hpsMin:4.12,zona:4,prec:1500},
+  'Belo Horizonte — MG':{hps:4.90,hpsMin:3.85,zona:3,prec:1500},
+  'Curitiba — PR':{hps:3.90,hpsMin:2.98,zona:1,prec:1400},
+  'Salvador — BA':{hps:5.20,hpsMin:4.20,zona:7,prec:1900},
+  'João Pessoa — PB':{hps:5.80,hpsMin:4.92,zona:8,prec:1700},
+  'Manaus — AM':{hps:4.89,hpsMin:4.21,zona:8,prec:2200},
+  'Tunis — Tunísia':{hps:5.02,hpsMin:2.87,zona:0,prec:400},
+  'Amsterdã — Holanda':{hps:2.68,hpsMin:0.81,zona:0,prec:900},
+};
+const MAT_ZONA={
+  0:{e:'CLT + SIP',v:'Análise local',i:'Verificar',c:'Verificar',es:'Vidro duplo',l:'Internacional',cor:'#F3E5F5'},
+  1:{e:'CLT + SIP 150mm',v:'SIP + BTC + hempcrete',i:'Lã rocha 100mm',c:'Sanduíche 80mm + telhado verde',es:'Vidro triplo argônio',l:'Frio — Zona 1',cor:'#DBEAFE'},
+  2:{e:'CLT + SIP 100mm',v:'SIP + BTC',i:'Lã rocha 75mm',c:'Sanduíche 60mm + telhado verde',es:'Vidro triplo argônio',l:'Muito frio — Zona 2',cor:'#DBEAFE'},
+  3:{e:'CLT + SIP 100mm',v:'SIP + BTC / Hempcrete',i:'Lã PET 50mm',c:'Sanduíche 50mm + telhado verde',es:'Vidro duplo câmara ar',l:'Temperado — Zona 3',cor:'#EDE7F6'},
+  4:{e:'CLT ou SIP',v:'SIP ou BTC',i:'Lã PET cobertura',c:'Telhado verde',es:'Vidro duplo Low-E',l:'Subquente — Zona 4',cor:'#E8F5E9'},
+  5:{e:'CLT ou geopolímero',v:'BTC + alta inércia',i:'Lã rocha cobertura',c:'Sanduíche + câmara ar',es:'Vidro duplo Low-E',l:'Quente seco — Zona 5',cor:'#FFF9C4'},
+  6:{e:'Bambu + aço reciclado',v:'Adobe ou BTC',i:'Cobertura apenas',c:'Argila + cal refletiva',es:'Vidro duplo + shutters',l:'Quente seco — Zona 6',cor:'#FFE0B2'},
+  7:{e:'Bambu + aço reciclado',v:'Adobe branco + pedra',i:'Cobertura apenas',c:'Argila + cal refletiva',es:'Vidro duplo + shutters madeira',l:'Quente e seco — Zona 7',cor:'#FFE0B2'},
+  8:{e:'Bambu Guadua + FSC',v:'Paredes abertas + venezianas',i:'Mínimo',c:'Palha / sedum',es:'Venezianas + mosquiteiro',l:'Quente e úmido — Zona 8',cor:'#FCE4EC'},
+};
+const MATERIAIS=[
+  {n:'CLT — Madeira Laminada Cruzada',c:'Estrutura',u:'0,28 W/m²K',co2:'−1,5 (negativo)',custo:'R$2.200–3.000/m³'},
+  {n:'SIP 100mm (OSB+EPS+OSB)',c:'Vedação',u:'0,22 W/m²K',co2:'0,08–0,14',custo:'R$1.400–1.900/m²'},
+  {n:'BTC — Bloco Terra Comprimida',c:'Vedação',u:'0,80 W/m²K',co2:'0,01–0,03',custo:'R$80–140/m²'},
+  {n:'Hempcrete (cânhamo + cal)',c:'Vedação',u:'0,22 W/m²K',co2:'−0,4 (negativo)',custo:'R$150–250/m²'},
+  {n:'Bambu Guadua (estrutural)',c:'Estrutura',u:'—',co2:'−0,8 (negativo)',custo:'R$80–140/colmo'},
+  {n:'Lã de PET Reciclado',c:'Isolamento',u:'λ=0,038 W/mK',co2:'0,03–0,06',custo:'R$35–55/m²'},
+  {n:'Lã de Rocha Mineral',c:'Isolamento',u:'λ=0,034 W/mK',co2:'0,50–0,80',custo:'R$25–45/m²'},
+  {n:'Aerogel (painel 10mm)',c:'Isolamento',u:'λ=0,015 W/mK',co2:'2,50–4,00',custo:'R$480–960/m²'},
+  {n:'Vidro duplo câmara ar',c:'Esquadria',u:'1,20–1,80 W/m²K',co2:'1,20–1,60',custo:'R$180–320/m²'},
+  {n:'Vidro Low-E',c:'Esquadria',u:'1,00–1,40 W/m²K',co2:'1,30–1,70',custo:'R$220–380/m²'},
+  {n:'Vidro eletrocrômico',c:'Esquadria',u:'0,90–1,20 W/m²K',co2:'3,50–5,00',custo:'R$1.200–2.400/m²'},
+  {n:'Tadelakt (cal marroquina)',c:'Revestimento',u:'—',co2:'0,45',custo:'R$280–420/m²'},
+  {n:'Tinta Argila Arpex',c:'Revestimento',u:'—',co2:'0,05',custo:'R$48/m² (2 demãos)'},
+  {n:'Telhado verde extensivo',c:'Cobertura',u:'0,21 W/m²K',co2:'negativo',custo:'R$220–280/m²'},
+  {n:'Geopolímero (concreto)',c:'Estrutura',u:'—',co2:'0,06–0,10',custo:'Similar ao concreto'},
+  {n:'Madeira TMT (modificada)',c:'Revestimento',u:'—',co2:'negativo',custo:'R$280–520/m²'},
+];
+const ACABAMENTOS={
+  tadelakt:{n:'Tadelakt',matM2:115,base:42,ferra:680,moM2:280},
+  cal:{n:'Reboco Cal + Fibra',matM2:62,base:0,ferra:180,moM2:50},
+  argila:{n:'Tinta Argila Arpex',matM2:48,base:0,ferra:80,moM2:20},
+  stucco:{n:'Stucco Veneziano',matM2:220,base:0,ferra:220,moM2:320},
+  bambu:{n:'Piso Bambu (BLC)',matM2:160,base:18,ferra:120,moM2:45},
+};
+const CERTS={
+  leed:{n:'LEED v5 BD+C (Abril 2025)',cor:'#1565C0',items:[
+    'Descarbonização — NZEB + eletrificação + ACV obrigatório',
+    'Carbono Incorporado — LCA + EPD obrigatória (ISO 14025)',
+    'Energia — M&V datalogger + Arc platform',
+    'Água — Redução ≥30% + medição real',
+    'Materiais — HPD obrigatória para itens principais',
+    'Ecologia — Plano biodiversidade (NOVO v5)',
+    'Qualidade de Vida — CO₂, VOC e PM2.5 monitorados',
+    'Resiliência Climática — avaliação obrigatória (NOVO v5)',
+    'Equidade Social — práticas justas na obra (NOVO v5)',
+    'Registro na plataforma Arc (arc-app.gbci.org)',
+  ]},
+  edge:{n:'EDGE (IFC/Banco Mundial)',cor:'#1976D2',items:[
+    'Energia: redução ≥20% vs. linha de base',
+    'Água: redução ≥20% vs. linha de base',
+    'Carbono incorporado: redução ≥20%',
+    'EPDs dos materiais principais',
+    'Registro em edgebuildings.com',
+  ]},
+  casaazul:{n:'Selo Casa Azul — Caixa',cor:'#0D47A1',items:[
+    'RTQ-R Nível A (PROCEL Edifica)',
+    'Captação pluvial (NBR 15527)',
+    'Coleta seletiva e compostagem',
+    'Ventilação e iluminação natural (NBR 15575)',
+    'Manual do proprietário entregue',
+  ]},
+  greenkey:{n:'GreenKey — Hospitalidade',cor:'#2E7D32',items:[
+    'Política ambiental documentada',
+    'Medição e redução de energia',
+    '100% água sustentável',
+    'Separação de resíduos + compostagem',
+    'Produtos locais e orgânicos',
+  ]},
+  pbqp:{n:'PBQP-H Bioconstrução',cor:'#6A1B9A',items:[
+    'Materiais naturais/reciclados rastreados',
+    'ART assinada em todos os projetos',
+    'Conformidade NBR 15575 e NBR 15220',
+  ]},
+};
+const CHECKLIST=[
+  {f:'Fase 1 — Planejamento',cor:'#0D47A1',items:['Verificar zoneamento e zona de risco','Obter LPLS','Elaborar PGRCC','Submeter ao INEA','Registrar no LEED Arc ou EDGE']},
+  {f:'Fase 2 — Pré-Produção',cor:'#1565C0',items:['Encomendar CLT, SIP e sistemas solar','Instalar cisterna e captação','Executar fundação com SPDA']},
+  {f:'Fase 3 — Montagem',cor:'#1976D2',items:['Montar estrutura CLT + SIP','Instalar sistema FV (NBR 16690)','Instalar inversor + bateria + DPS']},
+  {f:'Fase 4 — Acabamento',cor:'#2196F3',items:['Aplicar tadelakt ou cal','Aplicar tinta Arpex zero VOC','Configurar Home Assistant + IoT','Paisagismo com mudas nativas']},
+  {f:'Fase 5 — Certificação',cor:'#0288D1',items:['Solicitar Habite-se','Homologação ANEEL FV','Auditoria LEED/EDGE','Manual digital ao hóspede']},
+];
+const MODELOS=[
+  {id:'chale',icon:'🏡',n:'Chalé Individual',e:'1 un · 60–120m²',s:'8–12 kWp',c:'EDGE + LEED Gold',cor:'#E8F5E9'},
+  {id:'conjunto',icon:'🏘️',n:'Conjunto (3–5)',e:'3–5 un · terreno único',s:'25–40 kWp',c:'EDGE + LEED Gold',cor:'#EDE7F6'},
+  {id:'sede',icon:'🏢',n:'Sede Physis',e:'200–400m²',s:'15–25 kWp',c:'LEED Platinum',cor:'#FFF9C4'},
+  {id:'hotel',icon:'🏨',n:'Hotel Boutique',e:'8–15 quartos',s:'60–100 kWp',c:'LEED Gold + WELL',cor:'#FCE4EC'},
+];
+const AGRO_CARGAS=[
+  {n:'Bomba irrigação gotejamento',p:750,h:6,on:false},
+  {n:'Câmara fria 10m³',p:2200,h:16,on:false},
+  {n:'Resfriador de leite',p:1800,h:6,on:false},
+  {n:'Debulhadora / trilhadora',p:3000,h:3,on:false},
+  {n:'Ordenhadeira mecânica',p:1100,h:2,on:false},
+  {n:'Iluminação LED galpão',p:200,h:12,on:false},
+  {n:'Hub IoT / monitoramento',p:5,h:24,on:false},
+];
+
+const CIDADE_OPTIONS = `<option value="Petrópolis — RJ">Petrópolis — RJ</option>
+<option value="Rio de Janeiro — RJ">Rio de Janeiro — RJ</option>
+<option value="São Paulo — SP">São Paulo — SP</option>
+<option value="Brasília — DF">Brasília — DF</option>
+<option value="Belo Horizonte — MG">Belo Horizonte — MG</option>
+<option value="Curitiba — PR">Curitiba — PR</option>
+<option value="Salvador — BA">Salvador — BA</option>
+<option value="João Pessoa — PB">João Pessoa — PB</option>
+<option value="Manaus — AM">Manaus — AM</option>
+<option value="Tunis — Tunísia">Tunis — Tunísia</option>
+<option value="Amsterdã — Holanda">Amsterdã — Holanda</option>
+`;
+
+
+let solarModo='pior', acab='tadelakt', acaplic='prof', certAtual='leed', certStatus={}, matCat='Todos';
+function setModo(m){solarModo=m;$('p-pior').classList.toggle('active',m==='pior');$('p-media').classList.toggle('active',m==='media');calcSolar();}
+function calcSolar(){
+  const cid=sel('s-cidade');if(!cid||!CIDADES[cid])return;
+  const c=CIDADES[cid];const hps=solarModo==='pior'?c.hpsMin:c.hps;const pr=0.78;
+  const consumo=val('s-consumo'),pot=val('s-pot');
+  const potMin=(consumo/(hps*pr)).toFixed(1),ger=Math.round(pot*hps*365*pr),saldo=ger-consumo*365;
+  set('r-potmin',potMin+' kWp');set('r-pot',pot+' kWp');set('r-ger',fmt(ger)+' kWh/ano');
+  statusBox('r-nzeb',saldo>=0,saldo>=0?'✅ NZEB alcançado':'⚠️ Déficit energético',`Saldo: ${saldo>0?'+':''}${fmt(saldo)} kWh/ano`);
+}
+function calcMat(){
+  const cid=sel('m-cidade');if(!cid||!CIDADES[cid])return;
+  const c=CIDADES[cid],mat=MAT_ZONA[c.zona];
+  $('m-zona-box').style.background=mat.cor;
+  set('m-zona-label',mat.l);
+  $('m-rec').innerHTML=[['🏗️',mat.e],['🧱',mat.v],['🌡️',mat.i],['🏠',mat.c],['🪟',mat.es]].map(([i,v])=>`<div style="padding:7px 9px;background:#F4F7F4;border-radius:8px;margin-bottom:4px"><div style="font-size:10px;color:#6B7F6E">${i}</div><div style="font-size:11px;font-weight:600;color:#074031">${v}</div></div>`).join('');
+  $('m-top').innerHTML=MATERIAIS.slice(0,5).map(m=>`<div style="padding:8px 10px;background:#F4F7F4;border-radius:8px;margin-bottom:4px"><div style="font-size:12px;font-weight:700;color:#074031">${m.n}</div><div style="font-size:10px;color:#6B7F6E">${m.c} · CO₂: ${m.co2}</div></div>`).join('');
+}
+function renderCerts(){
+  const sb=$('cert-sidebar');if(!sb)return;
+  sb.innerHTML=Object.entries(CERTS).map(([k,c])=>{
+    const total=c.items.length,ok=c.items.filter((_,i)=>certStatus[k+'_'+i]==='✅ Atende').length,pct=Math.round(ok/total*100);
+    return `<button class="cert-btn${certAtual===k?' active':''}" onclick="certAtual='${k}';renderCerts()"><div class="cert-btn-title" style="color:${certAtual===k?c.cor:'#1C2B22'}">${c.n}</div><div class="cert-btn-bar"><div class="cert-btn-fill" style="width:${pct}%;background:${c.cor}"></div></div><div class="cert-btn-pct">${pct}%</div></button>`;
+  }).join('');
+  const c=CERTS[certAtual],total=c.items.length,ok=c.items.filter((_,i)=>certStatus[certAtual+'_'+i]==='✅ Atende').length,pct=Math.round(ok/total*100);
+  const statusOpts=['✅ Atende','⚠️ Parcial','❌ Não atende','⬜ N/A'];
+  const statusBg={'✅ Atende':'#C8E6C9','⚠️ Parcial':'#FFE0B2','❌ Não atende':'#FFCDD2','⬜ N/A':'#E3F2FD'};
+  $('cert-panel').innerHTML=`<div class="cert-header"><div><div style="font-weight:700;font-size:13px">${c.n}</div></div><div class="cert-pct-box" style="background:${c.cor}20"><div class="cert-pct-num" style="color:${c.cor}">${pct}%</div><div class="cert-pct-label">atendido</div></div></div><div class="cert-bar"><div class="cert-bar-fill" style="width:${pct}%;background:${c.cor}"></div></div>${c.items.map((item,i)=>{const key=certAtual+'_'+i,v=certStatus[key]||'';return`<div class="crit-row" style="background:${statusBg[v]||'#F4F7F4'}"><span class="crit-text">${item}</span><select class="crit-sel" onchange="certStatus['${key}']=this.value;renderCerts()"><option value="">—</option>${statusOpts.map(o=>`<option value="${o}"${v===o?' selected':''}>${o}</option>`).join('')}</select></div>`}).join('')}`;
+}
+function setAcab(k){acab=k;renderAcabList();calcAcab();}
+function setAplic(v){acaplic=v;$('ap-prof').classList.toggle('active',v==='prof');$('ap-diy').classList.toggle('active',v==='diy');calcAcab();}
+function renderAcabList(){$('acab-list').innerHTML=Object.entries(ACABAMENTOS).map(([k,a])=>`<button onclick="setAcab('${k}')" style="display:flex;justify-content:space-between;width:100%;padding:8px 11px;border-radius:9px;margin-bottom:5px;text-align:left;cursor:pointer;font-family:inherit;border:1px solid ${acab===k?'#074031':'#D4E8D0'};background:${acab===k?'#EEF8EB':'#fff'}"><span style="font-size:12px;font-weight:${acab===k?700:400};color:${acab===k?'#074031':'#1C2B22'}">${a.n}</span></button>`).join('');}
+function calcAcab(){const a=ACABAMENTOS[acab];if(!a)return;const area=val('acab-area'),mat=(a.matM2+a.base)*area,mo=acaplic==='diy'?0:a.moM2*area,total=mat+a.ferra+mo;set('a-mat','R$ '+fmt(Math.round(mat)));set('a-ferra','R$ '+fmt(a.ferra));set('a-mo',acaplic==='diy'?'R$ 0 (DIY)':'R$ '+fmt(Math.round(mo)));set('a-total','R$ '+fmt(Math.round(total)));set('a-m2','R$ '+fmt(Math.round(total/area))+'/m²');}
+function initApp(){['s-cidade','m-cidade'].forEach(id=>{if($(id))$(id).innerHTML='<option value="">Selecionar...</option>'+CIDADE_OPTIONS;});calcSolar();calcMat();renderCerts();renderAcabList();calcAcab();}
+
+
+// Init
+document.addEventListener('DOMContentLoaded', function(){
+  if(typeof initApp === 'function') initApp();
+});
+</script>
+</body>
+</html>
