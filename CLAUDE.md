@@ -38,6 +38,9 @@ O servidor é `physis-hub/physis_hub/` (Python 3.10, sem dependências).
 7. A seleção de módulos existe só na loja.
 8. Nome, CPF ou CNPJ, e-mail e telefone são obrigatórios só no pagamento e no pedido de projeto personalizado.
 9. Plataforma, Gestão Physis e Central de clientes não se misturam.
+10. Um título só por tela: árvore + serifada (Fraunces, Georgia), no verde `#33512F`. Nada de cabeçalho repetido.
+11. Independência: nada pode depender de serviço de terceiros para funcionar. Software aberto, hospedado pela Physis ou pelo cliente; arquivos em ODF e PDF/A; IA e bots com modelo aberto no próprio servidor. Serviço externo (WhatsApp, Power BI, GitHub) só como opção ou espelho, nunca como único caminho.
+12. Segredos (senhas, chaves, tokens, números pessoais) nunca no código: `secrets.h` ou variáveis de ambiente, fora do Git.
 
 ## Comandos
 
