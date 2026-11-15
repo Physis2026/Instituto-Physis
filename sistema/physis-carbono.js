@@ -27,6 +27,10 @@ const NOMES_RC = { esterco_bov:"Esterco bovino", esterco_sui:"Dejetos suínos", 
 const ROTA_DESTINO = { aterro:["aterro",false], aterro1:["aterro",false], reciclagem:["reciclagem",false], reversa:["reciclagem",false], incineracao:["incineracao",false], compostagem:["compostagem",true], vermi:["compostagem",true], biodigestor:["biodigestor",true], biomassa:["queima",true] };
 const RC_UN_F = { kg_mes:1, kg_sem:52 / 12, kg_dia:30, t_mes:1000, l_mes:0.92 };
 const BIOG_PAD = { alimentos:0.10, esterco_bov:0.04, esterco_sui:0.06, cama_aviario:0.07, colheita:0.05 };
+/* energia do biogás e do GLP: premissas biogas.pci e glp.pci da base (contas comuns, a mesma regra do SustainKit);
+   fora da plataforma (sem o bloco), os mesmos valores da base: 6 kWh/m³ e 12,8 kWh/kg (espelho physis_hub/carbono.py) */
+const PREM = (id, pad) => { try { const v = typeof PhysisCalc !== "undefined" ? PhysisCalc.premissa(id) : null; return typeof v === "number" ? v : pad; } catch (e) { return pad; } };
+const PCI_BIOGAS = () => PREM("biogas.pci", 6), PCI_GLP = () => PREM("glp.pci", 12.8);
 const BIO = ["biodiesel","etanol_anidro","etanol_hidratado","lenha","carvao_vegetal"], BOVINOS = ["gado_corte","gado_leite","bufalo"];
 
 /* ════════ utilitários ════════ */
@@ -215,7 +219,7 @@ function calcular(estado, ctx, F){ F = F || base(); if (!F) return null; ctx = c
   const glpKg = tco2e(combustao(F, "glp", 1, "estacionaria")[0], gw), biogM3 = bioR ? num(bioR.biogas_m3_dia) * 365 : (ctx.rc || []).filter(r => r.rota === "biodigestor").reduce((s, r) => s + n0(r.qtd) * (RC_UN_F[r.un] || 1) * 12 * ((typeof RC_BIOGAS !== "undefined" ? RC_BIOGAS : BIOG_PAD)[r.tipo] || 0.05), 0);
   const reusoM3 = ctx.esgoto ? n0(ctx.esgoto.reuso_m3_dia) * 365 : 0, fAgua = F.agua_fornecida ? num(F.agua_fornecida.kg_m3) : null;
   const recic = (ctx.rc || []).filter(r => (ROTA_DESTINO[r.rota] || [])[0] === "reciclagem").reduce((s, r) => { const t = n0(r.qtd) * (RC_UN_F[r.un] || 1) * 12 / 1000; return s + Math.max(0, tco2e(residuo(F, r.tipo, t, "aterro"), gw) - tco2e(residuo(F, r.tipo, t, "reciclagem"), gw)); }, 0);
-  const evit = { solar: n0(c.solar_kwh) / 1000 * fLoc, biogas: biogM3 * 6 / 12.8 * glpKg, reciclagem: recic, reuso: fAgua != null ? reusoM3 * fAgua / 1000 : 0 };
+  const evit = { solar: n0(c.solar_kwh) / 1000 * fLoc, biogas: biogM3 * PCI_BIOGAS() / PCI_GLP() * glpKg, reciclagem: recic, reuso: fAgua != null ? reusoM3 * fAgua / 1000 : 0 };
   /* intensidade, metas, SBCE */
   const area = num(c.area_m2) != null ? num(c.area_m2) : ctx.area_m2, opera = e1 + e2loc;
   const M = c.metas, anoBase = num(M.ano_base) || num(c.ano) || new Date().getFullYear() - 1, baseT = num(M.base_t) != null ? num(M.base_t) : (M.incluir_e3 ? total : opera);

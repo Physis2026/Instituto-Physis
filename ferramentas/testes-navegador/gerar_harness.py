@@ -36,6 +36,15 @@ try {
   /* migração da tela antiga */
   MEM.avac = { amb:[{ n:"Sala", area:"30", uso:"residencial" }] }; ui.avacSub = "ac"; const hm = telaAvac();
   if (!/Unidade \(migrada/.test(telaAvac.toString()) && hm.indexOf("24.000") < 0) { falha++; linhas.push("FALHA migração"); } else ok++;
+  /* carga térmica levada ao ar-condicionado (botão da subaba Carga térmica) e desfazer */
+  { const e0 = window.AVAC.padrao(); e0.ac.amb = [{ n:"Sala", area:20, dorm:0, override:12000, equip:"Split hi-wall", matriz:true, q:[], comum:1 }];
+    const R0 = window.AVAC.calcular(e0), antes = R0.ac.amb[0].btu, cg = [{ nome:"Sala", btuh:15000, area:20 }, { nome:"Quarto novo", btuh:7000, area:9 }];
+    const plano = window.AVAC.planoCargas(e0, R0, cg);
+    if (plano[0].manual && plano[0].antes === 12000 && plano[1].novo) ok++; else { falha++; linhas.push("FALHA plano da carga térmica: " + JSON.stringify(plano)); }
+    const R1 = window.AVAC.calcular(window.AVAC.aplicarCargas(e0, cg)), s = R1.ac.amb.find(a => a.nome === "Sala");
+    if (s.btuCalc >= 15000 && s.btu === s.btuCalc && s.fonte === "Carga térmica (NBR 16401-1)" && R1.ac.amb.some(a => a.nome === "Quarto novo")) ok++; else { falha++; linhas.push("FALHA carga térmica levada: " + JSON.stringify(s)); }
+    const R2 = window.AVAC.calcular(e0); /* desfazer = voltar o estado anterior */
+    if (R2.ac.amb[0].btu === antes && R2.ac.amb[0].fonte === "triagem por m²/TR" && R2.ac.amb.length === 1) ok++; else { falha++; linhas.push("FALHA desfazer"); } }
   /* inputs sem rótulo */
   delete MEM.avac; const doc = new DOMParser().parseFromString("<div>" + ["visao","tip","ac","vent","press","solar","piscina","dutos"].map(s => { ui.avacSub = s; return telaAvac(); }).join("") + telaQuadroEletrico() + "</div>", "text/html");
   const sem = [...doc.querySelectorAll("input,select")].filter(i => !doc.querySelector('label[for="' + i.id + '"]'));

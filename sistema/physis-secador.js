@@ -1,6 +1,7 @@
 /* physis-secador.js — aba Secador solar da plataforma (produto P23 da loja: frutas, ervas, cogumelos e café).
    Contrato com a plataforma: define telaSecador() (HTML da aba inteira, com o único título h1),
-   window.SECADOR = { contas puras, testáveis } e window.SECADOR_I18N (português → inglês, para juntar ao I18N).
+   window.SECADOR = { contas puras, testáveis } e window.SECADOR_I18N (português → inglês, para juntar ao I18N) com
+   window.SECADOR_I18N_RX (frases com números); os dois vão copiados em sistema/physis-i18n-modulos.json.
    Espelho de physis-hub/physis_hub/secador.py (mesmas premissas, fórmulas e constantes; teste em tests/test_secador.py).
    Dados: no modo hub, os nós TIPO:SEC de GET api/painel (ui.dados.nos) e as séries de GET api/serie; nos outros
    modos, um secador simulado (dados de exemplo, marcados como tal). Globais usadas se existirem: esc, n2, numBr, el,
@@ -164,13 +165,14 @@ function grafico(id, titulo, linhas, un, opc) { opc = opc || {}; const W = 640, 
   const ref = (opc.refs || []).map(r => `<line x1="${m.l}" x2="${W - m.r}" y1="${sy(r[0]).toFixed(1)}" y2="${sy(r[0]).toFixed(1)}" style="stroke:${r[2] || "#8A6410"}" stroke-dasharray="3 3"/><text x="${W - m.r}" y="${(sy(r[0]) - 4).toFixed(1)}" font-size="11" text-anchor="end" style="fill:${r[2] || "#8A6410"}">${E(r[1])}</text>`).join("");
   const eixoX = opc.rotX || (x => quando(x * 1000));
   const legenda = linhas.map(l => `<span class="t2 pq" style="display:inline-flex;align-items:center;gap:4px;margin-right:12px"><svg width="18" height="6" aria-hidden="true"><line x1="0" y1="3" x2="18" y2="3" style="stroke:${l.cor}" stroke-width="3"${l.tracejado ? ' stroke-dasharray="4 3"' : ""}/></svg>${E(l.nome)}</span>`).join("");
-  const resumo = linhas.filter(l => l.pts.length).map(l => { const v = l.pts.map(p => p[1]).filter(x => x != null && isFinite(x)); return v.length ? `${l.nome}: de ${f1(Math.min(...v))} a ${f1(Math.max(...v))} ${un}` : ""; }).filter(Boolean).join("; ");
-  return `<figure style="margin:0"><svg id="${id}" viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px" role="img" aria-label="${E(titulo)}. ${E(resumo)}">
+  /* nome acessível = título + resumo de cada linha, em textos separados (cada um tem o seu par em inglês) */
+  const resumo = linhas.filter(l => l.pts.length).map(l => { const v = l.pts.map(p => p[1]).filter(x => x != null && isFinite(x)); return v.length ? `${l.nome}: de ${f1(Math.min(...v))} a ${f1(Math.max(...v))} ${un}` : ""; }).filter(Boolean);
+  return `<figure style="margin:0"><svg id="${id}" viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px" role="img" aria-labelledby="${id}-t ${id}-d"><title id="${id}-t">${E(titulo)}</title>
     <line x1="${m.l}" y1="${H - m.b}" x2="${W - m.r}" y2="${H - m.b}" style="stroke:var(--linha,#C9D2C4)"/><line x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${H - m.b}" style="stroke:var(--linha,#C9D2C4)"/>
     <text x="${m.l - 6}" y="${m.t + 10}" font-size="11" text-anchor="end" style="fill:var(--tinta2,#4A4F44)">${f1(y1, 0)}</text><text x="${m.l - 6}" y="${H - m.b}" font-size="11" text-anchor="end" style="fill:var(--tinta2,#4A4F44)">${f1(y0, 0)}</text>
     <text x="${m.l}" y="${H - 8}" font-size="11" style="fill:var(--tinta2,#4A4F44)">${E(eixoX(x0))}</text><text x="${W - m.r}" y="${H - 8}" font-size="11" text-anchor="end" style="fill:var(--tinta2,#4A4F44)">${E(eixoX(x1))}</text>
     <text x="${m.l + 4}" y="${m.t + 10}" font-size="11" style="fill:var(--tinta2,#4A4F44)">${E(un)}</text>${ref}${linhas.map(traco).join("")}</svg>
-    <figcaption>${legenda}</figcaption></figure>`; }
+    <figcaption>${legenda}<span id="${id}-d" class="so-leitor">${resumo.map(r => `<span>${E(r)}</span>`).join("; ")}</span></figcaption></figure>`; }
 function tabelaSerie(cap, serie, cols) { const ult = serie.slice(-12).reverse();
   return `<details><summary>Ver os números (${E(cap)})</summary><div class="rolagem"><table><caption>${E(cap)}: as 12 leituras mais novas</caption><thead><tr><th scope="col">Quando</th>${cols.map(c => `<th scope="col">${E(c[1])}</th>`).join("")}</tr></thead><tbody>
     ${ult.map(p => `<tr><th scope="row">${E(quando(p.ts * 1000))}</th>${cols.map(c => `<td>${f1(p[c[0]], c[2] == null ? 1 : c[2])}</td>`).join("")}</tr>`).join("")}</tbody></table></div></details>`; }
@@ -379,7 +381,7 @@ window.SECADOR_I18N = {
   "Água para tirar": "Water to remove",
   "Fim previsto": "Predicted end",
   "Velocidade de secagem": "Drying rate",
-  "Rendimento": "Yield",
+  "Rendimento": "Efficiency",
   "Umidade final calculada": "Calculated final moisture",
   "Temperatura": "Temperature",
   "Umidade do ar": "Air humidity",
@@ -415,8 +417,135 @@ window.SECADOR_I18N = {
   "Outro produto": "Other product",
   "Exemplo com dados simulados.": "Example with simulated data.",
   "Nenhum secador ligado a este computador central ainda.": "No dryer connected to this central computer yet.",
-  "Secador": "Dryer"
+  "Secador": "Dryer",
+  "Comunicação": "Communication",
+  "Tampa": "Lid",
+  "Situação": "Status",
+  "Temperatura: sem leitura": "Temperature: no reading",
+  "Sensor de temperatura e umidade interna sem leitura.": "Inside temperature and humidity sensor without a reading.",
+  "Chuva prevista e o secador está aberto: feche a tampa ou recolha o produto.": "Rain forecast and the dryer is open: close the lid or bring the product in.",
+  "sem balança: pese à mão em Lotes": "no scale: weigh by hand in Batches",
+  "Nenhum lote secando. Registre um em": "No batch drying. Register one in",
+  "Umidade medida pelo peso:": "Moisture measured by weight:",
+  "Umidade estimada:": "Estimated moisture:",
+  ". Fim previsto:": ". Predicted end:",
+  "este ar não chega à meta (veja Lotes)": "this air will not reach the target (see Batches)",
+  "já na meta: confira com o medidor de umidade": "already at target: check with the moisture meter",
+  "(estimado sem balança).": "(estimated without a scale).",
+  "Ligado. Com o secador quente demais, o próprio aparelho liga o ventilador e não deixa desligar até esfriar.": "On. If the dryer gets too hot, the device itself turns the fan on and keeps it on until it cools down.",
+  "Desligado. Com o secador quente demais, o próprio aparelho liga o ventilador e não deixa desligar até esfriar.": "Off. If the dryer gets too hot, the device itself turns the fan on and does not let it turn off until it cools down.",
+  "Abaixo, um secador de exemplo (café). Ligue o secador pelo MQTT ou pelo Wi-Fi (linha TIPO:SEC) para ver os dados reais.": "Below, an example dryer (coffee). Connect the dryer through MQTT or Wi-Fi (TIPO:SEC line) to see the real data.",
+  "Um secador de café de exemplo, para conhecer a tela. Na plataforma ligada ao computador central aparecem os secadores de verdade.": "An example coffee dryer, to get to know the screen. On the platform connected to the central computer, the real dryers appear.",
+  "Do medidor de umidade; vazio = valor típico do produto (verificar).": "From the moisture meter; blank = typical value for the product (to be verified).",
+  "Café: 11 a 12 % base úmida para guardar.": "Coffee: 11 to 12 % wet basis for storage.",
+  "kg no lote": "kg in the batch",
+  "o equilíbrio fica acima da meta: mais calor ou mais ar": "equilibrium is above the target: more heat or more air",
+  "Poucas pesagens ainda (o ajuste pede 3 ou mais pontos): curva estimada com a velocidade típica do produto (verificar).": "Few weighings so far (the fit needs 3 or more points): curve estimated with the typical drying rate of the product (to be verified).",
+  "Sem balança e sem pesagens: curva estimada com a velocidade típica do produto (verificar). Pese uma bandeja de amostra uma vez por dia para a previsão valer.": "No scale and no weighings: curve estimated with the typical drying rate of the product (to be verified). Weigh a sample tray once a day for the forecast to hold.",
+  "Peso do lote inteiro, ou da bandeja de amostra vezes o número de bandejas.": "Weight of the whole batch, or of the sample tray times the number of trays.",
+  "Curva de secagem": "Drying curve",
+  "Peso medido (balança do secador)": "Measured weight (dryer scale)",
+  "Peso medido (pesagens à mão)": "Measured weight (manual weighings)",
+  "Sem pesagens": "No weighings",
+  "Modelo ajustado": "Fitted model",
+  "Curva estimada (sem balança)": "Estimated curve (no scale)",
+  "Quando": "When",
+  "Dentro (°C)": "Inside (°C)",
+  "Coletor (°C)": "Collector (°C)",
+  "Lá fora (°C)": "Outside (°C)",
+  "Dentro (%)": "Inside (%)",
+  "Lá fora (%)": "Outside (%)",
+  "Peso (kg)": "Weight (kg)",
+  "Sol (W/m²)": "Sun (W/m²)",
+  "temperatura": "temperature",
+  "umidade": "humidity",
+  "peso": "weight",
+  "Dados simulados de exemplo.": "Simulated example data.",
+  "Leituras guardadas no computador central (as 200 mais novas de cada sensor).": "Readings stored on the central computer (the 200 latest from each sensor).",
+  "Rendimento e umidade final de cada lote": "Yield and final moisture of each batch",
+  "Duração": "Duration",
+  "Peso inicial": "Initial weight",
+  "Peso final": "Final weight",
+  "Umidade final calculada pela matéria seca: confira com o medidor de umidade antes de ensacar.": "Final moisture calculated from the dry matter: check it with the moisture meter before bagging.",
+  "Sem a localização do lugar (Monitoramento verde → Configuração) ou sem o servidor, digite a irradiação; vazio usa 5 kWh/m² por dia.": "Without the site location (Green monitoring → Setup) or without the server, type the irradiation; blank uses 5 kWh/m² per day.",
+  "Umidade no começo (%)": "Starting moisture (%)",
+  "Umidade final (%)": "Final moisture (%)",
+  "Coletor de ar com cobertura: tipicamente 0,3 a 0,6 (verificar com o ensaio do coletor).": "Glazed air collector: typically 0.3 to 0.6 (verify with the collector test report).",
+  "Parte do calor do ar que vira evaporação; o resto sai com o ar.": "Share of the air heat that turns into evaporation; the rest leaves with the air.",
+  "kg por lote": "kg per batch",
+  "m³/h no ventilador": "m³/h at the fan",
+  "Da base de fatores do Carbono.": "From the Carbon emission factor database.",
+  "Padrão do núcleo physis/1 (verificar o ano).": "physis/1 core default (verify the year).",
+  "Secador trocado": "Dryer replaced",
+  "Energia por lote": "Energy per batch",
+  "Energia por ano": "Energy per year",
+  "CO₂ evitado por ano": "CO₂ avoided per year",
+  "O ventilador gasta energia também: some a potência dele × horas no ano antes de comparar. A rede brasileira tem fator baixo; com lenha de manejo sustentável, o CO₂ da queima é biogênico e só o metano e o óxido nitroso contam.": "The fan also uses energy: add its power × hours per year before comparing. The Brazilian grid has a low emission factor; with sustainably managed firewood, combustion CO₂ is biogenic and only methane and nitrous oxide count.",
+  "Contas: água = massa × (u₀ − u)/(100 − u); calor = água × 2,45 MJ/kg ÷ aproveitamento; área = calor ÷ (irradiação × 3,6 × eficiência × dias); ar = água ÷ Δw, com Δw = 1,006 × ΔT × aproveitamento ÷ 2.450; vazão = ar ÷ 1,15 kg/m³ ÷ horas. Resultado de pré-projeto: conferir com o fornecedor do coletor e do ventilador.": "Calculations: water = mass × (u₀ − u)/(100 − u); heat = water × 2.45 MJ/kg ÷ air use; area = heat ÷ (irradiation × 3.6 × efficiency × days); air = water ÷ Δw, with Δw = 1.006 × ΔT × air use ÷ 2,450; flow = air ÷ 1.15 kg/m³ ÷ hours. Pre-design result: check with the collector and fan suppliers.",
+  "Como o secador funciona:": "How the dryer works:",
+  "o coletor esquenta o ar, o ventilador empurra esse ar pelas bandejas e o ar leva a água do produto. Ar mais quente segura mais água; por isso o ar de dentro fica mais seco que o de fora quando o sol bate.": "the collector heats the air, the fan pushes this air through the trays and the air carries away the water from the product. Warmer air holds more water; that is why the inside air is drier than the outside air when the sun is out.",
+  "Umidade do produto:": "Product moisture:",
+  "sempre em base úmida (água ÷ peso total). A matéria seca não muda durante a secagem, então o peso diz a umidade: u = 100 × (1 − matéria seca ÷ peso).": "always on a wet basis (water ÷ total weight). The dry matter does not change during drying, so the weight gives the moisture: u = 100 × (1 − dry matter ÷ weight).",
+  "Curva de secagem:": "Drying curve:",
+  "modelo exponencial simples (de Lewis, ou de Newton): o peso cai em direção a um peso de equilíbrio, sempre mais devagar. Com 3 ou mais pesagens, a tela ajusta o modelo aos pesos (mínimos quadrados) e prevê a hora do fim. Sem pesagens, usa uma velocidade típica do produto (verificar). Na secagem real há fases (aquecimento, taxa constante, taxa decrescente) e o dia e a noite; modelos de duas fases (Page, Henderson e Pabis) podem entrar depois, com os dados do próprio secador.": "simple exponential model (Lewis, or Newton): the weight falls towards an equilibrium weight, ever more slowly. With 3 or more weighings, the screen fits the model to the weights (least squares) and predicts the end time. Without weighings, it uses a typical drying rate for the product (to be verified). Real drying has phases (warm-up, constant rate, falling rate) and day and night; two-phase models (Page, Henderson and Pabis) can be added later, using the dryer's own data.",
+  "Temperaturas por produto:": "Temperatures by product:",
+  "café com a massa até 40 °C para qualidade e nunca acima de 45 °C (sementes até 35 °C), guardado com 11 a 12 % de umidade, conforme as recomendações da Embrapa Café e do Consórcio Pesquisa Café; ervas medicinais e aromáticas entre 30 e 40 °C para não perder óleos essenciais; frutas em fatias entre 55 e 65 °C; cogumelos entre 40 e 55 °C. Todos marcados \"verificar\": a equipe técnica confere com a literatura do produto e com o comprador.": "coffee bean mass up to 40 °C for quality and never above 45 °C (seeds up to 35 °C), stored at 11 to 12 % moisture, following the recommendations of Embrapa Café and the Consórcio Pesquisa Café; medicinal and aromatic herbs between 30 and 40 °C so as not to lose essential oils; sliced fruit between 55 and 65 °C; mushrooms between 40 and 55 °C. All marked \"to be verified\": the technical team checks them against the product literature and with the buyer.",
+  "Dimensionamento:": "Sizing:",
+  "balanço de massa (água a tirar), balanço de energia (calor latente de 2,45 MJ por kg de água a cerca de 25 °C) e psicrometria simplificada (o ar esquenta no coletor e esfria ao pegar água, com calor específico de 1,006 kJ/kg·K). A eficiência do coletor de ar segue os fundamentos do ASHRAE Handbook (Fundamentals, psicrometria) e da norma ASHRAE 93 (ensaio de coletores solares); a irradiação vem da NASA POWER (média de longo prazo do lugar).": "mass balance (water to remove), energy balance (latent heat of 2.45 MJ per kg of water at about 25 °C) and simplified psychrometrics (the air warms in the collector and cools as it picks up water, with a specific heat of 1.006 kJ/kg·K). The air collector efficiency follows the fundamentals of the ASHRAE Handbook (Fundamentals, psychrometrics) and the ASHRAE 93 standard (testing of solar collectors); the irradiation comes from NASA POWER (long-term average for the site).",
+  "Energia e CO₂ evitados:": "Energy and CO₂ avoided:",
+  "energia que um secador elétrico ou a lenha gastaria para tirar a mesma água, com a eficiência de cada um; CO₂ pela base de fatores do Carbono (rede elétrica do SIN; lenha pelos fatores do IPCC, GWP do AR5).": "energy that an electric or firewood dryer would use to remove the same water, with the efficiency of each; CO₂ from the Carbon emission factor database (SIN power grid; firewood from IPCC factors, AR5 GWP).",
+  "Alertas:": "Alerts:",
+  "superaquecimento pelo produto do lote; umidade de dentro acima de 80 % com o ventilador desligado; chuva prevista (Open-Meteo, já usada na plataforma) com o secador aberto; aparelho sem falar. A segurança de temperatura fica no próprio aparelho: ele liga o ventilador sozinho no limite, mesmo sem rede.": "overheating for the batch product; inside humidity above 80 % with the fan off; rain forecast (Open-Meteo, already used on the platform) with the dryer open; device offline. Temperature safety lives in the device itself: it turns the fan on by itself at the limit, even without a network.",
+  "Referências para conferir (redação própria; ler o texto vigente)": "References to check (our own wording; read the current text)",
+  "Embrapa Café e Consórcio Pesquisa Café — recomendações de secagem e armazenamento do café (temperatura da massa e umidade final).": "Embrapa Café and Consórcio Pesquisa Café — recommendations for drying and storing coffee (bean mass temperature and final moisture).",
+  "MAPA — Instrução Normativa 8/2003 (Regulamento Técnico de Identidade e de Qualidade do café beneficiado grão cru): umidade máxima do café para comercialização — verificar a redação vigente.": "MAPA — Normative Instruction 8/2003 (Technical Regulation on the Identity and Quality of hulled raw coffee beans): maximum coffee moisture for trade — verify the current wording.",
+  "ANVISA — boas práticas de fabricação para alimentos (RDC 275/2002 e RDC 216/2004) quando o produto seco for vendido; ervas medicinais com regras próprias — verificar.": "ANVISA — good manufacturing practices for food (RDC 275/2002 and RDC 216/2004) when the dried product is sold; medicinal herbs have their own rules — to be verified.",
+  "ASHRAE Handbook — Fundamentals (psicrometria) e ASHRAE 93 (método de ensaio de coletores solares); Duffie e Beckman, Solar Engineering of Thermal Processes (coletores de ar).": "ASHRAE Handbook — Fundamentals (psychrometrics) and ASHRAE 93 (test method for solar collectors); Duffie and Beckman, Solar Engineering of Thermal Processes (air collectors).",
+  "Literatura de secagem solar de produtos agrícolas (FAO e manuais de extensão rural) para a eficiência de secadores solares de ar forçado — tipicamente de 10 a 30 % no conjunto.": "Literature on solar drying of agricultural products (FAO and rural extension manuals) for the efficiency of forced-air solar dryers — typically 10 to 30 % overall.",
+  "Ventilador ligado (exemplo).": "Fan on (example).",
+  "Ventilador desligado (exemplo).": "Fan off (example).",
+  "Pedido enviado ao secador; confirma na próxima leitura.": "Request sent to the dryer; confirmed on the next reading.",
+  "Não foi possível enviar agora.": "Could not send right now.",
+  "Sem ligação com o computador central.": "No connection to the central computer.",
+  "Informe o peso no começo.": "Enter the starting weight.",
+  "A umidade final tem de ser menor que a do começo (as duas entre 0 e 100 %).": "The final moisture must be lower than the starting moisture (both between 0 and 100 %).",
+  "Lote registrado.": "Batch registered.",
+  "café (cereja ou pergaminho)": "coffee (cherry or parchment)",
+  "ervas e folhas (medicinais, aromáticas)": "herbs and leaves (medicinal, aromatic)",
+  "frutas em fatias": "sliced fruit",
+  "cogumelos": "mushrooms",
+  "outro produto": "other product",
+  "Superaquecimento": "Overheating"
 };
+/* regras com números (o painel lê a cópia em sistema/physis-i18n-modulos.json) */
+window.SECADOR_I18N_RX = [
+  ["^°C · ([\\d.,]+|—) % de umidade$", "°C · $1 % humidity"],
+  ["^°C · sol ([\\d.,]+) W/m²$", "°C · sun $1 W/m²"],
+  ["^Lote de agora: (.+)$", "Current batch: $1"],
+  ["^Lote secando: (.+) \\(exemplo\\)$", "Batch drying: $1 (example)"],
+  ["^Lote secando: (.+)$", "Batch drying: $1"],
+  ["^Começou em (.+) com ([\\d.,]+|—) kg e ([\\d.,]+|—) % de umidade\\. Meta: ([\\d.,]+|—) % \\(([\\d.,]+|—) kg\\)\\.$", "Started on $1 with $2 kg at $3 % moisture. Target: $4 % ($5 kg)."],
+  ["^Superaquecimento: ([\\d.,]+) °C dentro do secador, acima de ([\\d.,]+) °C para (.+)\\.$", "Overheating: $1 °C inside the dryer, above $2 °C for $3."],
+  ["^Umidade alta dentro do secador \\(([\\d.,]+) %\\) com o ventilador desligado\\.$", "High humidity inside the dryer ($1 %) with the fan off."],
+  ["^Secador sem falar há ([\\d.,]+) min: confira a energia e a rede\\.$", "Dryer offline for $1 min: check the power and the network."],
+  ["^Nó (\\d+)$", "Node $1"],
+  ["^em (.+) desde o começo$", "$1 after the start"],
+  ["^([\\d.,]+) dias$", "$1 days"],
+  ["^% por hora do que falta \\(k = ([\\d.,]+) 1/h\\)$", "% per hour of the remaining water (k = $1 1/h)"],
+  ["^Modelo ajustado a (\\d+) pesagens: peso de equilíbrio ([\\d.,]+) kg\\.$", "Model fitted to $1 weighings: equilibrium weight $2 kg."],
+  ["^meta ([\\d.,]+) kg$", "target $1 kg"],
+  ["^(.+): de ([\\d.,−—-]+) a ([\\d.,−—-]+) (°C|%|kg)$", "$1: from $2 to $3 $4"],
+  ["^máximo ([\\d.,]+) °C$", "maximum $1 °C"],
+  ["^Sem dados para (.+) ainda\\.$", "No data for $1 yet."],
+  ["^Ver os números \\((.+)\\)$", "See the numbers ($1)"],
+  ["^(.+): as 12 leituras mais novas$", "$1: the 12 latest readings"],
+  ["^Irradiação do lugar \\(NASA POWER, média de longo prazo\\): de ([\\d.,]+) a ([\\d.,]+) kWh/m² por dia\\. Campo vazio usa o mês mais fraco\\.$", "Site irradiation (NASA POWER, long-term average): from $1 to $2 kWh/m² per day. A blank field uses the weakest month."],
+  ["^Irradiação do lugar \\(NASA POWER, média de longo prazo\\): de ([\\d.,]+) a ([\\d.,]+) kWh/m² por dia\\. Campo vazio usa o mês escolhido\\.$", "Site irradiation (NASA POWER, long-term average): from $1 to $2 kWh/m² per day. A blank field uses the chosen month."],
+  ["^MJ por lote \\(([\\d.,]+) kWh\\)$", "MJ per batch ($1 kWh)"],
+  ["^Energia e CO₂ que o sol evita por ano \\(([\\d.,]+) lotes\\)$", "Energy and CO₂ the sun avoids per year ($1 batches)"],
+  ["^([\\d.,]+|—) kg de lenha$", "$1 kg of firewood"],
+  ["^Lote terminado: rendimento de ([\\d.,]+|—) %\\.$", "Batch finished: yield of $1 %."]
+];
 
 window.SECADOR = { PRODUTOS, UMIDADE_INTERNA_ALTA, materiaSeca, pesoNaUmidade, aguaARemover, umidadeDoPeso, rendimento, ajustar, pesoPrevisto, horasAte,
   modeloEstimado, previsaoLote, dimensionar, alertas, demoSerie, CALOR_LATENTE_MJ_KG, CP_AR_KJ_KG_K, RHO_AR, FATOR_REDE_PADRAO, linhaExemplo: "ID:41,TIPO:SEC,TI:38.5,UI:42.0,TE:27.1,UE:70.0,TC:52.3,VENT:1,PESO:84.20,IRR:820,BAT:3.95,TS:1794600000" };

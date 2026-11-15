@@ -131,5 +131,22 @@ class CatalogoPelaRede(unittest.TestCase):
                 self.assertIn(b"<html", r.read(400).lower())
 
 
+class SemPainelDoCliente(unittest.TestCase):
+    """O item "Painel do cliente" (id "cliente") saiu da loja em 15/11/2026: a plataforma básica
+    (Início e Cursos) já vem com qualquer módulo. O papel "cliente" das contas continua existindo."""
+
+    def test_catalogo_sem_item_cliente(self):
+        import re
+        from pathlib import Path
+        painel = Path(__file__).resolve().parents[1] / "web" / "painel.html"
+        texto = painel.read_text(encoding="utf-8")
+        m = re.search(r"const CAT = \[(.*?)\n\];", texto, re.S)
+        self.assertIsNotNone(m, "catálogo CAT da loja não encontrado")
+        self.assertNotRegex(m.group(1), r'id:\s*"cliente"', "o item Painel do cliente voltou ao catálogo")
+        self.assertNotIn('ligado(m,"cliente")', texto)
+        self.assertNotIn("A.it.cliente", texto)
+        self.assertNotIn("cliente", Hub.ITEM_MODULOS)
+
+
 if __name__ == "__main__":
     unittest.main()

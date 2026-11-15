@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "atualizado": "2026-11-14",
+  "atualizado": "2026-11-15",
   "regra": "Valores de referência não são únicos: a base de dados é por projeto. Cada projeto guarda as suas premissas; aqui fica o padrão técnico sugerido, as opções aceitas e a fonte de cada uma. Quem muda o valor de um projeto registra o motivo.",
   "premissas": [
     {
@@ -9,13 +9,41 @@
       "valor_padrao": 130,
       "unidade": "L/pessoa·dia",
       "opcoes": [
-        {"rotulo": "Residência, padrão alto", "valor": 160, "quando": "casas de padrão alto; é o valor da Residência no Planejador"},
-        {"rotulo": "Residência, padrão médio", "valor": 130, "quando": "padrão do SustainKit para moradia"},
-        {"rotulo": "Residência, padrão baixo", "valor": 100, "quando": "moradia de padrão baixo ou uso muito econômico"},
-        {"rotulo": "Edifício residencial (Planejador)", "valor": 150, "quando": "prédio de apartamentos, valor de catálogo do Planejador"},
-        {"rotulo": "Hospedagem sem cozinha e lavanderia", "valor": 100, "quando": "hotel ou pousada em que cozinha e lavanderia são contadas à parte"},
-        {"rotulo": "Hospedagem (Planejador)", "valor": 120, "quando": "chalé ou pousada, valor de catálogo do Planejador"},
-        {"rotulo": "Escritório", "valor": 50, "quando": "escritório, estúdio, prédio comercial ou público"}
+        {
+          "rotulo": "Residência, padrão alto",
+          "valor": 160,
+          "quando": "casas de padrão alto; é o valor da Residência no Planejador"
+        },
+        {
+          "rotulo": "Residência, padrão médio",
+          "valor": 130,
+          "quando": "padrão do SustainKit para moradia"
+        },
+        {
+          "rotulo": "Residência, padrão baixo",
+          "valor": 100,
+          "quando": "moradia de padrão baixo ou uso muito econômico"
+        },
+        {
+          "rotulo": "Edifício residencial (Planejador)",
+          "valor": 150,
+          "quando": "prédio de apartamentos, valor de catálogo do Planejador"
+        },
+        {
+          "rotulo": "Hospedagem sem cozinha e lavanderia",
+          "valor": 100,
+          "quando": "hotel ou pousada em que cozinha e lavanderia são contadas à parte"
+        },
+        {
+          "rotulo": "Hospedagem (Planejador)",
+          "valor": 120,
+          "quando": "chalé ou pousada, valor de catálogo do Planejador"
+        },
+        {
+          "rotulo": "Escritório",
+          "valor": 50,
+          "quando": "escritório, estúdio, prédio comercial ou público"
+        }
       ],
       "fonte": "ABNT NBR 7229:1993, tabela de contribuição (os valores de residência, hospedagem e escritório); Planejador Physis (edifício residencial 150 e hospedagem 120, premissa Physis)",
       "nota": "A tabela da NBR 7229 dá a contribuição de esgoto; aqui ela é usada como estimativa de consumo de água. Medição real do projeto sempre vale mais que este número."
@@ -23,14 +51,34 @@
     {
       "id": "chuva.coef_escoamento",
       "grandeza": "Coeficiente de escoamento do telhado (parte da chuva que chega à cisterna)",
-      "valor_padrao": 0.80,
+      "valor_padrao": 0.8,
       "unidade": "adimensional (0 a 1)",
       "opcoes": [
-        {"rotulo": "Telha cerâmica", "valor": 0.80, "quando": "telhado de telha cerâmica"},
-        {"rotulo": "Telha metálica", "valor": 0.90, "quando": "telhado metálico"},
-        {"rotulo": "Fibrocimento", "valor": 0.85, "quando": "telha de fibrocimento"},
-        {"rotulo": "Concreto ou laje", "valor": 0.80, "quando": "laje impermeabilizada"},
-        {"rotulo": "Telhado verde", "valor": 0.30, "quando": "cobertura vegetada"}
+        {
+          "rotulo": "Telha cerâmica",
+          "valor": 0.8,
+          "quando": "telhado de telha cerâmica"
+        },
+        {
+          "rotulo": "Telha metálica",
+          "valor": 0.9,
+          "quando": "telhado metálico"
+        },
+        {
+          "rotulo": "Fibrocimento",
+          "valor": 0.85,
+          "quando": "telha de fibrocimento"
+        },
+        {
+          "rotulo": "Concreto ou laje",
+          "valor": 0.8,
+          "quando": "laje impermeabilizada"
+        },
+        {
+          "rotulo": "Telhado verde",
+          "valor": 0.3,
+          "quando": "cobertura vegetada"
+        }
       ],
       "fonte": "premissa Physis (literatura técnica de aproveitamento de água de chuva); ABNT NBR 15527:2019 não fixa um valor único",
       "nota": "Usado no SustainKit (captação) e no Planejador (balanço da cisterna). Valor do projeto escolhido pelo material real do telhado."
@@ -41,7 +89,11 @@
       "valor_padrao": 45,
       "unidade": "graus (°)",
       "opcoes": [
-        {"rotulo": "Limite legal", "valor": 45, "quando": "sempre: encostas acima de 45° são APP"}
+        {
+          "rotulo": "Limite legal",
+          "valor": 45,
+          "quando": "sempre: encostas acima de 45° são APP"
+        }
       ],
       "fonte": "Lei 12.651/2012 (Código Florestal), art. 4º, V",
       "nota": "45° = 100% de declividade (sobe 100 m em 100 m andados). Não confundir com 45% (cerca de 24°). Lei municipal ou plano de manejo da APA podem ser mais restritivos."
@@ -52,23 +104,39 @@
       "valor_padrao": 0.78,
       "unidade": "adimensional (0 a 1)",
       "opcoes": [
-        {"rotulo": "Padrão Physis", "valor": 0.78, "quando": "estudo preliminar, sem simulação do sistema real"}
+        {
+          "rotulo": "Padrão Physis",
+          "valor": 0.78,
+          "quando": "estudo preliminar, sem simulação do sistema real"
+        }
       ],
       "fonte": "premissa Physis",
-      "nota": "Inclui perdas de temperatura, sujeira, cabos e inversor. Trocar pelo valor simulado quando houver projeto executivo."
+      "nota": "Inclui perdas de temperatura, sujeira, cabos e inversor. Trocar pelo valor simulado quando houver projeto executivo. Também é o PR do agro solar do SustainKit (antes 0,75 fixo)."
     },
     {
       "id": "bateria.dod",
       "grandeza": "Profundidade de descarga da bateria (DoD)",
-      "valor_padrao": 0.90,
+      "valor_padrao": 0.9,
       "unidade": "adimensional (0 a 1)",
       "opcoes": [
-        {"rotulo": "LiFePO4 (lítio-ferro-fosfato)", "valor": 0.90, "quando": "bateria de lítio-ferro-fosfato"},
-        {"rotulo": "Li-NMC", "valor": 0.85, "quando": "bateria de lítio NMC"},
-        {"rotulo": "Chumbo-ácido ou AGM", "valor": 0.50, "quando": "bateria de chumbo-ácido ou AGM"}
+        {
+          "rotulo": "LiFePO4 (lítio-ferro-fosfato)",
+          "valor": 0.9,
+          "quando": "bateria de lítio-ferro-fosfato"
+        },
+        {
+          "rotulo": "Li-NMC",
+          "valor": 0.85,
+          "quando": "bateria de lítio NMC"
+        },
+        {
+          "rotulo": "Chumbo-ácido ou AGM",
+          "valor": 0.5,
+          "quando": "bateria de chumbo-ácido ou AGM"
+        }
       ],
       "fonte": "premissa Physis (conferir na folha de dados do fabricante escolhido)",
-      "nota": "Usado no SustainKit para dimensionar o banco de baterias."
+      "nota": "Regra única do banco de baterias (plataforma, SustainKit e agro): consumo diário × horas ÷ 24 ÷ DoD ÷ bateria.rendimento."
     },
     {
       "id": "rede.fator_emissao",
@@ -76,7 +144,11 @@
       "valor_padrao": 0.0289,
       "unidade": "tCO2/MWh",
       "opcoes": [
-        {"rotulo": "Fator médio do SIN", "valor": 0.0289, "quando": "inventário de emissões da energia comprada da rede"}
+        {
+          "rotulo": "Fator médio do SIN",
+          "valor": 0.0289,
+          "quando": "inventário de emissões da energia comprada da rede"
+        }
       ],
       "fonte": "fator médio SIN (MCTI), conferir ano",
       "nota": "Mesmo valor de FATORES.rede em sistema/physis-nucleo.js. O fator muda todo ano; atualizar aqui e no núcleo juntos."
@@ -88,7 +160,7 @@
       "unidade": "kgCO2e/L",
       "opcoes": [],
       "fonte": "valor usado em sistema/physis-nucleo.js (FATORES.diesel); conferir fonte e ano",
-      "nota": "Mantido igual ao núcleo."
+      "nota": "Mantido igual ao núcleo. O SustainKit usa este fator por litro, igual à aba Carbono (antes 0,74 kgCO2e/kWh)."
     },
     {
       "id": "combustivel.glp",
@@ -107,16 +179,337 @@
       "opcoes": [],
       "fonte": "valor usado em sistema/physis-nucleo.js (FATORES.gn); conferir fonte e ano",
       "nota": "Mantido igual ao núcleo."
+    },
+    {
+      "id": "solar.fio_b_escala",
+      "grandeza": "Parte do Fio B que a energia injetada não compensa, por ano (Lei 14.300)",
+      "valor_padrao": {
+        "2023": 0.15,
+        "2024": 0.3,
+        "2025": 0.45,
+        "2026": 0.6,
+        "2027": 0.75,
+        "2028": 0.9
+      },
+      "unidade": "fração do componente Fio B da tarifa (0 a 1), por ano",
+      "opcoes": [
+        {
+          "rotulo": "Regra de transição (art. 27)",
+          "valor": "lei14300",
+          "quando": "unidade com pedido de acesso depois de 07/01/2023"
+        },
+        {
+          "rotulo": "Regra antiga (art. 26)",
+          "valor": "antiga",
+          "quando": "pedido de acesso até 07/01/2023: sem Fio B até 2045"
+        }
+      ],
+      "fonte": "Lei 14.300/2022, art. 27 (escala de transição) e art. 26 (regra antiga até 2045); depois de 2028 a regra é da ANEEL (art. 17) [CONFERIR NA LEI]",
+      "status": "conferir",
+      "nota": "Percentuais lembrados da lei: o engenheiro confere no texto oficial antes de usar em proposta. Depois do último ano a conta repete o último percentual e avisa."
+    },
+    {
+      "id": "tarifa.custo_disponibilidade",
+      "grandeza": "Custo de disponibilidade (consumo mínimo faturado por mês)",
+      "valor_padrao": {
+        "monofasico": 30,
+        "bifasico": 50,
+        "trifasico": 100
+      },
+      "unidade": "kWh/mês, por tipo de ligação",
+      "opcoes": [
+        {
+          "rotulo": "Monofásico",
+          "valor": 30,
+          "quando": "ligação monofásica"
+        },
+        {
+          "rotulo": "Bifásico",
+          "valor": 50,
+          "quando": "ligação bifásica"
+        },
+        {
+          "rotulo": "Trifásico",
+          "valor": 100,
+          "quando": "ligação trifásica"
+        }
+      ],
+      "fonte": "REN ANEEL 1.000/2021 (custo de disponibilidade por tipo de ligação) [CONFERIR NA RESOLUÇÃO]",
+      "status": "conferir",
+      "nota": "A conta de luz nunca fica abaixo deste mínimo, com ou sem geração própria."
+    },
+    {
+      "id": "solar.albedo",
+      "grandeza": "Refletância do solo em volta das placas (albedo)",
+      "valor_padrao": 0.2,
+      "unidade": "adimensional (0 a 1)",
+      "opcoes": [
+        {
+          "rotulo": "Solo, grama ou telhado comum",
+          "valor": 0.2,
+          "quando": "valor usual sem neve"
+        }
+      ],
+      "fonte": "Duffie & Beckman, Solar Engineering of Thermal Processes, 4ª ed., 2013 (valor usual de refletância do solo no modelo isotrópico); premissa Physis",
+      "status": "conferir",
+      "nota": "Só pesa em placas muito inclinadas. Superfície clara (brita branca, membrana) reflete mais: trocar pelo valor medido."
+    },
+    {
+      "id": "bateria.rendimento",
+      "grandeza": "Rendimento de ida e volta da bateria com o inversor",
+      "valor_padrao": 0.95,
+      "unidade": "adimensional (0 a 1)",
+      "opcoes": [
+        {
+          "rotulo": "Lítio (LiFePO4) com inversor híbrido",
+          "valor": 0.95,
+          "quando": "padrão da Physis; o valor que a aba Energia solar já usava"
+        }
+      ],
+      "fonte": "premissa Physis (regra única do banco de baterias desde 15/11/2026: plataforma, SustainKit e agro); conferir na folha de dados da bateria e do inversor",
+      "status": "conferir",
+      "nota": "Banco = consumo diário × horas ÷ 24 ÷ DoD ÷ rendimento. Substitui a margem de 1,2 do SustainKit e do agro."
+    },
+    {
+      "id": "agro.autonomia_dias",
+      "grandeza": "Dias de autonomia da bateria no agro solar",
+      "valor_padrao": 2,
+      "unidade": "dias",
+      "opcoes": [
+        {
+          "rotulo": "Padrão do agro",
+          "valor": 2,
+          "quando": "cargas do campo sem rede"
+        }
+      ],
+      "fonte": "premissa Physis (valor que o agro do SustainKit já usava)",
+      "status": "conferir",
+      "nota": "Entra como horas = dias × 24 na regra única do banco de baterias."
+    },
+    {
+      "id": "biogas.pci",
+      "grandeza": "Energia do biogás",
+      "valor_padrao": 6,
+      "unidade": "kWh/m³",
+      "opcoes": [],
+      "fonte": "premissa Physis (mesmo valor do Planejador, physisBiogas, e da aba Carbono); conferir com o teor de metano medido",
+      "status": "conferir",
+      "nota": "Usado para dizer quanto GLP o biogás substitui (emissões evitadas)."
+    },
+    {
+      "id": "glp.pci",
+      "grandeza": "Energia do GLP",
+      "valor_padrao": 12.8,
+      "unidade": "kWh/kg",
+      "opcoes": [],
+      "fonte": "premissa Physis (valor da aba Carbono); conferir com a ficha do combustível",
+      "status": "conferir",
+      "nota": "Biogás evitado = m³ × biogas.pci ÷ glp.pci × fator do GLP (combustivel.glp). Regra única: aba Carbono e SustainKit."
+    },
+    {
+      "id": "drenagem.calha_tr",
+      "grandeza": "Tempo de retorno da chuva para calhas e condutores",
+      "valor_padrao": 5,
+      "unidade": "anos",
+      "opcoes": [
+        {
+          "rotulo": "Área pavimentada onde empoçar é tolerável",
+          "valor": 1,
+          "quando": "[CONFERIR NA NORMA]"
+        },
+        {
+          "rotulo": "Coberturas e terraços",
+          "valor": 5,
+          "quando": "padrão [CONFERIR NA NORMA]"
+        },
+        {
+          "rotulo": "Coberturas onde não pode transbordar",
+          "valor": 25,
+          "quando": "[CONFERIR NA NORMA]"
+        }
+      ],
+      "fonte": "ABNT NBR 10844:1989 (período de retorno das instalações de águas pluviais) [CONFERIR NA NORMA]",
+      "status": "conferir",
+      "nota": "Usado com a equação IDF do lugar."
+    },
+    {
+      "id": "drenagem.calha_duracao",
+      "grandeza": "Duração da chuva de projeto para calhas e condutores",
+      "valor_padrao": 5,
+      "unidade": "min",
+      "opcoes": [],
+      "fonte": "ABNT NBR 10844:1989 (duração da precipitação) [CONFERIR NA NORMA]",
+      "status": "conferir",
+      "nota": "Entra na IDF do lugar: i = K·T^a ÷ (t + b)^c."
+    },
+    {
+      "id": "drenagem.calha_manning_n",
+      "grandeza": "Coeficiente de rugosidade da calha (Manning)",
+      "valor_padrao": 0.011,
+      "unidade": "adimensional",
+      "opcoes": [
+        {
+          "rotulo": "Plástico, fibrocimento, aço ou metal",
+          "valor": 0.011,
+          "quando": "[CONFERIR NA NORMA]"
+        },
+        {
+          "rotulo": "Concreto alisado ou alvenaria revestida",
+          "valor": 0.012,
+          "quando": "[CONFERIR NA NORMA]"
+        },
+        {
+          "rotulo": "Cerâmica ou concreto não alisado",
+          "valor": 0.013,
+          "quando": "[CONFERIR NA NORMA]"
+        }
+      ],
+      "fonte": "ABNT NBR 10844:1989 (tabela de coeficientes de rugosidade) [CONFERIR NA NORMA]",
+      "status": "conferir",
+      "nota": "Usado na fórmula de Manning para a lâmina d'água da calha."
+    },
+    {
+      "id": "drenagem.calha_declividade",
+      "grandeza": "Declividade da calha",
+      "valor_padrao": 0.005,
+      "unidade": "m/m",
+      "opcoes": [],
+      "fonte": "ABNT NBR 10844:1989 (declividade mínima de calhas) [CONFERIR NA NORMA]",
+      "status": "conferir",
+      "nota": "Calha mais inclinada escoa mais com a mesma seção."
+    },
+    {
+      "id": "drenagem.condutor_diam_min",
+      "grandeza": "Diâmetro interno mínimo do condutor vertical",
+      "valor_padrao": 70,
+      "unidade": "mm",
+      "opcoes": [],
+      "fonte": "ABNT NBR 10844:1989 (condutores verticais) [CONFERIR NA NORMA]",
+      "status": "conferir",
+      "nota": "O diâmetro final sai do ábaco da norma com a vazão e a altura da lâmina na calha; o sistema mostra a vazão a conduzir."
+    },
+    {
+      "id": "chuva.descarte_inicial",
+      "grandeza": "Descarte da primeira chuva (lavagem do telhado)",
+      "valor_padrao": 2,
+      "unidade": "mm por chuva",
+      "opcoes": [
+        {
+          "rotulo": "Sem dado do local",
+          "valor": 2,
+          "quando": "valor recomendado na falta de dados [CONFERIR NA NORMA]"
+        }
+      ],
+      "fonte": "ABNT NBR 15527:2019 (descarte da água do escoamento inicial) [CONFERIR NA NORMA]",
+      "status": "conferir",
+      "nota": "Descontado em cada dia de chuva: captado = área × (chuva × coeficiente − descarte × dias de chuva)."
+    },
+    {
+      "id": "agua.fracao_nao_potavel",
+      "grandeza": "Parte do consumo das pessoas que pode ser água de chuva (usos não potáveis)",
+      "valor_padrao": 0.3,
+      "unidade": "adimensional (0 a 1)",
+      "opcoes": [
+        {
+          "rotulo": "Padrão do Planejador",
+          "valor": 0.3,
+          "quando": "descarga, limpeza e lavagem"
+        }
+      ],
+      "fonte": "premissa Physis (valor que o Planejador já usava); ABNT NBR 16783:2019 lista os usos não potáveis",
+      "status": "conferir",
+      "nota": "Mesma regra no Planejador e no SustainKit para a cisterna sair igual."
+    },
+    {
+      "id": "agua.reserva_dias",
+      "grandeza": "Dias de reserva de água fria",
+      "valor_padrao": 2,
+      "unidade": "dias",
+      "opcoes": [
+        {
+          "rotulo": "Padrão Physis",
+          "valor": 2,
+          "quando": "estudo preliminar"
+        }
+      ],
+      "fonte": "premissa Physis; a ABNT NBR 5626:2020 deixa a reservação ao projetista e à concessionária",
+      "status": "conferir",
+      "nota": "Usado no Planejador (reservação) e no SustainKit (cisterna do fluxo da água)."
+    },
+    {
+      "id": "esgoto.coef_retorno",
+      "grandeza": "Coeficiente de retorno (parte da água usada que vira esgoto)",
+      "valor_padrao": 0.8,
+      "unidade": "adimensional (0 a 1)",
+      "opcoes": [],
+      "fonte": "ABNT NBR 9649:1986 (coeficiente de retorno) [CONFERIR NA NORMA]",
+      "status": "conferir",
+      "nota": "Usado no fluxo da água do SustainKit."
     }
   ],
   "normas": {
-    "ABNT NBR 15527": {"edicao": "2019", "assunto": "aproveitamento de água de chuva", "situacao": "vigente", "nota": "a edição de 2007 foi substituída; não citar 2007"},
-    "ABNT NBR 5419": {"edicao": "2015", "partes": "1 a 4", "assunto": "proteção contra descargas atmosféricas (SPDA)", "situacao": "conferir", "nota": "conferir se há revisão publicada; propostas citam 2026"},
-    "Portaria Inmetro nº 309/2022": {"edicao": "2022", "assunto": "INI-C e INI-R (classificação de eficiência energética de edificações, PBE Edifica)", "situacao": "vigente", "nota": "a citação \"Portaria MDIC 309/2019\" está errada; o RTQ-R e o RTQ-C são as regras antigas"},
-    "ABNT NBR 10004": {"edicao": "2024", "partes": "1 e 2", "assunto": "classificação de resíduos sólidos", "situacao": "vigente (revisada)", "nota": "a classificação usada na Tela do cliente precisa ser conferida com a edição de 2024"},
-    "ABNT NBR 15220": {"edicao": "sem ano nos nossos arquivos", "partes": "1 a 5 (zoneamento na parte 3)", "assunto": "desempenho térmico e zoneamento bioclimático", "situacao": "conferir revisão vigente", "nota": "nenhum programa cita a edição; conferir a revisão vigente antes de usar o zoneamento em projeto"},
-    "ABNT NBR 7229": {"edicao": "1993", "assunto": "tanques sépticos", "situacao": "vigente", "nota": "fonte da tabela de contribuição por pessoa"},
-    "LEED": {"edicao": "v5", "assunto": "certificação de edificações (USGBC/GBCI)", "situacao": "vigente", "nota": "v4.1 é legado: só para projetos já registrados"},
-    "Lei 12.651/2012": {"edicao": "2012", "assunto": "Código Florestal (APP em encosta acima de 45°, art. 4º, V)", "situacao": "vigente", "nota": "45° = 100%"}
+    "ABNT NBR 15527": {
+      "edicao": "2019",
+      "assunto": "aproveitamento de água de chuva",
+      "situacao": "vigente",
+      "nota": "a edição de 2007 foi substituída; não citar 2007"
+    },
+    "ABNT NBR 5419": {
+      "edicao": "2015",
+      "partes": "1 a 4",
+      "assunto": "proteção contra descargas atmosféricas (SPDA)",
+      "situacao": "conferir",
+      "nota": "conferir se há revisão publicada; propostas citam 2026"
+    },
+    "Portaria Inmetro nº 309/2022": {
+      "edicao": "2022",
+      "assunto": "INI-C e INI-R (classificação de eficiência energética de edificações, PBE Edifica)",
+      "situacao": "vigente",
+      "nota": "a citação \"Portaria MDIC 309/2019\" está errada; o RTQ-R e o RTQ-C são as regras antigas"
+    },
+    "ABNT NBR 10004": {
+      "edicao": "2024",
+      "partes": "1 e 2",
+      "assunto": "classificação de resíduos sólidos",
+      "situacao": "vigente (revisada)",
+      "nota": "a classificação usada na Tela do cliente precisa ser conferida com a edição de 2024"
+    },
+    "ABNT NBR 15220": {
+      "edicao": "sem ano nos nossos arquivos",
+      "partes": "1 a 5 (zoneamento na parte 3)",
+      "assunto": "desempenho térmico e zoneamento bioclimático",
+      "situacao": "conferir revisão vigente",
+      "nota": "nenhum programa cita a edição; conferir a revisão vigente antes de usar o zoneamento em projeto"
+    },
+    "ABNT NBR 7229": {
+      "edicao": "1993",
+      "assunto": "tanques sépticos",
+      "situacao": "vigente",
+      "nota": "fonte da tabela de contribuição por pessoa"
+    },
+    "LEED": {
+      "edicao": "v5",
+      "assunto": "certificação de edificações (USGBC/GBCI)",
+      "situacao": "vigente",
+      "nota": "v4.1 é legado: só para projetos já registrados"
+    },
+    "Lei 12.651/2012": {
+      "edicao": "2012",
+      "assunto": "Código Florestal (APP em encosta acima de 45°, art. 4º, V)",
+      "situacao": "vigente",
+      "nota": "45° = 100%"
+    },
+    "ABNT NBR 10844": {
+      "edicao": "1989",
+      "assunto": "instalações prediais de águas pluviais (calhas e condutores)",
+      "situacao": "conferir",
+      "nota": "conferir tempo de retorno, rugosidades e ábacos"
+    },
+    "Lei 14.300/2022": {
+      "edicao": "2022",
+      "assunto": "micro e minigeração distribuída (sistema de compensação)",
+      "situacao": "vigente",
+      "nota": "transição do Fio B no art. 27"
+    }
   }
 }

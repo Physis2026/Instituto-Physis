@@ -5,7 +5,7 @@
     {
       "revisao": "Revisão de 15/11/2026 (docs/REVISAO_AVAC.md, item 1): potência no eixo = absorvida ÷ rendimento da transmissão (0,95, padrão) em vez de absorvida × rendimento do motor (0,88). Os motores sobem um degrau da tabela e o quadro elétrico acompanha.",
       "nome": "Exemplo da planilha — 308 unidades, 820 pessoas, 662 TR, 721 equipamentos",
-      "entradas": {},
+      "entradas": { "solar": { "prod": 1.8 } },
       "tolerancia": { "rel": 1e-9, "abs": 1e-9 },
       "esperado": {
         "status.ac": "ativo", "status.vent": "ativo", "status.press": "bloqueado", "status.solar": "ativo", "status.piscina": "ativo", "status.dutos": "ativo", "status.lista": "ativo", "status.quadro": "ativo",
@@ -69,6 +69,7 @@
       "revisao": "Revisão de 15/11/2026 (docs/REVISAO_AVAC.md, item 1): potência no eixo = absorvida ÷ rendimento da transmissão (0,95, padrão) em vez de absorvida × rendimento do motor (0,88). Os motores sobem um degrau da tabela e o quadro elétrico acompanha.",
       "nome": "Caso pequeno calculado à mão pelas fórmulas da planilha — 10 casas, 3 tipos de ambiente, escada com 10 portas, sem piscina",
       "entradas": {
+        "solar": { "prod": 1.8 },
         "controle": { "ativo": { "piscina": false } },
         "tipologias": { "pessoasDorm": 2, "lista": [{ "n": "Casa", "q": 10, "area": 50, "dorm": 2, "banh": 1, "vagas": 1 }] },
         "ac": { "amb": [
@@ -98,7 +99,7 @@
     },
     {
       "nome": "Exemplo da planilha com o ar-condicionado desligado (status propagado ao resumo, à lista e ao quadro)",
-      "entradas": { "controle": { "ativo": { "ac": false } } },
+      "entradas": { "controle": { "ativo": { "ac": false } }, "solar": { "prod": 1.8 } },
       "tolerancia": { "rel": 1e-9, "abs": 1e-9 },
       "esperado": {
         "status.ac": "não aplicável", "status.quadro": "ativo", "resumo.3.valor": "não aplicável", "resumo.6.valor": "não aplicável",

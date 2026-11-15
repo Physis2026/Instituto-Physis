@@ -283,7 +283,7 @@
      "nome": "Drenagem: vazão e detenção da chuva",
      "o_que_calcula": "Calcula a vazão de chuva antes e depois da obra e o volume para não aumentar o pico.",
      "formula": {
-      "texto": "Q = C·i·A ÷ 3,6 (método racional); i = K·T^a ÷ (t + b)^c; V_det ≈ (Q_depois − Q_antes)·t; SCS-CN como segundo método",
+      "texto": "Q = C·i·A ÷ 3,6 (método racional); calhas (NBR 10844): Q = i·A ÷ 60 (L/min) com i da IDF no tempo de retorno e na duração da base e área (a + h/2)·b no telhado inclinado; calha retangular por Manning; SCS-CN como segundo método",
       "variaveis": [
        {
         "simbolo": "Q",
@@ -317,7 +317,13 @@
        }
       ]
      },
-     "premissas": [],
+     "premissas": [
+      "drenagem.calha_tr",
+      "drenagem.calha_duracao",
+      "drenagem.calha_manning_n",
+      "drenagem.calha_declividade",
+      "drenagem.condutor_diam_min"
+     ],
      "normas": [
       {
        "codigo": "ABNT NBR 10844",
@@ -335,8 +341,8 @@
      "limites_de_validade": "Racional vale para bacias pequenas (até cerca de 2 a 3 km²). A IDF tem de ser a do município.",
      "fonte_de_dados": "IDF informada pela pessoa (SGB/CPRM ou estudo local).",
      "status": "simplificado",
-     "o_que_falta": "Dimensionar calha e condutor pela NBR 10844: vazão = intensidade × área de contribuição ÷ 60 (L/min), com o tempo de retorno e a duração que a norma indica e a correção da área pela inclinação do telhado. Conta simples, dá para fazer já.",
-     "onde": "planejador-physis.html · bloco Drenagem"
+     "o_que_falta": "Feito em 15/11/2026: vazão de cada água de telhado e calha sugerida pela NBR 10844. Falta: diâmetro do condutor pelo ábaco da norma e engenheiro conferir os valores marcados [CONFERIR NA NORMA].",
+     "onde": "planejador-physis.html · bloco Drenagem e Calhas; sistema/physis-calc-comum.js · calhas()"
     },
     {
      "id": "plan.agua_fria",
@@ -363,7 +369,8 @@
       ]
      },
      "premissas": [
-      "agua.per_capita"
+      "agua.per_capita",
+      "agua.reserva_dias"
      ],
      "normas": [
       {
@@ -382,7 +389,7 @@
      "limites_de_validade": "Estimativa de estudo preliminar; não é o dimensionamento de tubos.",
      "fonte_de_dados": "Ocupação informada; catálogo do Planejador.",
      "status": "simplificado",
-     "o_que_falta": "Reserva de 2 dias é premissa Physis (a NBR 5626 deixa ao projetista e à concessionária): pôr na base de premissas com fonte. Dimensionamento de tubos (pesos e vazões) fica para o projeto.",
+     "o_que_falta": "Feito em 15/11/2026: dias de reserva na base de premissas. Falta: dimensionamento de tubos (pesos e vazões) fica para o projeto.",
      "onde": "planejador-physis.html · bloco Água"
     },
     {
@@ -390,7 +397,7 @@
      "nome": "Aproveitamento de água de chuva",
      "o_que_calcula": "Simula a cisterna dia a dia com a chuva mensal do projeto e mostra cobertura e dias com água da rede para vários volumes.",
      "formula": {
-      "texto": "Captado = P × A × C; balanço diário: S(d) = min(S(d−1) + captado − demanda, V)",
+      "texto": "Captado no mês = A × max(0, P × C − descarte × dias de chuva) ÷ 1000; balanço mês a mês S(m) = min(V, S(m−1) + captado − demanda) (núcleo) e dia a dia (módulo)",
       "variaveis": [
        {
         "simbolo": "P",
@@ -415,7 +422,9 @@
       ]
      },
      "premissas": [
-      "chuva.coef_escoamento"
+      "chuva.coef_escoamento",
+      "chuva.descarte_inicial",
+      "agua.fracao_nao_potavel"
      ],
      "normas": [
       {
@@ -434,8 +443,8 @@
      "limites_de_validade": "Chuva diária simulada a partir da mensal; vale como estudo.",
      "fonte_de_dados": "Chuva mensal do projeto (INMET ou base GIS).",
      "status": "conforme",
-     "o_que_falta": "Descontar o volume de descarte inicial (primeira chuva) que a NBR 15527 recomenda; conferir o valor na norma.",
-     "onde": "planejador-physis.html · Água de chuva por simulação diária"
+     "o_que_falta": "Feito em 15/11/2026: descarte da primeira chuva descontado (mês a mês e na simulação diária). Falta: engenheiro conferir o valor do descarte na NBR 15527.",
+     "onde": "planejador-physis.html · run() (PhysisCalc.cisterna) e Água de chuva por simulação diária"
     },
     {
      "id": "plan.esgoto",
@@ -704,7 +713,7 @@
      "nome": "Captação de chuva e consumo",
      "o_que_calcula": "Estima a água de chuva captada por dia e o consumo das pessoas.",
      "formula": {
-      "texto": "captação (L/dia) = chuva anual (mm) × área × C ÷ 365; consumo = pessoas × L/pessoa·dia",
+      "texto": "captação (L/dia) = chuva anual × área × C ÷ 365 (indicador); cisterna = a mesma conta do Planejador: balanço mês a mês com descarte inicial e demanda não potável = pessoas × L/pessoa·dia × parte não potável",
       "variaveis": [
        {
         "simbolo": "C",
@@ -720,7 +729,9 @@
      },
      "premissas": [
       "chuva.coef_escoamento",
-      "agua.per_capita"
+      "agua.per_capita",
+      "chuva.descarte_inicial",
+      "agua.fracao_nao_potavel"
      ],
      "normas": [
       {
@@ -736,11 +747,11 @@
        "como_e_usada": "Origem dos valores por pessoa (estimativa)."
       }
      ],
-     "limites_de_validade": "Média do ano: esconde a seca. Não use para fixar o volume da cisterna.",
+     "limites_de_validade": "Sem a chuva mês a mês (digitada ou do Planejador) a cisterna não é dimensionada.",
      "fonte_de_dados": "Cidade escolhida (chuva anual) e Cadastro.",
      "status": "simplificado",
-     "o_que_falta": "Usar a simulação mensal ou diária do Planejador (mesma regra da NBR 15527) e mostrar o pior mês.",
-     "onde": "SustainKit_Definitivo.html · SK.agua"
+     "o_que_falta": "Feito em 15/11/2026: cisterna pelo balanço mês a mês do Planejador (mesma função) com o pior mês. Falta: trazer a chuva mensal da base GIS do servidor pela cidade.",
+     "onde": "SustainKit_Definitivo.html · SK.cisterna, calcAgua()"
     },
     {
      "id": "sk.fluxo_agua",
@@ -756,7 +767,9 @@
        }
       ]
      },
-     "premissas": [],
+     "premissas": [
+      "esgoto.coef_retorno"
+     ],
      "normas": [
       {
        "codigo": "ABNT NBR 9649",
@@ -780,7 +793,7 @@
      "limites_de_validade": "Balanço diário médio.",
      "fonte_de_dados": "Entradas do bloco Água.",
      "status": "simplificado",
-     "o_que_falta": "Pôr o coeficiente de retorno na base de premissas, com a fonte.",
+     "o_que_falta": "Feito em 15/11/2026: coeficiente de retorno lido da base. Falta: conferir o valor na NBR 9649.",
      "onde": "SustainKit_Definitivo.html · SK.fluxoAgua"
     },
     {
@@ -822,7 +835,7 @@
      "limites_de_validade": "Tabela de 11 cidades; plano horizontal.",
      "fonte_de_dados": "Tabela CIDADES do SustainKit.",
      "status": "simplificado",
-     "o_que_falta": "Usar a mesma base de irradiação da aba Energia solar (servidor) e o plano inclinado.",
+     "o_que_falta": "Pendente: o SustainKit ainda usa a tabela de HPS de 11 cidades no plano horizontal. Falta trazer a irradiação mensal do servidor e aplicar o fator do plano (PhysisCalc.fatorPlano, já usado na aba Energia solar).",
      "onde": "SustainKit_Definitivo.html · SK.solar"
     },
     {
@@ -830,7 +843,7 @@
      "nome": "Banco de baterias",
      "o_que_calcula": "Energia do banco para as horas de autonomia.",
      "formula": {
-      "texto": "E = consumo diário × (horas ÷ 24) ÷ DoD × 1,2",
+      "texto": "E = consumo diário × horas ÷ 24 ÷ DoD ÷ rendimento de ida e volta (regra única: plataforma, SustainKit e agro)",
       "variaveis": [
        {
         "simbolo": "DoD",
@@ -845,7 +858,8 @@
       ]
      },
      "premissas": [
-      "bateria.dod"
+      "bateria.dod",
+      "bateria.rendimento"
      ],
      "normas": [
       {
@@ -864,7 +878,7 @@
      "limites_de_validade": "Sem perdas do inversor separadas.",
      "fonte_de_dados": "Consumo e autonomia informados.",
      "status": "simplificado",
-     "o_que_falta": "A aba Energia solar usa ÷ 0,95 (rendimento) e o SustainKit usa × 1,2 (margem): escolher uma regra e pôr na base de premissas.",
+     "o_que_falta": "Feito em 15/11/2026: uma regra só (÷ rendimento 0,95 da base) na plataforma e no SustainKit; a margem de 1,2 saiu. Falta: perfil por hora quando houver medição; conferir o rendimento na folha de dados.",
      "onde": "SustainKit_Definitivo.html · SK.bateria"
     },
     {
@@ -872,7 +886,7 @@
      "nome": "Carbono do SustainKit",
      "o_que_calcula": "Emissões da rede e do diesel, evitado pela solar e pelo biogás, carbono dos materiais.",
      "formula": {
-      "texto": "rede = kWh ÷ 1000 × fator SIN; diesel = kWh gerados × 0,74; biogás evitado = m³ × 2,75 kgCO₂e",
+      "texto": "inventário = rede (kWh ÷ 1000 × fator SIN) + diesel (L × 2,671 kgCO₂e/L); evitadas à parte: solar (kWh × fator SIN) e biogás no lugar do GLP (m³ × 6 kWh/m³ ÷ 12,8 kWh/kg × fator do GLP)",
       "variaveis": [
        {
         "simbolo": "fator SIN",
@@ -882,7 +896,11 @@
       ]
      },
      "premissas": [
-      "rede.fator_emissao"
+      "rede.fator_emissao",
+      "combustivel.diesel",
+      "combustivel.glp",
+      "biogas.pci",
+      "glp.pci"
      ],
      "normas": [
       {
@@ -898,10 +916,10 @@
        "como_e_usada": "Base do inventário."
       }
      ],
-     "limites_de_validade": "Fatores de diesel e biogás diferentes dos da aba Carbono.",
+     "limites_de_validade": "Mesmos fatores e a mesma regra do biogás da aba Carbono; o SustainKit não tem remoções nem créditos, então o saldo net zero é o próprio inventário.",
      "fonte_de_dados": "Entradas do bloco Carbono.",
      "status": "simplificado",
-     "o_que_falta": "Unificar com a aba Carbono: diesel por litro (2,671 kgCO₂e/L da base) e uma única regra para o biogás; emissões evitadas fora do inventário (ver Carbono).",
+     "o_que_falta": "Feito em 15/11/2026: diesel por litro e biogás pela regra da aba Carbono, da base de premissas; a solar não abate mais o inventário. Falta: fatores com ano e fonte (adequação 23).",
      "onde": "SustainKit_Definitivo.html · SK.carbono"
     },
     {
@@ -949,7 +967,7 @@
      "nome": "Agro solar",
      "o_que_calcula": "Energia diária das cargas do campo, potência solar e bateria.",
      "formula": {
-      "texto": "kWh = Σ P·h ÷ 1000; P_min = kWh ÷ (HSP × 0,75); bateria = kWh × 2 ÷ 0,80 × 1,2",
+      "texto": "kWh = Σ P·h ÷ 1000; P_min = kWh ÷ (HSP × PR); bateria = regra única com horas = dias de autonomia × 24 e o DoD da base",
       "variaveis": [
        {
         "simbolo": "0,75",
@@ -963,7 +981,12 @@
        }
       ]
      },
-     "premissas": [],
+     "premissas": [
+      "pv.pr",
+      "bateria.dod",
+      "bateria.rendimento",
+      "agro.autonomia_dias"
+     ],
      "normas": [
       {
        "codigo": "sem norma aplicável",
@@ -975,7 +998,7 @@
      "limites_de_validade": "Cargas típicas, não medidas.",
      "fonte_de_dados": "Lista de cargas do SustainKit.",
      "status": "simplificado",
-     "o_que_falta": "Usa 0,75 em vez do PR da base (0,78) e DoD fixo de 0,80: ligar às premissas pv.pr e bateria.dod.",
+     "o_que_falta": "Feito em 15/11/2026: PR, DoD, rendimento e dias de autonomia vêm da base (antes 0,75, 0,80 e × 1,2 fixos). Falta: cargas medidas no lugar.",
      "onde": "SustainKit_Definitivo.html · SK.agro"
     },
     {
@@ -1091,7 +1114,7 @@
      "nome": "Potência, placas e área",
      "o_que_calcula": "Potência para cobrir a parte desejada do consumo, número de placas e área de telhado.",
      "formula": {
-      "texto": "kWp = consumo × cobertura ÷ Σ(H_mês × dias × PR); placas = ⌈kWp × 1000 ÷ W_placa⌉; área = placas × m²/placa",
+      "texto": "kWp = consumo × cobertura ÷ Σ(H_mês × fator do plano_mês × dias × PR); fator do plano pelo modelo isotrópico (Liu e Jordan; difusa pela correlação de Erbs); placas = ⌈kWp × 1000 ÷ W_placa⌉",
       "variaveis": [
        {
         "simbolo": "PR",
@@ -1106,7 +1129,8 @@
       ]
      },
      "premissas": [
-      "pv.pr"
+      "pv.pr",
+      "solar.albedo"
      ],
      "normas": [
       {
@@ -1128,18 +1152,18 @@
        "como_e_usada": "Citada; vale para o inversor escolhido."
       }
      ],
-     "limites_de_validade": "Usa a irradiação do plano horizontal: em telhado inclinado para o norte a geração real costuma ser maior no inverno e menor no verão.",
+     "limites_de_validade": "Plano das placas pelo modelo isotrópico com a inclinação e a orientação digitadas ou do telhado do Planejador; plano deitado dá o mesmo que antes.",
      "fonte_de_dados": "Consumo do Carbono ou do Início; irradiação do servidor.",
      "status": "simplificado",
-     "o_que_falta": "1) Levar a irradiação para o plano das placas (inclinação e orientação do telhado do Planejador; modelo isotrópico). 2) Projeto elétrico pela NBR 16690: tensão de circuito aberto na menor temperatura do lugar, corrente das strings, seção dos cabos CC e proteções. O item 1 é só software; o 2 precisa de engenheiro.",
-     "onde": "painel.html · solarCalc()"
+     "o_que_falta": "Feito em 15/11/2026: irradiação levada ao plano das placas (modelo isotrópico) com o telhado do Planejador. Falta (engenheiro): projeto elétrico pela NBR 16690 — strings na menor temperatura, cabos CC e proteções (adequação 20).",
+     "onde": "sistema/physis-solar.js · calcular(), entradas(); sistema/physis-calc-comum.js · fatorPlano()"
     },
     {
      "id": "solar.economia",
      "nome": "Economia em R$",
      "o_que_calcula": "Quanto a energia gerada economiza por ano.",
      "formula": {
-      "texto": "economia = geração anual × tarifa",
+      "texto": "mês a mês: autoconsumo = min(geração × parte usada na hora, consumo); injetada = geração − autoconsumo; créditos abatem o consumo da rede; a energia compensada paga pct(ano) × Fio B (Lei 14.300, art. 27); conta com solar ≥ custo de disponibilidade; economia = conta sem solar − conta com solar",
       "variaveis": [
        {
         "simbolo": "tarifa",
@@ -1148,7 +1172,10 @@
        }
       ]
      },
-     "premissas": [],
+     "premissas": [
+      "solar.fio_b_escala",
+      "tarifa.custo_disponibilidade"
+     ],
      "normas": [
       {
        "codigo": "Lei 14.300/2022",
@@ -1169,18 +1196,18 @@
        "como_e_usada": "A conta mínima continua sendo cobrada."
       }
      ],
-     "limites_de_validade": "Superestima a economia de sistemas novos, sobretudo quando quase tudo é injetado na rede.",
-     "fonte_de_dados": "Tarifa informada pela pessoa.",
-     "status": "falta implementar",
-     "o_que_falta": "Separar autoconsumo (vale a tarifa cheia) e energia injetada (vale a tarifa menos a parte do Fio B do ano, pela escala do art. 27 da Lei 14.300: conferir os percentuais na lei); manter o custo de disponibilidade (mínimo por tipo de ligação). Precisa dos campos: parte autoconsumida, tipo de ligação e componente Fio B da tarifa. Software, dá para fazer já.",
-     "onde": "painel.html · solarCalc() econ"
+     "limites_de_validade": "Com 100% de autoconsumo dá a conta antiga (geração × tarifa). Créditos que sobram não viram dinheiro; tarifa branca e geração remota não são tratadas; o retorno usa a economia do 1º ano.",
+     "fonte_de_dados": "Tarifa, parte autoconsumida, Fio B, tipo de ligação e ano informados pela pessoa; escala do Fio B e custo de disponibilidade da base de premissas.",
+     "status": "simplificado",
+     "o_que_falta": "Feito em 15/11/2026: autoconsumo e energia injetada separados, Fio B pela escala do art. 27 e custo de disponibilidade. Falta: engenheiro conferir os percentuais na lei e a regra da ANEEL depois de 2028 (premissas marcadas 'conferir').",
+     "onde": "sistema/physis-solar.js · calcular(); sistema/physis-calc-comum.js · economiaSolar()"
     },
     {
      "id": "solar.bateria",
      "nome": "Bateria",
      "o_que_calcula": "Energia da bateria para as horas de autonomia.",
      "formula": {
-      "texto": "E = consumo diário ÷ 24 × horas ÷ DoD ÷ 0,95",
+      "texto": "E = consumo diário × horas ÷ 24 ÷ DoD ÷ rendimento de ida e volta (regra única: plataforma, SustainKit e agro)",
       "variaveis": [
        {
         "simbolo": "DoD",
@@ -1195,7 +1222,8 @@
       ]
      },
      "premissas": [
-      "bateria.dod"
+      "bateria.dod",
+      "bateria.rendimento"
      ],
      "normas": [
       {
@@ -1214,7 +1242,7 @@
      "limites_de_validade": "Carga média, sem pico nem perfil por hora.",
      "fonte_de_dados": "Consumo anual.",
      "status": "simplificado",
-     "o_que_falta": "Unificar com o SustainKit (× 1,2) numa só premissa; usar o perfil por hora quando houver medição.",
+     "o_que_falta": "Feito em 15/11/2026: uma regra só (÷ rendimento 0,95 da base) na plataforma e no SustainKit; a margem de 1,2 saiu. Falta: perfil por hora quando houver medição; conferir o rendimento na folha de dados.",
      "onde": "painel.html · solarCalc() bat"
     }
    ]
@@ -1296,7 +1324,7 @@
      "nome": "Ar-condicionado por área",
      "o_que_calcula": "Capacidade de cada ambiente por m² por TR, padronizada na lista comercial de BTU/h, e carga elétrica.",
      "formula": {
-      "texto": "BTU/h = área ÷ (m²/TR) × 12.000 → próximo valor comercial; kWt = TR × 3,517; kWe = kWt ÷ COP",
+      "texto": "Com carga térmica levada da subaba Carga térmica: BTU/h = carga de projeto (NBR 16401-1) → próximo valor comercial; sem ela, triagem: BTU/h = área ÷ (m²/TR) × 12.000; kWt = TR × 3,517; kWe = kWt ÷ COP",
       "variaveis": [
        {
         "simbolo": "m²/TR",
@@ -1322,8 +1350,8 @@
      "limites_de_validade": "Triagem da planilha; não substitui a carga térmica.",
      "fonte_de_dados": "Tipologias e ambientes informados.",
      "status": "simplificado",
-     "o_que_falta": "Quando o ambiente tiver carga térmica calculada, usar o resultado de physis-cargatermica.js no lugar da regra m²/TR (só software, dá para fazer já).",
-     "onde": "sistema/physis-avac.js · calcular()"
+     "o_que_falta": "Feito em 15/11/2026: o botão 'Levar para o dimensionamento do ar-condicionado' passa a carga de cada ambiente (com confirmação e desfazer) e a tabela mostra a fonte 'Carga térmica (NBR 16401-1)'; m²/TR fica como triagem. Falta: carga térmica de todos os ambientes.",
+     "onde": "sistema/physis-avac.js · calcular(), telaLevarCargas(), aplicarCargas()"
     },
     {
      "id": "avac.ventilacao",
@@ -1409,7 +1437,7 @@
      "nome": "Aquecimento solar de água",
      "o_que_calcula": "Consumo de água quente, energia, área de coletores, reservatório e apoio.",
      "formula": {
-      "texto": "E = V·4,186·ΔT ÷ 3600; parcela solar = E × fração; área = parcela ÷ produção do coletor; reservatório = maior entre consumo e área × L/m²",
+      "texto": "E = V·4,186·ΔT ÷ 3600; parcela solar = E × fração; produção do mês = eficiência do coletor (ENCE Inmetro) × irradiação do lugar no plano do coletor; área = parcela ÷ produção do pior mês",
       "variaveis": [
        {
         "simbolo": "V",
@@ -1437,10 +1465,10 @@
        "como_e_usada": "Segue o roteiro de demanda, fração solar e volume; com produção fixa do coletor."
       }
      ],
-     "limites_de_validade": "Produção fixa de 1,8 kWh/m²·dia em qualquer lugar e mês.",
-     "fonte_de_dados": "Planilha PHYSIS_AVAC-5.",
+     "limites_de_validade": "Sol do lugar mês a mês (base do servidor, a mesma da aba Energia solar); sem a eficiência, vale a produção informada (sem valor fixo).",
+     "fonte_de_dados": "Eficiência da etiqueta Inmetro informada; irradiação mensal do servidor (NASA POWER) ou estimativa pela latitude.",
      "status": "simplificado",
-     "o_que_falta": "Usar a irradiação mês a mês do lugar (base GIS do servidor, já usada na aba Energia solar) e a produção do coletor da etiqueta do Inmetro; dimensionar pelo pior mês ou pela fração anual, com perdas do reservatório e da tubulação. Só software, com conferência do engenheiro.",
+     "o_que_falta": "Feito em 15/11/2026: produção fixa de 1,8 kWh/m²·dia trocada pela eficiência da ENCE × sol do lugar mês a mês, mostrando o pior mês. Falta: perdas do reservatório e da tubulação e a fração solar anual (NBR 15569), com conferência do engenheiro.",
      "onde": "sistema/physis-avac.js · calcular()"
     },
     {
@@ -2251,8 +2279,8 @@
      ],
      "limites_de_validade": "Pode contar a solar duas vezes: se o kWh da rede já vem das contas (que já estão menores por causa da solar), descontar a solar de novo dá saldo menor que o real.",
      "fonte_de_dados": "Entradas da aba.",
-     "status": "falta implementar",
-     "o_que_falta": "Mostrar o inventário (escopos 1 e 2) sem descontos; mostrar 'evitado' em quadro separado; o saldo net zero só desconta remoções e créditos (ISO 14068-1). Só software, dá para fazer já.",
+     "status": "simplificado",
+     "o_que_falta": "Feito em 15/11/2026: inventário dos escopos 1 e 2 sem descontos; evitadas (solar, biogás, reciclagem) num quadro à parte; o saldo net zero só abate remoções e créditos (aba Carbono e SustainKit). Falta: fatores com ano e fonte (adequação 23).",
      "onde": "painel.html · carbCalc() saldo"
     },
     {
@@ -3356,7 +3384,8 @@
    ],
    "titulo": "Carbono: tirar a dupla contagem da solar",
    "o_que_fazer": "Mostrar o inventário dos escopos 1 e 2 sem descontos; mostrar 'emissões evitadas' num quadro separado; o saldo net zero só desconta remoções e créditos.",
-   "criterio_de_aceite": "Com kWh da rede vindo das contas e geração solar informada, o total do inventário não muda quando a geração muda."
+   "criterio_de_aceite": "Com kWh da rede vindo das contas e geração solar informada, o total do inventário não muda quando a geração muda.",
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 2,
@@ -3367,7 +3396,8 @@
    ],
    "titulo": "Solar: economia pela Lei 14.300",
    "o_que_fazer": "Separar autoconsumo e energia injetada; aplicar à injetada o desconto do Fio B pela escala do art. 27 (percentuais na base de premissas, conferidos na lei); manter o custo de disponibilidade.",
-   "criterio_de_aceite": "Com 100% de autoconsumo a economia é a mesma de hoje; com 100% injetado ela fica menor e cai a cada ano da escala."
+   "criterio_de_aceite": "Com 100% de autoconsumo a economia é a mesma de hoje; com 100% injetado ela fica menor e cai a cada ano da escala.",
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 3,
@@ -3379,7 +3409,8 @@
    ],
    "titulo": "AVAC: usar a carga térmica no lugar de m²/TR",
    "o_que_fazer": "Quando o ambiente tiver carga térmica calculada (physis-cargatermica.js), o ar-condicionado e o quadro elétrico usam esse valor; m²/TR fica só como triagem e aparece marcado assim.",
-   "criterio_de_aceite": "Ambiente com carga calculada mostra a capacidade da carga térmica e a fonte 'NBR 16401-1'."
+   "criterio_de_aceite": "Ambiente com carga calculada mostra a capacidade da carga térmica e a fonte 'NBR 16401-1'.",
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 4,
@@ -3391,7 +3422,8 @@
    ],
    "titulo": "Solar: irradiação no plano das placas",
    "o_que_fazer": "Levar a irradiação horizontal para o plano inclinado (modelo isotrópico) com a inclinação e a orientação do telhado do Planejador; o SustainKit usa a mesma base do servidor.",
-   "criterio_de_aceite": "Telhado plano dá o mesmo resultado de hoje; telhado inclinado para o norte aumenta a geração de inverno."
+   "criterio_de_aceite": "Telhado plano dá o mesmo resultado de hoje; telhado inclinado para o norte aumenta a geração de inverno.",
+   "situacao": "parcial (falta o SustainKit) (15/11/2026)"
   },
   {
    "prioridade": 5,
@@ -3402,7 +3434,8 @@
    ],
    "titulo": "Aquecimento solar: irradiação do lugar mês a mês",
    "o_que_fazer": "Trocar a produção fixa de 1,8 kWh/m²·dia pela produção do coletor (etiqueta Inmetro) corrigida pela irradiação mensal do lugar; mostrar o pior mês.",
-   "criterio_de_aceite": "Duas cidades com sol diferente dão áreas de coletor diferentes."
+   "criterio_de_aceite": "Duas cidades com sol diferente dão áreas de coletor diferentes.",
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 6,
@@ -3415,7 +3448,8 @@
    ],
    "titulo": "Baterias e PR: uma regra só",
    "o_que_fazer": "Unificar a margem da bateria (÷ 0,95 na plataforma, × 1,2 no SustainKit, 2 dias e 0,80 no agro) e o PR do agro (0,75) numa premissa da base, com fonte.",
-   "criterio_de_aceite": "Mesma entrada dá o mesmo banco de baterias na plataforma e no SustainKit."
+   "criterio_de_aceite": "Mesma entrada dá o mesmo banco de baterias na plataforma e no SustainKit.",
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 7,
@@ -3427,7 +3461,8 @@
    ],
    "titulo": "Fatores de emissão: uma fonte só",
    "o_que_fazer": "SustainKit passa a usar o diesel por litro (2,671 kgCO₂e/L) e a regra de biogás da base de premissas, igual à aba Carbono.",
-   "criterio_de_aceite": "Teste de premissas compara os fatores dos dois programas."
+   "criterio_de_aceite": "Teste de premissas compara os fatores dos dois programas.",
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 8,
@@ -3438,7 +3473,8 @@
    ],
    "titulo": "Planejador: calhas e condutores pela NBR 10844",
    "o_que_fazer": "Calcular a vazão de cada água de telhado (intensidade × área de contribuição ÷ 60) com a IDF do lugar e o tempo de retorno da norma, e escolher calha e condutor.",
-   "criterio_de_aceite": "Cada cobertura do projeto mostra a vazão e a seção sugerida."
+   "criterio_de_aceite": "Cada cobertura do projeto mostra a vazão e a seção sugerida.",
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 9,
@@ -3450,7 +3486,8 @@
    ],
    "titulo": "Água de chuva: mês a mês e descarte inicial",
    "o_que_fazer": "SustainKit usa o balanço mensal ou diário do Planejador em vez da média anual; descontar o volume de descarte inicial recomendado pela NBR 15527.",
-   "criterio_de_aceite": "A cisterna do SustainKit e a do Planejador dão o mesmo volume para o mesmo projeto."
+   "criterio_de_aceite": "A cisterna do SustainKit e a do Planejador dão o mesmo volume para o mesmo projeto.",
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 10,
@@ -3461,7 +3498,8 @@
    ],
    "titulo": "Qualidade da água: referência por uso, sem alerta automático",
    "o_que_fazer": "Mostrar ao lado de cada limite a faixa de referência do uso escolhido (beber, rio, efluente, reúso) como informação; nada é preenchido nem alerta sozinho.",
-   "criterio_de_aceite": "Sem limite informado pela pessoa, nenhum alerta aparece (regra 3)."
+   "criterio_de_aceite": "Sem limite informado pela pessoa, nenhum alerta aparece (regra 3).",
+   "situacao": "pendente"
   },
   {
    "prioridade": 11,
@@ -3473,7 +3511,8 @@
    ],
    "titulo": "Resiliência: escalas escritas e limiares trocáveis",
    "o_que_fazer": "Descrever cada nível de chance e impacto (ISO 31000) e permitir trocar os limiares de chuva pelos da Defesa Civil do município.",
-   "criterio_de_aceite": "A tela mostra o significado de cada nível; limiar trocado vale para o alerta."
+   "criterio_de_aceite": "A tela mostra o significado de cada nível; limiar trocado vale para o alerta.",
+   "situacao": "pendente"
   },
   {
    "prioridade": 12,
@@ -3484,7 +3523,8 @@
    ],
    "titulo": "Planejador: outras APP e Lei 6.766",
    "o_que_fazer": "Marcar faixas de APP de rios e nascentes (art. 4º, I e IV) quando houver hidrografia no servidor; citar a Lei 6.766 no alerta de 30%.",
-   "criterio_de_aceite": "Com um rio no mapa aparece a faixa de APP na largura que o engenheiro aprovou."
+   "criterio_de_aceite": "Com um rio no mapa aparece a faixa de APP na largura que o engenheiro aprovou.",
+   "situacao": "pendente"
   },
   {
    "prioridade": 13,
@@ -3496,7 +3536,8 @@
    ],
    "titulo": "Turbinas: curva certificada e outorga",
    "o_que_fazer": "Permitir carregar a curva de potência do fabricante (IEC 61400-12-1) e avisar sobre outorga e vazão ecológica na hidráulica.",
-   "criterio_de_aceite": "Curva carregada substitui o modelo por Cp no cálculo da energia."
+   "criterio_de_aceite": "Curva carregada substitui o modelo por Cp no cálculo da energia.",
+   "situacao": "pendente"
   },
   {
    "prioridade": 14,
@@ -3507,7 +3548,8 @@
    ],
    "titulo": "Viveiro: aviso de RENASEM",
    "o_que_fazer": "Mostrar o aviso de registro antes de vender mudas.",
-   "criterio_de_aceite": "O aviso aparece na parte Viveiro."
+   "criterio_de_aceite": "O aviso aparece na parte Viveiro.",
+   "situacao": "pendente"
   },
   {
    "prioridade": 15,
@@ -3523,7 +3565,8 @@
    ],
    "titulo": "Premissas soltas para a base",
    "o_que_fazer": "Levar para sistema/physis-premissas.json os valores hoje fixos no código: vazões de exaustão, limites de velocidade de dutos, rendimentos dos resíduos, limiares das atividades, 2 dias de reserva de água e coeficiente de retorno 0,80.",
-   "criterio_de_aceite": "Cada valor tem id, unidade e fonte na base, e o código lê da base."
+   "criterio_de_aceite": "Cada valor tem id, unidade e fonte na base, e o código lê da base.",
+   "situacao": "parcial (15/11/2026)"
   },
   {
    "prioridade": 16,

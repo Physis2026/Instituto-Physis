@@ -55,7 +55,7 @@ function padrao() {
       garArea:1800, garPe:2.6, garVagas:0, garTrocas:6, garLsm2:7.5, garVaga:300,
       outros: [{ n:"Casa de bombas", area:15, pe:2.6, trocas:10 }, { n:"Sala de medidores", area:8, pe:2.6, trocas:6 }] },
     press: { dp:50, v:1, portas:0, abertas:2, w:0.9, h:2.1, fresta:0.02, outras:0, fator:1.25, fechador:50, limite:110 },
-    solar: { consumo:50, tq:40, tf:22, fracao:0.7, prod:1.8, areaCol:2, volM2:75, horas:4, reserv:RESERV.slice() },
+    solar: { consumo:50, tq:40, tf:22, fracao:0.7, eta:null, prod:null, incl:null, azim:0, lat:null, H:null, areaCol:2, volM2:75, horas:4, reserv:RESERV.slice() },
     piscina: { area:60, prof:1.4, tw:28, ta:22, ur:70, v:0.5, descoberta:1, capa:1, hCapa:12, redCapa:0.7, paredes:3, ti:22, tAq:24 },
     dutos: { rug:0.00009, fs:1.15, rend:0.6, alt:0, temp:20, rendTransm:0.95, rendMotor:0.88, margem1:0.3, margem2:0.2, sistemas: [
       { nome:"Exaustão de banheiros", fonte:"banheiros", vazao:0, vel:8, reto:40, equiv:30, local:150, altura:600, tipo:"Prumada residencial (shaft)" },
@@ -69,6 +69,7 @@ function padrao() {
 }
 
 /* ════════ Utilitários puros ════════ */
+const MESES_AQ = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 const N = v => { if (v === true) return 1; if (v === false || v == null || v === "") return 0; const n = +v; return isFinite(n) ? n : 0; };   // como N() do Excel
 const ehObj = o => o && typeof o === "object" && !Array.isArray(o);
 function mesclar(base, over) { Object.keys(over || {}).forEach(k => { const v = over[k];
@@ -103,11 +104,15 @@ function calcular(entradas) {
   const A = e.ac, m2 = N(A.m2TR), btuTR = N(A.btuTR), cop = N(A.cop);
   const deg = (A.degraus || []).map(N).filter(x => x > 0).sort((a, b) => a - b);
   const ambIn = A.amb || [];
-  const amb = ambIn.map((x, i) => { const area = N(x.area), nome = String(x.n == null ? "" : x.n), xb = area / m2 * btuTR;
+  /* carga térmica levada da subaba Carga térmica (physis-cargatermica.js, NBR 16401-1), em BTU/h de projeto por unidade
+     (x.carga, gravada pelo botão "Levar para o dimensionamento do ar-condicionado"): quando existe, ela dimensiona o
+     ar-condicionado; a regra de m²/TR fica só como triagem */
+  const amb = ambIn.map((x, i) => { const area = N(x.area), nome = String(x.n == null ? "" : x.n), ct = N(x.carga) > 0 ? N(x.carga) : null, xb = ct != null ? ct : area / m2 * btuTR;
     let bc = 0; if (area !== 0 && isFinite(xb)) { const a1 = acima(deg, xb); bc = a1 != null ? a1 : (btuTR ? Math.ceil(xb / btuTR) * btuTR : 0); }
     const ov = x.override, btu = (ov === null || ov === undefined || ov === "") ? bc : N(ov), naM = !!x.matriz && nome !== "";
     let M = 0; if (naM) { const q = x.q || []; unM.forEach((u, t) => { M += N(q[t]) * u; }); M += N(x.comum); }
-    return { i, nome, area, tr:m2 ? area / m2 : 0, btuCalc:bc, btu, equip:x.equip || "", matriz:naM, qtd:M, btuTotal:M * btu, dorm:N(x.dorm),
+    return { i, nome, area, tr:ct != null ? (btuTR ? ct / btuTR : 0) : (m2 ? area / m2 : 0), btuCalc:bc, btu, cargaBtu:ct, fonte:ct != null ? "Carga térmica (NBR 16401-1)" : "triagem por m²/TR",
+      equip:x.equip || "", matriz:naM, qtd:M, btuTotal:M * btu, dorm:N(x.dorm),
       comum:naM ? N(x.comum) : 0, foraMatriz:nome !== "" && !x.matriz }; });
   const dormChk = []; tl.forEach((t, ti) => { const nome = String(t.n == null ? "" : t.n); if (!nome) return;
     const mat = amb.reduce((s, a, ai) => s + (a.matriz ? a.dorm * N((ambIn[ai].q || [])[ti]) : 0), 0);
@@ -143,16 +148,26 @@ function calcular(entradas) {
   press.situacao = press.fTotal <= N(P.limite) ? "ok" : "acima de 110 N — reduzir ΔP ou prever alívio"; r.press = press;
   status.press = st("press", N(P.dp) > 0 && N(P.portas) > 0 && N(P.w) > 0 && N(P.h) > 0);
 
-  /* 5. Aquecimento solar (NBR 15569, método simplificado) */
+  /* 5. Aquecimento solar (NBR 15569, método simplificado), com a produção do coletor mês a mês */
   const SO = e.solar, solar = { pop:tip.pop };
   solar.consumo = solar.pop * N(SO.consumo); solar.dT = N(SO.tq) - N(SO.tf); solar.demanda = solar.consumo * 4.186 * solar.dT / 3600;
-  solar.parcela = solar.demanda * N(SO.fracao); solar.areaNec = N(SO.prod) ? solar.parcela / N(SO.prod) : 0;
+  solar.parcela = solar.demanda * N(SO.fracao);
+  /* produção do coletor mês a mês: eficiência média da etiqueta Inmetro × irradiação do lugar no plano do coletor
+     (base GIS do servidor, a mesma da aba Energia solar); a área sai do PIOR mês. Sem a irradiação ou sem a eficiência,
+     vale a produção específica informada (sem número fixo: a produção de 1,8 kWh/m²·dia em qualquer lugar saiu em 15/11/2026). */
+  const etaC = N(SO.eta) > 1 ? N(SO.eta) / 100 : N(SO.eta), Hs = Array.isArray(SO.H) && SO.H.length === 12 && SO.H.every(x => N(x) > 0) ? SO.H.map(N) : null;
+  const PCv = typeof PhysisCalc !== "undefined" ? PhysisCalc : null;
+  const Ht = Hs && PCv && N(SO.incl) > 0 && SO.lat != null && SO.lat !== "" ? PCv.fatorPlano(Hs, N(SO.lat), N(SO.incl), N(SO.azim)).Ht : Hs;
+  if (Ht && etaC > 0) { solar.prodMes = Ht.map(h => h * etaC); solar.piorMes = solar.prodMes.indexOf(Math.min.apply(null, solar.prodMes));
+    solar.prodUsada = solar.prodMes[solar.piorMes]; solar.modo = "mensal"; solar.eta = etaC; }
+  else { solar.prodMes = null; solar.piorMes = null; solar.prodUsada = N(SO.prod); solar.modo = solar.prodUsada > 0 ? "informada" : "falta"; }
+  solar.areaNec = solar.prodUsada ? solar.parcela / solar.prodUsada : 0;
   solar.coletores = N(SO.areaCol) ? Math.ceil(solar.areaNec / N(SO.areaCol)) : 0; solar.areaInst = solar.coletores * N(SO.areaCol);
   solar.volCol = solar.areaInst * N(SO.volM2); solar.volReq = Math.max(solar.consumo, solar.volCol);
   const resAsc = (SO.reserv || []).map(N).filter(x => x > 0).sort((a, b) => a - b), rc = acima(resAsc, solar.volReq);
   solar.reservatorio = rc != null ? rc : Math.ceil(solar.volReq / 1000) * 1000;
   solar.apoio = N(SO.horas) ? (solar.demanda - solar.parcela) / N(SO.horas) : 0; r.solar = solar;
-  status.solar = st("solar", tip.pop > 0 && N(SO.prod) > 0 && N(SO.areaCol) > 0);
+  status.solar = st("solar", tip.pop > 0 && solar.prodUsada > 0 && N(SO.areaCol) > 0);
 
   /* 6. Aquecimento de piscina */
   const PI = e.piscina, pis = {}, tw = N(PI.tw), ta = N(PI.ta), v = N(PI.v), Ap = N(PI.area);
@@ -342,7 +357,7 @@ function calcular(entradas) {
     "Consumo: " + fx(solar.pop, 0) + " × " + fx(SO.consumo, 0) + " L/dia = " + fx(solar.consumo, 0) + " L/dia a " + fx(SO.tq, 0) + " °C",
     "Demanda: E = V · c · ΔT / 3600 = " + fx(solar.consumo, 0) + " × 4,186 × " + fx(solar.dT, 0) + " / 3600 = " + fx(solar.demanda, 1) + " kWh/dia",
     "Parcela solar: " + fx(solar.demanda, 1) + " × " + fx(N(SO.fracao) * 100, 0) + "% = " + fx(solar.parcela, 1) + " kWh/dia",
-    "Área coletora: Ac = " + fx(solar.parcela, 1) + " / " + fx(SO.prod, 2) + " kWh/m²·dia = " + fx(solar.areaNec, 1) + " m²  →  " + fx(solar.coletores, 0) + " coletores (" + fx(solar.areaInst, 1) + " m²)",
+    "Área coletora: Ac = " + fx(solar.parcela, 1) + " / " + fx(solar.prodUsada, 2) + " kWh/m²·dia" + (solar.modo === "mensal" ? " (pior mês: " + MESES_AQ[solar.piorMes] + ", eficiência " + fx(solar.eta * 100, 0) + "% × sol do lugar)" : " (produção informada)") + " = " + fx(solar.areaNec, 1) + " m²  →  " + fx(solar.coletores, 0) + " coletores (" + fx(solar.areaInst, 1) + " m²)",
     "Reservatório: maior entre consumo diário e mínimo por m² = " + fx(solar.volReq, 0) + " L  →  comercial " + fx(solar.reservatorio, 0) + " L",
     "Apoio: (" + fx(solar.demanda, 1) + " − " + fx(solar.parcela, 1) + ") / " + fx(SO.horas, 0) + " h = " + fx(solar.apoio, 1) + " kW"]);
   sec("5. Aquecimento de piscina", "piscina", ["Espelho " + fx(Ap, 0) + " m² · volume " + fx(pis.volume, 0) + " m³ · água " + fx(tw, 1) + " °C · ar " + fx(ta, 1) + " °C · UR " + fx(PI.ur, 0) + "% · vento " + fx(v, 2) + " m/s",
@@ -445,9 +460,9 @@ function telaTip(e, R) { const tl = e.tipologias.lista, amb = e.ac.amb;
 function telaAC(e, R) { const a = e.ac, x = R.ac;
   const ent = sec("acp", "Critério adotado", `<div class="precos">${campo("ac.m2TR", a.m2TR, "Área por TR (m²/TR)")}${campo("ac.cop", a.cop, "COP de referência", "n", "Serve só para estimar a carga elétrica.")}
     ${campo("ac.btuTR", a.btuTR, "1 TR (BTU/h)")}${campo("ac.degraus", a.degraus, "Capacidades comerciais (BTU/h)", "l", "Separe por ponto e vírgula. Arredonda para a capacidade imediatamente superior.")}</div>`);
-  const tipos = sec("act", "Capacidade por tipo de ambiente", tabela("Área de referência ÷ m²/TR, arredondada à capacidade comercial", ["Tipo de ambiente", "Área (m²)", "TR calculado", "BTU/h calculado", "BTU/h padronizado", "Equipamento", "Qtd", "BTU/h total"],
-    x.amb.filter(y => y.nome).map(y => `<tr><th scope="row">${esc(y.nome)}</th><td>${f(y.area, 2)}</td><td>${f(y.tr, 2)}</td><td>${f(y.btuCalc, 0)}</td><td>${f(y.btu, 0)}</td><td>${esc(y.equip || "—")}</td><td>${y.foraMatriz ? selo("fora da matriz") : f(y.qtd, 0)}</td><td>${f(y.btuTotal, 0)}</td></tr>`))
-    + `<p class="t2 pq">Os tipos e as quantidades são editados em Tipologias e ambientes.</p>`);
+  const tipos = sec("act", "Capacidade por tipo de ambiente", tabela("Carga térmica calculada (NBR 16401-1) quando o ambiente tem; senão área ÷ m²/TR (triagem); arredondada à capacidade comercial", ["Tipo de ambiente", "Área (m²)", "TR calculado", "BTU/h calculado", "BTU/h padronizado", "Fonte", "Equipamento", "Qtd", "BTU/h total"],
+    x.amb.filter(y => y.nome).map(y => `<tr><th scope="row">${esc(y.nome)}</th><td>${f(y.area, 2)}</td><td>${f(y.tr, 2)}</td><td>${f(y.btuCalc, 0)}</td><td>${f(y.btu, 0)}</td><td>${y.cargaBtu != null ? selo("Carga térmica (NBR 16401-1)") : selo("triagem") + " m²/TR"}</td><td>${esc(y.equip || "—")}</td><td>${y.foraMatriz ? selo("fora da matriz") : f(y.qtd, 0)}</td><td>${f(y.btuTotal, 0)}</td></tr>`))
+    + `<p class="t2 pq">Os tipos e as quantidades são editados em Tipologias e ambientes. Ambientes levados da subaba Carga térmica (botão \"Levar para o dimensionamento do ar-condicionado\") usam a carga calculada (BTU/h de projeto, com o fator de segurança); os demais seguem a triagem por m²/TR.</p>`);
   const lst = sec("acl", "Lista de equipamentos para o projetista", tabela("Equipamentos por capacidade comercial", ["Capacidade (BTU/h)", "Capacidade (TR)", "Quantidade", "Tipos de ambiente atendidos"],
     x.porCap.map(c => `<tr><th scope="row">${f(c.cap, 0)}</th><td>${f(c.tr, 2)}</td><td>${f(c.qtd, 0)}</td><td>${f(c.tipos, 0)}</td></tr>`))
     + kv("Conferência", [["Total de equipamentos", f(x.equip, 0)], ["Ambientes na matriz", f(x.matrizTotal, 0)], ["Situação", selo(x.situacao)]])
@@ -489,7 +504,9 @@ function telaPress(e, R) { const p = e.press, x = R.press;
 function telaSolar(e, R) { const s = e.solar, x = R.solar;
   const ent = sec("se", "Demanda e coletor", `<div class="precos"><div><span class="t2">População (do cadastro)</span><br><strong>${f(x.pop, 0)} pessoas</strong></div>
     ${campo("solar.consumo", s.consumo, "Consumo por pessoa (L/dia)", "n", "Na temperatura de consumo.")}${campo("solar.tq", s.tq, "Temperatura de consumo (°C)")}${campo("solar.tf", s.tf, "Temperatura da água fria (°C)", "n", "Média da rede no local.")}
-    ${campo("solar.fracao", s.fracao, "Fração solar desejada (0 a 1)")}${campo("solar.prod", s.prod, "Produção específica do coletor (kWh/m²·dia)", "n", "Da ENCE Inmetro do modelo, para a cidade.")}
+    ${campo("solar.fracao", s.fracao, "Fração solar desejada (0 a 1)")}${campo("solar.eta", s.eta, "Eficiência média do coletor (%)", "n", "Da etiqueta Inmetro (ENCE) do modelo escolhido.")}
+    ${campo("solar.incl", s.incl, "Inclinação do coletor (°)", "n", "Vazio ou 0 = deitado.")}${campo("solar.azim", s.azim, "Para onde o coletor aponta (°)", "n", "0 norte, 90 leste, 180 sul, 270 oeste.")}
+    ${campo("solar.prod", s.prod, "Produção específica informada (kWh/m²·dia)", "n", "Só sem a eficiência ou sem o sol do lugar.")}
     ${campo("solar.areaCol", s.areaCol, "Área útil por coletor (m²)")}${campo("solar.volM2", s.volM2, "Volume mínimo por m² de coletor (L)")}${campo("solar.horas", s.horas, "Horas de operação do apoio (h)")}
     ${campo("solar.reserv", s.reserv, "Reservatórios comerciais (L)", "l", "Separe por ponto e vírgula.")}</div>`);
   const res = sec("sr", "Cálculo", kv("Aquecimento solar pelo método simplificado", [["Consumo diário (L/dia)", f(x.consumo, 0)], ["Diferencial de temperatura (°C)", f(x.dT, 1)],
@@ -497,7 +514,10 @@ function telaSolar(e, R) { const s = e.solar, x = R.solar;
     ["Número de coletores", f(x.coletores, 0)], ["Área coletora instalada (m²)", f(x.areaInst, 1)], ["Volume mínimo pelos coletores (L)", f(x.volCol, 0)], ["Volume requerido (L)", f(x.volReq, 0)],
     ["Reservatório comercial (L)", f(x.reservatorio, 0)], ["Potência do apoio (kW)", f(x.apoio, 2)]])
     + `<p class="t2 pq">Confirme área livre de cobertura, sombreamento ao longo do ano e acesso para manutenção. Procedimento completo na NBR 15569.</p>`);
-  return avisoStatus(R, "solar") + res + ent; }
+  const mes = x.modo === "mensal" ? sec("sm", "Produção do coletor mês a mês", `<div class="rolagem"><table><caption>Eficiência ${f(x.eta * 100, 0)}% × sol do lugar (${esc(s.solFonte || "base do servidor")}); a área sai do pior mês, ${MESES_AQ[x.piorMes]}</caption><thead><tr><th scope="col">Mês</th><th scope="col">Produção (kWh/m²·dia)</th><th scope="col">Área para a parcela solar (m²)</th></tr></thead><tbody>
+    ${x.prodMes.map((p, i) => `<tr><th scope="row">${MESES_AQ[i]}${i === x.piorMes ? " (pior)" : ""}</th><td>${f(p, 2)}</td><td>${f(p ? x.parcela / p : 0, 1)}</td></tr>`).join("")}</tbody></table></div>`)
+    : `<p class="t2 pq">${x.modo === "informada" ? "Produção informada à mão: informe a eficiência da etiqueta Inmetro para usar o sol do lugar mês a mês." : "Falta a eficiência do coletor (etiqueta Inmetro) ou a produção específica: sem ela o aquecimento solar não é dimensionado."}</p>`;
+  return avisoStatus(R, "solar") + res + mes + ent; }
 
 function telaPiscina(e, R) { const p = e.piscina, x = R.piscina;
   const ent = sec("ie", "Dados de entrada", `<div class="precos">${campo("piscina.area", p.area, "Área do espelho d'água (m²)")}${campo("piscina.prof", p.prof, "Profundidade média (m)")}
@@ -589,9 +609,42 @@ function telaMemoria(e, R) {
   return R.memoria.map((m, i) => sec("m" + i, m.titulo, `<p>${selo(m.situacao)}</p>` + (m.linhas.length ? `<ul>${m.linhas.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : `<p class="t2">Módulo ${esc(m.situacao)}: não calculado nesta emissão.</p>`))).join("")
     + `<p class="t2 pq">Documento de anteprojeto. Módulos não aplicáveis ou bloqueados não foram calculados nesta emissão.</p>`; }
 
-function telaAvac() { const e = ler(), R = calcular(e), sub = SUBS.some(s => s[0] === ui.avacSub) ? ui.avacSub : "visao";
+/* sol do lugar para o aquecimento solar: o mesmo da aba Energia solar (base GIS do servidor ou estimativa pela latitude) */
+function comSol(e) { try { const S = typeof window !== "undefined" && window.SOLAR && window.SOLAR.compat ? window.SOLAR.compat() : null;
+  if (S && Array.isArray(S.H) && S.H.length === 12 && !(e.solar && Array.isArray(e.solar.H))) { e = JSON.parse(JSON.stringify(e)); e.solar = e.solar || {};
+    e.solar.H = S.H; e.solar.lat = S.lat; e.solar.solFonte = S.medido ? "medida por satélite (NASA POWER, no servidor)" : "estimada pela latitude"; } } catch (x) {} return e; }
+/* ── Levar a carga térmica para o dimensionamento do ar-condicionado (botão na subaba Carga térmica) ──
+   cargasCalculadas(): [{ nome, btuh (projeto, com fator de segurança), area }] da subaba Carga térmica.
+   planoCargas(e, R, cargas): o que muda em cada ambiente (antes → depois, feito à mão, novo).
+   aplicarCargas(e, cargas): novo estado com x.carga em cada ambiente de mesmo nome (cria o que falta, 1 unidade);
+   o valor feito à mão (override) só é trocado depois da confirmação, e o desfazer volta o estado anterior. */
+function cargasCalculadas() { try { const CT = typeof window !== "undefined" ? window.CARGA_TERMICA : null, o = CT && typeof calcLer === "function" ? calcLer("cargatermica") : null;
+  if (!(CT && o && o.e && Array.isArray(o.e.ambientes) && o.e.ambientes.length)) return [];
+  const r = CT.calcular(o.e.ambientes, o.e.clima, o.e.opcoes);
+  return (r.ambientes || []).filter(a => a.nome && a.projeto && a.projeto.btuh > 0).map(a => ({ nome:a.nome, btuh:a.projeto.btuh, area:a.area })); } catch (x) { return []; } }
+function planoCargas(e, R, cargas) { const deg = (e.ac.degraus || []).map(N).filter(x => x > 0).sort((a, b) => a - b), btuTR = N(e.ac.btuTR);
+  return (cargas || []).map(c => { const i = (e.ac.amb || []).findIndex(a => String(a.n) === c.nome), a = i >= 0 ? e.ac.amb[i] : null, r = i >= 0 ? R.ac.amb[i] : null;
+    const pad = acima(deg, c.btuh), depois = pad != null ? pad : (btuTR ? Math.ceil(c.btuh / btuTR) * btuTR : c.btuh);
+    return { i, nome:c.nome, btuh:c.btuh, antes:r ? r.btu : null, depois, manual:!!(a && a.override !== null && a.override !== undefined && a.override !== ""), novo:i < 0 }; }); }
+function aplicarCargas(e, cargas) { e = JSON.parse(JSON.stringify(e));
+  (cargas || []).forEach(c => { let a = e.ac.amb.find(x => String(x.n) === c.nome);
+    if (!a) { a = { n:c.nome, area:+(c.area || 0).toFixed(2), dorm:0, override:null, equip:"Split hi-wall", matriz:true, q:[], comum:1 }; e.ac.amb.push(a); }
+    a.carga = c.btuh; a.override = null; });
+  return e; }
+function telaLevarCargas(e, R) { const cargas = cargasCalculadas(), plano = planoCargas(e, R, cargas), f = x => x == null ? "—" : n2(x, 0);
+  const conf = ui.avacPush && plano.length ? `<div role="alertdialog" aria-modal="false" aria-labelledby="h-avac-push-c" aria-describedby="avac-push-d" class="faixa at">
+    <h3 id="h-avac-push-c" class="t3">Confirme o que vai mudar</h3><p id="avac-push-d" class="t2">A capacidade destes ambientes passa a vir da carga térmica (NBR 16401-1).${plano.some(p => p.manual) ? " Atenção: há valor digitado à mão que será trocado." : ""}</p>
+    <div class="rolagem"><table><caption>Ambiente, capacidade antes e depois (BTU/h padronizado)</caption><thead><tr><th scope="col">Ambiente</th><th scope="col">Antes</th><th scope="col">Depois</th><th scope="col">Observação</th></tr></thead><tbody>
+    ${plano.map(p => `<tr><th scope="row">${esc(p.nome)}</th><td>${f(p.antes)}</td><td>${f(p.depois)}</td><td>${p.novo ? "ambiente novo (1 unidade; ajuste a quantidade em Tipologias e ambientes)" : p.manual ? "valor feito à mão será trocado" : "—"}</td></tr>`).join("")}</tbody></table></div>
+    <div class="chips"><button type="button" id="avac-push-ok" data-avac-push="ok">Confirmar</button><button type="button" id="avac-push-cancelar" data-avac-push="cancelar">Cancelar</button></div></div>` : "";
+  const desf = ui.avacDesfazer ? `<p class="t2" role="status">Carga térmica levada para ${ui.avacDesfazerN || 0} ambiente(s) do ar-condicionado. <button type="button" id="avac-push-desfazer" data-avac-push="desfazer">Desfazer</button></p>` : "";
+  return `<section class="cartao" aria-labelledby="h-avac-push"><h2 id="h-avac-push">Levar para o ar-condicionado</h2>
+    <p class="t2 pq">Cada ambiente com carga calculada acima passa a dimensionar o ambiente de mesmo nome no Ar-condicionado (se não existir, é criado). A capacidade aparece com a fonte "Carga térmica (NBR 16401-1)" no lugar da triagem por m²/TR. Antes de mudar, o sistema mostra o que muda; depois, dá para desfazer.</p>
+    <button type="button" id="avac-push-ver" data-avac-push="ver"${plano.length ? "" : " disabled aria-describedby=\"avac-push-sem\""}>Levar para o dimensionamento do ar-condicionado</button>${plano.length ? "" : `<p id="avac-push-sem" class="t2 pq">Calcule a carga de pelo menos um ambiente acima.</p>`}
+    ${conf}${desf}</section>`; }
+function telaAvac() { const e = comSol(ler()), R = calcular(e), sub = SUBS.some(s => s[0] === ui.avacSub) ? ui.avacSub : "visao";
   const chips = `<div class="chips" role="group" aria-label="Partes do AVAC">${SUBS.map(([k, n]) => `<button type="button" id="avac-sub-${k}" data-avac-sub="${k}" aria-pressed="${k === sub}">${esc(n)}</button>`).join("")}</div>`;
-  const corpo = { visao:telaVisao, tip:telaTip, carga: () => typeof telaCargaTermica === "function" ? telaCargaTermica() : "<p class=\"t2\">Módulo de carga térmica não carregado.</p>", ac:telaAC, vent:telaVent, press:telaPress, solar:telaSolar, piscina:telaPiscina, dutos:telaDutos, resumo:telaResumo, memoria:telaMemoria }[sub](e, R);
+  const corpo = { visao:telaVisao, tip:telaTip, carga: () => (typeof telaCargaTermica === "function" ? telaCargaTermica() : "<p class=\"t2\">Módulo de carga térmica não carregado.</p>") + telaLevarCargas(e, R), ac:telaAC, vent:telaVent, press:telaPress, solar:telaSolar, piscina:telaPiscina, dutos:telaDutos, resumo:telaResumo, memoria:telaMemoria }[sub](e, R);
   return `<h1>AVAC e térmico</h1><p class="t2 apoio">Ar-condicionado, ventilação, pressurização de escada, aquecimento solar, piscina, dutos e quadro elétrico — as contas da planilha PHYSIS_AVAC-5. Altere os dados: tudo é recalculado.</p>${chips}<div id="avac-corpo">${corpo}</div>`; }
 
 /* ════════ Eventos (atributos data-avac-…) ════════ */
@@ -605,6 +658,13 @@ if (typeof document !== "undefined" && !window.__avacEventos) { window.__avacEve
     const e = ler(), k = t.dataset.avacK; setPath(e, k, k.indexOf("ac.amb.") === 0 && /\.dorm$/.test(k) ? (v ? 1 : 0) : v); gravar(e); const id = t.id; desenhar(false); refocar(id); });
   document.addEventListener("click", ev => { const b = ev.target.closest ? ev.target.closest("button") : null; if (!b || !b.dataset) return;
     if (b.dataset.avacSub) { ui.avacSub = b.dataset.avacSub; desenhar(false); refocar("avac-sub-" + b.dataset.avacSub); return; }
+    if (b.dataset.avacPush) { const a = b.dataset.avacPush;
+      if (a === "ver") { ui.avacPush = true; desenhar(false); refocar("avac-push-ok"); return; }
+      if (a === "cancelar") { ui.avacPush = false; desenhar(false); refocar("avac-push-ver"); return; }
+      if (a === "ok") { const e0 = ler(), c = cargasCalculadas(); ui.avacDesfazer = JSON.stringify(e0.ac.amb); ui.avacDesfazerN = c.length; ui.avacPush = false;
+        gravar(aplicarCargas(e0, c)); desenhar(false); refocar("avac-push-desfazer"); return; }
+      if (a === "desfazer" && ui.avacDesfazer) { const e0 = ler(); e0.ac.amb = JSON.parse(ui.avacDesfazer); ui.avacDesfazer = null; gravar(e0); desenhar(false); refocar("avac-push-ver"); return; }
+      return; }
     const add = b.dataset.avacAdd, del = b.dataset.avacDel; if (!add && !del && !b.dataset.avacReset) return;
     let e = ler(); const id = b.id;
     if (b.dataset.avacReset) { if (typeof confirm === "function" && !confirm("Substituir todos os dados do AVAC pelo exemplo da planilha?")) return; e = padrao(); }
@@ -620,12 +680,12 @@ if (typeof document !== "undefined" && !window.__avacEventos) { window.__avacEve
 
 /* Quadro elétrico de AVAC — mostrado na aba Caixinha Physis IoT (fora do telaAvac). Mesmo estado e mesmas contas
    do AVAC: as cargas vêm da lista de equipamentos (ventiladores, splits de áreas comuns, apoio solar, piscina). */
-function telaQuadroEletrico() { const e = ler(), R = calcular(e);
+function telaQuadroEletrico() { const e = comSol(ler()), R = calcular(e);
   return `<section aria-labelledby="h-avac-qf"><h2 id="h-avac-qf">Quadro elétrico de AVAC (QF-AVAC)</h2>
     <p class="t2 pq">Corrente de projeto, proteção, seção (capacidade, queda, curto-circuito, seccionamento e partida de motor), neutro, PE e alimentador — critérios da NBR 5410 em forma simplificada; não substitui o projeto elétrico. As cargas vêm da aba AVAC e térmico.</p>
     ${telaQuadro(e, R)}</section>`; }
 
-window.AVAC = { calcular, padrao, migrar, versao:"PHYSIS_AVAC-5" };
+window.AVAC = { calcular, padrao, migrar, planoCargas, aplicarCargas, versao:"PHYSIS_AVAC-5" };
 window.telaAvac = telaAvac;   /* global: chamada pelo nome telaAvac() na hora de desenhar */
 window.telaQuadroEletrico = telaQuadroEletrico;
 })();

@@ -68,6 +68,8 @@ BLOCOS = {
     "physis-odf": RAIZ / "sistema" / "physis-odf.js",              # ODT, ODS, PDF/A e "compartilhar para comentários"
     "physis-parceiros": RAIZ / "sistema" / "physis-parceiros.js",  # profissionais parceiros
     "pc-ponte": RAIZ / "sistema" / "physis-ponte-cliente.js",      # ponte da plataforma com o servidor (dados do cliente)
+    # contas comuns (Lei 14.300, plano inclinado, baterias, cisterna, calhas, aquecimento solar) com a base de premissas
+    "physis-calc-comum": RAIZ / "sistema" / "physis-calc-comum.js",
 }
 # Nome antigo do bloco de preferências (px-preferencias v1, a segunda implementação que existia até 15/11/2026):
 # vira o bloco do módulo único na primeira rodada.
@@ -129,6 +131,27 @@ def tratar_programas(html: str, novo: str) -> str:
     return html[:m.start(1)] + corpo + html[m.end(1):]
 
 
+CALC_COMUM = RAIZ / "sistema" / "physis-calc-comum.js"
+PREMISSAS = RAIZ / "sistema" / "physis-premissas.json"
+
+
+def premissas_no_calc_comum(conferir: bool) -> bool:
+    """Copia sistema/physis-premissas.json para o bloco PREMISSAS de physis-calc-comum.js. Devolve True se mudou."""
+    if not (CALC_COMUM.is_file() and PREMISSAS.is_file()):
+        return False
+    import json
+    base = json.loads(PREMISSAS.read_text(encoding="utf-8"))
+    # só as premissas (o catálogo de normas fica no JSON: tem notas sobre edições substituídas que os programas não citam)
+    dados = {k: base[k] for k in ("versao", "atualizado", "premissas") if k in base}
+    texto = CALC_COMUM.read_text(encoding="utf-8")
+    novo = re.sub(r"(/\*PREMISSAS-INICIO\*/\nvar PREMISSAS = ).*?(;\n/\*PREMISSAS-FIM\*/)",
+                  lambda m: m.group(1) + json.dumps(dados, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + m.group(2),
+                  texto, count=1, flags=re.S)
+    if novo != texto and not conferir:
+        CALC_COMUM.write_text(novo, encoding="utf-8", newline="\n")
+    return novo != texto
+
+
 def _materiais():
     arq = RAIZ / "ferramentas" / "embutir_materiais.py"
     if not arq.is_file():
@@ -146,6 +169,9 @@ def main() -> int:
     if not novo.startswith(INICIO) or not novo.endswith(FIM):
         raise SystemExit("o original do exportador precisa começar e terminar com as marcas conhecidas")
     diferentes = []
+    # 0º a base de premissas dentro das contas comuns (o bloco vai para o painel, o SustainKit e o Planejador)
+    if premissas_no_calc_comum(conferir):
+        diferentes.append(CALC_COMUM.relative_to(RAIZ))
     # 1º a base de materiais dentro do SustainKit e do Planejador (a cópia do SustainKit vai embutida na plataforma)
     em = _materiais()
     if em:

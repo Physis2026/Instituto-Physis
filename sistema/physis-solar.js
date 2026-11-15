@@ -54,32 +54,42 @@ function strings(p) { const m = p.modulo, v = p.inversor, b = m.beta_voc / 100, 
   return { tc_max:tcMax, voc_frio:vocFrio, vmp_frio:vmpFrio, vmp_quente:vmpQuente, n_max:nMax, n_max_mppt:nMaxMppt, n_min:nMin, n_sup:nSup, strings:s, em_serie:n, por_mppt:porMppt,
     voc_string:n * vocFrio, ok:nSup >= nMin && !(porMppt && m.isc * porMppt > v.imax_mppt), avisos:av }; }
 
-/* p: H[12] kWh/m²·dia (horizontal), T[12] °C, fator_plano, consumo kWh/ano, cobertura (0–1), kwp (sem consumo),
+/* p: H[12] kWh/m²·dia (horizontal), T[12] °C, fator_plano (número ou 12 valores, um por mês: plano inclinado pelo modelo
+   isotrópico de PhysisCalc.fatorPlano), consumo kWh/ano, cobertura (0–1), kwp (sem consumo),
    modulo, inversor, perdas {% …}, eta_inv, g_op W/m², deg %/ano, vida, razao (CC/CA alvo), pca (kW, opcional),
-   tmin, tmax (°C ambiente), tarifa, custo_kwp, taxa, infl */
-function calcular(p) { p = p || {}; const H = p.H || [], T = Array.isArray(p.T) && p.T.length === 12 ? p.T : DIAS.map(() => 25), fp = p.fator_plano > 0 ? p.fator_plano : 1;
+   tmin, tmax (°C ambiente), tarifa, custo_kwp, taxa, infl;
+   Lei 14.300: autoconsumo (0–1), fio_b (R$/kWh), ano (1º ano de geração), regra ("lei14300" | "antiga"), disponibilidade (kWh/mês) */
+function calcular(p) { p = p || {}; const H = p.H || [], T = Array.isArray(p.T) && p.T.length === 12 ? p.T : DIAS.map(() => 25);
+  const fpM = Array.isArray(p.fator_plano) && p.fator_plano.length === 12 ? p.fator_plano : DIAS.map(() => (p.fator_plano > 0 ? p.fator_plano : 1));
   const m = p.modulo || MODULOS[0], v = p.inversor || INVERSORES[0], L = Object.assign({}, PERDAS_PADRAO, p.perdas || {}), eta = p.eta_inv > 0 ? p.eta_inv : v.eta, g = p.g_op > 0 ? p.g_op : 800;
   const fixo = (1 - L.sombra / 100) * (1 - L.sujeira / 100) * (1 - L.mismatch / 100) * (1 - L.cabos_cc / 100) * eta * (1 - L.cabos_ca / 100);
-  const meses = H.map((h, i) => { const tc = tCelula(T[i], m.noct, g), ft = fTemp(tc, m.gamma_pmax); return { H:h, T:T[i], tc, f_temp:ft, pr:fixo * ft, kwh_kwp:h * fp * DIAS[i] * fixo * ft }; });
-  const rend = meses.reduce((s, x) => s + x.kwh_kwp, 0), hPlano = H.reduce((s, h, i) => s + h * fp * DIAS[i], 0), pr = hPlano ? rend / hPlano : null;
+  const meses = H.map((h, i) => { const tc = tCelula(T[i], m.noct, g), ft = fTemp(tc, m.gamma_pmax); return { H:h, T:T[i], tc, f_temp:ft, pr:fixo * ft, fp:fpM[i], kwh_kwp:h * fpM[i] * DIAS[i] * fixo * ft }; });
+  const rend = meses.reduce((s, x) => s + x.kwh_kwp, 0), hPlano = H.reduce((s, h, i) => s + h * fpM[i] * DIAS[i], 0), pr = hPlano ? rend / hPlano : null;
   const alvo = p.consumo > 0 ? p.consumo * (p.cobertura == null ? 1 : p.cobertura) : null;
   const kwpNec = alvo != null && rend > 0 ? alvo / rend : (p.kwp || 0), placas = Math.ceil(kwpNec * 1000 / m.pmax - 1e-9), kwp = placas * m.pmax / 1000;
   const ger = kwp * rend, deg = (p.deg != null ? p.deg : m.deg) / 100, vida = p.vida || 25;
   let somaVida = 0; for (let a = 0; a < vida; a++) somaVida += ger * Math.pow(1 - deg, a);
   /* cascata de perdas (kWh por ano, na ordem aplicada) */
-  const bruta = kwp * hPlano, fTempMedio = hPlano ? meses.reduce((s, x, i) => s + x.H * fp * DIAS[i] * x.f_temp, 0) / hPlano : 1;
+  const bruta = kwp * hPlano, fTempMedio = hPlano ? meses.reduce((s, x, i) => s + x.H * fpM[i] * DIAS[i] * x.f_temp, 0) / hPlano : 1;
   const etapas = [["Sombreamento", 1 - L.sombra / 100], ["Sujeira", 1 - L.sujeira / 100], ["Temperatura", fTempMedio], ["Descasamento (mismatch)", 1 - L.mismatch / 100],
     ["Cabos CC", 1 - L.cabos_cc / 100], ["Inversor", eta], ["Cabos CA", 1 - L.cabos_ca / 100]];
   let e = bruta; const cascata = etapas.map(([nome, f]) => { const perda = e * (1 - f); e *= f; return { nome, pct:(1 - f) * 100, kwh:perda }; });
   const pca = p.pca > 0 ? p.pca : (kwp && p.razao > 0 ? kwp / p.razao : (kwp ? kwp / 1.2 : 0)), razao = pca ? kwp / pca : null, avisos = [];
   if (razao != null && (razao < 1.1 || razao > 1.35)) avisos.push(`Relação CC/CA de ${razao.toFixed(2)}: fora da faixa usual de 1,10 a 1,35 (abaixo, o inversor fica ocioso; acima, corta a geração no pico).`);
   const st = strings({ modulo:m, inversor:v, placas, tmin:p.tmin != null ? p.tmin : 0, tmax:p.tmax != null ? p.tmax : 40 });
-  const invest = p.custo_kwp > 0 ? kwp * p.custo_kwp : null, econ = p.tarifa > 0 ? ger * p.tarifa : null;
+  /* economia: com as contas comuns, separa autoconsumo e energia injetada (Lei 14.300, art. 27: Fio B da injetada) e
+     mantém o custo de disponibilidade; sem elas (ou sem tarifa), a conta antiga geração × tarifa */
+  const PC = typeof PhysisCalc !== "undefined" ? PhysisCalc : (typeof window !== "undefined" ? window.PhysisCalc : null);
+  const gerMes = meses.map(x => x.kwh_kwp * kwp), ano0 = p.ano > 0 ? p.ano : new Date().getFullYear();
+  const lei = p.tarifa > 0 && PC ? anos => PC.economiaSolar({ ger_meses:gerMes, consumo_ano:p.consumo, autoconsumo:p.autoconsumo == null ? 1 : p.autoconsumo, tarifa:p.tarifa,
+    fio_b:p.fio_b, ano:anos, regra:p.regra, disponibilidade:p.disponibilidade }) : null;
+  const ec = lei ? lei(ano0) : null, porAno = lei ? [0, 1, 2, 3, 4, 5, 6].map(k => { const x = lei(ano0 + k); return { ano:ano0 + k, pct:x.pct_fio_b, economia:x.economia }; }) : [];
+  const invest = p.custo_kwp > 0 ? kwp * p.custo_kwp : null, econ = ec ? ec.economia : (p.tarifa > 0 ? ger * p.tarifa : null);
   /* degradação entra como redução do reajuste: (1 + reajuste)·(1 − degradação) − 1 */
   const inflEf = ((1 + (p.infl != null ? p.infl : 4) / 100) * (1 - deg) - 1) * 100;
   const fin = invest && econ ? analise(invest, econ / 12, vida, p.taxa != null ? p.taxa : 10, inflEf) : null;
   return { meses, rend, h_plano:hPlano, pr, kwp_necessario:kwpNec, placas, kwp, area:placas * m.area, ger, ger_media_vida:somaVida / vida, deg, cascata, bruta, f_temp_medio:fTempMedio,
-    pca, razao, strings:st, invest, econ, infl_efetiva:inflEf, fin, avisos:avisos.concat(st.avisos), eta }; }
+    pca, razao, strings:st, invest, econ, economia:ec, economia_por_ano:porAno, fator_plano:fpM, infl_efetiva:inflEf, fin, avisos:avisos.concat(st.avisos, ec ? ec.avisos : []), eta }; }
 function analise(valor, ganhoMes, anos, taxa, infl) { const f = (typeof window !== "undefined" && typeof window.analiseInvest === "function") ? window.analiseInvest : (typeof analiseInvest === "function" ? analiseInvest : null);
   return f ? f(valor, ganhoMes, anos, taxa, infl) : null; }
 
@@ -98,6 +108,9 @@ function sol(o, P) { const k = P.lat.toFixed(2) + "," + P.lon.toFixed(2);
 function temperatura(P) { if (typeof carregarGis === "function") { try { carregarGis("temperatura", P.lat, P.lon); } catch (e) {} }
   const g = ui.gis && ui.gis.temperatura; return g && g.ponto && Array.isArray(g.ponto.meses) ? g.ponto.meses : null; }
 
+/* telhado gravado pelo Planejador (mesmo navegador): inclinação e orientação da água escolhida para as placas */
+function telhadoPlanejador() { try { const t = JSON.parse(localStorage.getItem("physis-calc-telhado") || "null"); return t && t.incl != null ? t : null; } catch (e) { return null; } }
+const PCx = () => (typeof PhysisCalc !== "undefined" ? PhysisCalc : null);
 function entradas(o) { const P = lugar(o), S = sol(o, P), Tm = temperatura(P), mods = modulos(), invs = inversores();
   const m0 = mods.find(x => x.id === o.mod) || mods[0], v0 = invs.find(x => x.id === o.inv) || invs[0];
   const m = Object.assign({}, m0, { pmax:ou(num(o.placa), m0.pmax), area:ou(num(o.m2placa), m0.area), voc:ou(num(o.voc), m0.voc), vmp:ou(num(o.vmp), m0.vmp), isc:ou(num(o.isc), m0.isc),
@@ -105,16 +118,25 @@ function entradas(o) { const P = lugar(o), S = sol(o, P), Tm = temperatura(P), m
   const v = Object.assign({}, v0, { vdc_max:ou(num(o.vdc_max), v0.vdc_max), mppt_min:ou(num(o.mppt_min), v0.mppt_min), mppt_max:ou(num(o.mppt_max), v0.mppt_max), n_mppt:ou(num(o.n_mppt), v0.n_mppt), imax_mppt:ou(num(o.imax_mppt), v0.imax_mppt) });
   let consumo = num(o.consumo); if (consumo == null) { try { if (typeof carbCalc === "function" && typeof carbLer === "function") { const ca = carbCalc(carbLer()); if (ca && ca.kwh != null) consumo = ca.kwh; } } catch (e) {} }
   const tAmb = num(o.tamb), T = tAmb != null ? DIAS.map(() => tAmb) : Tm;
+  /* plano das placas: inclinação e orientação digitadas, senão as do telhado do Planejador, senão o fator digitado (1 = horizontal) */
+  const tp = telhadoPlanejador(), incl = ou(num(o.incl), tp ? +tp.incl : null), azim = ou(num(o.azim), tp ? +tp.azim : 0), Hh = S.H || DIAS.map(() => 0);
+  const pl = incl != null && PCx() ? PCx().fatorPlano(Hh, P.lat, incl, azim) : null;
+  const disp = PCx() ? PCx().premissa("tarifa.custo_disponibilidade") : null, lig = o.ligacao || "bifasico";
   return { P, S, m, v, mods, invs, temBase:base().length > 0, Tfonte:tAmb != null ? "digitada" : Tm ? "base" : "padrão",
-    p:{ H:S.H || DIAS.map(() => 0), T, fator_plano:ou(num(o.fp), 1), consumo:consumo || 0, cobertura:ou(num(o.cobertura), 100) / 100, kwp:num(o.kwp) || 0, modulo:m, inversor:v,
+    plano:{ incl, azim, fonte:num(o.incl) != null ? "digitada" : tp ? "Planejador" : null, fator:pl, telhado:tp },
+    p:{ H:Hh, T, fator_plano:pl ? pl.fator : ou(num(o.fp), 1),
+      autoconsumo:ou(num(o.autoconsumo), 100) / 100, fio_b:num(o.fio_b), ano:ou(num(o.ano), new Date().getFullYear()), regra:o.regra || "lei14300",
+      disponibilidade:disp && disp[lig] != null ? disp[lig] : null, consumo:consumo || 0, cobertura:ou(num(o.cobertura), 100) / 100, kwp:num(o.kwp) || 0, modulo:m, inversor:v,
       perdas:{ sombra:ou(num(o.sombra), PERDAS_PADRAO.sombra), sujeira:ou(num(o.sujeira), PERDAS_PADRAO.sujeira), mismatch:ou(num(o.mismatch), PERDAS_PADRAO.mismatch), cabos_cc:ou(num(o.cabos_cc), PERDAS_PADRAO.cabos_cc), cabos_ca:ou(num(o.cabos_ca), PERDAS_PADRAO.cabos_ca) },
       eta_inv:num(o.eta_inv) != null ? num(o.eta_inv) / 100 : v.eta, g_op:ou(num(o.g_op), 800), deg:ou(num(o.deg), m.deg), vida:ou(num(o.vida), 25), razao:ou(num(o.razao), 1.2), pca:num(o.pca),
       tmin:ou(num(o.tmin), 0), tmax:ou(num(o.tmax), 40), tarifa:num(o.tarifa), custo_kwp:num(o.custo_kwp), taxa:num(o.taxa), infl:num(o.infl) } }; }
 
 /* campos do solarCalc() antigo, para o resto da plataforma */
+/* banco de baterias: regra única (PhysisCalc.bateria = consumo diário × horas ÷ 24 ÷ DoD ÷ rendimento, premissas bateria.*) */
+const bateriaKwh = (consumoAno, autH, dod) => { const pc = PCx(); return autH > 0 && consumoAno > 0 ? (pc ? pc.bateria(consumoAno / 365, autH, dod) : consumoAno / 365 / 24 * autH / dod / 0.95) : 0; };
 function compat() { const o = ler(), E = entradas(o), R = calcular(E.p), autH = ou(num(o.autonomia), 0), dod = { litio:0.9, agm:0.5 }[o.bateria || "litio"] || 0.9, consumo = E.p.consumo;
   return { lat:E.P.lat, kt:ou(num(o.kt), 0.5), pr:R.pr, consumo, kwp:R.kwp, placas:R.placas, area:R.area, ger:R.ger, rend:R.rend, H:E.p.H, hpsMin:Math.min.apply(null, E.p.H),
-    tarifa:E.p.tarifa, invest:R.invest, econ:R.econ, bat:autH > 0 && consumo > 0 ? consumo / 365 / 24 * autH / dod / 0.95 : 0, autH, dod, medido:E.S.medido }; }
+    tarifa:E.p.tarifa, invest:R.invest, econ:R.econ, bat:bateriaKwh(consumo, autH, dod), autH, dod, medido:E.S.medido }; }
 
 /* ════════ Desenho ════════ */
 const f1 = (x, c) => x == null || !isFinite(x) ? "—" : n2(x, c == null ? 1 : c);
@@ -127,7 +149,10 @@ function hbar(titulo, itens, un) { const W = 360, lh = 24, H = itens.length * lh
     return `<text x="${Lx - 6}" y="${y + 14}" font-size="11" text-anchor="end" fill="#1C2B21">${esc(x.rot)}</text><rect x="${Lx}" y="${y + 3}" width="${Math.max(0, w).toFixed(1)}" height="15" fill="#A85432"><title>${esc(x.rot)}: ${f1(x.v, 0)} ${esc(un)}</title></rect><text x="${(Lx + w + 4).toFixed(1)}" y="${y + 14}" font-size="11" fill="#4A4F44">${f1(x.v, 0)}</text>`; }).join("")}</svg>`; }
 
 function metodologia() { return `<details class="cartao"><summary><h2 style="display:inline">Metodologia e normas</h2></summary>
-  <ul><li><strong>Sol do lugar:</strong> irradiação global horizontal média de cada mês (NASA POWER, climatologia de longo prazo, guardada no servidor); sem a base, estimativa pela latitude (Duffie e Beckman) com o índice de claridade. O fator do plano corrige para a inclinação e a orientação do telhado (o Planejador calcula a exposição de cada água).</li>
+  <ul><li><strong>Sol do lugar:</strong> irradiação global horizontal média de cada mês (NASA POWER, climatologia de longo prazo, guardada no servidor); sem a base, estimativa pela latitude (Duffie e Beckman) com o índice de claridade.</li>
+  <li><strong>Sol no plano das placas:</strong> modelo isotrópico (Liu e Jordan, Duffie e Beckman): a parte direta do sol é levada ao plano mês a mês pela geometria do dia médio; a parte difusa vem da correlação mensal de Erbs com o índice de claridade; o reflexo do chão usa o albedo da base de premissas. Inclinação e orientação digitadas ou do telhado do Planejador; plano deitado dá o mesmo resultado do chão.</li>
+  <li><strong>Economia (Lei 14.300):</strong> mês a mês, a energia usada na hora vale a tarifa cheia; a injetada vira crédito que abate o consumo da rede, mas paga a parte do Fio B do ano pela escala do art. 27 (percentuais na base de premissas, a conferir); a conta nunca fica abaixo do custo de disponibilidade do tipo de ligação (REN ANEEL 1.000/2021). Créditos que sobram não viram dinheiro.</li>
+  <li><strong>Bateria:</strong> regra única da Physis (a mesma do SustainKit): consumo diário × horas ÷ 24 ÷ profundidade de descarga ÷ rendimento de ida e volta (premissas bateria.dod e bateria.rendimento).</li>
   <li><strong>Temperatura:</strong> célula pelo método NOCT, Tc = Ta + (NOCT − 20)/800 · G, com G de operação editável; perda = γ(Pmax) · (Tc − 25 °C). Ta vem da temperatura média mensal da base (inclui a noite: o valor tende a subestimar o calor do meio-dia; a irradiância de operação de 800 W/m² compensa em parte).</li>
   <li><strong>Perdas:</strong> sombreamento, sujeira, descasamento, cabos CC, inversor (eficiência europeia, ponderada) e cabos CA, multiplicadas em cascata. PR = energia entregue ÷ (kWp × irradiação no plano). Os padrões são valores típicos de partida; o projeto troca pelos seus.</li>
   <li><strong>Inversor:</strong> relação CC/CA usual de 1,10 a 1,35; o corte no pico (clipping) acima disso não entra na conta mensal.</li>
@@ -147,10 +172,13 @@ function telaSolar() { const o = ler(), E = entradas(o), R = calcular(E.p), M = 
   const ent = `<section class="cartao" aria-labelledby="h-so-ent"><h2 id="h-so-ent">Dados do lugar e do consumo</h2><div class="precos">
     ${campo(o, "consumo", "Consumo de eletricidade (kWh por ano)", E.p.consumo ? n2(E.p.consumo, 0) : "ex.: 24000", "Vazio = o do Carbono ou das contas do Início.")}${campo(o, "cobertura", "Quanto do consumo a solar deve cobrir (%)", "100")}
     ${campo(o, "kwp", "Potência desejada (kWp), sem consumo", "ex.: 5")}${campo(o, "lat", "Latitude", n2(E.P.lat, 4))}${campo(o, "lon", "Longitude", n2(E.P.lon, 4))}
-    ${campo(o, "kt", "Índice de claridade (só sem a base)", "0,5")}${campo(o, "fp", "Fator do plano (inclinação e orientação)", "1", "1 = horizontal. Use o valor do Planejador para o telhado real.")}
+    ${campo(o, "kt", "Índice de claridade (só sem a base)", "0,5")}
+    ${campo(o, "incl", "Inclinação das placas (°)", E.plano.telhado ? n2(+E.plano.telhado.incl, 0) + " (Planejador)" : "0 = deitadas", "Vazio = a do telhado do Planejador; sem ele, o fator abaixo.")}
+    ${campo(o, "azim", "Para onde as placas apontam (°)", E.plano.telhado ? n2(+E.plano.telhado.azim, 0) + " (Planejador)" : "0 = norte", "0 norte, 90 leste, 180 sul, 270 oeste.")}
+    ${E.plano.incl == null ? campo(o, "fp", "Fator do plano (sem inclinação)", "1", "1 = horizontal. Com a inclinação acima, o fator é calculado mês a mês.") : ""}
     ${campo(o, "tamb", "Temperatura ambiente média (°C)", E.Tfonte === "base" ? "da base" : "25", "Vazio = média mensal da base aberta.")}
     ${campo(o, "tmin", "Mínima histórica do lugar (°C)", "0", "Para a tensão máxima das strings; 0 °C é conservador.")}${campo(o, "tmax", "Máxima histórica do lugar (°C)", "40", "Para a tensão mínima das strings; 40 °C é conservador.")}</div>
-    <p class="t2 pq">${esc(fontS)} Temperatura: ${esc(fontT)}.</p></section>`;
+    <p class="t2 pq">${esc(fontS)} Temperatura: ${esc(fontT)}.${E.plano.fator ? ` Plano das placas: ${f1(E.plano.incl, 0)}° de inclinação, apontando para ${f1(E.plano.azim, 0)}°${E.plano.fonte === "Planejador" ? " (telhado do Planejador)" : ""}; no ano o plano recebe ${f1(E.plano.fator.anual * 100, 0)}% do sol do chão (modelo isotrópico).` : ""}</p></section>`;
   const eq = `<section class="cartao" aria-labelledby="h-so-eq"><h2 id="h-so-eq">Módulo e inversor</h2><div class="precos">
     ${lista(o, "mod", "Módulo", E.mods.map(x => [x.id, x.nome]), E.mods[0].id)}${campo(o, "placa", "Potência do módulo (W)", n2(M.pmax, 0))}${campo(o, "m2placa", "Área do módulo (m²)", n2(M.area, 2))}
     ${campo(o, "voc", "Voc (V)", n2(M.voc, 1))}${campo(o, "vmp", "Vmp (V)", n2(M.vmp, 1))}${campo(o, "isc", "Isc (A)", n2(M.isc, 2))}
@@ -180,10 +208,17 @@ function telaSolar() { const o = ler(), E = entradas(o), R = calcular(E.p), M = 
     <p>${S.ok ? `<span class="selo ok">Cabe no inversor</span>` : `<span class="selo al">Não cabe: veja os avisos</span>`}</p></section>`;
   const finTab = R.fin ? `<div class="rolagem"><table><caption>Retorno do investimento de ${brl(Math.round(R.invest))} (economia de ${brl(Math.round(R.econ))} no 1º ano; reajuste efetivo ${f1(R.infl_efetiva, 2)}% ao ano)</caption><thead><tr><th scope="col">Retorno simples</th><th scope="col">Retorno descontado</th><th scope="col">VPL</th><th scope="col">TIR ao ano</th></tr></thead><tbody><tr>
     <td>${R.fin.simples != null ? f1(R.fin.simples / 12, 1) + " anos" : "não se paga"}</td><td>${R.fin.descontado != null ? f1(R.fin.descontado / 12, 1) + " anos" : "—"}</td><td>${R.fin.vpl != null ? brl(Math.round(R.fin.vpl)) : "—"}</td><td>${R.fin.tir != null ? f1(R.fin.tir, 1) + "%" : "—"}</td></tr></tbody></table></div>` : `<p class="t2 pq">Informe a tarifa e o custo por kWp para ver o retorno.</p>`;
-  const autH = ou(num(o.autonomia), 0), dod = { litio:0.9, agm:0.5 }[o.bateria || "litio"] || 0.9, bat = autH > 0 && E.p.consumo > 0 ? E.p.consumo / 365 / 24 * autH / dod / 0.95 : 0;
+  const ec = R.economia, leiTab = ec ? `<div class="rolagem"><table><caption>Economia pela Lei 14.300: ${f1(ec.auto, 0)} kWh usados na hora (tarifa cheia) e ${f1(ec.compensada, 0)} kWh compensados pela rede no 1º ano</caption><thead><tr><th scope="col">Ano</th><th scope="col">Parte do Fio B paga pela energia injetada</th><th scope="col">Economia no ano</th></tr></thead><tbody>
+    ${R.economia_por_ano.map(x => `<tr><th scope="row">${x.ano}</th><td>${x.pct == null ? "—" : f1(x.pct * 100, 0) + "%"}</td><td>${brl(Math.round(x.economia))}</td></tr>`).join("")}</tbody></table></div>
+    <p class="t2 pq">Percentuais da base de premissas (solar.fio_b_escala, <span class="selo at">conferir</span> na Lei 14.300, art. 27). O retorno acima usa a economia do 1º ano.</p>` : "";
+  const autH = ou(num(o.autonomia), 0), dod = { litio:0.9, agm:0.5 }[o.bateria || "litio"] || 0.9, bat = bateriaKwh(E.p.consumo, autH, dod);
   const fin = `<section class="cartao" aria-labelledby="h-so-fin"><h2 id="h-so-fin">Custo, retorno e bateria</h2><div class="precos">${campo(o, "tarifa", "Tarifa de energia (R$ por kWh)", "ex.: 0,95")}${campo(o, "custo_kwp", "Custo instalado (R$ por kWp)", "ex.: 3800")}
     ${campo(o, "taxa", "Taxa de desconto (% ao ano)", "10")}${campo(o, "infl", "Reajuste da tarifa (% ao ano)", "4")}${campo(o, "autonomia", "Bateria: horas de autonomia", "0 = sem bateria")}
-    ${lista(o, "bateria", "Tipo de bateria", [["litio", "Lítio (LiFePO₄), pode usar 90%"], ["agm", "Chumbo-ácido (AGM), pode usar 50%"]], "litio")}</div>${finTab}${bat ? `<p class="t2">Bateria: <strong>${f1(bat, 1)} kWh</strong> para ${f1(autH, 0)} h de autonomia.</p>` : ""}</section>`;
+    ${lista(o, "bateria", "Tipo de bateria", [["litio", "Lítio (LiFePO₄), pode usar 90%"], ["agm", "Chumbo-ácido (AGM), pode usar 50%"]], "litio")}</div>
+    <h3 class="t3">Conta de luz com a solar (Lei 14.300)</h3><div class="precos">${campo(o, "autoconsumo", "Parte da geração usada na hora (%)", "100", "O resto vai para a rede e volta como crédito.")}
+    ${campo(o, "fio_b", "Fio B da tarifa (R$ por kWh)", "da conta ou da ANEEL", "Parte da tarifa de uso da rede (TUSD Fio B) da sua distribuidora.")}${campo(o, "ano", "1º ano de geração", String(new Date().getFullYear()))}
+    ${lista(o, "ligacao", "Tipo de ligação", [["monofasico", "Monofásica"], ["bifasico", "Bifásica"], ["trifasico", "Trifásica"]], "bifasico")}
+    ${lista(o, "regra", "Pedido de acesso à rede", [["lei14300", "Depois de 07/01/2023 (regra de transição)"], ["antiga", "Até 07/01/2023 (regra antiga até 2045)"]], "lei14300")}</div>${leiTab}${finTab}${bat ? `<p class="t2">Bateria: <strong>${f1(bat, 1)} kWh</strong> para ${f1(autH, 0)} h de autonomia.</p>` : ""}</section>`;
   const mapa = typeof mapaCalorSolar === "function" ? mapaCalorSolar(E.P.lat, E.P.lon) : "";
   return `<h1>Energia solar</h1><p class="t2 apoio">Potencial do lugar, perdas uma a uma, tamanho do sistema, inversor e strings, e o retorno. A geração calculada aqui vai para o Carbono e para a Gestão (compras e investimentos).</p>${ent}${eq}${per}${mapa}${res}${casc}${mes}${st}${fin}${metodologia()}`; }
 

@@ -30,7 +30,7 @@ const ROTAS_MIN = { compostagem:["Compostagem no lugar", "compostagem", 1], verm
   reversa:["Logística reversa", "reversa", 0], aterro:["Aterro sanitário (rejeito)", "aterro2", 0], aterro1:["Aterro de resíduos perigosos", "aterro1", 0], incineracao:["Incineração", "incineracao", 0] };
 const UN_MIN = { kg_mes:1, kg_sem:52 / 12, kg_dia:30, t_mes:1000, l_mes:0.92 };
 const DESVIADO_MIN = ["reuso", "reciclagem", "compostagem", "reversa"];
-const DIESEL_KG_L = 2.671;   /* premissa combustivel.diesel (sistema/physis-premissas.json); mudar lá muda aqui */
+const DIESEL_KG_L = (typeof PhysisCalc !== "undefined" && PhysisCalc.premissa("combustivel.diesel")) || 2.671;   /* premissa combustivel.diesel da base (contas comuns); 2,671 só se o bloco faltar */
 const RAIOS = [5, 10, 20, 30, 50], MAX_FOCO = 60;
 const RUMOS = ["norte", "nordeste", "leste", "sudeste", "sul", "sudoeste", "oeste", "noroeste"];
 
@@ -65,7 +65,8 @@ function indicadores(plano, pontos, cfg) { const linhas = [], porRota = {}; let 
     const cats = categoriasDoItem(r, info), alvo = cats.length ? maisProximo(pontos, cats) : null;
     const dist = alvo ? alvo.dist_km * (cfg.tort > 0 ? cfg.tort : 1) : null;
     const tp = (typeof RC_POR_ID === "object" && RC_POR_ID[r.tipo]) || null;
-    linhas.push({ grupo:tp ? tp.grupo : "Outros", classe:tp ? tp.classe : "?", tipo:nomeTipo(r.tipo), rota:info.nome, interno:info.interno, kg, alvo, dist, co2:dist != null ? co2Transporte(kg, dist, cfg) : null, semCategoria:!info.interno && !cats.length }); });
+    /* nomes sempre preenchidos: linhas extras (lodo do esgoto, águas negras) podem não ter grupo ou nome na tabela; sem isso o fluxo mostrava "undefined" */
+    linhas.push({ grupo:(tp && tp.grupo) || "Outros", classe:(tp && tp.classe) || "?", tipo:nomeTipo(r.tipo) || "Tipo não informado", rota:info.nome || r.rota || "Rota não informada", interno:info.interno, kg, alvo, dist, co2:dist != null ? co2Transporte(kg, dist, cfg) : null, semCategoria:!info.interno && !cats.length }); });
   return { linhas, tot, desv, pct:tot ? desv / tot : null, porRota, co2:linhas.reduce((s, l) => s + ((l.co2 && l.co2.kg_co2_mes) || 0), 0),
     temCo2:linhas.some(l => l.co2 && l.co2.kg_co2_mes != null) }; }
 
