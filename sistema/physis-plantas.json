@@ -81,7 +81,39 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "enxertada 3 anos, set–nov",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1100
+   ],
+   "estrato": "medio",
+   "ciclo": "climax",
+   "companheiras": [
+    2,
+    11,
+    17,
+    118,
+    119,
+    122,
+    169,
+    13
+   ],
+   "a_conferir": []
   },
   {
    "n": 2,
@@ -109,7 +141,41 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "2–3 anos, out–dez",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    11,
+    3,
+    4,
+    23,
+    51,
+    69,
+    70,
+    89
+   ],
+   "a_conferir": []
   },
   {
    "n": 3,
@@ -135,7 +201,38 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "4 anos, nov–dez",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "medio",
+   "ciclo": "climax",
+   "companheiras": [
+    2,
+    4,
+    23,
+    51,
+    89,
+    91,
+    118,
+    119
+   ],
+   "a_conferir": []
   },
   {
    "n": 4,
@@ -161,7 +258,39 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "3–4 anos, set–nov",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    2,
+    3,
+    23,
+    51,
+    89,
+    91,
+    123
+   ],
+   "a_conferir": [
+    "solo.umido?"
+   ]
   },
   {
    "n": 5,
@@ -186,7 +315,38 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "4 anos, jan–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1100
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    6,
+    10,
+    15,
+    69,
+    75,
+    103
+   ],
+   "a_conferir": [
+    "ciclo?"
+   ]
   },
   {
    "n": 6,
@@ -213,7 +373,40 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "2 anos, dez–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1400
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    5,
+    10,
+    15,
+    69,
+    75,
+    103,
+    123,
+    124
+   ],
+   "a_conferir": []
   },
   {
    "n": 7,
@@ -234,7 +427,32 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "3 anos, set–nov",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    900
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [],
+   "a_conferir": [
+    "altitude_m?",
+    "biomas?"
+   ]
   },
   {
    "n": 8,
@@ -255,7 +473,34 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "3 anos, out–nov",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    200,
+    1500
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    11,
+    128,
+    207
+   ],
+   "a_conferir": []
   },
   {
    "n": 9,
@@ -277,7 +522,35 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "3 anos, nov–dez",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    11,
+    128
+   ],
+   "a_conferir": []
   },
   {
    "n": 10,
@@ -303,7 +576,38 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "8 anos, frutos mar–jun",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "alto",
+   "ciclo": "climax",
+   "companheiras": [
+    5,
+    6,
+    15,
+    32,
+    69,
+    75,
+    103,
+    27
+   ],
+   "a_conferir": []
   },
   {
    "n": 11,
@@ -327,7 +631,41 @@
    "adaptacao": "Ótima",
    "plantio": "set–nov",
    "colheita": "3 anos, mar–mai",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    2,
+    1,
+    8,
+    9,
+    26,
+    69,
+    70,
+    118
+   ],
+   "a_conferir": [
+    "restauracao_app?"
+   ]
   },
   {
    "n": 12,
@@ -350,7 +688,41 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "1 ano, dez–jun",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "placenta2",
+   "companheiras": [
+    87,
+    116,
+    206,
+    117,
+    74,
+    84,
+    104,
+    219
+   ],
+   "a_conferir": []
   },
   {
    "n": 13,
@@ -374,7 +746,41 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "3 anos, abr–set",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    17,
+    15,
+    51,
+    69,
+    70,
+    71,
+    113,
+    114
+   ],
+   "a_conferir": []
   },
   {
    "n": 14,
@@ -396,7 +802,40 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "4 anos, mar–ago",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    15,
+    22,
+    69,
+    70,
+    71,
+    204,
+    1,
+    13
+   ],
+   "a_conferir": []
   },
   {
    "n": 15,
@@ -424,7 +863,40 @@
    "adaptacao": "Boa (proteger de geada)",
    "plantio": "set–dez",
    "colheita": "1 ano, o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "medio",
+   "ciclo": "placenta2",
+   "companheiras": [
+    69,
+    22,
+    75,
+    5,
+    6,
+    10,
+    70,
+    90
+   ],
+   "a_conferir": []
   },
   {
    "n": 16,
@@ -446,7 +918,39 @@
    "adaptacao": "Ótima",
    "plantio": "jun–ago",
    "colheita": "3 anos, mar–mai",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1500
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    17,
+    18,
+    69,
+    70,
+    179,
+    1,
+    13,
+    14
+   ],
+   "a_conferir": []
   },
   {
    "n": 17,
@@ -469,7 +973,42 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "3 anos, jul–set",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": true,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    16,
+    13,
+    1,
+    69,
+    70,
+    2,
+    11,
+    14
+   ],
+   "a_conferir": [
+    "invasora?"
+   ]
   },
   {
    "n": 18,
@@ -490,7 +1029,39 @@
    "adaptacao": "Boa",
    "plantio": "jun–ago",
    "colheita": "3 anos, out–dez",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    111,
+    112,
+    132,
+    16,
+    50,
+    69,
+    133,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 19,
@@ -510,7 +1081,37 @@
    "adaptacao": "Boa",
    "plantio": "jun–ago",
    "colheita": "2 anos, dez–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1400
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    115,
+    208,
+    53,
+    69
+   ],
+   "a_conferir": []
   },
   {
    "n": 20,
@@ -529,7 +1130,38 @@
    "adaptacao": "Ótima",
    "plantio": "jun–ago",
    "colheita": "1 ano, out–dez",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    21,
+    107,
+    126,
+    163,
+    176
+   ],
+   "a_conferir": [
+    "invasora?"
+   ]
   },
   {
    "n": 21,
@@ -550,7 +1182,38 @@
    "adaptacao": "Boa (solo ácido)",
    "plantio": "jun–ago",
    "colheita": "2 anos, nov–jan",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    49,
+    85,
+    106,
+    107,
+    20,
+    48,
+    2
+   ],
+   "a_conferir": []
   },
   {
    "n": 22,
@@ -581,7 +1244,41 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    15,
+    69,
+    70,
+    90,
+    204,
+    14,
+    24,
+    27
+   ],
+   "a_conferir": []
   },
   {
    "n": 23,
@@ -607,7 +1304,40 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    2,
+    3,
+    4,
+    51,
+    89,
+    91,
+    26,
+    27
+   ],
+   "a_conferir": []
   },
   {
    "n": 24,
@@ -634,7 +1364,43 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    22,
+    28,
+    29,
+    123,
+    172,
+    10,
+    25,
+    30
+   ],
+   "a_conferir": []
   },
   {
    "n": 25,
@@ -657,7 +1423,37 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    32,
+    27,
+    30,
+    125,
+    10,
+    22,
+    24
+   ],
+   "a_conferir": []
   },
   {
    "n": 26,
@@ -681,7 +1477,38 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    400,
+    1800
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    128,
+    207,
+    36,
+    71,
+    11,
+    23,
+    28
+   ],
+   "a_conferir": []
   },
   {
    "n": 27,
@@ -702,7 +1529,37 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    900
+   ],
+   "estrato": "emergente",
+   "ciclo": "secundaria",
+   "companheiras": [
+    32,
+    10,
+    15,
+    22,
+    23,
+    25,
+    125
+   ],
+   "a_conferir": []
   },
   {
    "n": 28,
@@ -724,7 +1581,38 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    22,
+    23,
+    24,
+    26,
+    29
+   ],
+   "a_conferir": []
   },
   {
    "n": 29,
@@ -747,7 +1635,37 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    22,
+    24,
+    28,
+    30,
+    31,
+    172
+   ],
+   "a_conferir": []
   },
   {
    "n": 30,
@@ -771,7 +1689,38 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    25,
+    29,
+    172,
+    2,
+    10,
+    22,
+    24,
+    31
+   ],
+   "a_conferir": []
   },
   {
    "n": 31,
@@ -794,7 +1743,36 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    29,
+    37,
+    2,
+    30,
+    43,
+    44
+   ],
+   "a_conferir": []
   },
   {
    "n": 32,
@@ -816,7 +1794,38 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "emergente",
+   "ciclo": "climax",
+   "companheiras": [
+    27,
+    10,
+    25,
+    22,
+    23,
+    30
+   ],
+   "a_conferir": []
   },
   {
    "n": 33,
@@ -839,7 +1848,41 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    800
+   ],
+   "estrato": "alto",
+   "ciclo": "climax",
+   "companheiras": [
+    10,
+    22,
+    35,
+    60,
+    62,
+    15,
+    34,
+    75
+   ],
+   "a_conferir": []
   },
   {
    "n": 34,
@@ -863,7 +1906,36 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    22,
+    33,
+    35,
+    62,
+    75
+   ],
+   "a_conferir": []
   },
   {
    "n": 35,
@@ -889,7 +1961,40 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    22,
+    33,
+    62,
+    15,
+    34,
+    75,
+    92
+   ],
+   "a_conferir": []
   },
   {
    "n": 36,
@@ -913,7 +2018,36 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    26,
+    71
+   ],
+   "a_conferir": [
+    "invasora?"
+   ]
   },
   {
    "n": 37,
@@ -934,7 +2068,37 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    600,
+    2000
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    43,
+    44,
+    31,
+    46,
+    48,
+    45,
+    47
+   ],
+   "a_conferir": []
   },
   {
    "n": 38,
@@ -958,7 +2122,39 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    39,
+    40,
+    41,
+    42,
+    53,
+    54,
+    44,
+    163
+   ],
+   "a_conferir": []
   },
   {
    "n": 39,
@@ -980,7 +2176,39 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    38,
+    40,
+    41,
+    42
+   ],
+   "a_conferir": [
+    "biomas?"
+   ]
   },
   {
    "n": 40,
@@ -1003,7 +2231,48 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    41,
+    38,
+    39,
+    42,
+    51,
+    68,
+    69,
+    222
+   ],
+   "a_conferir": [
+    "nativa_br?",
+    "invasora?"
+   ]
   },
   {
    "n": 41,
@@ -1027,7 +2296,43 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    40,
+    38,
+    39,
+    42,
+    51,
+    68,
+    69,
+    222
+   ],
+   "a_conferir": [
+    "biomas?"
+   ]
   },
   {
    "n": 42,
@@ -1049,7 +2354,37 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    38,
+    39,
+    40,
+    41
+   ],
+   "a_conferir": []
   },
   {
    "n": 43,
@@ -1072,7 +2407,38 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    37,
+    60,
+    61,
+    62,
+    44,
+    66,
+    2,
+    30
+   ],
+   "a_conferir": []
   },
   {
    "n": 44,
@@ -1096,7 +2462,38 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    2000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    37,
+    45,
+    43,
+    190,
+    2,
+    30,
+    31,
+    38
+   ],
+   "a_conferir": []
   },
   {
    "n": 45,
@@ -1118,7 +2515,38 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    2500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    44,
+    37,
+    43,
+    46,
+    47,
+    190
+   ],
+   "a_conferir": []
   },
   {
    "n": 46,
@@ -1139,7 +2567,34 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    37,
+    48,
+    44,
+    45
+   ],
+   "a_conferir": []
   },
   {
    "n": 47,
@@ -1160,7 +2615,37 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    900
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    37,
+    43,
+    44,
+    45
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 48,
@@ -1180,7 +2665,35 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    600,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    49,
+    21,
+    37,
+    46
+   ],
+   "a_conferir": []
   },
   {
    "n": 49,
@@ -1199,7 +2712,33 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    21,
+    48
+   ],
+   "a_conferir": []
   },
   {
    "n": 50,
@@ -1225,7 +2764,41 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jul",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    74,
+    75,
+    94,
+    179,
+    180,
+    181,
+    219,
+    231
+   ],
+   "a_conferir": []
   },
   {
    "n": 51,
@@ -1254,7 +2827,42 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "4 meses (chá) / o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    89,
+    2,
+    3,
+    4,
+    23,
+    40,
+    41,
+    53
+   ],
+   "a_conferir": []
   },
   {
    "n": 52,
@@ -1279,7 +2887,42 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    68,
+    90,
+    94,
+    95,
+    96,
+    51,
+    53,
+    54
+   ],
+   "a_conferir": []
   },
   {
    "n": 53,
@@ -1305,7 +2948,42 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "6 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    54,
+    51,
+    55,
+    19,
+    38,
+    52,
+    115,
+    139
+   ],
+   "a_conferir": []
   },
   {
    "n": 54,
@@ -1331,7 +3009,41 @@
    "adaptacao": "Boa",
    "plantio": "mar–jun",
    "colheita": "1 ano",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    53,
+    38,
+    51,
+    52,
+    55,
+    44,
+    163,
+    167
+   ],
+   "a_conferir": []
   },
   {
    "n": 55,
@@ -1354,7 +3066,44 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    51,
+    53,
+    52,
+    54,
+    162,
+    175,
+    178,
+    228
+   ],
+   "a_conferir": []
   },
   {
    "n": 56,
@@ -1372,7 +3121,29 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "secundaria",
+   "companheiras": [],
+   "a_conferir": []
   },
   {
    "n": 57,
@@ -1398,7 +3169,42 @@
    "adaptacao": "Boa (verão)",
    "plantio": "set–dez",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    154,
+    59,
+    83,
+    84,
+    86,
+    101,
+    145,
+    85
+   ],
+   "a_conferir": []
   },
   {
    "n": 58,
@@ -1420,7 +3226,38 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    157,
+    82,
+    83,
+    158,
+    173,
+    216
+   ],
+   "a_conferir": []
   },
   {
    "n": 59,
@@ -1444,7 +3281,39 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    154,
+    57,
+    145,
+    139,
+    155,
+    156
+   ],
+   "a_conferir": []
   },
   {
    "n": 60,
@@ -1466,7 +3335,41 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    800
+   ],
+   "estrato": "aquatica",
+   "ciclo": "placenta2",
+   "companheiras": [
+    61,
+    43,
+    62,
+    63,
+    64,
+    65,
+    33,
+    66
+   ],
+   "a_conferir": []
   },
   {
    "n": 61,
@@ -1488,7 +3391,44 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "aquatica",
+   "ciclo": "placenta2",
+   "companheiras": [
+    60,
+    43,
+    62,
+    66,
+    63,
+    64,
+    65
+   ],
+   "a_conferir": [
+    "restauracao_app?"
+   ]
   },
   {
    "n": 62,
@@ -1512,7 +3452,41 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    43,
+    60,
+    61,
+    15,
+    22,
+    33,
+    35,
+    66
+   ],
+   "a_conferir": []
   },
   {
    "n": 63,
@@ -1534,7 +3508,38 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    800
+   ],
+   "estrato": "aquatica",
+   "ciclo": "placenta2",
+   "companheiras": [
+    64,
+    65,
+    67,
+    60,
+    61
+   ],
+   "a_conferir": []
   },
   {
    "n": 64,
@@ -1556,7 +3561,38 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "aquatica",
+   "ciclo": "placenta2",
+   "companheiras": [
+    63,
+    65,
+    67,
+    60,
+    61
+   ],
+   "a_conferir": []
   },
   {
    "n": 65,
@@ -1578,7 +3614,41 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    800
+   ],
+   "estrato": "aquatica",
+   "ciclo": "placenta2",
+   "companheiras": [
+    63,
+    64,
+    67,
+    60,
+    61
+   ],
+   "a_conferir": [
+    "biomas?"
+   ]
   },
   {
    "n": 66,
@@ -1599,7 +3669,38 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    2000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    43,
+    60,
+    61,
+    62,
+    216
+   ],
+   "a_conferir": []
   },
   {
    "n": 67,
@@ -1620,7 +3721,40 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "aquatica",
+   "ciclo": "placenta2",
+   "companheiras": [
+    63,
+    64,
+    65,
+    60
+   ],
+   "a_conferir": []
   },
   {
    "n": 68,
@@ -1649,7 +3783,43 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    69,
+    222,
+    152,
+    179,
+    40,
+    41,
+    51,
+    52
+   ],
+   "a_conferir": []
   },
   {
    "n": 69,
@@ -1678,7 +3848,41 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    68,
+    222,
+    15,
+    70,
+    152,
+    179,
+    2,
+    5
+   ],
+   "a_conferir": []
   },
   {
    "n": 70,
@@ -1707,7 +3911,44 @@
    "adaptacao": "Boa",
    "plantio": "out–dez",
    "colheita": "5–6 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    69,
+    73,
+    205,
+    71,
+    2,
+    15,
+    22,
+    51
+   ],
+   "a_conferir": []
   },
   {
    "n": 71,
@@ -1734,7 +3975,45 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    70,
+    73,
+    26,
+    13,
+    14,
+    72,
+    74,
+    114
+   ],
+   "a_conferir": [
+    "invasora?"
+   ]
   },
   {
    "n": 72,
@@ -1757,7 +4036,37 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": true,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    70,
+    71,
+    73,
+    205
+   ],
+   "a_conferir": []
   },
   {
    "n": 73,
@@ -1779,7 +4088,39 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    70,
+    71,
+    74,
+    205,
+    72
+   ],
+   "a_conferir": [
+    "invasora?"
+   ]
   },
   {
    "n": 74,
@@ -1806,7 +4147,42 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "secundaria",
+   "companheiras": [
+    87,
+    116,
+    50,
+    70,
+    73,
+    75,
+    91,
+    231
+   ],
+   "a_conferir": []
   },
   {
    "n": 75,
@@ -1832,7 +4208,39 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    15,
+    5,
+    6,
+    10,
+    50,
+    69,
+    74,
+    103
+   ],
+   "a_conferir": []
   },
   {
    "n": 76,
@@ -1852,7 +4260,36 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    77,
+    78,
+    79,
+    80
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 77,
@@ -1872,7 +4309,37 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": true,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "secundaria",
+   "companheiras": [
+    76,
+    78,
+    79,
+    80
+   ],
+   "a_conferir": [
+    "invasora?"
+   ]
   },
   {
    "n": 78,
@@ -1892,7 +4359,37 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    76,
+    77,
+    79,
+    80
+   ],
+   "a_conferir": []
   },
   {
    "n": 79,
@@ -1913,7 +4410,35 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    76,
+    77,
+    78,
+    80
+   ],
+   "a_conferir": []
   },
   {
    "n": 80,
@@ -1933,7 +4458,36 @@
    "adaptacao": "Ótima (nativa da região)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    76,
+    77,
+    78,
+    79
+   ],
+   "a_conferir": []
   },
   {
    "n": 81,
@@ -1956,7 +4510,40 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "1–2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    102,
+    82,
+    85,
+    86,
+    97,
+    141,
+    145,
+    146
+   ],
+   "a_conferir": []
   },
   {
    "n": 82,
@@ -1978,7 +4565,39 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jul",
    "colheita": "2–3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    214,
+    58,
+    149,
+    158,
+    225,
+    226
+   ],
+   "a_conferir": []
   },
   {
    "n": 83,
@@ -1999,7 +4618,40 @@
    "adaptacao": "Boa (estufa no inverno)",
    "plantio": "set–dez",
    "colheita": "3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    57,
+    86,
+    58,
+    106,
+    147,
+    149,
+    150,
+    158
+   ],
+   "a_conferir": []
   },
   {
    "n": 84,
@@ -2023,7 +4675,40 @@
    "adaptacao": "Ótima",
    "plantio": "set–nov e mar–mai",
    "colheita": "2–3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "placenta1",
+   "companheiras": [
+    57,
+    86,
+    87,
+    88,
+    99,
+    101,
+    104,
+    146
+   ],
+   "a_conferir": []
   },
   {
    "n": 85,
@@ -2045,7 +4730,40 @@
    "adaptacao": "Ótima",
    "plantio": "mar–mai",
    "colheita": "jul–dez",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    400,
+    1800
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    21,
+    81,
+    213,
+    57,
+    107,
+    147,
+    224,
+    225
+   ],
+   "a_conferir": []
   },
   {
    "n": 86,
@@ -2068,7 +4786,41 @@
    "adaptacao": "Ótima",
    "plantio": "mar–ago",
    "colheita": "1–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    57,
+    81,
+    83,
+    84,
+    98,
+    99,
+    102,
+    215
+   ],
+   "a_conferir": []
   },
   {
    "n": 87,
@@ -2092,7 +4844,39 @@
    "adaptacao": "Ótima",
    "plantio": "set–nov",
    "colheita": "o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1500
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "placenta2",
+   "companheiras": [
+    116,
+    12,
+    74,
+    104,
+    206,
+    84,
+    91,
+    219
+   ],
+   "a_conferir": []
   },
   {
    "n": 88,
@@ -2114,7 +4898,34 @@
    "adaptacao": "Ótima",
    "plantio": "fev–abr e jul–ago",
    "colheita": "3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    84,
+    146
+   ],
+   "a_conferir": []
   },
   {
    "n": 89,
@@ -2140,7 +4951,46 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "4–5 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    51,
+    2,
+    3,
+    4,
+    23,
+    70,
+    91,
+    205
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 90,
@@ -2165,7 +5015,44 @@
    "adaptacao": "Boa (proteger de geada)",
    "plantio": "set–nov",
    "colheita": "8–12 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    15,
+    22,
+    52,
+    68,
+    69,
+    70,
+    94,
+    95
+   ],
+   "a_conferir": []
   },
   {
    "n": 91,
@@ -2189,7 +5076,42 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "8 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "placenta1",
+   "companheiras": [
+    2,
+    3,
+    4,
+    23,
+    51,
+    74,
+    87,
+    89
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 92,
@@ -2211,7 +5133,37 @@
    "adaptacao": "Ótima em solo úmido",
    "plantio": "set–dez",
    "colheita": "7–9 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": true,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    15,
+    62,
+    22,
+    33,
+    35,
+    75
+   ],
+   "a_conferir": []
   },
   {
    "n": 93,
@@ -2231,7 +5183,34 @@
    "adaptacao": "Ótima",
    "plantio": "set–nov",
    "colheita": "7–8 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    600,
+    2000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    89,
+    94,
+    95,
+    212
+   ],
+   "a_conferir": []
   },
   {
    "n": 94,
@@ -2256,7 +5235,45 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    95,
+    96,
+    50,
+    52,
+    68,
+    90,
+    219,
+    223
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 95,
@@ -2281,7 +5298,43 @@
    "adaptacao": "Boa",
    "plantio": "set–nov e fev–mar",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    94,
+    96,
+    52,
+    68,
+    90,
+    93,
+    105,
+    151
+   ],
+   "a_conferir": []
   },
   {
    "n": 96,
@@ -2307,7 +5360,46 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    94,
+    95,
+    52,
+    68,
+    90,
+    105,
+    143,
+    151
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 97,
@@ -2329,7 +5421,34 @@
    "adaptacao": "Ótima",
    "plantio": "set–mar",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    102
+   ],
+   "a_conferir": []
   },
   {
    "n": 98,
@@ -2350,7 +5469,36 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jul",
    "colheita": "3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    86,
+    229,
+    149,
+    226
+   ],
+   "a_conferir": []
   },
   {
    "n": 99,
@@ -2370,7 +5518,34 @@
    "adaptacao": "Ótima",
    "plantio": "mar–ago",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    84,
+    86
+   ],
+   "a_conferir": []
   },
   {
    "n": 100,
@@ -2389,7 +5564,36 @@
    "adaptacao": "Ótima (gosta de frio)",
    "plantio": "abr–jun",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1800
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    86,
+    102,
+    182
+   ],
+   "a_conferir": []
   },
   {
    "n": 101,
@@ -2409,7 +5613,35 @@
    "adaptacao": "Boa",
    "plantio": "set–jan",
    "colheita": "3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    57,
+    84,
+    161
+   ],
+   "a_conferir": []
   },
   {
    "n": 102,
@@ -2434,7 +5666,39 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "1–2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    86,
+    97,
+    100,
+    148,
+    217,
+    218
+   ],
+   "a_conferir": []
   },
   {
    "n": 103,
@@ -2458,7 +5722,40 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "8–10 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    5,
+    6,
+    10,
+    15,
+    69,
+    75,
+    108,
+    210
+   ],
+   "a_conferir": []
   },
   {
    "n": 104,
@@ -2479,7 +5776,40 @@
    "adaptacao": "Boa",
    "plantio": "set–jan",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "placenta1",
+   "companheiras": [
+    87,
+    84,
+    219,
+    12,
+    74,
+    91,
+    116,
+    127
+   ],
+   "a_conferir": []
   },
   {
    "n": 105,
@@ -2499,7 +5829,42 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    50,
+    94,
+    95,
+    96
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 106,
@@ -2520,7 +5885,38 @@
    "adaptacao": "Ótima",
    "plantio": "set–nov",
    "colheita": "4–5 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    21,
+    107,
+    57,
+    83,
+    2
+   ],
+   "a_conferir": []
   },
   {
    "n": 107,
@@ -2541,7 +5937,37 @@
    "adaptacao": "Ótima (altitude)",
    "plantio": "jun–ago",
    "colheita": "2º ano, nov–jan",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    700,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    21,
+    106,
+    20,
+    85,
+    126,
+    2
+   ],
+   "a_conferir": []
   },
   {
    "n": 108,
@@ -2560,7 +5986,34 @@
    "adaptacao": "Ótima (andina)",
    "plantio": "set–nov",
    "colheita": "2º ano, o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    700,
+    2000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    15,
+    75,
+    103,
+    204
+   ],
+   "a_conferir": []
   },
   {
    "n": 109,
@@ -2583,7 +6036,34 @@
    "adaptacao": "Boa (florada com frio)",
    "plantio": "out–dez",
    "colheita": "4–5 anos, dez–jan",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    900
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    15,
+    22,
+    69,
+    70
+   ],
+   "a_conferir": []
   },
   {
    "n": 110,
@@ -2606,7 +6086,35 @@
    "adaptacao": "Boa",
    "plantio": "out–dez",
    "colheita": "5–6 anos, mar–jun",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    15,
+    22,
+    69,
+    70,
+    204
+   ],
+   "a_conferir": []
   },
   {
    "n": 111,
@@ -2630,7 +6138,38 @@
    "adaptacao": "Boa",
    "plantio": "jun–ago (muda de raiz nua)",
    "colheita": "3 anos, dez–fev",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    600,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    18,
+    112,
+    132,
+    50,
+    69,
+    133,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 112,
@@ -2654,7 +6193,38 @@
    "adaptacao": "Boa",
    "plantio": "jun–ago",
    "colheita": "3 anos, nov–dez",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    18,
+    111,
+    132,
+    50,
+    69,
+    133,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 113,
@@ -2678,7 +6248,47 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "2 anos, jan–abr",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": true,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1300
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    13,
+    15,
+    69,
+    70,
+    1,
+    2,
+    11,
+    118
+   ],
+   "a_conferir": [
+    "nativa_br?",
+    "invasora?"
+   ]
   },
   {
    "n": 114,
@@ -2702,7 +6312,39 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "3 anos, abr–jul",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    13,
+    15,
+    69,
+    70,
+    71,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 115,
@@ -2726,7 +6368,36 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "2–3 anos, fev–abr",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    19,
+    208,
+    53
+   ],
+   "a_conferir": []
   },
   {
    "n": 116,
@@ -2748,7 +6419,42 @@
    "adaptacao": "Ótima (pergolado)",
    "plantio": "jun–ago",
    "colheita": "2 anos, dez–fev",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "secundaria",
+   "companheiras": [
+    87,
+    12,
+    117,
+    74,
+    206,
+    50,
+    91,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 117,
@@ -2770,7 +6476,35 @@
    "adaptacao": "Com cuidado (precisa de frio no inverno)",
    "plantio": "jun–ago",
    "colheita": "4 anos, abr–mai",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    600,
+    1600
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "secundaria",
+   "companheiras": [
+    116,
+    206,
+    12,
+    87
+   ],
+   "a_conferir": []
   },
   {
    "n": 118,
@@ -2794,7 +6528,38 @@
    "adaptacao": "Ótima (nativa do RJ)",
    "plantio": "out–dez",
    "colheita": "6–8 anos, jan–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    800
+   ],
+   "estrato": "medio",
+   "ciclo": "climax",
+   "companheiras": [
+    1,
+    2,
+    3,
+    10,
+    11,
+    119,
+    122,
+    17
+   ],
+   "a_conferir": []
   },
   {
    "n": 119,
@@ -2815,7 +6580,38 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "5 anos, nov–jan",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "medio",
+   "ciclo": "climax",
+   "companheiras": [
+    1,
+    3,
+    10,
+    118
+   ],
+   "a_conferir": [
+    "solo.umido?"
+   ]
   },
   {
    "n": 120,
@@ -2839,7 +6635,40 @@
    "adaptacao": "Com cuidado (geada e florada irregular acima de 800 m)",
    "plantio": "set–dez",
    "colheita": "4–5 anos, dez–fev",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    2,
+    69,
+    70,
+    136,
+    140
+   ],
+   "a_conferir": []
   },
   {
    "n": 121,
@@ -2863,7 +6692,40 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "2–3 anos, o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    13,
+    15,
+    69,
+    70,
+    71,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 122,
@@ -2885,7 +6747,36 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "5 anos, set–nov",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "medio",
+   "ciclo": "climax",
+   "companheiras": [
+    1,
+    3,
+    10,
+    118
+   ],
+   "a_conferir": [
+    "altitude_m?"
+   ]
   },
   {
    "n": 123,
@@ -2904,7 +6795,36 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "2 anos, nov–dez",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    700
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    2,
+    4,
+    6,
+    24
+   ],
+   "a_conferir": [
+    "altitude_m?"
+   ]
   },
   {
    "n": 124,
@@ -2926,7 +6846,34 @@
    "adaptacao": "Boa (nativa)",
    "plantio": "out–dez",
    "colheita": "4 anos, fev–abr",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    125,
+    6,
+    10,
+    22
+   ],
+   "a_conferir": []
   },
   {
    "n": 125,
@@ -2947,7 +6894,35 @@
    "adaptacao": "Boa (nativa)",
    "plantio": "out–dez",
    "colheita": "4 anos, dez–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    124,
+    22,
+    25,
+    27
+   ],
+   "a_conferir": []
   },
   {
    "n": 126,
@@ -2967,7 +6942,33 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "set–nov",
    "colheita": "1 ano, out–jan",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    2000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    20,
+    107,
+    197
+   ],
+   "a_conferir": []
   },
   {
    "n": 127,
@@ -2989,7 +6990,36 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "1 ano, dez–mai",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "placenta2",
+   "companheiras": [
+    74,
+    87,
+    91,
+    104,
+    116
+   ],
+   "a_conferir": []
   },
   {
    "n": 128,
@@ -3010,7 +7040,37 @@
    "adaptacao": "Boa (gosta de frio; plantar casal)",
    "plantio": "jun–ago",
    "colheita": "10–15 anos, abr–jul",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    1800
+   ],
+   "estrato": "emergente",
+   "ciclo": "climax",
+   "companheiras": [
+    26,
+    207,
+    8,
+    9,
+    11,
+    169
+   ],
+   "a_conferir": []
   },
   {
    "n": 129,
@@ -3032,7 +7092,40 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "3 anos, mai–set",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    13,
+    15,
+    69,
+    70,
+    71,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 130,
@@ -3054,7 +7147,39 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "3 anos, mar–jul",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    13,
+    15,
+    69,
+    70,
+    71,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 131,
@@ -3075,7 +7200,39 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "2 anos, jun–set",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    13,
+    15,
+    69,
+    70,
+    71,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 132,
@@ -3097,7 +7254,36 @@
    "adaptacao": "Com cuidado (precisa de algum frio)",
    "plantio": "jun–ago",
    "colheita": "3–4 anos, jan–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    1600
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    18,
+    111,
+    112,
+    69,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 133,
@@ -3119,7 +7305,36 @@
    "adaptacao": "Boa",
    "plantio": "jun–ago",
    "colheita": "3 anos, jan–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    1600
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    18,
+    69,
+    111,
+    112,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 134,
@@ -3139,7 +7354,35 @@
    "adaptacao": "Com cuidado (precisa de inverno frio)",
    "plantio": "jun–ago",
    "colheita": "6–8 anos, abr–jun",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "alto",
+   "ciclo": "climax",
+   "companheiras": [
+    69,
+    70,
+    183,
+    185
+   ],
+   "a_conferir": []
   },
   {
    "n": 135,
@@ -3160,7 +7403,40 @@
    "adaptacao": "Com cuidado (sensível à geada; local abrigado)",
    "plantio": "set–nov",
    "colheita": "1 ano, o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    900
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    15,
+    70,
+    90,
+    136,
+    140
+   ],
+   "a_conferir": []
   },
   {
    "n": 136,
@@ -3182,7 +7458,42 @@
    "adaptacao": "Com cuidado (sensível à geada)",
    "plantio": "set–nov",
    "colheita": "1–2 anos, nov–abr",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    800
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    2,
+    69,
+    70,
+    120,
+    140,
+    135,
+    137,
+    138
+   ],
+   "a_conferir": []
   },
   {
    "n": 137,
@@ -3203,7 +7514,36 @@
    "adaptacao": "Com cuidado (local quente e abrigado)",
    "plantio": "set–nov",
    "colheita": "3 anos, jan–jun",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    800
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    15,
+    69,
+    70,
+    136
+   ],
+   "a_conferir": []
   },
   {
    "n": 138,
@@ -3224,7 +7564,35 @@
    "adaptacao": "Com cuidado (local quente e abrigado)",
    "plantio": "set–nov",
    "colheita": "3 anos, mar–jun",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    15,
+    69,
+    70,
+    136
+   ],
+   "a_conferir": []
   },
   {
    "n": 139,
@@ -3244,7 +7612,37 @@
    "adaptacao": "Boa (local quente, encostada em muro)",
    "plantio": "set–nov",
    "colheita": "2 anos, dez–abr",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "secundaria",
+   "companheiras": [
+    53,
+    59,
+    140,
+    167
+   ],
+   "a_conferir": []
   },
   {
    "n": 140,
@@ -3266,7 +7664,42 @@
    "adaptacao": "Com cuidado (geada; sol pleno e local abrigado, 18–24 meses até o fruto)",
    "plantio": "set–nov",
    "colheita": "18–24 meses, dez–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    900
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    2,
+    69,
+    70,
+    120,
+    136,
+    135,
+    139,
+    209
+   ],
+   "a_conferir": []
   },
   {
    "n": 141,
@@ -3287,7 +7720,36 @@
    "adaptacao": "Boa (estufa ou abrigo no inverno)",
    "plantio": "set–dez",
    "colheita": "3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    146,
+    221,
+    220
+   ],
+   "a_conferir": []
   },
   {
    "n": 142,
@@ -3309,7 +7771,34 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    160,
+    163
+   ],
+   "a_conferir": []
   },
   {
    "n": 143,
@@ -3329,7 +7818,40 @@
    "adaptacao": "Boa (verão)",
    "plantio": "out–jan",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "placenta1",
+   "companheiras": [
+    219,
+    94,
+    96,
+    84,
+    87,
+    104
+   ],
+   "a_conferir": []
   },
   {
    "n": 144,
@@ -3349,7 +7871,36 @@
    "adaptacao": "Com cuidado (precisa de verão quente)",
    "plantio": "out–dez",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    50,
+    94,
+    227
+   ],
+   "a_conferir": []
   },
   {
    "n": 145,
@@ -3371,7 +7922,38 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    57,
+    59,
+    81,
+    154,
+    212,
+    224
+   ],
+   "a_conferir": []
   },
   {
    "n": 146,
@@ -3396,7 +7978,40 @@
    "adaptacao": "Ótima (prefere o outono e a primavera)",
    "plantio": "mar–mai e ago–out",
    "colheita": "1–2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    84,
+    88,
+    141,
+    221,
+    148,
+    153
+   ],
+   "a_conferir": []
   },
   {
    "n": 147,
@@ -3416,7 +8031,35 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    83,
+    85,
+    86
+   ],
+   "a_conferir": []
   },
   {
    "n": 148,
@@ -3434,7 +8077,36 @@
    "adaptacao": "Ótima",
    "plantio": "mar–ago",
    "colheita": "1–2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    86,
+    102,
+    146
+   ],
+   "a_conferir": []
   },
   {
    "n": 149,
@@ -3453,7 +8125,35 @@
    "adaptacao": "Ótima (clima ameno)",
    "plantio": "mar–jun",
    "colheita": "4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    82,
+    83,
+    98,
+    215
+   ],
+   "a_conferir": []
   },
   {
    "n": 150,
@@ -3471,7 +8171,36 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    83,
+    94
+   ],
+   "a_conferir": []
   },
   {
    "n": 151,
@@ -3490,7 +8219,41 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    50,
+    94,
+    95,
+    96
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 152,
@@ -3517,7 +8280,39 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    68,
+    69,
+    179,
+    222,
+    163,
+    189
+   ],
+   "a_conferir": []
   },
   {
    "n": 153,
@@ -3536,7 +8331,37 @@
    "adaptacao": "Com cuidado (umidade causa doenças; plantar no inverno seco)",
    "plantio": "abr–mai",
    "colheita": "4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    86,
+    94,
+    146
+   ],
+   "a_conferir": []
   },
   {
    "n": 154,
@@ -3561,7 +8386,40 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    57,
+    59,
+    155,
+    156,
+    145,
+    53,
+    161
+   ],
+   "a_conferir": []
   },
   {
    "n": 155,
@@ -3582,7 +8440,37 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    154,
+    156,
+    53,
+    59
+   ],
+   "a_conferir": []
   },
   {
    "n": 156,
@@ -3602,7 +8490,37 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    154,
+    155,
+    53,
+    59
+   ],
+   "a_conferir": []
   },
   {
    "n": 157,
@@ -3623,7 +8541,34 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    58,
+    173
+   ],
+   "a_conferir": []
   },
   {
    "n": 158,
@@ -3644,7 +8589,35 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    58,
+    82,
+    83
+   ],
+   "a_conferir": []
   },
   {
    "n": 159,
@@ -3666,7 +8639,37 @@
    "adaptacao": "Boa (verão)",
    "plantio": "set–dez",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    57,
+    83,
+    221
+   ],
+   "a_conferir": []
   },
   {
    "n": 160,
@@ -3692,7 +8695,36 @@
    "adaptacao": "Boa (verão)",
    "plantio": "set–dez",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    142,
+    163
+   ],
+   "a_conferir": []
   },
   {
    "n": 161,
@@ -3712,7 +8744,35 @@
    "adaptacao": "Com cuidado (prefere clima seco)",
    "plantio": "mar–mai",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    83,
+    101,
+    154
+   ],
+   "a_conferir": []
   },
   {
    "n": 162,
@@ -3731,7 +8791,37 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    55,
+    167,
+    174
+   ],
+   "a_conferir": []
   },
   {
    "n": 163,
@@ -3759,7 +8849,40 @@
    "adaptacao": "Ótima (gosta de frio)",
    "plantio": "mar–jun",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    167,
+    142,
+    152,
+    160,
+    168,
+    170,
+    173,
+    174
+   ],
+   "a_conferir": []
   },
   {
    "n": 164,
@@ -3778,7 +8901,35 @@
    "adaptacao": "Boa (meia-sombra úmida)",
    "plantio": "set–dez",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    165,
+    75,
+    81
+   ],
+   "a_conferir": []
   },
   {
    "n": 165,
@@ -3798,7 +8949,34 @@
    "adaptacao": "Com cuidado (prefere calor)",
    "plantio": "out–dez",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    164,
+    75,
+    81
+   ],
+   "a_conferir": []
   },
   {
    "n": 166,
@@ -3819,7 +8997,34 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1800
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    86,
+    173
+   ],
+   "a_conferir": []
   },
   {
    "n": 167,
@@ -3843,7 +9048,42 @@
    "adaptacao": "Ótima (local ensolarado e seco)",
    "plantio": "set–dez",
    "colheita": "folhas a partir do 2º ano",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    163,
+    168,
+    170,
+    173,
+    174,
+    176,
+    139,
+    162
+   ],
+   "a_conferir": []
   },
   {
    "n": 168,
@@ -3871,7 +9111,40 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "folhas em 3 meses (uso externo)",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    70,
+    163,
+    167,
+    170,
+    173,
+    174,
+    176,
+    186
+   ],
+   "a_conferir": []
   },
   {
    "n": 169,
@@ -3891,7 +9164,37 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "folhas a partir do 2º ano",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    207,
+    1,
+    10,
+    128
+   ],
+   "a_conferir": [
+    "restauracao_app?"
+   ]
   },
   {
    "n": 170,
@@ -3914,7 +9217,39 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "set–dez",
    "colheita": "3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    163,
+    167,
+    168,
+    173,
+    174,
+    176
+   ],
+   "a_conferir": []
   },
   {
    "n": 171,
@@ -3936,7 +9271,36 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "set–dez",
    "colheita": "flores a partir do 1º ano",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    38,
+    44,
+    53,
+    54
+   ],
+   "a_conferir": []
   },
   {
    "n": 172,
@@ -3959,7 +9323,36 @@
    "adaptacao": "Ótima (nativa)",
    "plantio": "out–dez",
    "colheita": "folhas a partir do 2º ano",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    22,
+    24,
+    29,
+    30
+   ],
+   "a_conferir": []
   },
   {
    "n": 173,
@@ -3981,7 +9374,43 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "2–3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    163,
+    167,
+    168,
+    170,
+    174,
+    176,
+    58,
+    157
+   ],
+   "a_conferir": []
   },
   {
    "n": 174,
@@ -4004,7 +9433,42 @@
    "adaptacao": "Boa (proteger da geada)",
    "plantio": "set–dez",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    163,
+    167,
+    168,
+    170,
+    173,
+    176,
+    162,
+    178
+   ],
+   "a_conferir": []
   },
   {
    "n": 175,
@@ -4022,7 +9486,38 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    55,
+    173
+   ],
+   "a_conferir": []
   },
   {
    "n": 176,
@@ -4046,7 +9541,40 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    163,
+    167,
+    168,
+    170,
+    173,
+    174,
+    20
+   ],
+   "a_conferir": []
   },
   {
    "n": 177,
@@ -4065,7 +9593,41 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    95,
+    179,
+    180
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 178,
@@ -4086,7 +9648,34 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    55,
+    168,
+    174
+   ],
+   "a_conferir": []
   },
   {
    "n": 179,
@@ -4115,7 +9704,42 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "flores em 2–3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    68,
+    69,
+    152,
+    222,
+    50,
+    180,
+    181,
+    189
+   ],
+   "a_conferir": []
   },
   {
    "n": 180,
@@ -4139,7 +9763,37 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    50,
+    179,
+    181,
+    177
+   ],
+   "a_conferir": []
   },
   {
    "n": 181,
@@ -4164,7 +9818,35 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    50,
+    179,
+    180
+   ],
+   "a_conferir": []
   },
   {
    "n": 182,
@@ -4189,7 +9871,36 @@
    "adaptacao": "Ótima (inverno)",
    "plantio": "mar–mai",
    "colheita": "corte em 2–3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    183,
+    184,
+    185,
+    100
+   ],
+   "a_conferir": []
   },
   {
    "n": 183,
@@ -4213,7 +9924,36 @@
    "adaptacao": "Ótima (inverno)",
    "plantio": "mar–mai",
    "colheita": "corte em 3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    182,
+    184,
+    185,
+    134,
+    218
+   ],
+   "a_conferir": []
   },
   {
    "n": 184,
@@ -4237,7 +9977,35 @@
    "adaptacao": "Ótima (inverno)",
    "plantio": "abr–mai",
    "colheita": "corte em 3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    182,
+    183,
+    185
+   ],
+   "a_conferir": []
   },
   {
    "n": 185,
@@ -4261,7 +10029,35 @@
    "adaptacao": "Ótima (inverno)",
    "plantio": "abr–mai",
    "colheita": "corte em 3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    182,
+    183,
+    184,
+    134
+   ],
+   "a_conferir": []
   },
   {
    "n": 186,
@@ -4287,7 +10083,41 @@
    "adaptacao": "Boa (verão)",
    "plantio": "out–dez",
    "colheita": "corte em 3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    70,
+    168,
+    189,
+    187,
+    188
+   ],
+   "a_conferir": []
   },
   {
    "n": 187,
@@ -4307,7 +10137,41 @@
    "adaptacao": "Boa (verão)",
    "plantio": "out–dez",
    "colheita": "corte em 3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    70,
+    90,
+    94,
+    186
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 188,
@@ -4327,7 +10191,38 @@
    "adaptacao": "Com cuidado (precisa de calor)",
    "plantio": "out–dez",
    "colheita": "corte em 4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "placenta1",
+   "companheiras": [
+    90,
+    94,
+    186
+   ],
+   "a_conferir": []
   },
   {
    "n": 189,
@@ -4354,7 +10249,40 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "podas a cada 2–3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": true,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    68,
+    69,
+    70,
+    152,
+    168,
+    179,
+    186,
+    222
+   ],
+   "a_conferir": []
   },
   {
    "n": 190,
@@ -4376,7 +10304,35 @@
    "adaptacao": "Ótima (sombra)",
    "plantio": "o ano todo",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": false,
+   "invasora": true,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    44,
+    45,
+    167
+   ],
+   "a_conferir": [
+    "invasora?"
+   ]
   },
   {
    "n": 191,
@@ -4401,7 +10357,38 @@
    "adaptacao": "Ótima (entouceirante; tolera geada forte)",
    "plantio": "out–dez",
    "colheita": "brotos a partir do 3º ano, nov–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    192,
+    194,
+    196,
+    197,
+    193,
+    195,
+    198
+   ],
+   "a_conferir": []
   },
   {
    "n": 192,
@@ -4426,7 +10413,37 @@
    "adaptacao": "Boa (entouceirante; geadas leves)",
    "plantio": "out–dez",
    "colheita": "brotos doces a partir do 3º ano, dez–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    191,
+    194,
+    196,
+    197,
+    193,
+    195,
+    198
+   ],
+   "a_conferir": []
   },
   {
    "n": 193,
@@ -4450,7 +10467,35 @@
    "adaptacao": "Com cuidado (sensível a geada; colmos para construção)",
    "plantio": "out–dez",
    "colheita": "colmos a partir do 4º ano",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    191,
+    192,
+    198
+   ],
+   "a_conferir": []
   },
   {
    "n": 194,
@@ -4473,7 +10518,38 @@
    "adaptacao": "Ótima (entouceirante)",
    "plantio": "out–dez",
    "colheita": "colmos a partir do 3º ano",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": true,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1400
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    191,
+    192,
+    196,
+    197,
+    195
+   ],
+   "a_conferir": [
+    "invasora?"
+   ]
   },
   {
    "n": 195,
@@ -4496,7 +10572,36 @@
    "adaptacao": "Ótima (entouceirante, ornamental)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    191,
+    192,
+    194,
+    196,
+    197
+   ],
+   "a_conferir": []
   },
   {
    "n": 196,
@@ -4520,7 +10625,37 @@
    "adaptacao": "Ótima (entouceirante, cerca viva)",
    "plantio": "out–dez",
    "colheita": "folhas para forragem o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    191,
+    192,
+    194,
+    197,
+    195
+   ],
+   "a_conferir": []
   },
   {
    "n": 197,
@@ -4543,7 +10678,37 @@
    "adaptacao": "Ótima (nativa da serra)",
    "plantio": "out–dez",
    "colheita": "—",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    2200
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    126,
+    191,
+    192,
+    194,
+    196,
+    195
+   ],
+   "a_conferir": []
   },
   {
    "n": 198,
@@ -4567,7 +10732,36 @@
    "adaptacao": "Com cuidado (alastrante: só com barreira antirrizoma)",
    "plantio": "out–dez",
    "colheita": "brotos a partir do 4º ano",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": true,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    500,
+    1600
+   ],
+   "estrato": "alto",
+   "ciclo": "secundaria",
+   "companheiras": [
+    191,
+    192,
+    193
+   ],
+   "a_conferir": [
+    "invasora?"
+   ]
   },
   {
    "n": 199,
@@ -4587,7 +10781,19 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "30–45 dias por ciclo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [],
+   "nativa_br": null,
+   "restauracao_app": null,
+   "invasora": null,
+   "solo": null,
+   "altitude_m": null,
+   "estrato": null,
+   "ciclo": null,
+   "companheiras": [],
+   "a_conferir": [
+    "item de viveiro (bandeja de mudas, várias espécies): campos ecológicos não se aplicam?"
+   ]
   },
   {
    "n": 200,
@@ -4609,7 +10815,21 @@
    "adaptacao": "Ótima",
    "plantio": "set–dez",
    "colheita": "4–8 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": true,
+   "restauracao_app": true,
+   "invasora": null,
+   "solo": null,
+   "altitude_m": null,
+   "estrato": null,
+   "ciclo": null,
+   "companheiras": [],
+   "a_conferir": [
+    "item de viveiro (bandeja de mudas, várias espécies): campos ecológicos não se aplicam?"
+   ]
   },
   {
    "n": 201,
@@ -4630,7 +10850,19 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "45–60 dias",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [],
+   "nativa_br": null,
+   "restauracao_app": null,
+   "invasora": null,
+   "solo": null,
+   "altitude_m": null,
+   "estrato": null,
+   "ciclo": null,
+   "companheiras": [],
+   "a_conferir": [
+    "item de viveiro (bandeja de mudas, várias espécies): campos ecológicos não se aplicam?"
+   ]
   },
   {
    "n": 202,
@@ -4650,7 +10882,19 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "6–12 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [],
+   "nativa_br": null,
+   "restauracao_app": null,
+   "invasora": null,
+   "solo": null,
+   "altitude_m": null,
+   "estrato": null,
+   "ciclo": null,
+   "companheiras": [],
+   "a_conferir": [
+    "item de viveiro (bandeja de mudas, várias espécies): campos ecológicos não se aplicam?"
+   ]
   },
   {
    "n": 203,
@@ -4671,7 +10915,19 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "3–6 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [],
+   "nativa_br": null,
+   "restauracao_app": null,
+   "invasora": null,
+   "solo": null,
+   "altitude_m": null,
+   "estrato": null,
+   "ciclo": null,
+   "companheiras": [],
+   "a_conferir": [
+    "item de viveiro (bandeja de mudas, várias espécies): campos ecológicos não se aplicam?"
+   ]
   },
   {
    "n": 204,
@@ -4695,7 +10951,41 @@
    "adaptacao": "Ótima (altitude ideal, à meia-sombra)",
    "plantio": "out–dez",
    "colheita": "3 anos, mai–ago",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": false,
+   "invasora": true,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    400,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "secundaria",
+   "companheiras": [
+    15,
+    22,
+    69,
+    70,
+    90,
+    14,
+    108,
+    110
+   ],
+   "a_conferir": [
+    "invasora?"
+   ]
   },
   {
    "n": 205,
@@ -4723,7 +11013,42 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "12 meses, mai–set",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    70,
+    51,
+    73,
+    89,
+    211,
+    71,
+    72
+   ],
+   "a_conferir": []
   },
   {
    "n": 206,
@@ -4744,7 +11069,41 @@
    "adaptacao": "Ótima (pergolado/espaldeira)",
    "plantio": "jun–ago",
    "colheita": "2 anos, jan–mar",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "secundaria",
+   "companheiras": [
+    12,
+    87,
+    117,
+    116,
+    50,
+    74,
+    179
+   ],
+   "a_conferir": []
   },
   {
    "n": 207,
@@ -4764,7 +11123,36 @@
    "adaptacao": "Boa (à sombra)",
    "plantio": "jun–ago",
    "colheita": "4 anos, folhas o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    400,
+    1500
+   ],
+   "estrato": "medio",
+   "ciclo": "climax",
+   "companheiras": [
+    26,
+    128,
+    169,
+    8,
+    10
+   ],
+   "a_conferir": []
   },
   {
    "n": 208,
@@ -4785,7 +11173,35 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "2 anos, folhas o ano todo",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "pedregoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    19,
+    115,
+    53
+   ],
+   "a_conferir": []
   },
   {
    "n": 209,
@@ -4807,7 +11223,38 @@
    "adaptacao": "Com cuidado (prefere calor)",
    "plantio": "set–nov",
    "colheita": "2 anos, mai–ago",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": true,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    210,
+    15,
+    22,
+    90,
+    140
+   ],
+   "a_conferir": []
   },
   {
    "n": 210,
@@ -4827,7 +11274,37 @@
    "adaptacao": "Com cuidado (o frio reduz o crescimento)",
    "plantio": "out–dez",
    "colheita": "18 meses (palmito)",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    900
+   ],
+   "estrato": "medio",
+   "ciclo": "secundaria",
+   "companheiras": [
+    209,
+    15,
+    22,
+    103,
+    140,
+    204
+   ],
+   "a_conferir": []
   },
   {
    "n": 211,
@@ -4850,7 +11327,36 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "10 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Amazônia"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    51,
+    70,
+    89,
+    205
+   ],
+   "a_conferir": []
   },
   {
    "n": 212,
@@ -4871,7 +11377,33 @@
    "adaptacao": "Ótima (clássica da serra)",
    "plantio": "mar–mai",
    "colheita": "8–10 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    700,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    145,
+    93
+   ],
+   "a_conferir": []
   },
   {
    "n": 213,
@@ -4893,7 +11425,33 @@
    "adaptacao": "Boa (gosta de frio)",
    "plantio": "mar–mai",
    "colheita": "5 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    400,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    85
+   ],
+   "a_conferir": []
   },
   {
    "n": 214,
@@ -4914,7 +11472,36 @@
    "adaptacao": "Boa",
    "plantio": "mar–mai",
    "colheita": "4–5 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    82,
+    226
+   ],
+   "a_conferir": []
   },
   {
    "n": 215,
@@ -4935,7 +11522,33 @@
    "adaptacao": "Ótima",
    "plantio": "fev–jun",
    "colheita": "4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    86,
+    149
+   ],
+   "a_conferir": []
   },
   {
    "n": 216,
@@ -4954,7 +11567,35 @@
    "adaptacao": "Ótima (com água corrente ou irrigação)",
    "plantio": "mar–ago",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    58,
+    60,
+    62,
+    66
+   ],
+   "a_conferir": []
   },
   {
    "n": 217,
@@ -4973,7 +11614,35 @@
    "adaptacao": "Ótima",
    "plantio": "mar–ago",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    86,
+    102
+   ],
+   "a_conferir": []
   },
   {
    "n": 218,
@@ -4992,7 +11661,36 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jul",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    86,
+    102,
+    183
+   ],
+   "a_conferir": []
   },
   {
    "n": 219,
@@ -5014,7 +11712,41 @@
    "adaptacao": "Boa",
    "plantio": "set–fev",
    "colheita": "2–3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "trepadeira",
+   "ciclo": "placenta1",
+   "companheiras": [
+    50,
+    84,
+    86,
+    87,
+    94,
+    104,
+    143,
+    230
+   ],
+   "a_conferir": []
   },
   {
    "n": 220,
@@ -5032,7 +11764,39 @@
    "adaptacao": "Com cuidado (só no verão)",
    "plantio": "out–jan",
    "colheita": "2–3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    83,
+    94,
+    141,
+    222,
+    233
+   ],
+   "a_conferir": []
   },
   {
    "n": 221,
@@ -5054,7 +11818,42 @@
    "adaptacao": "Boa",
    "plantio": "set–dez",
    "colheita": "3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    81,
+    141,
+    146,
+    159
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 222,
@@ -5073,7 +11872,42 @@
    "adaptacao": "Boa",
    "plantio": "out–dez",
    "colheita": "4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    68,
+    69,
+    152,
+    179,
+    40,
+    41,
+    51,
+    189
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   },
   {
    "n": 223,
@@ -5094,7 +11928,35 @@
    "adaptacao": "Boa (fava no frio, feijão-de-corda no verão)",
    "plantio": "abr–jun e out–dez",
    "colheita": "3–4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    94,
+    227
+   ],
+   "a_conferir": []
   },
   {
    "n": 224,
@@ -5112,7 +11974,34 @@
    "adaptacao": "Boa",
    "plantio": "jun–ago",
    "colheita": "2º ano, set–nov",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    83,
+    85,
+    145
+   ],
+   "a_conferir": []
   },
   {
    "n": 225,
@@ -5133,7 +12022,34 @@
    "adaptacao": "Boa (clima ameno de serra)",
    "plantio": "mar–mai",
    "colheita": "1 ano, set–nov",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    600,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    82,
+    85,
+    168
+   ],
+   "a_conferir": []
   },
   {
    "n": 226,
@@ -5151,7 +12067,35 @@
    "adaptacao": "Com cuidado (precisa de frio)",
    "plantio": "mar–mai",
    "colheita": "4 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    600,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    82,
+    98,
+    214,
+    229
+   ],
+   "a_conferir": []
   },
   {
    "n": 227,
@@ -5171,7 +12115,35 @@
    "adaptacao": "Com cuidado (precisa de verão quente)",
    "plantio": "out–dez",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    94,
+    223,
+    144
+   ],
+   "a_conferir": []
   },
   {
    "n": 228,
@@ -5189,7 +12161,35 @@
    "adaptacao": "Boa",
    "plantio": "set–nov",
    "colheita": "3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": true,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1200
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    55,
+    57,
+    163
+   ],
+   "a_conferir": []
   },
   {
    "n": 229,
@@ -5212,7 +12212,34 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "2–3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    300,
+    1800
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    86,
+    98,
+    226
+   ],
+   "a_conferir": []
   },
   {
    "n": 230,
@@ -5236,7 +12263,34 @@
    "adaptacao": "Ótima",
    "plantio": "mar–jun",
    "colheita": "2–3 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    86,
+    219
+   ],
+   "a_conferir": []
   },
   {
    "n": 231,
@@ -5257,7 +12311,37 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Pampa"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1600
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta2",
+   "companheiras": [
+    50,
+    74,
+    75,
+    234
+   ],
+   "a_conferir": []
   },
   {
    "n": 232,
@@ -5276,7 +12360,39 @@
    "adaptacao": "Ótima (espontâneas)",
    "plantio": "o ano todo",
    "colheita": "1–2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia",
+    "Pampa",
+    "Pantanal"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": true,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "rasteiro",
+   "ciclo": "placenta1",
+   "companheiras": [
+    81,
+    83,
+    94
+   ],
+   "a_conferir": []
   },
   {
    "n": 233,
@@ -5295,7 +12411,37 @@
    "adaptacao": "Com cuidado (prefere calor)",
    "plantio": "out–dez",
    "colheita": "3–5 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado",
+    "Caatinga",
+    "Amazônia"
+   ],
+   "nativa_br": false,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": true,
+    "acido": false,
+    "textura": [
+     "argiloso",
+     "arenoso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1000
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta1",
+   "companheiras": [
+    90,
+    94,
+    220
+   ],
+   "a_conferir": []
   },
   {
    "n": 234,
@@ -5313,7 +12459,36 @@
    "adaptacao": "Ótima",
    "plantio": "o ano todo",
    "colheita": "2 meses",
-   "imagem": ""
+   "imagem": "",
+   "biomas": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "nativa_br": true,
+   "invasora": false,
+   "restauracao_app": false,
+   "solo": {
+    "umido": false,
+    "seco": false,
+    "acido": true,
+    "textura": [
+     "argiloso"
+    ]
+   },
+   "altitude_m": [
+    0,
+    1500
+   ],
+   "estrato": "baixo",
+   "ciclo": "placenta2",
+   "companheiras": [
+    74,
+    81,
+    231
+   ],
+   "a_conferir": [
+    "nativa_br?"
+   ]
   }
  ],
  "espacos": [
@@ -7309,5 +14484,945 @@
    "Preço da muda (R$)": "8",
    "Valor (R$)": "8"
   }
- ]
+ ],
+ "biomas": {
+  "_leia": "APROXIMADO. Marcação automática do bioma a partir de coordenadas (lat, lon em graus decimais, WGS84) por caixas retangulares avaliadas em ordem (a primeira que contém o ponto vale). Erros de dezenas de km nas fronteiras e nas ecótonos são esperados. No servidor, substituir por interseção com os polígonos oficiais IBGE 'Biomas e Sistema Costeiro-Marinho do Brasil' (1:250.000, 2019). A altitude não muda o bioma (campos de altitude da Serra do Mar/Mantiqueira continuam Mata Atlântica), mas filtra plantas pelo campo altitude_m de cada planta.",
+  "lista": [
+   "Mata Atlântica",
+   "Cerrado",
+   "Caatinga",
+   "Amazônia",
+   "Pampa",
+   "Pantanal"
+  ],
+  "regras": [
+   {
+    "bioma": "Pantanal",
+    "lat": [
+     -22.0,
+     -15.5
+    ],
+    "lon": [
+     -58.5,
+     -55.2
+    ],
+    "nota": "planície pantaneira; exige altitude < 200 m se disponível",
+    "alt_max": 200
+   },
+   {
+    "bioma": "Pampa",
+    "lat": [
+     -34.0,
+     -28.5
+    ],
+    "lon": [
+     -57.7,
+     -50.5
+    ],
+    "nota": "metade sul e oeste do RS; o planalto norte do RS (≥ 600 m) é Mata Atlântica",
+    "alt_max": 500
+   },
+   {
+    "bioma": "Amazônia",
+    "lat": [
+     -10.0,
+     5.5
+    ],
+    "lon": [
+     -74.0,
+     -48.0
+    ],
+    "nota": "AC, AM, RR, AP, RO, PA e oeste do MA"
+   },
+   {
+    "bioma": "Amazônia",
+    "lat": [
+     -13.5,
+     -10.0
+    ],
+    "lon": [
+     -66.0,
+     -50.5
+    ],
+    "nota": "RO e norte do MT"
+   },
+   {
+    "bioma": "Caatinga",
+    "lat": [
+     -10.0,
+     -2.8
+    ],
+    "lon": [
+     -44.5,
+     -37.2
+    ],
+    "nota": "sertão do NE (PI leste, CE, RN, PB, PE, AL interior)"
+   },
+   {
+    "bioma": "Caatinga",
+    "lat": [
+     -16.0,
+     -10.0
+    ],
+    "lon": [
+     -44.0,
+     -39.8
+    ],
+    "nota": "interior da BA e norte de MG"
+   },
+   {
+    "bioma": "Cerrado",
+    "lat": [
+     -24.5,
+     -2.5
+    ],
+    "lon": [
+     -60.0,
+     -41.5
+    ],
+    "nota": "Brasil Central: GO, DF, TO, MS, MT sul, oeste de MG/BA, sul do MA/PI, noroeste de SP"
+   },
+   {
+    "bioma": "Mata Atlântica",
+    "lat": [
+     -30.5,
+     -3.0
+    ],
+    "lon": [
+     -55.0,
+     -34.7
+    ],
+    "nota": "faixa leste e sul restante (litoral do NE, ES, RJ, SP, MG leste, PR, SC, norte do RS)"
+   },
+   {
+    "bioma": "Pampa",
+    "lat": [
+     -34.0,
+     -28.0
+    ],
+    "lon": [
+     -58.0,
+     -49.0
+    ],
+    "nota": "sobra do RS"
+   }
+  ],
+  "por_uf": {
+   "AC": [
+    "Amazônia"
+   ],
+   "AM": [
+    "Amazônia"
+   ],
+   "AP": [
+    "Amazônia"
+   ],
+   "PA": [
+    "Amazônia"
+   ],
+   "RR": [
+    "Amazônia"
+   ],
+   "RO": [
+    "Amazônia",
+    "Cerrado"
+   ],
+   "MT": [
+    "Amazônia",
+    "Cerrado",
+    "Pantanal"
+   ],
+   "MS": [
+    "Cerrado",
+    "Pantanal",
+    "Mata Atlântica"
+   ],
+   "TO": [
+    "Cerrado",
+    "Amazônia"
+   ],
+   "MA": [
+    "Cerrado",
+    "Amazônia",
+    "Caatinga"
+   ],
+   "PI": [
+    "Caatinga",
+    "Cerrado"
+   ],
+   "CE": [
+    "Caatinga"
+   ],
+   "RN": [
+    "Caatinga",
+    "Mata Atlântica"
+   ],
+   "PB": [
+    "Caatinga",
+    "Mata Atlântica"
+   ],
+   "PE": [
+    "Caatinga",
+    "Mata Atlântica"
+   ],
+   "AL": [
+    "Mata Atlântica",
+    "Caatinga"
+   ],
+   "SE": [
+    "Mata Atlântica",
+    "Caatinga"
+   ],
+   "BA": [
+    "Caatinga",
+    "Cerrado",
+    "Mata Atlântica"
+   ],
+   "GO": [
+    "Cerrado"
+   ],
+   "DF": [
+    "Cerrado"
+   ],
+   "MG": [
+    "Cerrado",
+    "Mata Atlântica",
+    "Caatinga"
+   ],
+   "ES": [
+    "Mata Atlântica"
+   ],
+   "RJ": [
+    "Mata Atlântica"
+   ],
+   "SP": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "PR": [
+    "Mata Atlântica",
+    "Cerrado"
+   ],
+   "SC": [
+    "Mata Atlântica"
+   ],
+   "RS": [
+    "Pampa",
+    "Mata Atlântica"
+   ]
+  }
+ },
+ "estratos": [
+  {
+   "id": "emergente",
+   "nome": "Emergente",
+   "nota": "copa acima do dossel, > 20 m (guapuruvu, cedro, araucária)"
+  },
+  {
+   "id": "alto",
+   "nome": "Alto",
+   "nota": "dossel, ~10–20 m (ingá, abacateiro, juçara, bambus gigantes)"
+  },
+  {
+   "id": "medio",
+   "nome": "Médio",
+   "nota": "~4–10 m (jabuticabeira, citros, banana, café em SAF alto)"
+  },
+  {
+   "id": "baixo",
+   "nome": "Baixo",
+   "nota": "~0,5–4 m (arbustos, café, hortaliças de porte, ervas eretas)"
+  },
+  {
+   "id": "rasteiro",
+   "nome": "Rasteiro",
+   "nota": "< 0,5 m ou forração (amendoim-forrageiro, abóbora, morango)"
+  },
+  {
+   "id": "trepadeira",
+   "nome": "Trepadeira",
+   "nota": "ocupa o estrato do tutor (maracujá, chuchu, videira)"
+  },
+  {
+   "id": "aquatica",
+   "nome": "Aquática",
+   "nota": "lâmina d'água ou margem encharcada (taboa, tália, ninfeia)"
+  }
+ ],
+ "ciclos": [
+  {
+   "id": "placenta1",
+   "nome": "Placenta I",
+   "nota": "ciclo curto, até ~1 ano (hortaliças, milho, feijão, adubos verdes anuais)"
+  },
+  {
+   "id": "placenta2",
+   "nome": "Placenta II",
+   "nota": "1–2 anos (mandioca, banana, mamão, guandu); por convenção também ervas perenes de touceira renovadas a cada 1–2 anos (capins, aromáticas herbáceas, aquáticas)"
+  },
+  {
+   "id": "secundaria",
+   "nome": "Secundária (I–III)",
+   "nota": "anos a poucas décadas: pioneiras arbóreas, frutíferas e arbustos lenhosos"
+  },
+  {
+   "id": "climax",
+   "nome": "Clímax",
+   "nota": "décadas a séculos: árvores longevas de crescimento lento (jabuticabeira, juçara, cedro, araucária, erva-mate)"
+  }
+ ],
+ "ucs": [
+  {
+   "nome": "Área de Proteção Ambiental Costa das Algas",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Marinho e Mata Atlântica",
+   "tipo": "Flora marinha",
+   "numero_especies": 233
+  },
+  {
+   "nome": "Área de Proteção Ambiental Costa dos Corais",
+   "uf": [
+    "AL",
+    "PE"
+   ],
+   "estado": "Alagoas e Pernambuco",
+   "regiao": "Nordeste",
+   "bioma": "Marinho e Mata Atlântica",
+   "tipo": "Flora marinha",
+   "numero_especies": 174
+  },
+  {
+   "nome": "Área de Proteção Ambiental da Baía de Todos os Santos",
+   "uf": [
+    "BA"
+   ],
+   "estado": "Bahia",
+   "regiao": "Nordeste",
+   "bioma": "Mata Atlântica e Marinho",
+   "tipo": "Flora marinha",
+   "numero_especies": 303
+  },
+  {
+   "nome": "Área de Proteção Ambiental do Arquipélago de São Pedro e São Paulo",
+   "uf": [
+    "RN"
+   ],
+   "estado": "Rio Grande do Norte",
+   "regiao": "Nordeste",
+   "bioma": "Marinho",
+   "tipo": "Flora marinha",
+   "numero_especies": 27
+  },
+  {
+   "nome": "Área de Proteção Ambiental do Arquipélago de Trindade e Martim Vaz",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Marinho",
+   "tipo": "Flora marinha",
+   "numero_especies": 70
+  },
+  {
+   "nome": "Área de Proteção Ambiental dos Recifes de Corais",
+   "uf": [
+    "RN"
+   ],
+   "estado": "Rio Grande do Norte",
+   "regiao": "Nordeste",
+   "bioma": "Marinho e Mata Atlântica",
+   "tipo": "Flora marinha",
+   "numero_especies": 177
+  },
+  {
+   "nome": "Área de Proteção Ambiental Marinha do Litoral Norte",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Marinho e Mata Atlântica",
+   "tipo": "Flora marinha",
+   "numero_especies": 208
+  },
+  {
+   "nome": "Área de Proteção Ambiental Mestre Álvaro",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 553
+  },
+  {
+   "nome": "Área de Relevante Interesse Ecológico de Santa Helena",
+   "uf": [
+    "PR"
+   ],
+   "estado": "Paraná",
+   "regiao": "Sul",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 215
+  },
+  {
+   "nome": "Área de Relevante Interesse Ecológico Ilhas da Queimada Pequena e Queimada Grande",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 151
+  },
+  {
+   "nome": "Área de Relevante Interesse Ecológico Ilhas da Queimada Pequena e Queimada Grande",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Marinho e Mata Atlântica",
+   "tipo": "Flora marinha",
+   "numero_especies": 69
+  },
+  {
+   "nome": "Estação Ecológica de Angatuba",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 233
+  },
+  {
+   "nome": "Estação Ecológica de Assis",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Cerrado e Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 356
+  },
+  {
+   "nome": "Estação Ecológica de Avaré",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Cerrado e Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 59
+  },
+  {
+   "nome": "Estação Ecológica de Bananal",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 505
+  },
+  {
+   "nome": "Estação Ecológica de Maracá",
+   "uf": [
+    "RR"
+   ],
+   "estado": "Roraima",
+   "regiao": "Norte",
+   "bioma": "Amazônia",
+   "tipo": "Flora terrestre",
+   "numero_especies": 1119
+  },
+  {
+   "nome": "Estação Ecológica de Santa Bárbara",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Cerrado",
+   "tipo": "Flora terrestre",
+   "numero_especies": 568
+  },
+  {
+   "nome": "Estação Ecológica de Tamoios",
+   "uf": [
+    "RJ"
+   ],
+   "estado": "Rio de Janeiro",
+   "regiao": "Sudeste",
+   "bioma": "Marinho e Mata Atlântica",
+   "tipo": "Flora marinha",
+   "numero_especies": 138
+  },
+  {
+   "nome": "Estação Ecológica dos Caetetus",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 277
+  },
+  {
+   "nome": "Floresta Nacional Contendas do Sincorá",
+   "uf": [
+    "BA"
+   ],
+   "estado": "Bahia",
+   "regiao": "Nordeste",
+   "bioma": "Caatinga",
+   "tipo": "Flora terrestre",
+   "numero_especies": 282
+  },
+  {
+   "nome": "Floresta Nacional do Rio Preto",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 722
+  },
+  {
+   "nome": "Floresta Nacional do Tapajós",
+   "uf": [
+    "PA"
+   ],
+   "estado": "Pará",
+   "regiao": "Norte",
+   "bioma": "Amazônia",
+   "tipo": "Flora terrestre",
+   "numero_especies": 855
+  },
+  {
+   "nome": "Monumento Natural do Arquipélago das Ilhas Cagarras",
+   "uf": [
+    "RJ"
+   ],
+   "estado": "Rio de Janeiro",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 139
+  },
+  {
+   "nome": "Monumento Natural Municipal da Lagoa do Peri",
+   "uf": [
+    "SC"
+   ],
+   "estado": "Santa Catarina",
+   "regiao": "Sul",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 677
+  },
+  {
+   "nome": "Parque Estadual Cabeça do Cachorro",
+   "uf": [
+    "PR"
+   ],
+   "estado": "Paraná",
+   "regiao": "Sul",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 165
+  },
+  {
+   "nome": "Parque Estadual Carlos Botelho",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 998
+  },
+  {
+   "nome": "Parque Estadual da Costa do Sol",
+   "uf": [
+    "RJ"
+   ],
+   "estado": "Rio de Janeiro",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 1163
+  },
+  {
+   "nome": "Parque Estadual da Pedra Azul",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 225
+  },
+  {
+   "nome": "Parque Estadual da Pedra Selada",
+   "uf": [
+    "RJ"
+   ],
+   "estado": "Rio de Janeiro",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 303
+  },
+  {
+   "nome": "Parque Estadual da Serra da Concórdia",
+   "uf": [
+    "RJ"
+   ],
+   "estado": "Rio de Janeiro",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 231
+  },
+  {
+   "nome": "Parque Estadual de Porto Ferreira",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 509
+  },
+  {
+   "nome": "Parque Estadual do Desengano",
+   "uf": [
+    "RJ"
+   ],
+   "estado": "Rio de Janeiro",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 1398
+  },
+  {
+   "nome": "Parque Estadual do Forno Grande",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 974
+  },
+  {
+   "nome": "Parque Estadual Mata das Flores",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 349
+  },
+  {
+   "nome": "Parque Estadual Paulo César Vinha",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 677
+  },
+  {
+   "nome": "Parque Estadual Turístico do Alto Ribeira",
+   "uf": [
+    "SP"
+   ],
+   "estado": "São Paulo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 582
+  },
+  {
+   "nome": "Parque Nacional da Serra do Divisor",
+   "uf": [
+    "AC"
+   ],
+   "estado": "Acre",
+   "regiao": "Norte",
+   "bioma": "Amazônia",
+   "tipo": "Flora terrestre",
+   "numero_especies": 1158
+  },
+  {
+   "nome": "Parque Nacional das Sempre Vivas",
+   "uf": [
+    "MG"
+   ],
+   "estado": "Minas Gerais",
+   "regiao": "Sudeste",
+   "bioma": "Cerrado",
+   "tipo": "Flora terrestre",
+   "numero_especies": 760
+  },
+  {
+   "nome": "Parque Nacional de Anavilhanas",
+   "uf": [
+    "AM"
+   ],
+   "estado": "Amazonas",
+   "regiao": "Norte",
+   "bioma": "Amazônia",
+   "tipo": "Flora terrestre",
+   "numero_especies": 614
+  },
+  {
+   "nome": "Parque Nacional de São Joaquim",
+   "uf": [
+    "SC"
+   ],
+   "estado": "Santa Catarina",
+   "regiao": "Sul",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 962
+  },
+  {
+   "nome": "Parque Nacional do Caparaó",
+   "uf": [
+    "ES",
+    "MG"
+   ],
+   "estado": "Espírito Santo e Minas Gerais",
+   "regiao": "Sudeste",
+   "bioma": "Cerrado, Mata Atlântica e Caatinga",
+   "tipo": "Flora terrestre",
+   "numero_especies": 1791
+  },
+  {
+   "nome": "Parque Nacional do Descobrimento",
+   "uf": [
+    "BA"
+   ],
+   "estado": "Bahia",
+   "regiao": "Nordeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 229
+  },
+  {
+   "nome": "Parque Nacional do Itatiaia",
+   "uf": [
+    "RJ"
+   ],
+   "estado": "Rio de Janeiro",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 2641
+  },
+  {
+   "nome": "Parque Nacional do Pau Brasil",
+   "uf": [
+    "BA"
+   ],
+   "estado": "Bahia",
+   "regiao": "Nordeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 261
+  },
+  {
+   "nome": "Parque Nacional do Pico da Neblina",
+   "uf": [
+    "AM"
+   ],
+   "estado": "Amazonas",
+   "regiao": "Norte",
+   "bioma": "Amazônia",
+   "tipo": "Flora terrestre",
+   "numero_especies": 1039
+  },
+  {
+   "nome": "Parque Nacional dos Lençóis Maranhenses",
+   "uf": [
+    "MA"
+   ],
+   "estado": "Maranhão",
+   "regiao": "Nordeste",
+   "bioma": "Cerrado, Amazônia e Caatinga",
+   "tipo": "Flora terrestre",
+   "numero_especies": 291
+  },
+  {
+   "nome": "Parque Nacional do Superagui",
+   "uf": [
+    "PR"
+   ],
+   "estado": "Paraná",
+   "regiao": "Sul",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 259
+  },
+  {
+   "nome": "Parque Nacional Histórico do Monte Pascoal",
+   "uf": [
+    "BA"
+   ],
+   "estado": "Bahia",
+   "regiao": "Nordeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 656
+  },
+  {
+   "nome": "Parque Nacional Marinho de Fernando de Noronha",
+   "uf": [
+    "PE"
+   ],
+   "estado": "Pernambuco",
+   "regiao": "Nordeste",
+   "bioma": "Marinho e Mata Atlântica",
+   "tipo": "Flora marinha",
+   "numero_especies": 79
+  },
+  {
+   "nome": "Parque Nacional Marinho dos Abrolhos",
+   "uf": [
+    "BA"
+   ],
+   "estado": "Bahia",
+   "regiao": "Nordeste",
+   "bioma": "Marinho e Mata Atlântica",
+   "tipo": "Flora marinha",
+   "numero_especies": 148
+  },
+  {
+   "nome": "Refúgio de Vida Silvestre da Ilha dos Lobos",
+   "uf": [
+    "RS"
+   ],
+   "estado": "Rio Grande do Sul",
+   "regiao": "Sul",
+   "bioma": "Marinho e Mata Atlântica",
+   "tipo": "Flora marinha",
+   "numero_especies": 64
+  },
+  {
+   "nome": "Refúgio de Vida Silvestre de Santa Cruz",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Marinho e Mata Atlântica",
+   "tipo": "Flora marinha",
+   "numero_especies": 108
+  },
+  {
+   "nome": "Reserva Biológica de Duas Bocas",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 849
+  },
+  {
+   "nome": "Reserva Biológica do Atol das Rocas",
+   "uf": [
+    "RN"
+   ],
+   "estado": "Rio Grande do Norte",
+   "regiao": "Nordeste",
+   "bioma": "Marinho",
+   "tipo": "Flora marinha",
+   "numero_especies": 78
+  },
+  {
+   "nome": "Reserva Biológica do Córrego Grande",
+   "uf": [
+    "ES"
+   ],
+   "estado": "Espírito Santo",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 626
+  },
+  {
+   "nome": "Reserva Biológica do Tinguá",
+   "uf": [
+    "RJ"
+   ],
+   "estado": "Rio de Janeiro",
+   "regiao": "Sudeste",
+   "bioma": "Mata Atlântica",
+   "tipo": "Flora terrestre",
+   "numero_especies": 1310
+  },
+  {
+   "nome": "Reserva de Desenvolvimento Sustentável do Uatumã",
+   "uf": [
+    "AM"
+   ],
+   "estado": "Amazonas",
+   "regiao": "Norte",
+   "bioma": "Amazônia",
+   "tipo": "Flora terrestre",
+   "numero_especies": 602
+  },
+  {
+   "nome": "Reserva Extrativista Chico Mendes",
+   "uf": [
+    "AC"
+   ],
+   "estado": "Acre",
+   "regiao": "Norte",
+   "bioma": "Amazônia",
+   "tipo": "Flora terrestre",
+   "numero_especies": 534
+  },
+  {
+   "nome": "Reserva Extrativista Marinha do Arraial do Cabo",
+   "uf": [
+    "RJ"
+   ],
+   "estado": "Rio de Janeiro",
+   "regiao": "Sudeste",
+   "bioma": "Marinho",
+   "tipo": "Flora marinha",
+   "numero_especies": 166
+  }
+ ],
+ "_enriquecimento": "Campos ecológicos acrescentados em 2026-11 (biomas, nativa_br, restauracao_app, invasora, solo, altitude_m, estrato, ciclo, companheiras, a_conferir) a partir de conhecimento botânico/agronômico geral, não de levantamento de campo. 'ciclo' segue a sucessão agroflorestal (Götsch / SAF no Brasil): placenta I, placenta II, secundária, clímax. 'estrato' por altura adulta (ver 'estratos'). 'invasora' segue o espírito da base Instituto Hórus; invasora=true força restauracao_app=false. 'companheiras' (máx. 8, números n desta base) somam: consórcios das hortas e módulos da agrofloresta (peso 3), conhecimento agronômico (peso 2) e co-ocorrência nas combinações A/B/C dos espaços (peso 1). Itens em 'a_conferir' (terminados em '?') nomeiam o campo cujo valor é incerto e deve ser verificado (Flora e Funga do Brasil / Hórus) antes de uso em laudo. Itens 199–203 são bandejas de viveiro, não espécies."
 }
