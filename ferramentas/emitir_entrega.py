@@ -31,7 +31,7 @@ GIT = shutil.which("git") or r"C:\Program Files\Git\cmd\git.exe"
 PY = sys.executable
 SEGREDO = re.compile(r"(BEGIN [A-Z ]*PRIVATE KEY|phk_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|xox[baprs]-[0-9A-Za-z-]{10,})")
 PROIBIDOS = (".db", ".db-wal", ".db-shm", ".env", ".jks", ".keystore", ".pfx", ".p12")
-DOCS_INICIAIS = re.compile(r"^(0\d|1\d|2\d)_.+\.(md|json)$")
+DOCS_INICIAIS = re.compile(r"^[0-2]\d[a-z]?_.+\.(md|json|ods)$")   # 00 a 29, também 23b_; planilhas .ods (mapeamento semanal)
 
 
 def rodar(cmd, cwd=None, check=True):
@@ -61,6 +61,51 @@ def apagar_pasta(pasta: Path, tentativas: int = 6):
         time.sleep(2 + 2 * n)
     raise SystemExit(f"não consegui apagar {pasta}: o OneDrive (ou outro programa) está usando um arquivo dela. "
                      "Pause a sincronização do OneDrive por alguns minutos ou feche o que estiver aberto e rode de novo.")
+
+
+PAGINAS_PEDIDAS = ["site-loja-e-plataforma.html", "consultoria.html", "gestao-interna.html", "scada-supervisorio.html",
+                   "sustainkit.html", "planejador.html", "painel-municipal.html", "documento-para-comentarios.html",
+                   "baixar-o-app.html", "index.html"]
+DOCS_PEDIDOS = ["00_", "01_", "04_", "10_", "17_", "18_", "20_", "21_", "22_", "23_"]
+
+
+def conferir_inventario(saida: Path, rep: Path, mapa: list) -> list[str]:
+    """Lista o que falta na entrega em relação ao que já foi pedido (páginas, demos, pacotes de cada cliente, kits e
+    módulos de cada item do mapa, documentos, memos, tarefas, pastas por pessoa, índice)."""
+    faltas = []
+    pg = saida / "02_Paginas_completas"
+    faltas += [f"página {n}" for n in PAGINAS_PEDIDAS if not (pg / n).is_file()]
+    demos_repo = sorted(p.name for p in (rep / "demos").glob("*.html")) if (rep / "demos").is_dir() else []
+    faltas += [f"demo {n}" for n in demos_repo if not (saida / "03_Demos_site" / n).is_file()]
+    try:
+        clientes = json.loads((rep / "clientes" / "clientes.json").read_text(encoding="utf-8"))
+        lista = clientes["clientes"] if isinstance(clientes, dict) and "clientes" in clientes else clientes
+        orgs = [c.get("org") for c in lista if isinstance(c, dict) and c.get("org")]
+    except (OSError, ValueError, KeyError, TypeError):
+        orgs = []
+        faltas.append("clientes/clientes.json ilegível")
+    pacotes = [p.name for p in (saida / "04_Pacotes_instalacao").glob("*.zip")]
+    faltas += [f"pacote do cliente {o}" for o in orgs if not any(o in n for n in pacotes)]
+    for k in mapa:
+        if not list((saida / "06_Kits_revisao").glob(f"kit-{k['id']}-*.zip")):
+            faltas.append(f"kit {k['id']}")
+        if not list((saida / "05_Modulos").glob(f"modulo-{k['id']}_*.zip")):
+            faltas.append(f"módulo {k['id']}")
+        if not k.get("responsaveis"):
+            faltas.append(f"responsável do kit {k['id']}")
+    docs = [p.name for p in (saida / "01_Documentos").glob("*")]
+    faltas += [f"documento {d}*" for d in DOCS_PEDIDOS if not any(n.startswith(d) for n in docs)]
+    memos = saida / "01_Documentos" / "19_Memos_Fase2"
+    if not memos.is_dir() or len(list(memos.glob("*.md"))) < 12:
+        faltas.append("memos da Fase 2 (12)")
+    if not list((saida / "10_Gestao_tarefas_Fase2").glob("*.json")):
+        faltas.append("tarefas da Gestão")
+    for n in ("00_INDICE_DE_ENVIO.md", "00_O_que_e_cada_parte.md", "LEIA-ME.md"):
+        if not (saida / n).is_file():
+            faltas.append(n)
+    if not (saida / "00_Envio_por_pessoa").is_dir() or not any((saida / "00_Envio_por_pessoa").iterdir()):
+        faltas.append("pastas por pessoa")
+    return faltas
 
 
 def zipar(pasta: Path, destino: Path, raiz_nome: str | None = None):
@@ -180,6 +225,14 @@ def main():
         # 00 versão de envio: uma pasta por pessoa e o índice de tudo (pedido de 15/11/2026: "todos os itens, projetos,
         #    módulos e páginas claramente indicados para a versão de envio")
         montar_envio(saida, a.docs, mapa, commit, hoje, rep)
+
+        # inventário: tudo o que já foi pedido tem de estar na entrega (nada some sem alguém perceber)
+        faltas = conferir_inventario(saida, rep, mapa)
+        if faltas:
+            if a.intermediaria:
+                print("AVISO, falta na entrega:\n- " + "\n- ".join(faltas))
+            else:
+                raise SystemExit("entrega incompleta; falta:\n- " + "\n- ".join(faltas))
 
         # verificação: nada proibido, nenhum segredo
         problemas = []
