@@ -51,6 +51,7 @@ h2{font:500 clamp(1.45rem,3.2vw,1.9rem)/1.2 var(--titulo);color:var(--verde);mar
 h3{font:600 1.08rem/1.35 var(--fonte);margin:0 0 6px;color:var(--escuro)}
 .intro{color:var(--tinta2);max-width:760px;margin:0 0 20px}
 .cartao{background:var(--sup);border:1px solid var(--linha);border-radius:12px;padding:18px}
+.cartao.destaque{border:2px solid var(--marca, #33512F)}
 .grade{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
 .grade p{margin:0}
 .cartao p + p{margin-top:8px}
@@ -210,6 +211,7 @@ body.editando [data-chave]:focus{outline:3px solid var(--verde);background:#FFFD
       <article class="cartao"><span class="rotulo" data-chave="serv.cert.r">Certificações</span><h3 data-chave="serv.cert.t">Certificações e gap analysis</h3><p data-chave="serv.cert">Avaliação do quanto falta para uma certificação ou selo de sustentabilidade, plano de adequação e preparação das evidências para a auditoria.</p></article>
       <article class="cartao"><span class="rotulo" data-chave="serv.iso.r">Gestão</span><h3 data-chave="serv.iso.t">Gestão ambiental · ISO 14001 e ISO 50001</h3><p data-chave="serv.iso">Implantação ou revisão de sistemas de gestão ambiental e de energia: levantamento de aspectos, requisitos legais, indicadores, procedimentos e auditoria interna.</p></article>
       <article class="cartao"><span class="rotulo" data-chave="serv.cur.r">Capacitação</span><h3 data-chave="serv.cur.t">Cursos in-company</h3><p data-chave="serv.cur">Treinamentos práticos para a sua equipe em eficiência energética, uso da água, operação dos sensores e do painel e rotinas de gestão ambiental.</p></article>
+      <article class="cartao destaque"><span class="rotulo" data-chave="serv.pers.r">Sob medida</span><h3 data-chave="serv.pers.t">Consultoria personalizada com equipe multidisciplinar</h3><p data-chave="serv.pers">Para desafios que atravessam várias áreas ao mesmo tempo. Montamos uma equipe sob medida — engenharia de energia, água e saneamento, climatização, automação e IoT, soluções baseadas na natureza, resíduos e carbono, certificações e gestão — com uma pessoa responsável pelo projeto inteiro, um plano único e um só painel de dados.</p><p class="nota" data-chave="serv.pers.n">Indique no formulário abaixo as áreas envolvidas; a equipe é definida na primeira conversa.</p><p><a class="botao" href="#contato" data-personalizada="1" data-chave="serv.pers.b">Pedir consultoria personalizada</a></p></article>
     </div>
   </div>
 </section>
@@ -296,6 +298,7 @@ body.editando [data-chave]:focus{outline:3px solid var(--verde);background:#FFFD
             <label><input type="checkbox" name="areas" value="Gestão ambiental (ISO 14001 / 50001)"><span>Gestão ambiental (ISO 14001 / 50001)</span></label>
             <label><input type="checkbox" name="areas" value="Cursos in-company"><span>Cursos in-company</span></label>
             <label><input type="checkbox" name="areas" value="Diárias técnicas"><span>Diárias técnicas</span></label>
+            <label><input type="checkbox" name="areas" value="Consultoria personalizada com equipe multidisciplinar" data-pers="1"><span>Consultoria personalizada com equipe multidisciplinar</span></label>
           </div>
         </fieldset>
         <div class="campo"><label for="f-desc">O que você precisa? <span class="obrig" aria-hidden="true">*</span></label><textarea id="f-desc" name="descricao" required maxlength="6000" aria-describedby="f-desc-d"></textarea><p class="dica" id="f-desc-d">Onde fica, o tamanho da operação, o que já foi feito e o prazo que você imagina.</p></div>
@@ -327,6 +330,8 @@ body.editando [data-chave]:focus{outline:3px solid var(--verde);background:#FFFD
 </div>
 
 <script>
+/* "Pedir consultoria personalizada": já marca a opção no formulário */
+document.addEventListener("click", function (ev) { var a = ev.target.closest && ev.target.closest("[data-personalizada]"); if (!a) return; var c = document.querySelector("input[data-pers]"); if (c) c.checked = true; });
 (function () {
   "use strict";
   var PAGINA = "consultoria";

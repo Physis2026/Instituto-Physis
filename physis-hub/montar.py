@@ -27,7 +27,7 @@ AQUI = Path(__file__).resolve().parent
 MODULOS = ("monitoramento", "agua", "zonas", "animais", "coleiras", "comedouros", "sustainkit", "supervisao", "gestao",
            "painel", "planejador", "certificacoes", "solar", "avac", "turbinas", "sbn", "circular", "carbono",
            "resiliencia", "medicamentos", "pulseira")
-LICENCA_PADRAO = "[LICENÇA A DEFINIR PELA PHYSIS]"
+LICENCA_PADRAO = "Licença Physis de Uso e Adaptação (minuta em revisão jurídica)"
 VENDOR_ARQUIVOS = ("maplibre-gl.js", "maplibre-gl.css", "pmtiles.js", "web-ifc-api-iife.js", "web-ifc.wasm", "three.min.js",
                    "LEIA-ME.md", "LICENSE-maplibre-gl.txt", "LICENSE-three.txt")
 
@@ -69,6 +69,20 @@ Todo o código está nesta pasta e pode ser estudado e adaptado. Licença: {lice
 
     python3 -m unittest discover -s tests
 """
+
+
+def texto_licenca(nome: str) -> str:
+    """O texto da licença que vai no pacote: o das minutas (sistema/physis-juridico.js), quando existir."""
+    arq = AQUI.parent / "sistema" / "physis-juridico.js"
+    try:
+        dados = json.loads(arq.read_text(encoding="utf-8").split("window.PHYSIS_JURIDICO = ", 1)[1].rstrip().rstrip(";"))
+        linhas = [nome, "", f"Situação: {dados['situacao']} · versão de {dados['versao']}", ""]
+        for b in dados["licenca"]["blocos"]:
+            linhas += [b["t"]] if b["t"] else []
+            linhas += [re.sub(r"\*\*?([^*]+)\*\*?", r"\1", x) for x in b["p"]] + [""]
+        return "\n".join(linhas)
+    except (OSError, IndexError, KeyError, ValueError):
+        return nome + "\n"
 
 
 def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Path | None, licenca: str,
@@ -132,7 +146,7 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         inst["suporte_email"] = str(suporte.get("email") or "")
         inst["suporte_whatsapp"] = str(suporte.get("whatsapp") or "")
     (pasta / "instancia.json").write_text(json.dumps(inst, ensure_ascii=False, indent=2), encoding="utf-8")
-    (pasta / "LICENSE").write_text(licenca + "\n", encoding="utf-8")
+    (pasta / "LICENSE").write_text(texto_licenca(licenca), encoding="utf-8")
     sk = ("- **SustainKit:** já funciona, sem equipamento. Abra pela aba SustainKit.\n"
           if "sustainkit" in modulos else "")
     (pasta / "LEIA-ME.md").write_text(GUIA.format(org=org, lugar=lugar, modulos=", ".join(modulos),

@@ -1,6 +1,15 @@
-# Caixinha de Automação (SustainKit 2.0) — Módulo de irrigação
-# Nó ESP32 de uma zona, publicando via MQTT
+# Caixinha Physis IoT — Módulo de irrigação
+# Nó ESP32 de uma zona, publicando via MQTT para a plataforma Physis (ponte physis_hub/mqtt.py)
 # Status: NÃO TESTADO EM HARDWARE (fase de arquitetura / TRL 3)
+#
+# Na plataforma (instancia.json do servidor), este nó entra assim:
+#   "mqtt": {"broker": "192.168.x.x", "usuario": "physis-hub",
+#            "nos": [{"no": "irrigacao-zona1", "id": 21, "u1": "umidade_solo_zona_1",
+#                     "ir1": "valvula_zona_1", "bat": "tensao_alimentacao", "tmax": 15}]}
+# e a senha do broker vai na variável de ambiente PHYSIS_MQTT_SENHA (nunca no arquivo).
+
+substitutions:
+  tmax_min: "15"         # tempo máximo de rega por acionamento (o mesmo "tmax" da plataforma)
 
 esphome:
   name: irrigacao-zona1
@@ -18,6 +27,10 @@ mqtt:
   broker: !secret mqtt_broker_ip
   username: !secret mqtt_user
   password: !secret mqtt_password
+  # tópicos padrão: irrigacao-zona1/sensor/<objeto>/state, irrigacao-zona1/switch/<objeto>/command
+  # sem broker, a válvula fecha (segurança): ver on_disconnect
+  on_disconnect:
+    - switch.turn_off: valvula_zona1
 
 ota:
   platform: esphome
@@ -28,22 +41,41 @@ logger:
 sensor:
   - platform: adc
     pin: GPIO34          # pino ADC1 - não usar ADC2 (conflita com WiFi)
-    name: "Umidade Solo Zona 1"
+    name: "Umidade Solo Zona 1"            # objeto: umidade_solo_zona_1
     id: umidade_zona1
     attenuation: 11db
     update_interval: 60s
+    unit_of_measurement: "%"
     filters:
       - calibrate_linear:
-          # ajustar após calibrar o sensor específico, enterrado no local real
+          # CALIBRAÇÃO: ajustar após calibrar o sensor específico, enterrado no local real
           - 3.1 -> 0      # tensão lida com o sensor seco
           - 1.2 -> 100    # tensão lida com o sensor saturado de água
+      - clamp:
+          min_value: 0
+          max_value: 100
+      - sliding_window_moving_average:
+          window_size: 5
+          send_every: 1
+  - platform: adc
+    pin: GPIO35
+    name: "Tensao Alimentacao"             # objeto: tensao_alimentacao (bateria, se houver)
+    attenuation: 11db
+    update_interval: 300s
+    filters:
+      - multiply: 2.0     # divisor resistivo 1:1 — ajustar ao circuito real
 
 switch:
   - platform: gpio
     pin: GPIO26
-    name: "Valvula Zona 1"
+    name: "Valvula Zona 1"                 # objeto: valvula_zona_1
     id: valvula_zona1
+    restore_mode: ALWAYS_OFF               # ao religar, começa fechada
+    on_turn_on:
+      # segurança no próprio nó: fecha sozinha depois do tempo máximo, mesmo sem rede
+      - delay: !lambda "return ${tmax_min} * 60 * 1000;"
+      - switch.turn_off: valvula_zona1
 
 # Para mais zonas no mesmo nó: replicar sensor/switch com outros pinos ADC1
-# (GPIO32, GPIO33, GPIO35...) e outros GPIOs livres para os relés.
-# Para zonas distantes: criar irrigacao-zona2.yaml etc. com outro "name".
+# (GPIO32, GPIO33...) e outros GPIOs livres para os relés; na plataforma, "u2" e "ir2".
+# Para zonas distantes: criar irrigacao-zona2.yaml etc. com outro "name" e outro "id" (1 a 99).

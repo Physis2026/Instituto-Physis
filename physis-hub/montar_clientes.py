@@ -13,7 +13,7 @@ import argparse
 import json
 from pathlib import Path
 
-from montar import montar
+from montar import LICENCA_PADRAO, montar
 
 RAIZ = Path(__file__).resolve().parent.parent
 FICHAS = RAIZ / "clientes" / "clientes.json"
@@ -37,7 +37,7 @@ def main() -> None:
             continue
         gestao = RAIZ / "sistema" / "gestao-interna-physis.html" if f.get("gestao_interna") else None
         pacote = montar(f["org"], f.get("lugar", "lugar01"), f["modulos"], a.saida, PROGRAMAS["sustainkit"],
-                        "[LICENÇA A DEFINIR PELA PHYSIS]", PROGRAMAS["supervisao"], gestao, PROGRAMAS["planejador"],
+                        LICENCA_PADRAO, PROGRAMAS["supervisao"], gestao, PROGRAMAS["planejador"],
                         bool(f.get("pesquisa")), f.get("nome", ""), None, suporte)
         print(f"{f['nome']}: {pacote.name} ({pacote.stat().st_size // 1024} kB) · módulos: {', '.join(f['modulos'])}"
               + (" · pesquisa" if f.get("pesquisa") else ""))

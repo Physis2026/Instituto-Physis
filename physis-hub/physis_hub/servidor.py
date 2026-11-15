@@ -16,6 +16,7 @@ Rotas das telas:
   GET  /                         web/painel.html
 
 Variaveis de ambiente:
+  PHYSIS_MQTT_BROKER/_PORTA/_USUARIO/_SENHA/_TLS/_NOS  ponte MQTT da Caixinha IoT (ver docs/MQTT.md)
   PHYSIS_PORTA (8700)  PHYSIS_BANCO (physis-hub.db)  PHYSIS_ORG  PHYSIS_LUGAR
   PHYSIS_RX_URL        ex.: http://192.168.4.1 — liga o envio de comandos e a consulta ao receptor
   PHYSIS_TOKEN         se definido, exigido em X-Physis-Token nas rotas das telas que alteram estado
@@ -37,6 +38,7 @@ import re
 
 from . import clima as clima_mod
 from . import saude as saude_mod
+from . import mqtt as mqtt_mod
 from . import gis as gis_mod
 from . import app_pwa
 from . import correio
@@ -1040,6 +1042,9 @@ def main() -> None:
     clima = clima_mod.Clima(hub, receptor_url=rx, enviar_local=clima_mod.receptor_local(rx) if rx else None)
     if os.environ.get("PHYSIS_CLIMA", "1") != "0":     # PHYSIS_CLIMA=0 desliga as consultas (sem internet de propósito)
         threading.Thread(target=clima_mod.rodar, args=(clima, parar), daemon=True).start()
+    cfg_mqtt = mqtt_mod.config_de(ler_instancia())       # Caixinha Physis IoT (ESPHome) pelo broker MQTT
+    if cfg_mqtt:
+        threading.Thread(target=mqtt_mod.rodar, args=(hub, cfg_mqtt, parar), daemon=True).start()
     saude_fundo = saude_mod.Saude(hub)          # doses esquecidas e avisos aos cuidadores, mesmo sem a tela aberta
     threading.Thread(target=saude_mod.rodar, args=(saude_fundo, parar),
                      kwargs={"enviar": lambda: saude_mod.enviar_avisos(hub, correio.enviar_fila)}, daemon=True).start()
