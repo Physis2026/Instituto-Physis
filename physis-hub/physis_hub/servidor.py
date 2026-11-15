@@ -225,7 +225,29 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
         def log_message(self, *a):          # silencioso; a saude fica em /api/saude
             pass
 
+        def handle_one_request(self):
+            self._corpo_lido = False          # cada pedido começa sem corpo lido
+            super().handle_one_request()
+
+        def _drenar_pendente(self) -> None:
+            """Lê o corpo que ninguém leu antes de responder com erro. Sem isso, um 401/403/404 a um POST
+            com corpo fecha a conexão com bytes não lidos e o Windows corta com RST: quem enviou não vê a resposta."""
+            if getattr(self, "_corpo_lido", True):
+                return
+            self._corpo_lido = True
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                return
+            if 0 < n <= CORPO_MAX:
+                try:
+                    self.rfile.read(n)
+                except OSError:
+                    pass
+
         def _json(self, codigo: int, obj) -> None:
+            if codigo >= 400:
+                self._drenar_pendente()
             corpo = json.dumps(obj, ensure_ascii=False).encode("utf-8")
             self.send_response(codigo)
             self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -250,6 +272,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 n = int(self.headers.get("Content-Length") or 0)
             except ValueError:
                 n = 0
+            self._corpo_lido = True
             self.close_connection = True
             corpo = json.dumps({"ok": False, "erro": erro}, ensure_ascii=False).encode("utf-8")
             self.send_response(413)
@@ -277,6 +300,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return None
             if n < 0 or n > CORPO_MAX:
                 return None
+            self._corpo_lido = True
             return self.rfile.read(n).decode("utf-8", errors="replace")
 
         def _corpo_grande(self, limite: int) -> bytes | None:
@@ -287,6 +311,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return None
             if n <= 0 or n > limite:
                 return None
+            self._corpo_lido = True
             return self.rfile.read(n)
 
         def _sessao_ou_401(self) -> dict | None:
@@ -592,6 +617,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     n = -1
                 if n <= 0 or n > hub.ARQUIVO_MAX:
                     return self._recusar_corpo("arquivo vazio ou maior que 20 MB")
+                self._corpo_lido = True
                 r = hub.arquivo_por((q.get("pedido") or [""])[0], (q.get("nome") or [""])[0], self.rfile.read(n))
                 return self._json(200 if r["ok"] else 400, r)
             corpo = self._corpo()

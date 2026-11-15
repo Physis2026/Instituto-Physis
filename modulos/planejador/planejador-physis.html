@@ -155,7 +155,7 @@ function novo(){return{schema:'physis.terreno/1.0',meta:{nome:'',municipio:'',uf
  regras:{to:null,ca:null,perm:null,recFrente:null,recLat:null,recFundo:null,gabarito:null},
  itens:[], sistemas:{solar:false,biogas:false,chuva:false,reuso:false,baterias:false},
  premissas:{coefC:{telhado:0.95,pav:0.9,grama:0.25,mata:0.15,solo:0.35},Tr:25,tc:10,negras:20},
- prov:{},log:[]}}
+ prov:{},log:[],inicio:{obras:[],blocos:['implantacao'],nivel:'basico',lat:null,lon:null,area:null,docs:[]}}}
 let S;let HIST=[],FUT=[];const KEY='physis.terreno.v1';
 function save(silent){try{localStorage.setItem(KEY,JSON.stringify(S));if(!silent)toast('Projeto salvo neste navegador')}catch(e){if(!silent)toast('Não foi possível salvar no navegador; baixe o arquivo do projeto')}}
 function load(){try{const t=localStorage.getItem(KEY);if(t){const o=JSON.parse(t);if(o?.schema==='physis.terreno/1.0')return o}}catch(e){}return null}
@@ -450,11 +450,74 @@ function layersUI(keys){return h('div',{class:'layers'},...keys.map(([k,l,c])=>h
 
 // SPDX-License-Identifier: AGPL-3.0-only
 // Planejador Physis · núcleo · Copyright (C) 2026 Physis Engineering
-const STEPS=[['terreno','Terreno'],['clima','Clima, solo e regras'],['programa','O que construir'],['calculos','Cálculos e normas'],['modulos','Módulos e análises'],['documento','Documento EP']];
+const STEPS=[['inicio','Início'],['terreno','Terreno'],['clima','Clima, solo e regras'],['programa','O que construir'],['calculos','Cálculos e normas'],['modulos','Módulos e análises'],['documento','Documento EP']];
 let OPT={crs:'auto',zona:23,hemis:'S',lat:'',lon:''};
 function links(){const la=S.terreno.lat0,lo=S.terreno.lon0;const c=la!=null?`${NF(la,5)}, ${NF(lo,5)}`:'coordenadas do terreno';const L=(t,u,d)=>h('li',{},h('a',{href:u,target:'_blank',rel:'noopener'},t),' · ',d);
  return card('Bases públicas para completar os dados','Esta página não acessa a internet. Abra a base, baixe o arquivo para '+c+' e importe aqui; o planejador registra a origem de cada dado.',h('ul',{class:'links'},L('OpenTopography (SRTM, Copernicus 30 m)','https://portal.opentopography.org/datasets','modelo de elevação em .asc para o passo 1'),L('PVGIS (Comissão Europeia)','https://re.jrc.ec.europa.eu/pvg_tools/pt/','produção solar mensal em kWh/kWp'),L('CRESESB SunData','https://cresesb.cepel.br/index.php?section=sundata','radiação solar mensal no Brasil'),L('INMET · normais climatológicas','https://portal.inmet.gov.br/normais','chuva e temperatura mensais'),L('ANA · HidroWeb','https://www.snirh.gov.br/hidroweb/','séries de chuva por estação'),L('SGB/CPRM · GeoSGB','https://geosgb.sgb.gov.br/','geologia, solos, áreas de risco e equações de chuva'),L('MapBiomas','https://plataforma.brasil.mapbiomas.org/','cobertura e uso do solo'),L('IBGE · geociências','https://www.ibge.gov.br/geociencias/downloads-geociencias.html','limites, hidrografia, altimetria')))}
+/* ===== Início do Planejador: o que construir, blocos, localização e documentos (14/11/2026) ===== */
+const OBRAS_INICIO=[['casa','Casa ou residência'],['chales','Chalés, pousada ou hotel'],['galpao','Galpão, oficina ou indústria'],['escritorio','Escritório, escola ou comércio'],['rural','Estrutura rural (curral, estufa, armazém)'],['loteamento','Loteamento ou condomínio'],['reforma','Reforma ou ampliação do que existe'],['mapear','Só mapear o lugar (sem construção)']];
+const BLOCOS_INICIO=[
+  {id:'implantacao',nome:'Implantação e NBRs',det:'terreno, declividade, recuos, ocupação, acessibilidade e áreas de proteção',sempre:true},
+  {id:'solar',nome:'Energia solar',det:'potencial solar do lugar, orientação, telhados e baterias'},
+  {id:'avac',nome:'AVAC e térmico',det:'ar-condicionado, ventilação, aquecimento solar, potencial solar para AVAC e reaproveitamento de calor',sk:true},
+  {id:'agua',nome:'Água',det:'consumo, chuva e cisterna, reúso, esgoto e fluxo da água'},
+  {id:'drenagem',nome:'Drenagem e encosta',det:'escoamento da chuva, infiltração e estabilidade'},
+  {id:'residuos',nome:'Resíduos e economia circular',det:'resíduos da obra e da operação, compostagem e reaproveitamento',sk:true},
+  {id:'sbn',nome:'SbN e paisagem',det:'jardins de chuva, wetland, agrofloresta e viveiro',sk:true},
+  {id:'carbono',nome:'Carbono',det:'carbono dos materiais e da operação, caminho net zero',sk:true},
+  {id:'certificacoes',nome:'Certificações',det:'gap analysis de LEED, EDGE, Casa Azul, GreenKey e ISO',sk:true}];
+const TIPO_DOC={geo:'Topografia ou GIS',pdf:'PDF',img:'Imagem ou croqui',doc:'Documento de texto',planilha:'Planilha',dwg:'Desenho DWG',dxf:'Desenho DXF',ifc:'Modelo BIM (IFC)',outro:'Outro'};
+function tipoDoc(nome){const x=(nome.split('.').pop()||'').toLowerCase();return ['geojson','json','kml','csv','txt','xyz','asc'].includes(x)?'geo':x==='dxf'?'dxf':x==='pdf'?'pdf':['png','jpg','jpeg','webp','gif','bmp','tif','tiff','heic','svg'].includes(x)?'img':['doc','docx','odt','rtf'].includes(x)?'doc':['xls','xlsx','ods'].includes(x)?'planilha':x==='dwg'?'dwg':x==='ifc'?'ifc':'outro'}
+/* os arquivos ficam no próprio aparelho (IndexedDB), nunca saem dele sem o envio explícito */
+const DOCS={db:null,abrir(){return this.db||(this.db=new Promise((ok,er)=>{const r=indexedDB.open('physis.planejador.docs',1);r.onupgradeneeded=()=>r.result.createObjectStore('docs');r.onsuccess=()=>ok(r.result);r.onerror=()=>er(r.error)}))},
+  async guardar(id,blob){const db=await this.abrir();return new Promise((ok,er)=>{const t=db.transaction('docs','readwrite');t.objectStore('docs').put(blob,id);t.oncomplete=()=>ok();t.onerror=()=>er(t.error)})},
+  async ler(id){const db=await this.abrir();return new Promise((ok,er)=>{const q=db.transaction('docs').objectStore('docs').get(id);q.onsuccess=()=>ok(q.result);q.onerror=()=>er(q.error)})},
+  async apagar(id){try{const db=await this.abrir();db.transaction('docs','readwrite').objectStore('docs').delete(id)}catch(e){}}};
+async function receberDocs(files){const geo=[];const novos=[];
+  for(const f of files){const tipo=tipoDoc(f.name);if(tipo==='geo'||tipo==='dxf'){geo.push(f)}
+    const id='doc-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
+    try{await DOCS.guardar(id,f)}catch(e){toast('Não foi possível guardar '+f.name+' neste aparelho');continue}
+    const situacao={geo:'Lido como terreno',dxf:'Lido como terreno (polilinhas cotadas)',pdf:'Guardado. Se for levantamento vetorial, use “Ler como topografia”',img:'Guardado. Vai como fundo do mapa: marque 2 pontos conhecidos para posicionar e trace o contorno',doc:'Guardado no projeto',planilha:'Guardado no projeto',dwg:'Guardado. Conversão aberta para DXF em preparação; se precisar agora, exporte em DXF',ifc:'Guardado. Leitor BIM em instalação: as áreas e os ambientes do modelo vão alimentar os blocos',outro:'Guardado no projeto'}[tipo];
+    novos.push({id,nome:f.name,tipo,tamanho:f.size,situacao,quando:new Date().toISOString()})}
+  if(novos.length)mutate(()=>{S.inicio.docs.push(...novos)},'documentos: '+novos.map(d=>d.nome).join(', '));
+  if(geo.length)await ler(geo)}
+async function lerDocComoTerreno(d){try{const b=await DOCS.ler(d.id);if(!b){toast('O arquivo não está mais neste aparelho');return}await ler([new File([b],d.nome,{type:'application/pdf'})])}catch(e){toast('Não foi possível ler: '+e.message)}}
+/* só com o ponto e a área: um quadrado estimado no lugar, para os cálculos já rodarem */
+function terrenoEstimado(){const I=S.inicio,lado=Math.sqrt(I.area),dt=lado/2/111320,dl=lado/2/(111320*Math.cos(I.lat*Math.PI/180));
+  const poly=[[I.lon-dl,I.lat-dt],[I.lon+dl,I.lat-dt],[I.lon+dl,I.lat+dt],[I.lon-dl,I.lat+dt]];
+  mutate(()=>{T.ingest({poly,pts:[]},{...OPT,crs:'ll',nome:'terreno estimado no Início'});S.terreno.crs='geográficas (WGS84/SIRGAS), terreno estimado';S.prov['terreno.poly']={st:'est',src:'quadrado de '+NF(I.area,0)+' m² no ponto '+NF(I.lat,5)+', '+NF(I.lon,5)+' (Início). Trocar pela topografia real.'}},'terreno estimado a partir do Início');toast('Terreno estimado criado. Troque pela topografia quando tiver.')}
+/* primeiro resultado, já no Início: o sol do lugar */
+function resumoPotencial(I){const H0=SOL.H0(I.lat),Hh=S.clima.H.length===12?S.clima.H:H0.map(v=>v*S.clima.kt),dias=[31,28,31,30,31,30,31,31,30,31,30,31];
+  const rend=Hh.reduce((a,v,k)=>a+v*dias[k],0)*S.clima.pr*1.05,media=Hh.reduce((a,v)=>a+v,0)/12;
+  const itens=[[NF(media,1)+' kWh/m²·dia','sol médio no plano horizontal'],[NF(rend,0)+' kWh/kWp·ano','produção estimada de cada kWp']];
+  if(I.area>0&&S.inicio.blocos.includes('solar')){const kwp=I.area*0.15*0.18;itens.push([NF(kwp,1)+' kWp','potencial com 15% do terreno em placas (estimativa)'],[NF(kwp*rend/1000,1)+' MWh/ano','energia desse potencial'])}
+  return h('div',{},h('p',{class:'hint'},'Primeiro retrato do lugar (estimado pela latitude; troque pelo PVGIS ou CRESESB na etapa Clima):'),kpis(itens))}
 const R_={
+inicio(el){const I=S.inicio;
+  el.append(h('h2',{},'Início · o que você quer planejar'),h('p',{class:'lead'},'Marque o que quer construir ou mapear e envie o que já tem: planta, croqui, foto, Word, PDF, DWG, IFC, topografia ou arquivo GIS. O planejador modela só os blocos escolhidos. Para começar basta a localização e a área do terreno, ou um documento com essas marcações.'));
+  /* 1. o que construir ou mapear */
+  const obra=(id,l)=>h('label',{class:'chk'},h('input',{type:'checkbox',checked:I.obras.includes(id),onchange:e=>mutate(()=>{I.obras=e.target.checked?[...new Set([...I.obras,id])]:I.obras.filter(x=>x!==id)},'o que construir: '+l)}),' ',l);
+  el.append(card('1 · O que quer construir ou mapear','Pode marcar mais de um. O detalhe de cada edificação (tamanho, posição) fica na etapa “O que construir”.',h('div',{class:'grid'},...OBRAS_INICIO.map(([id,l])=>obra(id,l)))));
+  /* 2. blocos de análise */
+  const sk=I.nivel==='sustainkit';
+  const bloco=b=>h('label',{class:'chk',title:b.det},h('input',{type:'checkbox',checked:I.blocos.includes(b.id),disabled:!!b.sempre,onchange:e=>mutate(()=>{I.blocos=e.target.checked?[...new Set([...I.blocos,b.id])]:I.blocos.filter(x=>x!==b.id)},'bloco: '+b.nome)}),' ',h('b',{},b.nome),' ',h('span',{class:'hint'},b.det+(b.sk&&!sk?' (completo com o SustainKit)':'')));
+  el.append(card('2 · Blocos de análise','O básico mapeia as áreas e confere o estudo preliminar com as NBRs, a insolação do ano e as áreas de proteção. Com o SustainKit, cada bloco ganha diagnóstico, comparação entre opções, gestão para melhoria contínua, caminho net zero e gap analysis de certificações.',
+    h('div',{class:'field'},h('label',{},'Nível'),h('select',{onchange:e=>mutate(()=>{I.nivel=e.target.value},'nível do planejamento')},h('option',{value:'basico',selected:!sk},'Básico: mapeamento e adequação às NBRs (estudo preliminar)'),h('option',{value:'sustainkit',selected:sk},'Com SustainKit: diagnósticos, comparativos, net zero e certificações'))),
+    h('div',{class:'grid'},...BLOCOS_INICIO.map(bloco))));
+  /* 3. localização e área (obrigatório) ou documento com marcações */
+  const g=T.build(),temTerreno=!!S.terreno.poly.length,ok=temTerreno||(I.lat!=null&&I.lon!=null&&I.area>0);
+  const num=(k,l,ph)=>h('div',{class:'field'},h('label',{for:'ini-'+k},l+' (obrigatório se não houver documento)'),h('input',{id:'ini-'+k,type:'text',inputmode:'decimal',value:I[k]??'',placeholder:ph,onchange:e=>{const v=e.target.value.trim()===''?null:+e.target.value.replace(',','.');if(v!==null&&!isFinite(v)){toast('Use número: '+ph);return}mutate(()=>{I[k]=v},l)}}));
+  const gerar=h('button',{class:'btn',type:'button',disabled:!(I.lat!=null&&I.lon!=null&&I.area>0)||temTerreno,onclick:()=>terrenoEstimado()},'Criar terreno estimado com estes dados');
+  el.append(card('3 · Onde fica e qual o tamanho',ok?(temTerreno?'Terreno já carregado: '+NF(GEO.area(S.terreno.poly),0)+' m². Os blocos usam este terreno.':'Pronto: com a localização e a área, o planejador cria um terreno estimado (um quadrado no ponto informado) para já calcular. Troque depois pela topografia real.'):'Informe latitude, longitude e área do terreno, ou envie abaixo um levantamento, arquivo GIS ou documento com as marcações.',
+    h('div',{class:'grid'},num('lat','Latitude','-22,5050'),num('lon','Longitude','-43,1830'),num('area','Área do terreno (m²)','2500')),
+    h('div',{class:'grid'},h('button',{class:'btn',type:'button',onclick:()=>{if(!navigator.geolocation){toast('Este aparelho não informa a localização');return}navigator.geolocation.getCurrentPosition(p=>mutate(()=>{I.lat=+p.coords.latitude.toFixed(6);I.lon=+p.coords.longitude.toFixed(6)},'localização do aparelho'),()=>toast('Não foi possível pegar a localização'),{enableHighAccuracy:true,timeout:15000})}},'Usar a localização deste aparelho'),gerar),
+    I.lat!=null&&I.lon!=null?resumoPotencial(I):null));
+  /* 4. documentos */
+  const fi=h('input',{type:'file',multiple:true,hidden:true,onchange:e=>receberDocs([...e.target.files])});
+  const drop=h('div',{class:'drop',ondragover:e=>{e.preventDefault();drop.classList.add('over')},ondragleave:()=>drop.classList.remove('over'),ondrop:e=>{e.preventDefault();drop.classList.remove('over');receberDocs([...e.dataTransfer.files])}},h('p',{},h('b',{},'Arraste aqui qualquer arquivo do projeto')),h('p',{class:'hint'},'Topografia e GIS (GeoJSON, KML, CSV, TXT, ASC, DXF) vão direto para o terreno. PDF, imagens, Word, planilhas, DWG e IFC ficam guardados no projeto, neste aparelho.'),h('label',{class:'btn primary'},'Escolher arquivos',fi));
+  const linhas=I.docs.map((d,k)=>[d.nome,TIPO_DOC[d.tipo]||d.tipo,NF(d.tamanho/1024,0)+' kB',d.situacao,h('span',{},d.tipo==='pdf'?h('button',{class:'btn',type:'button',onclick:()=>lerDocComoTerreno(d)},'Ler como topografia'):null,' ',h('button',{class:'btn',type:'button',onclick:()=>mutate(()=>{I.docs.splice(k,1);DOCS.apagar(d.id)},'documento removido')},'Remover'))]);
+  el.append(card('4 · Documentos do projeto',null,drop,I.docs.length?tbl(['Arquivo','Tipo','Tamanho','O que acontece','Ações'],linhas):h('p',{class:'hint'},'Nenhum documento ainda.')));
+},
 terreno(el){const t=S.terreno;const g=T.build();
  el.append(h('h2',{},'1 · Seu terreno'),h('p',{class:'lead'},'Envie a topografia ou o arquivo GIS do terreno. Formatos: PDF do levantamento (vetorial, exportado do CAD), GeoJSON, KML, CSV ou TXT com x, y e cota (ou longitude, latitude e altitude), grade ASCII (.asc) de modelos de elevação e DXF com polilinhas cotadas. Com o arquivo, o planejador desenha as curvas de nível e modela declividade, escoamento da chuva e exposição ao sol.'));
  const fi=h('input',{type:'file',accept:'.geojson,.json,.kml,.csv,.txt,.xyz,.asc,.dxf,.pdf',multiple:true,hidden:true,onchange:e=>ler([...e.target.files])});
@@ -1423,7 +1486,7 @@ MOD.registrar({
 
 // SPDX-License-Identifier: AGPL-3.0-only
 // Planejador Physis · núcleo · Copyright (C) 2026 Physis Engineering
-let STEP='terreno',SIDE='chk',SAMPLE=null,PROPS=[],CHAT=[];
+let STEP='inicio',SIDE='chk',SAMPLE=null,PROPS=[],CHAT=[];
 const SEVT={bad:['bloqueio','t-bad'],warn:['atenção','t-warn'],info:['informação','t-info']};
 const REGRAS='Você é o assistente técnico do Planejador Physis, que modela terrenos e gera estudos preliminares de construção no Brasil. Responda em português do Brasil, curto e direto. Use as ferramentas para ler o projeto, os resultados e as verificações antes de responder; cite a NBR ou a lei quando houver. Nunca diga que alterou algo: para sugerir mudança, chame propor_alteracao com o caminho exato, o valor e o motivo. Deixe claro o que é estimado e o que depende de terceiros (sondagem, prefeitura, órgãos). Não invente parâmetros municipais: peça que a pessoa os consulte.';
 const TOOLS=[{name:'ler_projeto',description:'Lê um bloco do projeto pelo caminho (meta, terreno.poly, clima, solo, regras, itens, sistemas, premissas).',inputSchema:{type:'object',properties:{caminho:{type:'string'}},required:['caminho']},execute:({caminho})=>JSON.stringify(getP(S,caminho)??null).slice(0,3500)},
@@ -1438,8 +1501,8 @@ function renderSide(){const b=$('#side');if(!b)return;b.replaceChildren();docume
   ...PROPS.map((p,i)=>h('div',{class:'prop'},h('b',{},p.caminho),' → ',JSON.stringify(p.valor),h('div',{class:'hint'},p.motivo),h('div',{class:'row'},h('button',{class:'primary',onclick:()=>{PROPS.splice(i,1);mutate(()=>{setP(S,p.caminho,p.valor);S.prov[p.caminho]={st:'est',src:'sugestão do assistente: '+p.motivo}},'sugestão aplicada: '+p.caminho)}},'Aplicar'),h('button',{onclick:()=>{PROPS.splice(i,1);renderSide()}},'Descartar')))))}
  else if(SIDE==='glos')glossarioUI(b);
  else b.append(h('p',{class:'hint'},'Clique na etiqueta de um campo para alternar entre estimado, confirmado e aguarda terceiros.'),tbl(['Dado','Situação','Fonte'],Object.entries(S.prov).map(([k,p])=>[k,h('span',{class:'prov '+p.st},{est:'estimado',conf:'confirmado',ter:'aguarda terceiros'}[p.st]),p.src||''])))}
-function done(id){const g=T.build();return id==='terreno'?!!g:id==='clima'?!!(S.clima.idf.K&&S.solo.classe&&S.regras.to!=null):id==='programa'?ED().length>0&&S.itens.some(i=>i.tipo==='acesso'):id==='calculos'?!run().chk.some(c=>c[0]==='bad'):false}
-function refresh(){const st=$('#steps');st.replaceChildren(...STEPS.map(([id,l],k)=>h('a',{href:'#'+id,'aria-current':STEP===id?'true':'false',class:done(id)?'done':''},h('span',{class:'n'},done(id)?'✓':k+1),l)));
+function done(id){const g=T.build();return id==='inicio'?(!!S.terreno.poly.length||(S.inicio.lat!=null&&S.inicio.lon!=null&&S.inicio.area>0)):id==='terreno'?!!g:id==='clima'?!!(S.clima.idf.K&&S.solo.classe&&S.regras.to!=null):id==='programa'?ED().length>0&&S.itens.some(i=>i.tipo==='acesso'):id==='calculos'?!run().chk.some(c=>c[0]==='bad'):false}
+function refresh(){S.inicio=Object.assign({obras:[],blocos:['implantacao'],nivel:'basico',lat:null,lon:null,area:null,docs:[]},S.inicio||{});const st=$('#steps');st.replaceChildren(...STEPS.map(([id,l],k)=>h('a',{href:'#'+id,'aria-current':STEP===id?'true':'false',class:done(id)?'done':''},h('span',{class:'n'},done(id)?'✓':k+1),l)));
  const m=$('#main');const y=window.scrollY;m.replaceChildren();R_[STEP](m);const k=STEPS.findIndex(s=>s[0]===STEP);m.append(h('div',{class:'nav'},k>0?h('a',{class:'btn',href:'#'+STEPS[k-1][0]},'Voltar: '+STEPS[k-1][1]):h('span'),k<STEPS.length-1?h('a',{class:'btn primary',href:'#'+STEPS[k+1][0]},'Continuar: '+STEPS[k+1][1]):h('span')));window.scrollTo(0,y);
  renderSide();$('#undo').disabled=!HIST.length;$('#redo').disabled=!FUT.length;CONF.depois()}
 function route(){const id=location.hash.slice(1);if(STEPS.some(s=>s[0]===id))STEP=id;refresh()}
