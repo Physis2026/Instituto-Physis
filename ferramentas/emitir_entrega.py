@@ -155,6 +155,10 @@ def main():
             zipar(rep / "app-nativo", P("08_App_nativo") / f"app-nativo_{commit}.zip")
         shutil.copy2(arq_zip, P("09_Codigo_fonte") / f"sistema-physis_{commit}.zip")
 
+        # 00 versão de envio: uma pasta por pessoa e o índice de tudo (pedido de 15/11/2026: "todos os itens, projetos,
+        #    módulos e páginas claramente indicados para a versão de envio")
+        montar_envio(saida, a.docs, mapa, commit, hoje, rep)
+
         # verificação: nada proibido, nenhum segredo
         problemas = []
         for f in saida.rglob("*"):
@@ -178,10 +182,151 @@ def main():
                                                           "testes": resultado_testes, "arquivos": lista}, ensure_ascii=False, indent=1), encoding="utf-8")
         aviso = ("\n> **Versão intermediária** (trabalho em andamento sobre a versão salva " + base + "). Testes: " + resultado_testes +
                  ". Será substituída pela versão final nesta mesma pasta.\n") if a.intermediaria else ""
-        (saida / "LEIA-ME.md").write_text(LEIA.format(commit=commit, hoje=hoje, n=len(lista)) + aviso, encoding="utf-8")
+        (saida / "LEIA-ME.md").write_text(LEIA.format(commit=commit, hoje=hoje, n=len(lista), nkits=len(mapa)) + aviso, encoding="utf-8")
         print(f"entrega pronta: {saida} ({len(lista)} arquivos, versão {commit})")
+
+        # cópia da versão de envio inteira na pasta de backup (onde a equipe procura), com a versão no nome
+        bk = a.docs / "_backup_arquivos"
+        bk.mkdir(exist_ok=True)
+        destino = bk / f"{saida.name}_ENVIO_{commit}_{hoje}.zip"
+        zipar(saida, destino, saida.name)
+        print(f"cópia de envio: {destino}")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+"""Situação de cada módulo (decisão de 15/11/2026): os prontos aparecem no site e na loja; os outros estão em
+desenvolvimento, fora do site, mas instalados e usados na Casa Physis; o hardware vai a teste de campo na Fase 2."""
+PRONTOS = {"planejador", "sustainkit", "solar", "agua", "monitoramento", "scada", "certificacoes"}
+SITUACAO_PRONTO = "Pronto: no site e na loja"
+SITUACAO_DEV = "Em desenvolvimento: fora do site, instalado na Casa Physis"
+SITUACAO_HW = "Hardware: protótipo, teste de campo na Fase 2"
+
+
+def situacao_modulo(k: dict) -> str:
+    if k["id"] in PRONTOS:
+        return SITUACAO_PRONTO
+    if k["id"].startswith("hw-"):
+        return SITUACAO_HW
+    if k["id"] == "servidor":
+        return "Infraestrutura: instalação pelo Eric Oliveira (Fase 2)"
+    return SITUACAO_DEV
+
+
+def secoes_por_pessoa(texto: str) -> dict:
+    """Separa o memo "Quem faz o quê" em uma parte por pessoa (títulos "## Nome · N tarefas")."""
+    out, nome, linhas = {}, None, []
+    for l in texto.splitlines():
+        m = re.match(r"^## (.+?) · \d+ tarefas?", l)
+        if m:
+            if nome:
+                out[nome] = "\n".join(linhas).strip() + "\n"
+            nome, linhas = m.group(1).strip(), [l]
+        elif nome:
+            linhas.append(l)
+    if nome:
+        out[nome] = "\n".join(linhas).strip() + "\n"
+    return out
+
+
+def seguro(nome: str) -> str:
+    import unicodedata
+    s = unicodedata.normalize("NFD", nome).encode("ascii", "ignore").decode()
+    return re.sub(r"[^A-Za-z0-9]+", "_", s).strip("_")
+
+
+def montar_envio(saida: Path, docs: Path, mapa: list, commit: str, hoje: str, rep: Path):
+    """00_Envio_por_pessoa/<Pessoa>/ com o LEIA-ME, a parte dela no memo, os kits e os pacotes de módulo dela;
+    e o índice de envio (INDICE_DE_ENVIO.md e .ods) com cada página, demo, pacote, módulo, kit e documento."""
+    itens = []   # (tipo, item, arquivo, situação, responsáveis, enviar para)
+    paginas = {a: (n, o, q) for a, n, o, q in TELAS}
+    for f in sorted((saida / "02_Paginas_completas").glob("*.html")):
+        if f.name == "index.html":
+            continue
+        n, o, q = paginas.get(f.name, (f.stem, "", "equipe"))
+        itens.append(("Página completa", n, f"02_Paginas_completas/{f.name}",
+                      "Só uso interno" if "gestao" in f.name else "Pronta", "Rafaella (revisão)", q))
+    for f in sorted((saida / "03_Demos_site").glob("*.html")):
+        itens.append(("Demonstração do site", f.stem.replace("physis-demo-", "Demo ").replace("-", " "), f"03_Demos_site/{f.name}",
+                      "Pronta · dados simulados", "Rafaella", "site público"))
+    for f in sorted((saida / "04_Pacotes_instalacao").glob("*.zip")):
+        itens.append(("Pacote de instalação", f.stem.replace("physis-", "").replace("-", " "), f"04_Pacotes_instalacao/{f.name}",
+                      "Pronto para instalar (Fase 2)", "Eric Oliveira", "Eric Oliveira"))
+    kits = {p.name.split("-2")[0].replace("kit-", ""): p for p in (saida / "06_Kits_revisao").glob("kit-*.zip")}
+    for k in mapa:
+        mz = next((saida / "05_Modulos").glob(f"modulo-{k['id']}_*.zip"), None)
+        if mz:
+            itens.append(("Módulo (só leitura)", k["nome"], f"05_Modulos/{mz.name}", situacao_modulo(k),
+                          ", ".join(k["responsaveis"]), ", ".join(k["responsaveis"])))
+        kz = kits.get(k["id"])
+        if kz:
+            itens.append(("Kit de revisão (editar e devolver)", k["nome"], f"06_Kits_revisao/{kz.name}", situacao_modulo(k),
+                          ", ".join(k["responsaveis"]), ", ".join(k["responsaveis"]) + " → devolve ao Eric Oliveira"))
+    for f in sorted((saida / "01_Documentos").glob("*.*")):
+        itens.append(("Documento", f.stem.replace("_", " "), f"01_Documentos/{f.name}", "Pronto",
+                      "Rafaella", "Eric Oliveira (só o 10)" if f.name.startswith("10_") else "equipe Physis (interno)"))
+    for f in sorted((saida / "01_Documentos" / "19_Memos_Fase2").glob("*.md")) if (saida / "01_Documentos" / "19_Memos_Fase2").is_dir() else []:
+        itens.append(("Memo da Fase 2", f.stem.replace("_", " "), f"01_Documentos/19_Memos_Fase2/{f.name}", "Pronto", "Rafaella", "equipe Physis (interno)"))
+    for pasta, tipo, quem in (("07_Implantacao_e_servicos", "Implantação e serviços", "Eric Oliveira"),
+                              ("08_App_nativo", "App nativo", "Rafaella, Eric Oliveira"),
+                              ("09_Codigo_fonte", "Código-fonte completo", "Eric Oliveira"),
+                              ("10_Gestao_tarefas_Fase2", "Tarefas da Fase 2 para a Gestão", "Rafaella")):
+        for f in sorted((saida / pasta).glob("*")):
+            if f.is_file():
+                itens.append((tipo, f.stem, f"{pasta}/{f.name}", "Pronto", quem, quem))
+
+    # pasta de cada pessoa: o que ela recebe, a parte dela no memo, cópia dos kits e dos módulos dela
+    memo = docs / "19_Memos_Fase2" / "11_Quem_faz_o_que.md"
+    partes = secoes_por_pessoa(memo.read_text(encoding="utf-8")) if memo.is_file() else {}
+    pessoas = sorted({p for k in mapa for p in k["responsaveis"]} | set(partes))
+    base = saida / "00_Envio_por_pessoa"
+    for p in pessoas:
+        alvo = base / seguro(p)
+        alvo.mkdir(parents=True, exist_ok=True)
+        meus = [k for k in mapa if p in k["responsaveis"]]
+        linhas = [f"# Envio para {p} · Sistema Physis · versão {commit} · {hoje}", "",
+                  "Tudo nesta pasta é da mesma versão da entrega. Abra primeiro este arquivo.", ""]
+        if meus:
+            linhas += ["## Seus módulos", "", "| Módulo | Situação | Kit para revisar e devolver | Cópia só para leitura |", "|---|---|---|---|"]
+            for k in meus:
+                kz = kits.get(k["id"])
+                mz = next((saida / "05_Modulos").glob(f"modulo-{k['id']}_*.zip"), None)
+                if kz:
+                    shutil.copy2(kz, alvo / kz.name)
+                if mz:
+                    shutil.copy2(mz, alvo / mz.name)
+                linhas.append(f"| {k['nome']} | {situacao_modulo(k)} | {kz.name if kz else '—'} | {mz.name if mz else '—'} |")
+            linhas += ["", "Como revisar: abra o kit, siga o LEIA-ME dele, edite só os arquivos editáveis e devolva o kit ao Eric Oliveira, "
+                       "que valida e aplica sem mexer na estrutura do sistema.", ""]
+        if p == "Eric Oliveira":
+            linhas += ["## Instalação e servidor", "", "- Pacotes de cada cliente e do servidor: `04_Pacotes_instalacao/`",
+                       "- Implantação e serviços abertos: `07_Implantacao_e_servicos/`", "- Código-fonte completo: `09_Codigo_fonte/`",
+                       "- Lista para detalhar o servidor (a única que sai para fora): `01_Documentos/10_Perguntas_Eric_Infraestrutura.md`", ""]
+        if p == "Rafaella":
+            linhas += ["## Gestão", "", "- Tarefas da Fase 2 para importar na Gestão: `10_Gestao_tarefas_Fase2/`",
+                       "- Todas as páginas: `02_Paginas_completas/index.html` · demos do site: `03_Demos_site/`", ""]
+        if p in partes:
+            (alvo / "Minhas_tarefas_Fase2.md").write_text(partes[p], encoding="utf-8")
+            linhas += ["## Suas tarefas da Fase 2", "", "Estão em `Minhas_tarefas_Fase2.md`, nesta pasta (tiradas do memo \"Quem faz o quê\").", ""]
+        (alvo / "LEIA-ME.md").write_text("\n".join(linhas), encoding="utf-8")
+        itens.append(("Pasta de envio por pessoa", p, f"00_Envio_por_pessoa/{seguro(p)}/", "Pronta", p, p))
+
+    cab = ["Nº", "Tipo", "Item", "Arquivo", "Situação", "Responsáveis", "Enviar para"]
+    linhas = [f"# Índice de envio · Sistema Physis · versão {commit} · {hoje}", "",
+              "Cada item da entrega, com a situação e para quem vai. Comece por `00_Envio_por_pessoa/<seu nome>/LEIA-ME.md`.",
+              f"Módulos: **{SITUACAO_PRONTO}** · **{SITUACAO_DEV}** · **{SITUACAO_HW}**.", "",
+              "| " + " | ".join(cab) + " |", "|" + "---|" * len(cab)]
+    for i, it in enumerate(itens, 1):
+        linhas.append("| " + " | ".join([str(i)] + [str(x).replace("|", "/") for x in it]) + " |")
+    (saida / "00_INDICE_DE_ENVIO.md").write_text("\n".join(linhas) + "\n", encoding="utf-8")
+    try:   # a mesma tabela em planilha aberta (.ods), pelo gerador do próprio sistema
+        sys.path.insert(0, str(rep / "physis-hub"))
+        from physis_hub import documentos
+        dados = documentos.ods(f"Índice de envio {commit}", [{"nome": "Envio", "cab": cab,
+                                                              "linhas": [[str(i)] + list(it) for i, it in enumerate(itens, 1)]}])
+        (saida / "00_INDICE_DE_ENVIO.ods").write_bytes(dados)
+    except Exception as exc:  # noqa: BLE001 — o .md continua valendo
+        print("índice .ods não gerado:", exc)
 
 
 TELAS = [  # arquivo, nome, o que faz, para quem
@@ -219,14 +364,19 @@ LEIA = """# Entrega do Sistema Physis · versão {commit} · {hoje}
 
 Tudo nesta pasta é a **mesma versão** ({commit}). A conferência de cada arquivo (SHA-256) está em `MANIFESTO.json`. São {n} arquivos.
 
+**Para enviar aos colegas:** cada pessoa recebe a sua pasta em `00_Envio_por_pessoa/` (LEIA-ME, tarefas, kits e módulos dela).
+O índice de tudo, com a situação de cada item e para quem vai, está em `00_INDICE_DE_ENVIO.md` (e `.ods`).
+Uma cópia desta pasta inteira em ZIP fica em `_backup_arquivos/`.
+
 | Pasta | O que é | Para quem |
 |---|---|---|
-| 01_Documentos | Documentos iniciais (00 a 19) e memos da Fase 2 (um por bloco e um por pessoa) | Equipe toda. Só a lista do Eric (10) sai para fora. |
-| 02_Paginas_completas | Site com loja e plataforma, consultoria, Gestão interna, SCADA, SustainKit, Planejador, Tela do cliente, painel municipal, documento para comentários, página do app | Equipe (Gestão interna: só uso interno) |
+| 00_Envio_por_pessoa | Uma pasta por pessoa: o que enviar a cada colega | Cada pessoa |
+| 01_Documentos | Documentos iniciais (00 a 2x) e memos da Fase 2 (um por bloco e "Quem faz o quê") | Equipe toda. Só a lista do Eric (10) sai para fora. |
+| 02_Paginas_completas | Site com loja e plataforma, consultoria, Gestão interna, SCADA, SustainKit, Planejador, painel municipal, documento para comentários, página do app | Equipe (Gestão interna: só uso interno) |
 | 03_Demos_site | Versões reduzidas para o site, com "Demonstração · dados simulados" | Site público |
 | 04_Pacotes_instalacao | Pacote de cada cliente, do servidor da Physis e do Instituto Physis | Eric (instalação) |
 | 05_Modulos | Código, dados, manuais e testes de cada módulo, só leitura | Responsáveis dos módulos |
-| 06_Kits_revisao | 24 kits para revisar e devolver (LEIA-ME, editáveis, prévia, ficha) | Cada responsável; o Eric valida e aplica |
+| 06_Kits_revisao | {nkits} kits para revisar e devolver (LEIA-ME, editáveis, prévia, ficha) | Cada responsável; o Eric valida e aplica |
 | 07_Implantacao_e_servicos | Instalador do Raspberry Pi e mini PC, backup, serviços abertos | Eric |
 | 08_App_nativo | Projeto do app Android e iPhone e página de download | Rafaella, Eric |
 | 09_Codigo_fonte | Repositório completo desta versão | Eric |

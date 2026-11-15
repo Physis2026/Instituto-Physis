@@ -115,7 +115,7 @@ Situação em 14/11/2026. “Atendido” quer dizer construído e testado; não 
 | Contas dos consultores criadas pela direção | Não atendido | — | Não há tela |
 | Propostas, contratos e financeiro guardados no servidor | Não atendido | — | Hoje ficam no navegador |
 | Gestão Physis com o menu lateral do desenho, mantendo as Atividades e as demais funções | Atendido em parte | Gestão Physis | Por dentro de cada parte o visual ainda é o anterior; senha por pessoa |
-| Download em Word, PDF e Excel; “Encaminhar a colegas” | Atendido | Todas as abas da gestão | Nada |
+| Download em documento (.odt), PDF e planilha (.ods); “Encaminhar a colegas” | Atendido | Todas as abas da gestão | Nada |
 | Gestão interna em português e inglês | Atendido | Botão EN | Nada |
 | Financeiro detalhado por projeto, geral e por consultor | Atendido | Admin › Totais | Nada |
 | Entrada da gestão interna mostrando os clientes | Não atendido | Desenho aprovado como interface separada | Construir; depende do servidor no ar |

@@ -314,6 +314,105 @@ class ContasComuns(unittest.TestCase):
         self.assertIn('tipo:nomeTipo(r.tipo) || "Tipo não informado"', js)
         self.assertIn('rota:info.nome || r.rota || "Rota não informada"', js)
 
+    # 10 ── qualidade da água: referência por uso, sem alerta automático
+    def test_10_referencia_por_uso_sem_alerta(self):
+        ref = self.c.premissa("agua.referencias_por_uso")
+        self.assertEqual(set(ref), {"beber", "rio", "efluente", "reuso"})
+        for k, r in ref.items():
+            self.assertIn("[CONFERIR", r["fonte"], k)
+        self.assertEqual(self.c.p["agua.referencias_por_uso"]["status"], "conferir")
+        p = PAINEL.read_text(encoding="utf-8")
+        i = p.index("function agRefTxt(")
+        corpo = p[i:p.index("function alertasAgua(", i)]
+        self.assertIn("Só informação: o limite é você que define.", corpo)
+        self.assertNotRegex(corpo, r"limLer|guardaGravar|physis-agua-limites", "a referência nunca grava limite")
+        self.assertIn('data-ag="usoRef"', p)
+        # os alertas continuam só com o limite digitado (tMax, cMin, cMax vêm de limLer)
+        self.assertIn('tMax == null ? \'<span class="selo at">Defina o limite</span>\'', p)
+
+    # 11 ── resiliência: escala escrita e limiares trocáveis
+    def test_11_escala_e_limiares(self):
+        p = PAINEL.read_text(encoding="utf-8")
+        self.assertIn("const ESCALA_RISCO = [[1,", p)
+        for n in ("Rara", "Improvável", "Possível", "Provável", "Quase certa", "Insignificante", "Muito grave"):
+            self.assertIn(n, p)
+        self.assertIn('PhysisCalc.premissa("resiliencia.encosta_limiares")', p)
+        for k in ("enc_at24", "enc_al24", "enc_at72", "enc_al72"):
+            self.assertIn('"%s"' % k, p)
+        self.assertIn("nivelEnc = ac72 == null ? null : nivelChuva(ac24, ac72, Lim)", p)
+        self.assertIn("nivelLoc = cl ? nivelChuva(cl.mm_24h, cl.mm_72h, Lim) : null", p)
+        self.assertNotIn("ac72 >= 120 || ac24 >= 80", p)
+        lim = self.c.premissa("resiliencia.encosta_limiares")
+        self.assertEqual(lim, {"atencao_24h": 40, "alerta_24h": 80, "atencao_72h": 60, "alerta_72h": 120})
+
+    # 12 ── APP de rios e nascentes e Lei 6.766
+    def test_12_app_rios_nascentes(self):
+        faixas = self.c.premissa("app.faixa_rio")
+        def faixa(l):
+            for f in faixas:
+                if f["largura_ate_m"] is None or l < f["largura_ate_m"]:
+                    return f["faixa_m"]
+        self.assertEqual([faixa(x) for x in (4, 10, 49, 50, 199, 300, 700)], [30, 50, 50, 100, 100, 200, 500])
+        self.assertEqual(self.c.premissa("app.raio_nascente"), 50)
+        for i in ("app.faixa_rio", "app.raio_nascente"):
+            self.assertIn("[CONFERIR NA LEI]", self.c.p[i]["fonte"])
+            self.assertEqual(self.c.p[i]["status"], "conferir")
+        # área de APP de um rio reto de 4 m em y = 5 num lote de 60 × 40 m: faixa de 30 m acima (y 7 a 37) e 3 m abaixo (y 0 a 3)
+        self.assertEqual(60 * (37 - 7) + 60 * 3, 1980)
+        for trecho in ("function physisAppHidro(S)", "function importarHidro(g)", "PhysisCalc.premissa('app.faixa_rio')",
+                       "PhysisCalc.premissa('app.raio_nascente')", "R.appHidro=physisAppHidro(S)", "hidro:{rios:[],nascentes:[]}",
+                       "Lei 6.766/1979, art. 3º, parágrafo único", "informe a largura para marcar a faixa de APP"):
+            self.assertIn(trecho, self.pl, trecho)
+        self.assertIn("if(!(L>0)){out.semLargura.push", self.pl, "sem largura digitada, nenhuma faixa")
+
+    # 13 ── turbinas: curva certificada e outorga
+    def test_13_curva_do_fabricante_e_outorga(self):
+        import sys
+        sys.path.insert(0, str(RAIZ / "physis-hub"))
+        from physis_hub import vento
+        curva = [[3, 0.1], [5, 0.6], [8, 2.1], [11, 3.0], [25, 3.0]]
+        com = vento.eolica({"v_ref": 6, "diametro": 4, "curva": curva})
+        sem = vento.eolica({"v_ref": 6, "diametro": 4})
+        self.assertTrue(com["curva_fabricante"])
+        self.assertEqual(com["p_nom"], 3.0)
+        self.assertNotAlmostEqual(com["aep_kwh"], sem["aep_kwh"], places=0)
+        self.assertAlmostEqual(vento.potencia_curva(6.5, vento.curva_fabricante(curva)), 0.6 + 1.5 * 1.5 / 3)
+        js = (RAIZ / "sistema" / "physis-turbinas.js").read_text(encoding="utf-8")
+        for trecho in ("function curvaFabricante(c)", "if (t.curva) return", "IEC 61400-12-1", "vazao_ecologica", "Lei 9.433/1997", "aviso_outorga"):
+            self.assertIn(trecho, js, trecho)
+
+    # 14 ── viveiro: aviso de RENASEM
+    def test_14_aviso_renasem(self):
+        p = PAINEL.read_text(encoding="utf-8")
+        i = p.index('else if (sub === "viveiro"){')
+        trecho = p[i:i + 4000]
+        self.assertIn('id="sb-renasem"', trecho)
+        self.assertIn("RENASEM", trecho)
+        self.assertIn("Lei 10.711/2003", trecho)
+        self.assertIn('aria-describedby="sb-renasem"', trecho)
+
+    # 4 (resto) ── SustainKit no plano das placas
+    def test_4_sustainkit_plano_das_placas(self):
+        self.assertIn("PC.fatorPlano(s.H, c.lat, incl, azim||0)", self.sk)
+        self.assertIn("if(!(incl>0)) return {anual:1, pior:1, fonte:null};", self.sk, "placas deitadas = resultado de antes")
+        self.assertIn("var hps=modo==='pior'?c.hpsMin*pl.pior:c.hps*pl.anual;", self.sk)
+        self.assertIn("localStorage.getItem('physis-calc-telhado')", self.sk)
+        self.assertIn('id="s-incl"', self.sk)
+
+    # 15 (resto) ── exaustão, dutos, resíduos e alertas da base
+    def test_15_resto_premissas(self):
+        for i in ("avac.exaustao", "avac.velocidade_dutos", "residuos.rendimentos", "residuos.biogas_por_kg", "res.alertas_limiares"):
+            self.assertIn(i, self.c.p, i)
+            self.assertEqual(self.c.p[i]["status"], "conferir")
+        self.assertIn('PREM_AVAC("avac.velocidade_dutos"', self.avac)
+        self.assertIn("vazBanh:EXA.vazao_banheiro_m3h", self.avac)
+        p = PAINEL.read_text(encoding="utf-8")
+        self.assertIn('PhysisCalc.premissa("residuos.rendimentos")', p)
+        self.assertIn('PhysisCalc.premissa("residuos.biogas_por_kg")', p)
+        self.assertIn('PhysisCalc.premissa("res.alertas_limiares")', p)
+        self.assertNotIn("rend:0.35,", p)
+        self.assertNotIn("d.tmin < 3)", p)
+
     def test_planejador_sem_botao_proprio_de_ajustes(self):
         self.assertNotIn("id:'btn-ajustes'", self.pl)
         self.assertIn("PhysisPreferencias.iniciar(", self.pl)

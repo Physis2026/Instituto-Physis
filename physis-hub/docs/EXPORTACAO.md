@@ -67,7 +67,23 @@ dados = documentos.ods("Consumo 2026", [{"nome": "Água", "cab": [...], "linhas"
 ```
 Valores Python `int/float/date/bool` entram já tipados.
 
-### Botões ODT, ODS, PDF/A e "Compartilhar para comentários" (ganchos para quem cuida das telas)
+### Barra única: Documento, PDF e Planilha (decisão de 15/11/2026)
+
+O formato oficial da Physis é o do LibreOffice (ODF). Os nomes "Word" e "Excel" eram só para facilitar; a barra passou a ter
+**uma linha** com **Documento**, **PDF** e **Planilha** (sem a segunda linha "Formatos abertos"):
+
+| Botão | Com `physis-odf.js` acoplado | Sem ele (página só com o exportador) |
+|---|---|---|
+| Documento | `.odt` | `.docx` |
+| PDF | PDF/A pelo servidor (`pdfa: true`); sem servidor, o PDF do navegador com aviso | PDF do navegador |
+| Planilha | `.ods` (uma folha por tabela; tela sem tabela vira uma folha de uma coluna) | `.xlsx` |
+
+Como funciona: o exportador desenha os três botões; o `acoplar` põe `barra.pxFormato(f, botão, dizer)`, que gera o formato
+aberto e devolve `true` (ou `false` para cair no padrão). A dica de cada botão diz "abre no LibreOffice e no Word/Excel".
+A linha própria do `acoplar` ficou só para "Compartilhar para comentários" (escondida quando `compartilhar` é falso).
+As funções `PhysisExportar.docx/xlsx/planilha/csvParaXlsx` continuam disponíveis para quem precisar.
+
+### Ganchos (como acoplar em cada tela)
 
 `physis-odf.js` precisa estar na página (como o exportador). Para sincronizar como o exportador, acrescente-o ao
 `ferramentas/sincronizar.py` (bloco que começa em `/* physis-odf.js v` e termina em `})(typeof window !== "undefined" ? window : this);`).

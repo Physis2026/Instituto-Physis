@@ -11,7 +11,7 @@ já registrou na plataforma. O que falta aparece escrito como lacuna, com o luga
 - `relatorioEsgHtml(dados)` — devolve o HTML do relatório (títulos a partir de `h2`, para entrar dentro de uma aba);
 - `telaRelatorioEsg()` — atalho: `relatorioEsgHtml(relatorioEsgDados())`.
 
-O “Baixar esta tela” da plataforma exporta o HTML para Word, PDF ou Excel. Há regras de impressão
+O “Baixar esta tela” da plataforma exporta o HTML como documento (.odt), PDF ou planilha (.ods), no formato aberto do LibreOffice. Há regras de impressão
 (`@media print`) para não quebrar seções no meio.
 
 ## Estrutura (metodologia IGEA, Physis)

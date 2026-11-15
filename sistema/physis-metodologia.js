@@ -196,14 +196,16 @@ const DADOS = {
       ]
      },
      "premissas": [
-      "app.declividade"
+      "app.declividade",
+      "app.faixa_rio",
+      "app.raio_nascente"
      ],
      "normas": [
       {
        "codigo": "Lei 12.651/2012",
        "edicao": "2012",
-       "item": "art. 4º, V",
-       "como_e_usada": "Encosta com mais de 45° é APP. O sistema usa 45° = 100% de declividade (graus, não porcentagem)."
+       "item": "art. 4º, I, IV e V",
+       "como_e_usada": "Encosta acima de 45° (= 100%) é APP; faixa ao longo de rios pela largura (inciso I) e raio em volta de nascentes (inciso IV), com larguras da base a conferir."
       },
       {
        "codigo": "Lei 6.766/1979",
@@ -221,7 +223,7 @@ const DADOS = {
      "limites_de_validade": "A resolução é a do levantamento ou do modelo de elevação (30 m no SRTM). Modelo de 30 m não vê taludes pequenos.",
      "fonte_de_dados": "Topografia enviada pela pessoa; sem ela, modelo de elevação aberto (servidor, gis.py relevo).",
      "status": "conforme",
-     "o_que_falta": "Faltam as outras APP do art. 4º: faixas ao longo de rios e córregos (inciso I), em volta de nascentes (inciso IV) e topo de morro (inciso IX). Precisa da hidrografia (IBGE/ANA) no servidor.",
+     "o_que_falta": "Feito em 15/11/2026: APP de rios (art. 4º, I) e nascentes (IV) desenhadas quando há rio (digitado ou GeoJSON, com largura) ou nascente no mapa; Lei 6.766 citada no alerta de 30%. Falta: topo de morro (inciso IX) e a camada de hidrografia no servidor (gis.py), que ainda não existe.",
      "onde": "planejador-physis.html (declividade, aptidão) · physis_hub/gis.py relevo()"
     },
     {
@@ -812,7 +814,7 @@ const DADOS = {
      "nome": "Solar por horas de sol pleno",
      "o_que_calcula": "Potência mínima e geração anual pelas horas de sol pleno da cidade.",
      "formula": {
-      "texto": "P_min = consumo diário ÷ (HSP × PR); geração = P × HSP × 365 × PR",
+      "texto": "HSP no plano = HSP da cidade × fator do plano (modelo isotrópico, PhysisCalc.fatorPlano); P_min = consumo diário ÷ (HSP × PR); geração = P × HSP × 365 × PR",
       "variaveis": [
        {
         "simbolo": "HSP",
@@ -846,7 +848,7 @@ const DADOS = {
      "limites_de_validade": "Tabela de 11 cidades; plano horizontal.",
      "fonte_de_dados": "Tabela CIDADES do SustainKit.",
      "status": "simplificado",
-     "o_que_falta": "Pendente: o SustainKit ainda usa a tabela de HPS de 11 cidades no plano horizontal. Falta trazer a irradiação mensal do servidor e aplicar o fator do plano (PhysisCalc.fatorPlano, já usado na aba Energia solar).",
+     "o_que_falta": "Feito em 15/11/2026: inclinação e orientação (digitadas ou do telhado do Planejador) pelo mesmo modelo da aba Energia solar; sol mês a mês da plataforma quando o SustainKit está dentro dela, senão pela latitude escalada ao HSP da cidade. Falta: tabela de cidades com a base do servidor fora da plataforma.",
      "onde": "SustainKit_Definitivo.html · SK.solar"
     },
     {
@@ -1378,7 +1380,9 @@ const DADOS = {
        }
       ]
      },
-     "premissas": [],
+     "premissas": [
+      "avac.exaustao"
+     ],
      "normas": [
       {
        "codigo": "ABNT NBR 16401-3",
@@ -1396,7 +1400,7 @@ const DADOS = {
      "limites_de_validade": "Valores típicos da planilha.",
      "fonte_de_dados": "Planilha PHYSIS_AVAC-5.",
      "status": "simplificado",
-     "o_que_falta": "Pôr os valores (90 m³/h por banheiro, trocas, L/s·m²) na base de premissas com a fonte e conferir com o código de obras do município.",
+     "o_que_falta": "Feito em 15/11/2026: vazões e trocas de partida lidas da base de premissas. Falta: conferir com o código de obras do município.",
      "onde": "sistema/physis-avac.js · calcular()"
     },
     {
@@ -1552,7 +1556,9 @@ const DADOS = {
        }
       ]
      },
-     "premissas": [],
+     "premissas": [
+      "avac.velocidade_dutos"
+     ],
      "normas": [
       {
        "codigo": "ABNT NBR 16401-1",
@@ -1570,7 +1576,7 @@ const DADOS = {
      "limites_de_validade": "Ar padrão corrigido pela altitude e temperatura.",
      "fonte_de_dados": "Planilha PHYSIS_AVAC-5.",
      "status": "simplificado",
-     "o_que_falta": "Conferir os limites de velocidade por tipo de duto com a NBR 16401-1 e pôr na base de premissas.",
+     "o_que_falta": "Feito em 15/11/2026: limites de velocidade por tipo de duto lidos da base. Falta: conferir na NBR 16401-1 (marcado [CONFERIR NA NORMA]).",
      "onde": "sistema/physis-avac.js · calcular()"
     },
     {
@@ -1677,7 +1683,7 @@ const DADOS = {
      "limites_de_validade": "Faixas de tipo de turbina são de literatura (verificar com o fabricante).",
      "fonte_de_dados": "Vazão e queda informadas; vazão mensal quando houver.",
      "status": "conforme",
-     "o_que_falta": "Avisar sobre outorga do uso da água e vazão mínima que precisa ficar no rio (ecológica).",
+     "o_que_falta": "Feito em 15/11/2026: aviso de outorga (Lei 9.433/1997) e vazão ecológica, que sai da vazão disponível quando informada. Falta: buscar a vazão ecológica do órgão gestor.",
      "onde": "sistema/physis-turbinas.js · hidraulica(), eolica() (espelho physis_hub/vento.py)"
     },
     {
@@ -1728,7 +1734,7 @@ const DADOS = {
      "limites_de_validade": "Vento médio de base pública; k = 2 se não houver medição.",
      "fonte_de_dados": "Base GIS de vento (servidor) ou medição.",
      "status": "simplificado",
-     "o_que_falta": "Permitir carregar a curva de potência certificada do fabricante (tabela v × kW) no lugar do modelo por Cp; medir o vento no lugar antes de comprar.",
+     "o_que_falta": "Feito em 15/11/2026: a curva de potência do fabricante (IEC 61400-12-1), quando digitada, substitui o modelo por Cp. Falta: correção da curva pela densidade do ar do lugar.",
      "onde": "sistema/physis-turbinas.js · hidraulica(), eolica() (espelho physis_hub/vento.py)"
     }
    ]
@@ -1774,7 +1780,9 @@ const DADOS = {
       "texto": "alerta se leitura fora de [mínimo, máximo] do lugar",
       "variaveis": []
      },
-     "premissas": [],
+     "premissas": [
+      "agua.referencias_por_uso"
+     ],
      "normas": [
       {
        "codigo": "Portaria GM/MS 888/2021",
@@ -1803,8 +1811,8 @@ const DADOS = {
      ],
      "limites_de_validade": "Limite provisório não gera alerta (regra do sistema).",
      "fonte_de_dados": "Limites informados pela pessoa.",
-     "status": "só citado",
-     "o_que_falta": "Mostrar, ao lado do campo de limite, a faixa de referência de cada uso (beber, rio, efluente, reúso, irrigação) como informação, sem preencher nem alertar sozinho (regra 3).",
+     "status": "simplificado",
+     "o_que_falta": "Feito em 15/11/2026: ao lado de cada limite aparece a faixa de referência do uso escolhido (beber, rio, efluente, reúso), só como informação; nada é preenchido nem alerta sozinho. Falta: o engenheiro conferir as faixas (premissa 'conferir') e acrescentar outros parâmetros (coliformes, DBO).",
      "onde": "painel.html · telaAgua(); physis_hub/agua.py"
     },
     {
@@ -1907,8 +1915,8 @@ const DADOS = {
      ],
      "limites_de_validade": "Plano de produção da base.",
      "fonte_de_dados": "physis-plantas.json (viveiro).",
-     "status": "só citado",
-     "o_que_falta": "Mostrar o aviso de registro no RENASEM antes de vender mudas.",
+     "status": "conforme",
+     "o_que_falta": "",
      "onde": "painel.html · telaSbn() viveiro"
     },
     {
@@ -2065,7 +2073,10 @@ const DADOS = {
        }
       ]
      },
-     "premissas": [],
+     "premissas": [
+      "residuos.rendimentos",
+      "residuos.biogas_por_kg"
+     ],
      "normas": [
       {
        "codigo": "Resolução CONAMA 481/2017",
@@ -2089,7 +2100,7 @@ const DADOS = {
      "limites_de_validade": "Estimativas para planejamento.",
      "fonte_de_dados": "Tabela RC_ROTAS.",
      "status": "simplificado",
-     "o_que_falta": "Pôr os rendimentos na base de premissas com a fonte de cada um.",
+     "o_que_falta": "Feito em 15/11/2026: rendimentos e biogás por kg lidos da base de premissas. Falta: conferir as estimativas e os tamanhos de pátio e equipamentos.",
      "onde": "painel.html · RC_ROTAS, rcProduto()"
     },
     {
@@ -2428,7 +2439,7 @@ const DADOS = {
      "limites_de_validade": "As escalas de 1 a 5 não têm descrição escrita.",
      "fonte_de_dados": "Escolha da pessoa.",
      "status": "simplificado",
-     "o_que_falta": "Escrever o que significa cada nível de chance e de impacto (ex.: 5 = todo ano), como pede a ISO 31000, e mostrar na tela. Só software.",
+     "o_que_falta": "Feito em 15/11/2026: cada nível de chance e impacto (1 a 5) tem o sentido escrito na tela. Falta: riscos com dados medidos do lugar.",
      "onde": "painel.html · telaResiliencia()"
     },
     {
@@ -2445,7 +2456,9 @@ const DADOS = {
        }
       ]
      },
-     "premissas": [],
+     "premissas": [
+      "resiliencia.encosta_limiares"
+     ],
      "normas": [
       {
        "codigo": "sem norma aplicável",
@@ -2463,7 +2476,7 @@ const DADOS = {
      "limites_de_validade": "Limiar genérico; pode não valer para o bairro.",
      "fonte_de_dados": "CEMADEN (servidor).",
      "status": "simplificado",
-     "o_que_falta": "Permitir trocar pelos limiares da Defesa Civil do município e pôr os valores na base de premissas.",
+     "o_que_falta": "Feito em 15/11/2026: limiares de 24 h e 72 h na base de premissas e trocáveis na tela pelos da Defesa Civil do município (os digitados valem no alerta). Falta: limiar por bairro e sensor de umidade do solo.",
      "onde": "painel.html · telaResiliencia() nivelEnc"
     },
     {
@@ -2474,7 +2487,9 @@ const DADOS = {
       "texto": "alerta se a previsão passa do limiar da atividade (ex.: mínima < 3 °C para café)",
       "variaveis": []
      },
-     "premissas": [],
+     "premissas": [
+      "res.alertas_limiares"
+     ],
      "normas": [
       {
        "codigo": "sem norma aplicável",
@@ -2486,7 +2501,7 @@ const DADOS = {
      "limites_de_validade": "Previsão de poucos dias.",
      "fonte_de_dados": "Open-Meteo, INMET (servidor).",
      "status": "simplificado",
-     "o_que_falta": "Pôr os limiares por atividade na base de premissas com fonte.",
+     "o_que_falta": "Feito em 15/11/2026: limiares de cada atividade lidos da base de premissas. Falta: conferir com o técnico de cada atividade.",
      "onde": "painel.html · alertasAprendidos()"
     }
    ]
@@ -3434,7 +3449,7 @@ const DADOS = {
    "titulo": "Solar: irradiação no plano das placas",
    "o_que_fazer": "Levar a irradiação horizontal para o plano inclinado (modelo isotrópico) com a inclinação e a orientação do telhado do Planejador; o SustainKit usa a mesma base do servidor.",
    "criterio_de_aceite": "Telhado plano dá o mesmo resultado de hoje; telhado inclinado para o norte aumenta a geração de inverno.",
-   "situacao": "parcial (falta o SustainKit) (15/11/2026)"
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 5,
@@ -3510,7 +3525,7 @@ const DADOS = {
    "titulo": "Qualidade da água: referência por uso, sem alerta automático",
    "o_que_fazer": "Mostrar ao lado de cada limite a faixa de referência do uso escolhido (beber, rio, efluente, reúso) como informação; nada é preenchido nem alerta sozinho.",
    "criterio_de_aceite": "Sem limite informado pela pessoa, nenhum alerta aparece (regra 3).",
-   "situacao": "pendente"
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 11,
@@ -3523,7 +3538,7 @@ const DADOS = {
    "titulo": "Resiliência: escalas escritas e limiares trocáveis",
    "o_que_fazer": "Descrever cada nível de chance e impacto (ISO 31000) e permitir trocar os limiares de chuva pelos da Defesa Civil do município.",
    "criterio_de_aceite": "A tela mostra o significado de cada nível; limiar trocado vale para o alerta.",
-   "situacao": "pendente"
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 12,
@@ -3535,7 +3550,7 @@ const DADOS = {
    "titulo": "Planejador: outras APP e Lei 6.766",
    "o_que_fazer": "Marcar faixas de APP de rios e nascentes (art. 4º, I e IV) quando houver hidrografia no servidor; citar a Lei 6.766 no alerta de 30%.",
    "criterio_de_aceite": "Com um rio no mapa aparece a faixa de APP na largura que o engenheiro aprovou.",
-   "situacao": "pendente"
+   "situacao": "feito (falta a hidrografia no servidor) (15/11/2026)"
   },
   {
    "prioridade": 13,
@@ -3548,7 +3563,7 @@ const DADOS = {
    "titulo": "Turbinas: curva certificada e outorga",
    "o_que_fazer": "Permitir carregar a curva de potência do fabricante (IEC 61400-12-1) e avisar sobre outorga e vazão ecológica na hidráulica.",
    "criterio_de_aceite": "Curva carregada substitui o modelo por Cp no cálculo da energia.",
-   "situacao": "pendente"
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 14,
@@ -3560,7 +3575,7 @@ const DADOS = {
    "titulo": "Viveiro: aviso de RENASEM",
    "o_que_fazer": "Mostrar o aviso de registro antes de vender mudas.",
    "criterio_de_aceite": "O aviso aparece na parte Viveiro.",
-   "situacao": "pendente"
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 15,
@@ -3577,7 +3592,7 @@ const DADOS = {
    "titulo": "Premissas soltas para a base",
    "o_que_fazer": "Levar para sistema/physis-premissas.json os valores hoje fixos no código: vazões de exaustão, limites de velocidade de dutos, rendimentos dos resíduos, limiares das atividades, 2 dias de reserva de água e coeficiente de retorno 0,80.",
    "criterio_de_aceite": "Cada valor tem id, unidade e fonte na base, e o código lê da base.",
-   "situacao": "parcial (15/11/2026)"
+   "situacao": "feito (15/11/2026)"
   },
   {
    "prioridade": 16,

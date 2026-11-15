@@ -174,7 +174,7 @@ function relatorioEsgHtml(d){ d = d || relatorioEsgDados(); LAC = [];
     <li>Dados registrados pela organização na plataforma; não houve verificação independente. Valores anuais estimados a partir de até 12 meses de dados.</li></ul>`);
   const estilo = `<style>.esg-rel h3{margin-top:0}.esg-rel caption{text-align:left;font-weight:600;padding:4px 0}@media print{.esg-rel .esg-sec{break-inside:avoid-page}.esg-rel .esg-capa{border-bottom:2px solid currentColor;margin-bottom:12px}.esg-rel .selo{border:1px solid currentColor}}</style>`;
   return `${estilo}<article class="esg-rel" aria-labelledby="esg-titulo">${capa}${resumo}${limites}${amb}${soc}${gov}${fin}${tax}${cods}${lac}${nota}
-    <p class="t2 pq">Para levar em Word, PDF ou Excel, use “Baixar esta tela”.</p></article>`; }
+    <p class="t2 pq">Para levar como documento, PDF ou planilha, use “Baixar esta tela”.</p></article>`; }
 
 const telaRelatorioEsg = () => relatorioEsgHtml(relatorioEsgDados());
 window.relatorioEsgDados = relatorioEsgDados;

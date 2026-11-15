@@ -14,8 +14,8 @@
  * Opções: titulo, sistema, idioma ("pt-BR"|"en-GB"), data (Date), logo (true = do cabeçalho da tela | false |
  *         Uint8Array PNG), marcaDagua (true), svgEmbutido (false: SVG vira PNG; true: SVG + PNG de reserva),
  *         faixa (ODS, true), fonteTitulo ("Fraunces"), fonteTexto ("Inter").
- * Também: PhysisODF.acoplar(barraDoExportador, op) põe os botões ODT, ODS, PDF/A (servidor) e
- *         "Compartilhar para comentários" na barra "Baixar esta tela"; PhysisODF.paraPublicar(el) -> HTML pronto
+ * Também: PhysisODF.acoplar(barraDoExportador, op) faz os botões Documento/PDF/Planilha da barra "Baixar esta tela"
+ *         gerarem ODT, PDF/A (servidor; sem ele, PDF do navegador) e ODS, e põe "Compartilhar para comentários"; PhysisODF.paraPublicar(el) -> HTML pronto
  *         para publicar (controles viram texto, gráficos viram PNG); PhysisODF.publicar(el, titulo, origem).
  * Documentação: physis-hub/docs/EXPORTACAO.md
  */
@@ -41,12 +41,14 @@
       baixado: function (n) { return n + " saved."; }, vazio: "There is nothing on this screen to export.", semTabela: "There is no table on this screen.",
       gerando: "Generating…", semServidor: "PDF/A needs the Physis server with LibreOffice. Download the ODT and export it as PDF/A in LibreOffice.",
       publicando: "Publishing…", publicado: "Published for comments:", copiar: "Copy link", copiado: "Link copied.", abrir: "Open page",
-      falha: "It did not work: ", entrar: "Sign in to the Physis server first." };
+      falha: "It did not work: ", entrar: "Sign in to the Physis server first.",
+      pdfLocal: "(browser PDF; the archival PDF/A needs the Physis server with LibreOffice)" };
   var UI_PT = { odt: "ODT", ods: "ODS", pdfa: "PDF/A (servidor)", comp: "Compartilhar para comentários", abertos: "Formatos abertos",
       baixado: function (n) { return n + " baixado."; }, vazio: "Não há nada nesta tela para exportar.", semTabela: "Não há tabela nesta tela.",
       gerando: "Gerando…", semServidor: "O PDF/A precisa do servidor Physis com o LibreOffice. Baixe o ODT e exporte em PDF/A pelo LibreOffice.",
       publicando: "Publicando…", publicado: "Publicado para comentários:", copiar: "Copiar link", copiado: "Link copiado.", abrir: "Abrir página",
-      falha: "Não deu certo: ", entrar: "Entre no servidor Physis primeiro." };
+      falha: "Não deu certo: ", entrar: "Entre no servidor Physis primeiro.",
+      pdfLocal: "(PDF do navegador; o PDF/A de arquivo precisa do servidor Physis com o LibreOffice)" };
   /* idioma dos botões: o do navegador, ou o da tela quando ela informa (op.idiomaTela, p. ex. a Gestão, que não traduz o DOM) */
   var UI_PADRAO = EN ? UI_EN : UI_PT;
 
@@ -555,25 +557,58 @@
   /* Botões na barra "Baixar esta tela" do exportador. A barra do exportador se redesenha (innerHTML) ao abrir
      "Encaminhar"; por isso a linha é reposta por um MutationObserver. Mensagens saem no role=status da própria barra.
      op: { raiz(), titulo(), odt:true, ods:true, pdfa:false|true|fn, compartilhar:false|true|fn, origem() } */
+  /* Desde 15/11/2026 (decisão da Physis: "o formato oficial é o LibreOffice") a barra tem UMA linha:
+     Documento (.odt), PDF (PDF/A pelo servidor; sem servidor, o PDF do navegador) e Planilha (.ods). Os botões são os do
+     exportador; aqui só se troca o que cada um gera (barra.pxFormato). A linha própria fica só para "Compartilhar para comentários". */
   function acoplar(barra, op) {
     op = op || {};
     var UI = UI_PADRAO; if (typeof op.idiomaTela === "function") { try { var qi = String(op.idiomaTela() || ""); if (qi) UI = /^en/i.test(qi) ? UI_EN : UI_PT; } catch (e) {} }
     var vale = function (v, padrao) { return typeof v === "function" ? !!v() : v == null ? padrao : !!v; };
+    var dizer = function (txt) { var m = barra.querySelector("[data-px-msg]"); if (m) m.textContent = txt; };
+    barra.pxFormato = function (f, b, dizerBarra) {
+      var fala = dizerBarra || dizer, raiz = op.raiz(), titulo = op.titulo();
+      if (!raiz) return false;
+      if (f === "docx" && !vale(op.odt, true)) return false;
+      if (f === "xlsx" && !vale(op.ods, true)) return false;
+      var fim = function () { b.disabled = false; }, erro = function (e) { fala(UI.falha + (e && e.message || e)); };
+      fala(UI.gerando); b.disabled = true;
+      if (f === "docx") { odt(raiz, { titulo: titulo }).then(function (u8) { var n = nomeArquivo(titulo, "odt"); return baixar(n, u8, MIME.odt).then(function () { fala(UI.baixado(n)); }); }).catch(erro).then(fim); return true; }
+      if (f === "xlsx") {
+        var tabs = tabelasDe(raiz);
+        if (!tabs.length && g.PhysisExportar && g.PhysisExportar.extrair) {   // tela sem tabela: o texto vira uma folha de uma coluna
+          var linhas = g.PhysisExportar.extrair(raiz).filter(function (k) { return k.t; }).map(function (k) { return [k.t]; });
+          if (linhas.length) tabs = [{ nome: String(titulo || "Physis").slice(0, 31), cab: [], linhas: linhas }];
+        }
+        if (!tabs.length) { fim(); fala(UI.vazio); return true; }
+        ods(tabs, { titulo: titulo }).then(function (u8) { var n = nomeArquivo(titulo, "ods"); return baixar(n, u8, MIME.ods).then(function () { fala(UI.baixado(n)); }); }).catch(erro).then(fim); return true;
+      }
+      if (f === "pdf") {
+        if (!vale(op.pdfa, false)) { fim(); return false; }                  // sem servidor configurado: o PDF do navegador
+        var local = function (aviso) {
+          var r = g.PhysisExportar && g.PhysisExportar.gerar("pdf", titulo, raiz);
+          if (!r) { fala(UI.vazio); return; }
+          return g.PhysisExportar.baixar(r.nome, r.dados, r.mime).then(function () { fala(UI.baixado(r.nome) + " " + aviso); });
+        };
+        pdfa(raiz, titulo).then(function (r) {
+          if (r.ok) { var n = nomeArquivo(titulo, "pdf"); return baixar(n, r.pdf, MIME.pdf).then(function () { fala(UI.baixado(n) + " (PDF/A)"); }); }
+          return local(r.status === 401 ? UI.entrar : UI.pdfLocal);
+        }).catch(function () { return local(UI.pdfLocal); }).catch(erro).then(fim);
+        return true;
+      }
+      fim(); return false;
+    };
+    if (typeof barra.pxRepintar === "function") barra.pxRepintar();       // põe as dicas de formato aberto nos botões
     var linha = g.document.createElement("div");
     linha.className = "px-odf";
-    linha.setAttribute("role", "group"); linha.setAttribute("aria-label", UI.abertos);
+    linha.setAttribute("role", "group"); linha.setAttribute("aria-label", UI.comp);
     linha.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;align-items:center";
     var bt = "font:inherit;font-weight:600;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer";
     var pinta = function () {
-      linha.innerHTML = '<strong style="margin-right:4px">' + UI.abertos + "</strong>" +
-        (vale(op.odt, true) ? '<button type="button" data-px-odf="odt" style="' + bt + '">' + UI.odt + "</button>" : "") +
-        (vale(op.ods, true) ? '<button type="button" data-px-odf="ods" style="' + bt + '">' + UI.ods + "</button>" : "") +
-        (vale(op.pdfa, false) ? '<button type="button" data-px-odf="pdfa" style="' + bt + '">' + UI.pdfa + "</button>" : "") +
-        (vale(op.compartilhar, false) ? '<button type="button" data-px-odf="comp" style="' + bt + '">' + UI.comp + "</button>" : "") +
+      linha.innerHTML = (vale(op.compartilhar, false) ? '<button type="button" data-px-odf="comp" style="' + bt + '">' + UI.comp + "</button>" : "") +
         '<span data-px-odf-link="1"></span>';
+      linha.hidden = !vale(op.compartilhar, false);
     };
     pinta();
-    var dizer = function (txt) { var m = barra.querySelector("[data-px-msg]"); if (m) m.textContent = txt; };
     var repor = function () { if (!barra.contains(linha)) { var m = barra.querySelector("[data-px-msg]"); barra.insertBefore(linha, m || null); } };
     repor();
     if (g.MutationObserver) new g.MutationObserver(repor).observe(barra, { childList: true });

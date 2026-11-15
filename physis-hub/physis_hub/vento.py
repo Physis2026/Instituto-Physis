@@ -147,8 +147,29 @@ def turbina_eolica(diametro: float, cp: float = 0.30, v_in: float = 0.0, v_nom: 
     return {"area": area, "cp": cp, "v_in": v_in or 0.0, "v_nom": v_nom, "v_out": v_out, "p_nom": p_nom or None, "rho": rho}
 
 
+def curva_fabricante(c) -> list | None:
+    """Curva do fabricante (IEC 61400-12-1): pares [v, kW] válidos, em ordem; None com menos de 2 pontos."""
+    if not isinstance(c, list):
+        return None
+    l = sorted([float(x[0]), float(x[1])] for x in c if isinstance(x, (list, tuple)) and len(x) >= 2 and x[1] >= 0)
+    return l if len(l) >= 2 else None
+
+
+def potencia_curva(v: float, c: list) -> float:
+    """Interpolação linear na curva; zero fora dela."""
+    if v < c[0][0] or v > c[-1][0]:
+        return 0.0
+    for (v0, p0), (v1, p1) in zip(c, c[1:]):
+        if v <= v1:
+            return p1 if v1 == v0 else p0 + (p1 - p0) * (v - v0) / (v1 - v0)
+    return 0.0
+
+
 def potencia_vento(v: float, t: dict) -> float:
-    """kW na velocidade v: P = ½·ρ·A·v³·Cp entre a partida e a nominal; nominal até o corte; zero fora."""
+    """kW na velocidade v: P = ½·ρ·A·v³·Cp entre a partida e a nominal; nominal até o corte; zero fora.
+    Com a curva do fabricante (t["curva"]), a curva."""
+    if t.get("curva"):
+        return 0.0 if t["v_out"] and v >= t["v_out"] else potencia_curva(v, t["curva"])
     if v < t["v_in"] or (t["v_out"] and v >= t["v_out"]):
         return 0.0
     if t["p_nom"] and t["v_nom"] and v >= t["v_nom"]:
@@ -182,6 +203,9 @@ def eolica(p: dict) -> dict:
     if cp_in > BETZ:
         avisos.append("Cp acima do limite de Betz (0,593): usado 0,593")
     t = turbina_eolica(g("diametro", 0.0), cp_in, g("v_in", 0.0), g("v_nom"), g("v_out"), g("p_nom"), rho)
+    cf = curva_fabricante(p.get("curva"))
+    if cf:
+        t["curva"], t["p_nom"] = cf, max(x[1] for x in cf)
     k = g("k", 2.0) or 2.0
     v_ref = g("v_ref", 0.0) or 0.0
     v_cubo = cisalhamento(v_ref, h_ref, h, alfa) if v_ref > 0 else 0.0
@@ -210,7 +234,7 @@ def eolica(p: dict) -> dict:
         inv = analise(g("custo"), aep / 12 * g("tarifa"), g("vida", 20), g("taxa", 10), g("infl", 4))
     return {"rho": rho, "alfa": alfa, "v_cubo": v_cubo, "k": k, "c": c, "area": t["area"], "cp": t["cp"],
             "p_nom": t["p_nom"], "aep_kwh": aep, "fc": fc, "meses": meses, "viabilidade": viab[0], "mensagem": viab[1],
-            "invest": inv, "avisos": avisos}
+            "invest": inv, "avisos": avisos, "curva_fabricante": bool(cf)}
 
 
 # ═══════════════ Contas da água (hidráulica) ═══════════════

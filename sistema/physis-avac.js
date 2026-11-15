@@ -16,8 +16,12 @@ const RESERV = [10000, 8000, 6000, 5000, 4000, 3000, 2500, 2000, 1500, 1000, 750
 const MOTOR_KW = [0.18, 0.25, 0.37, 0.55, 0.75, 1.1, 1.5, 2.2, 3, 3.7, 4.5, 5.5, 7.5, 9.2, 11, 15, 18.5, 22, 30, 37, 45, 55, 75]; // aba 7, AD
 const MOTOR_CV = [0.25, 0.33, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 6, 7.5, 10, 12.5, 15, 20, 25, 30, 40, 50, 60, 75, 100];          // aba 7, AE
 const LARG = []; for (let w = 100; w <= 3000; w += 50) LARG.push(w);                                                 // aba 7, AG (passo 50 mm)
-const TIPOS_DUTO = [["Prumada residencial (shaft)", 8], ["Ramal em forro — residencial", 5], ["Exaustão técnica (lixo, bombas)", 8],
-  ["Garagem", 12], ["Pressurização e fumaça", 12], ["Duto principal — comercial", 10]];                              // aba 7, AA:AB
+/* premissas da base (sistema/physis-premissas.json, pelas contas comuns PhysisCalc). A cópia ao lado é a mesma da base e
+   só vale quando o módulo roda sem ela (teste do navegador em ferramentas/testes-navegador). */
+const PREM_AVAC = (id, pad) => { try { const v = typeof PhysisCalc !== "undefined" ? PhysisCalc.premissa(id) : null; return v && typeof v === "object" ? v : pad; } catch (e) { return pad; } };
+const VEL_DUTO = PREM_AVAC("avac.velocidade_dutos", { "Prumada residencial (shaft)":8, "Ramal em forro — residencial":5, "Exaustão técnica (lixo, bombas)":8, "Garagem":12, "Pressurização e fumaça":12, "Duto principal — comercial":10 });
+const TIPOS_DUTO = Object.entries(VEL_DUTO);                                                                         // aba 7, AA:AB
+const EXA = PREM_AVAC("avac.exaustao", { vazao_banheiro_m3h:90, trocas_banheiro_h:15, trocas_lixo_h:20, trocas_garagem_h:6, garagem_ls_por_m2:7.5, garagem_m3h_por_vaga:300 });
 /* NBR 5410: seções, capacidade de condução (cobre, PVC 70 °C, método B1), FCT, neutro reduzido; disjuntores comerciais */
 const SEC = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300];
 const IZ2 = [17.5, 24, 32, 41, 57, 76, 101, 125, 151, 192, 232, 269, 309, 353, 415, 477];
@@ -51,8 +55,8 @@ function padrao() {
       amb("Salão de festas", 80, 0, "Cassete", true, [], 1), amb("Academia", 45, 0, "Cassete", true, [], 1),
       amb("Coworking", 30, 0, "Split hi-wall", true, [], 1), amb("Salão de jogos", 35, 0, "Split hi-wall", true),
       amb("Brinquedoteca", 25, 0, "Split hi-wall", true), amb("Portaria / recepção", 12, 0, "Split hi-wall", true)] },
-    vent: { metodo:"Vazão fixa", vazBanh:90, areaBanh:4, peBanh:2.6, trocasBanh:15, lixoArea:12, lixoPe:2.6, lixoTrocas:20,
-      garArea:1800, garPe:2.6, garVagas:0, garTrocas:6, garLsm2:7.5, garVaga:300,
+    vent: { metodo:"Vazão fixa", vazBanh:EXA.vazao_banheiro_m3h, areaBanh:4, peBanh:2.6, trocasBanh:EXA.trocas_banheiro_h, lixoArea:12, lixoPe:2.6, lixoTrocas:EXA.trocas_lixo_h,
+      garArea:1800, garPe:2.6, garVagas:0, garTrocas:EXA.trocas_garagem_h, garLsm2:EXA.garagem_ls_por_m2, garVaga:EXA.garagem_m3h_por_vaga,
       outros: [{ n:"Casa de bombas", area:15, pe:2.6, trocas:10 }, { n:"Sala de medidores", area:8, pe:2.6, trocas:6 }] },
     press: { dp:50, v:1, portas:0, abertas:2, w:0.9, h:2.1, fresta:0.02, outras:0, fator:1.25, fechador:50, limite:110 },
     solar: { consumo:50, tq:40, tf:22, fracao:0.7, eta:null, prod:null, incl:null, azim:0, lat:null, H:null, areaCol:2, volM2:75, horas:4, reserv:RESERV.slice() },

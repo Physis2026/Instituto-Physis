@@ -445,6 +445,225 @@
       "fonte": "ABNT NBR 9649:1986 (coeficiente de retorno) [CONFERIR NA NORMA]",
       "status": "conferir",
       "nota": "Usado no fluxo da água do SustainKit."
+    },
+    {
+      "id": "app.faixa_rio",
+      "grandeza": "Largura da faixa de APP ao longo de rios e córregos, pela largura do rio",
+      "valor_padrao": [
+        {
+          "largura_ate_m": 10,
+          "faixa_m": 30
+        },
+        {
+          "largura_ate_m": 50,
+          "faixa_m": 50
+        },
+        {
+          "largura_ate_m": 200,
+          "faixa_m": 100
+        },
+        {
+          "largura_ate_m": 600,
+          "faixa_m": 200
+        },
+        {
+          "largura_ate_m": null,
+          "faixa_m": 500
+        }
+      ],
+      "unidade": "m (medidos da borda da calha do leito regular, para cada lado)",
+      "opcoes": [
+        {
+          "rotulo": "Rio com menos de 10 m",
+          "valor": 30,
+          "quando": "[CONFERIR NA LEI]"
+        },
+        {
+          "rotulo": "10 a 50 m",
+          "valor": 50,
+          "quando": "[CONFERIR NA LEI]"
+        },
+        {
+          "rotulo": "50 a 200 m",
+          "valor": 100,
+          "quando": "[CONFERIR NA LEI]"
+        },
+        {
+          "rotulo": "200 a 600 m",
+          "valor": 200,
+          "quando": "[CONFERIR NA LEI]"
+        },
+        {
+          "rotulo": "Mais de 600 m",
+          "valor": 500,
+          "quando": "[CONFERIR NA LEI]"
+        }
+      ],
+      "fonte": "Lei 12.651/2012 (Código Florestal), art. 4º, I, alíneas a a e [CONFERIR NA LEI]",
+      "status": "conferir",
+      "nota": "O engenheiro aprova as larguras. Área urbana consolidada e lei municipal podem ter regra própria (conferir). A faixa só é desenhada quando há um rio no mapa e a largura dele foi digitada."
+    },
+    {
+      "id": "app.raio_nascente",
+      "grandeza": "Raio da APP em volta de nascentes e olhos d'água perenes",
+      "valor_padrao": 50,
+      "unidade": "m",
+      "opcoes": [],
+      "fonte": "Lei 12.651/2012 (Código Florestal), art. 4º, IV [CONFERIR NA LEI]",
+      "status": "conferir",
+      "nota": "O engenheiro aprova. Só é desenhado quando há uma nascente marcada no mapa."
+    },
+    {
+      "id": "resiliencia.encosta_limiares",
+      "grandeza": "Chuva acumulada que muda o nível de alerta de encosta",
+      "valor_padrao": {
+        "atencao_24h": 40,
+        "alerta_24h": 80,
+        "atencao_72h": 60,
+        "alerta_72h": 120
+      },
+      "unidade": "mm",
+      "opcoes": [
+        {
+          "rotulo": "Referência de planejamento Physis",
+          "valor": "padrão",
+          "quando": "sem limiar da Defesa Civil do município"
+        }
+      ],
+      "fonte": "premissa Physis (valores que a aba Resiliência já usava); trocar pelos limiares da Defesa Civil do município",
+      "status": "conferir",
+      "nota": "Os limiares digitados na tela (Defesa Civil) valem no lugar destes."
+    },
+    {
+      "id": "res.alertas_limiares",
+      "grandeza": "Limiares dos alertas por atividade (previsão do tempo)",
+      "valor_padrao": {
+        "geada_tmin_c": 3,
+        "colheita_chuva_mm": 10,
+        "rebanho_tmax_c": 30,
+        "irrigacao_chuva_mm": 5,
+        "horta_chuva_mm": 30,
+        "horta_tmin_c": 4,
+        "horta_tmax_c": 34,
+        "hospedagem_chuva_mm": 30
+      },
+      "unidade": "°C ou mm por dia",
+      "opcoes": [],
+      "fonte": "premissa Physis (valores que os alertas da plataforma já usavam); conferir com o técnico da atividade",
+      "status": "conferir",
+      "nota": "Alertas de planejamento; não substituem a Defesa Civil nem o agrônomo."
+    },
+    {
+      "id": "residuos.rendimentos",
+      "grandeza": "Rendimento de cada rota de resíduo no próprio lugar",
+      "valor_padrao": {
+        "compostagem": 0.35,
+        "vermi": 0.3,
+        "larvas": 0.15,
+        "biodiesel_l_por_l_oleo": 0.9,
+        "filamento": 0.85,
+        "agregado": 0.9,
+        "biomassa_kwh_por_kg": 4.0,
+        "biochar": 0.25
+      },
+      "unidade": "kg de produto por kg de resíduo (biodiesel em L por L de óleo; biomassa em kWh por kg)",
+      "opcoes": [],
+      "fonte": "premissa Physis (estimativas de literatura que a Economia circular já usava) [CONFERIR]",
+      "status": "conferir",
+      "nota": "Ordem de grandeza para planejar; o rendimento real é medido."
+    },
+    {
+      "id": "residuos.biogas_por_kg",
+      "grandeza": "Biogás por kg de resíduo fresco",
+      "valor_padrao": {
+        "alimentos": 0.1,
+        "esterco_bov": 0.04,
+        "esterco_sui": 0.06,
+        "cama_aviario": 0.07,
+        "colheita": 0.05,
+        "outros": 0.05
+      },
+      "unidade": "m³/kg",
+      "opcoes": [],
+      "fonte": "premissa Physis (estimativas de literatura que a Economia circular já usava) [CONFERIR]",
+      "status": "conferir",
+      "nota": "Mesmos valores na aba Carbono (biogás do plano de resíduos)."
+    },
+    {
+      "id": "agua.referencias_por_uso",
+      "grandeza": "Faixas de referência por uso da água (só informação, nunca limite)",
+      "valor_padrao": {
+        "beber": {
+          "rotulo": "Água para beber",
+          "fonte": "Portaria GM/MS 888/2021 [CONFERIR NA PORTARIA]",
+          "turbidez_max_ut": 5,
+          "cloro_min_mgl": 0.2,
+          "cloro_max_mgl": 5,
+          "ph_min": 6,
+          "ph_max": 9
+        },
+        "rio": {
+          "rotulo": "Rio ou represa (água doce classe 2)",
+          "fonte": "Resolução CONAMA 357/2005 [CONFERIR NA RESOLUÇÃO]",
+          "turbidez_max_ut": 100,
+          "ph_min": 6,
+          "ph_max": 9
+        },
+        "efluente": {
+          "rotulo": "Efluente lançado",
+          "fonte": "Resolução CONAMA 430/2011 [CONFERIR NA RESOLUÇÃO]",
+          "ph_min": 5,
+          "ph_max": 9
+        },
+        "reuso": {
+          "rotulo": "Reúso (classe mais exigente)",
+          "fonte": "ABNT NBR 13969:1997 (classes de reúso) [CONFERIR NA NORMA]",
+          "turbidez_max_ut": 5,
+          "cloro_min_mgl": 0.5,
+          "cloro_max_mgl": 1.5,
+          "ph_min": 6,
+          "ph_max": 8
+        }
+      },
+      "unidade": "uT, mg/L e pH",
+      "opcoes": [],
+      "fonte": "Portaria GM/MS 888/2021; Resoluções CONAMA 357/2005 e 430/2011; ABNT NBR 13969:1997 [CONFERIR]",
+      "status": "conferir",
+      "nota": "Aparece ao lado de cada limite como informação. Nada é preenchido e nenhum alerta sai sem o limite digitado pela pessoa (regra 3)."
+    },
+    {
+      "id": "avac.exaustao",
+      "grandeza": "Vazões e trocas de ar das exaustões (banheiro, lixo, garagem)",
+      "valor_padrao": {
+        "vazao_banheiro_m3h": 90,
+        "trocas_banheiro_h": 15,
+        "trocas_lixo_h": 20,
+        "trocas_garagem_h": 6,
+        "garagem_ls_por_m2": 7.5,
+        "garagem_m3h_por_vaga": 300
+      },
+      "unidade": "m³/h, trocas por hora, L/s·m²",
+      "opcoes": [],
+      "fonte": "planilha PHYSIS_AVAC-5 (premissa Physis); exaustão de banheiro, lixo e garagem não tem vazão em NBR: conferir com o código de obras do município e a NBR 16401-3",
+      "status": "conferir",
+      "nota": "Valores de partida da tela de Ventilação; o projeto troca pelos do código de obras."
+    },
+    {
+      "id": "avac.velocidade_dutos",
+      "grandeza": "Velocidade máxima do ar por tipo de duto",
+      "valor_padrao": {
+        "Prumada residencial (shaft)": 8,
+        "Ramal em forro — residencial": 5,
+        "Exaustão técnica (lixo, bombas)": 8,
+        "Garagem": 12,
+        "Pressurização e fumaça": 12,
+        "Duto principal — comercial": 10
+      },
+      "unidade": "m/s",
+      "opcoes": [],
+      "fonte": "planilha PHYSIS_AVAC-5 (premissa Physis); conferir os limites de velocidade e ruído na ABNT NBR 16401-1 [CONFERIR NA NORMA]",
+      "status": "conferir",
+      "nota": "Usado para conferir a velocidade adotada em cada sistema de dutos."
     }
   ],
   "normas": {

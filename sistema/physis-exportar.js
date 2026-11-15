@@ -27,13 +27,18 @@
 (function (g) {
   "use strict";
   var EN = /^en/i.test((g.navigator && g.navigator.language) || "pt");
-  var TX_EN = { baixar: "Download this screen", word: "Word", pdf: "PDF", excel: "Excel", enc: "Forward to colleagues",
+  /* Nomes dos botões (decisão da Physis, 15/11/2026): o formato oficial é o do LibreOffice (ODF). "Documento", "PDF" e
+     "Planilha" no lugar de Word/Excel e da segunda linha "Formatos abertos". Com o physis-odf.js na página (acoplar),
+     Documento = .odt, Planilha = .ods e PDF = PDF/A pelo servidor (sem servidor, o PDF do navegador). Sem ele, .docx/.xlsx. */
+  var TX_EN = { baixar: "Download this screen", word: "Document", pdf: "PDF", excel: "Spreadsheet", enc: "Forward to colleagues",
+      dicaDoc: "Open format (.odt): opens in LibreOffice and Word", dicaPlan: "Open format (.ods): opens in LibreOffice and Excel", dicaPdf: "PDF to read and print",
       para: "To", nota: "Note (optional)", link: "Link to this screen", enviar: "Send notice", copiar: "Copy link and note",
       copiado: "Copied.", semCopia: "Select the text and copy it.", baixado: function (n) { return n + " saved."; },
       falha: "The download could not be started.", vazio: "There is nothing on this screen to export.",
       semServidor: "Without the Physis server the notice cannot be delivered straight to a colleague. Copy the link and the note and send them.",
       gerado: "Generated on", escolha: "Choose who", cancelado: "The download was cancelled." };
-  var TX_PT = { baixar: "Baixar esta tela", word: "Word", pdf: "PDF", excel: "Excel", enc: "Encaminhar a colegas",
+  var TX_PT = { baixar: "Baixar esta tela", word: "Documento", pdf: "PDF", excel: "Planilha", enc: "Encaminhar a colegas",
+      dicaDoc: "Formato aberto (.odt): abre no LibreOffice e no Word", dicaPlan: "Formato aberto (.ods): abre no LibreOffice e no Excel", dicaPdf: "PDF para ler e imprimir",
       para: "Para", nota: "Recado (opcional)", link: "Link desta tela", enviar: "Enviar aviso", copiar: "Copiar link e recado",
       copiado: "Copiado.", semCopia: "Selecione o texto e copie.", baixado: function (n) { return n + " baixado."; },
       falha: "Não foi possível iniciar o download.", vazio: "Não há nada nesta tela para exportar.",
@@ -412,7 +417,9 @@
     var pessoas = op.encaminhar && op.encaminhar.pessoas, semEnc = op.encaminhar === false;   // encaminhar a colegas só existe na gestão interna
     var pinta = function () {
       el.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"><strong id="' + id + '-t" style="margin-right:4px">' + TX.baixar + '</strong>' +
-        ["docx", "pdf", "xlsx"].map(function (f) { return '<button type="button" data-px-f="' + f + '" aria-describedby="' + id + '-t" style="' + bt + '">' + TX[f === "docx" ? "word" : f === "xlsx" ? "excel" : "pdf"] + "</button>"; }).join("") +
+        ["docx", "pdf", "xlsx"].map(function (f) { var odf = typeof el.pxFormato === "function";
+          var dica = f === "pdf" ? TX.dicaPdf : !odf ? "" : f === "docx" ? TX.dicaDoc : TX.dicaPlan;
+          return '<button type="button" data-px-f="' + f + '" aria-describedby="' + id + '-t"' + (dica ? ' title="' + xml(dica) + '"' : "") + ' style="' + bt + '">' + TX[f === "docx" ? "word" : f === "xlsx" ? "excel" : "pdf"] + "</button>"; }).join("") +
         (semEnc ? "" : '<button type="button" data-px-enc="1" aria-expanded="' + aberto + '" aria-controls="' + id + '-enc" style="' + bt + '">' + TX.enc + "</button>") + "</div>" +
         (semEnc ? "" : '<div id="' + id + '-enc"' + (aberto ? "" : " hidden") + ' style="display:' + (aberto ? "grid" : "none") + ';gap:8px;max-width:640px">' +
         (pessoas ? '<label style="display:grid;gap:3px;font-weight:600">' + TX.para + '<select data-px-para="1" style="font:inherit;min-height:44px;padding:8px 10px;border:1px solid #8A9284;border-radius:8px;background:#fff;color:#1C2B21"><option value="">' + TX.escolha + "</option>" + pessoas.map(function (p) { return '<option value="' + xml(p.id) + '">' + xml(p.nome) + "</option>"; }).join("") + "</select></label>" : '<p style="margin:0">' + TX.semServidor + "</p>") +
@@ -427,6 +434,8 @@
     if (typeof op.idiomaTela === "function" && g.MutationObserver) new MutationObserver(function () { var n = TX_PADRAO(op); if (n !== TX) { TX = n; el.setAttribute("aria-label", TX.baixar); pinta(); } }).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
     el.addEventListener("click", function (ev) {
       var b = ev.target.closest("button"); if (!b) return;
+      /* formato aberto (physis-odf.js acoplado): ele gera e diz o resultado; devolve false para cair no padrão */
+      if (b.dataset.pxF && typeof el.pxFormato === "function" && el.pxFormato(b.dataset.pxF, b, dizer)) return;
       if (b.dataset.pxF) { var r = gerar(b.dataset.pxF, op.titulo(), op.raiz()); if (!r) return dizer(TX.vazio);
         baixar(r.nome, r.dados, r.mime).then(function () { dizer(TX.baixado(r.nome)); }, function (e) { dizer(e && /cancel|declin|not_granted/i.test(String(e.code || e.message || e)) ? TX.cancelado : TX.falha); }); return; }
       if (b.dataset.pxEnc) { aberto = !aberto; pinta(); var f = el.querySelector(pessoas ? "[data-px-para]" : "[data-px-nota]"); if (aberto && f) f.focus(); else el.querySelector("[data-px-enc]").focus(); return; }
@@ -436,6 +445,7 @@
         var falhou = function () { var i = el.querySelector("[data-px-link]"); i.focus(); i.select(); dizer(TX.semCopia); };
         if (g.navigator.clipboard && g.navigator.clipboard.writeText) g.navigator.clipboard.writeText(txt).then(function () { dizer(TX.copiado); }, falhou); else falhou(); }
     });
+    el.pxRepintar = pinta;   // o acoplar do physis-odf.js repinta para pôr as dicas de formato aberto
     return el;
   }
 
