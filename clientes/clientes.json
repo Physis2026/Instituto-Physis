@@ -33,19 +33,19 @@
       "org": "fazenda-santa-clara",
       "nome": "Fazenda Santa Clara",
       "lugar": "itirapua-sp",
-      "projeto": "Proposta compilada: sensores de solo e clima, qualidade da água (pH), energia solar com baterias, SCADA e gestão",
-      "modulos": ["monitoramento", "agua", "solar", "resiliencia", "supervisao", "gestao"],
-      "pesquisa": false,
-      "confirmar": "Energia solar e resiliência (estação meteorológica) entram com aba em desenvolvimento até a leitura do inversor e da estação ficar pronta. A proposta de sensores fala em LoRaWAN; o Hub hoje fala V6 (decisão em aberto no documento 04)."
-    },
-    {
-      "org": "fazenda-santa-clara-basica",
-      "nome": "Fazenda Santa Clara (sem SCADA e gestão)",
-      "lugar": "itirapua-sp",
-      "projeto": "Mesmas frentes das propostas (sensores, água e solar), sem SCADA e sem gestão",
+      "projeto": "Versão 1, a executada pela proposta: sensores de solo e clima, qualidade da água (pH) e energia solar com baterias",
       "modulos": ["monitoramento", "agua", "solar", "resiliencia"],
       "pesquisa": false,
-      "confirmar": "Variante pedida em 14/11/2026 para comparar com a versão completa."
+      "confirmar": "Energia solar e resiliência (estação meteorológica) ganham aba quando a tela delas estiver pronta. A proposta de sensores fala em LoRaWAN; o Hub hoje fala V6 (decisão em aberto no documento 04)."
+    },
+    {
+      "org": "fazenda-santa-clara-v2",
+      "nome": "Fazenda Santa Clara · versão 2 (com SCADA e gestão)",
+      "lugar": "itirapua-sp",
+      "projeto": "Versão 2: a versão 1 mais SCADA (supervisão e controle) e a gestão da fazenda",
+      "modulos": ["monitoramento", "agua", "solar", "resiliencia", "supervisao", "gestao"],
+      "pesquisa": false,
+      "confirmar": "Ampliação proposta depois da versão 1."
     },
     {
       "org": "casa-physis",

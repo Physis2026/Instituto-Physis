@@ -158,7 +158,7 @@ def politica(chamadas: str | None = None) -> str:
     # worker-src blob:: o mapa (MapLibre) desenha num worker criado na própria página. Nada de fora entra.
     return ("default-src 'self'; script-src 'self' 'unsafe-inline'" + s + " 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; "
             "worker-src 'self' blob:; "
-            "img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'" + w + "; frame-src 'self' blob: data:" + s + "; "
+            "img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' blob:" + w + "; frame-src 'self' blob: data:" + s + "; "
             "media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'")
 
 

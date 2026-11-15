@@ -1071,6 +1071,123 @@ function telaAnimais(d){ const col = d.nos.filter(n => n.tipo === "COL"), com = 
   <section class="cartao" aria-labelledby="h-col"><h2 id="h-col">Coleiras</h2>${col.length ? `<div class="rolagem"><table><caption class="so-leitor">Coleiras: atividade, posição, estado, bateria e última leitura</caption><thead><tr><th scope="col">Coleira</th><th scope="col">Atividade</th><th scope="col">Posição</th><th scope="col">Estado</th><th scope="col">Bateria</th><th scope="col">Última leitura</th></tr></thead><tbody>${col.map(n => `<tr><th scope="row">Nó ${dois(n.id)}</th><td>${n.online ? atv[n.atv] || "—" : "—"}</td><td>${n.gps && n.lat != null ? n.lat.toFixed(5).replace(".",",") + " ; " + n.lon.toFixed(5).replace(".",",") : "Sem posição"}</td><td>${htmlSelo(n)}</td><td>${n.bat == null ? "—" : n.bat.toFixed(2).replace(".",",") + " V"}</td><td>há ${n.ha_s} s</td></tr>`).join("")}</tbody></table></div>` : `<p class="t2">Nenhuma coleira falou ainda.</p>`}</section>` : "") + (temCom ? `
   <section aria-labelledby="h-com" style="display:flex;flex-direction:column;gap:12px"><h2 id="h-com">Comedouros</h2>${com.length ? `<div class="grade">${com.map(n => `<div class="cartao"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><h3>Nó ${dois(n.id)}</h3>${htmlSelo(n)}</div><span class="numero">${f1(n.niv)} %</span><span class="t2 pq">de ração no reservatório</span>${barra(n.niv, 15, { online:n.online })}<span>${n.porc} ${n.porc === 1 ? "porção servida" : "porções servidas"} hoje${n.bloq ? "; limite diário atingido" : ""}</span><span class="t2 pq">Última tag: ${esc(n.tag || "—")}</span></div>`).join("")}</div>` : `<p class="t2">Nenhum comedouro falou ainda.</p>`}</section>` : ""); }
 
+/* ════════ Economia circular: planejamento do processamento dos resíduos ════════
+   A pessoa escolhe cada resíduo, a quantidade e a rota. O sistema mostra a classe (NBR 10004), se exige MTR,
+   o desvio do aterro (meta de 90%), o que cada rota produz e o tamanho do que precisa ser montado no lugar.
+   As regras de destino são as do núcleo physis/1 (classe I nunca vai para coleta pública, aterro comum ou
+   compostagem; reciclagem, compostagem, coprocessamento, incineração, aterros e logística reversa exigem MTR).
+   Rendimentos e dimensões são ESTIMATIVAS de planejamento (literatura técnica e premissas Physis), para
+   conferir com o projeto; cada uma diz de onde vem. */
+const RC_ROTAS = {
+  compostagem:{ nome:"Compostagem no lugar", destino:"compostagem", interno:1, produto:"composto", rend:0.35, un:"kg", nota:"perda de massa de 60 a 70% (estimativa)",
+    dim:kg => "pátio ou composteiras para cerca de " + n2(kg * 3 / 500, 1) + " m³ (3 meses de cura, 500 kg/m³)" },
+  vermi:{ nome:"Minhocário (vermicompostagem)", destino:"compostagem", interno:1, produto:"húmus", rend:0.30, un:"kg", nota:"estimativa",
+    dim:kg => "canteiros de cerca de " + n2(kg / 30 / 5, 1) + " m² (5 kg de resíduo por m² por dia)" },
+  larvas:{ nome:"Larvas (bioconversão)", destino:"reuso", interno:1, produto:"larvas para ração", rend:0.15, un:"kg", nota:"mosca-soldado-negra; o resíduo restante vira adubo (estimativa)",
+    dim:kg => "bandejas com cerca de " + n2(kg / 30 / 15, 1) + " m² (15 kg por m² por dia)" },
+  biodigestor:{ nome:"Biodigestor (biogás)", destino:"reuso", interno:1, produto:"biogás", rend:null, un:"m³", nota:"6 kWh de energia térmica por m³ de biogás (estimativa)",
+    dim:kg => "biodigestor de cerca de " + n2(kg / 30 * 2 * 30 / 1000, 1) + " m³ (mistura 1:1 com água, 30 dias de retenção)" },
+  biodiesel:{ nome:"Biodiesel", destino:"reuso", interno:1, produto:"biodiesel", rend:0.9 / 0.92, un:"L", nota:"cerca de 0,9 L de biodiesel por litro de óleo (estimativa)",
+    dim:kg => "reator de lote para cerca de " + n2(kg / 0.92 / 4, 0) + " L por semana" },
+  filamento:{ nome:"Filamento 3D (oficina)", destino:"reuso", interno:1, produto:"filamento", rend:0.85, un:"kg", nota:"plástico limpo e separado por tipo (estimativa)",
+    dim:kg => "trituradora e extrusora para cerca de " + n2(kg / 22, 1) + " kg por dia útil" },
+  maker:{ nome:"Oficina maker (reúso de peças)", destino:"reuso", interno:1, produto:"peças reaproveitadas", rend:null, un:"", nota:"o que não for reaproveitado segue para logística reversa",
+    dim:() => "bancada de triagem e teste" },
+  agregado:{ nome:"Agregado reciclado na obra", destino:"reuso", interno:1, produto:"agregado", rend:0.9, un:"kg", nota:"entulho classe A (CONAMA 307) triturado; uso não estrutural (estimativa)",
+    dim:kg => "britador móvel ou contratação por lote; cerca de " + n2(kg / 1400, 1) + " m³ por mês" },
+  biomassa:{ nome:"Biomassa para energia (lenha, caldeira, secador)", destino:"reuso", interno:1, produto:"energia térmica", rend:4.0, un:"kWh", nota:"madeira seca ao ar (estimativa)",
+    dim:kg => "depósito coberto para cerca de " + n2(kg / 400, 1) + " m³ por mês" },
+  biochar:{ nome:"Biocarvão (biochar)", destino:"reuso", interno:1, produto:"biocarvão", rend:0.25, un:"kg", nota:"pirólise lenta (estimativa)",
+    dim:kg => "forno de pirólise para cerca de " + n2(kg / 30, 0) + " kg por dia" },
+  reuso:{ nome:"Reúso ou doação", destino:"reuso", interno:1, produto:"", rend:null, un:"", nota:"", dim:() => "" },
+  reciclagem:{ nome:"Reciclagem (cooperativa ou empresa licenciada)", destino:"reciclagem", interno:0, produto:"", rend:null, un:"", nota:"", dim:() => "" },
+  reversa:{ nome:"Logística reversa (devolução ao fabricante)", destino:"reversa", interno:0, produto:"", rend:null, un:"", nota:"", dim:() => "" },
+  aterro:{ nome:"Aterro sanitário (rejeito)", destino:"aterro2", interno:0, produto:"", rend:null, un:"", nota:"", dim:() => "" },
+  aterro1:{ nome:"Aterro de resíduos perigosos (classe I)", destino:"aterro1", interno:0, produto:"", rend:null, un:"", nota:"", dim:() => "" },
+  incineracao:{ nome:"Incineração (empresa licenciada)", destino:"incineracao", interno:0, produto:"", rend:null, un:"", nota:"", dim:() => "" }
+};
+// biogás por kg de resíduo fresco (estimativas de literatura: dejetos e restos de alimentos)
+const RC_BIOGAS = { alimentos:0.10, esterco_bov:0.04, esterco_sui:0.06, cama_aviario:0.07, colheita:0.05 };
+const RC_TIPOS = [
+  ["Orgânicos", [["alimentos","Restos de alimentos e cozinha","IIA",["compostagem","vermi","larvas","biodigestor","aterro"]],
+                 ["poda","Poda, capina e jardinagem","IIA",["compostagem","biochar","biomassa","aterro"]],
+                 ["colheita","Resíduos de colheita (palha, casca de café, bagaço)","IIA",["compostagem","biomassa","biochar","biodigestor"]],
+                 ["esterco_bov","Esterco bovino","IIA",["biodigestor","compostagem","vermi"]],
+                 ["esterco_sui","Dejetos suínos","IIA",["biodigestor","compostagem"]],
+                 ["cama_aviario","Cama de aviário","IIA",["compostagem","biodigestor"]],
+                 ["oleo_cozinha","Óleo de cozinha usado (litros)","IIA",["biodiesel","reciclagem"]]]],
+  ["Recicláveis", [["papel","Papel e papelão","IIA",["reciclagem","compostagem","aterro"]],
+                   ["pet","Plástico PET (garrafas)","IIB",["filamento","reciclagem","aterro"]],
+                   ["pp_pead","Plástico PP e PEAD (potes, tampas, galões)","IIB",["filamento","reciclagem","aterro"]],
+                   ["filme","Plástico filme e sacolas","IIB",["reciclagem","aterro"]],
+                   ["eps","Isopor (EPS)","IIB",["reciclagem","aterro"]],
+                   ["vidro","Vidro","IIB",["reciclagem","reuso","aterro"]],
+                   ["aluminio","Alumínio (latas)","IIB",["reciclagem"]],
+                   ["sucata","Metais e sucata","IIB",["reciclagem","reuso"]],
+                   ["longa_vida","Embalagem longa vida","IIB",["reciclagem","aterro"]],
+                   ["tecidos","Tecidos e uniformes","IIA",["reuso","reciclagem","aterro"]]]],
+  ["Obra e madeira", [["madeira","Madeira (pallets, sobras, formas)","IIA",["reuso","biomassa","biochar","reciclagem"]],
+                      ["rcc","Entulho de construção (classe A)","IIB",["agregado","reciclagem","aterro"]]]],
+  ["Perigosos e logística reversa", [["eletronicos","Eletrônicos (e-waste)","I",["maker","reversa"]],
+                                     ["pilhas","Pilhas e baterias","I",["reversa"]],
+                                     ["lampadas","Lâmpadas fluorescentes","I",["reversa"]],
+                                     ["oleo_lub","Óleo lubrificante usado","I",["reversa"]],
+                                     ["agrotoxico","Embalagens de agrotóxico (lavadas)","I",["reversa"]],
+                                     ["saude","Resíduos de saúde (veterinário, ambulatório)","I",["incineracao","aterro1"]],
+                                     ["pneus","Pneus","IIB",["reversa"]]]],
+  ["Rejeito", [["rejeito","Rejeito (não reciclável)","IIA",["aterro"]]]]
+];
+const RC_POR_ID = Object.fromEntries(RC_TIPOS.flatMap(([g, l]) => l.map(([id, nome, classe, rotas]) => [id, { id, nome, classe, rotas, grupo:g }])));
+const RC_EXIGE_MTR = ["reciclagem","compostagem","coproc","incineracao","aterro1","aterro2","reversa"], RC_PROIBIDO_I = ["publica","aterro2","compostagem"], RC_DESVIADO = ["reuso","reciclagem","compostagem","reversa"];
+const RC_UN = { kg_mes:["kg por mês",1], kg_sem:["kg por semana",52 / 12], kg_dia:["kg por dia",30], t_mes:["toneladas por mês",1000], l_mes:["litros por mês",0.92] };
+function rcLer(){ if (ui.vazia) return ui.mem.residuos || []; try { const l = JSON.parse(localStorage.getItem("physis-residuos-plano") || "[]"); return Array.isArray(l) ? l : []; } catch (e){ return []; } }
+function rcGravar(l){ if (ui.vazia){ ui.mem.residuos = l; return; } try { localStorage.setItem("physis-residuos-plano", JSON.stringify(l)); } catch (e){} }
+const rcKgMes = r => (numBr(r.qtd) || 0) * ((RC_UN[r.un] || RC_UN.kg_mes)[1]);
+function rcProduto(r){ const rota = RC_ROTAS[r.rota], kg = rcKgMes(r); if (!rota || !rota.produto) return null;
+  if (r.rota === "biodigestor"){ const m3 = kg * (RC_BIOGAS[r.tipo] || 0.05); return { nome:"biogás", qtd:m3, un:"m³", extra:" (≈ " + n2(m3 * 6, 0) + " kWh térmicos)" }; }
+  return rota.rend == null ? { nome:rota.produto, qtd:null, un:"" } : { nome:rota.produto, qtd:kg * rota.rend, un:rota.un, extra:"" }; }
+function rcAlertas(r){ const t = RC_POR_ID[r.tipo], rota = RC_ROTAS[r.rota], a = []; if (!t || !rota) return a;
+  if (t.classe === "I" && RC_PROIBIDO_I.includes(rota.destino)) a.push("Classe I não pode ir para " + rota.nome.toLowerCase());
+  if (!rcKgMes(r)) a.push("Falta a quantidade"); return a; }
+function rcResumo(l){ const tot = l.reduce((s, r) => s + rcKgMes(r), 0), desv = l.filter(r => RC_ROTAS[r.rota] && RC_DESVIADO.includes(RC_ROTAS[r.rota].destino)).reduce((s, r) => s + rcKgMes(r), 0);
+  const prod = {}; l.forEach(r => { const p = rcProduto(r); if (p && p.qtd != null){ const k = p.nome + "|" + p.un; prod[k] = (prod[k] || 0) + p.qtd; } });
+  const dims = {}; l.forEach(r => { const rota = RC_ROTAS[r.rota]; if (rota && rota.interno){ dims[r.rota] = (dims[r.rota] || 0) + rcKgMes(r); } });
+  return { tot, desv, pct: tot ? desv / tot : null, prod, dims, mtr: l.filter(r => RC_ROTAS[r.rota] && RC_EXIGE_MTR.includes(RC_ROTAS[r.rota].destino)) }; }
+function telaCircular(){ const l = rcLer(), f = ui.rcForm || { tipo:"alimentos", qtd:"", un:"kg_mes", rota:"" }, t = RC_POR_ID[f.tipo] || RC_POR_ID.alimentos, rotaF = t.rotas.includes(f.rota) ? f.rota : t.rotas[0], s = rcResumo(l);
+  const opTipos = RC_TIPOS.map(([g, ls]) => `<optgroup label="${esc(g)}">${ls.map(([id, nome, cl]) => `<option value="${id}" ${f.tipo === id ? "selected" : ""}>${esc(nome)} · classe ${cl}</option>`).join("")}</optgroup>`).join("");
+  const form = `<section class="cartao" aria-labelledby="h-rc-novo"><h2 id="h-rc-novo">Acrescentar resíduo</h2><div class="precos">
+      <div><label for="rc-tipo">Resíduo</label><select id="rc-tipo" data-rc="tipo" style="width:100%">${opTipos}</select></div>
+      <div><label for="rc-qtd">Quantidade</label><input id="rc-qtd" type="text" inputmode="decimal" data-rc="qtd" value="${esc(f.qtd || "")}" placeholder="ex.: 120" style="width:100%"></div>
+      <div><label for="rc-un">Unidade</label><select id="rc-un" data-rc="un" style="width:100%">${Object.entries(RC_UN).map(([k, [n]]) => `<option value="${k}" ${f.un === k ? "selected" : ""}>${n}</option>`).join("")}</select></div>
+      <div><label for="rc-rota">Rota de processamento</label><select id="rc-rota" data-rc="rota" style="width:100%">${t.rotas.map(k => `<option value="${k}" ${rotaF === k ? "selected" : ""}>${esc(RC_ROTAS[k].nome)}</option>`).join("")}</select></div></div>
+      <p class="t2 pq">Classe ${t.classe}${t.classe === "I" ? " (perigoso): só logística reversa, incineração ou aterro de perigosos" : ""}. ${esc(RC_ROTAS[rotaF].nota || "")}</p>
+      ${ui.rcErro ? `<p role="alert" class="faixa al">${esc(ui.rcErro)}</p>` : ""}<div><button type="button" class="principal" data-rc-acao="add">Acrescentar</button></div></section>`;
+  const linhas = l.map((r, i) => { const tp = RC_POR_ID[r.tipo] || { nome:r.tipo, classe:"?", rotas:[r.rota] }, p = rcProduto(r), al = rcAlertas(r), rota = RC_ROTAS[r.rota] || {};
+    return `<tr><th scope="row">${esc(tp.nome)}</th><td><span class="selo ${tp.classe === "I" ? "al" : "in"}">Classe ${tp.classe}</span></td><td>${n2(rcKgMes(r), 1)} kg/mês</td>
+      <td><label class="so-leitor" for="rc-r-${i}">Rota de ${esc(tp.nome)}</label><select id="rc-r-${i}" data-rc-linha="${i}">${tp.rotas.map(k => `<option value="${k}" ${r.rota === k ? "selected" : ""}>${esc(RC_ROTAS[k].nome)}</option>`).join("")}</select></td>
+      <td>${p ? (p.qtd != null ? n2(p.qtd, 1) + " " + p.un + " de " + esc(p.nome) + (p.extra || "") : esc(p.nome)) : "—"}</td>
+      <td>${RC_EXIGE_MTR.includes(rota.destino) ? "Sim" : "Não"}</td><td>${al.length ? `<span class="selo al">${esc(al.join("; "))}</span>` : `<span class="selo ok">OK</span>`}</td>
+      <td><button type="button" data-rc-del="${i}" aria-label="Remover ${esc(tp.nome)}">Remover</button></td></tr>`; }).join("");
+  const tabela = `<section class="cartao" aria-labelledby="h-rc-lista"><h2 id="h-rc-lista">Resíduos do lugar (${l.length})</h2>${l.length ? `<div class="rolagem"><table><caption class="so-leitor">Resíduos, classe, quantidade, rota, produto, MTR e conferência</caption><thead><tr><th scope="col">Resíduo</th><th scope="col">Classe</th><th scope="col">Quantidade</th><th scope="col">Rota</th><th scope="col">Produz (estimativa)</th><th scope="col">Exige MTR</th><th scope="col">Conferência</th><th scope="col"><span class="so-leitor">Ações</span></th></tr></thead><tbody>${linhas}</tbody></table></div>` : `<p class="t2">Nenhum resíduo ainda. Acrescente cada tipo com a quantidade, para o sistema planejar o processamento.</p>`}</section>`;
+  const meta = s.pct == null ? "" : `<span class="selo ${s.pct >= 0.9 ? "ok" : "at"}">${s.pct >= 0.9 ? "Meta de 90% atingida" : "Abaixo da meta de 90%"}</span>`;
+  const prods = Object.entries(s.prod).map(([k, v]) => { const [n, u] = k.split("|"); return `<li>${n2(v, 1)} ${u} de ${esc(n)} por mês</li>`; }).join("");
+  const dims = Object.entries(s.dims).map(([k, kg]) => { const d = RC_ROTAS[k].dim(kg); return d ? `<li><strong>${esc(RC_ROTAS[k].nome)}:</strong> ${esc(d)}</li>` : ""; }).join("");
+  const resumo = l.length ? `<div class="grade"><section class="cartao" aria-labelledby="h-rc-tot"><h3 id="h-rc-tot" class="t3">Total</h3><span class="numero">${n2(s.tot, 0)}</span><span class="t2">kg por mês · ${n2(s.tot * 12 / 1000, 1)} t por ano</span></section>
+      <section class="cartao" aria-labelledby="h-rc-desv"><h3 id="h-rc-desv" class="t3">Desvio do aterro</h3><span class="numero">${s.pct == null ? "—" : Math.round(s.pct * 100) + "%"}</span>${meta}<span class="t2 pq">Reúso, reciclagem, compostagem e logística reversa contam como desvio (critério TRUE / LEED Zero Waste).</span></section>
+      <section class="cartao" aria-labelledby="h-rc-mtr"><h3 id="h-rc-mtr" class="t3">MTR</h3><span class="numero">${s.mtr.length}</span><span class="t2">${s.mtr.length === 1 ? "resíduo precisa" : "resíduos precisam"} de Manifesto de Transporte (SINIR) a cada saída</span></section></div>
+    <div class="grade"><section class="cartao" aria-labelledby="h-rc-prod"><h3 id="h-rc-prod" class="t3">O que o processamento produz</h3>${prods ? `<ul>${prods}</ul>` : `<p class="t2">Escolha rotas no lugar (compostagem, larvas, biodigestor…) para ver os produtos.</p>`}</section>
+      <section class="cartao" aria-labelledby="h-rc-dim"><h3 id="h-rc-dim" class="t3">O que montar no lugar</h3>${dims ? `<ul>${dims}</ul>` : `<p class="t2">Nada a montar: todas as rotas são externas.</p>`}<p class="t2 pq">Estimativas para planejamento; conferir com o projeto.</p></section></div>` : "";
+  return `<h1>Economia circular</h1><p class="t2 apoio">Escolha cada resíduo, a quantidade e a rota. O sistema confere a classe e o MTR, calcula o desvio do aterro e planeja o que montar para processar no lugar.</p>${form}${resumo}${tabela}`; }
+document.addEventListener("change", ev => { const t = ev.target; if (!t || !t.dataset) return;
+  if (t.dataset.rc){ ui.rcForm = Object.assign({ tipo:"alimentos", qtd:"", un:"kg_mes", rota:"" }, ui.rcForm || {}); ui.rcForm[t.dataset.rc] = t.value; if (t.dataset.rc === "tipo"){ ui.rcForm.rota = ""; ui.rcForm.un = t.value === "oleo_cozinha" ? "l_mes" : (ui.rcForm.un === "l_mes" ? "kg_mes" : ui.rcForm.un); }   /* litro só para o óleo */ ui.rcErro = ""; desenhar(false); const x = el(t.id); if (x) x.focus(); }
+  if (t.dataset.rcLinha != null){ const l = rcLer(), i = +t.dataset.rcLinha; if (l[i]){ l[i].rota = t.value; rcGravar(l); desenhar(false); const x = el(t.id); if (x) x.focus(); } } });
+document.addEventListener("input", ev => { const t = ev.target; if (t && t.dataset && t.dataset.rc === "qtd"){ ui.rcForm = Object.assign({ tipo:"alimentos", qtd:"", un:"kg_mes", rota:"" }, ui.rcForm || {}); ui.rcForm.qtd = t.value; } });
+document.addEventListener("click", ev => { const b = ev.target.closest("button"); if (!b) return;
+  if (b.dataset.rcAcao === "add"){ const f = Object.assign({ tipo:"alimentos", qtd:"", un:"kg_mes", rota:"" }, ui.rcForm || {}), t = RC_POR_ID[f.tipo]; const q = numBr(f.qtd);
+    if (!t){ ui.rcErro = "Escolha o resíduo."; return desenhar(false); } if (!(q > 0)){ ui.rcErro = "Informe a quantidade (número maior que zero)."; desenhar(false); const x = el("rc-qtd"); if (x) x.focus(); return; }
+    const l = rcLer(); l.push({ tipo:f.tipo, qtd:String(f.qtd), un:f.un, rota: t.rotas.includes(f.rota) ? f.rota : t.rotas[0], quando:new Date().toISOString() }); rcGravar(l); ui.rcForm = { tipo:f.tipo, qtd:"", un:f.un, rota:"" }; ui.rcErro = ""; desenhar(false); const x = el("rc-qtd"); if (x) x.focus(); return; }
+  if (b.dataset.rcDel != null){ const l = rcLer(); l.splice(+b.dataset.rcDel, 1); rcGravar(l); desenhar(false); } });
+
 /* Aba de um módulo planejado: o que faz, o que recebe, telas previstas, dados, equipamento, situação e a
    programação básica prevista para o servidor. Sempre marcada como em desenvolvimento. */
 function telaPlanejado(id){ const m = MODS_PLAN[id], nome = (ABAS.find(a => a[0] === id) || [id, id])[1]; if (!m) return `<h1>${esc(nome)}</h1>`;
@@ -1160,7 +1277,7 @@ const G_ABAS = G_SEC.map(s => [s[0], s[1]]).concat([["indicadores","Indicadores"
    guardados neste aparelho): Início = cadastro; Gestão = consumo, medições e trilha; Carbono, Economia circular e
    Certificações = as seções delas. */
 const quadroTela = (secs, titulo) => `<div class="quadro"><iframe id="quadro-tc-${secs.join("-")}" title="${esc(titulo)}" data-prog="painel" data-so="${secs.join(",")}"></iframe></div>`;
-const SECAO_TELA = { carbono:["recp","carbono"], circular:["residuos"], certificacoes:["cert","conformidade","medicao"] };   // consumo anual alimenta o carbono; a medição comprova a economia exigida pelas certificações (a Gestão fica sem essa parte: já está nos Indicadores e no Início)
+const SECAO_TELA = { carbono:["recp","carbono"], certificacoes:["cert","conformidade","medicao"] };   // consumo anual alimenta o carbono; a medição comprova a economia exigida pelas certificações (a Gestão fica sem essa parte: já está nos Indicadores e no Início)
 const gLer = () => Object.assign({ atividades:[], compras:[], manutencao:[], producao:[], fatores:[], sistemas:{}, indicadores:[] }, guardaLer("physis-gestao-cliente", {}));
 const gGravar = g => guardaGravar("physis-gestao-cliente", g);
 const gFmt = (v, t) => v == null || v === "" ? "—" : t === "d" ? String(v).split("-").reverse().join("/") : t === "m" ? mesRot(v) : t === "n" ? n2(numBr(v) || 0, 2) : String(v);
@@ -1432,7 +1549,7 @@ function rodarEstresse(ciclos){ const t0 = performance.now(), h = criarHubLocal(
   const falhas = itens.filter(i => !i.ok).length; return { itens, total: itens.length, passaram: itens.length - falhas, falhas, linhas, ms: Math.round(performance.now() - t0) }; }
 
 /* ════════ Desenho e eventos ════════ */
-const TELAS = { certificacoes: () => telaPlanejado("certificacoes"), solar: () => telaPlanejado("solar"), avac: () => telaPlanejado("avac"), turbinas: () => telaPlanejado("turbinas"), sbn: () => telaPlanejado("sbn"), circular: () => telaPlanejado("circular"), carbono: () => telaPlanejado("carbono"), resiliencia: () => telaPlanejado("resiliencia"), saude: () => telaPlanejado("saude"), inicio: telaPerfil, resumo: telaInicio, modulos: telaModulos, campo: telaMonitoramento, agua: telaAgua, zonas: telaZonas, animais: telaAnimais, sustainkit: telaSustainkit, supervisao: telaSupervisao, painel: telaPainel, gestao: telaGestao, planejador: () => telaPrograma("planejador"), pesquisa: telaPesquisa, cursos: telaCursos, registro: telaRegistro, teste: telaTeste };
+const TELAS = { certificacoes: () => telaPlanejado("certificacoes"), solar: () => telaPlanejado("solar"), avac: () => telaPlanejado("avac"), turbinas: () => telaPlanejado("turbinas"), sbn: () => telaPlanejado("sbn"), circular: telaCircular, carbono: () => telaPlanejado("carbono"), resiliencia: () => telaPlanejado("resiliencia"), saude: () => telaPlanejado("saude"), inicio: telaPerfil, resumo: telaInicio, modulos: telaModulos, campo: telaMonitoramento, agua: telaAgua, zonas: telaZonas, animais: telaAnimais, sustainkit: telaSustainkit, supervisao: telaSupervisao, painel: telaPainel, gestao: telaGestao, planejador: () => telaPrograma("planejador"), pesquisa: telaPesquisa, cursos: telaCursos, registro: telaRegistro, teste: telaTeste };
 /* Área que rola para o lado precisa receber foco do teclado e ter nome. */
 function rolagens(){ montarQuadros(); document.querySelectorAll("#tela .rolagem").forEach(r => { if (r.scrollWidth > r.clientWidth + 1){ const c = r.querySelector("caption"); r.tabIndex = 0; r.setAttribute("role", "region"); r.setAttribute("aria-label", (c ? c.textContent.trim() + ". " : "") + "Role para o lado para ver a tabela inteira."); } }); }
 function mostraBaixar(){ if (ui.acesso) return false; if (soLoja()) return ui.compra === "pronto" && !!ui.pedido && ui.aba === "modulos";

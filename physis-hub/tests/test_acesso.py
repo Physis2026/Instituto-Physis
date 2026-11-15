@@ -211,7 +211,7 @@ class PoliticaDeChamadas(unittest.TestCase):
         from physis_hub.servidor import politica
         p = politica(None)
         self.assertIn("frame-src 'self' blob: data:;", p)
-        self.assertIn("connect-src 'self';", p)
+        self.assertIn("connect-src 'self' blob:;", p)            # blob: só de dentro da própria página (imagem posicionada no mapa)
         self.assertIn("worker-src 'self' blob:;", p)                 # mapa: worker da própria página
         self.assertNotIn("https://", p)
         self.assertNotIn("'unsafe-eval'", p)                          # só WebAssembly, nunca eval de texto
