@@ -40,6 +40,7 @@ from . import saude as saude_mod
 from . import gis as gis_mod
 from . import app_pwa
 from . import correio
+from . import editais as editais_mod
 from .hub import Hub
 from .protocolo import para_int, validar_telemetria
 from .simulador import Simulador
@@ -256,6 +257,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
     csp_planejador = csp.replace("'wasm-unsafe-eval'", "'wasm-unsafe-eval' 'unsafe-eval'", 1)
     fabricar = fabricante(instancia)
     url_publica = (os.environ.get("PHYSIS_URL_PUBLICA") or instancia.get("url_publica") or "").rstrip("/")
+    # Editais e eventos (editais.py): listas públicas buscadas pelo servidor, com cache em arquivo
+    pasta_editais = Path(os.environ.get("PHYSIS_EDITAIS_PASTA") or (Path(os.environ.get("PHYSIS_BANCO", "physis-hub.db")).resolve().parent / "editais"))
+    editais_col = editais_mod.Coletor(pasta_editais, tipo="edital")
+    eventos_col = editais_mod.Coletor(pasta_editais, tipo="evento")
     class Manipulador(BaseHTTPRequestHandler):
         # Cabecalhos de seguranca em toda resposta. As telas usam script e estilo dentro da pagina,
         # por isso 'unsafe-inline'; de fora do proprio servidor, so o servidor de chamadas da Physis, se configurado.
@@ -472,6 +477,11 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             q = parse_qs(u.query)
             if u.path == "/api/instancia":
                 return self._json(200, self._estado_instancia())
+            # ── Editais (só quem tem acesso) e eventos (equipe com sessão): editais.rota decide ──
+            if u.path.startswith(("/api/editais", "/api/eventos")):
+                r = editais_mod.rota("GET", u.path, self._quem(), None, editais_col, eventos_col, hub, correio)
+                if r:
+                    return self._json(*r)
             if u.path.startswith("/api/central/compra/"):
                 # publico de proposito: a loja so pergunta se a propria compra ja foi aprovada
                 est = hub.central_estado("compra", u.path.rsplit("/", 1)[-1])
@@ -709,6 +719,11 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def do_POST(self):
             u = urlparse(self.path)
+            # ── Editais, eventos e e-mail escrito na Gestão (vai para a fila email_saida que já existe) ──
+            if u.path.startswith(("/api/editais", "/api/eventos")) or u.path == "/api/gestao/correio":
+                r = editais_mod.rota("POST", u.path, self._quem(), self._corpo(), editais_col, eventos_col, hub, correio)
+                if r:
+                    return self._json(*r)
             # ── Suporte ao cliente: chamado + e-mail para a Physis (e-mail e WhatsApp vêm da configuração) ──
             if u.path == "/api/suporte":
                 q = self._quem()

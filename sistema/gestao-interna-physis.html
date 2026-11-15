@@ -46,6 +46,18 @@ html.px-conforto body, html.px-conforto body *:not(code):not(pre):not(svg *):not
 html.px-conforto *{transition:none!important;animation:none!important}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
+<link rel="manifest" href="/app/manifest-gestao.webmanifest">
+<meta name="theme-color" content="#33512F">
+<link rel="icon" type="image/png" sizes="192x192" href="/app/icone-192.png">
+<link rel="apple-touch-icon" href="/app/icone-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Gestão Physis">
+<script>
+if ("serviceWorker" in navigator && window.isSecureContext && location.protocol !== "file:") {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("/app/sw.js", { scope: "/" }).catch(function () {}); });
+}
+</script>
 </head>
 <body>
 <a class="px-pular" href="#px-conteudo">Ir para o conteúdo</a>
@@ -4279,13 +4291,17 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     ["fin", "Financeiro", ["plan", "tot"]],
     ["forn", "Fornecedores", ["forn"]],
     // Alertas saiu do menu (14/11/2026): fica no topo de Atividades, ver pintarAlertas()
-    ["mails", "E-mails a enviar", null],
+    ["mails", "E-mails", null],         // 15/11/2026: caixa no estilo Outlook/Gmail (ver gp-extras)
     ["contas", "Conta", null],          // aberta pelos botões da conta no menu (Minha senha, Contas da equipe)
     ["reun", "Reuniões", null],
+    ["eventos", "Eventos", null],       // 15/11/2026: partes novas, desenhadas no bloco gp-extras
+    ["editais", "Editais", null],       // só Rafaella, Erick Lopes e Marzia (o botão some para os demais)
+    ["mkt", "Marketing", null],
     ["docs", "Documentos", null],
     ["cursos", "Cursos", null]
   ];
-  var EN_MENU = { contas:"Account", mails:"E-mails to send", atv:"Activities", mapa:"Team map", dir:"Leadership", org:"Tasks and projects", prop:"Proposals", cont:"Contracts", fin:"Finance", forn:"Suppliers", alert:"Alerts", reun:"Meetings", docs:"Documents", cursos:"Courses", meus:"My contracts" };
+  var VISTAS = ["atv","cursos","reun","docs","mails","contas","eventos","editais","mkt"];   // partes da casca que não são do painel
+  var EN_MENU = { eventos:"Events", editais:"Funding calls", mkt:"Marketing", contas:"Account", mails:"E-mails", atv:"Activities", mapa:"Team map", dir:"Leadership", org:"Tasks and projects", prop:"Proposals", cont:"Contracts", fin:"Finance", forn:"Suppliers", alert:"Alerts", reun:"Meetings", docs:"Documents", cursos:"Courses", meus:"My contracts" };
   function emIngles() { var bs = document.querySelectorAll("#app button"); for (var i = 0; i < bs.length; i++) if (bs[i].textContent.trim() === "PT") return true; return false; }
   function rotular() { var en = emIngles(); document.documentElement.lang = en ? "en" : "pt-BR"; ITENS.forEach(function (i) { var b = document.getElementById("gp-m-" + i[0]); if (b) b.textContent = en ? EN_MENU[i[0]] : i[1]; });
     var m = document.getElementById("gp-m-meus"); if (m) m.textContent = en ? EN_MENU.meus : "Meus contratos"; var l = document.querySelector("#gp-menu .gp-quem label"); if (l) l.textContent = en ? "Who is using" : "Quem está usando";
@@ -4297,8 +4313,9 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
   var raiz = document.documentElement, menu, atual = "atv";
 
   function topo() { var f = document.querySelector(".px-faixa"); if (menu && f && window.innerWidth > 860) menu.style.top = Math.max(0, Math.round(f.getBoundingClientRect().bottom)) + "px"; else if (menu) menu.style.top = ""; }
-  function marcar(id) { atual = id; raiz.classList.toggle("gp-v-adm", !!(ITENS.filter(function (i) { return i[0] === id; })[0] || [])[2]); ["atv","cursos","reun","docs","mails","contas"].forEach(function (n) { raiz.classList.toggle("gp-v-" + n, id === n); });
-    if (id === "atv") pintarAlertas(); if (id === "mails") pintarEmails(); if (id === "contas") { estC.msg = ""; if (estC.modo === "contas") carregarContas(); else pintarContas(); }
+  function marcar(id) { atual = id; raiz.classList.toggle("gp-v-adm", !!(ITENS.filter(function (i) { return i[0] === id; })[0] || [])[2]); VISTAS.forEach(function (n) { raiz.classList.toggle("gp-v-" + n, id === n); });
+    if (id === "atv") pintarAlertas(); if (id === "mails" && !window.PhysisExtras) pintarEmails();
+    if (window.PhysisExtras) { try { window.PhysisExtras.mostrar(id); } catch (e) { /* a parte nova não derruba a casca */ } } if (id === "contas") { estC.msg = ""; if (estC.modo === "contas") carregarContas(); else pintarContas(); }
     ITENS.forEach(function (i) { var b = document.getElementById("gp-m-" + i[0]); if (b) { if (i[0] === id) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); } }); }
   function ir(id, focar) {
     var item = ITENS.filter(function (i) { return i[0] === id; })[0]; if (!item) return;
@@ -4310,7 +4327,7 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     } else {
       var f = document.getElementById("adm-fechar"), pp = document.getElementById("physis-adm"); if (f && pp && pp.style.display !== "none") f.click();
       marcar(id); if (["atv","mapa","dir"].indexOf(id) >= 0) telaDoApp(id); if (id === "reun") pintarReunioes(); if (id === "docs") pintarDocs();
-      if (focar) { var alvo = document.getElementById({ cursos: "gp-cursos", reun: "gp-reun-topo", docs: "gp-docs", mails: "gp-mails", contas: "gp-contas" }[id] || "px-conteudo"); if (alvo) alvo.focus(); }
+      if (focar) { var alvo = document.getElementById({ cursos: "gp-cursos", reun: "gp-reun-topo", docs: "gp-docs", mails: "gp-mails", contas: "gp-contas", eventos: "gx-eventos", editais: "gx-editais", mkt: "gx-mkt" }[id] || "px-conteudo"); if (alvo) alvo.focus(); }
     }
     window.scrollTo(0, 0);
   }
@@ -4636,7 +4653,9 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
   var alTodos = false;
   function abrirAlvo(a, adm) {
     if (!adm && a.aba === "cont") { var mc = document.getElementById("adm-meus"); if (mc) mc.click(); return; }
-    var g = grupoDe[a.aba]; if (!g) return; ir(g, true);
+    var g = grupoDe[a.aba];
+    if (!g) { if (ITENS.some(function (i) { return i[0] === a.aba; })) ir(a.aba, true); return; }   // partes novas (Eventos, Editais, Marketing, Atividades)
+    ir(g, true);
     var t = document.querySelector("#physis-adm [data-aba='" + a.aba + "']"); if (t) t.click();
   }
   function pintarAlertas() {
@@ -4700,7 +4719,8 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
   }
   function ligarEmails() {
     var s = document.getElementById("gp-mails");
-    s.addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return; var id;
+    s.addEventListener("click", function (ev) { if (window.PhysisExtras) return;   // a caixa nova (gp-extras) cuida dos cliques
+      var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return; var id;
       if ((id = b.getAttribute("data-gm-copiar"))) { var e = (s._lista || []).filter(function (x) { return String(x.id) === id; })[0]; if (!e) return;
         var txt = L("Para: ", "To: ") + e.para + "\n" + L("Assunto: ", "Subject: ") + e.assunto + "\n\n" + e.corpo;
         (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { mailsMsg = L("E-mail copiado. Cole no seu programa de e-mail.", "E-mail copied. Paste it in your e-mail program."); pintarEmails(); }, function () { mailsMsg = L("Não foi possível copiar: abra 'Ver o texto' e copie.", "Could not copy: open 'View the text' and copy."); pintarEmails(); }); return; }
@@ -4743,7 +4763,7 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
       "<button type='button' id='gp-c-senha'>" + esc(L("Minha senha", "My password")) + "</button>" + (admin ? "<button type='button' id='gp-c-contas'>" + esc(L("Contas da equipe", "Team accounts")) + "</button>" : "") +
       "<button type='button' id='gp-c-sair'>" + esc(L("Sair", "Sign out")) + "</button>";
     menu.appendChild(cx);
-    document.getElementById("gp-c-sair").onclick = function () { fetch("/api/conta/sair", { method: "POST", body: "{}" }).then(function () { location.reload(); }); };
+    document.getElementById("gp-c-sair").onclick = function () { if (navigator.serviceWorker && navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage({ tipo: "sair" }); fetch("/api/conta/sair", { method: "POST", body: "{}" }).then(function () { location.reload(); }); };
     document.getElementById("gp-c-senha").onclick = function () { ir("contas", true); estC.modo = "senha"; pintarContas(); };
     if (admin) document.getElementById("gp-c-contas").onclick = function () { ir("contas", true); estC.modo = "contas"; pintarContas(); };
     // faixa de avisos da sincronização
@@ -4809,7 +4829,7 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
     sel.onchange = function () { var o = document.querySelector("#app select"); if (!o) return; var set = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value").set; set.call(o, sel.value); o.dispatchEvent(new Event("change", { bubbles: true })); };
     sincroniza(); setInterval(sincroniza, 500);
     setInterval(function () { var ax = document.getElementById("physis-anexo"); if (ax && ax !== document.body.lastElementChild) document.body.appendChild(ax); }, 600);
-    var idiomaAntes = null; setInterval(function () { var en = emIngles(); if (en !== idiomaAntes) { idiomaAntes = en; rotular(); if (atual === "reun") pintarReunioes(); if (atual === "docs") pintarDocs(); } }, 400);
+    var idiomaAntes = null; setInterval(function () { var en = emIngles(); if (en !== idiomaAntes) { idiomaAntes = en; rotular(); if (atual === "reun") pintarReunioes(); if (atual === "docs") pintarDocs(); if (window.PhysisExtras) { try { window.PhysisExtras.mostrar(atual); } catch (e) {} } } }, 400);
     var bm = document.createElement("button"); bm.type = "button"; bm.id = "gp-m-meus"; bm.textContent = "Meus contratos"; bm.onclick = function () { var x = document.getElementById("adm-meus"); if (x) x.click(); }; menu.appendChild(bm);
     var n = document.createElement("div"); n.className = "gp-nota"; n.textContent = "Clientes e suporte ficam na Central de clientes, uma interface separada, ainda em construção."; menu.appendChild(n);
     var f = document.querySelector(".px-faixa"); f.parentNode.insertBefore(menu, f.nextSibling);
@@ -4839,7 +4859,1031 @@ html.gp #physis-adm[data-grupo="org"] [data-aba]:not([data-aba="tar"]):not([data
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", montar); else montar();
   window.addEventListener("load", function () { setTimeout(montar, 300); });
-  window.PhysisGestaoCasca = { ir: ir };
+  window.PhysisGestaoCasca = { ir: ir, atual: function () { return atual; }, emIngles: emIngles, quem: quem, ehAdmin: ehAdmin, dizer: dizer,
+    pintarAlertas: function () { var s = document.getElementById("gp-alertas"); if (s) s._chave = ""; pintarAlertas(); } };
+})();
+</script>
+<style id="gx-estilo">
+/* 15/11/2026 · Calendário único, Eventos, Editais, Marketing e E-mails (bloco gp-extras). Mesma paleta e mesmas regras da casca. */
+html.gp:not(.gp-v-eventos) #gx-eventos, html.gp:not(.gp-v-editais) #gx-editais, html.gp:not(.gp-v-mkt) #gx-mkt{display:none}
+html.gp.gp-v-eventos main#px-conteudo, html.gp.gp-v-editais main#px-conteudo, html.gp.gp-v-mkt main#px-conteudo{display:none}
+html.gp:not(.gp-v-atv) #gx-cal-atv, html.gp:not(.gp-v-reun) #gx-cal-reun{display:none}
+html.gp #gx-cal-atv{margin:0 0 18px;padding:14px 16px;background:#FFFFFF;border:1px solid #C9D2C4;border-radius:12px;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#1C2B21}
+html.gp #gx-cal-atv h2, html.gp #gx-cal-atv h3{color:#33512F}
+html.gp .gx-cal h2, html.gp .gx-s h2{font:500 1.25em Fraunces,Georgia,serif;margin:0 0 6px}
+html.gp .gx-cal h3, html.gp .gx-s h3{font-size:1.05em;margin:14px 0 6px}
+html.gp .gx-b{font:inherit;font-weight:600;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #33512F;background:#FFFFFF;color:#33512F;cursor:pointer}
+html.gp .gx-b.gx-p, html.gp .gx-b[aria-pressed="true"], html.gp .gx-b[aria-current="true"]{background:#33512F;color:#FFFFFF}
+html.gp .gx-b:disabled{opacity:.55;cursor:not-allowed}
+html.gp .gx-b.gx-pq{min-height:36px;padding:0 10px;font-size:14px}
+html.gp .gx-c{font:inherit;min-height:44px;border:1px solid #8A9284;border-radius:8px;background:#FFFFFF;color:#1C2B21;padding:6px 10px;width:100%;box-sizing:border-box}
+html.gp textarea.gx-c{min-height:110px;resize:vertical;line-height:1.45}
+html.gp .gx-card{background:#FFFFFF;border:1px solid #C9D2C4;border-radius:12px;padding:14px 16px;margin:0 0 14px}
+html.gp .gx-grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 14px}
+html.gp .gx-rot{font-weight:600;display:block}
+html.gp .gx-aj{font-size:13.5px;color:#4A4F44;margin:2px 0 4px}
+html.gp .gx-sub{margin:0 0 12px;color:#4A4F44;max-width:780px}
+html.gp .gx-barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px}
+html.gp .gx-erro{margin:10px 0;padding:8px 12px;border-radius:8px;background:#F5E2D7;color:#7A2214}
+html.gp .gx-bom{margin:10px 0;padding:8px 12px;border-radius:8px;background:#DCEBD8;color:#1F4A1C}
+html.gp .gx-etq{display:inline-block;font-size:12.5px;font-weight:700;padding:2px 8px;border-radius:10px;background:#E3E8DF;color:#1C2B21;margin:0 4px 2px 0}
+html.gp .gx-etq.al{background:#F5E2D7;color:#7A2214} html.gp .gx-etq.ok{background:#DCEBD8;color:#1F4A1C} html.gp .gx-etq.at{background:#EFE8D6;color:#5E4408}
+html.gp .gx-lista{list-style:none;margin:0;padding:0}
+html.gp .gx-lista > li{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:8px 0;border-top:1px solid #E3E8DF}
+html.gp .gx-lista > li > .gx-tx{flex:1 1 240px;min-width:0;overflow-wrap:anywhere}
+html.gp .gx-lista label{display:flex;gap:10px;align-items:center;min-height:44px;cursor:pointer}
+html.gp .gx-lista input[type=checkbox], html.gp .gx-chk input[type=checkbox]{width:22px;height:22px;flex-shrink:0}
+html.gp .gx-chk{display:flex;gap:10px;align-items:center;min-height:44px;cursor:pointer}
+html.gp .gx-tab{width:100%;border-collapse:collapse}
+html.gp .gx-tab th, html.gp .gx-tab td{text-align:left;padding:8px;border-bottom:1px solid #C9D2C4;vertical-align:top}
+html.gp .gx-tab thead th{border-bottom:2px solid #C9D2C4;font-size:.9em}
+html.gp .gx-rolar{overflow-x:auto}
+html.gp .gx-so-leitor{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+html.gp .gx-etapas{margin:8px 0 0;padding-left:22px;display:grid;gap:8px}
+html.gp .gx-etapas li{padding-left:4px}
+html.gp .gx-pre{white-space:pre-wrap;background:#F4F6F1;border:1px solid #C9D2C4;border-radius:8px;padding:10px;font:inherit;margin:8px 0;max-height:420px;overflow:auto}
+/* calendário */
+html.gp .gx-cal table.gx-mes{border-collapse:collapse;width:100%;table-layout:fixed;margin:4px 0 10px}
+html.gp .gx-cal table.gx-mes caption{font-weight:700;text-align:left;padding:4px 0 6px;font-size:1.05em}
+html.gp .gx-cal table.gx-mes th{font-size:13px;color:#4A4F44;padding:4px 2px;text-align:center}
+html.gp .gx-cal table.gx-mes td{border:1px solid #E3E8DF;padding:0;vertical-align:top;height:66px}
+html.gp .gx-cal button.gx-dia{display:block;width:100%;height:100%;min-height:62px;padding:4px 5px;margin:0;border:0;background:transparent;color:#1C2B21;text-align:left;cursor:pointer;font:inherit;box-sizing:border-box}
+html.gp .gx-cal td.gx-fora button.gx-dia{color:#6B7266;background:#FAFBF8}
+html.gp .gx-cal td.gx-hoje{background:#EEF4EC}
+html.gp .gx-cal td.gx-hoje .gx-num{text-decoration:underline;text-underline-offset:3px}
+html.gp .gx-cal button.gx-dia[aria-pressed="true"]{box-shadow:inset 0 0 0 3px #33512F;background:#DCEBD8}
+html.gp .gx-cal button.gx-dia:focus-visible{outline:3px solid #1C2B21 !important;outline-offset:-5px !important}
+html.gp .gx-num{font-weight:700;font-size:14px}
+html.gp .gx-marcas{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}
+html.gp .gx-m{display:inline-block;font-size:11.5px;font-weight:700;padding:0 5px;border-radius:6px;line-height:17px;white-space:nowrap}
+html.gp .gx-m.atividade{background:#DCEBD8;color:#1F4A1C} html.gp .gx-m.reuniao{background:#DBE7F1;color:#1C3550}
+html.gp .gx-m.evento{background:#EFE8D6;color:#5E4408} html.gp .gx-m.prazo{background:#F5E2D7;color:#7A2214}
+html.gp .gx-m.post{background:#E9E0F0;color:#4A2A5E} html.gp .gx-m.lembrete{background:#E3E8DF;color:#1C2B21}
+html.gp .gx-legenda{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;color:#4A4F44;margin:0 0 6px;padding:0;list-style:none}
+/* e-mails */
+html.gp .gx-mail{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;align-items:start}
+html.gp .gx-pastas{display:grid;gap:4px}
+html.gp .gx-pastas .gx-b{text-align:left;display:flex;justify-content:space-between;gap:8px;align-items:center}
+html.gp .gx-msgs{list-style:none;margin:0;padding:0;border-top:1px solid #C9D2C4}
+html.gp .gx-msgs li button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;width:100%;text-align:left;font:inherit;color:#1C2B21;background:#FFFFFF;border:0;border-bottom:1px solid #E3E8DF;padding:10px 8px;min-height:56px;cursor:pointer}
+html.gp .gx-msgs li button[aria-current="true"]{background:#DCEBD8}
+html.gp .gx-msgs li button:hover{background:#F4F6F1}
+html.gp .gx-msgs .gx-de{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.gp .gx-msgs .gx-as{grid-column:1/-1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.gp .gx-grafico{width:100%;max-width:760px;height:auto;display:block}
+@media (max-width:860px){
+  html.gp .gx-mail{grid-template-columns:1fr}
+  html.gp .gx-pastas{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+  html.gp .gx-cal table.gx-mes td{height:52px}
+  html.gp .gx-cal button.gx-dia{min-height:50px;padding:3px}
+  html.gp .gx-m .gx-n{display:none}
+  html.gp #gx-cal-atv{padding:12px 10px}
+}
+</style>
+<script id="gp-extras">
+/* ══ Partes novas da Gestão Physis (15/11/2026) ══
+   1. Calendário único: o mesmo calendário aparece em Atividades, Reuniões e Eventos (mês e lista, com teclado).
+   2. Editais: só Rafaella, Erick Lopes e Marzia. Lista do servidor (editais.py) + cadastro à mão. Aceito vira proposta
+      (modelo da Physis), datas do TdR viram atividades com caixa de marcar e alertas; revisão da equipe (a mesma das
+      Propostas), aprovação final por uma pessoa responsável e, só então, "Autorizar envio".
+   3. Eventos: cadastro e busca de eventos de networking, no calendário, com lembretes.
+   4. Marketing: enquete de segunda (texto + link do WhatsApp), temas com nota por regra simples, plano da semana,
+      aprovação (Rafaella e Marzia), agenda por rede e métricas com gráfico. Sem IA externa: há um gancho para a IA local.
+   5. E-mails no estilo Outlook/Gmail: pastas, busca, rótulos, modelos e envio pela fila de saída do servidor.
+   Tudo fica em chaves "gestao-physis:..." do navegador; com o servidor, a ponte (gestao-ponte) sincroniza sozinha. */
+(function () {
+  "use strict";
+  if (document.documentElement.getAttribute("data-physis-perfil") === "cliente") return;
+
+  var K = {
+    agenda: "gestao-physis:agenda", reun: "gestao-physis:reunioes", eventos: "gestao-physis:eventos", editais: "gestao-physis:editais",
+    mktItens: "gestao-physis:mkt-conteudos", mktTemas: "gestao-physis:mkt-temas", mktModelos: "gestao-physis:mkt-modelos",
+    mktMetricas: "gestao-physis:mkt-metricas", mktEnquetes: "gestao-physis:mkt-enquetes",
+    mailRasc: "gestao-physis:mail-rascunhos", mailModelos: "gestao-physis:mail-modelos", mailRotulos: "gestao-physis:mail-rotulos"
+  };
+  var ACESSO_EDITAIS = ["rafaella", "ericklopes", "marzia"];   // decisão de 14/11/2026 (Erick = Erick Lopes; trocar aqui se for o Erick Oliveira)
+  var APROVA_MKT = ["rafaella", "marzia"];
+  var EQUIPE_PADRAO = [["rafaella","Rafaella"],["laura","Laura"],["marzia","Marzia"],["arthur","Arthur"],["ericklopes","Erick Lopes"],["ryan","Ryan"],["emerson","Emerson"],["rafael","Rafael"],["erickoliveira","Erick Oliveira"]];
+  var SRV = /^https?:$/.test(location.protocol);
+
+  /* ── utilidades ── */
+  function C() { return window.PhysisGestaoCasca || {}; }
+  function EN() { var c = C(); return c.emIngles ? c.emIngles() : false; }
+  function L(pt, en) { return EN() ? en : pt; }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function ler(k) { try { var v = JSON.parse(localStorage.getItem(k) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+  function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { dizer(L("Não coube neste navegador.", "It did not fit in this browser."), true); return false; } }
+  function existe(k) { try { return localStorage.getItem(k) !== null; } catch (e) { return true; } }
+  function novoId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function p2(n) { return (n < 10 ? "0" : "") + n; }
+  function isoDe(d) { return d.getFullYear() + "-" + p2(d.getMonth() + 1) + "-" + p2(d.getDate()); }
+  function hojeISO() { return isoDe(new Date()); }
+  function dataDe(iso) { return new Date(iso + "T12:00:00"); }
+  function somaDias(iso, n) { var d = dataDe(iso); d.setDate(d.getDate() + n); return isoDe(d); }
+  function diasAte(iso) { if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null; return Math.round((dataDe(iso) - dataDe(hojeISO())) / 864e5); }
+  function dataBr(iso) { return !iso ? "" : EN() ? iso : iso.split("-").reverse().join("/"); }
+  function segundaDe(iso) { var d = dataDe(iso); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return isoDe(d); }
+  function quando(iso) { var d = diasAte(iso); if (d === null) return ""; return d === 0 ? L("hoje", "today") : d === 1 ? L("amanhã", "tomorrow") : d > 0 ? L("em " + d + " dias", "in " + d + " days") : L("há " + (-d) + " dias", (-d) + " days ago"); }
+  var MES = { pt: ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"], en: ["January","February","March","April","May","June","July","August","September","October","November","December"] };
+  var SEM = { pt: ["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"], ptc: ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"], en: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], enc: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] };
+  function dataLonga(iso) { var d = dataDe(iso); return EN() ? SEM.en[d.getDay()] + ", " + MES.en[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() : SEM.pt[d.getDay()] + ", " + d.getDate() + " de " + MES.pt[d.getMonth()] + " de " + d.getFullYear(); }
+  function dizer(t, erro) { var c = C(); if (c.dizer) c.dizer(t, erro); }
+  function equipe() {
+    // a equipe toda (lista do painel), com os nomes que o aplicativo usar; o seletor do aplicativo pode ter só quem já usou
+    var l = EQUIPE_PADRAO.map(function (p) { return p.slice(); }), ids = l.map(function (p) { return p[0]; });
+    Array.prototype.forEach.call(document.querySelectorAll("#app select option"), function (x) { if (!x.value) return; var k = ids.indexOf(x.value); if (k >= 0) l[k][1] = x.textContent.trim(); else { l.push([x.value, x.textContent.trim()]); ids.push(x.value); } });
+    return l;
+  }
+  function dataTs(ts) { if (!ts) return ""; var d = new Date(ts); return isFinite(d) ? dataBr(isoDe(d)) : ""; }
+  function nomePessoa(id) { var p = equipe().filter(function (x) { return x[0] === id; })[0] || EQUIPE_PADRAO.filter(function (x) { return x[0] === id; })[0]; return p ? p[1] : (id || ""); }
+  function pessoaAtual() { var A = window.PhysisAdm; if (A && A.pessoaAtual) return A.pessoaAtual(); var s = document.querySelector("#app select"); return s ? s.value : ""; }
+  function ehAdmin() { var c = C(); try { return c.ehAdmin ? !!c.ehAdmin(pessoaAtual()) : false; } catch (e) { return false; } }
+  function seguro(u) { try { var x = new URL(u); return x.protocol === "https:" || x.protocol === "http:" ? x.href : ""; } catch (e) { return ""; } }
+  function link(u, txt) { var h = seguro(u); return h ? "<a href=\"" + esc(h) + "\" target='_blank' rel='noopener noreferrer'>" + esc(txt) + "<span class='gx-so-leitor'>" + esc(L(" (abre outra aba)", " (opens another tab)")) + "</span></a>" : ""; }
+  function bt(attrs, txt, prim, pq) { return "<button type='button' class='gx-b" + (prim ? " gx-p" : "") + (pq ? " gx-pq" : "") + "' " + attrs + ">" + esc(txt) + "</button>"; }
+  function campo(id, rot, controle, aj) { return "<div><label class='gx-rot' for='" + id + "'>" + esc(rot) + "</label>" + (aj ? "<div id='aj-" + id + "' class='gx-aj'>" + esc(aj) + "</div>" : "") + controle + "</div>"; }
+  function inp(id, val, tipo, extra) { return "<input id='" + id + "' class='gx-c' type='" + (tipo || "text") + "' value=\"" + esc(val == null ? "" : val) + "\"" + (extra || "") + ">"; }
+  function area(id, val, extra) { return "<textarea id='" + id + "' class='gx-c'" + (extra || "") + ">" + esc(val || "") + "</textarea>"; }
+  function sel(id, ops, val, extra) { return "<select id='" + id + "' class='gx-c'" + (extra || "") + ">" + ops.map(function (o) { return "<option value=\"" + esc(o[0]) + "\"" + (String(o[0]) === String(val == null ? "" : val) ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>"; }
+  function val(id) { var x = document.getElementById(id); return x ? (x.type === "checkbox" ? x.checked : x.value) : ""; }
+  function focar(sel) { if (!sel) return; var x = typeof sel === "string" ? (document.getElementById(sel) || document.querySelector(sel)) : sel; if (x) { try { x.focus(); } catch (e) {} } }
+  function opsPessoas(vazio) { return (vazio ? [["", vazio]] : []).concat(equipe()); }
+  function pedir(url, corpo) {
+    return fetch(url, corpo === undefined ? { cache: "no-store" } : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._status = r.status; return j; }); });
+  }
+  function msgServidor(j) {
+    if (j._status === 401) return L("Entre no servidor para usar esta parte.", "Sign in to the server to use this part.");
+    if (j._status === 404 && !j.erro) return L("O servidor ainda não tem esta rota. Peça ao Erick Oliveira para colar as rotas novas no servidor.", "The server does not have this route yet.");
+    return j.erro || L("O servidor não respondeu.", "The server did not answer.");
+  }
+  function sec(id) { garantir(); return document.getElementById(id); }
+
+  /* ══ 1. Calendário único ══ */
+  var TIPOS = {
+    atividade: ["Atividade", "Activity", "A"], reuniao: ["Reunião", "Meeting", "R"], evento: ["Evento", "Event", "E"],
+    prazo: ["Prazo", "Deadline", "P"], post: ["Publicação", "Post", "M"], lembrete: ["Lembrete", "Reminder", "L"]
+  };
+  function nomeTipo(t, n) { var x = TIPOS[t] || TIPOS.lembrete; var b = L(x[0], x[1]); return n > 1 ? (EN() ? b + "s" : b.replace(/ão$/, "ões").replace(/([^s])$/, "$1s")) : b; }
+  var REDES = [["instagram", "Instagram @physisengineering", "https://www.instagram.com/physisengineering/"], ["linkedin", "LinkedIn physis-engineering", "https://www.linkedin.com/company/physis-engineering/"],
+    ["site", "Site www.physisengineering.com", "https://www.physisengineering.com"], ["youtube", L("YouTube (vídeo curto)", "YouTube (short video)"), ""]];
+  function nomeRede(r) { var x = REDES.filter(function (y) { return y[0] === r; })[0]; return x ? x[1].split(" ")[0] : r; }
+
+  function entradas() {
+    var out = [];
+    ler(K.agenda).forEach(function (a) { if (a.data) out.push({ id: "ag-" + a.id, ref: a.id, fonte: "agenda", data: a.data, hora: a.hora || "", tipo: TIPOS[a.tipo] ? a.tipo : "atividade", titulo: a.titulo || "", pessoa: a.pessoa || "", feito: !!a.feito, ir: a.origem || "" }); });
+    ler(K.reun).forEach(function (r) { if (r.data) out.push({ id: "re-" + r.id, fonte: "reun", data: r.data, hora: "", tipo: "reuniao", titulo: r.titulo || L("Reunião", "Meeting"), ir: "reun" }); });
+    ler(K.eventos).forEach(function (e) {
+      if (!e.noCalendario || !e.inicio) return;
+      var fim = e.fim && e.fim >= e.inicio ? e.fim : e.inicio, d = e.inicio, n = 0;
+      while (d <= fim && n < 31) { out.push({ id: "ev-" + e.id + "-" + n, fonte: "eventos", data: d, hora: n === 0 ? (e.hora || "") : "", tipo: "evento", titulo: e.nome + (fim !== e.inicio ? L(" (dia " + (n + 1) + ")", " (day " + (n + 1) + ")") : ""), ir: "eventos" }); d = somaDias(d, 1); n++; }
+      if (e.inscricao) out.push({ id: "evi-" + e.id, fonte: "eventos", data: e.inscricao, hora: "", tipo: "prazo", titulo: L("Inscrição: ", "Registration: ") + e.nome, ir: "eventos" });
+    });
+    var A = window.PhysisAdm;
+    if (A && A.lerLista) { try { A.lerLista("marcos").forEach(function (m) { if (m.data && m.situacao !== "feito") out.push({ id: "mc-" + m.id, fonte: "marcos", data: m.data, hora: "", tipo: "prazo", titulo: m.texto + (m.projeto ? " · " + m.projeto : ""), pessoa: m.dono || "", ir: "org" }); }); } catch (e) {} }
+    ler(K.mktItens).forEach(function (c) { if (c.data && (c.estado === "agendado" || c.estado === "publicado")) out.push({ id: "mk-" + c.id, fonte: "mkt", data: c.data, hora: c.hora || "", tipo: "post", titulo: (c.redes || []).map(nomeRede).join(" + ") + ": " + c.titulo, feito: c.estado === "publicado", ir: "mkt" }); });
+    return out.sort(function (a, b) { return (a.data + (a.hora || "99")).localeCompare(b.data + (b.hora || "99")); });
+  }
+
+  var estCal = {};
+  function stCal(id) { return estCal[id] || (estCal[id] = { dia: hojeISO(), modo: "mes", form: false, minhas: false, erro: "" }); }
+  function rotuloDia(iso, es) {
+    var cont = {}; es.forEach(function (e) { cont[e.tipo] = (cont[e.tipo] || 0) + 1; });
+    var partes = Object.keys(cont).map(function (t) { return cont[t] + " " + nomeTipo(t, cont[t]).toLowerCase(); });
+    return dataLonga(iso) + (iso === hojeISO() ? L(", hoje", ", today") : "") + ": " + (partes.length ? partes.join(", ") : L("nada marcado", "nothing scheduled"));
+  }
+  function marcas(es) {
+    var cont = {}; es.forEach(function (e) { cont[e.tipo] = (cont[e.tipo] || 0) + 1; });
+    return Object.keys(cont).length ? "<span class='gx-marcas' aria-hidden='true'>" + Object.keys(TIPOS).filter(function (t) { return cont[t]; }).map(function (t) { return "<span class='gx-m " + t + "'>" + TIPOS[t][2] + "<span class='gx-n'>" + (cont[t] > 1 ? "·" + cont[t] : "") + "</span></span>"; }).join("") + "</span>" : "";
+  }
+  function legenda() { return "<ul class='gx-legenda' aria-label='" + esc(L("Legenda das marcas", "Marker legend")) + "'>" + Object.keys(TIPOS).map(function (t) { return "<li><span class='gx-m " + t + "' aria-hidden='true'>" + TIPOS[t][2] + "</span> " + esc(nomeTipo(t)) + "</li>"; }).join("") + "</ul>"; }
+  function itemCal(e, cid) {
+    var tx = esc(e.titulo) + (e.hora ? " · " + esc(e.hora) : "") + (e.pessoa ? " · <span class='gx-aj'>" + esc(nomePessoa(e.pessoa)) + "</span>" : "");
+    var marcavel = e.fonte === "agenda" && (e.tipo === "atividade" || e.tipo === "lembrete");
+    var corpo = marcavel ? "<label><input type='checkbox' data-cal-feito='" + esc(e.ref) + "'" + (e.feito ? " checked" : "") + " id='" + cid + "-fe-" + esc(e.ref) + "'> <span" + (e.feito ? " style='text-decoration:line-through'" : "") + ">" + tx + "</span></label>" : "<span>" + tx + (e.feito ? " · " + esc(L("feito", "done")) : "") + "</span>";
+    var destino = { reun: L("Reuniões", "Meetings"), eventos: L("Eventos", "Events"), editais: L("Editais", "Calls"), mkt: "Marketing", org: L("Projetos", "Projects") }[e.ir];
+    return "<li><span class='gx-m " + e.tipo + "'>" + esc(nomeTipo(e.tipo)) + "</span><span class='gx-tx'>" + corpo + "</span>" +
+      (destino && !(e.ir === "editais" && ACESSO_EDITAIS.indexOf(pessoaAtual()) < 0) ? bt("data-cal-ir='" + e.ir + "' aria-label=\"" + esc(L("Abrir em ", "Open in ") + destino + ": " + e.titulo) + "\"", destino, false, true) : "") +
+      (e.fonte === "agenda" ? bt("data-cal-apagar='" + esc(e.ref) + "' aria-label=\"" + esc(L("Tirar do calendário: ", "Remove from calendar: ") + e.titulo) + "\"", L("Tirar", "Remove"), false, true) : "") + "</li>";
+  }
+  function pintarCal(cid, foco) {
+    var box = document.getElementById(cid); if (!box) return;
+    var st = stCal(cid), tudo = entradas(), porDia = {}, hj = hojeISO();
+    tudo.forEach(function (e) { (porDia[e.data] = porDia[e.data] || []).push(e); });
+    var ano = +st.dia.slice(0, 4), mes = +st.dia.slice(5, 7) - 1, prim = new Date(ano, mes, 1, 12), nDias = new Date(ano, mes + 1, 0, 12).getDate();
+    var semanas = Math.ceil((prim.getDay() + nDias) / 7), ini = new Date(ano, mes, 1 - prim.getDay(), 12);
+    var h = "<h2 id='" + cid + "-h'>" + esc(L("Calendário da equipe", "Team calendar")) + "</h2>" +
+      "<p class='gx-sub'>" + esc(L("Um calendário só, o mesmo em Atividades, Reuniões e Eventos: atividades, reuniões, eventos, prazos e publicações. No mês, use as setas do teclado para andar pelos dias; Page Up e Page Down trocam o mês.", "One calendar, the same in Activities, Meetings and Events. In the month view, use the arrow keys to move between days; Page Up and Page Down change the month.")) + "</p>" +
+      "<div class='gx-barra'>" + bt("data-cal='ant'", "‹ " + L("Mês anterior", "Previous month")) + bt("data-cal='hoje'", L("Hoje", "Today")) + bt("data-cal='prox'", L("Próximo mês", "Next month") + " ›") +
+      "<span role='group' aria-label='" + esc(L("Jeito de ver", "View")) + "' class='gx-barra' style='margin:0'>" + bt("data-cal='mes' aria-pressed='" + (st.modo === "mes") + "'", L("Mês", "Month")) + bt("data-cal='lista' aria-pressed='" + (st.modo === "lista") + "'", L("Lista dos próximos dias", "Upcoming list")) + "</span></div>" + legenda();
+    if (st.modo === "mes") {
+      h += "<div class='gx-rolar'><table class='gx-mes'><caption>" + esc((EN() ? MES.en[mes] : MES.pt[mes].replace(/^./, function (c) { return c.toUpperCase(); })) + " " + ano) + "</caption><thead><tr>" +
+        [0, 1, 2, 3, 4, 5, 6].map(function (k) { return "<th scope='col'><abbr title='" + esc(EN() ? SEM.en[k] : SEM.pt[k]) + "' style='text-decoration:none'>" + esc(EN() ? SEM.enc[k] : SEM.ptc[k]) + "</abbr></th>"; }).join("") + "</tr></thead><tbody>";
+      for (var w = 0; w < semanas; w++) {
+        h += "<tr>";
+        for (var k = 0; k < 7; k++) {
+          var d = new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + w * 7 + k, 12), iso = isoDe(d), es = porDia[iso] || [], marcado = iso === st.dia;
+          h += "<td class='" + (d.getMonth() !== mes ? "gx-fora " : "") + (iso === hj ? "gx-hoje" : "") + "'><button type='button' class='gx-dia' data-dia='" + iso + "' tabindex='" + (marcado ? "0" : "-1") + "' aria-pressed='" + marcado + "' aria-label=\"" + esc(rotuloDia(iso, es)) + "\"><span class='gx-num'>" + d.getDate() + "</span>" + marcas(es) + "</button></td>";
+        }
+        h += "</tr>";
+      }
+      h += "</tbody></table></div><h3 id='" + cid + "-dia'>" + esc(dataLonga(st.dia)) + "</h3>";
+      var doDia = porDia[st.dia] || [];
+      h += doDia.length ? "<ul class='gx-lista' aria-labelledby='" + cid + "-dia'>" + doDia.map(function (e) { return itemCal(e, cid); }).join("") + "</ul>" : "<p class='gx-aj'>" + esc(L("Nada marcado neste dia.", "Nothing on this day.")) + "</p>";
+    } else {
+      var fim = somaDias(hj, 60), atrasadas = tudo.filter(function (e) { return e.data < hj && e.fonte === "agenda" && !e.feito && (e.tipo === "atividade" || e.tipo === "lembrete"); }),
+        prox = tudo.filter(function (e) { return e.data >= hj && e.data <= fim; }), grupos = {};
+      if (atrasadas.length) h += "<h3>" + esc(L("Atrasadas", "Overdue")) + " (" + atrasadas.length + ")</h3><ul class='gx-lista'>" + atrasadas.map(function (e) { return itemCal(e, cid); }).join("") + "</ul>";
+      prox.forEach(function (e) { (grupos[e.data] = grupos[e.data] || []).push(e); });
+      h += Object.keys(grupos).length ? Object.keys(grupos).sort().map(function (d) { return "<h3>" + esc(dataLonga(d)) + " · " + esc(quando(d)) + "</h3><ul class='gx-lista'>" + grupos[d].map(function (e) { return itemCal(e, cid); }).join("") + "</ul>"; }).join("")
+        : "<p class='gx-aj'>" + esc(L("Nada marcado nos próximos 60 dias.", "Nothing in the next 60 days.")) + "</p>";
+    }
+    // anotar
+    h += "<div style='margin-top:12px'>" + bt("data-cal='novo' aria-expanded='" + !!st.form + "' aria-controls='" + cid + "-form'", st.form ? L("Fechar a anotação", "Close") : L("Anotar no calendário", "Add to calendar"), !st.form) + "</div>";
+    if (st.form) {
+      h += "<div id='" + cid + "-form' class='gx-card' style='margin-top:10px;background:#F4F6F1'><div class='gx-grade'>" +
+        campo(cid + "-f-tit", L("O que é (obrigatório)", "What (required)"), inp(cid + "-f-tit", "", "text", " aria-required='true'")) +
+        campo(cid + "-f-data", L("Data", "Date"), inp(cid + "-f-data", st.dia, "date")) +
+        campo(cid + "-f-hora", L("Hora (se tiver)", "Time (optional)"), inp(cid + "-f-hora", "", "time")) +
+        campo(cid + "-f-tipo", L("Tipo", "Type"), sel(cid + "-f-tipo", [["atividade", nomeTipo("atividade") + L(" (com caixa de marcar)", " (with checkbox)")], ["lembrete", nomeTipo("lembrete")], ["prazo", nomeTipo("prazo")], ["reuniao", nomeTipo("reuniao")], ["evento", nomeTipo("evento")]], "atividade")) +
+        campo(cid + "-f-pes", L("De quem", "Whose"), sel(cid + "-f-pes", opsPessoas(L("(da equipe toda)", "(whole team)")), pessoaAtual())) +
+        campo(cid + "-f-av", L("Avisar quantos dias antes", "Remind how many days before"), inp(cid + "-f-av", "3", "number", " min='0' max='60' inputmode='numeric'")) +
+        "</div>" + (st.erro ? "<p role='alert' class='gx-erro'>" + esc(st.erro) + "</p>" : "") +
+        "<div class='gx-barra' style='margin-top:10px'>" + bt("data-cal='guardar'", L("Guardar no calendário", "Save to calendar"), true) + "</div></div>";
+    }
+    if (cid === "gx-cal-atv") h += checklist(tudo, st);
+    box.innerHTML = h;
+    focar(foco);
+  }
+  function checklist(tudo, st) {
+    var eu = pessoaAtual(), ativ = tudo.filter(function (e) { return e.fonte === "agenda" && (e.tipo === "atividade" || e.tipo === "lembrete") && (!st.minhas || e.pessoa === eu); });
+    var afazer = ativ.filter(function (e) { return !e.feito; }), feitas = ativ.filter(function (e) { return e.feito; });
+    var li = function (e) { var d = diasAte(e.data); return "<li><span class='gx-etq " + (d < 0 ? "al" : d <= 3 ? "at" : "") + "'>" + esc(dataBr(e.data)) + " · " + esc(quando(e.data)) + "</span><span class='gx-tx'><label><input type='checkbox' data-cal-feito='" + esc(e.ref) + "' id='gx-cal-atv-ck-" + esc(e.ref) + "'" + (e.feito ? " checked" : "") + "> <span>" + esc(e.titulo) + (e.pessoa ? " · " + esc(nomePessoa(e.pessoa)) : "") + "</span></label></span></li>"; };
+    return "<h2 id='gx-cal-atv-ck' style='margin-top:18px'>" + esc(L("Atividades com data", "Dated activities")) + " (" + afazer.length + ")</h2>" +
+      "<label class='gx-chk'><input type='checkbox' data-cal-minhas" + (st.minhas ? " checked" : "") + "> " + esc(L("Mostrar só as minhas", "Show only mine")) + "</label>" +
+      (afazer.length ? "<ul class='gx-lista' aria-labelledby='gx-cal-atv-ck'>" + afazer.map(li).join("") + "</ul>" : "<p class='gx-aj'>" + esc(L("Nenhuma atividade aberta.", "No open activity.")) + "</p>") +
+      (feitas.length ? "<details><summary style='cursor:pointer;min-height:44px;display:flex;align-items:center'>" + esc(L("Feitas", "Done")) + " (" + feitas.length + ")</summary><ul class='gx-lista'>" + feitas.slice(-30).reverse().map(li).join("") + "</ul></details>" : "");
+  }
+  function mudarAgenda(id, fn) { var l = ler(K.agenda), mudou = false; l = l.map(function (a) { if (a.id === id) { mudou = true; return fn(Object.assign({}, a)) || a; } return a; }); if (mudou) gravar(K.agenda, l); return mudou; }
+  function repintarCalendarios() { ["gx-cal-atv", "gx-cal-reun", "gx-cal-ev"].forEach(function (c) { if (document.getElementById(c)) pintarCal(c); }); var c = C(); if (c.pintarAlertas) c.pintarAlertas(); }
+  function ligarCal(box) {
+    var cid = box.id;
+    box.addEventListener("click", function (ev) {
+      var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return; var st = stCal(cid), a;
+      if ((a = b.getAttribute("data-dia"))) { st.dia = a; return pintarCal(cid, "#" + cid + " [data-dia='" + a + "']"); }
+      if ((a = b.getAttribute("data-cal-ir"))) { var c = C(); if (c.ir) c.ir(a, true); return; }
+      if ((a = b.getAttribute("data-cal-apagar"))) { var it = ler(K.agenda).filter(function (x) { return x.id === a; })[0]; if (!it || !window.confirm(L("Tirar do calendário: “", "Remove from the calendar: “") + it.titulo + "”?")) return; gravar(K.agenda, ler(K.agenda).filter(function (x) { return x.id !== a; })); repintarCalendarios(); dizer(L("Tirado do calendário.", "Removed."), false); return focar("#" + cid + "-h"); }
+      a = b.getAttribute("data-cal"); if (!a) return;
+      if (a === "ant" || a === "prox") { var d = dataDe(st.dia), dia = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + (a === "ant" ? -1 : 1)); d.setDate(Math.min(dia, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate())); st.dia = isoDe(d); return pintarCal(cid, "#" + cid + " [data-cal='" + a + "']"); }
+      if (a === "hoje") { st.dia = hojeISO(); return pintarCal(cid, st.modo === "mes" ? "#" + cid + " [data-dia='" + st.dia + "']" : "#" + cid + " [data-cal='hoje']"); }
+      if (a === "mes" || a === "lista") { st.modo = a; return pintarCal(cid, "#" + cid + " [data-cal='" + a + "']"); }
+      if (a === "novo") { st.form = !st.form; st.erro = ""; return pintarCal(cid, st.form ? cid + "-f-tit" : "#" + cid + " [data-cal='novo']"); }
+      if (a === "guardar") {
+        var tit = String(val(cid + "-f-tit")).trim(), data = val(cid + "-f-data");
+        if (!tit || !data) { st.erro = !tit ? L("Escreva o que é.", "Write what it is.") : L("Escolha a data.", "Pick the date."); var guard = { t: tit, d: data, h: val(cid + "-f-hora"), ti: val(cid + "-f-tipo"), p: val(cid + "-f-pes") }; pintarCal(cid); document.getElementById(cid + "-f-tit").value = guard.t; document.getElementById(cid + "-f-data").value = guard.d || st.dia; document.getElementById(cid + "-f-hora").value = guard.h; document.getElementById(cid + "-f-tipo").value = guard.ti; document.getElementById(cid + "-f-pes").value = guard.p; return focar(!tit ? cid + "-f-tit" : cid + "-f-data"); }
+        var l = ler(K.agenda); l.push({ id: novoId(), data: data, hora: val(cid + "-f-hora"), titulo: tit, tipo: val(cid + "-f-tipo"), pessoa: val(cid + "-f-pes"), avisarDias: Math.max(0, Math.min(60, parseInt(val(cid + "-f-av"), 10) || 0)), feito: false, criadoPor: pessoaAtual(), criadoEm: new Date().toISOString() });
+        gravar(K.agenda, l); st.form = false; st.erro = ""; st.dia = data; repintarCalendarios(); dizer(L("Guardado no calendário: ", "Saved to the calendar: ") + tit, false); return focar("#" + cid + " [data-cal='novo']");
+      }
+    });
+    box.addEventListener("change", function (ev) {
+      var t = ev.target, id = t.getAttribute && t.getAttribute("data-cal-feito");
+      if (t.hasAttribute && t.hasAttribute("data-cal-minhas")) { stCal(cid).minhas = t.checked; return pintarCal(cid, "#" + cid + " [data-cal-minhas]"); }
+      if (!id) return; var feito = t.checked, foco = t.id;
+      mudarAgenda(id, function (a) { a.feito = feito; a.feitoPor = feito ? pessoaAtual() : ""; a.feitoEm = feito ? new Date().toISOString() : ""; return a; });
+      repintarCalendarios(); focar(foco); dizer(feito ? L("Marcada como feita.", "Marked as done.") : L("Marcada como não feita.", "Marked as not done."), false);
+    });
+    box.addEventListener("keydown", function (ev) {
+      var b = ev.target; if (!b.classList || !b.classList.contains("gx-dia")) return;
+      var st = stCal(cid), d = dataDe(b.getAttribute("data-dia")), mov = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[ev.key];
+      if (mov) d.setDate(d.getDate() + mov);
+      else if (ev.key === "Home") d.setDate(d.getDate() - d.getDay());
+      else if (ev.key === "End") d.setDate(d.getDate() + 6 - d.getDay());
+      else if (ev.key === "PageUp" || ev.key === "PageDown") { var dia = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + (ev.key === "PageUp" ? -1 : 1)); d.setDate(Math.min(dia, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate())); }
+      else return;
+      ev.preventDefault(); st.dia = isoDe(d); pintarCal(cid, "#" + cid + " [data-dia='" + st.dia + "']");
+    });
+  }
+
+  /* ── alertas: entram na mesma lista do topo de Atividades (PhysisAdm.alertas) ── */
+  function paraQuem(lista) { var eu = pessoaAtual(); return lista.indexOf(eu) >= 0 ? eu : (lista[0] || null); }   // um alerta só, para a pessoa certa
+  function meusAlertas() {
+    var out = [], hj = hojeISO(), add = function (nivel, tipo, texto, dias, aba, pessoa) { out.push({ nivel: nivel, tipo: tipo, texto: texto, dias: dias, aba: aba, pessoa: pessoa || null }); };
+    ler(K.agenda).forEach(function (a) {
+      if (a.feito || !a.data || (a.tipo !== "atividade" && a.tipo !== "lembrete" && a.tipo !== "prazo")) return;
+      var d = diasAte(a.data), av = a.avisarDias != null ? +a.avisarDias : 3; if (d === null) return;
+      if (d < 0 && a.tipo !== "lembrete") add("al", L("Atividade atrasada", "Overdue activity"), a.titulo, d, "atv", a.pessoa);
+      else if (d >= 0 && d <= av) add(d <= 1 ? "al" : "at", a.tipo === "lembrete" ? L("Lembrete", "Reminder") : L("Atividade com prazo", "Activity due"), a.titulo, d, "atv", a.pessoa);
+    });
+    ler(K.eventos).forEach(function (e) {
+      var av = e.lembrete != null ? +e.lembrete : 7, quemV = (e.quem || []).length ? e.quem : [null];
+      var di = diasAte(e.inscricao); if (di !== null && di >= 0 && di <= av) add(di <= 2 ? "al" : "at", L("Inscrição de evento fecha", "Event registration closes"), e.nome, di, "eventos", paraQuem(quemV));
+      var de = diasAte(e.inicio); if (e.noCalendario && de !== null && de >= 0 && de <= av) add("at", L("Evento chegando", "Event coming up"), e.nome + (e.local ? " · " + e.local : ""), de, "eventos", paraQuem(quemV));
+    });
+    if (ACESSO_EDITAIS.indexOf(pessoaAtual()) >= 0 || ehAdmin()) ler(K.editais).forEach(function (it) {
+      if (it.estado !== "aceito" || (it.enviado && it.enviado.em)) return;
+      var e = etapaEdital(it), d = diasAte(it.prazo);
+      if (d !== null && d >= 0 && d <= 14) add(d <= 3 ? "al" : "at", L("Edital: prazo de envio", "Call: submission deadline"), it.titulo, d, "editais", paraQuem(ACESSO_EDITAIS));
+      if (e.passo === "revisao" && e.faltam.length) add("at", L("Edital: falta revisar a proposta", "Call: proposal review pending"), it.titulo + " · " + e.faltam.map(nomePessoa).join(", "), null, "editais", paraQuem(e.faltam));
+      if (e.passo === "aprovar") add("al", L("Edital: aprovação final", "Call: final approval"), it.titulo, null, "editais", it.responsavel || "rafaella");
+      if (e.passo === "autorizar") add("al", L("Edital: autorizar o envio", "Call: authorise submission"), it.titulo, null, "editais", it.responsavel || "rafaella");
+    });
+    ler(K.mktItens).forEach(function (c) {
+      if (c.estado !== "aguardando") return; var falta = APROVA_MKT.filter(function (p) { return !(c.aprovacoes || {})[p]; });
+      if (falta.length) add("at", L("Marketing: aprovar conteúdo", "Marketing: approve content"), c.titulo + " · " + falta.map(nomePessoa).join(", "), diasAte(c.dataSugerida), "mkt", paraQuem(falta));
+    });
+    if (new Date().getDay() === 1 && !ler(K.mktEnquetes).some(function (q) { return q.semana === segundaDe(hj); })) add("at", L("Marketing: enquete de segunda", "Marketing: Monday poll"), L("Mande a enquete da semana no grupo da equipe.", "Send this week's poll to the team group."), 0, "mkt", paraQuem(APROVA_MKT));
+    return out;
+  }
+  function ligarAlertas() {
+    var A = window.PhysisAdm; if (!A || A._gx || !A.alertas) return; A._gx = true;
+    var orig = A.alertas, origTx = A.textosAlerta;
+    A.alertas = function () { var l = orig() || []; try { l = l.concat(meusAlertas()); } catch (e) {} return l.sort(function (a, b) { return (a.nivel === b.nivel ? 0 : a.nivel === "al" ? -1 : 1) || ((a.dias === null ? 9999 : a.dias) - (b.dias === null ? 9999 : b.dias)); }); };
+    A.textosAlerta = function () { var t = origTx ? origTx() : { rotulo: {} }; t.rotulo = Object.assign({}, t.rotulo, { atv: L("Calendário", "Calendar"), eventos: L("Eventos", "Events"), editais: L("Editais", "Calls"), mkt: "Marketing" }); return t; };
+  }
+
+  /* ══ 3. Eventos ══ */
+  var AREAS = [["energia", "Energia e solar", "Energy and solar"], ["agua", "Água e saneamento", "Water"], ["clima", "Clima e carbono", "Climate and carbon"], ["agro", "Agro e SbN", "Agriculture and NbS"],
+    ["inovacao", "Inovação, IoT e dados", "Innovation, IoT and data"], ["sustentabilidade", "Sustentabilidade e ESG", "Sustainability and ESG"], ["construcao", "Construção e climatização", "Buildings and HVAC"], ["capacitacao", "Cursos e capacitação", "Training"], ["outra", "Outra", "Other"]];
+  function nomeArea(a) { var x = AREAS.filter(function (y) { return y[0] === a; })[0]; return x ? L(x[1], x[2]) : (a || ""); }
+  var ONDE_PROCURAR = [
+    ["Sympla (eventos no Brasil)", "https://www.sympla.com.br/eventos?s=sustentabilidade"], ["Eventbrite", "https://www.eventbrite.com.br/d/brazil/sustainability/"],
+    ["ABRAVA (climatização)", "https://abrava.com.br/"], ["ABSOLAR (energia solar)", "https://www.absolar.org.br/"], ["Change Now", "https://www.changenow.world/"],
+    ["UNFCCC (agenda do clima)", "https://unfccc.int/calendar"], ["IEA (energia, internacional)", "https://www.iea.org/events"], ["10times (feiras no mundo)", "https://10times.com/brazil/environment"]
+  ];
+  var estEv = { edit: null, erro: "", filtro: "proximos", abr: "", area: "", busca: "", srv: null, carregou: false, buscando: false, srvErro: "" };
+  function pintarEventos(foco) {
+    var s = sec("gx-eventos"); if (!s) return;
+    if (!estEv.carregou && SRV) { estEv.carregou = true; pedir("/api/eventos").then(function (j) { if (j.ok) estEv.srv = j; else estEv.srvErro = msgServidor(j); if (C().atual && C().atual() === "eventos") pintarEventos(); }).catch(function () {}); }
+    var e = estEv.edit || {}, hj = hojeISO(), todos = ler(K.eventos), b = estEv.busca.toLowerCase();
+    var vis = todos.filter(function (x) { var fim = x.fim || x.inicio || ""; return (estEv.filtro === "todos" || (estEv.filtro === "proximos" ? (!fim || fim >= hj) : (fim && fim < hj))) && (!estEv.abr || x.abrangencia === estEv.abr) && (!estEv.area || x.area === estEv.area) && (!b || JSON.stringify(x).toLowerCase().indexOf(b) >= 0); })
+      .sort(function (x, y) { return String(x.inicio || "9").localeCompare(String(y.inicio || "9")); });
+    var marcados = e.quem || [];
+    var h = "<h1 id='gx-h-eventos'>" + esc(L("Eventos e networking", "Events and networking")) + "</h1><p class='gx-sub'>" + esc(L("Feiras, congressos e encontros, no Brasil e fora, nas áreas da Physis. Cadastre, ponha no calendário e receba lembrete antes da inscrição e do evento.", "Fairs, conferences and meetups in Physis areas. Register, add to the calendar and get reminders.")) + "</p>" +
+      "<div id='gx-cal-ev' class='gx-card gx-cal'></div>" +
+      "<section class='gx-card gx-s' aria-labelledby='gx-ev-hf'><h2 id='gx-ev-hf'>" + esc(estEv.edit && estEv.edit.id ? L("Editar evento", "Edit event") : L("Cadastrar evento", "Add event")) + "</h2><div class='gx-grade'>" +
+      campo("gx-ev-nome", L("Nome do evento (obrigatório)", "Event name (required)"), inp("gx-ev-nome", e.nome, "text", " aria-required='true'")) +
+      campo("gx-ev-area", L("Área", "Area"), sel("gx-ev-area", AREAS.map(function (a) { return [a[0], L(a[1], a[2])]; }), e.area || "sustentabilidade")) +
+      campo("gx-ev-abr", L("Abrangência", "Scope"), sel("gx-ev-abr", [["nacional", L("Nacional", "National")], ["internacional", L("Internacional", "International")]], e.abrangencia || "nacional")) +
+      campo("gx-ev-forma", L("Formato", "Format"), sel("gx-ev-forma", [["presencial", L("Presencial", "In person")], ["online", "Online"], ["hibrido", L("Híbrido", "Hybrid")]], e.formato || "presencial")) +
+      campo("gx-ev-local", L("Cidade e país, ou link da sala", "City and country, or room link"), inp("gx-ev-local", e.local)) +
+      campo("gx-ev-ini", L("Começa em", "Starts"), inp("gx-ev-ini", e.inicio, "date")) + campo("gx-ev-fim", L("Termina em", "Ends"), inp("gx-ev-fim", e.fim, "date")) +
+      campo("gx-ev-hora", L("Hora de início", "Start time"), inp("gx-ev-hora", e.hora, "time")) +
+      campo("gx-ev-insc", L("Inscrição até", "Register by"), inp("gx-ev-insc", e.inscricao, "date")) +
+      campo("gx-ev-link", L("Página do evento (https://…)", "Event page (https://…)"), inp("gx-ev-link", e.link, "url", " inputmode='url'")) +
+      campo("gx-ev-custo", L("Custo (inscrição, viagem)", "Cost"), inp("gx-ev-custo", e.custo)) +
+      campo("gx-ev-lem", L("Lembrar quantos dias antes", "Remind days before"), inp("gx-ev-lem", e.lembrete == null ? 7 : e.lembrete, "number", " min='0' max='90' inputmode='numeric'")) +
+      "</div><fieldset style='border:0;padding:0;margin:10px 0 0'><legend class='gx-rot'>" + esc(L("Quem vai (recebe o lembrete)", "Who goes (gets the reminder)")) + "</legend><div style='display:flex;flex-wrap:wrap;gap:0 16px'>" +
+      equipe().map(function (p) { return "<label class='gx-chk'><input type='checkbox' data-ev-quem='" + esc(p[0]) + "'" + (marcados.indexOf(p[0]) >= 0 ? " checked" : "") + "> " + esc(p[1]) + "</label>"; }).join("") + "</div></fieldset>" +
+      "<div style='margin-top:8px'>" + campo("gx-ev-obs", L("Por que ir, quem encontrar, observações", "Why go, who to meet, notes"), area("gx-ev-obs", e.obs, " style='min-height:70px'")) + "</div>" +
+      "<label class='gx-chk'><input type='checkbox' id='gx-ev-cal'" + (e.noCalendario === false ? "" : " checked") + "> " + esc(L("Pôr no calendário da equipe", "Add to the team calendar")) + "</label>" +
+      (estEv.erro ? "<p role='alert' class='gx-erro'>" + esc(estEv.erro) + "</p>" : "") +
+      "<div class='gx-barra' style='margin-top:8px'>" + bt("id='gx-ev-salvar'", estEv.edit && estEv.edit.id ? L("Salvar alteração", "Save change") : L("Cadastrar evento", "Add event"), true) + (estEv.edit ? bt("id='gx-ev-cancelar'", L("Cancelar", "Cancel")) : "") + "</div></section>";
+    h += "<section class='gx-card gx-s' aria-labelledby='gx-ev-hl'><h2 id='gx-ev-hl'>" + esc(L("Eventos cadastrados", "Saved events")) + " (" + vis.length + ")</h2><div class='gx-grade' style='margin-bottom:10px'>" +
+      campo("gx-ev-ff", L("Quando", "When"), sel("gx-ev-ff", [["proximos", L("Próximos", "Upcoming")], ["passados", L("Já passaram", "Past")], ["todos", L("Todos", "All")]], estEv.filtro)) +
+      campo("gx-ev-fa", L("Abrangência", "Scope"), sel("gx-ev-fa", [["", L("Nacionais e internacionais", "All")], ["nacional", L("Nacionais", "National")], ["internacional", L("Internacionais", "International")]], estEv.abr)) +
+      campo("gx-ev-far", L("Área", "Area"), sel("gx-ev-far", [["", L("Todas", "All")]].concat(AREAS.map(function (a) { return [a[0], L(a[1], a[2])]; })), estEv.area)) +
+      campo("gx-ev-fb", L("Procurar", "Search"), inp("gx-ev-fb", estEv.busca, "search")) + "</div>" +
+      (vis.length ? "<ul class='gx-lista'>" + vis.map(function (x) {
+        return "<li><span class='gx-tx'><strong>" + esc(x.nome) + "</strong><br><span class='gx-aj'>" + esc([x.inicio ? dataBr(x.inicio) + (x.fim && x.fim !== x.inicio ? " a " + dataBr(x.fim) : "") + " · " + quando(x.inicio) : L("sem data", "no date"), x.local, nomeArea(x.area), x.abrangencia === "internacional" ? L("internacional", "international") : L("nacional", "national"), (x.quem || []).map(nomePessoa).join(", ")].filter(Boolean).join(" · ")) + "</span>" +
+          (x.inscricao ? "<br><span class='gx-etq " + (diasAte(x.inscricao) < 0 ? "" : diasAte(x.inscricao) <= 7 ? "al" : "at") + "'>" + esc(L("Inscrição até ", "Register by ") + dataBr(x.inscricao)) + "</span>" : "") + (x.link ? " " + link(x.link, L("Página do evento", "Event page")) : "") + "</span>" +
+          bt("data-ev-cal='" + esc(x.id) + "' aria-pressed='" + !!x.noCalendario + "' aria-label=\"" + esc(L("No calendário: ", "In calendar: ") + x.nome) + "\"", x.noCalendario ? L("No calendário", "In calendar") : L("Pôr no calendário", "Add to calendar"), false, true) +
+          bt("data-ev-ed='" + esc(x.id) + "' aria-label=\"" + esc(L("Editar ", "Edit ") + x.nome) + "\"", L("Editar", "Edit"), false, true) +
+          bt("data-ev-x='" + esc(x.id) + "' aria-label=\"" + esc(L("Apagar ", "Delete ") + x.nome) + "\"", L("Apagar", "Delete"), false, true) + "</li>"; }).join("") + "</ul>"
+        : "<p class='gx-aj'>" + esc(todos.length ? L("Nenhum evento com esse filtro.", "No event matches.") : L("Nenhum evento cadastrado ainda.", "No events yet.")) + "</p>") + "</section>";
+    // procurar
+    var achados = estEv.srv ? (estEv.srv.itens || []) : [], jaTem = {}; todos.forEach(function (x) { if (x.origemId) jaTem[x.origemId] = true; });
+    h += "<section class='gx-card gx-s' aria-labelledby='gx-ev-hp'><h2 id='gx-ev-hp'>" + esc(L("Procurar eventos", "Find events")) + "</h2>" +
+      "<p class='gx-sub'>" + esc(L("O servidor da Physis lê agendas públicas de eventos e traz o que parece ser das nossas áreas. Confira sempre na página do evento.", "The Physis server reads public event listings. Always check the event page.")) + "</p>" +
+      (SRV ? "<div class='gx-barra'>" + bt("id='gx-ev-buscar'" + (estEv.buscando ? " disabled" : ""), estEv.buscando ? L("Buscando…", "Searching…") : L("Buscar agora", "Search now"), true) +
+        (estEv.srv && estEv.srv.atualizado ? "<span class='gx-aj'>" + esc(L("Última busca: ", "Last search: ") + new Date(estEv.srv.atualizado * 1000).toLocaleString(EN() ? "en" : "pt-BR")) + "</span>" : "") + "</div>" : "<p class='gx-aj'>" + esc(L("A busca automática só funciona com o servidor da Physis. Use os sites abaixo.", "Automatic search needs the Physis server. Use the sites below.")) + "</p>") +
+      (estEv.srvErro ? "<p class='gx-erro' role='alert'>" + esc(estEv.srvErro) + "</p>" : "") +
+      (achados.length ? "<ul class='gx-lista'>" + achados.slice(0, 40).map(function (x, i) { return "<li><span class='gx-tx'><strong>" + esc(x.titulo) + "</strong><br><span class='gx-aj'>" + esc([x.fonteNome, x.prazo ? dataBr(x.prazo) : (x.datas && x.datas[0] ? dataBr(x.datas[0].data) : ""), (x.areas || []).map(nomeArea).join(", ")].filter(Boolean).join(" · ")) + "</span> " + link(x.link, L("Ver", "View")) + "</span>" +
+        (jaTem[x.id] ? "<span class='gx-etq ok'>" + esc(L("cadastrado", "saved")) + "</span>" : bt("data-ev-usar='" + i + "' aria-label=\"" + esc(L("Cadastrar ", "Add ") + x.titulo) + "\"", L("Cadastrar", "Add"), false, true)) + "</li>"; }).join("") + "</ul>" : (estEv.srv ? "<p class='gx-aj'>" + esc(L("A última busca não trouxe eventos.", "The last search found no events.")) + "</p>" : "")) +
+      "<h3>" + esc(L("Onde procurar", "Where to look")) + "</h3><ul>" + ONDE_PROCURAR.map(function (o) { return "<li>" + link(o[1], o[0]) + "</li>"; }).join("") + "</ul></section>";
+    s.innerHTML = h;
+    var cal = document.getElementById("gx-cal-ev"); if (cal && !cal._ligado) { cal._ligado = true; ligarCal(cal); } pintarCal("gx-cal-ev");
+    focar(foco);
+  }
+  function lerFormEvento() {
+    var quem = []; document.querySelectorAll("#gx-eventos [data-ev-quem]").forEach(function (c) { if (c.checked) quem.push(c.getAttribute("data-ev-quem")); });
+    return { nome: String(val("gx-ev-nome")).trim(), area: val("gx-ev-area"), abrangencia: val("gx-ev-abr"), formato: val("gx-ev-forma"), local: String(val("gx-ev-local")).trim(), inicio: val("gx-ev-ini"), fim: val("gx-ev-fim"), hora: val("gx-ev-hora"),
+      inscricao: val("gx-ev-insc"), link: String(val("gx-ev-link")).trim(), custo: String(val("gx-ev-custo")).trim(), lembrete: Math.max(0, Math.min(90, parseInt(val("gx-ev-lem"), 10) || 0)), quem: quem, obs: val("gx-ev-obs"), noCalendario: !!val("gx-ev-cal") };
+  }
+  function ligarEventos(s) {
+    s.addEventListener("click", function (ev) {
+      var b = ev.target.closest ? ev.target.closest("button") : null; if (!b || b.closest("#gx-cal-ev")) return; var id;
+      if (b.id === "gx-ev-salvar") {
+        var r = lerFormEvento(), ant = estEv.edit && estEv.edit.id ? estEv.edit : null;
+        var erro = !r.nome ? [L("Escreva o nome do evento.", "Write the event name."), "gx-ev-nome"] : r.fim && r.inicio && r.fim < r.inicio ? [L("O fim vem antes do começo.", "The end is before the start."), "gx-ev-fim"] : r.link && !seguro(r.link) ? [L("O link precisa começar com https://", "The link must start with https://"), "gx-ev-link"] : r.noCalendario && !r.inicio ? [L("Para pôr no calendário, informe quando começa.", "To add to the calendar, give the start date."), "gx-ev-ini"] : null;
+        if (erro) { estEv.erro = erro[0]; estEv.edit = Object.assign({}, ant || estEv.edit || {}, r); return pintarEventos(erro[1]); }
+        var l = ler(K.eventos); r.id = ant ? ant.id : novoId(); r.origemId = (ant || estEv.edit || {}).origemId || ""; r.criadoPor = ant ? ant.criadoPor : pessoaAtual();
+        l = l.filter(function (x) { return x.id !== r.id; }); l.push(r); gravar(K.eventos, l); estEv.edit = null; estEv.erro = "";
+        pintarEventos("gx-ev-salvar"); repintarCalendarios(); return dizer(L("Evento guardado: ", "Event saved: ") + r.nome, false);
+      }
+      if (b.id === "gx-ev-cancelar") { estEv.edit = null; estEv.erro = ""; return pintarEventos("gx-ev-nome"); }
+      if (b.id === "gx-ev-buscar") { estEv.buscando = true; estEv.srvErro = ""; pintarEventos("gx-ev-buscar"); return pedir("/api/eventos/buscar", { forcar: true }).then(function (j) { estEv.buscando = false; if (j.ok) estEv.srv = j; else estEv.srvErro = msgServidor(j); pintarEventos("gx-ev-buscar"); dizer(j.ok ? L("Busca feita: ", "Search done: ") + (j.itens || []).length + L(" eventos.", " events.") : estEv.srvErro, !j.ok); }).catch(function () { estEv.buscando = false; estEv.srvErro = L("O servidor não respondeu.", "The server did not answer."); pintarEventos("gx-ev-buscar"); }); }
+      if ((id = b.getAttribute("data-ev-usar")) !== null) { var x = (estEv.srv.itens || [])[+id]; if (!x) return; var dt = (x.datas || [])[0]; estEv.edit = { nome: x.titulo, link: x.link, area: (x.areas || [])[0] || "sustentabilidade", abrangencia: x.pais && x.pais !== "BR" ? "internacional" : "nacional", inicio: dt ? dt.data : "", origemId: x.id, obs: x.fonteNome }; estEv.erro = ""; pintarEventos("gx-ev-nome"); return window.scrollTo(0, 0); }
+      if ((id = b.getAttribute("data-ev-ed"))) { estEv.edit = ler(K.eventos).filter(function (x) { return x.id === id; })[0] || null; estEv.erro = ""; pintarEventos("gx-ev-nome"); return; }
+      if ((id = b.getAttribute("data-ev-cal"))) { var l = ler(K.eventos), alvo = l.filter(function (x) { return x.id === id; })[0]; if (!alvo) return; if (!alvo.noCalendario && !alvo.inicio) return dizer(L("Edite o evento e informe quando começa.", "Edit the event and give the start date."), true); alvo.noCalendario = !alvo.noCalendario; gravar(K.eventos, l); pintarEventos("[data-ev-cal='" + id + "']"); repintarCalendarios(); return dizer(alvo.noCalendario ? L("Evento no calendário.", "Event in the calendar.") : L("Evento tirado do calendário.", "Event removed from the calendar."), false); }
+      if ((id = b.getAttribute("data-ev-x"))) { var al = ler(K.eventos).filter(function (x) { return x.id === id; })[0]; if (!al || !window.confirm(L("Apagar o evento “", "Delete the event “") + al.nome + "”?")) return; gravar(K.eventos, ler(K.eventos).filter(function (x) { return x.id !== id; })); pintarEventos("gx-ev-hl"); repintarCalendarios(); return dizer(L("Evento apagado.", "Event deleted."), false); }
+    });
+    s.addEventListener("change", function (ev) { var t = ev.target; if (t.id === "gx-ev-ff") { estEv.filtro = t.value; pintarEventos("gx-ev-ff"); } if (t.id === "gx-ev-fa") { estEv.abr = t.value; pintarEventos("gx-ev-fa"); } if (t.id === "gx-ev-far") { estEv.area = t.value; pintarEventos("gx-ev-far"); } });
+    s.addEventListener("input", function (ev) { if (ev.target.id !== "gx-ev-fb") return; estEv.busca = ev.target.value; var f = lerFormEvento(), ed = estEv.edit; estEv.edit = Object.assign({}, ed || {}, f, { id: ed && ed.id, origemId: ed && ed.origemId }); if (!ed && !f.nome) estEv.edit = null; var pos = ev.target.selectionStart; pintarEventos("gx-ev-fb"); try { document.getElementById("gx-ev-fb").setSelectionRange(pos, pos); } catch (e) {} });
+  }
+
+  /* ══ 2. Editais ══ */
+  var estE = { aba: "novos", so: true, grupo: "", busca: "", srv: null, carregou: false, buscando: false, erro: "", aceitando: null, datas: [], modelo: "", resp: "rafaella", etapas: true };
+  function podeEditais() { return ACESSO_EDITAIS.indexOf(pessoaAtual()) >= 0; }
+  var GRUPOS_ED = ["FINEP", "BNDES", "Fundo Clima", "CNPq", "FAPs", "Prosas", "Inovação", "Internacional", "Outras"];
+  function proposta(id) { var A = window.PhysisAdm; if (!A || !A.lerLista || !id) return null; return A.lerLista("propostas").filter(function (p) { return p.id === id; })[0] || null; }
+  function mexerProposta(id, fn) { var A = window.PhysisAdm; if (!A || !A.lerLista) return false; var l = A.lerLista("propostas"), ok = false; l = l.map(function (p) { if (p.id === id) { ok = true; fn(p); } return p; }); if (ok) A.gravarLista("propostas", l); return ok; }
+  function etapaEdital(it) {
+    // passos: rascunho -> revisao -> aprovar -> autorizar -> enviar -> feito
+    var p = proposta(it.propostaId), rev = (p && p.revisores) || {}, ids = Object.keys(rev), faltam = ids.filter(function (k) { return rev[k].estado !== "ok"; });
+    if (it.enviado && it.enviado.em) return { passo: "feito", faltam: [] };
+    if (it.envio && it.envio.em) return { passo: "enviar", faltam: [] };
+    if (it.aprovacao && it.aprovacao.em) return { passo: "autorizar", faltam: [] };
+    if (!p) return { passo: "rascunho", faltam: [], semProposta: !!it.propostaId };
+    if (!ids.length) return { passo: "rascunho", faltam: [] };
+    if (faltam.length) return { passo: "revisao", faltam: faltam };
+    return { passo: "aprovar", faltam: [] };
+  }
+  function itensEditais() {
+    var loc = ler(K.editais), m = {}; loc.forEach(function (x) { m[x.id] = x; });
+    var srv = estE.srv ? (estE.srv.itens || []) : [], out = [];
+    srv.forEach(function (x) { if (!m[x.id]) out.push(Object.assign({ estado: "novo" }, x)); });
+    return { novos: out.concat(loc.filter(function (x) { return x.estado === "salvo"; })), aceitos: loc.filter(function (x) { return x.estado === "aceito"; }), recusados: loc.filter(function (x) { return x.estado === "recusado"; }) };
+  }
+  function carregarEditais(buscar) {
+    estE.buscando = !!buscar; estE.erro = "";
+    var p = buscar ? pedir("/api/editais/buscar", { forcar: true }) : pedir("/api/editais");
+    return p.then(function (j) { estE.buscando = false; if (j.ok) estE.srv = j; else estE.erro = msgServidor(j); if (C().atual && C().atual() === "editais") pintarEditais(buscar ? "gx-ed-buscar" : null); if (buscar) dizer(j.ok ? L("Busca feita: ", "Search done: ") + (j.itens || []).length + L(" editais.", " calls.") : estE.erro, !j.ok); })
+      .catch(function () { estE.buscando = false; estE.erro = L("O servidor não respondeu.", "The server did not answer."); pintarEditais(); });
+  }
+  function metaEdital(x) {
+    var d = diasAte(x.prazo);
+    return esc([x.fonteNome || x.grupo, x.prazo ? L("Envio até ", "Submit by ") + dataBr(x.prazo) + " (" + quando(x.prazo) + ")" : L("Prazo: confira no edital", "Deadline: check the call"), (x.areas || []).length ? L("Áreas: ", "Areas: ") + x.areas.map(nomeArea).join(", ") : "", x.relevancia ? L("Relevância ", "Relevance ") + x.relevancia : ""].filter(Boolean).join(" · ")) + (d !== null && d < 0 ? " <span class='gx-etq'>" + esc(L("prazo passou", "deadline passed")) + "</span>" : "");
+  }
+  function pintarEditais(foco) {
+    var s = sec("gx-editais"); if (!s) return;
+    var h = "<h1 id='gx-h-editais'>" + esc(L("Editais e chamadas", "Funding calls")) + "</h1>";
+    if (!podeEditais()) { s.innerHTML = h + "<p class='gx-card'>" + esc(L("Esta parte é só para Rafaella, Erick Lopes e Marzia.", "This part is only for Rafaella, Erick Lopes and Marzia.")) + "</p>"; return; }
+    if (!estE.carregou && SRV) { estE.carregou = true; carregarEditais(false); }
+    var g = itensEditais(), b = estE.busca.toLowerCase();
+    h += "<p class='gx-sub'>" + esc(L("Editais de FINEP, BNDES, CNPq, FAPs, Prosas, Fundo Clima e fundos internacionais, nas áreas da Physis. A equipe aceita ou recusa. O aceito vira proposta (modelo da Physis); as datas do termo de referência viram atividades e alertas. Depois: revisão da equipe, aprovação final e autorização do envio.", "Funding calls in Physis areas. Accepted calls become proposals, with key dates as activities and alerts; then team review, final approval and authorisation to submit.")) + "</p>" +
+      "<div class='gx-barra' role='group' aria-label='" + esc(L("Partes dos editais", "Parts")) + "'>" + [["novos", L("Para decidir", "To decide") + " (" + g.novos.length + ")"], ["aceitos", L("Aceitos", "Accepted") + " (" + g.aceitos.length + ")"], ["recusados", L("Recusados", "Declined") + " (" + g.recusados.length + ")"], ["mao", L("Cadastrar à mão", "Add by hand")], ["fontes", L("Fontes", "Sources")]]
+        .map(function (a) { return bt("data-ed-aba='" + a[0] + "' aria-pressed='" + (estE.aba === a[0]) + "'", a[1]); }).join("") + "</div>" +
+      (estE.erro ? "<p role='alert' class='gx-erro'>" + esc(estE.erro) + "</p>" : "");
+    if (estE.aba === "novos") {
+      var lista = g.novos.filter(function (x) { return (!estE.so || x.relevancia > 0 || x.origem === "manual") && (!estE.grupo || x.grupo === estE.grupo) && (!b || (x.titulo + " " + (x.resumo || "") + " " + (x.fonteNome || "")).toLowerCase().indexOf(b) >= 0); });
+      h += "<div class='gx-card'><div class='gx-barra'>" + (SRV ? bt("id='gx-ed-buscar'" + (estE.buscando ? " disabled" : ""), estE.buscando ? L("Buscando em todas as fontes…", "Searching all sources…") : L("Buscar editais agora", "Search calls now"), true) : "<span class='gx-aj'>" + esc(L("A busca automática só funciona com o servidor da Physis. Cadastre à mão.", "Automatic search needs the Physis server.")) + "</span>") +
+        (estE.srv && estE.srv.atualizado ? "<span class='gx-aj'>" + esc(L("Última busca: ", "Last search: ") + new Date(estE.srv.atualizado * 1000).toLocaleString(EN() ? "en" : "pt-BR")) + "</span>" : "") + "</div><div class='gx-grade'>" +
+        campo("gx-ed-fg", L("Fonte", "Source"), sel("gx-ed-fg", [["", L("Todas", "All")]].concat(GRUPOS_ED.map(function (x) { return [x, x]; })), estE.grupo)) + campo("gx-ed-fb", L("Procurar", "Search"), inp("gx-ed-fb", estE.busca, "search")) + "</div>" +
+        "<label class='gx-chk'><input type='checkbox' id='gx-ed-so'" + (estE.so ? " checked" : "") + "> " + esc(L("Só os das áreas da Physis (regra simples por palavras)", "Only Physis areas (simple keyword rule)")) + "</label></div>";
+      h += lista.length ? lista.map(cartaoNovo).join("") : "<p class='gx-aj'>" + esc(L("Nada para decidir com esse filtro.", "Nothing to decide with this filter.")) + "</p>";
+    } else if (estE.aba === "aceitos") {
+      h += g.aceitos.length ? g.aceitos.sort(function (a, c) { return String(a.prazo || "9").localeCompare(String(c.prazo || "9")); }).map(cartaoAceito).join("") : "<p class='gx-aj'>" + esc(L("Nenhum edital aceito ainda.", "No accepted call yet.")) + "</p>";
+    } else if (estE.aba === "recusados") {
+      h += g.recusados.length ? "<ul class='gx-lista'>" + g.recusados.map(function (x) { return "<li><span class='gx-tx'><strong>" + esc(x.titulo) + "</strong><br><span class='gx-aj'>" + esc(L("Recusado por ", "Declined by ") + nomePessoa(x.decididoPor) + " · " + dataTs(x.decididoEm) + (x.motivo ? " · " + x.motivo : "")) + "</span></span>" + bt("data-ed-voltar='" + esc(x.id) + "' aria-label=\"" + esc(L("Voltar para decidir: ", "Back to decide: ") + x.titulo) + "\"", L("Voltar para decidir", "Back to decide"), false, true) + "</li>"; }).join("") + "</ul>" : "<p class='gx-aj'>" + esc(L("Nenhum recusado.", "None declined.")) + "</p>";
+    } else if (estE.aba === "mao") {
+      h += "<section class='gx-card gx-s' aria-labelledby='gx-ed-hm'><h2 id='gx-ed-hm'>" + esc(L("Cadastrar edital à mão", "Add a call by hand")) + "</h2><div class='gx-grade'>" +
+        campo("gx-ed-m-tit", L("Nome do edital (obrigatório)", "Call name (required)"), inp("gx-ed-m-tit", "", "text", " aria-required='true'")) + campo("gx-ed-m-org", L("Quem lança (órgão)", "Issuer"), inp("gx-ed-m-org")) +
+        campo("gx-ed-m-gr", L("Tipo de fonte", "Source type"), sel("gx-ed-m-gr", GRUPOS_ED.map(function (x) { return [x, x]; }), "Outras")) + campo("gx-ed-m-link", L("Página do edital (https://…)", "Call page"), inp("gx-ed-m-link", "", "url")) +
+        campo("gx-ed-m-prazo", L("Envio até", "Submit by"), inp("gx-ed-m-prazo", "", "date")) + "</div><div style='margin-top:10px'>" +
+        campo("gx-ed-m-res", L("Resumo e datas do termo de referência (cole o texto: as datas são lidas sozinhas)", "Summary and key dates (paste: dates are read automatically)"), area("gx-ed-m-res", "")) + "</div>" +
+        "<div class='gx-barra' style='margin-top:10px'>" + bt("id='gx-ed-m-ok'", L("Guardar para decidir", "Save to decide"), true) + "</div></section>";
+    } else if (estE.aba === "fontes") {
+      var st = {}; ((estE.srv && estE.srv.fontes) || []).forEach(function (f) { st[f.id] = f; });
+      var fl = (estE.srv && estE.srv.lista_fontes) || [];
+      h += "<section class='gx-card gx-s' aria-labelledby='gx-ed-hfo'><h2 id='gx-ed-hfo'>" + esc(L("Fontes que o servidor lê", "Sources the server reads")) + "</h2>" +
+        (!SRV ? "<p class='gx-aj'>" + esc(L("Só com o servidor da Physis.", "Only with the Physis server.")) + "</p>" :
+        "<p class='gx-sub'>" + esc(L("Páginas públicas. “A conferir” quer dizer que ninguém da equipe confirmou ainda que o endereço lista editais; se der erro, troque o endereço.", "Public pages. “To check” means nobody confirmed the address yet.")) + "</p>" +
+        (fl.length ? "<div class='gx-rolar'><table class='gx-tab'><caption class='gx-so-leitor'>" + esc(L("Fontes de editais", "Call sources")) + "</caption><thead><tr><th scope='col'>" + esc(L("Fonte", "Source")) + "</th><th scope='col'>" + esc(L("Tipo", "Type")) + "</th><th scope='col'>" + esc(L("Última busca", "Last search")) + "</th><th scope='col'>" + esc(L("Ações", "Actions")) + "</th></tr></thead><tbody>" +
+          fl.map(function (f) { var e = st[f.id]; return "<tr><th scope='row' style='font-weight:600'>" + link(f.url, f.nome) + (f.conferir ? " <span class='gx-etq at'>" + esc(L("a conferir", "to check")) + "</span>" : "") + "</th><td>" + esc(f.grupo + " · " + f.formato.toUpperCase()) + "</td><td>" + (e ? (e.ok ? "<span class='gx-etq ok'>" + esc(e.n + L(" itens", " items")) + "</span>" : "<span class='gx-etq al'>" + esc(L("erro", "error")) + "</span> <span class='gx-aj'>" + esc(e.erro) + "</span>") : esc(L("ainda não buscada", "not searched yet"))) + "</td><td>" + (f.extra ? bt("data-ed-fx='" + esc(f.id) + "' aria-label=\"" + esc(L("Remover a fonte ", "Remove source ") + f.nome) + "\"", L("Remover", "Remove"), false, true) : "") + "</td></tr>"; }).join("") + "</tbody></table></div>" : "<p class='gx-aj'>" + esc(L("Carregando a lista de fontes…", "Loading sources…")) + "</p>") +
+        "<h3>" + esc(L("Acrescentar fonte", "Add source")) + "</h3><div class='gx-grade'>" + campo("gx-ed-f-nome", L("Nome", "Name"), inp("gx-ed-f-nome")) + campo("gx-ed-f-url", L("Endereço público (https://…)", "Public address"), inp("gx-ed-f-url", "", "url")) +
+        campo("gx-ed-f-fmt", L("Formato", "Format"), sel("gx-ed-f-fmt", [["html", L("Página comum (HTML)", "Web page (HTML)")], ["rss", "RSS / Atom"]], "html")) + campo("gx-ed-f-gr", L("Tipo de fonte", "Source type"), sel("gx-ed-f-gr", GRUPOS_ED.map(function (x) { return [x, x]; }), "Outras")) + "</div>" +
+        "<div class='gx-barra' style='margin-top:10px'>" + bt("id='gx-ed-f-ok'", L("Acrescentar", "Add"), true) + "</div>") + "</section>";
+    }
+    s.innerHTML = h; focar(foco);
+  }
+  function cartaoNovo(x) {
+    var idc = "gx-ed-" + x.id;
+    return "<article class='gx-card' aria-labelledby='" + idc + "-t'><h2 id='" + idc + "-t' tabindex='-1' style='font-size:1.1em;margin:0 0 4px'>" + esc(x.titulo) + "</h2><p class='gx-aj'>" + metaEdital(x) + "</p>" +
+      (x.resumo ? "<p style='margin:6px 0'>" + esc(String(x.resumo).slice(0, 320)) + (String(x.resumo).length > 320 ? "…" : "") + "</p>" : "") +
+      (x.link ? "<p style='margin:6px 0'>" + link(x.link, L("Abrir o edital", "Open the call")) + "</p>" : "") +
+      (estE.aceitando === x.id ? formAceite(x) : "<div class='gx-barra'>" + bt("data-ed-aceitar='" + esc(x.id) + "' aria-label=\"" + esc(L("Aceitar: ", "Accept: ") + x.titulo) + "\"", L("Aceitar e preparar proposta", "Accept and prepare proposal"), true) +
+        bt("data-ed-recusar='" + esc(x.id) + "' aria-label=\"" + esc(L("Recusar: ", "Decline: ") + x.titulo) + "\"", L("Recusar", "Decline")) +
+        (x.estado === "novo" ? bt("data-ed-guardar='" + esc(x.id) + "' aria-label=\"" + esc(L("Guardar para ver depois: ", "Keep for later: ") + x.titulo) + "\"", L("Guardar para depois", "Keep for later")) : "") + "</div>") + "</article>";
+  }
+  function formAceite(x) {
+    var A = window.PhysisAdm, props = A && A.lerLista ? A.lerLista("propostas") : [];
+    return "<fieldset class='gx-card' style='background:#F4F6F1;margin:10px 0 0'><legend class='gx-rot'>" + esc(L("Aceitar: preparar a proposta", "Accept: prepare the proposal")) + "</legend>" +
+      "<p class='gx-aj'>" + esc(L("Confira as datas-chave do termo de referência (TdR). Cada uma vira uma atividade com caixa de marcar em Atividades, no calendário, e um alerta perto do prazo.", "Check the key dates. Each becomes a checkbox activity, a calendar entry and an alert.")) + "</p>" +
+      "<div class='gx-rolar'><table class='gx-tab'><caption class='gx-so-leitor'>" + esc(L("Datas-chave", "Key dates")) + "</caption><thead><tr><th scope='col'>" + esc(L("O que acontece", "What")) + "</th><th scope='col'>" + esc(L("Data", "Date")) + "</th><th scope='col'>" + esc(L("Quem cuida", "Who")) + "</th><th scope='col'><span class='gx-so-leitor'>" + esc(L("Ações", "Actions")) + "</span></th></tr></thead><tbody>" +
+      estE.datas.map(function (d, i) { return "<tr><td><input class='gx-c' id='gx-ed-d-r-" + i + "' value=\"" + esc(d.rotulo) + "\" aria-label='" + esc(L("O que acontece, linha ", "What, row ") + (i + 1)) + "'></td><td><input class='gx-c' type='date' id='gx-ed-d-d-" + i + "' value=\"" + esc(d.data) + "\" aria-label='" + esc(L("Data, linha ", "Date, row ") + (i + 1)) + "'></td><td>" + sel("gx-ed-d-p-" + i, opsPessoas(L("(ninguém)", "(nobody)")), d.pessoa, " aria-label='" + esc(L("Quem cuida, linha ", "Who, row ") + (i + 1)) + "'") + "</td><td>" + bt("data-ed-dx='" + i + "' aria-label='" + esc(L("Tirar a linha ", "Remove row ") + (i + 1)) + "'", L("Tirar", "Remove"), false, true) + "</td></tr>"; }).join("") +
+      "</tbody></table></div><div class='gx-barra' style='margin-top:6px'>" + bt("id='gx-ed-d-mais'", L("Acrescentar data", "Add date"), false, true) + "</div><div class='gx-grade' style='margin-top:10px'>" +
+      campo("gx-ed-modelo", L("Modelo da proposta", "Proposal template"), sel("gx-ed-modelo", [["", L("Modelo da Physis para editais", "Physis template for calls")]].concat(props.map(function (p) { return [p.id, L("Copiar a proposta ", "Copy proposal ") + p.numero + (p.org || p.cliente ? " · " + (p.org || p.cliente) : "")]; })), estE.modelo)) +
+      campo("gx-ed-resp", L("Quem dá a aprovação final", "Who gives final approval"), sel("gx-ed-resp", ACESSO_EDITAIS.map(function (p) { return [p, nomePessoa(p)]; }), estE.resp)) + "</div>" +
+      "<label class='gx-chk'><input type='checkbox' id='gx-ed-etapas'" + (estE.etapas ? " checked" : "") + "> " + esc(L("Criar também as etapas internas antes do envio (rascunho, revisão, aprovação, envio)", "Also create internal steps before submission")) + "</label>" +
+      "<div class='gx-barra' style='margin-top:8px'>" + bt("id='gx-ed-confirmar' data-id='" + esc(x.id) + "'", L("Confirmar: criar proposta, atividades e alertas", "Confirm: create proposal, activities and alerts"), true) + bt("id='gx-ed-cancelar'", L("Cancelar", "Cancel")) + "</div></fieldset>";
+  }
+  function cartaoAceito(x) {
+    var e = etapaEdital(x), p = proposta(x.propostaId), rev = (p && p.revisores) || {}, eu = pessoaAtual(), resp = x.responsavel || "rafaella", idc = "gx-ed-" + x.id;
+    var ordem = ["rascunho", "revisao", "aprovar", "autorizar", "enviar", "feito"], k = ordem.indexOf(e.passo);
+    var est = function (i) { return i < k ? "<span class='gx-etq ok'>" + esc(L("feito", "done")) + "</span>" : i === k ? "<span class='gx-etq at'>" + esc(L("agora", "now")) + "</span>" : "<span class='gx-etq'>" + esc(L("depois", "later")) + "</span>"; };
+    var ativ = ler(K.agenda).filter(function (a) { return a.origem === "editais" && a.ref === x.id; }).sort(function (a, c) { return String(a.data).localeCompare(String(c.data)); });
+    var h = "<article class='gx-card' aria-labelledby='" + idc + "-t'><h2 id='" + idc + "-t' tabindex='-1' style='font-size:1.1em;margin:0 0 4px'>" + esc(x.titulo) + "</h2><p class='gx-aj'>" + metaEdital(x) + "</p>" +
+      "<p class='gx-aj'>" + esc(L("Aceito por ", "Accepted by ") + nomePessoa(x.decididoPor) + " · " + dataTs(x.decididoEm) + " · " + L("aprovação final: ", "final approval: ") + nomePessoa(resp)) + (x.link ? " · " + link(x.link, L("Abrir o edital", "Open the call")) : "") + "</p><ol class='gx-etapas'>";
+    h += "<li>" + est(0) + " <strong>" + esc(L("Rascunho da proposta", "Proposal draft")) + "</strong>: " + (p ? esc(p.numero + " · ") + bt("data-ed-prop aria-label=\"" + esc(L("Abrir em Propostas: ", "Open in Proposals: ") + p.numero) + "\"", L("Abrir em Propostas", "Open in Proposals"), false, true) : e.semProposta ? esc(L("a proposta foi apagada em Propostas. ", "the proposal was deleted. ")) + bt("data-ed-refazer='" + esc(x.id) + "'", L("Criar de novo", "Create again"), false, true) : esc(L("ainda sem proposta. ", "no proposal yet. ")) + bt("data-ed-refazer='" + esc(x.id) + "'", L("Criar a proposta", "Create the proposal"), false, true)) + "</li>";
+    h += "<li>" + est(1) + " <strong>" + esc(L("Revisão da equipe", "Team review")) + "</strong>: " + (Object.keys(rev).length ? esc(Object.keys(rev).map(function (pid) { return nomePessoa(pid) + " (" + (rev[pid].estado === "ok" ? L("OK em ", "OK on ") + (rev[pid].em || "") : L("aguardando", "waiting")) + ")"; }).join(", ")) + ". <span class='gx-aj'>" + esc(L("Cada pessoa abre a proposta em Propostas e clica em “Dar o meu OK”.", "Each person opens the proposal and gives their OK.")) + "</span>" :
+      (p ? bt("data-ed-rev='" + esc(x.id) + "'", L("Pedir revisão a ", "Ask review from ") + ACESSO_EDITAIS.map(nomePessoa).join(", "), false, true) : esc(L("depois do rascunho.", "after the draft.")))) + "</li>";
+    h += "<li>" + est(2) + " <strong>" + esc(L("Aprovação final", "Final approval")) + "</strong> (" + esc(nomePessoa(resp)) + "): " + (x.aprovacao && x.aprovacao.em ? esc(L("aprovada por ", "approved by ") + nomePessoa(x.aprovacao.por) + " · " + dataTs(x.aprovacao.em)) :
+      e.passo === "aprovar" ? (eu === resp ? bt("data-ed-aprovar='" + esc(x.id) + "'", L("Aprovar a versão final", "Approve the final version"), true, true) : esc(L("aguardando ", "waiting for ") + nomePessoa(resp) + ".")) : esc(L("depois da revisão de todos.", "after everyone's review."))) + "</li>";
+    h += "<li>" + est(3) + " <strong>" + esc(L("Autorizar envio", "Authorise submission")) + "</strong>: " + (x.envio && x.envio.em ? esc(L("autorizado por ", "authorised by ") + nomePessoa(x.envio.por) + " · " + dataTs(x.envio.em)) :
+      e.passo === "autorizar" ? (eu === resp || ehAdmin() ? bt("data-ed-autorizar='" + esc(x.id) + "'", L("Autorizar envio", "Authorise submission"), true, true) : esc(L("aguardando ", "waiting for ") + nomePessoa(resp) + L(" ou a direção.", " or management."))) : esc(L("depois da aprovação final.", "after final approval."))) + "</li>";
+    h += "<li>" + est(4) + " <strong>" + esc(L("Enviado no portal do edital", "Submitted on the call portal")) + "</strong>: " + (x.enviado && x.enviado.em ? esc(nomePessoa(x.enviado.por) + " · " + dataTs(x.enviado.em) + (x.enviado.protocolo ? " · " + L("protocolo ", "receipt ") + x.enviado.protocolo : "")) :
+      e.passo === "enviar" ? bt("data-ed-enviado='" + esc(x.id) + "'", L("Marcar como enviado", "Mark as submitted"), true, true) : esc(L("só depois da autorização.", "only after authorisation."))) + "</li></ol>";
+    h += "<h3 id='" + idc + "-at'>" + esc(L("Atividades deste edital", "Activities for this call")) + "</h3>" + (ativ.length ? "<ul class='gx-lista' aria-labelledby='" + idc + "-at'>" + ativ.map(function (a) { var d = diasAte(a.data); return "<li><span class='gx-etq " + (a.feito ? "ok" : d < 0 ? "al" : d <= 3 ? "at" : "") + "'>" + esc(dataBr(a.data)) + "</span><span class='gx-tx'><label><input type='checkbox' data-ed-feito='" + esc(a.id) + "' id='gx-ed-fe-" + esc(a.id) + "'" + (a.feito ? " checked" : "") + "> <span>" + esc(a.titulo) + (a.pessoa ? " · " + esc(nomePessoa(a.pessoa)) : "") + "</span></label></span></li>"; }).join("") + "</ul>" : "<p class='gx-aj'>" + esc(L("Sem atividades.", "No activities.")) + "</p>") +
+      "<div class='gx-barra' style='margin-top:8px'>" + bt("data-ed-cal aria-label=\"" + esc(L("Ver no calendário: ", "See in calendar: ") + x.titulo) + "\"", L("Ver no calendário", "See in calendar"), false, true) + bt("data-ed-desfazer='" + esc(x.id) + "' aria-label=\"" + esc(L("Desfazer o aceite: ", "Undo acceptance: ") + x.titulo) + "\"", L("Desfazer o aceite", "Undo acceptance"), false, true) + "</div></article>";
+    return h;
+  }
+  var MODELO_EDITAL = {
+    escopo: ["Diagnóstico e linha de base do problema descrito no edital", "Plano de trabalho com metas, entregas e indicadores", "Implantação da solução Physis (sensores, dados e relatórios)", "Capacitação da equipe local", "Relatório final com resultados e indicadores do edital"],
+    premissas: ["Valores, prazos e itens elegíveis conforme o termo de referência (TdR)", "Contrapartida a confirmar com a direção", "Documentos de habilitação da Physis em dia"],
+    fora: ["Itens que o edital não aceita financiar", "Obras civis não previstas no TdR"],
+    perguntas: ["Qual a contrapartida exigida?", "Quais documentos de habilitação são pedidos?", "Há limite de valor por proposta?", "Precisa de parceiro (universidade, ICT, cooperativa)?"]
+  };
+  function confirmarAceite(id) {
+    lerDatasForm(); var x = itensEditais().novos.filter(function (i) { return i.id === id; })[0]; if (!x) return;
+    var datas = estE.datas.filter(function (d) { return d.rotulo.trim() && d.data; }), eu = pessoaAtual(), agora = new Date().toISOString(), hj = hojeISO();
+    var A = window.PhysisAdm, props = A && A.lerLista ? A.lerLista("propostas") : null, base = estE.modelo && props ? props.filter(function (p) { return p.id === estE.modelo; })[0] : null, prop = null;
+    if (props) {
+      var rnd = Math.random().toString(36).slice(2, 6).toUpperCase(), J = function (a) { return a.join("\n"); };
+      prop = { id: "l" + novoId(), numero: "PP-" + hj.replace(/-/g, "").slice(2) + "-" + rnd, data: hj, origem: "edital", editalId: x.id, cliente: x.fonteNome || x.grupo || L("Edital", "Call"), org: x.grupo || "", email: "", cep: "", telefone: "",
+        pedido: L("Edital: ", "Call: ") + x.titulo + (x.link ? "\n" + x.link : "") + (x.resumo ? "\n\n" + x.resumo : ""),
+        resumo: base ? base.resumo : L("Proposta da Physis Engineering ao edital “", "Physis Engineering proposal to the call “") + x.titulo + "”. " + L("[Descreva o problema e o resultado esperado, com as palavras do edital.]", "[Describe the problem and the expected result.]"),
+        escopo: base ? base.escopo : J(MODELO_EDITAL.escopo), premissas: base ? base.premissas : J(MODELO_EDITAL.premissas), fora: base ? base.fora : J(MODELO_EDITAL.fora), perguntas: base ? base.perguntas : J(MODELO_EDITAL.perguntas),
+        prazo: x.prazo ? L("Conforme o cronograma do edital. Envio até ", "As per the call schedule. Submit by ") + dataBr(x.prazo) + "." : L("Conforme o cronograma do edital.", "As per the call schedule."),
+        itens: base ? JSON.parse(JSON.stringify(base.itens || [])) : [{ d: L("Consultoria, por diária", "Consulting, per day"), qtd: "1", unit: "" }],
+        revisor: "", situacao: "rascunho", obs: L("Proposta para edital", "Proposal for a call") + (x.prazo ? " · " + L("envio até ", "submit by ") + dataBr(x.prazo) : ""), notas: "", contratoId: "", anexos: [] };
+      props.push(prop); if (!A.gravarLista("propostas", props)) prop = null;
+    }
+    var ag = ler(K.agenda), novos = [];
+    datas.forEach(function (d) { novos.push({ id: novoId(), data: d.data, titulo: d.rotulo + " · " + x.titulo, tipo: "atividade", pessoa: d.pessoa || "", avisarDias: 7, feito: false, origem: "editais", ref: x.id, criadoPor: eu, criadoEm: agora }); });
+    var envio = x.prazo || (datas.filter(function (d) { return /envio|submiss|prazo|inscri/i.test(d.rotulo); }).map(function (d) { return d.data; }).sort().pop() || "");
+    if (estE.etapas && envio) [[-10, L("Rascunho pronto para revisão", "Draft ready for review"), eu], [-6, L("Revisão da equipe concluída", "Team review done"), ""], [-4, L("Aprovação final", "Final approval"), estE.resp], [-2, L("Autorizar e enviar", "Authorise and submit"), estE.resp]]
+      .forEach(function (p) { var d = somaDias(envio, p[0]); if (d >= hj) novos.push({ id: novoId(), data: d, titulo: p[1] + " · " + x.titulo, tipo: "atividade", pessoa: p[2] || "", avisarDias: 2, feito: false, origem: "editais", ref: x.id, criadoPor: eu, criadoEm: agora }); });
+    var jaTem = {}; ag.forEach(function (a) { if (a.origem === "editais" && a.ref === x.id) jaTem[a.data + "|" + a.titulo] = 1; });   // aceitar de novo não repete atividade
+    novos = novos.filter(function (a) { return !jaTem[a.data + "|" + a.titulo]; });
+    gravar(K.agenda, ag.concat(novos));
+    var reg = Object.assign({}, x, { estado: "aceito", decididoPor: eu, decididoEm: agora, propostaId: prop ? prop.id : "", responsavel: estE.resp, prazo: envio || x.prazo || "" });
+    delete reg.novo; gravar(K.editais, ler(K.editais).filter(function (i) { return i.id !== x.id; }).concat([reg]));
+    estE.aceitando = null; estE.aba = "aceitos"; pintarEditais("gx-ed-" + x.id + "-t"); repintarCalendarios();
+    dizer(L("Edital aceito. ", "Call accepted. ") + (prop ? L("Proposta ", "Proposal ") + prop.numero + L(" criada como rascunho. ", " created as a draft. ") : L("A proposta não pôde ser criada aqui; crie em Propostas. ", "Create the proposal in Proposals. ")) + novos.length + L(" atividades no calendário.", " activities in the calendar."), !prop);
+  }
+  function lerDatasForm() { estE.datas = estE.datas.map(function (d, i) { var r = document.getElementById("gx-ed-d-r-" + i); return r ? { rotulo: r.value, data: val("gx-ed-d-d-" + i), pessoa: val("gx-ed-d-p-" + i) } : d; }); var m = document.getElementById("gx-ed-modelo"); if (m) estE.modelo = m.value; var r2 = document.getElementById("gx-ed-resp"); if (r2) estE.resp = r2.value; var e2 = document.getElementById("gx-ed-etapas"); if (e2) estE.etapas = e2.checked; }
+  function mudarEdital(id, fn) { var l = ler(K.editais); l = l.map(function (x) { return x.id === id ? (fn(x) || x) : x; }); gravar(K.editais, l); }
+  function ligarEditais(s) {
+    s.addEventListener("click", function (ev) {
+      var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return; var id, eu = pessoaAtual(), agora = new Date().toISOString();
+      if (!podeEditais()) return;
+      if ((id = b.getAttribute("data-ed-aba"))) { estE.aba = id; estE.aceitando = null; return pintarEditais("[data-ed-aba='" + id + "']"); }
+      if (b.id === "gx-ed-buscar") { carregarEditais(true); return pintarEditais("gx-ed-buscar"); }
+      if ((id = b.getAttribute("data-ed-aceitar"))) { var x = itensEditais().novos.filter(function (i) { return i.id === id; })[0]; if (!x) return;
+        estE.aceitando = id; estE.modelo = ""; estE.resp = ACESSO_EDITAIS.indexOf("rafaella") >= 0 ? "rafaella" : ACESSO_EDITAIS[0]; estE.etapas = true;
+        estE.datas = (x.datas || []).filter(function (d) { return d.data >= hojeISO(); }).map(function (d) { return { rotulo: d.rotulo, data: d.data, pessoa: eu }; });
+        if (x.prazo && !estE.datas.some(function (d) { return d.data === x.prazo; })) estE.datas.push({ rotulo: L("Envio da proposta", "Proposal submission"), data: x.prazo, pessoa: eu });
+        if (!estE.datas.length) estE.datas.push({ rotulo: L("Envio da proposta", "Proposal submission"), data: "", pessoa: eu });
+        return pintarEditais("gx-ed-d-r-0"); }
+      if (b.id === "gx-ed-d-mais") { lerDatasForm(); estE.datas.push({ rotulo: "", data: "", pessoa: eu }); return pintarEditais("gx-ed-d-r-" + (estE.datas.length - 1)); }
+      if ((id = b.getAttribute("data-ed-dx")) !== null) { lerDatasForm(); estE.datas.splice(+id, 1); return pintarEditais("gx-ed-d-mais"); }
+      if (b.id === "gx-ed-cancelar") { var era = estE.aceitando; estE.aceitando = null; return pintarEditais("[data-ed-aceitar='" + era + "']"); }
+      if (b.id === "gx-ed-confirmar") return confirmarAceite(b.getAttribute("data-id"));
+      if ((id = b.getAttribute("data-ed-recusar")) || (id = b.getAttribute("data-ed-guardar"))) { var y = itensEditais().novos.filter(function (i) { return i.id === id; })[0]; if (!y) return; var rec = b.hasAttribute("data-ed-recusar"), motivo = "";
+        if (rec) { motivo = window.prompt(L("Por que recusar? (opcional, ajuda a equipe a aprender)", "Why decline? (optional)"), ""); if (motivo === null) return; }
+        var reg = Object.assign({}, y, { estado: rec ? "recusado" : "salvo", decididoPor: eu, decididoEm: agora, motivo: motivo || "" }); delete reg.novo;
+        gravar(K.editais, ler(K.editais).filter(function (i) { return i.id !== id; }).concat([reg])); pintarEditais("gx-h-editais"); return dizer(rec ? L("Edital recusado.", "Call declined.") : L("Guardado para decidir depois.", "Kept for later."), false); }
+      if ((id = b.getAttribute("data-ed-voltar"))) { mudarEdital(id, function (x) { x.estado = "salvo"; return x; }); pintarEditais("[data-ed-aba='recusados']"); return dizer(L("Voltou para decidir.", "Back to decide."), false); }
+      if (b.hasAttribute("data-ed-prop")) { var c = C(); if (c.ir) c.ir("prop", true); return; }
+      if (b.hasAttribute("data-ed-cal")) { var c2 = C(); if (c2.ir) c2.ir("atv", true); return; }
+      if ((id = b.getAttribute("data-ed-refazer"))) { var it = ler(K.editais).filter(function (i) { return i.id === id; })[0]; if (!it) return; var lista = ler(K.editais).filter(function (i) { return i.id !== id; }); it.estado = "salvo"; gravar(K.editais, lista.concat([it])); estE.aba = "novos"; estE.aceitando = id; estE.datas = [{ rotulo: L("Envio da proposta", "Proposal submission"), data: it.prazo || "", pessoa: eu }]; estE.etapas = false;
+        pintarEditais("gx-ed-d-r-0"); return dizer(L("Confira e confirme de novo para criar a proposta.", "Check and confirm again to create the proposal."), false); }
+      if ((id = b.getAttribute("data-ed-rev"))) { var ed = ler(K.editais).filter(function (i) { return i.id === id; })[0]; if (!ed) return;
+        mexerProposta(ed.propostaId, function (p) { var r = p.revisores || {}; ACESSO_EDITAIS.forEach(function (pid) { if (!r[pid]) r[pid] = { estado: "aguardando", em: "" }; }); p.revisores = r; if (p.situacao === "novo" || p.situacao === "rascunho") p.situacao = "revisao"; });
+        pintarEditais(idEd(id)); repintarCalendarios(); return dizer(L("Revisão pedida. Cada pessoa vê o alerta em Atividades e dá o OK em Propostas.", "Review requested."), false); }
+      if ((id = b.getAttribute("data-ed-aprovar"))) { var ea = ler(K.editais).filter(function (i) { return i.id === id; })[0]; if (!ea || eu !== (ea.responsavel || "rafaella") || etapaEdital(ea).passo !== "aprovar") return dizer(L("Só quem dá a aprovação final pode aprovar, e só depois da revisão de todos.", "Only the approver can approve, after everyone's review."), true);
+        if (!window.confirm(L("Aprovar a versão final da proposta deste edital?", "Approve the final version?"))) return;
+        mudarEdital(id, function (x) { x.aprovacao = { por: eu, em: agora }; return x; });
+        mexerProposta(ea.propostaId, function (p) { p.revisor = Object.keys(p.revisores || {}).map(nomePessoa).join(", "); p.situacao = "revisada"; });
+        pintarEditais(idEd(id)); repintarCalendarios(); return dizer(L("Versão final aprovada. Falta autorizar o envio.", "Final version approved."), false); }
+      if ((id = b.getAttribute("data-ed-autorizar"))) { var eb = ler(K.editais).filter(function (i) { return i.id === id; })[0]; if (!eb || etapaEdital(eb).passo !== "autorizar" || !(eu === (eb.responsavel || "rafaella") || ehAdmin())) return;
+        if (!window.confirm(L("Autorizar o envio da proposta ao edital? Depois disso, quem envia já pode enviar no portal do edital.", "Authorise submission?"))) return;
+        mudarEdital(id, function (x) { x.envio = { por: eu, em: agora }; return x; }); pintarEditais(idEd(id)); repintarCalendarios(); return dizer(L("Envio autorizado.", "Submission authorised."), false); }
+      if ((id = b.getAttribute("data-ed-enviado"))) { var pr = window.prompt(L("Número de protocolo do envio (se o portal deu um):", "Submission receipt number (if any):"), ""); if (pr === null) return; var ec = ler(K.editais).filter(function (i) { return i.id === id; })[0];
+        mudarEdital(id, function (x) { x.enviado = { por: eu, em: agora, protocolo: pr.trim() }; return x; }); if (ec) mexerProposta(ec.propostaId, function (p) { p.situacao = "enviada"; p.obs = (p.obs ? p.obs + " · " : "") + L("enviada ao edital em ", "submitted on ") + dataBr(hojeISO()) + (pr.trim() ? " · " + pr.trim() : ""); });
+        pintarEditais(idEd(id)); repintarCalendarios(); return dizer(L("Marcado como enviado.", "Marked as submitted."), false); }
+      if ((id = b.getAttribute("data-ed-desfazer"))) { var ex = ler(K.editais).filter(function (i) { return i.id === id; })[0]; if (!ex || !window.confirm(L("Desfazer o aceite? As atividades não feitas deste edital saem do calendário. A proposta continua em Propostas.", "Undo? Open activities leave the calendar; the proposal stays."))) return;
+        gravar(K.agenda, ler(K.agenda).filter(function (a) { return !(a.origem === "editais" && a.ref === id && !a.feito); })); mudarEdital(id, function (x) { x.estado = "salvo"; delete x.aprovacao; delete x.envio; delete x.enviado; return x; });
+        estE.aba = "novos"; pintarEditais("[data-ed-aba='aceitos']"); repintarCalendarios(); return dizer(L("Aceite desfeito.", "Acceptance undone."), false); }
+      if (b.id === "gx-ed-m-ok") { var tit = String(val("gx-ed-m-tit")).trim(), lk = String(val("gx-ed-m-link")).trim();
+        if (!tit) { dizer(L("Escreva o nome do edital.", "Write the call name."), true); return focar("gx-ed-m-tit"); }
+        if (lk && !seguro(lk)) { dizer(L("O link precisa começar com https://", "The link must start with https://"), true); return focar("gx-ed-m-link"); }
+        var res = String(val("gx-ed-m-res")), datas = lerDatasTexto(res), prazo = val("gx-ed-m-prazo") || (datas.filter(function (d) { return d.envio; }).map(function (d) { return d.data; }).sort().pop() || "");
+        var org = String(val("gx-ed-m-org")).trim();
+        gravar(K.editais, ler(K.editais).concat([{ id: "m-" + novoId(), origem: "manual", estado: "salvo", titulo: tit, fonteNome: org || val("gx-ed-m-gr"), grupo: val("gx-ed-m-gr"), link: lk, prazo: prazo, resumo: res.slice(0, 3000), datas: datas, areas: [], relevancia: 1, decididoPor: eu, decididoEm: agora }]));
+        estE.aba = "novos"; pintarEditais("[data-ed-aba='novos']"); return dizer(L("Edital guardado em “Para decidir”.", "Call saved under “To decide”."), false); }
+      if (b.id === "gx-ed-f-ok") { pedir("/api/editais/fontes", { nome: String(val("gx-ed-f-nome")).trim(), url: String(val("gx-ed-f-url")).trim(), formato: val("gx-ed-f-fmt"), grupo: val("gx-ed-f-gr") }).then(function (j) { if (j.ok) { dizer(L("Fonte acrescentada. Ela entra na próxima busca.", "Source added."), false); carregarEditais(false); } else dizer(msgServidor(j), true); }); return; }
+      if ((id = b.getAttribute("data-ed-fx"))) { if (!window.confirm(L("Remover esta fonte?", "Remove this source?"))) return; pedir("/api/editais/fontes", { remover: id }).then(function (j) { dizer(j.ok ? L("Fonte removida.", "Source removed.") : msgServidor(j), !j.ok); carregarEditais(false); }); return; }
+    });
+    s.addEventListener("change", function (ev) {
+      var t = ev.target, id;
+      if (t.id === "gx-ed-so") { estE.so = t.checked; return pintarEditais("gx-ed-so"); }
+      if (t.id === "gx-ed-fg") { estE.grupo = t.value; return pintarEditais("gx-ed-fg"); }
+      if ((id = t.getAttribute && t.getAttribute("data-ed-feito"))) { var f = t.checked, foco = t.id; mudarAgenda(id, function (a) { a.feito = f; a.feitoPor = f ? pessoaAtual() : ""; a.feitoEm = f ? new Date().toISOString() : ""; return a; }); pintarEditais(foco); repintarCalendarios(); }
+    });
+    s.addEventListener("input", function (ev) { if (ev.target.id !== "gx-ed-fb") return; estE.busca = ev.target.value; var pos = ev.target.selectionStart; pintarEditais("gx-ed-fb"); try { document.getElementById("gx-ed-fb").setSelectionRange(pos, pos); } catch (e) {} });
+  }
+  function idEd(id) { return "gx-ed-" + id + "-t"; }
+  // as mesmas regras do servidor (editais.py), para o texto colado à mão
+  function lerDatasTexto(t) {
+    var s = String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(), out = [], vistos = {}, m, re = /\b(\d{1,2})\/(\d{1,2})\/(\d{4})\b/g;
+    var ROT = [["submiss", "Envio da proposta", 1], ["inscri", "Inscrição", 1], ["envio", "Envio da proposta", 1], ["prazo", "Prazo final", 1], ["encerr", "Prazo final", 1], ["ate ", "Prazo final", 1], ["resultado", "Resultado", 0], ["recurso", "Recursos", 0], ["abertura", "Abertura", 0], ["publicac", "Publicação", 0]];
+    while ((m = re.exec(s))) {
+      var d = new Date(+m[3], +m[2] - 1, +m[1], 12); if (d.getMonth() !== +m[2] - 1) continue; var iso = isoDe(d), antes = s.slice(Math.max(0, m.index - 70), m.index), melhor = -1, rot = "Data citada", env = false;
+      ROT.forEach(function (r) { var k = antes.lastIndexOf(r[0]); if (k > melhor) { melhor = k; rot = r[1]; env = !!r[2]; } });
+      if (!vistos[iso + rot]) { vistos[iso + rot] = 1; out.push({ rotulo: rot, data: iso, envio: env }); }
+    }
+    return out;
+  }
+
+  /* ══ 4. Marketing ══
+     Regras simples agora. Gancho para o servidor de IA local: quando existir, defina
+       window.PHYSIS_IA_LOCAL = { gerar: function (pedido) { return Promise<string>; } }
+     (por exemplo, chamando o servidor de IA da própria Physis). Nada é enviado a IA de fora. */
+  var TEMAS_INICIAIS = [["Energia solar no campo", "energia"], ["Reúso de água na irrigação", "agua"], ["Sensores de umidade do solo", "agro"], ["Crédito de carbono para pequenos produtores", "clima"],
+    ["Eficiência energética na climatização", "construcao"], ["Agrofloresta e soluções baseadas na natureza", "agro"], ["Qualidade da água e pH", "agua"], ["ESG para pequenas empresas", "sustentabilidade"]];
+  var SISTEMAS = ["Monitoramento Verde (sensores e receptor)", "SustainKit", "SCADA Physis", "Hub Physis (servidor e dados)", "Planejador Physis", "Seletor de SbN e viveiro"];
+  var FORMATOS = [["post", L("Post (quadrado)", "Post (square)")], ["carrossel", L("Carrossel", "Carousel")], ["story", "Story"], ["artigo", L("Capa de artigo", "Article cover")], ["video", L("Vídeo curto", "Short video")]];
+  var TIPOS_MKT = { post: [L("Post", "Post"), ["instagram", "linkedin"], "post"], artigo: [L("Artigo (blog e LinkedIn)", "Article (blog and LinkedIn)"), ["site", "linkedin"], "artigo"], cientifico: [L("Artigo técnico", "Technical article"), ["site", "linkedin"], "artigo"], video: [L("Vídeo curto (cursos)", "Short video (courses)"), ["youtube", "instagram"], "video"] };
+  var ESTADOS_MKT = { rascunho: L("Rascunho", "Draft"), aguardando: L("Aguardando aprovação", "Awaiting approval"), ajuste: L("Pediram ajuste", "Changes requested"), aprovado: L("Aprovado", "Approved"), agendado: L("Agendado", "Scheduled"), publicado: L("Publicado", "Published") };
+  var estM = { vista: "plano", semana: "", nPosts: 3, aberto: null, metrica: "seguidores", erro: "" };
+  function temas() { if (!existe(K.mktTemas)) gravar(K.mktTemas, TEMAS_INICIAIS.map(function (t) { return { id: novoId(), tema: t[0], area: t[1], tendencia: 5, interesse: 5, votos: 0, usadoEm: "" }; })); return ler(K.mktTemas); }
+  function nota(t) { var usado = t.usadoEm && diasAte(t.usadoEm) !== null && diasAte(t.usadoEm) > -14; return Math.round((0.4 * (+t.tendencia || 0) + 0.3 * (+t.interesse || 0) + 0.3 * Math.min(10, (+t.votos || 0) * 2) - (usado ? 3 : 0)) * 10) / 10; }
+  function ranking() { return temas().slice().sort(function (a, b) { return nota(b) - nota(a); }); }
+  function hashtags(area) { return { energia: "#EnergiaSolar #Energia", agua: "#Água #Saneamento", clima: "#Clima #Carbono", agro: "#Agro #Agrofloresta", inovacao: "#IoT #Inovação", sustentabilidade: "#ESG #Sustentabilidade", construcao: "#Climatização #Eficiência", capacitacao: "#Cursos #Capacitação" }[area] || "#Sustentabilidade"; }
+  function rascunho(tipo, tema, area) {
+    // regra simples: um esqueleto bom para começar. Quem escreve troca os colchetes.
+    if (tipo === "post") return tema + ": " + L("você sabia?", "did you know?") + "\n\n[" + L("Uma frase com um dado real sobre ", "One sentence with a real fact about ") + tema.toLowerCase() + L(" (com a fonte)", " (with the source)") + "]\n\n" + L("Na Physis Engineering, a gente mede, mostra e ajuda a decidir:", "At Physis Engineering we measure, show and help decide:") + "\n• [" + L("benefício 1", "benefit 1") + "]\n• [" + L("benefício 2", "benefit 2") + "]\n• [" + L("benefício 3", "benefit 3") + "]\n\n" + L("Quer saber mais? www.physisengineering.com", "Want to know more? www.physisengineering.com") + "\n\n#Physis " + hashtags(area);
+    if (tipo === "artigo") return L("Título: ", "Title: ") + tema + L(" na prática", " in practice") + "\n\n1. " + L("O problema (em palavras simples)", "The problem") + "\n2. " + L("O que a Physis faz e como mede o resultado", "What Physis does and how it measures results") + "\n3. " + L("Um caso real (sem nome do cliente sem autorização)", "A real case (no client name without permission)") + "\n4. " + L("Como começar", "How to start") + "\n\n" + L("Chamada: fale com a Physis em www.physisengineering.com", "Call to action: www.physisengineering.com") + "\n" + L("Publicar no blog do site e no LinkedIn da empresa.", "Publish on the site blog and the company LinkedIn.");
+    if (tipo === "cientifico") return L("Artigo técnico sobre: ", "Technical article on: ") + tema + "\n\n" + L("Resumo (até 150 palavras)\nIntrodução: o problema e por que importa\nMétodo: o sistema, os sensores e os dados usados\nResultados: números reais, com período e fonte\nDiscussão: limites e próximos passos\nReferências: normas e artigos citados", "Abstract\nIntroduction\nMethod\nResults (real numbers, period and source)\nDiscussion\nReferences") + "\n\n" + L("Só publicar com dados conferidos pela equipe técnica.", "Publish only with data checked by the technical team.");
+    return L("Roteiro de vídeo curto (45 a 60 segundos) · ", "Short video script (45-60 s) · ") + tema + "\n\n0–5 s · " + L("Gancho: uma pergunta que a pessoa se faz", "Hook: a question people ask") + "\n5–20 s · " + L("O problema, com uma imagem do campo", "The problem, with a field image") + "\n20–45 s · " + L("O que o curso [nome do curso] ensina, em 3 pontos", "What the course [course name] teaches, in 3 points") + "\n45–60 s · " + L("Chamada: inscrições em www.physisengineering.com", "Call to action: sign up at www.physisengineering.com") + "\n\n" + L("Legenda na tela e texto alternativo na descrição.", "On-screen captions and alt text in the description.");
+  }
+  function montarPlano(semana, n) {
+    var seg = segundaDe(semana || hojeISO()), rk = ranking().slice(0, n), itens = ler(K.mktItens), modelos = ler(K.mktModelos), novos = [], dias = [1, 3, 5], ts = temas();
+    var modeloDe = function (f) { var m = modelos.filter(function (x) { return x.formato === f; })[0]; return m ? m.id : ""; };
+    if (itens.some(function (c) { return c.semana === seg && c.auto; })) return { ok: false, erro: L("Esta semana já tem plano. Apague os itens dela para montar de novo.", "This week already has a plan.") };
+    rk.forEach(function (t, i) {
+      var pid = novoId(), dia = somaDias(seg, dias[i] || i + 1);
+      novos.push({ id: pid, auto: true, semana: seg, tipo: "post", tema: t.tema, area: t.area, titulo: t.tema, texto: rascunho("post", t.tema, t.area), redes: TIPOS_MKT.post[1].slice(), modelo: modeloDe("post"), dataSugerida: dia, estado: "rascunho", aprovacoes: {} });
+      novos.push({ id: novoId(), auto: true, semana: seg, tipo: "artigo", vinculo: pid, tema: t.tema, area: t.area, titulo: L("Artigo: ", "Article: ") + t.tema, texto: rascunho("artigo", t.tema, t.area), redes: TIPOS_MKT.artigo[1].slice(), modelo: modeloDe("artigo"), dataSugerida: somaDias(dia, 1), estado: "rascunho", aprovacoes: {} });
+    });
+    var semN = Math.floor(dataDe(seg) / 6048e5), sist = SISTEMAS[semN % SISTEMAS.length];
+    novos.push({ id: novoId(), auto: true, semana: seg, tipo: "cientifico", tema: sist, area: "inovacao", titulo: L("Artigo técnico: ", "Technical article: ") + sist, texto: rascunho("cientifico", sist, "inovacao"), redes: TIPOS_MKT.cientifico[1].slice(), modelo: modeloDe("artigo"), dataSugerida: somaDias(seg, 2), estado: "rascunho", aprovacoes: {} });
+    var tv = rk[0] ? rk[0].tema : L("cursos da Physis", "Physis courses");
+    novos.push({ id: novoId(), auto: true, semana: seg, tipo: "video", tema: tv, area: "capacitacao", titulo: L("Vídeo curto: curso sobre ", "Short video: course on ") + tv.toLowerCase(), texto: rascunho("video", tv, "capacitacao"), redes: TIPOS_MKT.video[1].slice(), modelo: modeloDe("video"), dataSugerida: somaDias(seg, 4), estado: "rascunho", aprovacoes: {} });
+    gravar(K.mktItens, itens.concat(novos));
+    var usados = rk.map(function (t) { return t.id; }); gravar(K.mktTemas, ts.map(function (t) { if (usados.indexOf(t.id) >= 0) t.usadoEm = seg; return t; }));
+    return { ok: true, n: novos.length };
+  }
+  function pintarMkt(foco) {
+    var s = sec("gx-mkt"); if (!s) return;
+    if (!estM.semana) { var dw = new Date().getDay(); estM.semana = segundaDe(dw === 0 || dw >= 5 ? somaDias(hojeISO(), 7) : hojeISO()); }   // de sexta a domingo, o plano é da semana que vem
+    var eu = pessoaAtual(), aprovador = APROVA_MKT.indexOf(eu) >= 0;
+    var h = "<h1 id='gx-h-mkt'>" + esc(L("Marketing", "Marketing")) + "</h1><p class='gx-sub'>" + esc(L("Instagram @physisengineering, LinkedIn physis-engineering e o site www.physisengineering.com. Nada é publicado sem a aprovação da Rafaella e da Marzia; a publicação é feita pelas contas oficiais, à mão.", "Nothing is published without Rafaella's and Marzia's approval; posting is done by hand on the official accounts.")) + "</p>" +
+      "<p class='gx-aj'>" + esc(L("Os textos e a nota dos temas saem de regras simples, escritas aqui. Quando o servidor de IA da Physis estiver pronto, ele entra no lugar das regras (está preparado).", "Texts and topic scores come from simple rules. The Physis AI server can replace them later.")) + (window.PHYSIS_IA_LOCAL ? " <span class='gx-etq ok'>" + esc(L("IA local ligada", "Local AI on")) + "</span>" : " <span class='gx-etq'>" + esc(L("IA local: ainda não ligada", "Local AI: not connected")) + "</span>") + "</p>" +
+      "<div class='gx-barra' role='group' aria-label='" + esc(L("Partes do marketing", "Marketing parts")) + "'>" + [["plano", L("Plano da semana", "Weekly plan")], ["agenda", L("Agenda por rede", "Schedule by network")], ["enquete", L("Enquete de segunda", "Monday poll")], ["temas", L("Temas e nota", "Topics and score")], ["modelos", L("Modelos do Canva", "Canva templates")], ["metricas", L("Métricas", "Metrics")]]
+        .map(function (a) { return bt("data-mk-vista='" + a[0] + "' aria-pressed='" + (estM.vista === a[0]) + "'", a[1]); }).join("") + "</div>" + (estM.erro ? "<p role='alert' class='gx-erro'>" + esc(estM.erro) + "</p>" : "");
+    if (estM.vista === "plano") h += vistaPlano(eu, aprovador);
+    else if (estM.vista === "agenda") h += vistaAgendaRedes();
+    else if (estM.vista === "enquete") h += vistaEnquete();
+    else if (estM.vista === "temas") h += vistaTemas();
+    else if (estM.vista === "modelos") h += vistaModelos();
+    else h += vistaMetricas();
+    s.innerHTML = h; focar(foco);
+  }
+  function vistaPlano(eu, aprovador) {
+    var seg = estM.semana, itens = ler(K.mktItens).filter(function (c) { return c.semana === seg; }), modelos = ler(K.mktModelos);
+    var h = "<section class='gx-card gx-s' aria-labelledby='gx-mk-hp'><h2 id='gx-mk-hp'>" + esc(L("Plano da semana", "Weekly plan")) + "</h2><p class='gx-sub'>" + esc(L("Por semana: 2 ou 3 posts com os temas de nota mais alta, um artigo (blog e LinkedIn) para cada post, um artigo técnico sobre um sistema da Physis e um vídeo curto que divulga os cursos.", "Per week: 2-3 posts, one article per post, one technical article and one short course video.")) + "</p><div class='gx-grade'>" +
+      campo("gx-mk-sem", L("Semana (qualquer dia dela)", "Week (any day)"), inp("gx-mk-sem", seg, "date")) + campo("gx-mk-n", L("Posts na semana", "Posts per week"), sel("gx-mk-n", [["2", "2"], ["3", "3"]], String(estM.nPosts))) + "</div>" +
+      "<div class='gx-barra' style='margin-top:10px'>" + bt("id='gx-mk-montar'", L("Montar o plano desta semana", "Build this week's plan"), true) + bt("id='gx-mk-novo'", L("Acrescentar item à mão", "Add an item by hand")) + "</div></section>";
+    if (!itens.length) return h + "<p class='gx-aj'>" + esc(L("Nenhum item nesta semana.", "No items this week.")) + "</p>";
+    return h + itens.sort(function (a, b) { return String(a.dataSugerida).localeCompare(String(b.dataSugerida)); }).map(function (c) {
+      var idc = "gx-mk-" + c.id, ab = estM.aberto === c.id, ap = c.aprovacoes || {}, falta = APROVA_MKT.filter(function (p) { return !ap[p]; });
+      var x = "<article class='gx-card' aria-labelledby='" + idc + "-t'><h3 id='" + idc + "-t' tabindex='-1' style='margin:0 0 4px'>" + esc((TIPOS_MKT[c.tipo] || TIPOS_MKT.post)[0] + " · " + c.titulo) + "</h3><p class='gx-aj'>" +
+        "<span class='gx-etq " + (c.estado === "aprovado" || c.estado === "agendado" || c.estado === "publicado" ? "ok" : c.estado === "ajuste" ? "al" : c.estado === "aguardando" ? "at" : "") + "'>" + esc(ESTADOS_MKT[c.estado] || c.estado) + "</span>" +
+        esc([(c.redes || []).map(nomeRede).join(" + "), c.data ? L("publicar em ", "publish on ") + dataBr(c.data) + (c.hora ? " " + c.hora : "") : L("sugerido: ", "suggested: ") + dataBr(c.dataSugerida), APROVA_MKT.map(function (p) { return nomePessoa(p) + (ap[p] ? " OK" : L(" falta", " pending")); }).join(", ")].join(" · ")) + "</p>" +
+        (c.nota ? "<p class='gx-erro'>" + esc(L("Ajuste pedido: ", "Change requested: ") + c.nota) + "</p>" : "");
+      if (ab) {
+        x += "<div class='gx-grade'>" + campo(idc + "-tit", L("Título", "Title"), inp(idc + "-tit", c.titulo)) + campo(idc + "-mod", L("Modelo do Canva", "Canva template"), sel(idc + "-mod", [["", L("(sem modelo)", "(none)")]].concat(modelos.map(function (m) { return [m.id, m.nome]; })), c.modelo)) +
+          campo(idc + "-sug", L("Data sugerida", "Suggested date"), inp(idc + "-sug", c.dataSugerida, "date")) + "</div><fieldset style='border:0;padding:0;margin:8px 0 0'><legend class='gx-rot'>" + esc(L("Onde publicar", "Where to publish")) + "</legend><div style='display:flex;flex-wrap:wrap;gap:0 16px'>" +
+          REDES.map(function (r) { return "<label class='gx-chk'><input type='checkbox' data-mk-rede='" + r[0] + "'" + ((c.redes || []).indexOf(r[0]) >= 0 ? " checked" : "") + "> " + esc(r[1]) + "</label>"; }).join("") + "</div></fieldset>" +
+          campo(idc + "-tx", L("Texto", "Text"), area(idc + "-tx", c.texto, " style='min-height:220px'")) +
+          "<div class='gx-barra' style='margin-top:8px'>" + bt("data-mk-salvar='" + c.id + "'", L("Salvar", "Save"), true) + bt("data-mk-regra='" + c.id + "'", L("Refazer o rascunho (regra simples)", "Redo draft (simple rule)")) +
+          (window.PHYSIS_IA_LOCAL ? bt("data-mk-ia='" + c.id + "'", L("Melhorar com a IA local", "Improve with local AI")) : "") + bt("data-mk-fechar='" + c.id + "'", L("Fechar", "Close")) + "</div>" +
+          "<p class='gx-aj'>" + esc(L("Mudar o texto depois de aprovado volta o item para rascunho (precisa de nova aprovação).", "Editing after approval sends it back to draft.")) + "</p>";
+      } else x += "<details><summary style='cursor:pointer;min-height:44px;display:flex;align-items:center'>" + esc(L("Ver o texto", "View the text")) + "</summary><div class='gx-pre' tabindex='0'>" + esc(c.texto) + "</div></details>";
+      x += "<div class='gx-barra' style='margin-top:6px'>" + (!ab && c.estado !== "publicado" ? bt("data-mk-abrir='" + c.id + "' aria-label=\"" + esc(L("Editar ", "Edit ") + c.titulo) + "\"", L("Editar", "Edit"), false, true) : "") +
+        (c.estado === "rascunho" || c.estado === "ajuste" ? bt("data-mk-pedir='" + c.id + "' aria-label=\"" + esc(L("Pedir aprovação: ", "Ask approval: ") + c.titulo) + "\"", L("Pedir aprovação", "Ask for approval"), true, true) : "") +
+        (c.estado === "aguardando" && aprovador && !ap[eu] ? bt("data-mk-ok='" + c.id + "' aria-label=\"" + esc(L("Aprovar ", "Approve ") + c.titulo) + "\"", L("Aprovar", "Approve"), true, true) + bt("data-mk-ajuste='" + c.id + "' aria-label=\"" + esc(L("Pedir ajuste em ", "Request changes to ") + c.titulo) + "\"", L("Pedir ajuste", "Request changes"), false, true) : "") +
+        (c.estado === "aguardando" && falta.length && !(aprovador && !ap[eu]) ? "<span class='gx-aj'>" + esc(L("Aguardando: ", "Waiting: ") + falta.map(nomePessoa).join(", ")) + "</span>" : "") +
+        (c.estado === "aprovado" || c.estado === "agendado" ? "<label class='gx-rot' for='" + idc + "-dt' style='display:inline'>" + esc(L("Publicar em", "Publish on")) + "</label> <input id='" + idc + "-dt' type='date' class='gx-c' style='width:auto' value=\"" + esc(c.data || c.dataSugerida || "") + "\"> <label class='gx-so-leitor' for='" + idc + "-hr'>" + esc(L("Hora", "Time")) + "</label><input id='" + idc + "-hr' type='time' class='gx-c' style='width:auto' value=\"" + esc(c.hora || "") + "\">" + bt("data-mk-agendar='" + c.id + "'", c.estado === "agendado" ? L("Mudar a data", "Change date") : L("Agendar", "Schedule"), c.estado === "aprovado", true) : "") +
+        (c.estado === "agendado" ? bt("data-mk-pub='" + c.id + "' aria-label=\"" + esc(L("Marcar como publicado: ", "Mark as published: ") + c.titulo) + "\"", L("Marcar como publicado", "Mark as published"), false, true) : "") +
+        bt("data-mk-x='" + c.id + "' aria-label=\"" + esc(L("Apagar ", "Delete ") + c.titulo) + "\"", L("Apagar", "Delete"), false, true) + "</div></article>";
+      return x;
+    }).join("");
+  }
+  function vistaAgendaRedes() {
+    var hj = hojeISO(), fim = somaDias(hj, 41), itens = ler(K.mktItens).filter(function (c) { var d = c.data || c.dataSugerida; return d && d >= somaDias(hj, -7) && d <= fim; }), datas = {};
+    itens.forEach(function (c) { var d = c.data || c.dataSugerida; (datas[d] = datas[d] || []).push(c); });
+    var h = "<section class='gx-card gx-s' aria-labelledby='gx-mk-ha'><h2 id='gx-mk-ha'>" + esc(L("Agenda por rede (6 semanas)", "Schedule by network (6 weeks)")) + "</h2><p class='gx-sub'>" + esc(L("Agendados aparecem também no calendário da equipe. Itens ainda não aprovados aparecem com a data sugerida.", "Scheduled items also show in the team calendar.")) + "</p>" +
+      "<p>" + REDES.filter(function (r) { return r[2]; }).map(function (r) { return link(r[2], r[1]); }).join(" · ") + "</p>";
+    if (!Object.keys(datas).length) return h + "<p class='gx-aj'>" + esc(L("Nada nas próximas semanas.", "Nothing in the coming weeks.")) + "</p></section>";
+    return h + "<div class='gx-rolar'><table class='gx-tab' style='min-width:640px'><caption class='gx-so-leitor'>" + esc(L("Publicações por data e rede", "Posts by date and network")) + "</caption><thead><tr><th scope='col'>" + esc(L("Data", "Date")) + "</th>" + REDES.map(function (r) { return "<th scope='col'>" + esc(nomeRede(r[0])) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+      Object.keys(datas).sort().map(function (d) { return "<tr><th scope='row'>" + esc(dataBr(d)) + "<div class='gx-aj'>" + esc(EN() ? SEM.en[dataDe(d).getDay()] : SEM.pt[dataDe(d).getDay()]) + "</div></th>" + REDES.map(function (r) { return "<td>" + datas[d].filter(function (c) { return (c.redes || []).indexOf(r[0]) >= 0; }).map(function (c) { return "<div>" + esc(c.titulo) + "<br><span class='gx-etq " + (c.estado === "agendado" || c.estado === "publicado" ? "ok" : "") + "'>" + esc(ESTADOS_MKT[c.estado] || c.estado) + "</span></div>"; }).join("") + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div></section>";
+  }
+  function textoEnquete(q) { return L("Enquete da semana · Physis", "Weekly poll · Physis") + "\n" + q.pergunta + "\n\n" + q.opcoes.map(function (o, i) { return (i + 1) + ") " + o.tema; }).join("\n") + "\n\n" + L("Responda com o número. Obrigado!", "Reply with the number. Thanks!"); }
+  function vistaEnquete() {
+    var seg = segundaDe(hojeISO()), q = ler(K.mktEnquetes).filter(function (x) { return x.semana === seg; })[0];
+    var h = "<section class='gx-card gx-s' aria-labelledby='gx-mk-he'><h2 id='gx-mk-he'>" + esc(L("Enquete de segunda (grupo da equipe no WhatsApp)", "Monday poll (team WhatsApp group)")) + "</h2><p class='gx-sub'>" + esc(L("Toda segunda, a equipe vota nos temas da semana. A Gestão monta o texto com os 4 temas de nota mais alta. Abra no WhatsApp, escolha o grupo da equipe e envie (ou crie uma enquete do WhatsApp com as mesmas opções). Depois, anote os votos aqui: eles entram na nota dos temas.", "Every Monday the team votes on topics. Open in WhatsApp, pick the team group and send. Then record the votes here.")) + "</p>";
+    if (!q) return h + bt("id='gx-mk-enq'", L("Montar a enquete desta semana", "Build this week's poll"), true) + "</section>";
+    var tx = textoEnquete(q);
+    return h + "<p><strong>" + esc(L("Semana de ", "Week of ") + dataBr(seg)) + "</strong></p><div class='gx-pre' tabindex='0' aria-label='" + esc(L("Texto da enquete", "Poll text")) + "'>" + esc(tx) + "</div>" +
+      "<div class='gx-barra'>" + bt("id='gx-mk-enq-copiar'", L("Copiar o texto", "Copy text")) + "<a class='gx-b gx-p' style='display:inline-flex;align-items:center;text-decoration:none' href=\"" + esc("https://wa.me/?text=" + encodeURIComponent(tx)) + "\" target='_blank' rel='noopener noreferrer'>" + esc(L("Abrir no WhatsApp", "Open in WhatsApp")) + "<span class='gx-so-leitor'>" + esc(L(" (abre outra aba)", " (opens another tab)")) + "</span></a></div>" +
+      "<h3>" + esc(L("Votos recebidos", "Votes received")) + "</h3><div class='gx-grade'>" + q.opcoes.map(function (o, i) { return campo("gx-mk-v-" + i, o.tema, inp("gx-mk-v-" + i, o.votos || 0, "number", " min='0' inputmode='numeric'")); }).join("") + "</div>" +
+      "<div class='gx-barra' style='margin-top:10px'>" + bt("id='gx-mk-votos'", L("Guardar os votos", "Save votes"), true) + bt("id='gx-mk-enq-x'", L("Refazer a enquete", "Redo the poll")) + "</div></section>";
+  }
+  function vistaTemas() {
+    var rk = ranking();
+    return "<section class='gx-card gx-s' aria-labelledby='gx-mk-ht'><h2 id='gx-mk-ht'>" + esc(L("Temas e nota", "Topics and score")) + "</h2><p class='gx-sub'>" + esc(L("Nota por regra simples: 40% tendência + 30% interesse do público + 30% votos da enquete (cada voto vale 2, até 10) − 3 se o tema foi usado nas últimas 2 semanas. Tendência e interesse vão de 0 a 10 e são dados por vocês (por exemplo, olhando buscas e comentários).", "Score: 40% trend + 30% interest + 30% poll votes − 3 if used in the last 2 weeks.")) + "</p>" +
+      "<div class='gx-rolar'><table class='gx-tab' style='min-width:640px'><caption class='gx-so-leitor'>" + esc(L("Temas por nota", "Topics by score")) + "</caption><thead><tr><th scope='col'>" + esc(L("Tema", "Topic")) + "</th><th scope='col'>" + esc(L("Área", "Area")) + "</th><th scope='col'>" + esc(L("Tendência (0–10)", "Trend (0-10)")) + "</th><th scope='col'>" + esc(L("Interesse (0–10)", "Interest (0-10)")) + "</th><th scope='col'>" + esc(L("Votos", "Votes")) + "</th><th scope='col'>" + esc(L("Nota", "Score")) + "</th><th scope='col'><span class='gx-so-leitor'>" + esc(L("Ações", "Actions")) + "</span></th></tr></thead><tbody>" +
+      rk.map(function (t) { return "<tr><th scope='row' style='font-weight:600'>" + esc(t.tema) + (t.usadoEm ? "<div class='gx-aj'>" + esc(L("usado na semana de ", "used week of ") + dataBr(t.usadoEm)) + "</div>" : "") + "</th><td>" + esc(nomeArea(t.area)) + "</td><td><input class='gx-c' style='width:5em' type='number' min='0' max='10' data-mk-t='" + t.id + "' data-campo='tendencia' value='" + esc(t.tendencia) + "' aria-label=\"" + esc(L("Tendência de ", "Trend of ") + t.tema) + "\"></td><td><input class='gx-c' style='width:5em' type='number' min='0' max='10' data-mk-t='" + t.id + "' data-campo='interesse' value='" + esc(t.interesse) + "' aria-label=\"" + esc(L("Interesse de ", "Interest of ") + t.tema) + "\"></td><td>" + esc(t.votos || 0) + "</td><td><strong>" + esc(nota(t)) + "</strong></td><td>" + bt("data-mk-tx='" + t.id + "' aria-label=\"" + esc(L("Apagar o tema ", "Delete topic ") + t.tema) + "\"", L("Apagar", "Delete"), false, true) + "</td></tr>"; }).join("") + "</tbody></table></div>" +
+      "<h3>" + esc(L("Novo tema", "New topic")) + "</h3><div class='gx-grade'>" + campo("gx-mk-nt", L("Tema", "Topic"), inp("gx-mk-nt")) + campo("gx-mk-na", L("Área", "Area"), sel("gx-mk-na", AREAS.map(function (a) { return [a[0], L(a[1], a[2])]; }), "sustentabilidade")) + "</div><div class='gx-barra' style='margin-top:10px'>" + bt("id='gx-mk-nt-ok'", L("Acrescentar tema", "Add topic"), true) + "</div></section>";
+  }
+  function vistaModelos() {
+    var ms = ler(K.mktModelos);
+    return "<section class='gx-card gx-s' aria-labelledby='gx-mk-hm'><h2 id='gx-mk-hm'>" + esc(L("Modelos do Canva", "Canva templates")) + "</h2><p class='gx-sub'>" + esc(L("Os modelos ficam no Canva da Physis. Guarde aqui o nome e o link de cada um; o plano da semana escolhe o modelo pelo formato.", "Templates live in Physis' Canva. Keep the name and link here.")) + "</p>" +
+      (ms.length ? "<ul class='gx-lista'>" + ms.map(function (m) { return "<li><span class='gx-tx'><strong>" + esc(m.nome) + "</strong> · " + esc((FORMATOS.filter(function (f) { return f[0] === m.formato; })[0] || ["", m.formato])[1]) + (m.link ? " · " + link(m.link, L("Abrir no Canva", "Open in Canva")) : "") + "</span>" + bt("data-mk-mx='" + m.id + "' aria-label=\"" + esc(L("Apagar o modelo ", "Delete template ") + m.nome) + "\"", L("Apagar", "Delete"), false, true) + "</li>"; }).join("") + "</ul>" : "<p class='gx-aj'>" + esc(L("Nenhum modelo guardado ainda.", "No templates yet.")) + "</p>") +
+      "<h3>" + esc(L("Novo modelo", "New template")) + "</h3><div class='gx-grade'>" + campo("gx-mk-mn", L("Nome", "Name"), inp("gx-mk-mn")) + campo("gx-mk-mf", L("Formato", "Format"), sel("gx-mk-mf", FORMATOS, "post")) + campo("gx-mk-ml", L("Link do Canva (https://…)", "Canva link (https://…)"), inp("gx-mk-ml", "", "url")) + "</div>" +
+      "<div class='gx-barra' style='margin-top:10px'>" + bt("id='gx-mk-m-ok'", L("Guardar modelo", "Save template"), true) + "</div></section>";
+  }
+  var METRICAS = [["seguidores", L("Seguidores", "Followers")], ["visualizacoes", L("Visualizações", "Views")], ["leads", L("Contatos (leads)", "Leads")], ["clientes", L("Clientes novos", "New clients")]];
+  function vistaMetricas() {
+    var ms = ler(K.mktMetricas).sort(function (a, b) { return String(a.data).localeCompare(String(b.data)); }), nm = (METRICAS.filter(function (m) { return m[0] === estM.metrica; })[0] || METRICAS[0])[1];
+    var h = "<section class='gx-card gx-s' aria-labelledby='gx-mk-hme'><h2 id='gx-mk-hme'>" + esc(L("Métricas", "Metrics")) + "</h2><p class='gx-sub'>" + esc(L("Anote os números de cada rede (por exemplo, toda segunda ou todo mês). O gráfico mostra a evolução.", "Record each network's numbers; the chart shows the trend.")) + "</p><div class='gx-grade'>" +
+      campo("gx-mk-md", L("Data", "Date"), inp("gx-mk-md", hojeISO(), "date")) + campo("gx-mk-mr", L("Rede", "Network"), sel("gx-mk-mr", REDES.map(function (r) { return [r[0], nomeRede(r[0])]; }), "instagram")) +
+      METRICAS.map(function (m) { return campo("gx-mk-m-" + m[0], m[1], inp("gx-mk-m-" + m[0], "", "number", " min='0' inputmode='numeric'")); }).join("") + "</div><div class='gx-barra' style='margin-top:10px'>" + bt("id='gx-mk-me-ok'", L("Guardar os números", "Save numbers"), true) + "</div></section>";
+    h += "<section class='gx-card gx-s' aria-labelledby='gx-mk-hg'><h2 id='gx-mk-hg'>" + esc(L("Gráfico", "Chart")) + "</h2><div style='max-width:320px'>" + campo("gx-mk-mg", L("Mostrar", "Show"), sel("gx-mk-mg", METRICAS, estM.metrica)) + "</div>" + grafico(ms, estM.metrica, nm) + "</section>";
+    h += "<section class='gx-card gx-s' aria-labelledby='gx-mk-hmt'><h2 id='gx-mk-hmt'>" + esc(L("Números anotados", "Recorded numbers")) + " (" + ms.length + ")</h2>" + (ms.length ? "<div class='gx-rolar'><table class='gx-tab' style='min-width:600px'><caption class='gx-so-leitor'>" + esc(L("Métricas por data e rede", "Metrics by date and network")) + "</caption><thead><tr><th scope='col'>" + esc(L("Data", "Date")) + "</th><th scope='col'>" + esc(L("Rede", "Network")) + "</th>" + METRICAS.map(function (m) { return "<th scope='col' style='text-align:right'>" + esc(m[1]) + "</th>"; }).join("") + "<th scope='col'><span class='gx-so-leitor'>" + esc(L("Ações", "Actions")) + "</span></th></tr></thead><tbody>" +
+      ms.slice().reverse().map(function (m) { return "<tr><th scope='row'>" + esc(dataBr(m.data)) + "</th><td>" + esc(nomeRede(m.rede)) + "</td>" + METRICAS.map(function (k) { return "<td style='text-align:right;font-variant-numeric:tabular-nums'>" + (m[k[0]] === "" || m[k[0]] == null ? "—" : esc(Number(m[k[0]]).toLocaleString(EN() ? "en" : "pt-BR"))) + "</td>"; }).join("") + "<td>" + bt("data-mk-mex='" + m.id + "' aria-label=\"" + esc(L("Apagar a linha de ", "Delete row of ") + dataBr(m.data) + " " + nomeRede(m.rede)) + "\"", L("Apagar", "Delete"), false, true) + "</td></tr>"; }).join("") + "</tbody></table></div>" : "<p class='gx-aj'>" + esc(L("Nenhum número anotado ainda.", "No numbers yet.")) + "</p>") + "</section>";
+    return h;
+  }
+  function grafico(ms, chave, nome) {
+    var redes = REDES.map(function (r) { return r[0]; }).filter(function (r) { return ms.some(function (m) { return m.rede === r && m[chave] !== "" && m[chave] != null; }); });
+    var datas = []; ms.forEach(function (m) { if (m[chave] !== "" && m[chave] != null && datas.indexOf(m.data) < 0) datas.push(m.data); }); datas.sort();
+    if (!redes.length || datas.length < 2) return "<p class='gx-aj'>" + esc(L("O gráfico aparece quando houver pelo menos duas datas com números.", "The chart appears with at least two dates.")) + "</p>";
+    var W = 720, H = 300, ml = 64, mr = 150, mt = 16, mb = 40, max = 0;
+    ms.forEach(function (m) { var v = +m[chave]; if (isFinite(v) && v > max) max = v; }); max = max || 1;
+    var x = function (d) { return ml + (W - ml - mr) * (datas.indexOf(d) / (datas.length - 1)); }, y = function (v) { return mt + (H - mt - mb) * (1 - v / max); };
+    var cores = { instagram: "#8E3A6E", linkedin: "#1C5A8A", site: "#33512F", youtube: "#A63A28" }, fmt = function (v) { return Number(v).toLocaleString(EN() ? "en" : "pt-BR"); };
+    var resumo = redes.map(function (r) { var l = ms.filter(function (m) { return m.rede === r && m[chave] !== "" && m[chave] != null; }); return nomeRede(r) + ": " + fmt(l[0][chave]) + " → " + fmt(l[l.length - 1][chave]); }).join("; ");
+    var s = "<svg class='gx-grafico' viewBox='0 0 " + W + " " + H + "' role='img' aria-label=\"" + esc(nome + L(" por rede, de ", " by network, from ") + dataBr(datas[0]) + L(" a ", " to ") + dataBr(datas[datas.length - 1]) + ". " + resumo) + "\">";
+    [0, 0.5, 1].forEach(function (f) { var yy = y(max * f); s += "<line x1='" + ml + "' x2='" + (W - mr) + "' y1='" + yy + "' y2='" + yy + "' stroke='#C9D2C4'/><text x='" + (ml - 8) + "' y='" + (yy + 4) + "' text-anchor='end' font-size='12' fill='#4A4F44'>" + esc(fmt(Math.round(max * f))) + "</text>"; });
+    s += "<text x='" + ml + "' y='" + (H - 12) + "' font-size='12' fill='#4A4F44'>" + esc(dataBr(datas[0])) + "</text><text x='" + (W - mr) + "' y='" + (H - 12) + "' text-anchor='end' font-size='12' fill='#4A4F44'>" + esc(dataBr(datas[datas.length - 1])) + "</text>";
+    redes.forEach(function (r) { var pts = ms.filter(function (m) { return m.rede === r && m[chave] !== "" && m[chave] != null; }).map(function (m) { return [x(m.data), y(+m[chave])]; });
+      s += "<polyline fill='none' stroke='" + cores[r] + "' stroke-width='2.5' points='" + pts.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ") + "'/>" + pts.map(function (p) { return "<circle cx='" + p[0].toFixed(1) + "' cy='" + p[1].toFixed(1) + "' r='3.5' fill='" + cores[r] + "'/>"; }).join("");
+      var u = pts[pts.length - 1]; s += "<text x='" + (u[0] + 8) + "' y='" + (u[1] + 4) + "' font-size='13' font-weight='600' fill='" + cores[r] + "'>" + esc(nomeRede(r)) + "</text>"; });
+    return s + "</svg>";
+  }
+  function lerItemAberto(id) {
+    var idc = "gx-mk-" + id, redes = []; document.querySelectorAll("#gx-mkt [data-mk-rede]").forEach(function (c) { if (c.checked) redes.push(c.getAttribute("data-mk-rede")); });
+    return { titulo: String(val(idc + "-tit")).trim(), modelo: val(idc + "-mod"), dataSugerida: val(idc + "-sug"), texto: val(idc + "-tx"), redes: redes };
+  }
+  function mudarMkt(id, fn) { var l = ler(K.mktItens); l = l.map(function (c) { return c.id === id ? (fn(c) || c) : c; }); gravar(K.mktItens, l); }
+  function ligarMkt(s) {
+    s.addEventListener("click", function (ev) {
+      var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return; var id, eu = pessoaAtual(); estM.erro = "";
+      if ((id = b.getAttribute("data-mk-vista"))) { estM.vista = id; return pintarMkt("[data-mk-vista='" + id + "']"); }
+      if (b.id === "gx-mk-montar") { estM.semana = segundaDe(val("gx-mk-sem") || hojeISO()); estM.nPosts = +val("gx-mk-n") || 3; var r = montarPlano(estM.semana, estM.nPosts); if (!r.ok) estM.erro = r.erro; pintarMkt("gx-mk-montar"); return dizer(r.ok ? L("Plano montado: ", "Plan built: ") + r.n + L(" itens em rascunho.", " draft items.") : r.erro, !r.ok); }
+      if (b.id === "gx-mk-novo") { estM.semana = segundaDe(val("gx-mk-sem") || hojeISO()); var nid = novoId(); gravar(K.mktItens, ler(K.mktItens).concat([{ id: nid, semana: estM.semana, tipo: "post", tema: "", area: "", titulo: L("Novo post", "New post"), texto: "", redes: ["instagram"], modelo: "", dataSugerida: somaDias(estM.semana, 1), estado: "rascunho", aprovacoes: {} }])); estM.aberto = nid; return pintarMkt("gx-mk-" + nid + "-tit"); }
+      if ((id = b.getAttribute("data-mk-abrir"))) { estM.aberto = id; return pintarMkt("gx-mk-" + id + "-tit"); }
+      if ((id = b.getAttribute("data-mk-fechar"))) { estM.aberto = null; return pintarMkt("[data-mk-abrir='" + id + "']"); }
+      if ((id = b.getAttribute("data-mk-salvar"))) { var f = lerItemAberto(id); if (!f.titulo) { dizer(L("Escreva o título.", "Write the title."), true); return focar("gx-mk-" + id + "-tit"); }
+        mudarMkt(id, function (c) { var mudouTexto = c.texto !== f.texto || c.titulo !== f.titulo; Object.assign(c, f); if (mudouTexto && ["aguardando", "aprovado", "agendado"].indexOf(c.estado) >= 0) { c.estado = "rascunho"; c.aprovacoes = {}; c.data = ""; } return c; });
+        estM.aberto = null; pintarMkt("[data-mk-abrir='" + id + "']"); repintarCalendarios(); return dizer(L("Salvo.", "Saved."), false); }
+      if ((id = b.getAttribute("data-mk-regra"))) { var it = ler(K.mktItens).filter(function (c) { return c.id === id; })[0]; if (!it) return; var t = document.getElementById("gx-mk-" + id + "-tx"); if (t && (!t.value.trim() || window.confirm(L("Trocar o texto atual pelo rascunho da regra?", "Replace the text with the rule draft?")))) { t.value = rascunho(it.tipo, it.tema || String(val("gx-mk-" + id + "-tit")), it.area); t.focus(); } return; }
+      if ((id = b.getAttribute("data-mk-ia"))) { var t2 = document.getElementById("gx-mk-" + id + "-tx"), ia = window.PHYSIS_IA_LOCAL; if (!t2 || !ia || !ia.gerar) return; b.disabled = true; dizer(L("Pedindo à IA local…", "Asking the local AI…"), false);
+        Promise.resolve(ia.gerar({ tarefa: "melhorar-texto-marketing", texto: t2.value, idioma: EN() ? "en" : "pt-BR" })).then(function (novo) { if (novo) { t2.value = String(novo); dizer(L("Texto sugerido pela IA local. Revise antes de salvar.", "Text suggested by the local AI. Review before saving."), false); } b.disabled = false; t2.focus(); }, function () { b.disabled = false; dizer(L("A IA local não respondeu.", "The local AI did not answer."), true); }); return; }
+      if ((id = b.getAttribute("data-mk-pedir"))) { mudarMkt(id, function (c) { c.estado = "aguardando"; c.aprovacoes = {}; c.nota = ""; c.pedidoPor = eu; return c; }); pintarMkt("gx-mk-" + id + "-t"); repintarCalendarios(); return dizer(L("Aprovação pedida a Rafaella e Marzia.", "Approval requested."), false); }
+      if ((id = b.getAttribute("data-mk-ok"))) { if (APROVA_MKT.indexOf(eu) < 0) return; mudarMkt(id, function (c) { c.aprovacoes = c.aprovacoes || {}; c.aprovacoes[eu] = new Date().toISOString(); if (APROVA_MKT.every(function (p) { return c.aprovacoes[p]; })) c.estado = "aprovado"; return c; }); pintarMkt("gx-mk-" + id + "-t"); repintarCalendarios(); return dizer(L("Sua aprovação foi registrada.", "Your approval was recorded."), false); }
+      if ((id = b.getAttribute("data-mk-ajuste"))) { if (APROVA_MKT.indexOf(eu) < 0) return; var n = window.prompt(L("O que ajustar?", "What to change?"), ""); if (!n) return; mudarMkt(id, function (c) { c.estado = "ajuste"; c.nota = nomePessoa(eu) + ": " + n; c.aprovacoes = {}; return c; }); pintarMkt("gx-mk-" + id + "-t"); repintarCalendarios(); return dizer(L("Ajuste pedido.", "Changes requested."), false); }
+      if ((id = b.getAttribute("data-mk-agendar"))) { var d = val("gx-mk-" + id + "-dt"); if (!d) { dizer(L("Escolha a data.", "Pick the date."), true); return focar("gx-mk-" + id + "-dt"); } var hr = val("gx-mk-" + id + "-hr"); mudarMkt(id, function (c) { if (c.estado !== "aprovado" && c.estado !== "agendado") return c; c.data = d; c.hora = hr; c.estado = "agendado"; return c; }); pintarMkt("gx-mk-" + id + "-t"); repintarCalendarios(); return dizer(L("Agendado para ", "Scheduled for ") + dataBr(d) + L(". Está no calendário da equipe.", ". It is in the team calendar."), false); }
+      if ((id = b.getAttribute("data-mk-pub"))) { mudarMkt(id, function (c) { c.estado = "publicado"; c.publicadoPor = eu; c.publicadoEm = new Date().toISOString(); return c; }); pintarMkt("gx-mk-" + id + "-t"); repintarCalendarios(); return dizer(L("Marcado como publicado.", "Marked as published."), false); }
+      if ((id = b.getAttribute("data-mk-x"))) { var al = ler(K.mktItens).filter(function (c) { return c.id === id; })[0]; if (!al || !window.confirm(L("Apagar “", "Delete “") + al.titulo + "”?")) return; gravar(K.mktItens, ler(K.mktItens).filter(function (c) { return c.id !== id; })); pintarMkt("gx-mk-hp"); repintarCalendarios(); return; }
+      if (b.id === "gx-mk-enq") { var top = ranking().slice(0, 4); gravar(K.mktEnquetes, ler(K.mktEnquetes).concat([{ id: novoId(), semana: segundaDe(hojeISO()), pergunta: L("Qual destes temas a Physis deve mostrar esta semana?", "Which of these topics should Physis show this week?"), opcoes: top.map(function (t) { return { temaId: t.id, tema: t.tema, votos: 0 }; }), criadaPor: eu }])); pintarMkt("gx-mk-enq-copiar"); return dizer(L("Enquete montada.", "Poll built."), false); }
+      if (b.id === "gx-mk-enq-copiar") { var q = ler(K.mktEnquetes).filter(function (x) { return x.semana === segundaDe(hojeISO()); })[0]; if (!q) return; var tx = textoEnquete(q); (navigator.clipboard ? navigator.clipboard.writeText(tx) : Promise.reject()).then(function () { dizer(L("Texto copiado. Cole no grupo da equipe.", "Text copied."), false); }, function () { dizer(L("Não deu para copiar: selecione o texto e use Ctrl+C.", "Could not copy: select the text and press Ctrl+C."), true); }); return; }
+      if (b.id === "gx-mk-votos") { var seg = segundaDe(hojeISO()), qs = ler(K.mktEnquetes), q2 = qs.filter(function (x) { return x.semana === seg; })[0]; if (!q2) return; var ts = temas();
+        q2.opcoes.forEach(function (o, i) { var novo = Math.max(0, parseInt(val("gx-mk-v-" + i), 10) || 0), dif = novo - (o.votos || 0); o.votos = novo; ts.forEach(function (t) { if (t.id === o.temaId) t.votos = Math.max(0, (+t.votos || 0) + dif); }); });
+        gravar(K.mktEnquetes, qs); gravar(K.mktTemas, ts); pintarMkt("gx-mk-votos"); return dizer(L("Votos guardados. A nota dos temas foi atualizada.", "Votes saved; topic scores updated."), false); }
+      if (b.id === "gx-mk-enq-x") { if (!window.confirm(L("Refazer a enquete desta semana? Os votos anotados nela saem.", "Redo this week's poll?"))) return; var seg2 = segundaDe(hojeISO()), velha = ler(K.mktEnquetes).filter(function (x) { return x.semana === seg2; })[0], ts2 = temas();
+        if (velha) velha.opcoes.forEach(function (o) { ts2.forEach(function (t) { if (t.id === o.temaId) t.votos = Math.max(0, (+t.votos || 0) - (o.votos || 0)); }); }); gravar(K.mktTemas, ts2); gravar(K.mktEnquetes, ler(K.mktEnquetes).filter(function (x) { return x.semana !== seg2; })); return pintarMkt("gx-mk-enq"); }
+      if (b.id === "gx-mk-nt-ok") { var nt = String(val("gx-mk-nt")).trim(); if (!nt) { dizer(L("Escreva o tema.", "Write the topic."), true); return focar("gx-mk-nt"); } gravar(K.mktTemas, temas().concat([{ id: novoId(), tema: nt, area: val("gx-mk-na"), tendencia: 5, interesse: 5, votos: 0, usadoEm: "" }])); pintarMkt("gx-mk-nt"); return dizer(L("Tema acrescentado.", "Topic added."), false); }
+      if ((id = b.getAttribute("data-mk-tx"))) { if (!window.confirm(L("Apagar este tema?", "Delete this topic?"))) return; gravar(K.mktTemas, temas().filter(function (t) { return t.id !== id; })); return pintarMkt("gx-mk-nt"); }
+      if (b.id === "gx-mk-m-ok") { var mn = String(val("gx-mk-mn")).trim(), ml = String(val("gx-mk-ml")).trim(); if (!mn) { dizer(L("Escreva o nome do modelo.", "Write the template name."), true); return focar("gx-mk-mn"); } if (ml && !/^https:\/\//i.test(ml)) { dizer(L("O link precisa começar com https://", "The link must start with https://"), true); return focar("gx-mk-ml"); }
+        gravar(K.mktModelos, ler(K.mktModelos).concat([{ id: novoId(), nome: mn, formato: val("gx-mk-mf"), link: ml }])); pintarMkt("gx-mk-mn"); return dizer(L("Modelo guardado.", "Template saved."), false); }
+      if ((id = b.getAttribute("data-mk-mx"))) { if (!window.confirm(L("Apagar este modelo?", "Delete this template?"))) return; gravar(K.mktModelos, ler(K.mktModelos).filter(function (m) { return m.id !== id; })); return pintarMkt("gx-mk-mn"); }
+      if (b.id === "gx-mk-me-ok") { var reg = { id: novoId(), data: val("gx-mk-md"), rede: val("gx-mk-mr") }, algum = false; METRICAS.forEach(function (m) { var v = String(val("gx-mk-m-" + m[0])).trim(); reg[m[0]] = v === "" ? "" : Math.max(0, +v || 0); if (v !== "") algum = true; });
+        if (!reg.data || !algum) { dizer(L("Informe a data e pelo menos um número.", "Give the date and at least one number."), true); return focar(!reg.data ? "gx-mk-md" : "gx-mk-m-seguidores"); }
+        gravar(K.mktMetricas, ler(K.mktMetricas).filter(function (m) { return !(m.data === reg.data && m.rede === reg.rede); }).concat([reg])); pintarMkt("gx-mk-me-ok"); return dizer(L("Números guardados.", "Numbers saved."), false); }
+      if ((id = b.getAttribute("data-mk-mex"))) { if (!window.confirm(L("Apagar esta linha?", "Delete this row?"))) return; gravar(K.mktMetricas, ler(K.mktMetricas).filter(function (m) { return m.id !== id; })); return pintarMkt("gx-mk-hmt"); }
+    });
+    s.addEventListener("change", function (ev) {
+      var t = ev.target, id;
+      if (t.id === "gx-mk-sem") { estM.semana = segundaDe(t.value || hojeISO()); return pintarMkt("gx-mk-sem"); }
+      if (t.id === "gx-mk-n") { estM.nPosts = +t.value; return; }
+      if (t.id === "gx-mk-mg") { estM.metrica = t.value; return pintarMkt("gx-mk-mg"); }
+      if ((id = t.getAttribute && t.getAttribute("data-mk-t"))) { var campoT = t.getAttribute("data-campo"), v = Math.max(0, Math.min(10, +t.value || 0)); gravar(K.mktTemas, temas().map(function (x) { if (x.id === id) x[campoT] = v; return x; })); var foco = "[data-mk-t='" + id + "'][data-campo='" + campoT + "']"; pintarMkt(foco); }
+    });
+  }
+
+  /* ══ 5. E-mails no estilo Outlook/Gmail ══ */
+  var MODELOS_MAIL = [
+    ["Envio de proposta", "Proposta da Physis Engineering · {proposta}", "Olá, {nome}.\n\nSegue a proposta {proposta} da Physis Engineering, conforme conversamos.\n\nFicamos à disposição para tirar dúvidas e ajustar o que for preciso.\n\nAtenciosamente,\n{assinatura}"],
+    ["Convite para reunião", "Reunião com a Physis · {assunto}", "Olá, {nome}.\n\nVamos conversar sobre {assunto}?\nData: {data}\nLink da sala: {link}\n\nSe o horário não servir, responda com duas opções.\n\nAtenciosamente,\n{assinatura}"],
+    ["Acompanhamento (sem resposta)", "Seguimos à disposição · {assunto}", "Olá, {nome}.\n\nPassando para saber se você conseguiu ver o que enviamos sobre {assunto}.\n\nSe preferir, podemos conversar por telefone.\n\nAtenciosamente,\n{assinatura}"],
+    ["Edital: pedido de esclarecimento", "Pedido de esclarecimento · {edital}", "Prezados,\n\nA Physis Engineering tem interesse no edital {edital} e gostaria de esclarecer:\n\n1. {pergunta}\n\nAgradecemos a atenção.\n\n{assinatura}"],
+    ["Agradecimento após evento", "Foi bom conhecer você no {evento}", "Olá, {nome}.\n\nFoi muito bom conversar no {evento}. Como combinamos, seguem os nossos contatos e o site www.physisengineering.com.\n\nVamos marcar uma conversa?\n\n{assinatura}"]
+  ];
+  function modelosMail() { if (!existe(K.mailModelos)) gravar(K.mailModelos, MODELOS_MAIL.map(function (m) { return { id: novoId(), nome: m[0], assunto: m[1], corpo: m[2] }; })); return ler(K.mailModelos); }
+  var estMail = { pasta: "saida", busca: "", rotulo: "", aberto: null, esc: null, srv: null, srvErro: "", carregando: false, modeloEd: null };
+  function rotulosDe(id) { var r = ler(K.mailRotulos).filter(function (x) { return x.id === id; })[0]; return r ? r.rotulos || [] : []; }
+  function gravarRotulos(id, rot) { var l = ler(K.mailRotulos).filter(function (x) { return x.id !== id; }); if (rot.length) l.push({ id: id, rotulos: rot }); gravar(K.mailRotulos, l); }
+  function lerRotulos(txt) { var v = []; String(txt || "").split(",").forEach(function (x) { x = x.trim().toLowerCase().slice(0, 30); if (x && v.indexOf(x) < 0) v.push(x); }); return v.slice(0, 8); }
+  function assinatura() { var c = C(), n = c.quem ? c.quem() : ""; return (n ? n + "\n" : "") + "Physis Engineering\nwww.physisengineering.com"; }
+  function carregarMails() { if (!SRV) return; estMail.carregando = true; pedir("/api/central/emails").then(function (j) { estMail.carregando = false; if (j.ok) { estMail.srv = j; estMail.srvErro = ""; } else estMail.srvErro = msgServidor(j); if (C().atual && C().atual() === "mails") pintarMail(); }).catch(function () { estMail.carregando = false; estMail.srvErro = L("O servidor não respondeu.", "The server did not answer."); pintarMail(); }); }
+  function mensagens(pasta) {
+    var srv = estMail.srv ? estMail.srv.emails || [] : [], m;
+    if (pasta === "saida") m = srv.filter(function (e) { return e.estado === "pendente" || e.estado === "falhou"; }).map(function (e) { return { id: "srv-" + e.id, srvId: e.id, para: e.para, assunto: e.assunto, corpo: e.corpo, quando: e.criado, estado: e.estado, erro: e.erro }; });
+    else if (pasta === "enviados") m = srv.filter(function (e) { return e.estado === "enviado" || e.estado === "enviado_a_mao"; }).map(function (e) { return { id: "srv-" + e.id, srvId: e.id, para: e.para, assunto: e.assunto, corpo: e.corpo, quando: e.enviado || e.criado, estado: e.estado }; });
+    else if (pasta === "rascunhos") m = ler(K.mailRasc).map(function (r) { return { id: r.id, para: r.para, assunto: r.assunto || L("(sem assunto)", "(no subject)"), corpo: r.corpo, quando: r.em ? Date.parse(r.em) / 1000 : 0, estado: "rascunho" }; });
+    else m = modelosMail().map(function (r) { return { id: r.id, para: "", assunto: r.nome, corpo: r.assunto + "\n\n" + r.corpo, quando: 0, estado: "modelo" }; });
+    var b = estMail.busca.toLowerCase();
+    return m.filter(function (x) { return (!b || (x.para + " " + x.assunto + " " + x.corpo).toLowerCase().indexOf(b) >= 0) && (!estMail.rotulo || rotulosDe(x.id).indexOf(estMail.rotulo) >= 0); }).sort(function (a, c) { return (c.quando || 0) - (a.quando || 0); });
+  }
+  var NOMES_PASTA = { saida: ["Caixa de saída", "Outbox"], enviados: ["Enviados", "Sent"], rascunhos: ["Rascunhos", "Drafts"], modelos: ["Modelos", "Templates"] };
+  var ESTADO_MAIL = { pendente: ["pendente", "pending"], falhou: ["falhou", "failed"], enviado: ["enviado pelo servidor", "sent by the server"], enviado_a_mao: ["enviado à mão", "sent by hand"], rascunho: ["rascunho", "draft"], modelo: ["modelo", "template"] };
+  function pintarMail(foco) {
+    var s = document.getElementById("gp-mails"); if (!s) return;
+    if (!estMail.srv && !estMail.carregando && !estMail.srvErro && SRV) carregarMails();
+    var todosRot = {}; ler(K.mailRotulos).forEach(function (r) { (r.rotulos || []).forEach(function (x) { todosRot[x] = 1; }); });
+    var h = "<h1 id='gp-h-mails'>" + esc(L("E-mails", "E-mails")) + "</h1><p class='gx-sub'>" + esc(L("Escreva com modelos, guarde rascunhos e envie pela fila de saída do servidor da Physis. Com o servidor de e-mail configurado, sai sozinho; sem ele, fica na Caixa de saída para copiar e marcar como enviado.", "Write with templates, keep drafts and send through the Physis server outbox.")) + "</p>" +
+      (SRV && estMail.srv ? "<p class='gx-aj'>" + esc(estMail.srv.configurado ? L("Servidor de e-mail da Physis ligado.", "Physis e-mail server connected.") : L("Servidor de e-mail ainda não configurado: os e-mails ficam pendentes para enviar à mão.", "E-mail server not configured yet: e-mails stay pending.")) + "</p>" : "") +
+      (!SRV ? "<p class='gx-aj'>" + esc(L("Aberto sem o servidor: dá para escrever, guardar rascunhos e abrir no seu programa de e-mail. A Caixa de saída e os Enviados só aparecem com o servidor.", "Without the server: write, keep drafts and open in your e-mail program.")) + "</p>" : "") +
+      (estMail.srvErro ? "<p role='alert' class='gx-erro'>" + esc(estMail.srvErro) + "</p>" : "") +
+      "<div class='gx-mail'><nav aria-label='" + esc(L("Pastas de e-mail", "Mail folders")) + "'><div class='gx-pastas'>" + bt("id='gx-ml-escrever'", L("Escrever e-mail", "Compose"), true) +
+      Object.keys(NOMES_PASTA).map(function (p) { var n = mensagens(p).length; return "<button type='button' class='gx-b' data-ml-pasta='" + p + "'" + (estMail.pasta === p ? " aria-current='true'" : "") + "><span>" + esc(L(NOMES_PASTA[p][0], NOMES_PASTA[p][1])) + "</span><span class='gx-etq'>" + n + "</span></button>"; }).join("") +
+      (SRV ? bt("id='gx-ml-atualizar'", L("Atualizar", "Refresh"), false, true) : "") + "</div></nav><div>";
+    if (estMail.esc) h += formEscrever();
+    else if (estMail.modeloEd) h += formModelo();
+    else {
+      var lista = mensagens(estMail.pasta), ab = lista.filter(function (x) { return x.id === estMail.aberto; })[0];
+      h += "<h2 id='gx-ml-hp' style='font-size:1.15em;margin:0 0 8px;color:#33512F'>" + esc(L(NOMES_PASTA[estMail.pasta][0], NOMES_PASTA[estMail.pasta][1])) + " (" + lista.length + ")</h2><div class='gx-grade' style='margin-bottom:10px'>" +
+        campo("gx-ml-busca", L("Procurar nesta pasta", "Search this folder"), inp("gx-ml-busca", estMail.busca, "search")) +
+        campo("gx-ml-rot", L("Rótulo", "Label"), sel("gx-ml-rot", [["", L("Todos", "All")]].concat(Object.keys(todosRot).sort().map(function (r) { return [r, r]; })), estMail.rotulo)) + "</div>";
+      if ((estMail.pasta === "saida" || estMail.pasta === "enviados") && !SRV) h += "<p class='gx-aj'>" + esc(L("Só com o servidor da Physis.", "Only with the Physis server.")) + "</p>";
+      else if (estMail.pasta === "modelos") h += "<div class='gx-barra'>" + bt("id='gx-ml-novo-modelo'", L("Novo modelo", "New template"), false, true) + "</div>";
+      h += lista.length ? "<ul class='gx-msgs' aria-labelledby='gx-ml-hp'>" + lista.map(function (m) { var rot = rotulosDe(m.id);
+        return "<li><button type='button' data-ml-abrir='" + esc(m.id) + "'" + (m.id === estMail.aberto ? " aria-current='true'" : "") + "><span class='gx-de'>" + esc(m.para || (m.estado === "modelo" ? L("Modelo", "Template") : L("(sem destinatário)", "(no recipient)"))) + "</span><span class='gx-aj' style='margin:0'>" + esc(m.quando ? new Date(m.quando * 1000).toLocaleDateString(EN() ? "en" : "pt-BR") : "") + "</span><span class='gx-as'>" + esc(m.assunto) + "</span><span style='grid-column:1/-1'>" + (m.estado !== "modelo" && m.estado !== "rascunho" ? "<span class='gx-etq " + (m.estado === "falhou" ? "al" : m.estado === "pendente" ? "at" : "ok") + "'>" + esc(L(ESTADO_MAIL[m.estado][0], ESTADO_MAIL[m.estado][1])) + "</span>" : "") + rot.map(function (r) { return "<span class='gx-etq'>" + esc(r) + "</span>"; }).join("") + "</span></button></li>"; }).join("") + "</ul>"
+        : "<p class='gx-aj'>" + esc(L("Nada nesta pasta.", "Nothing in this folder.")) + "</p>";
+      if (ab) h += leitura(ab);
+    }
+    h += "</div></div>";
+    s.innerHTML = h; focar(foco);
+  }
+  function leitura(m) {
+    var rot = rotulosDe(m.id), ehSrv = !!m.srvId, pend = m.estado === "pendente" || m.estado === "falhou";
+    return "<section class='gx-card gx-s' aria-labelledby='gx-ml-lt' style='margin-top:14px'><h3 id='gx-ml-lt' tabindex='-1' style='margin:0 0 6px'>" + esc(m.assunto) + "</h3>" +
+      (m.para ? "<p class='gx-aj'>" + esc(L("Para: ", "To: ") + m.para) + (m.erro ? " · " + esc(m.erro) : "") + "</p>" : "") + "<div class='gx-pre' tabindex='0'>" + esc(m.corpo) + "</div>" +
+      "<div class='gx-grade' style='align-items:end'>" + campo("gx-ml-rotulos", L("Rótulos (separados por vírgula)", "Labels (comma separated)"), inp("gx-ml-rotulos", rot.join(", "))) + "<div>" + bt("data-ml-rot='" + esc(m.id) + "'", L("Guardar rótulos", "Save labels"), false) + "</div></div>" +
+      "<div class='gx-barra' style='margin-top:10px'>" +
+      (ehSrv ? bt("data-ml-copiar='" + esc(m.id) + "'", L("Copiar o e-mail", "Copy the e-mail")) : "") +
+      (ehSrv && pend ? bt("data-ml-feito='" + m.srvId + "'", L("Marcar como enviado", "Mark as sent"), true) + (estMail.srv && estMail.srv.configurado ? bt("data-ml-reenviar='" + m.srvId + "'", L("Enviar de novo pelo servidor", "Send again via the server")) : "") : "") +
+      (ehSrv ? bt("data-ml-reusar='" + esc(m.id) + "'", L("Usar como base para um novo", "Use as a base for a new one")) : "") +
+      (m.estado === "rascunho" ? bt("data-ml-continuar='" + esc(m.id) + "'", L("Continuar escrevendo", "Continue writing"), true) + bt("data-ml-apagar='" + esc(m.id) + "'", L("Apagar rascunho", "Delete draft")) : "") +
+      (m.estado === "modelo" ? bt("data-ml-usar='" + esc(m.id) + "'", L("Escrever com este modelo", "Write with this template"), true) + bt("data-ml-edmod='" + esc(m.id) + "'", L("Editar modelo", "Edit template")) + bt("data-ml-xmod='" + esc(m.id) + "'", L("Apagar modelo", "Delete template")) : "") + "</div></section>";
+  }
+  function formEscrever() {
+    var e = estMail.esc, ms = modelosMail();
+    return "<section class='gx-card gx-s' aria-labelledby='gx-ml-he'><h2 id='gx-ml-he' style='font-size:1.15em;color:#33512F'>" + esc(e.id ? L("Rascunho", "Draft") : L("Novo e-mail", "New e-mail")) + "</h2><div class='gx-grade'>" +
+      campo("gx-ml-modelo", L("Começar de um modelo", "Start from a template"), sel("gx-ml-modelo", [["", L("(sem modelo)", "(none)")]].concat(ms.map(function (m) { return [m.id, m.nome]; })), "")) +
+      campo("gx-ml-para", L("Para (separe com vírgula)", "To (comma separated)"), inp("gx-ml-para", e.para, "text", " inputmode='email' autocomplete='email'")) + "</div><div style='display:grid;gap:10px;margin-top:10px'>" +
+      campo("gx-ml-ass", L("Assunto", "Subject"), inp("gx-ml-ass", e.assunto)) +
+      campo("gx-ml-corpo", L("Texto", "Text"), area("gx-ml-corpo", e.corpo, " style='min-height:240px' aria-describedby='aj-gx-ml-corpo'"), L("Troque o que estiver entre chaves { } antes de enviar.", "Replace anything in braces { } before sending.")) +
+      campo("gx-ml-rots", L("Rótulos (separados por vírgula)", "Labels (comma separated)"), inp("gx-ml-rots", (e.rotulos || []).join(", "))) + "</div>" +
+      (e.erro ? "<p role='alert' class='gx-erro'>" + esc(e.erro) + "</p>" : "") +
+      "<div class='gx-barra' style='margin-top:10px'>" + (SRV ? bt("id='gx-ml-enviar'", L("Enviar pela fila do servidor", "Send via the server outbox"), true) : "") +
+      bt("id='gx-ml-guardar'", L("Guardar rascunho", "Save draft"), !SRV) + bt("id='gx-ml-mailto'", L("Abrir no meu programa de e-mail", "Open in my e-mail program")) + bt("id='gx-ml-descartar'", L("Fechar sem enviar", "Close without sending")) + "</div></section>";
+  }
+  function formModelo() {
+    var m = estMail.modeloEd;
+    return "<section class='gx-card gx-s' aria-labelledby='gx-ml-hm'><h2 id='gx-ml-hm' style='font-size:1.15em;color:#33512F'>" + esc(m.id ? L("Editar modelo", "Edit template") : L("Novo modelo", "New template")) + "</h2><div style='display:grid;gap:10px'>" +
+      campo("gx-ml-m-nome", L("Nome do modelo", "Template name"), inp("gx-ml-m-nome", m.nome)) + campo("gx-ml-m-ass", L("Assunto", "Subject"), inp("gx-ml-m-ass", m.assunto)) +
+      campo("gx-ml-m-corpo", L("Texto (use {nome}, {assinatura} e outros campos entre chaves)", "Text (use {nome}, {assinatura}…)"), area("gx-ml-m-corpo", m.corpo, " style='min-height:200px'")) + "</div>" +
+      "<div class='gx-barra' style='margin-top:10px'>" + bt("id='gx-ml-m-ok'", L("Guardar modelo", "Save template"), true) + bt("id='gx-ml-m-cancelar'", L("Cancelar", "Cancel")) + "</div></section>";
+  }
+  function lerEscrita() { var e = estMail.esc || {}; return { id: e.id || null, para: String(val("gx-ml-para")).trim(), assunto: String(val("gx-ml-ass")).trim(), corpo: val("gx-ml-corpo"), rotulos: lerRotulos(val("gx-ml-rots")) }; }
+  function guardarRascunho(e) { var id = e.id || "r-" + novoId(), l = ler(K.mailRasc).filter(function (x) { return x.id !== id; }); l.push({ id: id, para: e.para, assunto: e.assunto, corpo: e.corpo, em: new Date().toISOString(), por: pessoaAtual() }); gravar(K.mailRasc, l); gravarRotulos(id, e.rotulos || []); return id; }
+  function ligarMail(s) {
+    s.addEventListener("click", function (ev) {
+      var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return; var id;
+      if (b.id === "gx-ml-escrever") { estMail.esc = { para: "", assunto: "", corpo: "\n\n" + assinatura(), rotulos: [] }; estMail.modeloEd = null; return pintarMail("gx-ml-modelo"); }
+      if ((id = b.getAttribute("data-ml-pasta"))) { estMail.pasta = id; estMail.aberto = null; estMail.esc = null; estMail.modeloEd = null; return pintarMail("[data-ml-pasta='" + id + "']"); }
+      if (b.id === "gx-ml-atualizar") { estMail.srvErro = ""; carregarMails(); return dizer(L("Atualizando…", "Refreshing…"), false); }
+      if ((id = b.getAttribute("data-ml-abrir"))) { estMail.aberto = id; return pintarMail("gx-ml-lt"); }
+      if ((id = b.getAttribute("data-ml-rot"))) { gravarRotulos(id, lerRotulos(val("gx-ml-rotulos"))); pintarMail("gx-ml-rotulos"); return dizer(L("Rótulos guardados.", "Labels saved."), false); }
+      var m = estMail.aberto ? mensagens(estMail.pasta).filter(function (x) { return x.id === estMail.aberto; })[0] : null;
+      if ((id = b.getAttribute("data-ml-copiar")) && m) { var txt = L("Para: ", "To: ") + m.para + "\n" + L("Assunto: ", "Subject: ") + m.assunto + "\n\n" + m.corpo; (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { dizer(L("E-mail copiado. Cole no seu programa de e-mail.", "E-mail copied."), false); }, function () { dizer(L("Não deu para copiar: selecione o texto e use Ctrl+C.", "Could not copy."), true); }); return; }
+      if ((id = b.getAttribute("data-ml-feito")) || (id = b.getAttribute("data-ml-reenviar"))) { var feito = b.hasAttribute("data-ml-feito"); b.disabled = true;
+        pedir("/api/central/emails/" + id + (feito ? "/enviado" : "/enviar"), {}).then(function (j) { dizer(j.ok ? (feito ? L("Marcado como enviado.", "Marked as sent.") : L("Enviado.", "Sent.")) : L("Não foi possível: ", "Could not: ") + msgServidor(j), !j.ok); if (j.ok && feito) { estMail.aberto = null; } carregarMails(); }); return; }
+      if ((id = b.getAttribute("data-ml-reusar")) && m) { estMail.esc = { para: m.para, assunto: m.assunto, corpo: m.corpo, rotulos: rotulosDe(m.id) }; return pintarMail("gx-ml-para"); }
+      if ((id = b.getAttribute("data-ml-continuar"))) { var r = ler(K.mailRasc).filter(function (x) { return x.id === id; })[0]; if (r) { estMail.esc = { id: r.id, para: r.para, assunto: r.assunto, corpo: r.corpo, rotulos: rotulosDe(r.id) }; pintarMail("gx-ml-para"); } return; }
+      if ((id = b.getAttribute("data-ml-apagar"))) { if (!window.confirm(L("Apagar este rascunho?", "Delete this draft?"))) return; gravar(K.mailRasc, ler(K.mailRasc).filter(function (x) { return x.id !== id; })); gravarRotulos(id, []); estMail.aberto = null; pintarMail("[data-ml-pasta='rascunhos']"); return dizer(L("Rascunho apagado.", "Draft deleted."), false); }
+      if ((id = b.getAttribute("data-ml-usar"))) { var mo = modelosMail().filter(function (x) { return x.id === id; })[0]; if (mo) { estMail.esc = { para: "", assunto: mo.assunto, corpo: mo.corpo.replace(/\{assinatura\}/g, assinatura()), rotulos: [] }; pintarMail("gx-ml-para"); } return; }
+      if ((id = b.getAttribute("data-ml-edmod"))) { estMail.modeloEd = Object.assign({}, modelosMail().filter(function (x) { return x.id === id; })[0] || {}); return pintarMail("gx-ml-m-nome"); }
+      if ((id = b.getAttribute("data-ml-xmod"))) { if (!window.confirm(L("Apagar este modelo?", "Delete this template?"))) return; gravar(K.mailModelos, modelosMail().filter(function (x) { return x.id !== id; })); estMail.aberto = null; return pintarMail("[data-ml-pasta='modelos']"); }
+      if (b.id === "gx-ml-novo-modelo") { estMail.modeloEd = { nome: "", assunto: "", corpo: "Olá, {nome}.\n\n\n\n{assinatura}" }; return pintarMail("gx-ml-m-nome"); }
+      if (b.id === "gx-ml-m-cancelar") { estMail.modeloEd = null; return pintarMail("[data-ml-pasta='modelos']"); }
+      if (b.id === "gx-ml-m-ok") { var nm = String(val("gx-ml-m-nome")).trim(); if (!nm) { dizer(L("Dê um nome ao modelo.", "Name the template."), true); return focar("gx-ml-m-nome"); }
+        var mid = estMail.modeloEd.id || novoId(); gravar(K.mailModelos, modelosMail().filter(function (x) { return x.id !== mid; }).concat([{ id: mid, nome: nm, assunto: val("gx-ml-m-ass"), corpo: val("gx-ml-m-corpo") }])); estMail.modeloEd = null; estMail.pasta = "modelos"; estMail.aberto = mid; pintarMail("gx-ml-lt"); return dizer(L("Modelo guardado.", "Template saved."), false); }
+      if (b.id === "gx-ml-descartar") { var e0 = lerEscrita(); if ((e0.assunto || e0.para) && !e0.id && !window.confirm(L("Fechar sem guardar? O texto se perde.", "Close without saving?"))) return; estMail.esc = null; return pintarMail("gx-ml-escrever"); }
+      if (b.id === "gx-ml-guardar") { var e1 = lerEscrita(), rid = guardarRascunho(e1); estMail.esc = null; estMail.pasta = "rascunhos"; estMail.aberto = rid; pintarMail("gx-ml-lt"); return dizer(L("Rascunho guardado.", "Draft saved."), false); }
+      if (b.id === "gx-ml-mailto") { var e2 = lerEscrita(); window.location.href = "mailto:" + encodeURIComponent(e2.para).replace(/%2C/gi, ",").replace(/%40/g, "@") + "?subject=" + encodeURIComponent(e2.assunto) + "&body=" + encodeURIComponent(e2.corpo); return; }
+      if (b.id === "gx-ml-enviar") {
+        var e3 = lerEscrita(), erro = !e3.para ? [L("Informe para quem vai o e-mail.", "Give the recipient."), "gx-ml-para"] : !e3.para.split(/[,;]/).every(function (x) { return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x.trim()); }) ? [L("Confira os endereços de e-mail.", "Check the e-mail addresses."), "gx-ml-para"] : !e3.assunto ? [L("Escreva o assunto.", "Write the subject."), "gx-ml-ass"] : /\{[a-zà-ú]+\}/i.test(e3.assunto + e3.corpo) ? [L("Ainda há campos entre chaves { } para trocar.", "There are still fields in braces { } to replace."), "gx-ml-corpo"] : null;
+        if (erro) { estMail.esc = Object.assign({}, e3, { erro: erro[0] }); return pintarMail(erro[1]); }
+        b.disabled = true;
+        pedir("/api/gestao/correio", { para: e3.para, assunto: e3.assunto, corpo: e3.corpo }).then(function (j) {
+          if (!j.ok) { estMail.esc = Object.assign({}, e3, { erro: msgServidor(j) }); return pintarMail("gx-ml-enviar"); }
+          gravarRotulos("srv-" + j.id, e3.rotulos); if (e3.id) { gravar(K.mailRasc, ler(K.mailRasc).filter(function (x) { return x.id !== e3.id; })); gravarRotulos(e3.id, []); }
+          estMail.esc = null; estMail.pasta = "saida"; estMail.aberto = "srv-" + j.id; carregarMails();
+          dizer(j.servidor_email ? L("E-mail na fila: o servidor está enviando.", "E-mail queued: the server is sending.") : L("E-mail na Caixa de saída. O servidor de e-mail ainda não está configurado: copie, envie e marque como enviado.", "E-mail in the Outbox; the e-mail server is not configured yet."), false);
+        }).catch(function () { estMail.esc = Object.assign({}, e3, { erro: L("O servidor não respondeu. Guarde como rascunho.", "The server did not answer. Save as draft.") }); pintarMail("gx-ml-guardar"); });
+      }
+    });
+    s.addEventListener("change", function (ev) {
+      var t = ev.target;
+      if (t.id === "gx-ml-rot") { estMail.rotulo = t.value; estMail.aberto = null; return pintarMail("gx-ml-rot"); }
+      if (t.id === "gx-ml-modelo" && t.value) { var mo = modelosMail().filter(function (x) { return x.id === t.value; })[0]; if (!mo) return; var e = lerEscrita(); if (e.corpo.trim() && e.corpo.trim() !== assinatura().trim() && !window.confirm(L("Trocar o texto pelo do modelo?", "Replace the text with the template?"))) { t.value = ""; return; }
+        estMail.esc = Object.assign({}, e, { assunto: mo.assunto, corpo: mo.corpo.replace(/\{assinatura\}/g, assinatura()) }); return pintarMail("gx-ml-para"); }
+    });
+    s.addEventListener("input", function (ev) { if (ev.target.id !== "gx-ml-busca") return; estMail.busca = ev.target.value; estMail.aberto = null; var pos = ev.target.selectionStart; pintarMail("gx-ml-busca"); try { document.getElementById("gx-ml-busca").setSelectionRange(pos, pos); } catch (e) {} });
+  }
+
+  /* ══ montagem ══ */
+  function novaSecao(id, rotulo) { var x = document.createElement("section"); x.id = id; x.className = "gp-sec"; x.tabIndex = -1; x.setAttribute("aria-labelledby", rotulo); return x; }
+  function garantir() {
+    if (!document.getElementById("gp-menu")) return;
+    var viv = document.getElementById("gp-aviso-vivo"), ref = viv || null;
+    if (!document.getElementById("gx-eventos")) { var e = novaSecao("gx-eventos", "gx-h-eventos"); document.body.insertBefore(e, ref); ligarEventos(e); }
+    if (!document.getElementById("gx-editais")) { var d = novaSecao("gx-editais", "gx-h-editais"); document.body.insertBefore(d, ref); ligarEditais(d); }
+    if (!document.getElementById("gx-mkt")) { var m = novaSecao("gx-mkt", "gx-h-mkt"); document.body.insertBefore(m, ref); ligarMkt(m); }
+    var app = document.getElementById("app");
+    if (app && !document.getElementById("gx-cal-atv")) { var c = document.createElement("section"); c.id = "gx-cal-atv"; c.className = "gx-cal"; c.setAttribute("aria-labelledby", "gx-cal-atv-h"); app.parentNode.insertBefore(c, app); ligarCal(c); }
+    var ru = document.getElementById("gp-reun");
+    if (ru && !document.getElementById("gx-cal-reun")) { var r = novaSecao("gx-cal-reun", "gx-cal-reun-h"); r.classList.add("gx-cal"); r.removeAttribute("tabindex"); ru.parentNode.insertBefore(r, ru.nextSibling); ligarCal(r); }
+    var ms = document.getElementById("gp-mails"); if (ms && !ms._gx) { ms._gx = true; ligarMail(ms); }
+    ligarAlertas();
+  }
+  var podiaAntes = null;
+  function permissoes() {
+    // o botão Editais só aparece para quem tem acesso; se a pessoa mudar com a tela aberta, a tela se redesenha
+    var pode = podeEditais(), b = document.getElementById("gp-m-editais"); if (b) b.hidden = !pode;
+    if (podiaAntes !== null && pode !== podiaAntes) { var c = C(); if (c.atual && c.atual() === "editais") pintarEditais(); }
+    podiaAntes = pode;
+  }
+  function mostrar(id) {
+    garantir(); permissoes();
+    if (id === "atv") pintarCal("gx-cal-atv");
+    if (id === "reun") pintarCal("gx-cal-reun");
+    if (id === "eventos") pintarEventos();
+    if (id === "editais") pintarEditais();
+    if (id === "mkt") pintarMkt();
+    if (id === "mails") pintarMail();
+  }
+  setInterval(function () { if (document.getElementById("gp-menu")) { garantir(); permissoes(); } }, 800);
+  window.PhysisExtras = {
+    mostrar: mostrar, entradas: entradas, alertas: meusAlertas, nota: nota, montarPlano: montarPlano, rascunho: rascunho, lerDatasTexto: lerDatasTexto, etapaEdital: etapaEdital,
+    CHAVES: K, ACESSO_EDITAIS: ACESSO_EDITAIS, APROVA_MKT: APROVA_MKT
+  };
 })();
 </script>
 </body>
