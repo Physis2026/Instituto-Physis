@@ -1,5 +1,6 @@
 {
   "_leia": "Uma ficha por cliente (ou por versão a enviar para a equipe). O código é um só; cada plataforma é montada a partir desta ficha com: python physis-hub/montar_clientes.py --saida <pasta>. Mudou um módulo? Mude aqui e monte de novo. Na compra pela loja ou por proposta aprovada, os módulos saem sozinhos do contrato (Hub.modulos_do_contrato).",
+  "suporte": {"email": "admin@physisengineering.com", "whatsapp": "+55 61 99815-5155", "_leia": "Canais de suporte da Physis usados em Gestão → Suporte de todas as plataformas."},
   "clientes": [
     {
       "org": "physis-site",

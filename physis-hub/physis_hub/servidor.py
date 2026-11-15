@@ -610,6 +610,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             if u.path == "/api/clima":
                 # previsão das fontes guardadas no hub (a tela nunca chama a internet)
                 return self._json(200, clima.estado())
+            if u.path == "/api/suporte":
+                return self._json(200, {"ok": True, "chamados": hub.suporte_listar(),
+                                        "whatsapp": re.sub(r"\D", "", os.environ.get("PHYSIS_SUPORTE_WHATSAPP") or instancia.get("suporte_whatsapp") or ""),
+                                        "email": os.environ.get("PHYSIS_SUPORTE_EMAIL") or instancia.get("suporte_email") or ""})
             if u.path in ("/api/gis/relevo", "/api/gis/solo", "/api/gis/rio"):
                 # relevo (curvas de nível e declividade), solo e rio (enchente) do lugar, guardados no hub
                 try:
@@ -679,6 +683,20 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def do_POST(self):
             u = urlparse(self.path)
+            # ── Suporte ao cliente: chamado + e-mail para a Physis (e-mail e WhatsApp vêm da configuração) ──
+            if u.path == "/api/suporte":
+                q = self._quem()
+                if exige_login and not q:
+                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                try:
+                    d = json.loads(self._corpo() or "{}")
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                para = os.environ.get("PHYSIS_SUPORTE_EMAIL") or instancia.get("suporte_email") or ""
+                r = hub.suporte_abrir(d if isinstance(d, dict) else {}, (q or {}).get("nome", ""), para)
+                if r.get("ok"):
+                    threading.Thread(target=correio.enviar_fila, args=(hub, r["numero"]), daemon=True).start()
+                return self._json(200 if r["ok"] else 400, r)
             # ── DWG para DXF (Planejador): conversor aberto LibreDWG (dwg2dxf) instalado no servidor ──
             if u.path == "/api/converter/dwg":
                 q = self._quem()

@@ -30,14 +30,15 @@ def main() -> None:
     ap.add_argument("--so", default="", help="montar só esta organização")
     a = ap.parse_args()
     a.saida.mkdir(parents=True, exist_ok=True)
-    fichas = json.loads(FICHAS.read_text(encoding="utf-8"))["clientes"]
+    base = json.loads(FICHAS.read_text(encoding="utf-8"))
+    fichas, suporte = base["clientes"], base.get("suporte")
     for f in fichas:
         if a.so and f["org"] != a.so:
             continue
         gestao = RAIZ / "sistema" / "gestao-interna-physis.html" if f.get("gestao_interna") else None
         pacote = montar(f["org"], f.get("lugar", "lugar01"), f["modulos"], a.saida, PROGRAMAS["sustainkit"],
                         "[LICENÇA A DEFINIR PELA PHYSIS]", PROGRAMAS["supervisao"], gestao, PROGRAMAS["planejador"],
-                        bool(f.get("pesquisa")), f.get("nome", ""))
+                        bool(f.get("pesquisa")), f.get("nome", ""), None, suporte)
         print(f"{f['nome']}: {pacote.name} ({pacote.stat().st_size // 1024} kB) · módulos: {', '.join(f['modulos'])}"
               + (" · pesquisa" if f.get("pesquisa") else ""))
 

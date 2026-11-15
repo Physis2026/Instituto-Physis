@@ -530,7 +530,37 @@ class Hub:
             self._db.commit()
 
     # ── Caixa central: o que a loja entrega e a gestao recebe, sem copiar e colar ──
-    TIPOS_CENTRAL = ("compra", "pedido", "alocacao")
+    TIPOS_CENTRAL = ("compra", "pedido", "alocacao", "suporte")
+
+    # ── Suporte ao cliente: cada mensagem vira um chamado, com e-mail para a Physis na fila de saída ──
+    def suporte_abrir(self, dados: dict, quem: str, para: str) -> dict:
+        assunto = str(dados.get("assunto") or "").strip()[:140]
+        mensagem = str(dados.get("mensagem") or "").strip()[:4000]
+        if not assunto or not mensagem:
+            return {"ok": False, "erro": "assunto e mensagem são obrigatórios"}
+        if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", para or ""):
+            return {"ok": False, "erro": "e-mail de suporte da Physis não configurado"}
+        contato = str(dados.get("contato") or "").strip()[:160]
+        canal = "whatsapp" if dados.get("canal") == "whatsapp" else "email"
+        with self._trava:
+            seq = self._db.execute("SELECT COUNT(*) FROM central WHERE tipo='suporte'").fetchone()[0] + 1
+        numero = "SP-%04d" % seq
+        reg = {"assunto": assunto, "mensagem": mensagem, "contato": contato, "canal": canal, "quem": quem,
+               "org": self.org, "lugar": self.lugar, "quando": self.relogio()}
+        r = self.central_por("suporte", numero, reg)
+        if not r.get("ok"):
+            return r
+        corpo = "\n".join([f"Chamado {numero} · {self.org} ({self.lugar})", f"Quem: {quem or '—'} · contato: {contato or '—'} · canal preferido: {canal}",
+                           f"Assunto: {assunto}", "", mensagem, "", "Responda pelo canal indicado. Mensagem enviada pela plataforma Physis."])
+        with self._trava:
+            self._db.execute("INSERT INTO email_saida(para,assunto,corpo,estado,ref,criado) VALUES(?,?,?,?,?,?)",
+                             (para, f"Suporte {numero} · {assunto}", corpo, "pendente", numero, self.relogio()))
+            self._db.commit()
+        return {"ok": True, "numero": numero}
+
+    def suporte_listar(self) -> list[dict]:
+        return [{"numero": x["numero"], "estado": x["estado"], "criado": x["criado"], **{k: x["dados"].get(k) for k in ("assunto", "mensagem", "canal", "contato")}}
+                for x in self.central_listar() if x["tipo"] == "suporte"]
 
     def central_por(self, tipo: str, numero: str, dados: dict) -> dict:
         """Guarda uma compra paga ou um pedido de proposta. Repetir o mesmo numero nao duplica."""

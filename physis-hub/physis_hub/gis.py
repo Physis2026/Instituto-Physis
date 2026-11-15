@@ -9,7 +9,11 @@ from __future__ import annotations
 import json
 import math
 import os
+import struct
 import urllib.error
+import urllib.request
+import zlib
+from concurrent.futures import ThreadPoolExecutor
 
 from .clima import buscar_json
 
@@ -118,15 +122,116 @@ def percentil(vals: list[float], p: float) -> float | None:
     return v[i] if i + 1 >= len(v) else v[i] + (v[i + 1] - v[i]) * (k - i)
 
 
+def buscar_bytes(url: str, timeout: float = 20.0) -> bytes:
+    req = urllib.request.Request(url, headers={"User-Agent": "PhysisHub/1.0"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read()
+
+
+# ── Solo: duas bases abertas, as duas guardadas no servidor ──
+# 1) SoilGrids 250 m (ISRIC) pelo serviço de mapas WCS: responde em ~1 s (o serviço REST antigo leva ~20 s ou cai,
+#    e fica só como reserva). Propriedades: pH, argila, areia, silte, carbono orgânico, nitrogênio e CTC, em 3 profundidades.
+# 2) Pedologia do Brasil 1:250.000 (IBGE, BDiA): a classe de solo brasileira (SiBCS) do polígono onde o ponto cai.
+URL_SOLO_WCS = ("https://maps.isric.org/mapserv?map=/map/{prop}.map&SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage"
+                "&COVERAGEID={prop}_{prof}_mean&FORMAT=image/tiff&SUBSET=long({lo0},{lo1})&SUBSET=lat({la0},{la1})"
+                "&SUBSETTINGCRS=http://www.opengis.net/def/crs/EPSG/0/4326&OUTPUTCRS=http://www.opengis.net/def/crs/EPSG/0/4326")
+URL_SOLO_IBGE = ("https://geoservicos.ibge.gov.br/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=BDIA:pedo_area"
+                 "&outputFormat=application/json&maxFeatures=1&propertyName=legenda,ordem,subordem,grande_gru,subgrupos,textura,"
+                 "horizonte,relevo,erosao,pedregosid,rochosidad,leg_ordem,legenda_2&CQL_FILTER=INTERSECTS(geom,POINT({lon}%20{lat}))")
+# propriedade -> (fator que divide o valor guardado, unidade); conforme a documentação do SoilGrids
+SOLO_PROPS = {"phh2o": (10, "pH"), "clay": (10, "%"), "sand": (10, "%"), "silt": (10, "%"), "soc": (10, "g/kg"),
+              "nitrogen": (100, "g/kg"), "cec": (10, "cmol(c)/kg")}
+SOLO_PROFS = ("0-5cm", "5-15cm", "15-30cm")
+VERSAO_SOLO = 2          # muda a chave guardada: lugares buscados na base antiga são buscados de novo
+
+
+def ler_tiff(b: bytes) -> tuple[int, int, list, float | None]:
+    """Leitor mínimo de GeoTIFF (faixas ou blocos, sem compressão ou deflate). Devolve largura, altura, valores e 'sem dado'."""
+    bo = "<" if b[:2] == b"II" else ">" if b[:2] == b"MM" else None
+    if bo is None or struct.unpack(bo + "H", b[2:4])[0] != 42:
+        raise ValueError("não é TIFF")
+    tam = {1: 1, 2: 1, 3: 2, 4: 4, 6: 1, 7: 1, 8: 2, 9: 4, 11: 4, 12: 8, 16: 8}
+    fmt = {1: "B", 3: "H", 4: "I", 6: "b", 8: "h", 9: "i", 11: "f", 12: "d", 16: "Q"}
+    ifd = struct.unpack(bo + "I", b[4:8])[0]
+    n, tags = struct.unpack(bo + "H", b[ifd:ifd + 2])[0], {}
+    for i in range(n):
+        e = ifd + 2 + 12 * i
+        tag, tipo, qtd = struct.unpack(bo + "HHI", b[e:e + 8])
+        sz = tam.get(tipo, 1) * qtd
+        vo = e + 8 if sz <= 4 else struct.unpack(bo + "I", b[e + 8:e + 12])[0]
+        if tipo == 2:
+            tags[tag] = b[vo:vo + sz].split(b"\0")[0].decode("ascii", "replace")
+        elif tipo in fmt:
+            tags[tag] = list(struct.unpack(bo + fmt[tipo] * qtd, b[vo:vo + sz]))
+    w, h = tags[256][0], tags[257][0]
+    bits, comp = tags.get(258, [16])[0], tags.get(259, [1])[0]
+    sf, pred = tags.get(339, [1])[0], tags.get(317, [1])[0]
+    cod = {(8, 1): "B", (8, 2): "b", (16, 1): "H", (16, 2): "h", (32, 1): "I", (32, 2): "i", (32, 3): "f", (64, 3): "d"}.get((bits, sf))
+    if cod is None or comp not in (1, 8, 32946):
+        raise ValueError("formato de TIFF não suportado")
+    tw, th = (tags[322][0], tags[323][0]) if 324 in tags else (w, tags.get(278, [h])[0])
+    offs, cnts = tags.get(324) or tags.get(273), tags.get(325) or tags.get(279)
+    grade = [None] * (w * h)
+    por_linha = (w + tw - 1) // tw
+    for k, (o, c) in enumerate(zip(offs, cnts)):
+        bruto = b[o:o + c]
+        if comp != 1:
+            bruto = zlib.decompress(bruto)
+        cw, sz = tw, struct.calcsize(cod)
+        m = len(bruto) // sz
+        cel = list(struct.unpack(f"{bo}{m}{cod}", bruto[:m * sz]))
+        if pred == 2 and cod not in "fd":
+            for li in range(len(cel) // cw):
+                for x in range(1, cw):
+                    cel[li * cw + x] += cel[li * cw + x - 1]
+        x0, y0 = ((k % por_linha) * tw, (k // por_linha) * th) if 324 in tags else (0, k * th)
+        for i, v in enumerate(cel):
+            x, y = x0 + i % cw, y0 + i // cw
+            if x < w and y < h:
+                grade[y * w + x] = v
+    nd = tags.get(42113)
+    try:
+        nd = float(nd) if nd not in (None, "") else None
+    except ValueError:
+        nd = None
+    return w, h, grade, nd
+
+
+def valor_tiff(b: bytes) -> float | None:
+    """Média dos pixels válidos da pequena janela em volta do ponto."""
+    _, _, g, nd = ler_tiff(b)
+    # 0 é a máscara do SoilGrids (área urbana, água, rocha): não entra na média
+    v = [x for x in g if x is not None and x != nd and x not in (0, -32768) and not (isinstance(x, float) and math.isnan(x))]
+    return sum(v) / len(v) if v else None
+
+
+def ler_pedologia(j: dict) -> dict | None:
+    """Classe de solo do IBGE (SiBCS). Área urbana ou corpo d'água vêm sem classe."""
+    f = (j.get("features") or [None])[0]
+    if not f:
+        return None
+    p = {k: " ".join(str(v).split()) if isinstance(v, str) and v.strip() else None for k, v in (f.get("properties") or {}).items()}
+    tit = lambda s: s.capitalize() if s else None
+    return {"classe": tit(p.get("legenda_2") or p.get("legenda")), "ordem": tit(p.get("ordem") or p.get("leg_ordem")),
+            "subordem": tit(p.get("subordem")), "grande_grupo": tit(p.get("grande_gru")), "textura": p.get("textura"),
+            "horizonte": p.get("horizonte"), "relevo": p.get("relevo"), "erosao": p.get("erosao"),
+            "pedregosidade": p.get("pedregosid"), "rochosidade": p.get("rochosidad"), "legenda": p.get("legenda"),
+            "urbano_ou_agua": (p.get("leg_ordem") or "").upper() == "OUTROS"}
+
+
 def ler_solo(j: dict) -> dict:
-    """pH, argila e areia (%), carbono orgânico (g/kg) por profundidade; e o que isso diz para as plantas."""
+    """pH, argila e areia (%), carbono orgânico (g/kg) por profundidade; e o que isso diz para as plantas.
+    Aceita a resposta do serviço REST do SoilGrids ou o dicionário {propriedade: {profundidade: valor}} já convertido."""
     r = {}
-    for camada in (j.get("properties") or {}).get("layers") or []:
-        nome, fator = camada.get("name"), ((camada.get("unit_measure") or {}).get("d_factor") or 1)
-        for d in camada.get("depths") or []:
-            v = (d.get("values") or {}).get("mean")
-            if v is not None:
-                r.setdefault(nome, {})[d.get("label")] = round(v / fator, 2)
+    if "properties" in j:
+        for camada in (j.get("properties") or {}).get("layers") or []:
+            nome, fator = camada.get("name"), ((camada.get("unit_measure") or {}).get("d_factor") or 1)
+            for d in camada.get("depths") or []:
+                v = (d.get("values") or {}).get("mean")
+                if v is not None:
+                    r.setdefault(nome, {})[d.get("label")] = round(v / fator, 2)
+    else:
+        r = {k: dict(v) for k, v in j.items() if isinstance(v, dict) and v}
     if not r:
         raise ValueError("sem dados de solo")
     ph = (r.get("phh2o") or {}).get("0-5cm")
@@ -135,14 +240,41 @@ def ler_solo(j: dict) -> dict:
     textura = None
     if argila is not None and areia is not None:
         textura = "argiloso" if argila >= 35 else "arenoso" if areia >= 70 else "médio (franco)"
-    return {"camadas": r, "ph": ph, "acido": ph is not None and ph < 5.5, "argila_pct": argila, "areia_pct": areia, "textura": textura}
+    sup = lambda k: (r.get(k) or {}).get("0-5cm")
+    return {"camadas": r, "ph": ph, "acido": ph is not None and ph < 5.5, "argila_pct": argila, "areia_pct": areia,
+            "silte_pct": sup("silt"), "carbono_gkg": sup("soc"), "nitrogenio_gkg": sup("nitrogen"), "ctc": sup("cec"),
+            "textura": textura}
 
 
 class GisExtra:
     """Relevo, solo e rio do lugar, guardados no banco do hub (mesma tabela gis_cache)."""
 
-    def __init__(self, base: "Irradiacao"):
-        self.b = base
+    def __init__(self, base: "Irradiacao", buscar_bytes=buscar_bytes):
+        self.b, self.buscar_bytes = base, buscar_bytes
+
+    def _soilgrids(self, lat: float, lon: float) -> dict:
+        """As 21 janelas (7 propriedades x 3 profundidades) em paralelo pelo WCS; se o WCS falhar todo, o REST antigo."""
+        d = 0.003          # ~300 m: a janela pega o pixel de 250 m do ponto e os vizinhos
+        pedidos = [(p, pr) for p in SOLO_PROPS for pr in SOLO_PROFS]
+
+        def um(par):
+            p, pr = par
+            try:
+                v = valor_tiff(self.buscar_bytes(URL_SOLO_WCS.format(prop=p, prof=pr, lo0=lon - d, lo1=lon + d, la0=lat - d, la1=lat + d)))
+                return p, pr, None if v is None else round(v / SOLO_PROPS[p][0], 2), True
+            except (urllib.error.URLError, OSError, ValueError, KeyError, struct.error, zlib.error):
+                return p, pr, None, False
+        with ThreadPoolExecutor(max_workers=7) as ex:
+            res = list(ex.map(um, pedidos))
+        tab = {}
+        for p, pr, v, _ in res:
+            if v is not None:
+                tab.setdefault(p, {})[pr] = v
+        if tab:
+            return ler_solo(tab)
+        if any(ok for *_, ok in res):          # o serviço respondeu, mas o ponto não é mapeado (resposta guardada)
+            return {"sem_mapa": True}
+        return ler_solo(self.b.buscar(URL_SOLO.format(lat=round(lat, 4), lon=round(lon, 4))))
 
     def relevo(self, lat: float, lon: float) -> dict:
         la, lo = round(lat, 3), round(lon, 3)
@@ -174,15 +306,31 @@ class GisExtra:
                 "decl_max_pct": round(max(decl) * 100, 1), "fonte": "Copernicus DEM 90 m (via Open-Meteo), guardado no servidor"}
 
     def solo(self, lat: float, lon: float) -> dict:
-        chave = f"solo:{round(lat, 3)}:{round(lon, 3)}"
-        s = self.b._guardado(chave)
+        """Propriedades (SoilGrids) e classe brasileira (IBGE). Cada parte é guardada à parte: a que vier fica,
+        a que falhar é buscada de novo na próxima abertura."""
+        la, lo, avisos = round(lat, 3), round(lon, 3), []
+        ck_sg, ck_ib = f"solo{VERSAO_SOLO}:{la}:{lo}", f"pedologia:{la}:{lo}"
+        s, ped = self.b._guardado(ck_sg), self.b._guardado(ck_ib)
         if s is None:
             try:
-                s = ler_solo(self.b.buscar(URL_SOLO.format(lat=round(lat, 4), lon=round(lon, 4))))
-                self.b._guardar(chave, s)
+                s = self._soilgrids(la, lo)
+                self.b._guardar(ck_sg, s)
             except (urllib.error.URLError, OSError, ValueError, TypeError, AttributeError) as exc:
-                return {"ok": False, "avisos": [f"solo indisponível agora; o servidor tenta de novo na próxima abertura ({exc})"]}
-        return {"ok": True, **s, "fonte": "SoilGrids 250 m (ISRIC), guardado no servidor"}
+                avisos.append(f"propriedades do solo (SoilGrids) indisponíveis agora; o servidor tenta de novo na próxima abertura ({exc})")
+        if ped is None:
+            try:
+                ped = ler_pedologia(self.b.buscar(URL_SOLO_IBGE.format(lat=la, lon=lo))) or {}
+                self.b._guardar(ck_ib, ped)
+            except (urllib.error.URLError, OSError, ValueError, TypeError, AttributeError) as exc:
+                avisos.append(f"classe de solo do IBGE indisponível agora ({exc})")
+        if s and s.get("sem_mapa"):
+            avisos.append("o SoilGrids não mapeia este ponto (área urbana, água ou rocha): confirme com análise de solo")
+            s = None
+        if s is None and not ped:
+            return {"ok": False, "avisos": avisos or ["solo indisponível agora"]}
+        fontes = (["SoilGrids 250 m (ISRIC, serviço de mapas)"] if s else []) + (["Pedologia do Brasil 1:250.000 (IBGE, BDiA)"] if ped else [])
+        return {"ok": True, **(s or {}), "pedologia": ped or None, "avisos": avisos,
+                "fonte": " + ".join(fontes) + ", guardado no servidor"}
 
     def rio(self, lat: float, lon: float) -> dict:
         la, lo = round(lat, 2), round(lon, 2)
