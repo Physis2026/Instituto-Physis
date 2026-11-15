@@ -127,6 +127,46 @@ const DADOS = {
     }
    ]
   },
+  "mapeamento": {
+   "nome": "Mapeamento",
+   "resumo": "Camadas abertas do lugar numa tela só: zonas do IBGE, Köppen, solo, relevo, clima, rio e destinos de resíduos. As contas de solo, relevo, clima e rio são as mesmas das outras abas.",
+   "calculos": [
+    {
+     "id": "map.koppen",
+     "nome": "Clima de Köppen do lugar",
+     "o_que_calcula": "A classe de Köppen pelas médias mensais de temperatura e chuva, com a temperatura corrigida pela altitude real do lugar.",
+     "formula": {
+      "texto": "T_lugar = T_base − 0,0065 × (altitude do lugar − altitude da célula da base), quando a diferença passa de 50 m; depois, as regras de Köppen-Geiger (grupos A, B, C pelas temperaturas e pela chuva do mês mais seco)",
+      "variaveis": [
+       {
+        "simbolo": "T_base",
+        "significado": "temperatura média do mês na célula da base aberta",
+        "unidade": "°C"
+       },
+       {
+        "simbolo": "T_lugar",
+        "significado": "temperatura média do mês corrigida para o lugar",
+        "unidade": "°C"
+       }
+      ]
+     },
+     "premissas": [],
+     "normas": [
+      {
+       "codigo": "sem norma aplicável",
+       "edicao": "",
+       "item": "",
+       "como_e_usada": "Método de referência: classificação climática de Köppen-Geiger; gradiente de 6,5 °C por km da atmosfera padrão."
+      }
+     ],
+     "limites_de_validade": "A base de clima tem células de cerca de 50 km; a correção de altitude não vê encosta, vale nem vento local.",
+     "fonte_de_dados": "NASA POWER (médias de longo prazo), guardada no servidor; altitude do lugar pela base de relevo.",
+     "status": "simplificado",
+     "o_que_falta": "Comparar com estação meteorológica próxima (INMET) quando houver 30 anos de dados e mostrar a diferença na tela. Só software.",
+     "onde": "physis_hub/zonas.py · koppen(); painel.html · telaMapeamento()"
+    }
+   ]
+  },
   "planejador": {
    "nome": "Planejador",
    "resumo": "Terreno, implantação e cálculos por norma do estudo preliminar (programa modulos/planejador/planejador-physis.html).",
@@ -2048,6 +2088,72 @@ const DADOS = {
      "status": "simplificado",
      "o_que_falta": "Aplicar fator de rota (linha reta → estrada) e conferir licença do destino.",
      "onde": "sistema/physis-circular-mapa.js; physis_hub/residuos_gis.py"
+    },
+    {
+     "id": "rc.esgoto_biogas",
+     "nome": "Esgoto e biogás",
+     "o_que_calcula": "Volume do tanque séptico, filtro, área de infiltração, biodigestor, biogás, energia, reúso e lodo.",
+     "formula": {
+      "texto": "C = Σ N × C_uso; Lf = Σ N × Lf_uso; tanque séptico V = 1.000 + C × T + K × Lf (L); filtro anaeróbio = 1,6 × C × T (L); infiltração = C ÷ coeficiente do solo; biodigestor = (Nb × águas negras + resíduo) × 35 dias × 1,25; biogás = Nb × 0,04 + resíduo de cozinha × 0,1 (outros substratos: [MARCADOR]); energia = biogás × 6 kWh/m³; fogão = biogás ÷ 0,35 m³/h; reúso = efluente tratado",
+      "variaveis": [
+       {
+        "simbolo": "N",
+        "significado": "pessoas por tipo de uso",
+        "unidade": "pessoas"
+       },
+       {
+        "simbolo": "C",
+        "significado": "contribuição de esgoto",
+        "unidade": "L/dia"
+       },
+       {
+        "simbolo": "Lf",
+        "significado": "lodo fresco",
+        "unidade": "L/dia"
+       },
+       {
+        "simbolo": "T",
+        "significado": "tempo de detenção",
+        "unidade": "dia"
+       },
+       {
+        "simbolo": "K",
+        "significado": "taxa de acumulação de lodo",
+        "unidade": "dia"
+       },
+       {
+        "simbolo": "Nb",
+        "significado": "pessoas-equivalentes no biodigestor",
+        "unidade": "pessoas"
+       }
+      ]
+     },
+     "premissas": [],
+     "normas": [
+      {
+       "codigo": "ABNT NBR 7229",
+       "edicao": "1993",
+       "item": "tanque séptico: contribuição, detenção e acumulação de lodo",
+       "como_e_usada": "Volume útil do tanque séptico; mesmos valores por tipo de uso do Planejador."
+      },
+      {
+       "codigo": "ABNT NBR 13969",
+       "edicao": "1997",
+       "item": "filtro anaeróbio, infiltração e reúso",
+       "como_e_usada": "Filtro, área de infiltração pelo coeficiente do solo e classes de reúso."
+      },
+      {
+       "codigo": "ABNT NBR 17076",
+       "edicao": "2024",
+       "item": "sistemas de menor porte",
+       "como_e_usada": "Pode ter substituído as duas acima; um engenheiro confere antes de usar os números em projeto."
+      }
+     ],
+     "limites_de_validade": "Planejamento; prefere os números do Planejador, depois os do SustainKit; a estimativa usa a ocupação do Início e os resíduos do plano com a rota Biodigestor.",
+     "fonte_de_dados": "localStorage physis-calc-esgoto e physis-calc-biogas (Planejador ou SustainKit) ou ocupação do Início, plano de resíduos e base de equipamentos (metano do biogás, áreas por pessoa).",
+     "status": "simplificado",
+     "o_que_falta": "Conferir a NBR 17076:2024; fator de biofertilizante [MARCADOR]; fator de metano do tratamento no Carbono [MARCADOR].",
+     "onde": "painel.html · physisSaneamento() e physisBiogas() (cópia do bloco physis-calc-planejador do Planejador), ebAtual(), telaEsgotoBiogas()"
     }
    ]
   },
@@ -2182,6 +2288,85 @@ const DADOS = {
      "status": "só citado",
      "o_que_falta": "Conferir a regulamentação do SBCE antes de mostrar como regra.",
      "onde": "painel.html · telaCarbono()"
+    },
+    {
+     "id": "carb.esgoto",
+     "nome": "Tratamento de esgoto no lugar (escopo 1)",
+     "o_que_calcula": "Metano do tratamento de esgoto feito no próprio lugar.",
+     "formula": {
+      "texto": "CH₄ (kg/ano) = pessoas × DBO por pessoa × 365 × capacidade máxima de metano × fator de correção do tratamento; só entra com os fatores na base",
+      "variaveis": [
+       {
+        "simbolo": "pessoas",
+        "significado": "pessoas atendidas",
+        "unidade": "pessoas"
+       },
+       {
+        "simbolo": "DBO",
+        "significado": "carga orgânica por pessoa",
+        "unidade": "kg/dia"
+       },
+       {
+        "simbolo": "fator de correção",
+        "significado": "fração do metano possível que o tratamento gera",
+        "unidade": "0 a 1"
+       }
+      ]
+     },
+     "premissas": [],
+     "normas": [
+      {
+       "codigo": "IPCC 2006",
+       "edicao": "2006",
+       "item": "vol. 5, cap. 6 (efluentes domésticos)",
+       "como_e_usada": "Método do metano do tratamento de efluentes."
+      },
+      {
+       "codigo": "GHG Protocol",
+       "edicao": "2004 / 2015",
+       "item": "escopo 1",
+       "como_e_usada": "Fonte própria da organização."
+      }
+     ],
+     "limites_de_validade": "Só com os fatores na base de fatores (efluentes); sem eles a linha fica [MARCADOR].",
+     "fonte_de_dados": "Economia circular · Esgoto e biogás (pessoas e rota).",
+     "status": "simplificado",
+     "o_que_falta": "Incluir na base de fatores, com fonte, a DBO por pessoa, a capacidade máxima de metano e o fator de correção de cada rota [MARCADOR].",
+     "onde": "sistema/physis-carbono.js · calcular() (esgoto_no_lugar); espelho physis_hub/carbono.py"
+    },
+    {
+     "id": "carb.materiais_obra",
+     "nome": "Materiais da obra (escopo 3, categoria 1)",
+     "o_que_calcula": "Carbono incorporado das paredes e coberturas escolhidas.",
+     "formula": {
+      "texto": "tCO₂e = Σ área × carbono incorporado por m² ÷ 1000",
+      "variaveis": [
+       {
+        "simbolo": "área",
+        "significado": "área da composição",
+        "unidade": "m²"
+       },
+       {
+        "simbolo": "carbono por m²",
+        "significado": "carbono incorporado, berço ao portão",
+        "unidade": "kgCO₂e/m²"
+       }
+      ]
+     },
+     "premissas": [],
+     "normas": [
+      {
+       "codigo": "GHG Protocol",
+       "edicao": "2004 / 2015",
+       "item": "escopo 3, categoria 1",
+       "como_e_usada": "Bens comprados; o carbono da obra entra no ano da compra."
+      }
+     ],
+     "limites_de_validade": "Berço ao portão; composição sem valor por m² fica [MARCADOR].",
+     "fonte_de_dados": "localStorage physis-calc-materiais (SustainKit ou Planejador).",
+     "status": "simplificado",
+     "o_que_falta": "Valor por m² de cada composição na base de materiais.",
+     "onde": "sistema/physis-carbono.js · calcular() (materiais_obra); espelho physis_hub/carbono.py"
     }
    ]
   },
@@ -2556,6 +2741,123 @@ const DADOS = {
      "status": "simplificado",
      "o_que_falta": "Pontos de cada crédito LEED v5 conferidos com o guia oficial; evidências automáticas ligadas às metodologias deste documento.",
      "onde": "painel.html · certAvalia()"
+    },
+    {
+     "id": "cert.conformidade",
+     "nome": "Conformidade legal",
+     "o_que_calcula": "Quanto dos requisitos legais que se aplicam já está atendido.",
+     "formula": {
+      "texto": "atendimento = (conformes + 0,5 × parciais) ÷ itens que se aplicam × 100 (itens “não se aplica” e sem resposta ficam fora)",
+      "variaveis": [
+       {
+        "simbolo": "conformes",
+        "significado": "conformes",
+        "unidade": "itens"
+       },
+       {
+        "simbolo": "parciais",
+        "significado": "parciais",
+        "unidade": "itens"
+       },
+       {
+        "simbolo": "itens que se aplicam",
+        "significado": "itens que se aplicam",
+        "unidade": "itens"
+       }
+      ]
+     },
+     "premissas": [],
+     "normas": [
+      {
+       "codigo": "Lei 12.305/2010",
+       "edicao": "2010",
+       "item": "plano de gerenciamento de resíduos e MTR",
+       "como_e_usada": "Itens do tema Resíduos."
+      },
+      {
+       "codigo": "Lei 9.433/1997",
+       "edicao": "1997",
+       "item": "outorga de uso da água",
+       "como_e_usada": "Itens do tema Água e outorga."
+      },
+      {
+       "codigo": "Lei 12.651/2012",
+       "edicao": "2012",
+       "item": "APP",
+       "como_e_usada": "Tema APP e Código Florestal; o requisito ainda está como [MARCADOR]."
+      }
+     ],
+     "limites_de_validade": "Levantamento assistido, não certificação; não substitui ART de profissional habilitado.",
+     "fonte_de_dados": "Respostas da pessoa, por item: situação, evidência, prazo e responsável.",
+     "status": "simplificado",
+     "o_que_falta": "Redigir o requisito de APP e Código Florestal; conferir a vigência de cada NR e norma citada antes de emitir relatório.",
+     "onde": "painel.html · confCalc() (mesma conta da antiga Tela do cliente, calcConformidade)"
+    },
+    {
+     "id": "cert.ipmvp",
+     "nome": "Economia medida (IPMVP)",
+     "o_que_calcula": "Economia de energia e de água de uma medida, em kWh, m³, % e R$, e se a medição consegue comprová-la.",
+     "formula": {
+      "texto": "economia = (linha de base − período de relatório) ± ajustes rotineiros ± ajustes não rotineiros; % = economia ÷ (linha de base + ajustes); R$ = economia × tarifa; comprovável quando economia pretendida ÷ incerteza ≥ 3 (apertado entre 1 e 3); evitadas = kWh economizados ÷ 1000 × fator da rede do Carbono",
+      "variaveis": [
+       {
+        "simbolo": "linha de base",
+        "significado": "linha de base",
+        "unidade": "kWh ou m³ (soma dos meses escolhidos)"
+       },
+       {
+        "simbolo": "período de relatório",
+        "significado": "período de relatório",
+        "unidade": "kWh ou m³"
+       },
+       {
+        "simbolo": "ajustes",
+        "significado": "ajustes",
+        "unidade": "kWh ou m³"
+       },
+       {
+        "simbolo": "tarifa",
+        "significado": "tarifa",
+        "unidade": "R$/kWh ou R$/m³"
+       },
+       {
+        "simbolo": "incerteza",
+        "significado": "incerteza",
+        "unidade": "%"
+       },
+       {
+        "simbolo": "fator da rede",
+        "significado": "fator da rede",
+        "unidade": "tCO₂/MWh"
+       }
+      ]
+     },
+     "premissas": [],
+     "normas": [
+      {
+       "codigo": "IPMVP",
+       "edicao": "a conferir",
+       "item": "equação geral de economia e ajustes",
+       "como_e_usada": "Economia como diferença entre linha de base e período de relatório, com ajustes rotineiros e não rotineiros."
+      },
+      {
+       "codigo": "ISO 50015",
+       "edicao": "2014",
+       "item": "medição e verificação do desempenho energético",
+       "como_e_usada": "Referência para o plano de medição, a incerteza e a verificação dos instrumentos."
+      },
+      {
+       "codigo": "ISO 50006",
+       "edicao": "2023",
+       "item": "linha de base energética",
+       "como_e_usada": "Escolha do período da linha de base."
+      }
+     ],
+     "limites_de_validade": "Opção pela fatura (medição da instalação inteira); o ajuste sugerido pela produção supõe consumo proporcional à produção.",
+     "fonte_de_dados": "Contas mensais de luz e água (Início), produção mensal (Gestão), ajustes, tarifas e instrumentos informados.",
+     "status": "simplificado",
+     "o_que_falta": "Ajuste rotineiro por regressão (clima e produção) em vez da proporção simples; incerteza calculada a partir dos instrumentos.",
+     "onde": "painel.html · mvEconomia(), mvComprovavel(), mvStatusCal(), mvPlano()"
     }
    ]
   },
@@ -2661,6 +2963,395 @@ const DADOS = {
      "status": "conforme",
      "o_que_falta": "",
      "onde": "physis-hub/web/painel.html; physis-preferencias.js"
+    }
+   ]
+  },
+  "secador": {
+   "nome": "Secador solar",
+   "resumo": "Secagem com o sol: balanço de massa, curva de secagem, tamanho do coletor e CO₂ evitado (versão 0.1, a homologar).",
+   "calculos": [
+    {
+     "id": "sec.massa",
+     "nome": "Balanço de massa do lote",
+     "o_que_calcula": "Quanta água sai do produto, o peso na umidade desejada e o rendimento.",
+     "formula": {
+      "texto": "água a tirar = W₀ × (u₀ − u) ÷ (100 − u); peso na meta = matéria seca ÷ (1 − u/100); rendimento = W_fim ÷ W₀",
+      "variaveis": [
+       {
+        "simbolo": "W₀",
+        "significado": "peso no começo",
+        "unidade": "kg"
+       },
+       {
+        "simbolo": "u₀",
+        "significado": "umidade no começo, base úmida",
+        "unidade": "%"
+       },
+       {
+        "simbolo": "u",
+        "significado": "umidade desejada, base úmida",
+        "unidade": "%"
+       },
+       {
+        "simbolo": "W_fim",
+        "significado": "peso no fim",
+        "unidade": "kg"
+       }
+      ]
+     },
+     "premissas": [],
+     "normas": [
+      {
+       "codigo": "Embrapa Café",
+       "edicao": "a conferir",
+       "item": "umidade de armazenamento e temperatura da massa",
+       "como_e_usada": "Referência da meta de umidade e da temperatura máxima do café (premissas marcadas verificar)."
+      },
+      {
+       "codigo": "IN MAPA 8/2003",
+       "edicao": "2003",
+       "item": "classificação do café cru",
+       "como_e_usada": "Referência para a umidade do café beneficiado; o limite exato é conferido no regulamento."
+      }
+     ],
+     "limites_de_validade": "Umidades em base úmida; premissas por produto são de literatura geral, marcadas verificar.",
+     "fonte_de_dados": "Lote informado (peso e umidade) e pesagens à mão ou célula de carga (PESO).",
+     "status": "simplificado",
+     "o_que_falta": "Medir a umidade real de cada produto no começo e no fim para trocar as premissas.",
+     "onde": "sistema/physis-secador.js · aguaARemover(), pesoNaUmidade(), rendimento() (espelho: physis_hub/secador.py)"
+    },
+    {
+     "id": "sec.curva",
+     "nome": "Curva de secagem (modelo de Lewis)",
+     "o_que_calcula": "Velocidade de secagem e hora prevista para chegar à umidade desejada.",
+     "formula": {
+      "texto": "W(t) = We + (W₀ − We) × e^(−k·t); com 3 ou mais pesos, ajuste por mínimos quadrados (We numa grade de 100 passos, refinado por seção áurea); fim previsto = −ln((W_meta − We) ÷ (W₀ − We)) ÷ k",
+      "variaveis": [
+       {
+        "simbolo": "W(t)",
+        "significado": "peso no tempo t",
+        "unidade": "kg"
+       },
+       {
+        "simbolo": "We",
+        "significado": "peso de equilíbrio",
+        "unidade": "kg"
+       },
+       {
+        "simbolo": "k",
+        "significado": "constante de secagem",
+        "unidade": "1/h"
+       },
+       {
+        "simbolo": "t",
+        "significado": "tempo desde o começo",
+        "unidade": "h"
+       }
+      ]
+     },
+     "premissas": [],
+     "normas": [
+      {
+       "codigo": "sem norma aplicável",
+       "edicao": "—",
+       "item": "—",
+       "como_e_usada": "Modelo exponencial de camada fina da literatura de secagem; sem pesos, k e umidade de equilíbrio típicos do produto."
+      }
+     ],
+     "limites_de_validade": "Camada fina e condições do ar parecidas ao longo do lote; sem resposta quando o equilíbrio fica acima da meta.",
+     "fonte_de_dados": "Pesos do lote (PESO ou pesagens à mão).",
+     "status": "simplificado",
+     "o_que_falta": "Medir o k de cada produto no secador da Physis.",
+     "onde": "sistema/physis-secador.js · ajustar(), previsaoLote() (espelho: physis_hub/secador.py)"
+    },
+    {
+     "id": "sec.coletor",
+     "nome": "Tamanho do coletor e vazão de ar",
+     "o_que_calcula": "Área de coletor solar e vazão do ventilador para secar um lote no prazo.",
+     "formula": {
+      "texto": "calor = água × 2,45 MJ/kg ÷ aproveitamento do ar; área = calor ÷ (H × 3,6 × η × dias); Δw = 1,006 × ΔT × aproveitamento ÷ 2.450; vazão = (água ÷ Δw) ÷ 1,15 ÷ (dias × horas)",
+      "variaveis": [
+       {
+        "simbolo": "H",
+        "significado": "irradiação no coletor",
+        "unidade": "kWh/m² por dia"
+       },
+       {
+        "simbolo": "η",
+        "significado": "eficiência do coletor",
+        "unidade": "0 a 1"
+       },
+       {
+        "simbolo": "ΔT",
+        "significado": "aquecimento do ar no coletor",
+        "unidade": "°C"
+       },
+       {
+        "simbolo": "Δw",
+        "significado": "água levada por kg de ar",
+        "unidade": "kg/kg"
+       }
+      ]
+     },
+     "premissas": [],
+     "normas": [
+      {
+       "codigo": "ASHRAE 93",
+       "edicao": "a conferir",
+       "item": "eficiência do coletor",
+       "como_e_usada": "A eficiência usada é premissa; o método de ensaio indica como medi-la no coletor construído."
+      },
+      {
+       "codigo": "ASHRAE Handbook Fundamentals",
+       "edicao": "a conferir",
+       "item": "psicrometria",
+       "como_e_usada": "Calor específico do ar, calor latente da água e densidade do ar nas contas do ar de secagem."
+      }
+     ],
+     "limites_de_validade": "Mês de projeto escolhido (o mais fraco por padrão); irradiação da NASA POWER quando o lugar tem localização.",
+     "fonte_de_dados": "Produto por lote, dias de sol, horas de ventilador, irradiação do lugar.",
+     "status": "simplificado",
+     "o_que_falta": "Medir a eficiência real do coletor (ensaio) e trocar a premissa.",
+     "onde": "sistema/physis-secador.js · dimensionar() (espelho: physis_hub/secador.py)"
+    },
+    {
+     "id": "sec.evitado",
+     "nome": "CO₂ evitado pelo secador solar",
+     "o_que_calcula": "Emissão que um secador elétrico ou a lenha teria para tirar a mesma água.",
+     "formula": {
+      "texto": "elétrico = calor da água ÷ η ÷ 3,6 (kWh) × fator da rede; lenha = calor ÷ (13 MJ/kg × η) kg, com CH₄ e N₂O da queima e o CO₂ só se a lenha for sem reposição",
+      "variaveis": [
+       {
+        "simbolo": "η",
+        "significado": "eficiência do secador comparado",
+        "unidade": "0 a 1"
+       },
+       {
+        "simbolo": "fator da rede",
+        "significado": "emissão da eletricidade",
+        "unidade": "tCO₂/MWh"
+       }
+      ]
+     },
+     "premissas": [],
+     "normas": [
+      {
+       "codigo": "GHG Protocol",
+       "edicao": "2004 / 2015",
+       "item": "emissões evitadas",
+       "como_e_usada": "Informadas à parte, nunca descontadas do inventário."
+      },
+      {
+       "codigo": "Fator médio do SIN (MCTI)",
+       "edicao": "por ano",
+       "item": "fator da rede",
+       "como_e_usada": "Fator da base do Carbono."
+      }
+     ],
+     "limites_de_validade": "Comparação com um secador hipotético de mesma carga.",
+     "fonte_de_dados": "Água tirada nos lotes, base de fatores de emissão.",
+     "status": "simplificado",
+     "o_que_falta": "Confirmar a eficiência dos secadores de comparação usados na região.",
+     "onde": "sistema/physis-secador.js · dimensionar() (evitado)"
+    }
+   ]
+  },
+  "servidor-verde": {
+   "nome": "Servidor verde",
+   "resumo": "Dimensionamento de servidores com pouca pegada, por projeto (em desenvolvimento).",
+   "calculos": [
+    {
+     "premissas": [],
+     "status": "simplificado",
+     "onde": "sistema/physis-servidor-verde.js (espelho: physis_hub/servidor_verde.py)",
+     "id": "sv.computacao",
+     "nome": "Computação e memória de vídeo",
+     "o_que_calcula": "Núcleos, memória e memória de vídeo para as cargas de trabalho e o modelo de IA.",
+     "formula": {
+      "texto": "memória de vídeo = parâmetros × bytes por parâmetro × 1,2; memória = soma dos programas (+ o modelo, quando a placa não comporta); placas = memória de vídeo ÷ memória por placa",
+      "variaveis": [
+       {
+        "simbolo": "parâmetros",
+        "significado": "tamanho do modelo",
+        "unidade": "bilhões"
+       },
+       {
+        "simbolo": "bytes por parâmetro",
+        "significado": "precisão do modelo",
+        "unidade": "B"
+       }
+      ]
+     },
+     "normas": [
+      {
+       "codigo": "sem norma aplicável",
+       "edicao": "—",
+       "item": "—",
+       "como_e_usada": "Regra de dimensionamento da Physis; faixas por classe genérica marcadas verificar."
+      }
+     ],
+     "limites_de_validade": "Classes genéricas de máquina; o desempenho real depende do modelo e do programa.",
+     "fonte_de_dados": "Seleção de módulos e cargas de trabalho do projeto; catálogo de módulos.",
+     "o_que_falta": "Curadoria das faixas de potência e desempenho por classe; tokens por segundo medidos."
+    },
+    {
+     "premissas": [],
+     "status": "simplificado",
+     "onde": "sistema/physis-servidor-verde.js (espelho: physis_hub/servidor_verde.py)",
+     "id": "sv.armazenamento",
+     "nome": "Armazenamento e cópias",
+     "o_que_calcula": "Crescimento do banco de dados e dos arquivos e o espaço das cópias.",
+     "formula": {
+      "texto": "dados = sensores × leituras por dia × bytes × dias de retenção; cópia 3-2-1 com uma cópia fora do lugar",
+      "variaveis": [
+       {
+        "simbolo": "bytes",
+        "significado": "tamanho de cada leitura",
+        "unidade": "B"
+       },
+       {
+        "simbolo": "retenção",
+        "significado": "tempo guardado",
+        "unidade": "anos"
+       }
+      ]
+     },
+     "normas": [
+      {
+       "codigo": "sem norma aplicável",
+       "edicao": "—",
+       "item": "—",
+       "como_e_usada": "Boa prática de cópia de segurança (3 cópias, 2 meios, 1 fora do lugar)."
+      }
+     ],
+     "limites_de_validade": "Sem compressão do banco; RAID e fotos do disco somados à parte.",
+     "fonte_de_dados": "Cargas de trabalho do projeto.",
+     "o_que_falta": "Medir o crescimento real do banco na Casa Physis."
+    },
+    {
+     "premissas": [],
+     "status": "simplificado",
+     "onde": "sistema/physis-servidor-verde.js (espelho: physis_hub/servidor_verde.py)",
+     "id": "sv.energia",
+     "nome": "Energia, nobreak e solar",
+     "o_que_calcula": "Consumo do servidor, tamanho do nobreak e da geração solar com bateria.",
+     "formula": {
+      "texto": "kWh/dia = W médio × 24 ÷ eficiência da fonte (curva 80 PLUS pela carga); nobreak VA = pico ÷ fator de potência; Wh = W médio × autonomia ÷ profundidade de descarga; kWp = kWh/dia ÷ (horas de sol × PR)",
+      "variaveis": [
+       {
+        "simbolo": "W médio",
+        "significado": "potência média do servidor",
+        "unidade": "W"
+       },
+       {
+        "simbolo": "autonomia",
+        "significado": "tempo no nobreak",
+        "unidade": "h"
+       },
+       {
+        "simbolo": "PR",
+        "significado": "rendimento global do sistema solar",
+        "unidade": "0 a 1"
+       }
+      ]
+     },
+     "normas": [
+      {
+       "codigo": "IEC 62040-3",
+       "edicao": "a conferir",
+       "item": "desempenho do nobreak",
+       "como_e_usada": "Referência para a escolha e o ensaio do nobreak."
+      },
+      {
+       "codigo": "ABNT NBR 16690",
+       "edicao": "2019",
+       "item": "instalação fotovoltaica",
+       "como_e_usada": "Instalação do sistema solar que alimenta o servidor."
+      }
+     ],
+     "limites_de_validade": "Potências por classe genérica (verificar); sol do lugar pela NASA POWER ou digitado.",
+     "fonte_de_dados": "Seleção de módulos, lugar do projeto e catálogo (curvas 80 PLUS).",
+     "o_que_falta": "Calibrar com a medição real da pegada do servidor."
+    },
+    {
+     "premissas": [],
+     "status": "simplificado",
+     "onde": "sistema/physis-servidor-verde.js (espelho: physis_hub/servidor_verde.py)",
+     "id": "sv.termico",
+     "nome": "Calor da sala e PUE",
+     "o_que_calcula": "Calor do servidor, ar-condicionado ou ventilação e a eficiência da sala.",
+     "formula": {
+      "texto": "BTU/h = W × 3,412; TR = BTU/h ÷ 12.000; PUE = (TI + ar + perdas + luz) ÷ TI",
+      "variaveis": [
+       {
+        "simbolo": "TI",
+        "significado": "energia dos equipamentos de TI",
+        "unidade": "kW"
+       },
+       {
+        "simbolo": "PUE",
+        "significado": "eficiência no uso da energia",
+        "unidade": "—"
+       }
+      ]
+     },
+     "normas": [
+      {
+       "codigo": "ISO/IEC 30134-2",
+       "edicao": "a conferir",
+       "item": "PUE",
+       "como_e_usada": "Definição do indicador de eficiência da sala."
+      },
+      {
+       "codigo": "ASHRAE TC 9.9",
+       "edicao": "a conferir",
+       "item": "classe A1",
+       "como_e_usada": "Faixa de temperatura e umidade da sala."
+      }
+     ],
+     "limites_de_validade": "Sala pequena; perdas e iluminação informadas.",
+     "fonte_de_dados": "Energia calculada e dados da sala.",
+     "o_que_falta": "Medir temperatura e consumo do ar na sala da Casa Physis."
+    },
+    {
+     "premissas": [],
+     "status": "simplificado",
+     "onde": "sistema/physis-servidor-verde.js (espelho: physis_hub/servidor_verde.py)",
+     "id": "sv.carbono",
+     "nome": "Carbono e custos do servidor",
+     "o_que_calcula": "Emissão da operação e da fabricação, custo da energia e retorno do investimento solar.",
+     "formula": {
+      "texto": "operação = kWh/ano ÷ 1000 × fator da rede do lugar; fabricação = carbono da classe ÷ anos de uso (escopo 3, cat. 2); custo = kWh × tarifa",
+      "variaveis": [
+       {
+        "simbolo": "fator da rede",
+        "significado": "emissão da eletricidade do lugar",
+        "unidade": "tCO₂/MWh"
+       },
+       {
+        "simbolo": "anos de uso",
+        "significado": "vida útil considerada",
+        "unidade": "anos"
+       }
+      ]
+     },
+     "normas": [
+      {
+       "codigo": "GHG Protocol",
+       "edicao": "2004 / 2015",
+       "item": "orientação setorial de TIC",
+       "como_e_usada": "Energia no escopo 2 ou 3 e fabricação no escopo 3."
+      },
+      {
+       "codigo": "ITU-T L.1450",
+       "edicao": "a conferir",
+       "item": "pegada do setor de TIC",
+       "como_e_usada": "Métodos para a pegada das máquinas."
+      }
+     ],
+     "limites_de_validade": "Carbono de fabricação por classe é ordem de grandeza (verificar); custos sem orçamento ficam [MARCADOR].",
+     "fonte_de_dados": "Energia calculada, fator da rede do Carbono e catálogo.",
+     "o_que_falta": "Orçamentos reais e carbono de fabricação por modelo de máquina."
     }
    ]
   }
@@ -3556,6 +4247,62 @@ const DADOS = {
    "assunto": "não há norma técnica que fixe este cálculo; vale o método de referência descrito",
    "edicao": "—",
    "situacao": "—",
+   "nota": ""
+  },
+  "Embrapa Café": {
+   "tipo": "referência técnica",
+   "assunto": "pós-colheita, secagem e armazenamento do café (Embrapa Café e Consórcio Pesquisa Café)",
+   "edicao": "a conferir",
+   "situacao": "conferir",
+   "nota": "publicações técnicas; conferir a mais recente"
+  },
+  "IN MAPA 8/2003": {
+   "tipo": "regulamento",
+   "assunto": "regulamento técnico de identidade e qualidade para a classificação do café beneficiado grão cru",
+   "edicao": "2003",
+   "situacao": "conferir",
+   "nota": "conferir se houve atualização do regulamento"
+  },
+  "ASHRAE 93": {
+   "tipo": "referência técnica",
+   "assunto": "métodos de ensaio do desempenho térmico de coletores solares",
+   "edicao": "a conferir",
+   "situacao": "conferir",
+   "nota": "norma americana; base para medir a eficiência do coletor"
+  },
+  "IPCC 2006": {
+   "tipo": "referência técnica",
+   "assunto": "diretrizes para inventários nacionais de gases de efeito estufa (vol. 5: resíduos e efluentes)",
+   "edicao": "2006",
+   "situacao": "conferir",
+   "nota": "com o Refinamento de 2019"
+  },
+  "ISO/IEC 30134-2": {
+   "tipo": "ISO",
+   "assunto": "indicadores de datacenter: eficiência no uso da energia (PUE)",
+   "edicao": "a conferir",
+   "situacao": "conferir",
+   "nota": ""
+  },
+  "ASHRAE TC 9.9": {
+   "tipo": "referência técnica",
+   "assunto": "faixas de temperatura e umidade para salas de equipamentos de TI",
+   "edicao": "a conferir",
+   "situacao": "conferir",
+   "nota": "orientação técnica, não é norma brasileira"
+  },
+  "ITU-T L.1450": {
+   "tipo": "referência técnica",
+   "assunto": "métodos para a pegada ambiental do setor de tecnologia da informação e comunicação",
+   "edicao": "a conferir",
+   "situacao": "conferir",
+   "nota": ""
+  },
+  "IEC 62040-3": {
+   "tipo": "IEC",
+   "assunto": "sistemas de alimentação ininterrupta (nobreak): desempenho e ensaios",
+   "edicao": "a conferir",
+   "situacao": "conferir",
    "nota": ""
   }
  }

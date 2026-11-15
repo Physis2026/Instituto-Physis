@@ -57,7 +57,7 @@ function padrao() {
     press: { dp:50, v:1, portas:0, abertas:2, w:0.9, h:2.1, fresta:0.02, outras:0, fator:1.25, fechador:50, limite:110 },
     solar: { consumo:50, tq:40, tf:22, fracao:0.7, prod:1.8, areaCol:2, volM2:75, horas:4, reserv:RESERV.slice() },
     piscina: { area:60, prof:1.4, tw:28, ta:22, ur:70, v:0.5, descoberta:1, capa:1, hCapa:12, redCapa:0.7, paredes:3, ti:22, tAq:24 },
-    dutos: { rug:0.00009, fs:1.15, rend:0.6, alt:0, temp:20, rendMotor:0.88, margem1:0.3, margem2:0.2, sistemas: [
+    dutos: { rug:0.00009, fs:1.15, rend:0.6, alt:0, temp:20, rendTransm:0.95, rendMotor:0.88, margem1:0.3, margem2:0.2, sistemas: [
       { nome:"Exaustão de banheiros", fonte:"banheiros", vazao:0, vel:8, reto:40, equiv:30, local:150, altura:600, tipo:"Prumada residencial (shaft)" },
       { nome:"Depósito de lixo", fonte:"lixo", vazao:0, vel:8, reto:15, equiv:10, local:100, altura:200, tipo:"Exaustão técnica (lixo, bombas)" },
       { nome:"Garagem", fonte:"garagem", vazao:0, vel:10, reto:60, equiv:45, local:200, altura:600, tipo:"Garagem" },
@@ -179,17 +179,21 @@ function calcular(entradas) {
     o.atrito = o.reynolds === 0 ? 0 : 0.25 / Math.pow(Math.log10(rug / (3.7 * o.diam / 1000) + 5.74 / Math.pow(o.reynolds, 0.9)), 2);
     o.perdaUnit = o.diam === 0 ? 0 : o.atrito / (o.diam / 1000) * dut.rho * C * C / 2; o.perdaTrecho = o.perdaUnit * (N(s.reto) + N(s.equiv));
     o.pressao = (o.perdaTrecho + N(s.local)) * N(D.fs); o.potAbs = (B === 0 || !rendC) ? 0 : B / 3600 * o.pressao / rendC / 1000;
-    const H = N(s.altura); o.largura = null; o.deRet = o.aspecto = o.velRet = o.potEixo = o.potMargem = o.motorKw = o.motorCv = null;
+    const H = N(s.altura); o.largura = null; o.deRet = o.aspecto = o.velRet = o.potEixo = o.potMargem = o.potEletrica = o.motorKw = o.motorCv = null;
     if (B !== 0 && H !== 0) { let c = 0; LARG.forEach(w => { if (deRet(H, w) < o.diam) c++; }); o.largura = c < LARG.length ? LARG[c] : "acima da tabela"; }
     if (typeof o.largura === "number") { o.deRet = deRet(H, o.largura); o.aspecto = Math.max(H, o.largura) / Math.min(H, o.largura); o.velRet = B / 3600 / (H * o.largura / 1e6); }
-    if (B !== 0) { o.potEixo = o.potAbs * N(D.rendMotor); o.potMargem = o.potEixo * (1 + (o.potEixo <= 1.5 ? N(D.margem1) : N(D.margem2)));
+    /* Revisão de 15/11/2026 (docs/REVISAO_AVAC.md, item 1): o rendimento entre o ventilador e a rede só aumenta a potência
+       pedida. Eixo do motor = absorvida ÷ rendimento da transmissão (correia 0,95; acoplamento direto 1); elétrica = eixo ÷
+       rendimento do motor. Antes multiplicava pelo rendimento do motor e escolhia motor menor. */
+    if (B !== 0) { const rT = (D.rendTransm == null || D.rendTransm === "") ? 0.95 : (N(D.rendTransm) || 1);
+      o.potEixo = o.potAbs / rT; o.potEletrica = o.potEixo / (N(D.rendMotor) || 1); o.potMargem = o.potEixo * (1 + (o.potEixo <= 1.5 ? N(D.margem1) : N(D.margem2)));
       const m = acima(MOTOR_KW, o.potMargem); o.motorKw = m != null ? m : "acima da tabela"; if (m != null) o.motorCv = MOTOR_CV[MOTOR_KW.indexOf(m)]; }
     o.situacao = B === 0 ? "" : H === 0 ? "informe a altura" : o.largura === "acima da tabela" ? "dividir em mais dutos ou prumadas"
       : o.aspecto > 4 ? "relação > 4:1 — rever altura" : o.motorKw === "acima da tabela" ? "motor acima da tabela" : "ok";
     const tp = TIPOS_DUTO.find(t => t[0] === s.tipo); o.tipo = s.tipo || ""; o.limite = tp ? tp[1] : 0;
     o.situacaoVel = (o.nome === "" || C === 0) ? "" : o.limite === 0 ? "defina o tipo" : C <= o.limite ? "ok" : "acima do limite";
     return o; });
-  dut.potAbs = dut.sis.reduce((s, o) => s + o.potAbs, 0); dut.potEixo = dut.sis.reduce((s, o) => s + N(o.potEixo), 0);
+  dut.potAbs = dut.sis.reduce((s, o) => s + o.potAbs, 0); dut.potEixo = dut.sis.reduce((s, o) => s + N(o.potEixo), 0); dut.potEletrica = dut.sis.reduce((s, o) => s + N(o.potEletrica), 0);
   dut.motores = dut.sis.reduce((s, o) => s + N(o.motorKw), 0); dut.ventiladores = dut.sis.filter(o => o.vazao > 0).length; r.dutos = dut;
   status.dutos = st("dutos", status.vent === "ativo" || status.press === "ativo");
   const algum = ["ac", "vent", "press", "solar", "piscina", "dutos"].some(k => status[k] === "ativo");
@@ -373,7 +377,7 @@ function setPath(obj, path, v) { const ps = String(path).split("."); let c = obj
   c[ps[ps.length - 1]] = v; }
 
 /* ════════ Desenho (usa os globais da plataforma) ════════ */
-const SUBS = [["visao", "Visão geral e controle"], ["tip", "Tipologias e ambientes"], ["ac", "Ar-condicionado"], ["vent", "Ventilação"], ["press", "Pressurização"],
+const SUBS = [["visao", "Visão geral e controle"], ["tip", "Tipologias e ambientes"], ["carga", "Carga térmica"], ["ac", "Ar-condicionado"], ["vent", "Ventilação"], ["press", "Pressurização"],
   ["solar", "Aquecimento solar"], ["piscina", "Piscina"], ["dutos", "Dutos e ventiladores"], ["resumo", "Resumo e lista de equipamentos"], ["memoria", "Memória de cálculo"]];
 const f = (v, c) => (v == null || v === "" || (typeof v === "number" && !isFinite(v))) ? "—" : typeof v === "number" ? n2(v, c == null ? 2 : c) : esc(v);
 const fmtIn = v => v == null || v === "" ? "" : typeof v === "number" ? String(+v.toPrecision(12)).replace(".", ",") : String(v);
@@ -512,7 +516,7 @@ function telaPiscina(e, R) { const p = e.piscina, x = R.piscina;
 function telaDutos(e, R) { const d = e.dutos, x = R.dutos;
   const ent = sec("de", "Parâmetros do ar, do duto e do motor", `<div class="precos">${campo("dutos.alt", d.alt, "Altitude do local (m)")}${campo("dutos.temp", d.temp, "Temperatura do ar no duto (°C)")}
     ${campo("dutos.rug", d.rug, "Rugosidade absoluta (m)", "n", "Chapa galvanizada: 0,00009 m.")}${campo("dutos.fs", d.fs, "Fator de segurança sobre a pressão")}${campo("dutos.rend", d.rend, "Rendimento do conjunto motoventilador")}
-    ${campo("dutos.rendMotor", d.rendMotor, "Rendimento do motor")}${campo("dutos.margem1", d.margem1, "Margem do motor até 1,5 kW")}${campo("dutos.margem2", d.margem2, "Margem do motor acima de 1,5 kW")}</div>`
+    ${campo("dutos.rendTransm", d.rendTransm == null ? 0.95 : d.rendTransm, "Rendimento da transmissão", "n", "Correia: 0,95. Acoplamento direto: 1.")}${campo("dutos.rendMotor", d.rendMotor, "Rendimento do motor")}${campo("dutos.margem1", d.margem1, "Margem do motor até 1,5 kW")}${campo("dutos.margem2", d.margem2, "Margem do motor acima de 1,5 kW")}</div>`
     + kv("Propriedades do ar", [["Pressão atmosférica (kPa)", f(x.patm, 3)], ["Densidade do ar (kg/m³)", f(x.rho, 4)], ["Viscosidade cinemática (m²/s, Sutherland)", x.nu.toExponential(4).replace(".", ",")]]));
   const FONTES = [["", "vazão manual"], ["banheiros", "Ventilação — banheiros"], ["lixo", "Ventilação — lixo"], ["garagem", "Ventilação — garagem"], ["press", "Pressurização"]];
   const sis = sec("ds", "Trecho crítico por sistema", tabela("Dados de cada sistema (a vazão vem das outras partes ou é digitada)", ["Sistema", "Origem da vazão", "Vazão manual (m³/h)", "Velocidade (m/s)", "Trecho reto (m)", "Comp. equiv. acessórios (m)", "Perdas localizadas (Pa)", "Altura disponível (mm)", "Tipo de sistema", "<span class=\"so-leitor\">Ações</span>"],
@@ -521,11 +525,11 @@ function telaDutos(e, R) { const d = e.dutos, x = R.dutos;
         ${cel(p + ".vel", s.vel, "Velocidade de " + s.nome)}${cel(p + ".reto", s.reto, "Trecho reto de " + s.nome)}${cel(p + ".equiv", s.equiv, "Comprimento equivalente de acessórios de " + s.nome)}${cel(p + ".local", s.local, "Perdas localizadas de " + s.nome)}
         ${cel(p + ".altura", s.altura, "Altura disponível de " + s.nome)}${cel(p + ".tipo", s.tipo || "", "Tipo de sistema de " + s.nome, "sel", { ops:[["", "—"]].concat(TIPOS_DUTO.map(t => [t[0], t[0] + " (" + t[1] + " m/s)"])) })}<td>${btn("del=sis:" + i, "Remover", "Remover " + s.nome)}</td></tr>`; }))
     + `<p>${btn("add=sis", "Acrescentar sistema")}</p>`
-    + tabela("Resultados: perda de carga (Darcy-Weisbach com Swamee-Jain), duto retangular e motor", ["Sistema", "Vazão (m³/h)", "Diâm. equiv. (mm)", "Reynolds", "Fator de atrito", "Perda unitária (Pa/m)", "Perda no trecho (Pa)", "Pressão total (Pa)", "Potência absorvida (kW)", "Largura (mm)", "De retangular (mm)", "Relação de aspecto", "Velocidade no retangular (m/s)", "Potência no eixo (kW)", "Com margem (kW)", "Motor (kW)", "Motor (cv)", "Situação"],
+    + tabela("Resultados: perda de carga (Darcy-Weisbach com Swamee-Jain), duto retangular e motor", ["Sistema", "Vazão (m³/h)", "Diâm. equiv. (mm)", "Reynolds", "Fator de atrito", "Perda unitária (Pa/m)", "Perda no trecho (Pa)", "Pressão total (Pa)", "Potência absorvida (kW)", "Largura (mm)", "De retangular (mm)", "Relação de aspecto", "Velocidade no retangular (m/s)", "Potência no eixo (kW)", "Com margem (kW)", "Potência elétrica (kW)", "Motor (kW)", "Motor (cv)", "Situação"],
       x.sis.map(o => `<tr><th scope="row">${esc(o.nome)}</th><td>${f(o.vazao, 0)}</td><td>${f(o.diam, 0)}</td><td>${f(o.reynolds, 0)}</td><td>${f(o.atrito, 4)}</td><td>${f(o.perdaUnit, 3)}</td><td>${f(o.perdaTrecho, 1)}</td><td>${f(o.pressao, 1)}</td><td>${f(o.potAbs, 3)}</td>
-        <td>${f(o.largura, 0)}</td><td>${f(o.deRet, 0)}</td><td>${f(o.aspecto, 2)}</td><td>${f(o.velRet, 2)}</td><td>${f(o.potEixo, 3)}</td><td>${f(o.potMargem, 3)}</td><td>${f(o.motorKw, 2)}</td><td>${f(o.motorCv, 2)}</td><td>${selo(o.situacao)}</td></tr>`))
-    + kv("Totais", [["Potência absorvida total (kW)", f(x.potAbs, 3)], ["Potência no eixo total (kW)", f(x.potEixo, 3)], ["Motores instalados (kW)", f(x.motores, 2)], ["Ventiladores especificados", f(x.ventiladores, 0)]])
-    + `<p class="t2 pq">Perdas localizadas reúnem veneziana, grelhas, atenuador, damper e filtro sujo. A seção retangular tem diâmetro equivalente (De = 1,30·(a·b)^0,625/(a+b)^0,25) igual ou maior que o circular. Eixo do motor = potência absorvida × rendimento do motor, como na planilha.</p>`);
+        <td>${f(o.largura, 0)}</td><td>${f(o.deRet, 0)}</td><td>${f(o.aspecto, 2)}</td><td>${f(o.velRet, 2)}</td><td>${f(o.potEixo, 3)}</td><td>${f(o.potMargem, 3)}</td><td>${f(o.potEletrica, 3)}</td><td>${f(o.motorKw, 2)}</td><td>${f(o.motorCv, 2)}</td><td>${selo(o.situacao)}</td></tr>`))
+    + kv("Totais", [["Potência absorvida total (kW)", f(x.potAbs, 3)], ["Potência no eixo total (kW)", f(x.potEixo, 3)], ["Potência elétrica total (kW)", f(x.potEletrica, 3)], ["Motores instalados (kW)", f(x.motores, 2)], ["Ventiladores especificados", f(x.ventiladores, 0)]])
+    + `<p class="t2 pq">Perdas localizadas reúnem veneziana, grelhas, atenuador, damper e filtro sujo. A seção retangular tem diâmetro equivalente (De = 1,30·(a·b)^0,625/(a+b)^0,25) igual ou maior que o circular. Potência no eixo do motor = potência absorvida ÷ rendimento da transmissão; potência elétrica = potência no eixo ÷ rendimento do motor. A planilha multiplicava pelo rendimento do motor, o que escolhia motor menor (revisão de 15/11/2026).</p>`);
   const vel = sec("dv", "Verificação de velocidade", tabela("Velocidade adotada contra o limite do tipo de sistema", ["Sistema", "Velocidade adotada (m/s)", "Limite (m/s)", "Situação"],
     x.sis.filter(o => o.nome).map(o => `<tr><th scope="row">${esc(o.nome)}</th><td>${f(o.vel, 1)}</td><td>${f(o.limite, 0)}</td><td>${selo(o.situacaoVel)}</td></tr>`))
     + `<p class="t2 pq">Em shaft residencial quem manda é o ruído: 6 a 8 m/s em prumada, até 12 m/s em garagem e pressurização.</p>`);
@@ -587,7 +591,7 @@ function telaMemoria(e, R) {
 
 function telaAvac() { const e = ler(), R = calcular(e), sub = SUBS.some(s => s[0] === ui.avacSub) ? ui.avacSub : "visao";
   const chips = `<div class="chips" role="group" aria-label="Partes do AVAC">${SUBS.map(([k, n]) => `<button type="button" id="avac-sub-${k}" data-avac-sub="${k}" aria-pressed="${k === sub}">${esc(n)}</button>`).join("")}</div>`;
-  const corpo = { visao:telaVisao, tip:telaTip, ac:telaAC, vent:telaVent, press:telaPress, solar:telaSolar, piscina:telaPiscina, dutos:telaDutos, resumo:telaResumo, memoria:telaMemoria }[sub](e, R);
+  const corpo = { visao:telaVisao, tip:telaTip, carga: () => typeof telaCargaTermica === "function" ? telaCargaTermica() : "<p class=\"t2\">Módulo de carga térmica não carregado.</p>", ac:telaAC, vent:telaVent, press:telaPress, solar:telaSolar, piscina:telaPiscina, dutos:telaDutos, resumo:telaResumo, memoria:telaMemoria }[sub](e, R);
   return `<h1>AVAC e térmico</h1><p class="t2 apoio">Ar-condicionado, ventilação, pressurização de escada, aquecimento solar, piscina, dutos e quadro elétrico — as contas da planilha PHYSIS_AVAC-5. Altere os dados: tudo é recalculado.</p>${chips}<div id="avac-corpo">${corpo}</div>`; }
 
 /* ════════ Eventos (atributos data-avac-…) ════════ */

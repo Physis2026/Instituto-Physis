@@ -7,7 +7,12 @@
    id="base-fatores-emissao"> (ferramentas/embutir_bases.py). Estado em localStorage "physis-carbono"
    (o formato antigo {kwh, diesel, glp, gn, solar_kwh, medidas} é lido e migrado).
    Globais usadas só na hora de desenhar: esc, n2, el, ui, desenhar; e, se existirem, os leitores dos outros
-   módulos (perfilLer, rcLer, gLer, sbnLer, calcLer, solarCalc, RC_POR_ID, RC_BIOGAS, SBN, window.AVAC).
+   módulos (perfilLer, rcLer, gLer, sbnLer, calcLer, solarCalc, RC_POR_ID, RC_BIOGAS, SBN, window.AVAC, ebAtual).
+   Esgoto e biogás (Economia circular): ebAtual() da plataforma ou as chaves "physis-calc-esgoto" e "physis-calc-biogas"
+   (Planejador ou SustainKit). Materiais da obra: chave "physis-calc-materiais" { composicoes:[{ id, nome, area_m2,
+   kgco2e_m2, fonte }], zona, atualizado }. Fatores que ainda não estão na base ficam [MARCADOR] e não entram na soma:
+   F.efluentes = { dbo_kg_pessoa_dia, bo_kg_ch4_kg_dbo, mcf:{ fossa_filtro, wetland, biodigestor, ete } } (IPCC 2006,
+   vol. 5, cap. 6) e F.agua_fornecida = { kg_m3 } (água tratada da concessionária, para o reúso evitado).
    Normas citadas pelo nome; nenhum texto de norma copiado. */
 (function () {
 "use strict";
@@ -75,16 +80,37 @@ function remocoes(F, ha, bioma, idade){ const R = F.remocoes; let tx = R.tco2_ha
 function fatorDesloc(F, modo, gw){ const d = F.escopo3.deslocamento[modo]; if (!d) return 0; if (d.km_por_l) return tco2e(combustao(F, d.combustivel, 1, "movel")[0], gw) * 1000 / d.km_por_l; return d.kg; }
 const sbceSit = (F, e1) => e1 > F.sbce.limite_obrigacao_t ? "obrigacao" : e1 > F.sbce.limite_relato_t ? "relato" : "voluntario";
 function incerteza(l){ const tot = l.reduce((s, x) => s + x[0], 0); return tot > 0 ? Math.sqrt(l.reduce((s, x) => s + Math.pow(x[0] * x[1], 2), 0)) / tot : null; }
+/* pegada do servidor (sistema digital): mesma regra de carbono.servidor_contagem e servidor_inventario */
+const svContagem = (eq, escolha) => escolha === "ja_contado" || escolha === "somar" ? escolha : (eq.local === "fora" ? "somar" : "ja_contado");
+function servidorInventario(eqs, fLoc, escolha, cats){ const tem = k => !cats || cats.indexOf(k) >= 0, out = { linhas:[], e2_t:0, e3_cat1_t:0, cat2_t:0, ja_contado_t:0 };
+  (eqs || []).forEach(eq => { const t = n0(eq.kwh_ano) / 1000 * fLoc, q = eq.qualidade === "medido" ? "medido" : "estimado", nome = String(eq.nome || "Servidor");
+    if (svContagem(eq, escolha) === "ja_contado") out.ja_contado_t += t;
+    else if (eq.controle === "servico"){ if (tem(1)){ out.e3_cat1_t += t; out.linhas.push({ escopo:3, cat:1, fonte:nome + " (hospedagem comprada)", t, q }); } }
+    else { out.e2_t += t; out.linhas.push({ escopo:2, cat:null, fonte:nome + " (energia do servidor)", t, q }); }
+    const fab = n0(eq.t_ano_fabricacao); if (fab && tem(2)){ out.cat2_t += fab; out.linhas.push({ escopo:3, cat:2, fonte:nome + " (fabricação, amortizada)", t:fab, q:"estimado" }); } });
+  return out; }
+/* dados do hub (GET /api/servidor/pegada); sem servidor = exemplo da demonstração, que nunca entra no inventário */
+const SV = { dados:null, quando:0, pedido:false, erro:null };
+const temServidorWeb = () => { try { return /^https?:$/.test(location.protocol); } catch (e){ return false; } };
+function svCarregar(){ if (!temServidorWeb() || SV.pedido || typeof fetch !== "function") return; if (SV.dados && Date.now() - SV.quando < 300000) return; if (SV.erro && Date.now() - SV.quando < 300000) return;
+  SV.pedido = true; fetch("/api/servidor/pegada", { credentials:"same-origin", cache:"no-store" }).then(r => r.json().then(j => [r.status, j], () => [r.status, {}]))
+    .then(([st, j]) => { SV.pedido = false; SV.quando = Date.now(); if (j && j.ok && j.modo === "hub"){ SV.dados = j; SV.erro = null; } else SV.erro = st; redesenhar(); })
+    .catch(() => { SV.pedido = false; SV.quando = Date.now(); SV.erro = "rede"; }); }
+const SV_DEMO = { ok:true, modo:"demo", fator_rede:null, equipamentos:[
+  { nome:"Hub (Raspberry Pi 5)", classe_nome:"Raspberry Pi 5 (com fonte, ventoinha e SSD)", local:"no_lugar", controle:"proprio", metodo:"nominal", qualidade:"estimado", w_agora:6, kwh_mes:4.4, kwh_ano:52.6, kg_fabricacao:20, vida_anos:5, t_ano_fabricacao:0.004 },
+  { nome:"Servidor de IA (2 placas de vídeo)", classe_nome:"Servidor com GPU para IA", local:"no_lugar", controle:"proprio", metodo:"nominal+gpu", qualidade:"parcial", w_agora:180, kwh_mes:131, kwh_ano:1577, kg_fabricacao:1600, vida_anos:4, t_ano_fabricacao:0.4 }],
+  dicas:[] };
 const anoNetZero = (anoBase, pct, resid) => pct > 0 ? anoBase + Math.ceil((1 - resid) / (pct / 100) - 1e-9) : null;
 
 /* ════════ estado salvo ════════ */
 function padrao(){ return { v:2, ano:String(new Date().getFullYear() - 1), gwp:"", area_m2:"", kwh:"", solar_kwh:"",
   rede:{ fator:"", fator_manual:"", usar_mensal:false, mensal:["","","","","","","","","","","",""], irec_mwh:"", contratos:[], q:"medido" },
   estac:[], movel:[], refrig:[], proc:[], rebanho:[], fert:{ n_kg:"", ureia_kg:"", calcario_kg:"", dolomita_kg:"", q:"estimado" }, solo:{ ativo:false, ha:"", bioma:"mata_atlantica" },
-  e3:{ cats:[1,4,5,6,7], gastos:[], materiais:[], capital:"", transp:[], res_auto:true, residuos:[], viagens:[], desloc:[], fim:[], outras:[] },
+  e3:{ cats:[1,4,5,6,7], gastos:[], materiais:[], mat_auto:true, capital:"", transp:[], res_auto:true, residuos:[], viagens:[], desloc:[], fim:[], outras:[] },
   remo:{ bioma:"mata_atlantica", ha:"", idade:"", usar_sbn:true },
   metas:{ ano_base:"", base_t:"", alvo:"2050", pct:"", incluir_e3:false, medidas:[] },
-  sbce:{ inventario:false, responsavel:false, plano:false, dados:false, relato:false, verif:false, registro:false } }; }
+  sbce:{ inventario:false, responsavel:false, plano:false, dados:false, relato:false, verif:false, registro:false },
+  servidor:{ incluir:true, contagem:"auto" } }; }
 function mesclar(a, b){ Object.keys(b || {}).forEach(k => { const v = b[k]; if (v && typeof v === "object" && !Array.isArray(v) && a[k] && typeof a[k] === "object" && !Array.isArray(a[k])) mesclar(a[k], v); else a[k] = v; }); return a; }
 /* formato antigo (até 11/2026): { kwh, diesel, glp, gn, solar_kwh, medidas:[{n,t}] } */
 function migrar(c){ c = c && typeof c === "object" ? c : {}; if (c.v === 2) return mesclar(padrao(), clone(c));
@@ -103,6 +129,9 @@ function contexto(c){ c = c || ler(); const ctx = {}, ano = String(c.ano || "");
   else { const u = hist.slice(-12); if (u.length){ ctx.kwh_ano = u.reduce((s, x) => s + num(x.kwh), 0) * 12 / u.length; ctx.kwh_fonte = "média das " + u.length + " últimas contas do Início, levada a 12 meses"; } }
   const pc = perfil.c || {}; ctx.area_m2 = num(pc.area_construida); ctx.colaboradores = num(pc.colaboradores); ctx.nome = pc.razao_social || pc.nome_fantasia || pc.unidade_nome || pc.nome || "";
   ctx.rc = typeof rcLer === "function" ? rcLer() : lerLS("physis-residuos-plano", []); if (!Array.isArray(ctx.rc)) ctx.rc = [];
+  const reg = k => { const r = lerLS(k, null); return r && typeof r === "object" && !Array.isArray(r) && (r.fonte || num(r.pessoas) != null || num(r.biogas_m3_dia) != null) ? r : null; };
+  try { const eb = typeof ebAtual === "function" ? ebAtual() : null; ctx.esgoto = eb ? eb.esgoto : reg("physis-calc-esgoto"); ctx.biogas = eb ? eb.biogas : reg("physis-calc-biogas"); } catch (e){}
+  const mt = lerLS("physis-calc-materiais", null); if (mt && typeof mt === "object" && Array.isArray(mt.composicoes)) ctx.materiais = mt;
   const g = typeof gLer === "function" ? gLer() : Object.assign({ producao:[], compras:[] }, lerLS("physis-gestao-cliente", {}));
   const prod = (g.producao || []).filter(x => x.mes && num(x.prod)).sort((a, b) => a.mes.localeCompare(b.mes)).slice(-12);
   if (prod.length){ ctx.producao = prod.reduce((s, x) => s + num(x.prod), 0) * 12 / prod.length; ctx.producao_un = (prod.find(x => x.un) || {}).un || "unidade"; }
@@ -114,6 +143,7 @@ function contexto(c){ c = c || ler(); const ctx = {}, ano = String(c.ano || "");
   ctx.mudas_sbn = (sbn.plano || []).reduce((s, x) => { const p = plantas.find(y => String(y.n) === String(x.n)); return s + (!plantas.length || (p && ["medio","alto","emergente"].indexOf(p.estrato) >= 0) ? n0(x.qtd) : 0); }, 0);
   try { if (window.AVAC && typeof calcLer === "function"){ const o = calcLer("avac"), e = o && o.e ? o.e : null; if (e){ const R = window.AVAC.calcular(e); if (R && R.ac && R.ac.kWt > 0) ctx.avac_kwt = R.ac.kWt; } } } catch (e){}
   try { if (typeof solarCalc === "function"){ const s = solarCalc(); if (s && s.ger > 0) ctx.solar_kwh = s.ger; } } catch (e){}
+  if (SV.dados && SV.dados.modo === "hub" && Array.isArray(SV.dados.equipamentos)) ctx.servidor = SV.dados.equipamentos;
   return ctx; }
 /* kWh do ano sem chamar solarCalc (que pode chamar de volta o Carbono): campo do Carbono ou contas do Início */
 const kwhAno = c => { c = migrar(c || ler()); const k = num(c.kwh); if (k != null) return k; const ano = String(c.ano || "");
@@ -140,17 +170,31 @@ function calcular(estado, ctx, F){ F = F || base(); if (!F) return null; ctx = c
   if (e3.res_auto !== false) (ctx.rc || []).forEach((r, i) => { const rd = ROTA_DESTINO[r.rota] || ["nenhum", true], tAno = n0(r.qtd) * (RC_UN_F[r.un] || 1) * 12 / 1000, g = residuo(F, r.tipo, tAno, rd[0]);
     if (!Object.keys(g).length) return; if (rd[1]) add(1, "residuos_no_lugar", nomeRes(r.tipo) + " · " + DESTINOS.concat([["queima","Queima para energia"]]).find(d => d[0] === rd[0])[1].toLowerCase() + " no lugar", g, "estimado", "residuos", 0, null, false, "rc." + i);
     else if (tem(5)) add(3, "residuos", nomeRes(r.tipo) + " · " + DESTINOS.find(d => d[0] === rd[0])[1].toLowerCase(), g, "estimado", "residuos", 0, 5, false, "rc." + i); });
+  /* tratamento de esgoto no lugar (Economia circular · Esgoto e biogás): escopo 1, só com o fator na base */
+  const es = ctx.esgoto, pesEsg = es ? n0(es.pessoas) : 0, EF = F.efluentes; let esgoto = null;
+  if (pesEsg > 0){ const trat = es.tratamento || "", mcf = EF && EF.mcf ? num(EF.mcf[trat]) : null, dbo = EF ? num(EF.dbo_kg_pessoa_dia) : null, bo = EF ? num(EF.bo_kg_ch4_kg_dbo) : null;
+    if (mcf != null && dbo != null && bo != null){ const kg = pesEsg * dbo * 365 * bo * mcf; add(1, "esgoto_no_lugar", "Tratamento de esgoto no lugar", { CH4_bio: kg }, "estimado", "residuos", 0, null, false, "esgoto"); esgoto = { marcador:false, pessoas:pesEsg, tratamento:trat, kg_ch4:kg, fonte:es.fonte || "" }; }
+    else esgoto = { marcador:true, pessoas:pesEsg, tratamento:trat, fonte:es.fonte || "" }; }
   if (tem(5)) e3.residuos.forEach((x, i) => add(3, "residuos", nomeRes(x.tipo) + " · " + ((DESTINOS.find(d => d[0] === x.destino) || ["", x.destino])[1]).toLowerCase(), residuo(F, x.tipo, n0(x.t), x.destino), x.q, "residuos", 0, 5, false, "e3.residuos." + i));
   /* escopo 2 */
   const kwh = num(c.kwh) != null ? num(c.kwh) : (ctx.kwh_ano != null ? ctx.kwh_ano : null), fLoc = fatorRede(F, c.rede.fator, c.rede.fator_manual);
   const mens = (c.rede.mensal || []).map(num), usaMes = !!c.rede.usar_mensal && mens.length === 12 && mens.every(v => v != null) && num(c.kwh) == null && ctx.kwh_mes && ctx.kwh_mes.length === 12;
-  const e2loc = usaMes ? ctx.kwh_mes.reduce((s, k, i) => s + k / 1000 * mens[i], 0) : (kwh || 0) / 1000 * fLoc;
-  const e2mkt = redeMercado(kwh || 0, fLoc, n0(c.rede.irec_mwh), (c.rede.contratos || []).map(k => [n0(k.mwh), n0(k.fator)]));
+  let e2loc = usaMes ? ctx.kwh_mes.reduce((s, k, i) => s + k / 1000 * mens[i], 0) : (kwh || 0) / 1000 * fLoc;
+  let e2mkt = redeMercado(kwh || 0, fLoc, n0(c.rede.irec_mwh), (c.rede.contratos || []).map(k => [n0(k.mwh), n0(k.fator)]));
   if (kwh) add(2, "rede", "Eletricidade da rede (localização" + (usaMes ? ", fatores mensais" : "") + ")", { CO2: e2loc * 1000 }, c.rede.q || "medido", "rede", 0, null, false, "rede");
+  /* pegada do servidor: só com dado do hub (nunca com o exemplo da demonstração) */
+  const svc = c.servidor || {}; let sv = null;
+  if (ctx.servidor && svc.incluir !== false){ sv = servidorInventario(ctx.servidor, fLoc, svc.contagem || "auto", cats);
+    sv.linhas.forEach((x, i) => add(x.escopo, x.escopo === 2 ? "servidor" : x.cat === 2 ? "servidor_fabricacao" : "servidor_hospedagem", x.fonte, { CO2: x.t * 1000 }, x.q, x.escopo === 2 ? "rede" : "escopo3", 0, x.cat, false, "servidor." + i));
+    e2loc += sv.e2_t; e2mkt += sv.e2_t; }
   /* escopo 3 */
   const G3 = F.escopo3;
   if (tem(1)){ e3.gastos.forEach((x, i) => add(3, "compras", (G3.gasto_kg_por_real[x.cat] || { nome:"Compras" }).nome + " (por gasto)", { CO2: n0(x.valor) * ((G3.gasto_kg_por_real[x.cat] || {}).kg || 0) }, "estimado", "gasto", 0, 1, false, "e3.gastos." + i));
     e3.materiais.forEach((x, i) => add(3, "compras", (G3.materiais_kg_por_kg[x.mat] || { nome:"Material" }).nome, { CO2: n0(x.kg) * ((G3.materiais_kg_por_kg[x.mat] || {}).kg || 0) }, x.q, "escopo3", 0, 1, false, "e3.materiais." + i)); }
+  /* carbono incorporado das composições escolhidas no SustainKit ou no Planejador (área × kgCO₂e/m²); sem o valor por m², [MARCADOR] */
+  const matFalta = [], comps = ctx.materiais ? ctx.materiais.composicoes : [];
+  if (tem(1) && e3.mat_auto !== false) (comps || []).forEach((m, i) => { if (!m || typeof m !== "object") return; const a = num(m.area_m2), k = num(m.kgco2e_m2), nome = String(m.nome || m.id || "Composição");
+    if (!(a > 0)) return; if (k == null){ matFalta.push(nome); return; } add(3, "materiais_obra", nome, { CO2: a * k }, "estimado", "escopo3", 0, 1, false, "mat." + i); });
   if (tem(2) && n0(e3.capital)) add(3, "bens_capital", "Bens de capital (por gasto)", { CO2: n0(e3.capital) * G3.gasto_kg_por_real.manufaturados.kg }, "estimado", "gasto", 0, 2, false, "e3.capital");
   e3.transp.forEach((x, i) => { const k = Number(x.cat) || 4; if (tem(k)) add(3, "transporte", (G3.transporte_tkm[x.modo] || { nome:"Transporte" }).nome, { CO2: n0(x.tkm) * ((G3.transporte_tkm[x.modo] || {}).kg || 0) }, x.q, "escopo3", 0, k, false, "e3.transp." + i); });
   if (tem(6)) e3.viagens.forEach((x, i) => add(3, "viagens", (G3.viagens_pkm[x.modo] || { nome:"Viagem" }).nome, { CO2: n0(x.pkm) * ((G3.viagens_pkm[x.modo] || {}).kg || 0) }, x.q, "escopo3", 0, 6, false, "e3.viagens." + i));
@@ -165,9 +209,13 @@ function calcular(estado, ctx, F){ F = F || base(); if (!F) return null; ctx = c
   const tMed = linhas.filter(l => !l.fora && l.q === "medido").reduce((s, l) => s + l.t, 0);
   /* remoções e evitadas: sempre à parte */
   const haSbn = c.remo.usar_sbn !== false ? n0(ctx.mudas_sbn) / F.remocoes.mudas_por_ha : 0, ha = n0(c.remo.ha) + haSbn, rem = ha ? remocoes(F, ha, c.remo.bioma, n0(c.remo.idade)) : 0;
-  const glpKg = tco2e(combustao(F, "glp", 1, "estacionaria")[0], gw), biogM3 = (ctx.rc || []).filter(r => r.rota === "biodigestor").reduce((s, r) => s + n0(r.qtd) * (RC_UN_F[r.un] || 1) * 12 * ((typeof RC_BIOGAS !== "undefined" ? RC_BIOGAS : BIOG_PAD)[r.tipo] || 0.05), 0);
+  /* biogás: o registro da parte Esgoto e biogás (Planejador, SustainKit ou estimativa, que já soma os resíduos do plano com a
+     rota Biodigestor) substitui a soma do plano, para não contar duas vezes */
+  const bioR = ctx.biogas && num(ctx.biogas.biogas_m3_dia) != null ? ctx.biogas : null;
+  const glpKg = tco2e(combustao(F, "glp", 1, "estacionaria")[0], gw), biogM3 = bioR ? num(bioR.biogas_m3_dia) * 365 : (ctx.rc || []).filter(r => r.rota === "biodigestor").reduce((s, r) => s + n0(r.qtd) * (RC_UN_F[r.un] || 1) * 12 * ((typeof RC_BIOGAS !== "undefined" ? RC_BIOGAS : BIOG_PAD)[r.tipo] || 0.05), 0);
+  const reusoM3 = ctx.esgoto ? n0(ctx.esgoto.reuso_m3_dia) * 365 : 0, fAgua = F.agua_fornecida ? num(F.agua_fornecida.kg_m3) : null;
   const recic = (ctx.rc || []).filter(r => (ROTA_DESTINO[r.rota] || [])[0] === "reciclagem").reduce((s, r) => { const t = n0(r.qtd) * (RC_UN_F[r.un] || 1) * 12 / 1000; return s + Math.max(0, tco2e(residuo(F, r.tipo, t, "aterro"), gw) - tco2e(residuo(F, r.tipo, t, "reciclagem"), gw)); }, 0);
-  const evit = { solar: n0(c.solar_kwh) / 1000 * fLoc, biogas: biogM3 * 6 / 12.8 * glpKg, reciclagem: recic };
+  const evit = { solar: n0(c.solar_kwh) / 1000 * fLoc, biogas: biogM3 * 6 / 12.8 * glpKg, reciclagem: recic, reuso: fAgua != null ? reusoM3 * fAgua / 1000 : 0 };
   /* intensidade, metas, SBCE */
   const area = num(c.area_m2) != null ? num(c.area_m2) : ctx.area_m2, opera = e1 + e2loc;
   const M = c.metas, anoBase = num(M.ano_base) || num(c.ano) || new Date().getFullYear() - 1, baseT = num(M.base_t) != null ? num(M.base_t) : (M.incluir_e3 ? total : opera);
@@ -176,10 +224,10 @@ function calcular(estado, ctx, F){ F = F || base(); if (!F) return null; ctx = c
   const medT = (M.medidas || []).reduce((s, m) => s + n0(m.t), 0);
   return { c, gwp:gwv, linhas, e1, e2_loc:e2loc, e2_mkt:e2mkt, e3:e3t, total, opera, porGas, porGrupo, porCat, kwh, kwh_fonte: num(c.kwh) != null ? "informado no Carbono" : ctx.kwh_fonte || "", fator_rede:fLoc, usa_mensal:usaMes,
     bio_t: linhas.reduce((s, l) => s + l.bio_t, 0), fora_t: linhas.filter(l => l.fora).reduce((s, l) => s + l.t, 0), medido: total ? tMed / total : null,
-    incerteza: incerteza(linhas.filter(l => !l.fora).map(l => [l.t, l.u])), remocoes_t: rem, remocoes_ha: ha, ha_sbn: haSbn, evitadas: evit, evitadas_t: evit.solar + evit.biogas + evit.reciclagem, biogas_m3: biogM3,
+    incerteza: incerteza(linhas.filter(l => !l.fora).map(l => [l.t, l.u])), remocoes_t: rem, remocoes_ha: ha, ha_sbn: haSbn, evitadas: evit, evitadas_t: evit.solar + evit.biogas + evit.reciclagem + evit.reuso, biogas_m3: biogM3, biogas_fonte: bioR ? String(bioR.fonte || "") : "", reuso_m3: reusoM3, reuso_marcador: reusoM3 > 0 && fAgua == null, esgoto, mat_falta: matFalta,
     area, int_m2: area ? opera / area * 1000 : null, producao: ctx.producao || null, producao_un: ctx.producao_un || "", int_prod: ctx.producao ? opera / ctx.producao * 1000 : null,
     metas:{ ano_base:anoBase, base_t:baseT, pct, alvo, trajet, net_zero: anoNetZero(anoBase, pct, F.metas.residual_max), medidas_t:medT, apos_medidas: Math.max(0, (M.incluir_e3 ? total : opera) - medT) },
-    sbce: sbceSit(F, e1) }; }
+    sbce: sbceSit(F, e1), servidor: sv }; }
 
 /* ════════ peças de tela ════════ */
 const idDe = p => "cb-" + String(p).replace(/[^a-zA-Z0-9]+/g, "-");
@@ -240,9 +288,31 @@ function linhaMeta(R){ const tr = R.metas.trajet; if (tr.length < 2 || !(R.metas
     <figcaption class="t2 pq">Linha cheia: meta (tCO₂e por ano). ${R.metas.medidas_t > 0 ? "Tracejada: depois das medidas cadastradas." : ""}</figcaption></figure>`; }
 
 /* ════════ subabas ════════ */
-const GRUPOS = { estacionaria:"Combustão estacionária", movel:"Combustão móvel", fugitivas:"Fugitivas (refrigeração)", processos:"Processos", agropecuaria:"Agropecuária", residuos_no_lugar:"Resíduos tratados no lugar", uso_solo:"Mudança de uso do solo", rede:"Eletricidade da rede", compras:"Compras", bens_capital:"Bens de capital", transporte:"Transporte de cargas", residuos:"Resíduos enviados", viagens:"Viagens a negócios", deslocamento:"Deslocamento casa–trabalho", fim_de_vida:"Fim de vida dos produtos", outras:"Outras categorias" };
+const GRUPOS = { estacionaria:"Combustão estacionária", movel:"Combustão móvel", fugitivas:"Fugitivas (refrigeração)", processos:"Processos", agropecuaria:"Agropecuária", residuos_no_lugar:"Resíduos tratados no lugar", esgoto_no_lugar:"Tratamento de esgoto no lugar", materiais_obra:"Materiais da obra", uso_solo:"Mudança de uso do solo", rede:"Eletricidade da rede", compras:"Compras", bens_capital:"Bens de capital", transporte:"Transporte de cargas", residuos:"Resíduos enviados", viagens:"Viagens a negócios", deslocamento:"Deslocamento casa–trabalho", fim_de_vida:"Fim de vida dos produtos", outras:"Outras categorias", servidor:"Servidor do sistema digital", servidor_hospedagem:"Hospedagem do sistema digital", servidor_fabricacao:"Fabricação do servidor" };
 function tabLinhas(R, filtro, cap){ const l = R.linhas.filter(filtro); if (!l.length) return `<p class="t2">Nada lançado ainda.</p>`;
   return tabela(cap, ["Fonte", "Grupo", "tCO₂e por ano", "CO₂ biogênico (t)", "Dado", "Incerteza"], l.map(x => `<tr><th scope="row" style="font-weight:500">${E(x.fonte)}${x.fora ? ' <span class="selo in">fora de Quioto, à parte</span>' : ""}</th><td>${E(GRUPOS[x.grupo] || x.grupo)}${x.cat ? " · cat. " + x.cat : ""}</td><td>${T(x.t)}</td><td>${x.bio_t ? T(x.bio_t) : "—"}</td><td>${x.q === "medido" ? "Medido" : "Estimado"}</td><td>±${Math.round(x.u * 100)}%</td></tr>`)); }
+
+/* ════════ pegada do servidor (sistema digital) ════════ */
+const SV_METODO = { medidor:"medido (medidor na tomada)", rapl:"parcial (contador do processador + resto estimado)", "rapl+gpu":"parcial (processador e placas de vídeo medidos)", "nominal+gpu":"parcial (placas de vídeo medidas, resto estimado)", nominal:"estimado (potência da classe × uso)", fixo:"estimado (potência informada)", misto:"misto (mudou de método no período)", sem_historico:"estimado (sem histórico ainda)" };
+const SV_LOCAL = { no_lugar:"no lugar do inventário", fora:"fora (datacenter ou outro lugar)" };
+function secaoServidor(c, R, F, foco){ svCarregar();
+  const hub = !!(SV.dados && SV.dados.modo === "hub"), D = hub ? SV.dados : SV_DEMO, eqs = D.equipamentos || [], fLoc = R.fator_rede, svc = c.servidor || {}, escolha = svc.contagem || "auto";
+  const inv = servidorInventario(eqs, fLoc, escolha, null), kwhMes = eqs.reduce((s, e) => s + n0(e.kwh_mes), 0), tEn = eqs.reduce((s, e) => s + n0(e.kwh_ano), 0) / 1000 * fLoc, tFab = eqs.reduce((s, e) => s + n0(e.t_ano_fabricacao), 0), wAgora = eqs.reduce((s, e) => s + n0(e.w_agora), 0);
+  const quals = eqs.map(e => e.qualidade), qual = quals.length && quals.every(q => q === "medido") ? "medido" : quals.some(q => q === "medido" || q === "parcial") ? "parcialmente medido" : "estimado";
+  const faixa = hub ? `<p class="t2 pq">Dados deste servidor, atualizados a cada ${N(n0(D.intervalo_min) || 5, 0)} minutos. ${D.total && D.total.medido_pct != null ? "Parte medida: " + P(D.total.medido_pct) + "." : ""}</p>`
+    : `<p class="faixa at" role="note"><strong>Exemplo (modo demonstração).</strong> Números ilustrativos de um hub Raspberry Pi 5 e um servidor de IA com 2 placas de vídeo. Eles não entram no inventário. ${SV.erro === 401 || SV.erro === 403 ? "Entre com a sua conta para ver os dados do servidor." : temServidorWeb() ? "O servidor ainda não mandou a pegada." : "Abra a plataforma pelo servidor Physis para ver os dados reais."}</p>`;
+  const cards = `<div class="grade">${cartao("cb-sv-w", "Potência agora", N(wAgora, 0), "W")}${cartao("cb-sv-k", "Energia", N(kwhMes, 1), "kWh por mês", `<span class="t2 pq">${qual}${hub ? "" : " · exemplo"}</span>`)}${cartao("cb-sv-t", "Operação (energia)", T(tEn), "tCO₂e por ano", `<span class="t2 pq">${N(kwhMes * 12, 0)} kWh × ${N(fLoc, 4)} tCO₂/MWh (o mesmo fator do escopo 2)</span>`)}${cartao("cb-sv-f", "Fabricação (escopo 3, cat. 2)", T(tFab), "tCO₂e por ano", `<span class="t2 pq">dividida pelos anos de uso</span>`)}</div>`;
+  const linhas = eqs.map(e => { const k = svContagem(e, escolha), t = n0(e.kwh_ano) / 1000 * fLoc;
+    return `<tr><th scope="row" style="font-weight:500">${E(e.nome)}<br><span class="t2 pq">${E(e.classe_nome || "")}</span></th><td>${E(SV_LOCAL[e.local] || e.local || "")}${n0(e.pue) > 1 ? " · PUE " + N(e.pue, 2) : ""}</td><td>${E(SV_METODO[e.metodo] || e.metodo || "")}</td><td>${N(n0(e.kwh_mes), 1)}</td><td>${T(t)}</td><td>${T(n0(e.t_ano_fabricacao))}<br><span class="t2 pq">${N(n0(e.kg_fabricacao), 0)} kg ÷ ${N(n0(e.vida_anos), 0)} anos</span></td><td>${k === "ja_contado" ? '<span class="selo in">parte do escopo 2 já contado</span>' : e.controle === "servico" ? '<span class="selo at">soma no escopo 3, cat. 1</span>' : '<span class="selo at">soma no escopo 2</span>'}</td></tr>`; });
+  const tab = eqs.length ? tabela("Equipamentos do sistema digital", ["Equipamento", "Onde fica", "Método", "kWh por mês", "Energia (tCO₂e por ano)", "Fabricação (tCO₂e por ano)", "No inventário"], linhas) : `<p class="t2">Nenhum equipamento informado.</p>`;
+  const conf = `<div class="precos">${chk(c, "servidor.incluir", "Incluir a pegada do servidor no inventário")}${sel(c, "servidor.contagem", "Como contar a energia do servidor", [["auto", "Automático: pelo lugar de cada máquina (recomendado)"], ["ja_contado", "Já está nas contas de luz do inventário (só informar)"], ["somar", "Somar como fonte própria"]])}</div>
+    <p class="t2 pq">Por que isso importa: se o servidor fica no mesmo lugar cujas contas de luz já estão no escopo 2 (como a Casa Physis), a energia dele já foi contada; ela aparece aqui só como informação (${T(inv.ja_contado_t)} tCO₂e por ano), para não contar duas vezes. Se fica em outro lugar (datacenter, servidor da Physis que hospeda clientes), ninguém contou: entra como fonte própria, no escopo 2 quando a máquina é sua, ou no escopo 3, categoria 1, quando a hospedagem é comprada de outra empresa. Somado agora: escopo 2 ${T(inv.e2_t)}, escopo 3 cat. 1 ${T(inv.e3_cat1_t)} tCO₂e por ano.</p>`;
+  const dicas = (D.dicas && D.dicas.length ? D.dicas : ["Desligue ou suspenda a placa de vídeo quando nenhum modelo de IA estiver rodando.", "Agende treinos de IA para as horas de sol, quando a energia solar própria cobre o pico.", "Prefira máquinas pequenas e eficientes e junte serviços em contêineres.", "Use a máquina até o fim da vida útil: a fabricação pesa mais que a luz nas máquinas pequenas."]).map(d => `<li>${E(d)}</li>`).join("");
+  const e3nota = `<p class="t2 pq">Fabricação: o carbono de fazer as máquinas (escopo 3, categoria 2, bens de capital) é dividido pelos anos de uso, para acompanhar a pegada ano a ano. O GHG Protocol pede, no relato oficial, o total no ano da compra: use a soma das máquinas compradas no ano. Se a compra do servidor já está em “Bens de capital (por gasto)”, não marque as duas coisas. A linha entra no total só com a categoria 2 marcada.</p>`;
+  const resumo = `<p class="t2 pq">${hub ? "" : "Exemplo: "}${N(kwhMes, 1)} kWh por mês · ${T(tEn)} tCO₂e por ano de energia (${qual}) + ${T(tFab)} de fabricação.</p>`;
+  if (foco === "resumo") return `<section class="cartao" aria-labelledby="h-cb-sv-r"><h2 id="h-cb-sv-r">Pegada do servidor (sistema digital)</h2>${hub ? "" : faixa}${resumo}<p class="t2 pq">Detalhes e escolha da contagem nas subabas Escopo 2 e Escopo 3.</p></section>`;
+  return `<section class="cartao" aria-labelledby="h-cb-sv-${foco}"><h2 id="h-cb-sv-${foco}">Pegada do servidor (sistema digital)</h2><p class="t2 pq">As máquinas que rodam este sistema também gastam energia e foram fabricadas. Aqui está a pegada delas.</p>${faixa}${cards}${tab}${foco === "e2" ? conf : e3nota}
+    <details><summary>Como reduzir</summary><ul>${dicas}</ul></details><p class="t2 pq">${aviso("potência por classe e carbono de fabricação são ordem de grandeza (" + E((F.servidor || {})._fonte || "") + ")")}</p></section>`; }
 
 function abaInventario(c, R, F, ctx){ const tot = R.total, ops = [["", "Padrão (" + F.gwp.padrao + ")"], ["AR5", "AR5 (IPCC 2013)"], ["AR6", "AR6 (IPCC 2021)"]];
   const conf = `<section class="cartao" aria-labelledby="h-cb-conf"><h2 id="h-cb-conf">Ano e método</h2><div class="precos">${inp(c, "ano", "Ano do inventário", "ex.: 2025")}${sel(c, "gwp", "Potencial de aquecimento (GWP)", ops)}${inp(c, "area_m2", "Área construída (m²)", ctx.area_m2 != null ? N(ctx.area_m2, 0) + " (do Início)" : "ex.: 1200", "Para o indicador por m².")}</div>
@@ -253,8 +323,12 @@ function abaInventario(c, R, F, ctx){ const tot = R.total, ops = [["", "Padrão 
   const ind = tabela("Indicadores de intensidade", ["Indicador", "Valor"], [`<tr><th scope="row">Escopos 1 e 2 por m² construído</th><td>${R.int_m2 != null ? N(R.int_m2, 1) + " kgCO₂e/m²·ano" : "falta a área"}</td></tr>`, `<tr><th scope="row">Escopos 1 e 2 por unidade produzida</th><td>${R.int_prod != null ? N(R.int_prod, 3) + " kgCO₂e por " + E(R.producao_un) : "falta a produção (Gestão → Produção e insumos)"}</td></tr>`, `<tr><th scope="row">CO₂ biogênico (à parte)</th><td>${T(R.bio_t)} t</td></tr>`, `<tr><th scope="row">Gases fora de Quioto (HCFC-22, à parte)</th><td>${T(R.fora_t)} tCO₂e</td></tr>`, `<tr><th scope="row">Remoções (à parte, não abatem)</th><td>${T(R.remocoes_t)} tCO₂ por ano</td></tr>`, `<tr><th scope="row">Emissões evitadas (à parte, não abatem)</th><td>${T(R.evitadas_t)} tCO₂e por ano</td></tr>`]);
   return `${conf}${cards}<section class="cartao" aria-labelledby="h-cb-inv"><h2 id="h-cb-inv">Inventário ${E(c.ano || "")} por fonte</h2>${grafico}${tabLinhas(R, () => true, "Todas as fontes do inventário")}
     <p class="t2 pq">Incerteza: soma quadrática do dado (medido ±5%, estimado ±30%) e do fator de cada linha; valor de ordem de grandeza para orientar onde medir melhor, não um intervalo estatístico formal.</p></section>
-    <div class="grade"><section class="cartao" aria-labelledby="h-cb-gas"><h2 id="h-cb-gas">Por gás</h2>${gases}</section><section class="cartao" aria-labelledby="h-cb-ind"><h2 id="h-cb-ind">Intensidade e itens à parte</h2>${ind}</section></div>`; }
+    <div class="grade"><section class="cartao" aria-labelledby="h-cb-gas"><h2 id="h-cb-gas">Por gás</h2>${gases}</section><section class="cartao" aria-labelledby="h-cb-ind"><h2 id="h-cb-ind">Intensidade e itens à parte</h2>${ind}</section></div>${secaoServidor(c, R, F, "resumo")}`; }
 
+const NOME_TRAT = { fossa_filtro:"Tanque séptico + filtro anaeróbio", wetland:"Tanque séptico + wetland construído", biodigestor:"Biodigestor (esgoto e orgânicos)", ete:"ETE compacta" };
+function secaoEsgoto(R){ const s = R.esgoto; if (!s) return "";
+  return `<section class="cartao" aria-labelledby="h-cb-esg"><h3 id="h-cb-esg" class="t3">Tratamento de esgoto no lugar (da Economia circular)</h3><p class="t2"><span>Pessoas atendidas:</span> <strong>${N(s.pessoas, 0)}</strong> · <span>Tratamento:</span> <strong>${E(NOME_TRAT[s.tratamento] || s.tratamento || "a definir")}</strong>${s.fonte ? ` · <span>Fonte:</span> <strong>${E(s.fonte)}</strong>` : ""}</p>
+    ${s.marcador ? `<p class="faixa at" role="note">[MARCADOR: fator de metano do tratamento de esgoto (IPCC 2006, vol. 5, cap. 6) ainda não está na base de fatores. A linha entra no escopo 1 quando ele for incluído e conferido.]</p>` : tabLinhas(R, l => l.grupo === "esgoto_no_lugar", "Tratamento de esgoto no lugar")}</section>`; }
 function abaE1(c, R, F, ctx){ const L = p => lista(c, p, F, R);
   const avac = ctx.avac_kwt ? `<p class="t2 pq">A aba AVAC e térmico tem ${N(ctx.avac_kwt, 0)} kW de frio: carga estimada de ${N(ctx.avac_kwt * F.vazamento.carga_kg_por_kw.valor, 0)} kg de fluido. <button type="button" id="cb-sug-avac" data-carb-sug="avac">Acrescentar como linha estimada</button></p>` : "";
   const comb = ctx.comb_l ? `<p class="t2 pq">A Gestão registra ${N(ctx.comb_l, 0)} litros de combustível por ano em Produção e insumos: lance aqui separando gerador (estacionária) e frota (móvel).</p>` : "";
@@ -263,7 +337,7 @@ function abaE1(c, R, F, ctx){ const L = p => lista(c, p, F, R);
   return `<p class="t2 apoio">Emissões que saem de fontes da própria organização: queima de combustíveis, vazamento de gases de refrigeração, processos, animais e solo, e resíduos tratados no lugar.</p>
     ${L("estac")}${comb}${L("movel")}${L("refrig")}${avac}${L("proc")}${L("rebanho")}
     <section class="cartao" aria-labelledby="h-cb-fert"><h3 id="h-cb-fert" class="t3">Adubo e correção do solo</h3><div class="precos">${inp(c, "fert.n_kg", "Nitrogênio de outros adubos (kg de N por ano)", "ex.: 300", "kg de N, não de adubo")}${inp(c, "fert.ureia_kg", "Ureia (kg por ano)", "ex.: 500", "O N da ureia (46%) já entra na conta.")}${inp(c, "fert.calcario_kg", "Calcário calcítico (kg por ano)", "ex.: 2000")}${inp(c, "fert.dolomita_kg", "Calcário dolomítico (kg por ano)", "ex.: 0")}${sel(c, "fert.q", "Dado", QUAL)}</div></section>
-    <section class="cartao" aria-labelledby="h-cb-rcl"><h3 id="h-cb-rcl" class="t3">Resíduos tratados no lugar (da Economia circular)</h3>${rc.length ? tabLinhas(R, l => l.grupo === "residuos_no_lugar", "Resíduos tratados no lugar") : `<p class="t2">Nenhum resíduo com rota no lugar (compostagem, minhocário, biodigestor, queima) na Economia circular.</p>`}</section>
+    <section class="cartao" aria-labelledby="h-cb-rcl"><h3 id="h-cb-rcl" class="t3">Resíduos tratados no lugar (da Economia circular)</h3>${rc.length ? tabLinhas(R, l => l.grupo === "residuos_no_lugar", "Resíduos tratados no lugar") : `<p class="t2">Nenhum resíduo com rota no lugar (compostagem, minhocário, biodigestor, queima) na Economia circular.</p>`}</section>${secaoEsgoto(R)}
     ${solo}<section class="cartao" aria-labelledby="h-cb-s1"><h2 id="h-cb-s1">Escopo 1: ${T(R.e1)} tCO₂e por ano</h2>${tabLinhas(R, l => l.escopo === 1, "Fontes do escopo 1")}</section>`; }
 
 function abaE2(c, R, F, ctx){ const A = F.rede.anual, ops = [["", A[F.rede.padrao].rotulo + " · " + N(A[F.rede.padrao].valor, 4)]].concat(Object.keys(A).filter(k => k !== F.rede.padrao).sort().reverse().map(k => [k, A[k].rotulo + " · " + N(A[k].valor, 4)]));
@@ -276,7 +350,7 @@ function abaE2(c, R, F, ctx){ const A = F.rede.anual, ops = [["", A[F.rede.padra
       <div class="grade">${cartao("cb-e2l", "Localização", T(R.e2_loc), "tCO₂e por ano", `<span class="t2 pq">${R.kwh != null ? N(R.kwh, 0) + " kWh × " + (R.usa_mensal ? "fatores mensais" : N(R.fator_rede, 4) + " tCO₂/MWh") : "falta o consumo"}</span>`)}${cartao("cb-e2m", "Escolha de compra", T(R.e2_mkt), "tCO₂e por ano")}</div></section>
     <section class="cartao" aria-labelledby="h-cb-mkt"><h2 id="h-cb-mkt">Por escolha de compra</h2><p class="t2 pq">${E(F.rede.mercado.nota)}</p><div class="precos">${inp(c, "rede.irec_mwh", "Energia com I-REC (MWh por ano)", "ex.: 10")}</div>${lista(c, "rede.contratos", F, R)}</section>
     <section class="cartao" aria-labelledby="h-cb-sol"><h2 id="h-cb-sol">Geração solar no lugar (mostrada à parte)</h2><div class="precos">${inp(c, "solar_kwh", "Geração solar consumida no lugar (kWh por ano)", solarPh)}</div>
-      <p class="t2 pq">A energia solar própria tem emissão zero e já reduz o que vem da rede (a conta de luz mede só o que entra). Por isso ela não é descontada outra vez do escopo 2: aparece aqui e em “Remoções e evitadas” só como informação (${T(R.evitadas.solar)} tCO₂e por ano que a rede teria emitido).</p></section>`; }
+      <p class="t2 pq">A energia solar própria tem emissão zero e já reduz o que vem da rede (a conta de luz mede só o que entra). Por isso ela não é descontada outra vez do escopo 2: aparece aqui e em “Remoções e evitadas” só como informação (${T(R.evitadas.solar)} tCO₂e por ano que a rede teria emitido).</p></section>${secaoServidor(c, R, F, "e2")}`; }
 
 function abaE3(c, R, F, ctx){ const cats = (c.e3.cats || []).map(Number), tem = k => cats.indexOf(k) >= 0, L = p => lista(c, p, F, R);
   const escolha = `<section class="cartao" aria-labelledby="h-cb-cats"><h2 id="h-cb-cats">Categorias que entram</h2><p class="t2 pq">O escopo 3 é opcional no Programa Brasileiro GHG Protocol, mas bancos e investidores pedem as categorias relevantes. Marque as que se aplicam e explique as que ficaram de fora.</p>
@@ -284,7 +358,10 @@ function abaE3(c, R, F, ctx){ const cats = (c.e3.cats || []).map(Number), tem = 
   const sugC = ctx.compras_rs ? `<p class="t2 pq">Gestão → Compras: R$ ${N(ctx.compras_rs, 2)} pagos nos últimos 12 meses (sem investimentos). <button type="button" id="cb-sug-compras" data-carb-sug="compras">Usar como bens manufaturados</button></p>` : "";
   const rcL = R.linhas.filter(l => l.escopo === 3 && l.ref && l.ref.indexOf("rc.") === 0);
   let corpo = "";
-  if (tem(1)) corpo += L("e3.gastos") + sugC + L("e3.materiais");
+  const matL = R.linhas.filter(l => l.grupo === "materiais_obra");
+  if (tem(1)) corpo += L("e3.gastos") + sugC + L("e3.materiais") + `<section class="cartao" aria-labelledby="h-cb-mob"><h3 id="h-cb-mob" class="t3">Materiais da obra (carbono incorporado, categoria 1)</h3>${chk(c, "e3.mat_auto", "Ler as composições escolhidas no SustainKit ou no Planejador")}
+    ${matL.length ? tabLinhas(R, l => l.grupo === "materiais_obra", "Materiais da obra") : `<p class="t2">Nenhuma composição com área e carbono por m² ainda. Escolha as paredes e coberturas no SustainKit (Materiais) ou no Planejador.</p>`}
+    ${R.mat_falta.length ? `<p class="t2 pq">[MARCADOR] carbono por m² ainda não informado: ${E(R.mat_falta.join(", "))}.</p>` : ""}<p class="t2 pq">Área × carbono incorporado por m² (berço ao portão). É o carbono da obra inteira: pelo GHG Protocol entra no ano da compra dos materiais; nos outros anos, desmarque a leitura.</p></section>`;
   if (tem(2)) corpo += `<section class="cartao" aria-labelledby="h-cb-cap"><h3 id="h-cb-cap" class="t3">Bens de capital (categoria 2)</h3><div class="precos">${inp(c, "e3.capital", "Investimentos em máquinas e obras (R$ no ano)", ctx.capital_rs ? N(ctx.capital_rs, 2) + " (da Gestão)" : "ex.: 150000")}</div>${ctx.capital_rs && !n0(c.e3.capital) ? `<button type="button" id="cb-sug-capital" data-carb-sug="capital">Usar o valor da Gestão</button>` : ""}</section>`;
   if (tem(4) || tem(9)) corpo += L("e3.transp");
   if (tem(5)) corpo += `<section class="cartao" aria-labelledby="h-cb-rc3"><h3 id="h-cb-rc3" class="t3">Resíduos da Economia circular enviados para fora (categoria 5)</h3>${chk(c, "e3.res_auto", "Ler os resíduos da Economia circular")}${rcL.length ? tabLinhas(R, l => l.escopo === 3 && l.ref && l.ref.indexOf("rc.") === 0, "Resíduos enviados para fora") : `<p class="t2">Nenhum resíduo com destino externo emissor (aterro, reciclagem, incineração).</p>`}<p class="t2 pq">Aterro: metano que o resíduo vai gerar ao longo dos anos, lançado no ano do envio. ${aviso("fatores IPCC de nível 1; aterros com queima de biogás emitem menos")}</p></section>` + L("e3.residuos");
@@ -294,13 +371,13 @@ function abaE3(c, R, F, ctx){ const cats = (c.e3.cats || []).map(Number), tem = 
   if ([3, 8, 10, 11, 13, 14, 15].some(tem)) corpo += L("e3.outras");
   const porCat = Object.keys(R.porCat).sort((a, b) => a - b);
   return `<p class="t2 apoio">Emissões que acontecem fora da organização, por causa dela: compras, transporte, resíduos, viagens, deslocamento das pessoas e o fim de vida do que é vendido.</p>${escolha}${corpo}
-    <section class="cartao" aria-labelledby="h-cb-s3"><h2 id="h-cb-s3">Escopo 3: ${T(R.e3)} tCO₂e por ano</h2>${porCat.length ? tabela("Escopo 3 por categoria", ["Categoria", "tCO₂e por ano"], porCat.map(k => `<tr><th scope="row">${k} · ${E(CAT3[k] || "")}</th><td>${T(R.porCat[k])}</td></tr>`)) : `<p class="t2">Nada lançado ainda.</p>`}<p class="t2 pq">${aviso("fatores de transporte, viagens e gasto vêm de base internacional ou são provisórios; substituir por dados de fornecedores")}</p></section>`; }
+    <section class="cartao" aria-labelledby="h-cb-s3"><h2 id="h-cb-s3">Escopo 3: ${T(R.e3)} tCO₂e por ano</h2>${porCat.length ? tabela("Escopo 3 por categoria", ["Categoria", "tCO₂e por ano"], porCat.map(k => `<tr><th scope="row">${k} · ${E(CAT3[k] || "")}</th><td>${T(R.porCat[k])}</td></tr>`)) : `<p class="t2">Nada lançado ainda.</p>`}<p class="t2 pq">${aviso("fatores de transporte, viagens e gasto vêm de base internacional ou são provisórios; substituir por dados de fornecedores")}</p></section>${secaoServidor(c, R, F, "e3")}`; }
 
 function abaRemocoes(c, R, F, ctx){ return `<p class="t2 apoio">Pelo GHG Protocol, remoções (carbono que as plantas tiram do ar) e emissões evitadas (o que se deixa de emitir em outro lugar) são informadas à parte. Elas nunca são descontadas do inventário.</p>
     <section class="cartao" aria-labelledby="h-cb-rem"><h2 id="h-cb-rem">Remoções por restauração e reflorestamento</h2><div class="precos">${sel(c, "remo.bioma", "Bioma ou sistema", BIOMAS)}${inp(c, "remo.ha", "Área plantada ou em restauração (ha)", "ex.: 2")}${inp(c, "remo.idade", "Idade do plantio (anos)", "ex.: 3")}${chk(c, "remo.usar_sbn", "Somar as árvores do plano SbN" + (ctx.mudas_sbn ? " (" + N(ctx.mudas_sbn, 0) + " mudas = " + N(ctx.mudas_sbn / F.remocoes.mudas_por_ha, 2) + " ha)" : ""))}</div>
       <div class="grade">${cartao("cb-rm", "Remoção estimada", T(R.remocoes_t), "tCO₂ por ano", `<span class="t2 pq">${N(R.remocoes_ha, 2)} ha × ${N(F.remocoes.tco2_ha_ano[c.remo.bioma] || 0, 1)} tCO₂/ha·ano${n0(c.remo.idade) > F.remocoes.anos_crescimento_rapido ? " × " + N(F.remocoes.fator_depois, 1) + " (plantio adulto)" : ""}</span>`)}</div>
       <p class="t2 pq">${aviso(E(F.remocoes._fonte))}</p></section>
-    <section class="cartao" aria-labelledby="h-cb-ev"><h2 id="h-cb-ev">Emissões evitadas</h2>${tabela("Emissões evitadas", ["Origem", "tCO₂e por ano", "Como"], [`<tr><th scope="row">Energia solar própria</th><td>${T(R.evitadas.solar)}</td><td>kWh solares × fator da rede</td></tr>`, `<tr><th scope="row">Biogás no lugar do GLP</th><td>${T(R.evitadas.biogas)}</td><td>${N(R.biogas_m3, 0)} m³ de biogás por ano (Economia circular): 6 kWh/m³ ÷ 12,8 kWh/kg de GLP</td></tr>`, `<tr><th scope="row">Reciclagem no lugar do aterro</th><td>${T(R.evitadas.reciclagem)}</td><td>metano de aterro que não acontece, menos o transporte da reciclagem</td></tr>`])}
+    <section class="cartao" aria-labelledby="h-cb-ev"><h2 id="h-cb-ev">Emissões evitadas</h2>${tabela("Emissões evitadas", ["Origem", "tCO₂e por ano", "Como"], [`<tr><th scope="row">Energia solar própria</th><td>${T(R.evitadas.solar)}</td><td>kWh solares × fator da rede</td></tr>`, `<tr><th scope="row">Biogás no lugar do GLP</th><td>${T(R.evitadas.biogas)}</td><td>${N(R.biogas_m3, 0)} m³ de biogás por ano (Economia circular): 6 kWh/m³ ÷ 12,8 kWh/kg de GLP${R.biogas_fonte ? `<br><span class="t2 pq">Fonte: ${E(R.biogas_fonte)} (substitui a soma do plano de resíduos, sem contar duas vezes)</span>` : ""}</td></tr>`, `<tr><th scope="row">Reúso de água tratada</th><td>${R.reuso_marcador ? "[MARCADOR]" : T(R.evitadas.reuso)}</td><td>${N(R.reuso_m3, 0)} m³ de efluente reusado por ano (Esgoto e biogás)${R.reuso_marcador ? `<br><span class="t2 pq">[MARCADOR: fator de emissão da água fornecida pela concessionária ainda não está na base.]</span>` : ""}</td></tr>`, `<tr><th scope="row">Reciclagem no lugar do aterro</th><td>${T(R.evitadas.reciclagem)}</td><td>metano de aterro que não acontece, menos o transporte da reciclagem</td></tr>`])}
       <p class="t2 pq">Total evitado: ${T(R.evitadas_t)} tCO₂e por ano. Serve para comunicar benefício e para avaliar projetos de crédito; não entra no saldo do inventário.</p></section>`; }
 
 function abaMetas(c, R, F){ const M = R.metas, marcos = M.trajet.filter(([a], i) => i === 0 || (a - M.ano_base) % 5 === 0 || i === M.trajet.length - 1);
@@ -332,6 +409,7 @@ function metodologia(F){ return `<details><summary class="t2">Metodologia e norm
     <li><strong>Programa Brasileiro GHG Protocol</strong>: adaptação brasileira, com a ferramenta de cálculo e as especificações do programa (fatores do SIN do MCTI, mistura de biocombustíveis, CO₂ biogênico informado à parte).</li>
     <li><strong>ISO 14064-1:2018</strong>: inventário organizacional; as categorias 1 (diretas), 2 (energia importada) e 3 a 6 (indiretas) correspondem aos escopos 1, 2 e 3.</li>
     <li><strong>Lei 15.042/2024</strong>: cria o SBCE, com limites de 10 mil e 25 mil tCO₂e por ano para relato e para obrigações.</li>
+    <li><strong>Pegada do servidor</strong>: GHG Protocol (energia no escopo 2, ou no escopo 3, categoria 1, quando a hospedagem é comprada; fabricação no escopo 3, categoria 2), Orientação Setorial de TIC do GHG Protocol e Recomendação ITU-T L.1450 (métodos para a pegada de organizações do setor de tecnologia). Medição por medidor, contador do processador (RAPL) ou potência da classe; PUE para datacenter.</li>
     <li><strong>IPCC 2006</strong> e Refinamento 2019: fatores de combustão, agropecuária, solo e resíduos (nível 1). <strong>IPCC AR5 e AR6</strong>: GWP de 100 anos.</li>
     <li>Fatores com fonte e ano em sistema/physis-fatores-emissao.json; os marcados “verificar” são conferidos antes de qualquer relato oficial. Base de dados por projeto: quem troca um fator registra o motivo.</li></ul>
     <p class="t2 pq">Os textos acima resumem as normas com palavras próprias da Physis; não substituem a leitura dos documentos nem a verificação por terceira parte.</p></details>`; }
@@ -371,6 +449,10 @@ if (typeof document !== "undefined" && !window.__carbEventos){ window.__carbEven
       if (k === "capital" && ctx.capital_rs) c.e3.capital = String(Math.round(ctx.capital_rs));
       gravar(c); redesenhar(); refocar("cb-aba-" + (UI().carbAba || "inventario")); } }); }
 
-window.PhysisCarbono = { tela, calcular, migrar, ler, gravar, contexto, resumo, kwhAno, base, num, versao:"carbono-ghg-1" };
+const I18N_SERVIDOR = { "Pegada do servidor (sistema digital)":"Server footprint (digital system)", "Potência agora":"Power now", "Energia":"Energy", "kWh por mês":"kWh per month", "Operação (energia)":"Operation (energy)", "Fabricação (escopo 3, cat. 2)":"Manufacturing (scope 3, cat. 2)", "dividida pelos anos de uso":"spread over the years of use",
+  "Equipamento":"Equipment", "Onde fica":"Location", "Método":"Method", "Energia (tCO₂e por ano)":"Energy (tCO₂e per year)", "Fabricação (tCO₂e por ano)":"Manufacturing (tCO₂e per year)", "No inventário":"In the inventory", "parte do escopo 2 já contado":"part of scope 2 already counted", "soma no escopo 2":"added to scope 2", "soma no escopo 3, cat. 1":"added to scope 3, cat. 1",
+  "Incluir a pegada do servidor no inventário":"Include the server footprint in the inventory", "Como contar a energia do servidor":"How to count the server energy", "Automático: pelo lugar de cada máquina (recomendado)":"Automatic: by where each machine is (recommended)", "Já está nas contas de luz do inventário (só informar)":"Already in the inventory electricity bills (report only)", "Somar como fonte própria":"Add as its own source",
+  "Como reduzir":"How to reduce", "Exemplo (modo demonstração).":"Example (demo mode).", "Servidor do sistema digital":"Digital system server", "Hospedagem do sistema digital":"Digital system hosting", "Fabricação do servidor":"Server manufacturing", "no lugar do inventário":"at the inventory site", "fora (datacenter ou outro lugar)":"elsewhere (datacenter or other site)" };
+window.PhysisCarbono = { tela, calcular, migrar, ler, gravar, contexto, resumo, kwhAno, base, num, servidorInventario, i18nServidor: I18N_SERVIDOR, versao:"carbono-ghg-3" };
 window.telaCarbono = tela;   /* global: chamada pelo nome telaCarbono() na hora de desenhar (TELAS.carbono) */
 })();

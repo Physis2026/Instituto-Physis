@@ -199,6 +199,42 @@ def rede_mercado(kwh: float, fator_residual: float, irec_mwh: float = 0, contrat
     return t + max(0.0, mwh - coberto) * fator_residual
 
 
+# ─────────────── pegada do servidor (sistema digital) ───────────────
+def servidor_contagem(eq: dict, escolha: str | None = "auto") -> str:
+    """'ja_contado' (servidor dentro do lugar cujas contas de luz ja estao no inventario: so informacao)
+    ou 'somar' (hospedado em outro lugar: fonte propria). 'auto' segue o local do equipamento."""
+    if escolha in ("ja_contado", "somar"):
+        return escolha
+    return "somar" if eq.get("local") == "fora" else "ja_contado"
+
+
+def servidor_inventario(equipamentos: list, f_loc: float, escolha: str | None = "auto", cats=None) -> dict:
+    """Linhas do servidor no inventario. equipamentos: [{nome, kwh_ano (ja com PUE), local, controle,
+    t_ano_fabricacao, qualidade}]. Energia: escopo 2 (controle 'proprio') ou escopo 3 cat. 1 ('servico',
+    hospedagem comprada); so entra se 'somar'. Fabricacao: escopo 3 cat. 2, sempre (nao esta na conta de luz).
+    cats: categorias do escopo 3 marcadas (None = todas)."""
+    tem = (lambda k: True) if cats is None else (lambda k: k in cats)
+    out = {"linhas": [], "e2_t": 0.0, "e3_cat1_t": 0.0, "cat2_t": 0.0, "ja_contado_t": 0.0}
+    for eq in equipamentos or []:
+        t = n0(eq.get("kwh_ano")) / 1000 * f_loc
+        q = "medido" if eq.get("qualidade") == "medido" else "estimado"
+        nome = str(eq.get("nome") or "Servidor")
+        if servidor_contagem(eq, escolha) == "ja_contado":
+            out["ja_contado_t"] += t
+        elif eq.get("controle") == "servico":
+            if tem(1):
+                out["e3_cat1_t"] += t
+                out["linhas"].append({"escopo": 3, "cat": 1, "fonte": nome + " (hospedagem comprada)", "t": t, "q": q})
+        else:
+            out["e2_t"] += t
+            out["linhas"].append({"escopo": 2, "cat": None, "fonte": nome + " (energia do servidor)", "t": t, "q": q})
+        fab = n0(eq.get("t_ano_fabricacao"))
+        if fab and tem(2):
+            out["cat2_t"] += fab
+            out["linhas"].append({"escopo": 3, "cat": 2, "fonte": nome + " (fabricação, amortizada)", "t": fab, "q": "estimado"})
+    return out
+
+
 # ─────────────── remocoes, metas e SBCE ───────────────
 def remocoes(F: dict, ha: float, bioma: str, idade_anos: float = 0) -> float:
     R = F["remocoes"]
@@ -252,7 +288,9 @@ def migrar(c: dict | None) -> dict:
 
 def calcular(estado: dict, ctx: dict | None = None, F: dict | None = None) -> dict:
     """Inventario completo. ctx traz os dados de outros modulos: rc (lista da Economia circular),
-    kwh_ano, area_m2, producao, mudas_sbn. Mesmas regras do calcular() em physis-carbono.js."""
+    kwh_ano, area_m2, producao, mudas_sbn, esgoto (parte Esgoto e biogas: pessoas, tratamento, reuso_m3_dia) e
+    materiais (chave physis-calc-materiais: composicoes com area_m2 e kgco2e_m2). Mesmas regras do calcular() em
+    physis-carbono.js. Sem o fator na base (F["efluentes"], F["agua_fornecida"]) a linha nao entra: [MARCADOR]."""
     F = F or carregar()
     ctx = ctx or {}
     c = migrar(estado)
@@ -311,6 +349,19 @@ def calcular(estado: dict, ctx: dict | None = None, F: dict | None = None) -> di
                 add(1, "residuos_no_lugar", g, "estimado", "residuos")
             elif 5 in cats:
                 add(3, "residuos", g, "estimado", "residuos", cat=5)
+    # tratamento de esgoto no lugar: escopo 1, so com o fator de metano na base (IPCC 2006, vol. 5, cap. 6)
+    es = ctx.get("esgoto") or {}
+    esgoto = None
+    if n0(es.get("pessoas")) > 0:
+        ef = F.get("efluentes") or {}
+        trat = es.get("tratamento") or ""
+        mcf, dbo, bo = num((ef.get("mcf") or {}).get(trat)), num(ef.get("dbo_kg_pessoa_dia")), num(ef.get("bo_kg_ch4_kg_dbo"))
+        if None not in (mcf, dbo, bo):
+            kg = n0(es.get("pessoas")) * dbo * 365 * bo * mcf
+            add(1, "esgoto_no_lugar", {"CH4_bio": kg}, "estimado", "residuos")
+            esgoto = {"marcador": False, "pessoas": n0(es.get("pessoas")), "tratamento": trat, "kg_ch4": kg}
+        else:
+            esgoto = {"marcador": True, "pessoas": n0(es.get("pessoas")), "tratamento": trat}
     if 5 in cats:
         for x in e3.get("residuos", []):
             add(3, "residuos", residuo(F, x.get("tipo", "rejeito"), n0(x.get("t")), x.get("destino", "aterro")),
@@ -336,6 +387,19 @@ def calcular(estado: dict, ctx: dict | None = None, F: dict | None = None) -> di
                        "q": rede.get("q", "medido"), "u": math.hypot(U["dado"].get(rede.get("q", "medido"), 0.05), U["fator"]["rede"]),
                        "cat": None, "fora": False})
 
+    # pegada do servidor (sistema digital): so com dado do hub (ctx["servidor"]), nunca com o exemplo da demonstracao
+    sv_cfg = c.get("servidor") or {}
+    sv = None
+    if ctx.get("servidor") and sv_cfg.get("incluir", True):
+        sv = servidor_inventario(ctx["servidor"], f_loc, sv_cfg.get("contagem", "auto"), cats)
+        for x in sv["linhas"]:
+            grupo = "servidor" if x["escopo"] == 2 else "servidor_fabricacao" if x["cat"] == 2 else "servidor_hospedagem"
+            linhas.append({"escopo": x["escopo"], "fonte": grupo, "gases": {"CO2": x["t"] * 1000}, "t": x["t"], "bio_t": 0,
+                           "q": x["q"], "u": math.hypot(U["dado"][x["q"]], U["fator"]["rede" if x["escopo"] == 2 else "escopo3"]),
+                           "cat": x["cat"], "fora": False})
+        e2_loc += sv["e2_t"]
+        e2_mkt += sv["e2_t"]
+
     # escopo 3
     G3 = F["escopo3"]
     if 1 in cats:
@@ -345,6 +409,19 @@ def calcular(estado: dict, ctx: dict | None = None, F: dict | None = None) -> di
         for x in e3.get("materiais", []):
             f = G3["materiais_kg_por_kg"].get(x.get("mat"), {"kg": 0})["kg"]
             add(3, "compras", {"CO2": n0(x.get("kg")) * f}, x.get("q", "estimado"), "escopo3", cat=1)
+    # materiais da obra: area x carbono incorporado por m2 das composicoes escolhidas; sem o valor por m2, [MARCADOR]
+    mat_falta = []
+    if 1 in cats and e3.get("mat_auto", True):
+        for m in (ctx.get("materiais") or {}).get("composicoes") or []:
+            if not isinstance(m, dict):
+                continue
+            a, k = num(m.get("area_m2")), num(m.get("kgco2e_m2"))
+            if not (a and a > 0):
+                continue
+            if k is None:
+                mat_falta.append(str(m.get("nome") or m.get("id") or "Composição"))
+                continue
+            add(3, "materiais_obra", {"CO2": a * k}, "estimado", "escopo3", cat=1)
     if 2 in cats and n0(e3.get("capital")):
         add(3, "bens_capital", {"CO2": n0(e3.get("capital")) * G3["gasto_kg_por_real"]["manufaturados"]["kg"]},
             "estimado", "gasto", cat=2)
@@ -389,12 +466,16 @@ def calcular(estado: dict, ctx: dict | None = None, F: dict | None = None) -> di
     rem_t = remocoes(F, ha, rm.get("bioma", "mata_atlantica"), n0(rm.get("idade"))) if ha else 0.0
     solar = n0(c.get("solar_kwh"))
     evit = {"solar": rede_localizacao(solar, f_loc)}
+    reuso_m3 = n0((ctx.get("esgoto") or {}).get("reuso_m3_dia")) * 365
+    f_agua = num((F.get("agua_fornecida") or {}).get("kg_m3"))
+    evit["reuso"] = reuso_m3 * f_agua / 1000 if f_agua is not None else 0.0
 
     return {"linhas": linhas, "e1": e1, "e2_loc": e2_loc, "e2_mkt": e2_mkt, "e3": e3t, "total": total,
             "por_gas": por_gas, "bio_t": sum(l["bio_t"] for l in linhas),
             "fora_quioto_t": sum(l["t"] for l in linhas if l["fora"]), "remocoes_t": rem_t, "evitadas": evit,
             "incerteza": incerteza([(l["t"], l["u"]) for l in linhas if not l["fora"]]),
-            "sbce": sbce(F, e1), "kwh": kwh, "fator_rede": f_loc}
+            "sbce": sbce(F, e1), "kwh": kwh, "fator_rede": f_loc, "servidor": sv, "esgoto": esgoto, "mat_falta": mat_falta,
+            "reuso_m3": reuso_m3, "reuso_marcador": reuso_m3 > 0 and f_agua is None}
 
 
 def fator_deslocamento(F: dict, modo: str, gw: dict) -> float:

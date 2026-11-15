@@ -521,6 +521,14 @@ def converter_pdfa(odf: bytes, programa: str | None = None, tempo: float = 120.0
     import tempfile
     exe = soffice_programa(programa)
     if not exe:
+        # sem LibreOffice aqui: tenta o serviço "documentos" do próprio sistema (LibreOffice + veraPDF, PHYSIS_DOC_URL)
+        try:
+            from . import documentos_cliente
+            r = documentos_cliente.pdfa_converter(odf, extensao)
+        except Exception:      # o serviço é opcional: qualquer falha volta ao aviso abaixo
+            r = None
+        if r and r.get("ok") and r.get("pdf"):
+            return {"ok": True, "pdf": r["pdf"], "pdfa": r.get("pdfa", "nao-validado"), "via": "servico-documentos"}
         return {"ok": False, "codigo": 501, "erro": "o LibreOffice (soffice) não está instalado neste servidor; "
                 "baixe em ODT e exporte em PDF/A pelo LibreOffice, ou instale-o (docs/EXPORTACAO.md)"}
     if not odf.startswith(b"PK\x03\x04") or extensao not in ("odt", "ods"):

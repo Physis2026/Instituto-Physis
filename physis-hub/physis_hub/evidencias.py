@@ -292,11 +292,50 @@ def f_custos(d, p, crit):
     return None
 
 
+def f_agua_reuso(d, p, crit):
+    e = d.get("esgoto") or {}
+    r = num(e.get("reuso_m3_dia"))
+    if not (r and r > 0):
+        return None
+    f = str(e.get("fonte") or "")
+    return _r("parcial", "Reúso de efluente tratado planejado: " + fix(r, 2).replace(".", ",", 1) + " m³/dia" + (f" ({f})" if f else ""), e.get("atualizado"))
+
+
+def f_biogas(d, p, crit):
+    b = d.get("biogas") or {}
+    g = num(b.get("biogas_m3_dia"))
+    if not (g and g > 0):
+        return None
+    v, f = num(b.get("biodigestor_m3")), str(b.get("fonte") or "")
+    return _r("parcial", "Biodigestor dimensionado: " + fix(g, 2).replace(".", ",", 1) + " m³/dia de biogás"
+              + (", " + fix(v, 1).replace(".", ",", 1) + " m³" if v else "") + (f" ({f})" if f else ""), b.get("atualizado"))
+
+
+def f_materiais(d, p, crit):
+    m = d.get("materiais") or {}
+    comps = [c for c in (m.get("composicoes") or []) if isinstance(c, dict)]
+    if not comps:
+        return None
+    if p.get("modo") == "envoltoria":
+        av = [c for c in comps if c.get("nbr15575") in ("atende", "parcial", "nao")]
+        if not av:
+            return None
+        ok = sum(1 for c in av if c.get("nbr15575") == "atende")
+        return _r("atendido" if ok == len(av) else "parcial", f"{ok} de {len(av)} composições atendem à NBR 15575 (procedimento simplificado"
+                  + (f", zona {m.get('zona')}" if m.get("zona") else "") + ")", m.get("atualizado"))
+    com = [c for c in comps if num(c.get("kgco2e_m2")) is not None and (num(c.get("area_m2")) or 0) > 0]
+    if not com:
+        return _r("parcial", f"{len(comps)} composições escolhidas, sem carbono incorporado por m²", m.get("atualizado"))
+    t = sum(num(c.get("area_m2")) * num(c.get("kgco2e_m2")) for c in com) / 1000
+    return _r("parcial", "Carbono incorporado das composições: " + fix(t, 1).replace(".", ",", 1) + f" tCO₂e ({len(com)} de {len(comps)} com valor por m²)", m.get("atualizado"))
+
+
 FONTES = {"agua_contas": f_agua_contas, "energia_hist": f_energia_hist, "medidor": f_medidor, "agua_cisterna": f_agua_cisterna,
           "solar": f_solar, "enpi": f_enpi, "residuos_desvio": f_residuos_desvio, "residuos_plano": f_residuos_plano,
           "carbono_inventario": f_carbono_inventario, "sbn_plano": f_sbn_plano, "acessibilidade": f_acessibilidade,
           "calibracao": f_calibracao, "documentos": f_documentos, "perfil": f_perfil, "riscos": f_riscos,
-          "risco_municipal": f_risco_municipal, "custos": f_custos}
+          "risco_municipal": f_risco_municipal, "custos": f_custos, "agua_reuso": f_agua_reuso, "biogas": f_biogas,
+          "materiais": f_materiais}
 
 
 # ══ Motor ════════════════════════════════════════════════════════════════════════════════════════

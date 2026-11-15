@@ -232,6 +232,9 @@
     try { var p = typeof cfg.perfil === "function" ? cfg.perfil() : null; atv = ((p && p.atividades) || []).filter(function (a) { return ATIVIDADES[a]; }); } catch (e) {}
     var regras = R.assinaturas.estado === "ok" ? Object.keys(R.assinaturas.dados.regras || {}) : [];
     if (R.assinaturas.estado !== "ok") return;        // espera as regras e a finalidade do servidor
+    // o servidor também conhece as atividades aprendidas do perfil (GET /api/alertas/assinaturas → atividades_perfil):
+    // já vêm marcadas, junto com as do perfil deste navegador
+    (R.assinaturas.dados.atividades_perfil || []).forEach(function (a) { if (ATIVIDADES[a] && atv.indexOf(a) < 0) atv.push(a); });
     F = { id: null, nome: "", email: "", whatsapp: "", whatsapp_chave: "", canais: ["email"], alertas: regras, atividades: atv,
       nivel_min: "atencao", silencio_ini: "22:00", silencio_fim: "06:00", alerta_fura_silencio: true, consentimento: false };
   }

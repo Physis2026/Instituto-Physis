@@ -1,0 +1,150 @@
+# Secador solar Physis — nó ESP32 com ESPHome, publicando via MQTT para a plataforma (ponte physis_hub/mqtt.py)
+# Linha V6 TIPO:SEC (a homologar; physis-hub/docs/SECADOR.md). Parâmetros: firmware/secador/parametros.json
+# Status: NÃO TESTADO EM HARDWARE (exemplo de referência / TRL 3). Pinos, sensores e calibração: conferir na bancada.
+#
+# Na plataforma (instancia.json do servidor), este nó entra assim:
+#   "mqtt": {"broker": "192.168.x.x", "usuario": "physis-hub",
+#            "nos": [{"no": "secador-solar", "id": 41, "tipo": "secador",
+#                     "ti": "temperatura_interna", "ui": "umidade_interna", "te": "temperatura_externa",
+#                     "ue": "umidade_externa", "tc": "temperatura_coletor", "vent": "ventilador",
+#                     "abt": "tampa", "peso": "peso_produto", "irr": "irradiancia", "tmax": 60}]}
+# e a senha do broker vai na variável de ambiente PHYSIS_MQTT_SENHA (nunca no arquivo).
+# Os segredos (Wi-Fi, broker, OTA) vêm do secrets.yaml, como na Caixinha (firmware/caixinha/esphome/secrets.example.yaml).
+
+substitutions:
+  t_seguranca: "60"      # °C dentro do secador: liga o ventilador à força (o mesmo "tmax" da plataforma; verificar com o produto)
+  histerese: "5"         # °C abaixo do limite para soltar o ventilador forçado
+
+esphome:
+  name: secador-solar
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+mqtt:
+  broker: !secret mqtt_broker_ip
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+  # tópicos padrão: secador-solar/sensor/<objeto>/state, secador-solar/switch/ventilador/command
+  # sem broker o ventilador NÃO desliga: a segurança de temperatura abaixo continua valendo sozinha
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+logger:
+
+globals:
+  - id: forcado
+    type: bool
+    initial_value: "false"
+
+i2c:
+  sda: GPIO21
+  scl: GPIO22
+
+one_wire:
+  - platform: gpio
+    pin: GPIO4           # DS18B20 do coletor (com resistor de 4,7 kΩ para 3,3 V)
+
+sensor:
+  # Ar de dentro do secador (sobre as bandejas, longe do sol direto): SHT31 no I²C
+  - platform: sht3xd
+    address: 0x44
+    update_interval: 60s
+    temperature:
+      name: "Temperatura Interna"          # objeto: temperatura_interna
+      id: t_interna
+      on_value:
+        then:
+          # segurança no próprio nó: no limite, liga o ventilador e segura ligado até esfriar
+          - if:
+              condition:
+                lambda: "return x >= ${t_seguranca};"
+              then:
+                - lambda: "id(forcado) = true;"
+                - switch.turn_on: ventilador
+          - if:
+              condition:
+                lambda: "return id(forcado) && x < ${t_seguranca} - ${histerese};"
+              then:
+                - lambda: "id(forcado) = false;"
+    humidity:
+      name: "Umidade Interna"              # objeto: umidade_interna
+  # Ar de fora (abrigo à sombra, ventilado): segundo SHT31 com o pino ADDR em 3,3 V
+  - platform: sht3xd
+    address: 0x45
+    update_interval: 60s
+    temperature:
+      name: "Temperatura Externa"          # objeto: temperatura_externa
+    humidity:
+      name: "Umidade Externa"              # objeto: umidade_externa
+  # Saída do coletor solar
+  - platform: dallas_temp
+    name: "Temperatura Coletor"            # objeto: temperatura_coletor
+    update_interval: 60s
+  # Célula de carga sob as bandejas (opcional): HX711
+  - platform: hx711
+    name: "Peso Produto"                   # objeto: peso_produto
+    dout_pin: GPIO16
+    clk_pin: GPIO17
+    gain: 128
+    update_interval: 300s
+    unit_of_measurement: kg
+    accuracy_decimals: 2
+    filters:
+      - calibrate_linear:
+          # CALIBRAÇÃO: ler o valor cru vazio e com um peso conhecido (ex.: 10 kg) e trocar aqui
+          - 0 -> 0
+          - 100000 -> 10
+      - median:
+          window_size: 5
+          send_every: 1
+  # Irradiância (opcional): piranômetro ou célula de referência com saída 0–3,3 V
+  - platform: adc
+    pin: GPIO34          # ADC1 (o ADC2 conflita com o Wi-Fi)
+    name: "Irradiancia"                    # objeto: irradiancia
+    attenuation: 11db
+    update_interval: 60s
+    unit_of_measurement: "W/m²"
+    filters:
+      - multiply: 454.5  # 3,3 V ≈ 1500 W/m² — trocar pelo fator do certificado do sensor
+      - clamp:
+          min_value: 0
+          max_value: 1500
+  - platform: adc
+    pin: GPIO35
+    name: "Tensao Alimentacao"             # objeto: tensao_alimentacao (bateria, se houver)
+    attenuation: 11db
+    update_interval: 300s
+    filters:
+      - multiply: 2.0    # divisor resistivo 1:1 — ajustar ao circuito real
+
+binary_sensor:
+  # Tampa ou lona aberta (opcional): fim de curso; ON = aberto
+  - platform: gpio
+    pin:
+      number: GPIO27
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Tampa"                          # objeto: tampa
+
+switch:
+  - platform: gpio
+    pin: GPIO26          # relé do ventilador
+    name: "Ventilador"                     # objeto: ventilador
+    id: ventilador
+    restore_mode: ALWAYS_OFF
+    on_turn_off:
+      # pedido de desligar com o secador no limite: o nó liga de volta (segurança vence o comando)
+      - if:
+          condition:
+            lambda: "return id(forcado);"
+          then:
+            - switch.turn_on: ventilador

@@ -13,6 +13,10 @@ A ponte:
 3. entrega os comandos pendentes do hub: IRR1/IRR2 viram ON/OFF na válvula; LIM1/LIM2/MODO ficam
    na ponte, que faz a rega automática (abre abaixo do limite, fecha no limite + 5 pontos ou no tempo
    máximo). A segurança final continua no nó: o ESPHome fecha a válvula sozinho depois de TMAX.
+4. secador solar ("tipo": "secador" no nó, docs/SECADOR.md, a homologar): os sensores viram a linha
+   TIPO:SEC e o comando VENT liga e desliga o ventilador. Segurança: com a temperatura interna no
+   limite ("tmax", padrão 60 °C) a ponte força o ventilador ligado e recusa VENT:0 até esfriar 5 °C;
+   o YAML do nó faz o mesmo sozinho (firmware/secador/secador-solar.yaml), sem depender da ponte.
 
 Só a biblioteca padrão (socket/ssl): MQTT 3.1.1, QoS 0, usuário e senha, TLS opcional (porta 8883).
 A senha vem de PHYSIS_MQTT_SENHA (nunca do código nem do instancia.json).
@@ -28,6 +32,7 @@ import threading
 import time
 
 from .protocolo import comando_valido, separar_comando
+from .secador import HISTERESE_T, T_SEGURANCA_PADRAO
 
 HISTERESE = 5.0          # pontos de umidade acima do limite para fechar no modo automático
 TMAX_PADRAO_MIN = 15     # minutos máximos por rega, se o nó não disser outro
@@ -97,6 +102,7 @@ def ler_publish(cab: int, corpo: bytes) -> tuple[str, str]:
 class No:
     """Configuração de um nó: {"no": "irrigacao-zona1", "id": 21, "u1": "umidade_solo_zona_1",
     "ir1": "valvula_zona_1", "u2": ..., "ir2": ..., "bomba": ..., "bat": ..., "tmax": 15}."""
+    BOOL = ("ir1", "ir2", "bomba")
 
     def __init__(self, cfg: dict):
         self.nome = str(cfg["no"])
@@ -131,6 +137,42 @@ class No:
                 f"TMAX:{self.tmax},LIM1:{lim(1)},LIM2:{lim(2)},BAT:{v('bat', 2)},TS:{int(agora)}")
 
 
+class NoSecador:
+    """Secador solar: {"no": "secador-cafe", "id": 41, "tipo": "secador", "ti": "temperatura_interna",
+    "ui": "umidade_interna", "te": ..., "ue": ..., "tc": ..., "vent": "ventilador", "abt": "tampa",
+    "peso": "peso_produto", "irr": "irradiancia", "bat": ..., "tmax": 60}. Só "ti" e "vent" são obrigatórios."""
+    BOOL = ("vent", "abt")
+    CHAVES = ("ti", "ui", "te", "ue", "tc", "vent", "abt", "peso", "irr", "bat")
+    CASAS = {"peso": 2, "irr": 0, "bat": 2}
+
+    def __init__(self, cfg: dict):
+        self.nome = str(cfg["no"])
+        self.id = int(cfg["id"])
+        if not 1 <= self.id <= 99:
+            raise ValueError("id do nó entre 1 e 99")
+        self.obj = {k: str(cfg[k]) for k in self.CHAVES if cfg.get(k)}
+        if "ti" not in self.obj or "vent" not in self.obj:
+            raise ValueError("secador sem 'ti' ou sem 'vent'")
+        self.tmax = float(cfg.get("tmax") or T_SEGURANCA_PADRAO)
+        self.val: dict[str, float | int | None] = {}
+        self.forcado = False          # ventilador ligado pela segurança (temperatura no limite)
+        self.pedido = None            # último VENT pedido pelo hub (0/1), para voltar a ele depois de esfriar
+        self.online = None
+
+    chave_de = No.chave_de
+
+    def linha(self, agora: float) -> str:
+        def v(k):
+            x = self.val.get(k)
+            if x is None:
+                return "-"
+            return str(int(x)) if k in self.BOOL else f"{x:.{self.CASAS.get(k, 1)}f}"
+        self.ultimo_ts = max(int(agora), getattr(self, "ultimo_ts", 0) + 1)
+        abt = f"ABT:{v('abt')}," if "abt" in self.obj else ""
+        return (f"ID:{self.id},TIPO:SEC,TI:{v('ti')},UI:{v('ui')},TE:{v('te')},UE:{v('ue')},TC:{v('tc')},"
+                f"VENT:{v('vent')},{abt}PESO:{v('peso')},IRR:{v('irr')},BAT:{v('bat')},TS:{self.ultimo_ts}")
+
+
 def _num(carga: str) -> float | None:
     try:
         f = float(carga)
@@ -148,7 +190,7 @@ class Ponte:
     """Sem rede: recebe (tópico, carga), devolve linhas V6 para o hub e (tópico, carga) para publicar."""
 
     def __init__(self, nos: list[dict], relogio=time.time):
-        self.nos = {n.nome: n for n in (No(c) for c in nos)}
+        self.nos = {n.nome: n for n in ((NoSecador(c) if str(c.get("tipo", "")).lower() == "secador" else No(c)) for c in nos)}
         self.por_id = {n.id: n for n in self.nos.values()}
         self.relogio = relogio
 
@@ -168,7 +210,7 @@ class Ponte:
         k = no.chave_de(partes[2])
         if not k:
             return [], []
-        x = _liga(carga) if k in ("ir1", "ir2", "bomba") else _num(carga)
+        x = _liga(carga) if k in no.BOOL else _num(carga)
         if x is None:
             return [], []
         antes = no.val.get(k)
@@ -188,7 +230,24 @@ class Ponte:
         obj = no.obj.get(f"ir{i}")
         return [(f"{no.nome}/switch/{obj}/command", "ON" if ligar else "OFF")] if obj else []
 
-    def _automatico(self, no: No, agora: float) -> list[tuple[str, str]]:
+    def _ventilador(self, no: NoSecador, ligar: bool) -> list[tuple[str, str]]:
+        return [(f"{no.nome}/switch/{no.obj['vent']}/command", "ON" if ligar else "OFF")]
+
+    def _seguranca(self, no: NoSecador) -> list[tuple[str, str]]:
+        """Temperatura no limite: ventilador ligado à força; esfriou 5 °C: volta ao último pedido do hub."""
+        ti, vent = no.val.get("ti"), no.val.get("vent")
+        if ti is not None and ti >= no.tmax:
+            no.forcado = True
+            return [] if vent else self._ventilador(no, True)
+        if no.forcado and ti is not None and ti < no.tmax - HISTERESE_T:
+            no.forcado = False
+            if no.pedido == 0 and vent:
+                return self._ventilador(no, False)
+        return []
+
+    def _automatico(self, no, agora: float) -> list[tuple[str, str]]:
+        if isinstance(no, NoSecador):
+            return self._seguranca(no)
         pub: list[tuple[str, str]] = []
         for i in (1, 2):
             aberta = bool(no.val.get(f"ir{i}"))
@@ -215,6 +274,15 @@ class Ponte:
         alvos = list(self.por_id.values()) if destino == 0 else [self.por_id[destino]] if destino in self.por_id else []
         pub: list[tuple[str, str]] = []
         for no in alvos:
+            if isinstance(no, NoSecador):
+                if acao == "VENT":
+                    no.pedido = int(arg)
+                    quente = no.forcado or (no.val.get("ti") is not None and no.val["ti"] >= no.tmax)
+                    if arg == "1" or not quente:          # desligar com o secador no limite: recusado (segurança)
+                        pub += self._ventilador(no, arg == "1")
+                continue
+            if acao == "VENT":
+                continue
             if acao in ("IRR1", "IRR2"):
                 pub += self._valvula(no, int(acao[-1]), arg == "1")
             elif acao in ("LIM1", "LIM2"):

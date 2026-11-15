@@ -19,11 +19,16 @@ EPOCH_MAX_VALIDO = 4_102_444_800   # 2100-01-01
 # (docs/SAUDE.md, "a homologar"); o hub as entrega a saude.py antes do adaptador generico e nunca
 # as grava em `medicao`. PHYSIS_SAUDE_V6=0 volta a recusar MED/PUL (tipo_desconhecido) no receptor e no /api/v6/linha.
 TIPOS_SAUDE = ("MED", "PUL")
-TIPOS_CONHECIDOS = ("SOLO", "ZONA", "COL", "COM", "PLUV") + TIPOS_SAUDE
+TIPOS_CONHECIDOS = ("SOLO", "ZONA", "COL", "COM", "PLUV", "SEC") + TIPOS_SAUDE
 # Limites de plausibilidade fisica, largos de proposito. NAO sao faixas de operacao:
 # as faixas de operacao de cada equipamento devem ser confirmadas pela equipe tecnica da Physis.
 # CHI: mm de chuva no intervalo (0 a 200); PUL so e contador de pulsos quando TIPO:PLUV (na pulseira, PUL e o TIPO).
 FAIXAS_PLAUSIVEIS = {"BAT": (0.0, 60.0), "RSSI": (-200.0, 20.0), "SNR": (-60.0, 60.0), "CHI": (0.0, 200.0)}
+# SEC: secador solar (docs/SECADOR.md, "a homologar"). So valem quando TIPO:SEC (IRR aqui e irradiancia, nao a valvula).
+# TI/TE/TC temperaturas (C), UI/UE umidade relativa (%), PESO kg (celula de carga), IRR W/m2; VENT e ABT so 0/1.
+FAIXAS_SEC = {"TI": (-20.0, 120.0), "TE": (-20.0, 70.0), "TC": (-20.0, 150.0), "UI": (0.0, 100.0),
+              "UE": (0.0, 100.0), "PESO": (0.0, 5000.0), "IRR": (0.0, 1500.0)}
+BINARIOS_SEC = ("VENT", "ABT")
 
 
 def saude_v6_ligada() -> bool:
@@ -34,7 +39,7 @@ LINHA_MAX = 240                    # folga sobre o maior payload (~132 B) + RSSI
 SENTINELAS = {"-", "--", "---", "n/d", "nd", "null", "none", "nan"}
 VERDADEIROS = {"1", "SIM", "S", "TRUE", "T", "ON", "LIGADO", "YES"}
 FALSOS = {"0", "NAO", "N", "FALSE", "F", "OFF", "DESLIGADO", "NO"}
-ACOES = ("SYNC", "LIM1", "LIM2", "IRR1", "IRR2", "MODO", "PING")
+ACOES = ("SYNC", "LIM1", "LIM2", "IRR1", "IRR2", "MODO", "PING", "VENT")   # VENT: ventilador do secador (a homologar)
 
 _RE_NUM = re.compile(r"^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$")
 
@@ -125,7 +130,12 @@ def validar_telemetria(bruta: str) -> tuple[bool, str, dict[str, str]]:
             del campos["PUL"]                           # contador de pulsos: inteiro >= 0
             campos["_FORA"] = "PUL"
     fora = []
-    for k, (lo, hi) in FAIXAS_PLAUSIVEIS.items():
+    if tipo == "SEC":
+        for k in BINARIOS_SEC:
+            if k in campos and campos[k].strip().lower() not in SENTINELAS and campos[k].strip() not in ("0", "1"):
+                fora.append(k)
+    faixas = dict(FAIXAS_PLAUSIVEIS, **FAIXAS_SEC) if tipo == "SEC" else FAIXAS_PLAUSIVEIS
+    for k, (lo, hi) in faixas.items():
         if k in campos:
             f = para_float(campos[k], None)
             if f is not None and not (lo <= f <= hi):
@@ -159,7 +169,7 @@ def separar_comando(linha: str) -> tuple[int, str, str] | None:
 def argumento_valido(acao: str, arg: str) -> bool:
     if acao == "PING":
         return arg == ""
-    if acao in ("IRR1", "IRR2"):
+    if acao in ("IRR1", "IRR2", "VENT"):
         return arg in ("0", "1")
     if acao == "MODO":
         return arg.upper() in ("AUTO", "MANUAL")

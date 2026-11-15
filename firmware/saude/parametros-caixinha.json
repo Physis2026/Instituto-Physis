@@ -1,0 +1,21 @@
+{
+ "_leia": "Parâmetros da caixinha de remédios Physis (TIPO:MED, docs/SAUDE.md e firmware/saude/BLE_PERFIL.md). Fonte única dos valores que o firmware usa. Quem revisa muda só 'valor' (e marca 'conferido'); 'ble' não muda. 'valor' null = [MARCADOR].",
+ "versao": 1,
+ "atualizado": "2026-11-15",
+ "como_o_firmware_le": "Na montagem (PlatformIO): um passo antes da compilação lê este arquivo e escreve include/parametros.h com um #define por parâmetro (PARAM_<ID>). Valor null vira #error. A tolerância também pode ser trocada depois pelo comando BLE TOL, e o hub usa a tolerância de cada horário.",
+ "ble": {
+  "servico_caixinha": "461d76e3-6508-4db6-9886-05374c5fbb50",
+  "caracteristica_linha": "bbca3cf4-40e0-4103-9420-7c1f5f693fd4",
+  "caracteristica_comando": "529cbb10-062f-4ca8-aa64-cca0c1307234",
+  "battery_service": "0000180f-0000-1000-8000-00805f9b34fb",
+  "nome_anunciado": "Physis-MED-xxxx",
+  "fonte": "firmware/saude/BLE_PERFIL.md seção 2 (proposta, a homologar)"
+ },
+ "parametros": [
+  {"id": "tolerancia_min", "grandeza": "Tolerância para confirmar a dose", "valor": 60, "unidade": "min", "faixa_aceita": [5, 240], "fonte": "physis_hub/saude.py (TOLERANCIA_MIN) e caixa_remedios.ino", "nota": "O hub aceita de 5 a 240 min por horário.", "verificar": true},
+  {"id": "janela_antecipada_min", "grandeza": "Quanto antes do horário a dose ainda conta", "valor": 30, "unidade": "min", "faixa_aceita": [0, 120], "fonte": "physis_hub/saude.py (ANTES_MIN)", "verificar": true},
+  {"id": "bateria_baixa_v", "grandeza": "Tensão de bateria baixa", "valor": 3.45, "unidade": "V", "faixa_aceita": [3.0, 4.2], "fonte": "physis_hub/saude.py (BAT_BAIXA_V, a confirmar pela equipe técnica)", "verificar": true},
+  {"id": "fila_max_eventos", "grandeza": "Eventos guardados sem celular conectado", "valor": null, "unidade": "eventos", "faixa_aceita": [10, 10000], "fonte": "[MARCADOR] BLE_PERFIL.md seção 2.1 (depende da memória da placa)", "verificar": true},
+  {"id": "max_celulares_pareados", "grandeza": "Celulares de cuidadores pareados", "valor": null, "unidade": "celulares", "faixa_aceita": [1, 8], "fonte": "[MARCADOR] BLE_PERFIL.md seção 3", "verificar": true}
+ ]
+}

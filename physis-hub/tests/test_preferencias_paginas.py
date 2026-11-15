@@ -1,7 +1,8 @@
-"""Preferências nas quatro telas com código próprio: plataforma (painel.html), Gestão Physis, SCADA e Tela do cliente.
+"""Preferências nas telas com tradução própria: plataforma (painel.html), Gestão Physis e SCADA.
 
 Pedido (15/11/2026): "absolutamente todas as páginas devem ter opções de acessibilidade e modo de conforto, opção inglês
-e tela clara e escura". Cada tela leva a mesma barra (bloco <script id="px-preferencias">) com quatro controles:
+e tela clara e escura" e um só modelo em todas as janelas. Desde então há UM módulo (sistema/physis-preferencias.js),
+copiado igual em cada tela (bloco <script id="physis-preferencias">) por ferramentas/sincronizar.py, com quatro controles:
 Idioma · Tema (Claro, Escuro, Automático) · Modo de conforto ▾ · Acessibilidade (PcD) ▾.
 """
 from __future__ import annotations
@@ -16,7 +17,6 @@ PAINEL = RAIZ / "physis-hub" / "web" / "painel.html"
 SISTEMA = {
     "gestao": RAIZ / "sistema" / "gestao-interna-physis.html",
     "scada": RAIZ / "sistema" / "physis-scada-demo.html",
-    "cliente": RAIZ / "sistema" / "physis-tela-cliente.html",
 }
 TODAS = dict(SISTEMA, painel=PAINEL)
 
@@ -60,58 +60,66 @@ def variaveis(css: str) -> dict[str, str]:
     return {k: v.upper() for k, v in re.findall(r"(--[\w-]+):(#[0-9A-Fa-f]{6})\b", css)}
 
 
+MODULO = RAIZ / "sistema" / "physis-preferencias.js"
+
+
 class Barra(unittest.TestCase):
+    """Desde 15/11/2026 há UM módulo de preferências (sistema/physis-preferencias.js). A plataforma, a Gestão e o SCADA
+    entram pela porta PxPref (traduzem a si mesmos); consultoria, SustainKit e Planejador por PhysisPreferencias."""
+
     def test_mesma_barra_em_todas(self):
-        copias = {n: bloco(ler(p), "px-preferencias") for n, p in TODAS.items()}
-        for n, c in copias.items():
-            self.assertTrue(c.startswith("/* px-preferencias v"), n)
-        self.assertEqual(len(set(copias.values())), 1, "as cópias da barra precisam ser iguais")
+        original = ler(MODULO).replace("\r\n", "\n")
+        for n, p in TODAS.items():
+            t = ler(p)
+            m = re.search(r'<script id="physis-preferencias">\n(.*?)</script>', t, re.S)
+            self.assertIsNotNone(m, n)
+            self.assertEqual(m.group(1), original, f"{n}: cópia diferente de sistema/physis-preferencias.js (rode ferramentas/sincronizar.py)")
+            self.assertNotIn('<script id="px-preferencias">', t, f"{n}: a segunda implementação antiga voltou")
 
     def test_quatro_controles_e_rotulos(self):
-        mod = bloco(ler(PAINEL), "px-preferencias")
-        for rot in ['idioma: "English"', 'idioma: "Português"', 'tema: "Tema"', 'claro: "Claro"', 'escuro: "Escuro"', 'auto: "Automático"',
+        mod = ler(MODULO)
+        for rot in ['idioma: "Idioma"', 'tema: "Tema"', 'claro: "Claro"', 'escuro: "Escuro"', 'auto: "Automático"',
                     'conforto: "Modo de conforto"', 'a11y: "Acessibilidade (PcD)"', 'tema: "Theme"', 'conforto: "Comfort mode"']:
             self.assertIn(rot, mod)
-        for ident in ["pxp-idioma", "pxp-tema", "pxp-conforto", "pxp-a11y", "pxp-p-conforto", "pxp-p-a11y"]:
+        for ident in ["pp-idioma", "pp-tema", "pp-conforto", "pp-a11y", "pp-painel-conforto", "pp-painel-a11y", "pxp-barra"]:
             self.assertIn('"' + ident + '"', mod)
         self.assertIn('"aria-expanded": "false"', mod)
+        self.assertIn("global.PxPref = PX", mod)
+        self.assertIn("global.PhysisPreferencias = API", mod)
 
     def test_chaves_compartilhadas(self):
-        mod = bloco(ler(PAINEL), "px-preferencias")
-        self.assertIn('CH = "physis-pref", CH_TEMA = "physis-pref-tema"', mod)
+        mod = ler(MODULO)
+        self.assertIn('gravar("physis-pref-tema", e.tema)', mod)
+        self.assertIn('P.op.chave = P.op.chave || "physis-pref"', mod)
         for cedo in [ler(p) for p in TODAS.values()]:
             self.assertIn('<script id="pxp-cedo">', cedo)
             self.assertIn('localStorage.getItem("physis-pref-tema")', cedo)
             self.assertIn("prefers-color-scheme: dark", cedo)
 
-    def test_textos_pt_e_en_tem_as_mesmas_chaves(self):
-        mod = bloco(ler(PAINEL), "px-preferencias")
-        i, j = mod.index("    pt: {"), mod.index("    en: {")
-        k = mod.index("\n  };", j)
-        chaves = lambda s: set(re.findall(r"(?:^|[{,]\s*)(\w+):\s*\"", s, re.M))
-        self.assertEqual(chaves(mod[i:j]), chaves(mod[j:k]))
-
     def test_modo_de_conforto(self):
-        mod = bloco(ler(PAINEL), "px-preferencias")
-        for k in ["verde", "texto", "espaco", "calma", "foco", "dislexia", "contraste", "regua", "simples", "lembrar"]:
+        mod = ler(MODULO)
+        for k in ["verde", "espaco", "calma", "foco", "dislexia", "regua", "simples", "lembrar", "contraste"]:
             self.assertIn('caixa("%s"' % k, mod)
+        self.assertIn('name: "pp-texto"', mod)   # texto: normal, maior, muito maior
         # ligar o modo de conforto aplica o conjunto suave: fundo verde + menos estímulo + espaçamento
-        self.assertIn('if (k === "conforto") { patch.verde = t.checked; patch.calma = t.checked; patch.espaco = t.checked; }', mod)
-        # alto contraste aparece nos dois painéis, com o mesmo estado
-        self.assertEqual(mod.count('caixa("contraste"'), 2)
+        self.assertIn("patch = { conforto: t.checked, verde: t.checked, calma: t.checked, espaco: t.checked }", mod)
 
     def test_acessibilidade_pcd(self):
-        mod = bloco(ler(PAINEL), "px-preferencias")
+        mod = ler(MODULO)
         for x in ["Cegueira e baixa visão", "Surdez", "Fala", "Mobilidade", "NVDA, JAWS, VoiceOver, TalkBack", "speechSynthesis",
-                  "Alt+1: ir para o conteúdo", "Alt+2: ir para o menu e as abas", "Alt+0: abrir este painel",
-                  "Libras com VLibras (a instalar no servidor; o VLibras é aberto)", "Comunicação alternativa (CAA)",
+                  "Alt+1", "Alt+2", "Alt+3", "Alt+0", "Libras (VLibras)", "Comunicação alternativa (CAA)",
                   "Preciso de ajuda", "Não entendi", "Quero falar com uma pessoa", "Pode repetir de outro jeito?",
-                  "webkitSpeechRecognition", "LGPD", "Relatar barreira", "Declaração de acessibilidade",
+                  "webkitSpeechRecognition", "LGPD", "Relatar barreira", "Copiar relato", "Declaração de acessibilidade",
                   "Lei 13.146/2015", "eMAG", "WCAG 2.2", "NBR 17225"]:
             self.assertIn(x, mod)
-        # VLibras e comandos de voz começam desligados; nada é carregado de fora
         self.assertIn("libras: false, voz: false", mod)
         self.assertNotRegex(mod, r"https?://")
+
+    def test_em_quadro_segue_a_plataforma(self):
+        mod = ler(MODULO)
+        self.assertIn('hasAttribute("data-em-quadro")', mod)        # sem segunda barra dentro da plataforma
+        self.assertIn('global.addEventListener("storage"', mod)      # segue a escolha feita na plataforma
+        self.assertIn("esconderEmQuadro: op.esconderEmQuadro !== false", mod)
 
     def test_controles_antigos_saem(self):
         p = ler(PAINEL)
@@ -166,7 +174,8 @@ class TemaEscuro(unittest.TestCase):
     def test_programas_embutidos_seguem_o_tema(self):
         p = ler(PAINEL)
         self.assertIn('r.setAttribute("data-tema", h.getAttribute("data-tema") || "claro")', p)
-        self.assertIn("html[data-tema=escuro] body{background:#14180F !important}", p)
+        # os programas cuidam do próprio fundo no tema escuro; a plataforma só avisa que eles estão em quadro (15/11/2026)
+        self.assertIn('<html$1 data-em-quadro="">', p)
 
 
 class Ingles(unittest.TestCase):

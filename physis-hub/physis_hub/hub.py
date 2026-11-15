@@ -22,6 +22,7 @@ from datetime import datetime
 from . import adaptador, protocolo
 from . import clima as clima_mod
 from . import perfil_cliente
+from . import secador as secador_mod
 from . import seguranca as seg
 
 OFFLINE_S_PADRAO = 160          # 3 ciclos do TDMA com 99 nos (~53 s cada)
@@ -92,6 +93,7 @@ class Hub:
         self.guardar_medicoes = guardar_medicoes
         self.enviar_comando = enviar_comando      # funcao(linha) -> (ok, detalhe) ou None
         self.saude_receptor = None                # funcao(linha, origem) -> dict de saude.registrar_evento (o servidor liga)
+        self.secador_produtos: dict[int, str] = {}  # no SEC -> produto do lote (secador.PRODUTOS); vazio = limite generico
         self.relogio = relogio
         self.SESSAO_S = seg.sessao_vida_s(Hub.SESSAO_S)      # PHYSIS_SESSAO_DIAS (vida máxima da sessão)
         self._trava = threading.RLock()
@@ -246,7 +248,8 @@ class Hub:
         if antes is None:
             self.registrar("no_descoberto", f"no{no:02d}", {"no": no, "tipo": est["tipo"]})
         else:
-            for chave, nome in (("ir1", "valvula1"), ("ir2", "valvula2"), ("bomba", "bomba"), ("imp", "impacto")):
+            for chave, nome in (("ir1", "valvula1"), ("ir2", "valvula2"), ("bomba", "bomba"), ("imp", "impacto"),
+                                ("vent", "ventilador")):
                 if chave in est and bool(antes.get(chave)) != bool(est.get(chave)):
                     self.registrar("evento", f"no{no:02d}", {"no": no, "o_que": nome, "valor": bool(est.get(chave))})
         self._conferir_comandos(no, est)
@@ -294,7 +297,7 @@ class Hub:
             "SELECT seq, linha, restam FROM comando WHERE estado='enviado' AND destino=?", (no,)).fetchall()
         for seq, linha, restam in abertos:
             _, acao, arg = protocolo.separar_comando(linha)
-            alvo = {"LIM1": "lim1", "LIM2": "lim2", "IRR1": "ir1", "IRR2": "ir2"}.get(acao)
+            alvo = {"LIM1": "lim1", "LIM2": "lim2", "IRR1": "ir1", "IRR2": "ir2", "VENT": "vent"}.get(acao)
             if alvo is None:                    # SYNC, MODO, PING: a linha do no nao confirma
                 self._db.execute("UPDATE comando SET estado='sem_confirmacao', atualizado=? WHERE seq=?",
                                  (self.relogio(), seq))
@@ -316,7 +319,7 @@ class Hub:
 
     # ── Leitura para as telas ────────────────────────────────────────────────
     def alertas(self) -> list[dict]:
-        agora, out = self.relogio(), []
+        agora, out, chuva = self.relogio(), [], False
         for no, n in sorted(self.nos.items()):
             nome = f"No {no:02d}"
             if agora - n["visto"] > self.offline_s:
@@ -332,6 +335,12 @@ class Hub:
                 out.append({"nivel": "alarme", "no": no, "texto": f"{nome}: impacto detectado na coleira"})
             if n["tipo"] == "COM" and n.get("niv") is not None and n["niv"] < NIVEL_RACAO_BAIXO:
                 out.append({"nivel": "atencao", "no": no, "texto": f"{nome}: racao em {n['niv']:.0f} %"})
+            if n["tipo"] == "SEC":       # secador solar (docs/SECADOR.md): produto do lote, se a instalacao disser
+                if chuva is False:
+                    with self._trava:
+                        chuva = secador_mod.chuva_prevista(self._db, agora)
+                prod = self.secador_produtos.get(no)
+                out += [{"nivel": nv, "no": no, "texto": f"{nome}: {tx}"} for nv, tx in secador_mod.alertas(n, prod, chuva)]
         return out
 
     def painel(self) -> dict:
@@ -977,7 +986,7 @@ class Hub:
     # e-mail de acesso na fila de saída. O código nunca aparece na loja: só no e-mail.
     MODULOS_PLATAFORMA = ("monitoramento", "agua", "zonas", "animais", "coleiras", "comedouros", "sustainkit", "supervisao",
                           "gestao", "painel", "planejador", "certificacoes", "solar", "avac", "turbinas", "sbn", "circular",
-                          "carbono", "resiliencia", "medicamentos", "pulseira")
+                          "carbono", "resiliencia", "medicamentos", "pulseira", "secador")
     ATIVAR_ERROS = 5
     ATIVAR_ESPERA_S = 15 * 60
 
@@ -1001,7 +1010,7 @@ class Hub:
                     "P5": ("turbinas",), "P9": ("pulseira",), "P10": ("medicamentos",), "P12": ("carbono",),
                     "P13": ("planejador",), "P15": ("resiliencia",), "P14": ("avac",), "P26": ("avac",),
                     "P17": ("sbn",), "P18": ("sbn",), "P19": ("sbn",), "P11": ("circular",), "P16": ("circular",),
-                    "P20": ("circular",), "P22": ("circular",), "P27": ("circular",)}
+                    "P20": ("circular",), "P22": ("circular",), "P27": ("circular",), "P23": ("secador",)}
     # propostas personalizadas descrevem os itens em texto: palavras que identificam cada módulo
     PALAVRAS_MODULOS = (("solar", "solar"), ("fotovolt", "solar"), ("usina", "solar"), ("sensor", "monitoramento"),
                         ("umidade do solo", "monitoramento"), ("estação meteorol", "resiliencia"), ("ph", "agua"),

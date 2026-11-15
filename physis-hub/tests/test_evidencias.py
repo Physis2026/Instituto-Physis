@@ -224,5 +224,39 @@ class ModuloJS(unittest.TestCase):
             self.assertIn(frase, (Path(ev.__file__)).read_text(encoding="utf-8"), frase)
 
 
+class FontesEsgotoMateriais(unittest.TestCase):
+    """Reúso de água, biogás e materiais (carbono incorporado e NBR 15575) como evidência."""
+    def av(self, cid, d):
+        return ev.avaliar_criterio(crit(cid), dict({"hoje": "2026-11-15"}, **d))
+
+    def test_reuso(self):
+        r = self.av("edge_w_chuva", {"esgoto": {"reuso_m3_dia": 0.65, "fonte": "Planejador", "atualizado": "2026-11-15"}})
+        self.assertEqual(r["status"], "parcial")
+        self.assertIn("Reúso de efluente tratado planejado: 0,65 m³/dia (Planejador)", [e["valor"] for e in r["evidencias"]])
+        self.assertIsNone(ev.FONTES["agua_reuso"]({"esgoto": {"reuso_m3_dia": 0}}, {}, {}))
+
+    def test_biogas(self):
+        r = self.av("tr_comp", {"biogas": {"biogas_m3_dia": 0.2, "biodigestor_m3": 1.1, "fonte": "SustainKit"}})
+        self.assertIn("Biodigestor dimensionado: 0,20 m³/dia de biogás, 1,1 m³ (SustainKit)", [e["valor"] for e in r["evidencias"]])
+        self.assertEqual(r["status"], "parcial")
+
+    def test_materiais_carbono_e_envoltoria(self):
+        m = {"composicoes": [{"id": "x", "area_m2": 100, "kgco2e_m2": 50, "nbr15575": "atende"}, {"id": "y", "area_m2": 20, "nbr15575": "nao"}], "zona": "3"}
+        r = self.av("edge_mat", {"materiais": m})
+        self.assertIn("Carbono incorporado das composições: 5,0 tCO₂e (1 de 2 com valor por m²)", [e["valor"] for e in r["evidencias"]])
+        f = ev.FONTES["materiais"]({"materiais": m}, {"modo": "envoltoria"}, {})
+        self.assertEqual((f["status"], f["valor"]), ("parcial", "1 de 2 composições atendem à NBR 15575 (procedimento simplificado, zona 3)"))
+        r2 = self.av("pb_desemp", {"materiais": m})
+        self.assertEqual(r2["status"], "parcial")               # teto: o procedimento simplificado não comprova a norma inteira
+
+    def test_mesmos_textos_js_e_python(self):
+        for frase in ("Reúso de efluente tratado planejado: ", "Biodigestor dimensionado: ", "composições atendem à NBR 15575 (procedimento simplificado",
+                      "composições escolhidas, sem carbono incorporado por m²", "Carbono incorporado das composições: ", "com valor por m²"):
+            self.assertIn(frase, JS, frase)
+            self.assertIn(frase, (Path(ev.__file__)).read_text(encoding="utf-8"), frase)
+        self.assertIn("base-materiais", JS)
+        self.assertIn("ebAtual", JS)
+
+
 if __name__ == "__main__":
     unittest.main()

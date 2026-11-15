@@ -20,7 +20,10 @@
     "perfil": {"nome": "Perfil e lugar (Início)", "tela": "inicio"},
     "riscos": {"nome": "Matriz de riscos (Resiliência climática)", "tela": "resiliencia"},
     "risco_municipal": {"nome": "Risco do bairro (painel municipal)", "tela": "resiliencia"},
-    "custos": {"nome": "Investimentos e retorno", "tela": "custos"}
+    "custos": {"nome": "Investimentos e retorno", "tela": "custos"},
+    "agua_reuso": {"nome": "Reúso de água (Economia circular · Esgoto e biogás)", "tela": "circular"},
+    "biogas": {"nome": "Biogás (Economia circular · Esgoto e biogás)", "tela": "circular"},
+    "materiais": {"nome": "Materiais da obra (SustainKit ou Planejador)", "tela": "sustainkit"}
   },
   "regra_geral": [{"fonte": "documentos", "da_evidencia": true}],
   "por_auto": {
@@ -38,14 +41,14 @@
   "por_criterio": {
     "leed_ipp1": [{"fonte": "riscos"}, {"fonte": "risco_municipal"}, {"fonte": "documentos", "palavras": ["riscos climaticos", "avaliacao de riscos"]}],
     "leed_ipp2": [{"fonte": "acessibilidade"}],
-    "leed_ipp3": [{"fonte": "carbono_inventario", "teto": "parcial"}],
+    "leed_ipp3": [{"fonte": "carbono_inventario", "teto": "parcial"}, {"fonte": "materiais", "teto": "parcial"}],
     "leed_ssc1": [{"fonte": "sbn_plano", "teto": "parcial"}, {"fonte": "documentos", "palavras": ["paisagismo", "especies nativas"]}],
     "leed_ssc3": [{"fonte": "agua_cisterna", "min_dias": 30}, {"fonte": "sbn_plano", "teto": "parcial"}, {"fonte": "documentos", "palavras": ["drenagem", "jardim de chuva", "telhado verde"]}],
     "leed_ssc4": [{"fonte": "riscos", "teto": "parcial"}, {"fonte": "risco_municipal", "teto": "parcial"}],
     "leed_wep1": [{"fonte": "medidor", "grandeza": "agua", "min_dias": 30}, {"fonte": "agua_contas", "min_meses": 12, "teto": "parcial"}, {"fonte": "documentos", "palavras": ["hidrometro"]}],
     "leed_wep2": [{"fonte": "agua_contas", "min_meses": 12, "teto": "parcial"}, {"fonte": "documentos", "palavras": ["loucas e metais", "calculadora de agua"]}],
     "leed_wec1": [{"fonte": "medidor", "grandeza": "agua", "min_dias": 30}, {"fonte": "documentos", "palavras": ["submedicao"]}],
-    "leed_agua": [{"fonte": "agua_cisterna", "min_dias": 30, "teto": "parcial"}, {"fonte": "agua_contas", "min_meses": 12, "teto": "parcial"}, {"fonte": "documentos", "palavras": ["uso de agua", "reuso"]}],
+    "leed_agua": [{"fonte": "agua_cisterna", "min_dias": 30, "teto": "parcial"}, {"fonte": "agua_contas", "min_meses": 12, "teto": "parcial"}, {"fonte": "documentos", "palavras": ["uso de agua", "reuso"]}, {"fonte": "agua_reuso", "teto": "parcial"}],
     "leed_carbono": [{"fonte": "carbono_inventario"}, {"fonte": "documentos", "palavras": ["descarbonizacao"]}],
     "leed_eap4": [{"fonte": "medidor", "grandeza": "energia", "min_dias": 30}, {"fonte": "energia_hist", "min_meses": 12, "teto": "parcial"}],
     "leed_energia": [{"fonte": "energia_hist", "min_meses": 12, "teto": "parcial"}, {"fonte": "enpi", "teto": "parcial"}, {"fonte": "documentos", "palavras": ["simulacao energetica"]}],
@@ -61,7 +64,7 @@
     "edge_e_fv": [{"fonte": "solar"}, {"fonte": "documentos", "palavras": ["projeto fv", "homologacao"]}],
     "edge_e_med": [{"fonte": "medidor", "grandeza": "energia", "min_dias": 30}],
     "edge_w_metais": [{"fonte": "documentos", "palavras": ["ficha tecnica", "vazao"]}],
-    "edge_w_chuva": [{"fonte": "agua_cisterna", "min_dias": 30}, {"fonte": "documentos", "palavras": ["15527", "16783", "agua de chuva"]}],
+    "edge_w_chuva": [{"fonte": "agua_cisterna", "min_dias": 30}, {"fonte": "documentos", "palavras": ["15527", "16783", "agua de chuva"]}, {"fonte": "agua_reuso", "teto": "parcial"}],
     "edge_evid": [{"fonte": "documentos", "palavras": ["evidencia", "ficha tecnica", "dap", "epd", "foto"]}],
     "i14_4": [{"fonte": "riscos"}, {"fonte": "risco_municipal", "teto": "parcial"}, {"fonte": "documentos", "palavras": ["registro de contexto"]}],
     "i14_5_2": [{"fonte": "documentos", "palavras": ["politica ambiental"]}],
@@ -101,7 +104,20 @@
     "ca_qu_verde": [{"fonte": "sbn_plano", "teto": "parcial"}],
     "ca_energia": [{"fonte": "solar"}, {"fonte": "documentos", "palavras": ["procel", "ence"]}],
     "ca_agua": [{"fonte": "medidor", "grandeza": "agua", "min_dias": 30}, {"fonte": "agua_contas", "min_meses": 12, "teto": "parcial"}, {"fonte": "documentos", "palavras": ["projeto hidraulico"]}],
-    "ca_ga_chuva": [{"fonte": "agua_cisterna", "min_dias": 30}, {"fonte": "documentos", "palavras": ["15527", "agua de chuva"]}],
-    "ca_mat": [{"fonte": "residuos_desvio", "meta": 0.5}, {"fonte": "documentos", "palavras": ["pgrcc", "mtr", "ctr"]}]
+    "ca_ga_chuva": [{"fonte": "agua_cisterna", "min_dias": 30}, {"fonte": "documentos", "palavras": ["15527", "agua de chuva"]}, {"fonte": "agua_reuso", "teto": "parcial"}],
+    "ca_mat": [{"fonte": "residuos_desvio", "meta": 0.5}, {"fonte": "documentos", "palavras": ["pgrcc", "mtr", "ctr"]}],
+    "tr_comp": [{"fonte": "biogas", "teto": "parcial"}],
+    "nz_resid": [{"fonte": "residuos_desvio", "meta": 0.5}, {"fonte": "biogas", "teto": "parcial"}],
+    "ob_gas": [{"fonte": "biogas", "teto": "parcial"}],
+    "edge_mat": [{"fonte": "materiais", "teto": "parcial"}],
+    "leed_mat": [{"fonte": "materiais", "teto": "parcial"}],
+    "leed_mrp2": [{"fonte": "materiais", "teto": "parcial"}],
+    "edge_m_estr": [{"fonte": "materiais", "teto": "parcial"}],
+    "nz_cadeia": [{"fonte": "materiais", "teto": "parcial"}],
+    "pb_desemp": [{"fonte": "materiais", "modo": "envoltoria", "teto": "parcial"}],
+    "pbe_env": [{"fonte": "materiais", "modo": "envoltoria", "teto": "parcial"}],
+    "ca_projeto": [{"fonte": "materiais", "modo": "envoltoria", "teto": "parcial"}],
+    "edge_e_env": [{"fonte": "materiais", "modo": "envoltoria", "teto": "parcial"}],
+    "leed_eac2": [{"fonte": "materiais", "modo": "envoltoria", "teto": "parcial"}]
   }
 }

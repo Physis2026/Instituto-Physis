@@ -99,6 +99,9 @@ def preparar(origem: Path = ORIGEM_PADRAO, destino: Path = AQUI / "www", hub: st
                 shutil.copytree(p, destino / "vendor")
             elif p.is_dir() and p.name == "app":
                 shutil.copytree(p, destino / "app", ignore=lambda _d, nomes: [n for n in nomes if n in FORA_APP])
+    # no repositório, as bibliotecas de terceiros (mapa, BIM, PDF) ficam em vendor/ na raiz, como o montar.py usa
+    if not (destino / "vendor").exists() and Path(origem).resolve() == ORIGEM_PADRAO.resolve() and (RAIZ / "vendor").is_dir():
+        shutil.copytree(RAIZ / "vendor", destino / "vendor", ignore=lambda _d, nomes: [n for n in nomes if n.endswith(".md")])
     for p in sorted(Path(extra).iterdir()):
         if p.is_file():
             shutil.copy2(p, destino / p.name)

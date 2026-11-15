@@ -8,7 +8,9 @@
      telaEvidencias(certId) -> HTML da parte "Evidências automáticas" (sem h1; vai dentro de Certificações).
      window.EVIDENCIAS = { FONTES, num, norm, palavrasDaEvidencia, avaliarCriterio, coletar, carregarServidor, ... }
    Espelho em Python: physis-hub/physis_hub/evidencias.py (regra 4: mudou aqui, muda lá; test_evidencias.py).
-   Globais da plataforma usadas se existirem: perfilLer, calcLer, carbLer, rcLer, rcResumo, sbnLer, phLer, gLer,
+   Esgoto e biogás: ebAtual() da plataforma (ou as chaves physis-calc-esgoto e physis-calc-biogas); materiais: physis-calc-materiais
+   com a avaliação da NBR 15575 lida da base embutida base-materiais (sistema/physis-materiais.json).
+   Globais da plataforma usadas se existirem: perfilLer, calcLer, carbLer, rcLer, rcResumo, sbnLer, phLer, gLer, ebAtual,
    CERTS, esc, irPara, desenhar, ui. Sem internet: só /api/evidencias/* do próprio hub, quando houver servidor. */
 (function (global) {
 "use strict";
@@ -104,7 +106,21 @@ const FONTES = {
   custos(d){ const inv = ((d.gestao || {}).compras || []).filter(c => c && c.cat === "Investimento");
     if (inv.length) return R("parcial", `${inv.length} investimento(s) com retorno em Gestão → Compras e investimentos`);
     if (num(((d.calc || {}).solar || {}).custo_kwp)) return R("parcial", "Custo e retorno do sistema solar calculados");
-    return null; }
+    return null; },
+  /* Economia circular · Esgoto e biogás (Planejador, SustainKit ou estimativa da plataforma): projeto, ainda sem medição */
+  agua_reuso(d){ const e = d.esgoto || {}, r = num(e.reuso_m3_dia); if (!(r > 0)) return null; const f = String(e.fonte || "");
+    return R("parcial", "Reúso de efluente tratado planejado: " + virg(fix(r, 2)) + " m³/dia" + (f ? " (" + f + ")" : ""), e.atualizado); },
+  biogas(d){ const b = d.biogas || {}, g = num(b.biogas_m3_dia); if (!(g > 0)) return null; const v = num(b.biodigestor_m3), f = String(b.fonte || "");
+    return R("parcial", "Biodigestor dimensionado: " + virg(fix(g, 2)) + " m³/dia de biogás" + (v ? ", " + virg(fix(v, 1)) + " m³" : "") + (f ? " (" + f + ")" : ""), b.atualizado); },
+  /* materiais da obra (chave physis-calc-materiais): carbono incorporado ou, com modo "envoltoria", NBR 15575 (procedimento simplificado) */
+  materiais(d, p){ const m = d.materiais || {}, comps = (m.composicoes || []).filter(c => c && typeof c === "object"); if (!comps.length) return null;
+    if (p.modo === "envoltoria"){ const av = comps.filter(c => ["atende", "parcial", "nao"].indexOf(c.nbr15575) >= 0); if (!av.length) return null;
+      const ok = av.filter(c => c.nbr15575 === "atende").length;
+      return R(ok === av.length ? "atendido" : "parcial", `${ok} de ${av.length} composições atendem à NBR 15575 (procedimento simplificado` + (m.zona ? ", zona " + m.zona : "") + ")", m.atualizado); }
+    const com = comps.filter(c => num(c.kgco2e_m2) != null && (num(c.area_m2) || 0) > 0);
+    if (!com.length) return R("parcial", `${comps.length} composições escolhidas, sem carbono incorporado por m²`, m.atualizado);
+    const t = com.reduce((s, c) => s + num(c.area_m2) * num(c.kgco2e_m2), 0) / 1000;
+    return R("parcial", "Carbono incorporado das composições: " + virg(fix(t, 1)) + ` tCO₂e (${com.length} de ${comps.length} com valor por m²)`, m.atualizado); }
 };
 
 /* ── mapa e base de critérios ── */
@@ -162,11 +178,21 @@ const PLAT = {
   carbLer: () => typeof carbLer === "function" ? carbLer : null, rcLer: () => typeof rcLer === "function" ? rcLer : null,
   rcResumo: () => typeof rcResumo === "function" ? rcResumo : null, sbnLer: () => typeof sbnLer === "function" ? sbnLer : null,
   phLer: () => typeof phLer === "function" ? phLer : null, gLer: () => typeof gLer === "function" ? gLer : null,
-  irPara: () => typeof irPara === "function" ? irPara : null, desenhar: () => typeof desenhar === "function" ? desenhar : null };
+  irPara: () => typeof irPara === "function" ? irPara : null, desenhar: () => typeof desenhar === "function" ? desenhar : null,
+  ebAtual: () => typeof ebAtual === "function" ? ebAtual : null };
 /* eslint-enable no-undef */
 const fn = nome => { try { return (PLAT[nome] && PLAT[nome]()) || (typeof global[nome] === "function" ? global[nome] : null); } catch (e){ return null; } };
 function hojeLocal(){ const d = new Date(), z = n => String(n).padStart(2, "0"); return d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate()); }
+/* composições escolhidas + avaliação da NBR 15575 (procedimento simplificado) da base de materiais embutida (base-materiais),
+   pela zona bioclimática do registro: "atende" (todas as absortâncias), "parcial" (só algumas) ou "nao" */
+function materiaisAvaliados(m){ m = m && typeof m === "object" ? m : {}; const comps = Array.isArray(m.composicoes) ? m.composicoes : []; let base = {};
+  try { const n = global.document && global.document.getElementById("base-materiais"); if (n) (JSON.parse(n.textContent).composicoes || []).forEach(c => { base[c.id] = c; }); } catch (e){}
+  const zona = String(m.zona == null ? "" : m.zona).replace(/\D/g, "");
+  return Object.assign({}, m, { composicoes: comps.filter(c => c && typeof c === "object").map(c => { const b = base[c.id], av = b && b.avaliacao && b.avaliacao.nbr15575_simplificado ? b.avaliacao.nbr15575_simplificado[zona] : null;
+    const vs = av ? Object.keys(av).map(k => av[k]).filter(x => typeof x === "boolean") : [];
+    return Object.assign({}, c, { nbr15575: c.nbr15575 || (vs.length ? (vs.every(Boolean) ? "atende" : vs.some(Boolean) ? "parcial" : "nao") : null) }); }) }); }
 function coletar(){
+  const ebAtual = fn("ebAtual"); let eb = null; try { eb = ebAtual ? ebAtual() : null; } catch (e){}
   const perfilLer = fn("perfilLer"), calcLer = fn("calcLer"), carbLer = fn("carbLer"), rcLer = fn("rcLer"), rcResumo = fn("rcResumo"), sbnLer = fn("sbnLer"), phLer = fn("phLer"), gLer = fn("gLer");
   const calc = k => calcLer ? calcLer(k) : lerJSON("physis-calc-" + k, {});
   const lista = rcLer ? rcLer() : lerJSON("physis-residuos-plano", []), res = Array.isArray(lista) ? lista : [];
@@ -175,6 +201,7 @@ function coletar(){
   return { hoje: hojeLocal(),
     perfil: perfilLer ? perfilLer() : lerJSON("physis-perfil", {}),
     calc: { solar: calc("solar"), riscos: calc("riscos"), agua: calc("agua") },
+    esgoto: eb ? (eb.esgoto || {}) : calc("esgoto"), biogas: eb ? (eb.biogas || {}) : calc("biogas"), materiais: materiaisAvaliados(calc("materiais")),
     carbono: carbLer ? carbLer() : lerJSON("physis-carbono", {}),
     residuos: { n: res.length, com_rota: res.filter(r => r && r.rota).length, pct: p },
     sbn: sbnLer ? sbnLer() : lerJSON("physis-sbn", {}),

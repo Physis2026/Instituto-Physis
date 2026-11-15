@@ -234,53 +234,157 @@ def fabricante(instancia: dict):
     return fabricar
 
 
-PAGINA_ATIVAR = """<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ativar a plataforma · Physis</title><style>
-body{margin:0;background:#F4F6F1;color:#1C2B21;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-main{max-width:560px;margin:0 auto;padding:32px 16px}h1{font:500 1.9em Fraunces,Georgia,serif;color:#33512F;margin:0 0 8px}
-.cartao{background:#fff;border:1px solid #C9D2C4;border-radius:12px;padding:18px;margin-top:16px}
-label{display:block;font-weight:600;margin-bottom:4px}input{font:inherit;font-size:1.15em;letter-spacing:.08em;width:100%;box-sizing:border-box;min-height:48px;padding:6px 12px;border:1px solid #8A9284;border-radius:8px;text-transform:uppercase}
-button{font:inherit;font-weight:600;min-height:48px;padding:0 20px;margin-top:12px;border-radius:8px;border:1px solid #33512F;background:#33512F;color:#fff;cursor:pointer}
-:focus-visible{outline:3px solid #33512F;outline-offset:2px}#msg{min-height:1.5em;font-weight:600;margin-top:12px}.t2{color:#4A4F44}
-</style></head><body><main><h1>Ativar a sua plataforma</h1>
-<p class="t2">Instalação <strong>__NUMERO__</strong>. Digite o código de ativação que chegou no seu e-mail.</p>
-<div class="cartao"><label for="codigo">Código de ativação</label><input id="codigo" autocomplete="one-time-code" placeholder="XXXX-XXXX-XXXX" aria-describedby="msg">
-<button type="button" id="ok">Ativar e baixar a plataforma</button><p id="msg" role="status" aria-live="polite"></p></div>
-<p class="t2">Depois de baixar: descompacte, rode <code>python3 -m physis_hub.servidor</code> e abra o endereço indicado no arquivo LEIA-ME. No primeiro acesso, crie o seu usuário e senha.</p>
-</main><script>
+# ── Páginas que o próprio servidor monta (ativar, entrada da Gestão, fluxos de conta) ──
+# Mesmo modelo da plataforma (painel.html): faixa com a árvore e o título serifado verde (o único h1 da tela),
+# cartão, campos e botões do painel, rodapé com a navegação do site. Tudo dentro da página: a política de
+# segurança (politica()) já aceita estilo e script embutidos e imagem data:, e nada vem de fora.
+# Idioma e tema seguem a escolha guardada no navegador ("physis-pref" e "physis-pref-tema", as mesmas chaves
+# das outras telas). Cada página traz o seu dicionário português → inglês em window.PX_EN.
+_PX_LOGO = "data:image/png;base64,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"
+
+_PX_CEDO = r"""<script>(function(){var r=document.documentElement,p=null,t=null,i=null;try{p=JSON.parse(localStorage.getItem("physis-pref")||"null");}catch(e){}
+try{t=(p&&p.tema)||localStorage.getItem("physis-pref-tema");i=(p&&p.idioma)||localStorage.getItem("physis-idioma");}catch(e){}
+if(t!=="claro"&&t!=="escuro")t="auto";r.setAttribute("data-tema-escolha",t);var e=t;if(t==="auto"){try{e=matchMedia("(prefers-color-scheme: dark)").matches?"escuro":"claro";}catch(x){e="claro";}}
+r.setAttribute("data-tema",(p&&p.verde)?"escuro":e);if(i==="en")r.setAttribute("lang","en");})();</script>"""
+
+_PX_CSS = r"""<style>
+:root{color-scheme:light;--fundo:#F4F6F1;--sup:#FFFFFF;--tinta:#1C2B21;--tinta2:#4A4F44;--acao:#33512F;--sobre:#FFFFFF;--linha:#C9D2C4;--campo:#FFFFFF;--borda-campo:#8A9284;--ok:#1F4A1C;--al:#7A2214;
+--fonte:Lexend,"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--titulo:Fraunces,Georgia,"Times New Roman",serif}
+html[data-tema="escuro"]{color-scheme:dark;--fundo:#14180F;--sup:#1C2B21;--tinta:#EEF2EA;--tinta2:#D9D3C2;--acao:#B9CDB3;--sobre:#14180F;--linha:#4A5A47;--campo:#14180F;--borda-campo:#8A9182;--ok:#DCEBD8;--al:#FF8A80}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--fundo);color:var(--tinta);font:1rem/1.55 var(--fonte)}
+a{color:var(--acao)}:focus-visible{outline:3px solid var(--acao);outline-offset:2px}
+.pular{position:absolute;left:-9999px;top:8px;background:var(--acao);color:var(--sobre);padding:10px 14px;border-radius:8px;z-index:10}.pular:focus{left:8px}
+.px-faixa{background:var(--fundo);border-bottom:1px solid var(--linha)}
+.px-in{max-width:1240px;margin:0 auto;padding:10px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.px-id{display:flex;align-items:center;gap:14px;min-width:0}
+.px-id img{height:42px;width:42px;object-fit:cover;object-position:0 50%;display:block;flex:none;border-radius:6px}
+html[data-tema="escuro"] .px-id img{filter:brightness(0) invert(1)}
+.px-tit{font:500 24px/1.15 var(--titulo);letter-spacing:-.012em;color:var(--acao);margin:0;overflow-wrap:anywhere}
+.px-nav{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.px-nav div{display:flex;align-items:center;gap:6px}
+.px-nav label{font-size:.85em;font-weight:600;color:var(--tinta2)}
+.px-nav select{font:inherit;font-size:.88em;font-weight:600;min-height:44px;padding:0 8px;border:1px solid var(--linha);border-radius:8px;background:var(--sup);color:var(--tinta)}
+main{flex:1 0 auto;width:100%;max-width:520px;margin:0 auto;padding:24px 16px 40px}
+main:focus{outline:none}
+.t2{color:var(--tinta2);margin:0}
+.cartao{background:var(--sup);border:1px solid var(--linha);border-radius:14px;padding:18px;margin-top:14px;display:grid;gap:12px}
+label{font-weight:600}
+input{font:inherit;width:100%;min-height:46px;padding:6px 12px;border:1px solid var(--borda-campo);border-radius:8px;background:var(--campo);color:var(--tinta)}
+input[type=checkbox]{width:20px;height:20px;min-height:0;padding:0;margin:3px 0 0;accent-color:var(--acao);flex:none}
+.linha{display:flex;gap:10px;align-items:flex-start;font-weight:400}
+.principal{font:inherit;font-weight:600;min-height:46px;padding:0 20px;border-radius:8px;border:1px solid var(--acao);background:var(--acao);color:var(--sobre);cursor:pointer}
+.principal[disabled]{opacity:.6;cursor:wait}
+#msg{min-height:1.5em;font-weight:600;margin:0}#msg.erro{color:var(--al)}#msg.ok{color:var(--ok)}
+.depois{margin-top:14px}.depois a{display:inline-flex;align-items:center;min-height:44px;font-weight:600}
+code{font-size:.92em;background:var(--fundo);border:1px solid var(--linha);border-radius:4px;padding:0 4px;overflow-wrap:anywhere}
+footer{border-top:1px solid var(--linha);background:var(--sup);color:var(--tinta2);font-size:.92rem}
+footer .px-in{display:block;padding:12px 20px 24px}
+footer ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:0 20px}
+footer a{display:inline-flex;align-items:center;min-height:44px;font-weight:600}
+footer p{margin:4px 0}
+@media (max-width:480px){.px-in{padding:10px 16px}.px-tit{font-size:21px}footer .px-in{padding:10px 16px 22px}}
+"""
+
+_PX_FAIXA = r"""<a class="pular" href="#conteudo" data-pt="">Ir para o conteúdo</a>
+<header class="px-faixa"><div class="px-in">
+<div class="px-id"><img alt="Physis Engineering" width="42" height="42" src="__LOGO__"><h1 class="px-tit" id="tit">__TITULO__</h1></div>
+<div class="px-nav" role="group" aria-label="Preferências de leitura" data-pt-aria="Preferências de leitura">
+<div><label for="px-idioma" data-pt="">Idioma</label><select id="px-idioma"><option value="pt" lang="pt-BR">Português</option><option value="en" lang="en">English</option></select></div>
+<div><label for="px-tema" data-pt="">Tema</label><select id="px-tema"><option value="claro" data-pt="">Claro</option><option value="escuro" data-pt="">Escuro</option><option value="auto" data-pt="">Automático</option></select></div>
+</div></div></header>
+"""
+
+_PX_RODAPE = r"""<footer><div class="px-in">
+<nav aria-label="Site da Physis" data-pt-aria="Site da Physis"><ul>
+<li><a href="/loja/" data-pt="">Loja</a></li><li><a href="/consultoria/" data-pt="">Consultoria</a></li><li><a href="/demo/" data-pt="">Demonstração</a></li></ul></nav>
+<p><span data-pt="">Termos de uso, política de privacidade e declaração de acessibilidade:</span> <a href="/loja/" data-pt="">na loja, no rodapé</a></p>
+<p>Physis Engineering · Petrópolis/RJ</p>
+</div></footer>
+"""
+
+_PX_JS = r"""<script>
+var PX=(function(){var r=document.documentElement,est={titulo:null,suf:" · Physis"},tem=Object.prototype.hasOwnProperty;
+var COMUM={"Ir para o conteúdo":"Skip to content","Preferências de leitura":"Reading preferences","Idioma":"Language","Tema":"Theme","Claro":"Light","Escuro":"Dark","Automático":"Automatic",
+"Site da Physis":"Physis website","Loja":"Store","Consultoria":"Consulting","Demonstração":"Demo",
+"Termos de uso, política de privacidade e declaração de acessibilidade:":"Terms of use, privacy policy and accessibility statement:","na loja, no rodapé":"in the store, at the bottom of the page",
+"Conferindo…":"Checking…","Sem resposta do servidor.":"No response from the server.","Sem resposta do servidor. Tente de novo.":"No response from the server. Try again.",
+"Seu nome":"Your name","E-mail":"E-mail","Esqueci a senha":"I forgot my password",
+"Li e aceito os Termos de uso e a Política de privacidade da Physis (versão {0}).":"I have read and accept the Physis Terms of use and Privacy policy (version {0}).",
+"Para criar a conta, marque que leu e aceita os termos.":"To create the account, tick that you have read and accept the terms."};
+function en(){return r.getAttribute("lang")==="en";}
+function L(s,v){var d=window.PX_EN||{},t=s;if(en()){if(tem.call(d,s))t=d[s];else if(tem.call(COMUM,s))t=COMUM[s];}
+if(v)t=t.replace(/\{(\d)\}/g,function(_,n){return v[n]==null?"":L(String(v[n]));});return t;}
+function por(el,s,v){if(!el)return;el.setAttribute("data-pt",s||"");if(v)el.setAttribute("data-v",JSON.stringify(v));else el.removeAttribute("data-v");el.textContent=L(s||"",v);}
+function traduzir(){var a=document.querySelectorAll("[data-pt]"),i,v;for(i=0;i<a.length;i++){v=null;try{v=JSON.parse(a[i].getAttribute("data-v")||"null");}catch(e){}a[i].textContent=L(a[i].getAttribute("data-pt"),v);}
+a=document.querySelectorAll("[data-pt-aria]");for(i=0;i<a.length;i++)a[i].setAttribute("aria-label",L(a[i].getAttribute("data-pt-aria")));
+if(est.titulo)document.title=L(est.titulo)+est.suf;}
+function lerPref(){var p=null;try{p=JSON.parse(localStorage.getItem("physis-pref")||"null");}catch(e){}return p&&typeof p==="object"?p:{};}
+function gravarPref(k,v){var p=lerPref();if(!p.v)p.v=2;p[k]=v;try{localStorage.setItem("physis-pref",JSON.stringify(p));if(k==="tema")localStorage.setItem("physis-pref-tema",v);if(k==="idioma")localStorage.setItem("physis-idioma",v);}catch(e){}}
+function escuroSis(){try{return matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){return false;}}
+function tema(t){if(t!=="claro"&&t!=="escuro")t="auto";r.setAttribute("data-tema-escolha",t);r.setAttribute("data-tema",t==="auto"?(escuroSis()?"escuro":"claro"):t);if(st)st.value=t;}
+function idioma(i){r.setAttribute("lang",i==="en"?"en":"pt-BR");if(si)si.value=i==="en"?"en":"pt";traduzir();}
+var a=document.querySelectorAll("[data-pt]");for(var i=0;i<a.length;i++)if(!a[i].getAttribute("data-pt"))a[i].setAttribute("data-pt",a[i].textContent.replace(/\s+/g," ").trim());
+var si=document.getElementById("px-idioma"),st=document.getElementById("px-tema");
+if(si){si.value=en()?"en":"pt";si.addEventListener("change",function(){gravarPref("idioma",si.value);idioma(si.value);});}
+if(st){st.value=r.getAttribute("data-tema-escolha")||"auto";st.addEventListener("change",function(){gravarPref("tema",st.value);tema(st.value);});}
+try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if((r.getAttribute("data-tema-escolha")||"auto")==="auto")tema("auto");});}catch(e){}
+window.addEventListener("storage",function(e){if(e.key!=="physis-pref"&&e.key!=="physis-pref-tema")return;var p=lerPref();var t=p.tema;try{t=t||localStorage.getItem("physis-pref-tema");}catch(x){}tema(t);idioma(p.idioma==="en"?"en":"pt");});
+traduzir();
+return {L:L,por:por,titulo:function(s,suf){est.titulo=s;if(suf)est.suf=suf;document.title=L(s)+est.suf;}};})();
+</script>"""
+
+
+PAGINA_ATIVAR = (r"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ativar a plataforma · Physis</title>""" + _PX_CEDO + _PX_CSS + r"""#codigo{font-size:1.15em;letter-spacing:.08em;min-height:48px;text-transform:uppercase}
+</style></head><body>""" + _PX_FAIXA.replace("__TITULO__", '<span data-pt="">Ativar a sua plataforma</span>') + r"""<main id="conteudo" tabindex="-1">
+<p class="t2"><span data-pt="">Instalação</span> <strong>__NUMERO__</strong>. <span data-pt="">Digite o código de ativação que chegou no seu e-mail.</span></p>
+<div class="cartao"><label for="codigo" data-pt="">Código de ativação</label><input id="codigo" autocomplete="one-time-code" placeholder="XXXX-XXXX-XXXX" aria-describedby="msg">
+<button type="button" id="ok" class="principal" data-pt="">Ativar e baixar a plataforma</button><p id="msg" role="status" aria-live="polite"></p></div>
+<p class="t2 depois"><span data-pt="">Depois de baixar: descompacte, rode</span> <code>python3 -m physis_hub.servidor</code> <span data-pt="">e abra o endereço indicado no arquivo LEIA-ME. No primeiro acesso, crie o seu usuário e senha.</span></p>
+</main>""" + _PX_RODAPE + r"""<script>window.PX_EN={"Ativar a sua plataforma":"Activate your platform","Ativar a plataforma":"Activate the platform","Instalação":"Installation",
+"Digite o código de ativação que chegou no seu e-mail.":"Type the activation code that arrived in your e-mail.","Código de ativação":"Activation code",
+"Ativar e baixar a plataforma":"Activate and download the platform","Depois de baixar: descompacte, rode":"After downloading: unzip it, run",
+"e abra o endereço indicado no arquivo LEIA-ME. No primeiro acesso, crie o seu usuário e senha.":"and open the address given in the LEIA-ME (read me) file. On first access, create your user and password.",
+"Digite o código.":"Type the code.","Código conferido. O download da sua plataforma começou.":"Code confirmed. Your platform download has started.",
+"Código conferido. A equipe Physis envia a plataforma montada para você em breve.":"Code confirmed. The Physis team will send you the assembled platform soon.",
+"Muitas tentativas. Espere alguns minutos e tente de novo.":"Too many attempts. Wait a few minutes and try again.",
+"Instalação ou código não conferem. Confira o e-mail.":"Installation or code do not match. Check the e-mail."};</script>""" + _PX_JS + r"""<script>
+PX.titulo("Ativar a plataforma");
 var n="__NUMERO__",b=document.getElementById("ok"),m=document.getElementById("msg"),c=document.getElementById("codigo");
-function dizer(t,e){m.textContent=t;m.style.color=e?"#7A2214":"#1F4A1C";}
+function dizer(t,e){PX.por(m,t);m.className=e?"erro":"ok";}
 c.addEventListener("keydown",function(e){if(e.key==="Enter")b.click();});
 b.onclick=function(){var v=c.value.trim();if(!v){dizer("Digite o código.",true);c.focus();return;}b.disabled=true;dizer("Conferindo…",false);
 fetch("/api/ativar/"+encodeURIComponent(n),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({codigo:v})}).then(function(r){
 var t=r.headers.get("Content-Type")||"";if(r.ok&&t.indexOf("zip")>=0)return r.blob().then(function(z){var u=URL.createObjectURL(z),a=document.createElement("a");a.href=u;a.download="physis-"+n+".zip";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);dizer("Código conferido. O download da sua plataforma começou.",false);});
 return r.json().then(function(j){dizer(j.ok?"Código conferido. A equipe Physis envia a plataforma montada para você em breve.":(j.erro==="muitas tentativas; espere alguns minutos"?"Muitas tentativas. Espere alguns minutos e tente de novo.":"Instalação ou código não conferem. Confira o e-mail."),!j.ok);});
 }).catch(function(){dizer("Sem resposta do servidor. Tente de novo.",true);}).then(function(){b.disabled=false;});};
-</script></body></html>"""
+</script></body></html>""").replace("__LOGO__", _PX_LOGO)
 
 
-PAGINA_ENTRAR = """<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Entrar · Gestão Physis</title><style>
-body{margin:0;background:#F4F6F1;color:#1C2B21;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-main{max-width:460px;margin:0 auto;padding:40px 16px}h1{font:500 1.9em Fraunces,Georgia,serif;color:#33512F;margin:0 0 6px}
-.cartao{background:#fff;border:1px solid #C9D2C4;border-radius:12px;padding:18px;margin-top:14px;display:grid;gap:10px}
-label{font-weight:600}input{font:inherit;width:100%;box-sizing:border-box;min-height:46px;padding:6px 12px;border:1px solid #8A9284;border-radius:8px}
-button{font:inherit;font-weight:600;min-height:46px;padding:0 20px;border-radius:8px;border:1px solid #33512F;background:#33512F;color:#fff;cursor:pointer}
-:focus-visible{outline:3px solid #33512F;outline-offset:2px}#msg{min-height:1.5em;font-weight:600;margin:0}.t2{color:#4A4F44;margin:0}
-</style></head><body><main><h1>Gestão Physis</h1><p class="t2" id="sub">Entre com o seu e-mail da Physis e a sua senha.</p>
-<div class="cartao"><div id="caixa-nome" hidden><label for="nome">Seu nome</label><input id="nome" autocomplete="name"></div>
-<div><label for="usuario">E-mail</label><input id="usuario" type="email" autocomplete="username" inputmode="email"></div>
-<div><label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password"></div>
-<div id="caixa-codigo" hidden><label for="codigo">Código do aplicativo autenticador</label><input id="codigo" autocomplete="one-time-code" inputmode="numeric" aria-describedby="dica-codigo">
-<p class="t2" id="dica-codigo">6 números do aplicativo, ou um dos códigos de recuperação.</p></div>
-<div id="caixa-termos" hidden><label style="font-weight:400;display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="termos" style="width:auto;min-height:0;margin-top:5px"> <span id="termos-txt"></span></label></div>
-<button type="button" id="ok">Entrar</button><p id="msg" role="status" aria-live="polite"></p></div>
-<p class="t2" style="margin-top:12px"><a href="/conta/esqueci">Esqueci a senha</a></p></main><script>
+PAGINA_ENTRAR = (r"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Entrar · Gestão Physis</title>""" + _PX_CEDO + _PX_CSS + r"""</style></head><body>""" + _PX_FAIXA.replace("__TITULO__", "Gestão Physis") + r"""<main id="conteudo" tabindex="-1">
+<p class="t2" id="sub" data-pt="">Entre com o seu e-mail da Physis e a sua senha.</p>
+<div class="cartao"><div id="caixa-nome" hidden><label for="nome" data-pt="">Seu nome</label><input id="nome" autocomplete="name"></div>
+<div><label for="usuario" data-pt="">E-mail</label><input id="usuario" type="email" autocomplete="username" inputmode="email"></div>
+<div><label for="senha" data-pt="">Senha</label><input id="senha" type="password" autocomplete="current-password"></div>
+<div id="caixa-codigo" hidden><label for="codigo" data-pt="">Código do aplicativo autenticador</label><input id="codigo" autocomplete="one-time-code" inputmode="numeric" aria-describedby="dica-codigo">
+<p class="t2" id="dica-codigo" data-pt="">6 números do aplicativo, ou um dos códigos de recuperação.</p></div>
+<div id="caixa-termos" hidden><label class="linha"><input type="checkbox" id="termos"> <span id="termos-txt"></span></label></div>
+<button type="button" id="ok" class="principal" data-pt="">Entrar</button><p id="msg" role="status" aria-live="polite"></p></div>
+<p class="t2 depois"><a href="/conta/esqueci" data-pt="">Esqueci a senha</a></p></main>""" + _PX_RODAPE + r"""<script>window.PX_EN={"Entrar":"Sign in",
+"Entre com o seu e-mail da Physis e a sua senha.":"Sign in with your Physis e-mail and your password.","Senha":"Password",
+"Código do aplicativo autenticador":"Authenticator app code","6 números do aplicativo, ou um dos códigos de recuperação.":"The 6 digits from the app, or one of your recovery codes.",
+"Primeira entrada neste servidor: quem criar esta conta passa a ser da direção (administradora). Use uma senha de pelo menos 12 caracteres.":"First sign-in on this server: whoever creates this account becomes management (administrator). Use a password of at least 12 characters.",
+"Criar conta e entrar":"Create account and sign in","Informe o e-mail e a senha.":"Enter your e-mail and password.","Digite o código do aplicativo.":"Type the app code.",
+"Entrando…":"Signing in…","Esta conta usa verificação em duas etapas. Digite o código do aplicativo.":"This account uses two-step verification. Type the app code.",
+"E-mail ou senha não conferem.":"E-mail or password do not match."};</script>""" + _PX_JS + r"""<script>
+PX.titulo("Entrar"," · Gestão Physis");
 var criar=false,versao=null,b=document.getElementById("ok"),m=document.getElementById("msg");
-function dizer(t,e){m.textContent=t;m.style.color=e?"#7A2214":"#1F4A1C";}
+function dizer(t,e){PX.por(m,t);m.className=e?"erro":"ok";}
 fetch("/api/instancia",{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){versao=(j&&j.termos_versao)||null;if(j&&j.tem_conta===false){criar=true;document.getElementById("caixa-nome").hidden=false;
-document.getElementById("sub").textContent="Primeira entrada neste servidor: quem criar esta conta passa a ser da direção (administradora). Use uma senha de pelo menos 12 caracteres.";document.getElementById("senha").autocomplete="new-password";b.textContent="Criar conta e entrar";
-if(versao){document.getElementById("termos-txt").textContent="Li e aceito os Termos de uso e a Política de privacidade da Physis (versão "+versao+").";document.getElementById("caixa-termos").hidden=false;}}});
+PX.por(document.getElementById("sub"),"Primeira entrada neste servidor: quem criar esta conta passa a ser da direção (administradora). Use uma senha de pelo menos 12 caracteres.");document.getElementById("senha").autocomplete="new-password";PX.por(b,"Criar conta e entrar");
+if(versao){PX.por(document.getElementById("termos-txt"),"Li e aceito os Termos de uso e a Política de privacidade da Physis (versão {0}).",[versao]);document.getElementById("caixa-termos").hidden=false;}}});
 ["usuario","senha","nome","codigo"].forEach(function(i){document.getElementById(i).addEventListener("keydown",function(e){if(e.key==="Enter")b.click();});});
 b.onclick=function(){var u=document.getElementById("usuario").value.trim(),s=document.getElementById("senha").value,n=document.getElementById("nome").value.trim(),cx=document.getElementById("caixa-codigo");
 if(!u||!s){dizer("Informe o e-mail e a senha.",true);return;}var corpo={nome:n||u,usuario:u,senha:s};
@@ -292,47 +396,53 @@ fetch(criar?"/api/conta/criar":"/api/conta/entrar",{method:"POST",headers:{"Cont
 else if(j.precisa_2fa&&cx.hidden){cx.hidden=false;document.getElementById("codigo").focus();dizer("Esta conta usa verificação em duas etapas. Digite o código do aplicativo.",false);b.disabled=false;}
 else{dizer(j.erro||"E-mail ou senha não conferem.",true);b.disabled=false;}})
 .catch(function(){dizer("Sem resposta do servidor.",true);b.disabled=false;});};
-</script></body></html>"""
+</script></body></html>""").replace("__LOGO__", _PX_LOGO)
 
 
 # Páginas dos fluxos de conta, servidas pelo próprio servidor (as telas só precisam pôr os links):
 #   /conta/esqueci  /conta/nova-senha#t=…  /conta/confirmar#t=…  /conta/convite#t=…
 # O código vem depois de "#": o navegador não o envia ao servidor nem a proxies; a página o tira da barra de endereço.
-PAGINA_CONTA = """<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Conta · Physis</title><style>
-body{margin:0;background:#F4F6F1;color:#1C2B21;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-main{max-width:480px;margin:0 auto;padding:40px 16px}h1{font:500 1.9em Fraunces,Georgia,serif;color:#33512F;margin:0 0 6px}
-.cartao{background:#fff;border:1px solid #C9D2C4;border-radius:12px;padding:18px;margin-top:14px;display:grid;gap:10px}
-label{font-weight:600}input{font:inherit;width:100%;box-sizing:border-box;min-height:46px;padding:6px 12px;border:1px solid #8A9284;border-radius:8px}
-input[type=checkbox]{width:auto;min-height:0;margin-top:5px}.linha{display:flex;gap:8px;align-items:flex-start;font-weight:400}
-button{font:inherit;font-weight:600;min-height:46px;padding:0 20px;border-radius:8px;border:1px solid #33512F;background:#33512F;color:#fff;cursor:pointer}
-:focus-visible{outline:3px solid #33512F;outline-offset:2px}#msg{min-height:1.5em;font-weight:600;margin:0}.t2{color:#4A4F44;margin:0}a{color:#33512F}
-</style></head><body><main><h1 id="tit">Conta Physis</h1><p class="t2" id="sub"></p>
+PAGINA_CONTA = (r"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conta · Physis</title>""" + _PX_CEDO + _PX_CSS + r"""</style></head><body>""" + _PX_FAIXA.replace("__TITULO__", "Conta Physis") + r"""<main id="conteudo" tabindex="-1">
+<p class="t2" id="sub"></p>
 <form class="cartao" id="f" novalidate>
-<div id="c-email" hidden><label for="email">E-mail</label><input id="email" type="email" autocomplete="username" inputmode="email"></div>
-<div id="c-token" hidden><label for="token">Código que chegou no e-mail</label><input id="token" autocomplete="one-time-code"></div>
-<div id="c-nome" hidden><label for="nome">Seu nome</label><input id="nome" autocomplete="name"></div>
-<div id="c-senha" hidden><label for="senha">Senha nova</label><input id="senha" type="password" autocomplete="new-password" aria-describedby="dica">
-<p class="t2" id="dica">Pelo menos 12 caracteres. Uma frase com palavras suas é o melhor; não precisa de símbolos.</p></div>
-<div id="c-senha2" hidden><label for="senha2">Repita a senha nova</label><input id="senha2" type="password" autocomplete="new-password"></div>
+<div id="c-email" hidden><label for="email" data-pt="">E-mail</label><input id="email" type="email" autocomplete="username" inputmode="email"></div>
+<div id="c-token" hidden><label for="token" data-pt="">Código que chegou no e-mail</label><input id="token" autocomplete="one-time-code"></div>
+<div id="c-nome" hidden><label for="nome" data-pt="">Seu nome</label><input id="nome" autocomplete="name"></div>
+<div id="c-senha" hidden><label for="senha" data-pt="">Senha nova</label><input id="senha" type="password" autocomplete="new-password" aria-describedby="dica">
+<p class="t2" id="dica" data-pt="">Pelo menos 12 caracteres. Uma frase com palavras suas é o melhor; não precisa de símbolos.</p></div>
+<div id="c-senha2" hidden><label for="senha2" data-pt="">Repita a senha nova</label><input id="senha2" type="password" autocomplete="new-password"></div>
 <div id="c-termos" hidden><label class="linha"><input type="checkbox" id="termos"> <span id="termos-txt"></span></label></div>
-<button type="submit" id="ok">Continuar</button><p id="msg" role="status" aria-live="polite"></p></form>
-<p class="t2" style="margin-top:12px"><a href="/gestao">Ir para a entrada</a></p></main><script>
+<button type="submit" id="ok" class="principal" data-pt="">Continuar</button><p id="msg" role="status" aria-live="polite"></p></form>
+<p class="t2 depois"><a href="/gestao" data-pt="">Ir para a entrada</a></p></main>""" + _PX_RODAPE + r"""<script>window.PX_EN={"Conta Physis":"Physis account","Código que chegou no e-mail":"Code from the e-mail",
+"Senha nova":"New password","Pelo menos 12 caracteres. Uma frase com palavras suas é o melhor; não precisa de símbolos.":"At least 12 characters. A phrase in your own words works best; no symbols needed.",
+"Repita a senha nova":"Repeat the new password","Continuar":"Continue","Ir para a entrada":"Go to sign-in","Cole o código do e-mail.":"Paste the code from the e-mail.",
+"Convite para {0} ({1}) em {2}. Escolha o seu nome e a sua senha.":"Invitation for {0} ({1}) at {2}. Choose your name and your password.",
+"direção":"management","equipe":"team","cliente":"client","Criar a minha conta":"Create my account","Digite o e-mail.":"Type your e-mail.",
+"E-mail confirmado. Já pode entrar na plataforma.":"E-mail confirmed. You can now sign in to the platform.",
+"A senha precisa de pelo menos 12 caracteres.":"The password needs at least 12 characters.","As duas senhas não são iguais.":"The two passwords are not the same.",
+"Senha nova gravada. Indo para a entrada…":"New password saved. Going to sign-in…","Digite o seu nome.":"Type your name.","Conta criada. Entrando…":"Account created. Signing in…",
+"Digite o e-mail da sua conta. Se ele tiver conta, chega um link para criar uma senha nova.":"Type your account e-mail. If it has an account, a link to create a new password will arrive.",
+"Escolha a senha nova. Ao gravar, todas as sessões abertas da conta são encerradas.":"Choose the new password. When you save it, every open session of the account is closed.",
+"Confirmar o e-mail":"Confirm your e-mail","Confirme que este e-mail é seu.":"Confirm that this e-mail is yours.","Aceitar o convite":"Accept the invitation",
+"Conferindo o convite…":"Checking the invitation…","Gravar a senha nova":"Save the new password","Conferir o convite":"Check the invitation",
+"Cole o código que chegou no e-mail do convite.":"Paste the code from the invitation e-mail.",
+"Se este e-mail tiver conta, enviamos um link para criar uma senha nova. Ele vale 30 minutos.":"If this e-mail has an account, we sent a link to create a new password. It is valid for 30 minutes."};</script>""" + _PX_JS + r"""<script>
 var modo=location.pathname.replace(/\/+$/,"").split("/").pop(),versao=null;
 var tk=(location.hash.match(/[#&]t=([A-Za-z0-9_-]+)/)||[])[1]||"";
 if(tk&&history.replaceState)history.replaceState(null,"",location.pathname);
 function $(i){return document.getElementById(i);}
 function mostrar(){for(var i=0;i<arguments.length;i++)$("c-"+arguments[i]).hidden=false;}
-function dizer(t,e){$("msg").textContent=t||"";$("msg").style.color=e?"#7A2214":"#1F4A1C";}
+function dizer(t,e){PX.por($("msg"),t||"");$("msg").className=e?"erro":"ok";}
 function falha(){dizer("Sem resposta do servidor. Tente de novo.",true);$("ok").disabled=false;}
 function post(rota,corpo){return fetch(rota,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(corpo)}).then(function(r){return r.json();});}
 function codigo(){return tk||$("token").value.trim();}
 function ver(){if(!codigo()){dizer("Cole o código do e-mail.",true);$("token").focus();return;}
 post("/api/conta/convite/ver",{token:codigo()}).then(function(j){if(!j.ok){dizer(j.erro,true);return;}tk=codigo();$("c-token").hidden=true;
-$("sub").textContent="Convite para "+j.email+" ("+({administrador:"direção",operador:"equipe",cliente:"cliente"}[j.papel]||j.papel)+") em "+j.org+". Escolha o seu nome e a sua senha.";
+PX.por($("sub"),"Convite para {0} ({1}) em {2}. Escolha o seu nome e a sua senha.",[j.email,({administrador:"direção",operador:"equipe",cliente:"cliente"}[j.papel]||j.papel),j.org]);
 $("nome").value=j.nome||"";mostrar("nome","senha","senha2");versao=j.termos_versao||null;
-if(versao){$("termos-txt").textContent="Li e aceito os Termos de uso e a Política de privacidade da Physis (versão "+versao+").";mostrar("termos");}
-$("ok").textContent="Criar a minha conta";modo="convite2";dizer("",false);$("nome").focus();}).catch(falha);}
+if(versao){PX.por($("termos-txt"),"Li e aceito os Termos de uso e a Política de privacidade da Physis (versão {0}).",[versao]);mostrar("termos");}
+PX.por($("ok"),"Criar a minha conta");modo="convite2";dizer("",false);$("nome").focus();}).catch(falha);}
 function enviar(){var b=$("ok");
 if(modo==="esqueci"){var em=$("email").value.trim();if(!em){dizer("Digite o e-mail.",true);$("email").focus();return;}b.disabled=true;
 post("/api/conta/esqueci",{usuario:em}).then(function(j){dizer(j.mensagem||j.erro,!j.ok);b.disabled=false;}).catch(falha);return;}
@@ -350,13 +460,13 @@ post("/api/conta/convite/aceitar",corpo).then(function(j){if(j.ok){dizer("Conta 
 var T={esqueci:["Esqueci a senha","Digite o e-mail da sua conta. Se ele tiver conta, chega um link para criar uma senha nova."],
 "nova-senha":["Senha nova","Escolha a senha nova. Ao gravar, todas as sessões abertas da conta são encerradas."],
 confirmar:["Confirmar o e-mail","Confirme que este e-mail é seu."],convite:["Aceitar o convite","Conferindo o convite…"]};
-var t=T[modo]||T.esqueci;if(!T[modo])modo="esqueci";$("tit").textContent=t[0];$("sub").textContent=t[1];document.title=t[0]+" · Physis";
+var t=T[modo]||T.esqueci;if(!T[modo])modo="esqueci";PX.por($("tit"),t[0]);PX.por($("sub"),t[1]);PX.titulo(t[0]);
 $("f").addEventListener("submit",function(e){e.preventDefault();enviar();});
 if(modo==="esqueci")mostrar("email");
-else if(modo==="nova-senha"){if(!tk)mostrar("token");mostrar("senha","senha2");$("ok").textContent="Gravar a senha nova";}
+else if(modo==="nova-senha"){if(!tk)mostrar("token");mostrar("senha","senha2");PX.por($("ok"),"Gravar a senha nova");}
 else if(modo==="confirmar"){if(!tk)mostrar("token");else enviar();}
-else if(modo==="convite"){if(!tk){mostrar("token");$("ok").textContent="Conferir o convite";$("sub").textContent="Cole o código que chegou no e-mail do convite.";}else ver();}
-</script></body></html>"""
+else if(modo==="convite"){if(!tk){mostrar("token");PX.por($("ok"),"Conferir o convite");PX.por($("sub"),"Cole o código que chegou no e-mail do convite.");}else ver();}
+</script></body></html>""").replace("__LOGO__", _PX_LOGO)
 
 
 def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None, clima=None, irradiacao=None):

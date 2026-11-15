@@ -22,7 +22,7 @@ import re
 
 # chaves que a plataforma do cliente guarda (iguais às do localStorage)
 CHAVES = ("physis-perfil", "physis-gestao-cliente", "physis-carbono", "physis-residuos-plano", "physis-cert-gap",
-          "physis-sbn", "physis.terreno.v1")
+          "physis-sbn", "physis.terreno.v1", "physis-servidor-verde")
 PREFIXOS = ("physis-calc-", "physis-curso-")
 _SUFIXO = re.compile(r"^[A-Za-z0-9_.:-]{1,60}$")
 VALOR_MAX = 2 * 1024 * 1024          # por chave (texto UTF-8)

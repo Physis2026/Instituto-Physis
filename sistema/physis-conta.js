@@ -626,7 +626,7 @@
       ".pc-codigos code{display:block;padding:6px 8px;border-radius:6px;background:var(--pc-fundo);border:1px solid var(--pc-linha);text-align:center}",
       ".pc-destaque{border:2px solid var(--pc-marca);border-radius:10px;padding:10px 12px;margin:8px 0}",
       ".pc-chk{display:flex;gap:8px;align-items:flex-start;min-height:44px;padding-top:10px}.pc-chk input{width:22px;height:22px;margin:0;flex:none}",
-      ".pc-rolar-x{overflow-x:auto;max-width:100%}",
+      ".pc-rolar-x{overflow-x:auto;max-width:100%;position:relative}",
       ".pc-tab{border-collapse:collapse;width:100%;font-size:14.5px}.pc-tab th,.pc-tab td{text-align:left;padding:6px 8px;border-top:1px solid var(--pc-linha);vertical-align:middle}.pc-tab thead th{font-size:13px;color:var(--pc-fraca);border-top:0}",
       ".pc-tab th[scope=row]{font-weight:600;word-break:break-word}",
       ".pc-so-leitor{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}",

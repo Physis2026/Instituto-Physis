@@ -325,16 +325,33 @@ class Demos(unittest.TestCase):
 
     def test_cada_demo(self):
         nomes = {p.name for p in DEMOS}
-        self.assertEqual(nomes, {"physis-demo-cliente.html", "physis-demo-gestao.html", "physis-demo-scada.html", "physis-demo-planejador.html",
-                                 "physis-demo-sustainkit.html"})
+        self.assertEqual(nomes, {"physis-demo-cliente.html", "physis-demo-scada.html", "physis-demo-planejador.html",
+                                 "physis-demo-sustainkit.html", "physis-demo-monitoramento.html"})
+        # cada demo promove a compra do item certo da loja
+        compra = {"physis-demo-sustainkit.html": "/loja/?item=sk-pacote", "physis-demo-scada.html": "/loja/?item=scada",
+                  "physis-demo-monitoramento.html": "/loja/?item=mon-sw", "physis-demo-planejador.html": "/loja/?item=P13",
+                  "physis-demo-cliente.html": "/loja/"}
         for pag in DEMOS:
             with self.subTest(pag.name):
                 html = pag.read_text(encoding="utf-8")
                 self.assertIn('<meta name="physis-demo-gerado"', html)
                 self.assertIn('id="physis-demo-faixa"', html)
-                self.assertIn("dados simulados", html)
+                self.assertIn('id="physis-demo-compra"', html)
+                self.assertIn("Demonstração · dados simulados</title>", html)
+                self.assertIn(f'class="pdf-comprar" href="{compra[pag.name]}"', html)
+                self.assertIn("Na versão completa você", html)
                 self.assertTrue("data-physis-preferencias" in html or 'id="pxp-lugar"' in html, "falta a barra de preferências")
-                self.assertNotIn("rafaella", html.lower(), "dado interno da equipe numa demo pública")
+                for nome in ("rafaella", "oliveira"):
+                    self.assertNotIn(nome, html.lower(), "nome da equipe numa demo pública")
+                self.assertNotIn('href="physis-tela-cliente.html"', html, "a Tela do cliente saiu")
+        for nome in ("physis-demo-sustainkit.html", "physis-demo-scada.html", "physis-demo-monitoramento.html"):
+            html = (RAIZ / "demos" / nome).read_text(encoding="utf-8")
+            self.assertIn('id="pdf-linha" aria-live="polite"', html, nome)      # dado ao vivo, educado com leitor de tela
+            self.assertIn('id="pdf-pausa"', html, nome)                           # e com Pausar
+        mon = (RAIZ / "demos" / "physis-demo-monitoramento.html").read_text(encoding="utf-8")
+        self.assertIn('abrirPlataformaCliente(["monitoramento"], { campo:6', mon)
+        self.assertIn(': "campo"; desenhar(false);', mon)
+        self.assertFalse((RAIZ / "demos" / "physis-demo-gestao.html").exists(), "demo obsoleta")
         cliente = (RAIZ / "demos" / "physis-demo-cliente.html").read_text(encoding="utf-8")
         m = re.search(r"abrirPlataformaCliente\((\[[^\]]*\]), \{ campo:6", cliente)
         self.assertIsNotNone(m)

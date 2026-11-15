@@ -20,13 +20,13 @@
 (function (g) {
   "use strict";
   var CHAVES = ["physis-perfil", "physis-gestao-cliente", "physis-carbono", "physis-residuos-plano", "physis-cert-gap",
-                "physis-sbn", "physis.terreno.v1"];
+                "physis-sbn", "physis.terreno.v1", "physis-servidor-verde"];
   var PREFIXOS = ["physis-calc-", "physis-curso-"];
   var SUFIXO = /^[A-Za-z0-9_.:-]{1,60}$/;
   var PRE = "physis-ponte-cliente:";
   var NOMES = { "physis-perfil": "perfil", "physis-gestao-cliente": "gestão", "physis-carbono": "inventário de carbono",
                 "physis-residuos-plano": "plano de resíduos", "physis-cert-gap": "certificações", "physis-sbn": "soluções baseadas na natureza",
-                "physis.terreno.v1": "terreno" };
+                "physis.terreno.v1": "terreno", "physis-servidor-verde": "projetos de servidor verde" };
   function rastreada(k) {
     k = String(k == null ? "" : k);
     if (CHAVES.indexOf(k) >= 0) return true;

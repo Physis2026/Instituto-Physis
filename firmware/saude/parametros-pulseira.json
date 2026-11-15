@@ -1,0 +1,24 @@
+{
+ "_leia": "Parâmetros da pulseira Physis (TIPO:PUL, docs/SAUDE.md e firmware/saude/BLE_PERFIL.md). Fonte única dos valores que o firmware usa. Quem revisa muda só 'valor' (e marca 'conferido'); 'ble' não muda (as UUIDs são conferidas pelo teste do app). 'valor' null = [MARCADOR]: limite clínico é definido pela equipe clínica, nada de fábrica.",
+ "versao": 1,
+ "atualizado": "2026-11-15",
+ "como_o_firmware_le": "Na montagem (PlatformIO): um passo antes da compilação lê este arquivo e escreve include/parametros.h com um #define por parâmetro (PARAM_<ID>). Valor null vira #error, como o secrets.h: nunca sai uma pulseira sem o limite clínico. O LIMBPM também pode ser trocado depois pelo comando BLE LIMBPM (0 a 250).",
+ "ble": {
+  "servico_pulseira": "e970dc7d-400e-4b4e-924c-948d2198e81b",
+  "caracteristica_linha": "bbca3cf4-40e0-4103-9420-7c1f5f693fd4",
+  "caracteristica_comando": "529cbb10-062f-4ca8-aa64-cca0c1307234",
+  "battery_service": "0000180f-0000-1000-8000-00805f9b34fb",
+  "nome_anunciado": "Physis-PUL-xxxx",
+  "fonte": "firmware/saude/BLE_PERFIL.md seção 2 (proposta, a homologar)"
+ },
+ "parametros": [
+  {"id": "limite_bpm", "grandeza": "Batimentos para a regra de crise (LIMBPM)", "valor": null, "unidade": "bpm", "faixa_aceita": [0, 250], "fonte": "[MARCADOR clínico] definido pela equipe clínica para cada pessoa", "nota": "Mesmo valor do comando BLE LIMBPM.", "verificar": true},
+  {"id": "janela_crise_s", "grandeza": "Tempo acima do limite para declarar crise", "valor": null, "unidade": "s", "faixa_aceita": [5, 600], "fonte": "[MARCADOR clínico] regra de crise validada por especialistas", "verificar": true},
+  {"id": "limite_impacto_g", "grandeza": "Aceleração considerada impacto ou queda", "valor": null, "unidade": "g", "faixa_aceita": [1, 16], "fonte": "[MARCADOR] medir na placa com o sensor escolhido", "verificar": true},
+  {"id": "intervalo_envio_normal_min", "grandeza": "Intervalo da linha normal (BPM e MOV médios)", "valor": 5, "unidade": "min", "faixa_aceita": [1, 60], "fonte": "proposta de BLE_PERFIL.md seção 4", "verificar": true},
+  {"id": "intervalo_envio_crise_s", "grandeza": "Intervalo da linha durante a crise", "valor": 30, "unidade": "s", "faixa_aceita": [5, 300], "fonte": "BLE_PERFIL.md seção 4 (a cada 30 s enquanto CRISE:1)", "verificar": true},
+  {"id": "gps_intervalo_crise_s", "grandeza": "Intervalo do GPS durante a crise", "valor": 30, "unidade": "s", "faixa_aceita": [5, 600], "fonte": "proposta: igual ao envio na crise (BLE_PERFIL.md seção 4)", "verificar": true},
+  {"id": "gps_intervalo_normal_s", "grandeza": "Intervalo do GPS fora da crise (0 = desligado)", "valor": 0, "unidade": "s", "faixa_aceita": [0, 86400], "fonte": "BLE_PERFIL.md seção 4 (GPS desligado fora da crise)", "verificar": false},
+  {"id": "bateria_baixa_v", "grandeza": "Tensão de bateria baixa", "valor": 3.45, "unidade": "V", "faixa_aceita": [3.0, 4.2], "fonte": "physis_hub/saude.py (BAT_BAIXA_V, a confirmar pela equipe técnica)", "verificar": true}
+ ]
+}

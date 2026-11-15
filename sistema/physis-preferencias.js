@@ -1,16 +1,16 @@
-/* physis-preferencias.js v2 · Preferências de leitura e acessibilidade das telas da Physis
+/* physis-preferencias.js v3 · Preferências de leitura e acessibilidade das telas da Physis
    Barra com 4 controles: [Idioma: Português/English] [Tema: Claro/Escuro/Automático] [Modo de conforto ▾] [Acessibilidade (PcD) ▾].
    Modo de conforto (neurodivergência: autismo, TDAH, dislexia): fundo verde, texto maior, mais espaçamento, menos estímulo,
    foco reforçado, fonte para dislexia, régua de leitura, leitura simplificada, lembrar onde parei.
    Acessibilidade (PcD): cegueira e baixa visão (leitores de tela, ouvir esta tela, alto contraste, zoom, atalhos),
    surdez (alertas visuais, Libras, legendas), fala (comunicação alternativa · CAA), mobilidade (teclado, comandos de voz).
 
-   ORIGINAL: sistema/physis-preferencias.js. As telas são arquivos únicos, então cada uma leva uma CÓPIA IGUAL
-   dentro do bloco de script com id="physis-preferencias" (o arquivo inteiro, sem mudar nada):
-     physis-hub/web/consultoria.html · sistema/SustainKit_Definitivo.html · modulos/planejador/planejador-physis.html
-     demos/physis-demo-cliente.html · demos/physis-demo-gestao.html · demos/physis-demo-scada.html
-   Mudou aqui? Copie para todas (ou registre o bloco em ferramentas/sincronizar.py, BLOCOS). O teste
-   physis-hub/tests/test_preferencias.py confere que as cópias são iguais a este arquivo.
+   ORIGINAL ÚNICO: sistema/physis-preferencias.js (desde a v3 a antiga barra px-preferencias da plataforma, da Gestão e do
+   SCADA é esta mesma, pela porta PxPref, no fim do arquivo). As telas são arquivos únicos, então cada uma leva uma CÓPIA IGUAL
+   dentro do bloco <script id="physis-preferencias"> (o arquivo inteiro, sem mudar nada). Quem copia é ferramentas/sincronizar.py
+   (BLOCOS): physis-hub/web/painel.html, sistema/gestao-interna-physis.html, sistema/physis-scada-demo.html,
+   physis-hub/web/consultoria.html, sistema/SustainKit_Definitivo.html, modulos/planejador/planejador-physis.html (e as demos
+   geradas delas). O teste physis-hub/tests/test_preferencias.py confere que as cópias são iguais a este arquivo.
 
    Uso, uma vez por página, depois do conteúdo:
      PhysisPreferencias.iniciar({
@@ -28,7 +28,10 @@
        contato: "#f-desc",                // campo onde a CAA escreve quando nenhum campo está em uso
        relatar: "#contato",               // "Relatar barreira" sem abrirJuridico(): link do contato
        lembrar: { salvar: function () { return {}; }, restaurar: function (o) {} },  // opcional: aba aberta etc.
-       esconderEmQuadro: true,            // aberta num quadro (iframe) da plataforma: sem barra própria, segue a escolha de lá
+       esconderEmQuadro: true,            // aberta num quadro (iframe) da plataforma ou com html[data-em-quadro]: sem barra própria, segue a escolha de lá
+       idiomaExterno: { atual, definir }, // tela que se traduz sozinha (o módulo só pede a troca; não traduz o DOM)
+       suporte: function (frase) {},      // CAA sem campo em uso: leva a frase ao suporte da tela
+       tela: "nome",                      // chave do "lembrar onde parei" (padrão: o endereço)
        aoMudar: function (estado) {}      // chamado depois de cada mudança
      });
 
@@ -87,6 +90,8 @@
       voz: "Comandos de voz", vozD: "Começa desligado. Atenção à privacidade (LGPD): no Chrome e no Edge o áudio é enviado aos servidores do Google ou da Microsoft para ser entendido. Comandos: ir para conteúdo, próximo, voltar, ler tela, aumentar texto, diminuir texto, parar.",
       semRec: "Este navegador não reconhece voz.", vozOuve: "Ouvindo comandos de voz.", vozErro: "Os comandos de voz pararam: ",
       relatar: "Relatar barreira", decT: "Declaração de acessibilidade",
+      relatarD: "Descreva a barreira: o que tentou fazer, em que tela e o que aconteceu. Copie o relato e envie pelo canal de suporte da Physis.",
+      relatarCampo: "O que aconteceu", copiar: "Copiar relato", copiado: "Relato copiado.", caaSup: "Frase levada ao suporte: ",
       decD: "Estas telas seguem a Lei Brasileira de Inclusão (Lei 13.146/2015), o eMAG e as diretrizes de acessibilidade digital do gov.br, a WCAG 2.2 nível AA e a ABNT NBR 17225.",
       pular: "Pular para o conteúdo", ok: "Preferência aplicada.", aEn: "English on. Texts not yet translated stay in Portuguese.", aPt: "Português ligado.",
       aEsc: "Tema escuro ligado.", aClaro: "Tema claro ligado.", aAuto: "Tema automático: segue o aparelho.",
@@ -119,6 +124,8 @@
       voz: "Voice commands", vozD: "Off by default. Privacy notice (LGPD): in Chrome and Edge the audio is sent to Google or Microsoft servers to be understood. Commands: go to content, next, back, read screen, bigger text, smaller text, stop.",
       semRec: "This browser does not recognise speech.", vozOuve: "Listening for voice commands.", vozErro: "Voice commands stopped: ",
       relatar: "Report a barrier", decT: "Accessibility statement",
+      relatarD: "Describe the barrier: what you tried to do, on which screen and what happened. Copy the report and send it through the Physis support channel.",
+      relatarCampo: "What happened", copiar: "Copy report", copiado: "Report copied.", caaSup: "Phrase taken to support: ",
       decD: "These screens follow the Brazilian Inclusion Law (Law 13.146/2015), eMAG and the gov.br digital accessibility guidelines, WCAG 2.2 level AA and ABNT NBR 17225.",
       pular: "Skip to content", ok: "Preference applied.", aEn: "English on. Texts not yet translated stay in Portuguese.", aPt: "Português ligado.",
       aEsc: "Dark theme on.", aClaro: "Light theme on.", aAuto: "Automatic theme: follows the device.",
@@ -130,7 +137,7 @@
   var CSS = [
     /* barra */
     ".pp-barra{--pp-f:#FFFFFF;--pp-t:#1C2B21;--pp-l:#8A9284;--pp-a:#33512F;--pp-at:#FFFFFF;position:relative;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;line-height:1.3;font-family:inherit;color:var(--pp-t)}",
-    "html[data-tema=escuro] .pp-barra{--pp-f:#2A3829;--pp-t:#EEF2EA;--pp-l:#8A9182;--pp-a:#B9CDB3;--pp-at:#1C2B21}",
+    "html[data-tema=escuro] .pp-barra{--pp-f:#1C2B21;--pp-t:#EEF2EA;--pp-l:#8A9182;--pp-a:#B9CDB3;--pp-at:#1C2B21}",
     ".pp-barra.pp-sobre-verde{--pp-f:transparent;--pp-t:#DCEBD8;--pp-l:#B9CDB3;--pp-a:#DCEBD8;--pp-at:#1C2B21}",
     ".pp-barra .pp-b,.pp-barra select{font:inherit;font-size:13px;font-weight:600;min-height:36px;min-width:36px;padding:0 10px;border-radius:8px;border:1px solid var(--pp-l);background:var(--pp-f);color:var(--pp-t);cursor:pointer;margin:0;line-height:1.2;width:auto}",
     ".pp-barra select option{background:#FFFFFF;color:#1C2B21}",
@@ -140,7 +147,7 @@
     ".pp-barra .pp-b .pp-on{font-weight:400}",
     ".pp-barra .pp-b:focus-visible,.pp-barra select:focus-visible,.pp-painel :focus-visible{outline:3px solid var(--pp-t);outline-offset:2px}",
     ".pp-painel{position:absolute;right:0;top:calc(100% + 6px);z-index:1000;width:400px;max-width:calc(100vw - 32px);max-height:calc(100vh - 110px);overflow:auto;background:#FFFFFF;color:#1C2B21;border:1px solid #8A9284;border-radius:12px;padding:14px 16px;box-shadow:0 8px 28px rgba(28,43,33,.22);text-align:left;font-size:15px;line-height:1.45;font-weight:400;letter-spacing:normal}",
-    "html[data-tema=escuro] .pp-painel{background:#2A3829;color:#EEF2EA;border-color:#8A9182}",
+    "html[data-tema=escuro] .pp-painel{background:#1C2B21;color:#EEF2EA;border-color:#8A9182}",
     ".pp-painel[hidden],.pp-painel [hidden]{display:none!important}",
     ".pp-painel h2{font:700 17px/1.3 inherit;margin:0 0 2px;color:inherit;font-family:inherit}",
     ".pp-painel h3{font:700 15px/1.3 inherit;margin:14px 0 4px;color:inherit;font-family:inherit;border-top:1px solid #C9D2C4;padding-top:10px}",
@@ -159,7 +166,7 @@
     ".pp-painel .pp-acoes{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}",
     ".pp-painel button{font:inherit;font-size:14px;font-weight:600;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #33512F;background:#FFFFFF;color:#33512F;cursor:pointer}",
     ".pp-painel button.pp-prim{background:#33512F;color:#FFFFFF}",
-    "html[data-tema=escuro] .pp-painel button{background:#2A3829;color:#EEF2EA;border-color:#B9CDB3}",
+    "html[data-tema=escuro] .pp-painel button{background:#1C2B21;color:#EEF2EA;border-color:#B9CDB3}",
     "html[data-tema=escuro] .pp-painel button.pp-prim{background:#B9CDB3;color:#1C2B21}",
     ".pp-painel .pp-caa{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin:6px 0}",
     ".pp-painel .pp-caa button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 6px;min-height:76px;font-size:13px;line-height:1.2;text-align:center}",
@@ -201,6 +208,8 @@
   function limpar(o) {
     var e = copia(PADRAO);
     if (o && typeof o === "object") {
+      for (var x in o) if (tem(o, x) && !tem(PADRAO, x) && x !== "legivel" && x !== "fundoVerde") e[x] = o[x];   /* guarda o que outras telas gravam */
+      if (o.fundoVerde) e.verde = true;
       if (o.idioma === "en" || o.idioma === "pt") e.idioma = o.idioma;
       if (o.tema === "claro" || o.tema === "escuro" || o.tema === "auto") e.tema = o.tema;
       var t = parseInt(o.texto, 10); if (t === 0 || t === 1 || t === 2) e.texto = t; else if (o.texto === true) e.texto = 1;
@@ -220,23 +229,29 @@
     if (ler("physis-idioma") === "en") e.idioma = "en";
     if (ler("physis-conforto") === "1") { e.conforto = true; e.espaco = true; e.calma = true; }
     if (ler("physis-fundo") === "verde") e.verde = true;
-    try { var pp = JSON.parse(ler("physis-passaporte") || "null"); if (pp) { e.texto = pp.texto ? 1 : 0; e.espaco = e.espaco || !!pp.espaco; e.contraste = !!pp.contraste; e.calma = e.calma || !!pp.calma; } } catch (x) {}
+    try { var pp = JSON.parse(ler("physis-passaporte") || "null"); if (pp) { e.texto = pp.texto ? 1 : 0; e.espaco = e.espaco || !!pp.espaco; e.contraste = !!pp.contraste; e.calma = e.calma || !!pp.calma; e.foco = !!pp.foco; } } catch (x) {}
+    var t = ler("physis-pref-tema"); if (t === "claro" || t === "escuro" || t === "auto") e.tema = t;
     return e;
   }
   function guardar() {
     var e = P.estado;
     gravar(P.op.chave, JSON.stringify(e));
-    /* espelho nas chaves antigas, para a plataforma (painel.html) seguir a mesma escolha */
+    gravar("physis-pref-tema", e.tema);      /* lido pelo script cedo (pxp-cedo) antes de a tela desenhar */
+    /* espelho nas chaves antigas, para telas antigas seguirem a mesma escolha */
     gravar("physis-idioma", e.idioma);
     gravar("physis-conforto", e.conforto ? "1" : "0");
     gravar("physis-fundo", e.verde ? "verde" : "branco");
     var pp = {}; try { pp = JSON.parse(ler("physis-passaporte") || "{}") || {}; } catch (x) { pp = {}; }
-    pp.texto = e.texto > 0; pp.espaco = e.espaco; pp.contraste = e.contraste; pp.calma = e.calma;
+    pp.texto = e.texto > 0; pp.espaco = e.espaco; pp.contraste = e.contraste; pp.calma = e.calma; pp.foco = e.foco;
     gravar("physis-passaporte", JSON.stringify(pp));
   }
 
   function sistemaEscuro() { try { return !!(global.matchMedia && global.matchMedia("(prefers-color-scheme: dark)").matches); } catch (e) { return false; } }
-  function temaEfetivo() { return P.estado.tema === "auto" ? (sistemaEscuro() ? "escuro" : "claro") : P.estado.tema; }
+  /* o fundo verde é o escuro esverdeado: as telas o desenham com as cores do tema escuro mais html.a11y-verde */
+  function temaEfetivo() { return P.estado.verde ? "escuro" : P.estado.tema === "auto" ? (sistemaEscuro() ? "escuro" : "claro") : P.estado.tema; }
+  /* telas com tradução própria (plataforma, Gestão, SCADA): idiomaExterno = { atual(), definir(lingua, pelaPessoa) } */
+  function externo() { var i = P.op && P.op.idiomaExterno; return i && typeof i.definir === "function" ? i : null; }
+  function idiomaDaTela() { var i = externo(); if (i && i.atual) { try { return i.atual() === "en" ? "en" : "pt"; } catch (x) {} } return P.estado.idioma; }
   function txt(k) { return UI[P.estado && P.estado.idioma === "en" ? "en" : "pt"][k]; }
 
   /* ---------- aplicar no <html> ---------- */
@@ -250,6 +265,7 @@
     CLASSES.forEach(function (k) { cl.toggle("a11y-" + k, !!e[k]); });
     cl.toggle("pp-zoom", P.op.escalaPorZoom !== false);
     r.style.setProperty("--pp-escala", String(ESCALAS[e.texto]));
+    var meta = doc.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute("content", temaEfetivo() === "escuro" ? "#1C2B21" : "#33512F");
     if (P.idiomaAplicado !== e.idioma) { P.idiomaAplicado = e.idioma; definirIdioma(e.idioma); }
     if (e.calma) pararMidias(doc);
     vozLigar(e.voz);
@@ -293,8 +309,8 @@
     u.regua = criar("div", { "class": "pp-regua", "aria-hidden": "true", "data-pp-manter": "" });
     doc.body.appendChild(u.regua);
     /* dentro de um quadro da plataforma (esconderEmQuadro): a barra fica na plataforma; aqui só se aplica a escolha */
-    if (P.op.esconderEmQuadro) { var q = false; try { q = global.self !== global.top; } catch (e) { q = true; } if (q) return; }
-    var barra = criar("div", { "class": "pp-barra" + (P.op.variante ? " pp-" + P.op.variante : ""), role: "group", "data-pp-manter": "", "data-physis-preferencias": "barra" });
+    if (P.op.esconderEmQuadro) { var q = doc.documentElement.hasAttribute("data-em-quadro"); try { q = q || global.self !== global.top; } catch (e) { q = true; } if (q) return; }
+    var barra = criar("div", { "class": "pp-barra" + (P.op.variante ? " pp-" + P.op.variante : ""), id: "pxp-barra", role: "group", "data-pp-manter": "", translate: "no", "data-physis-preferencias": "barra" });
     u.idiomaRot = criar("label", { "for": "pp-idioma", "class": "pp-cx" });
     u.idioma = criar("select", { id: "pp-idioma" }, [criar("option", { value: "pt", lang: "pt-BR" }, ["Português"]), criar("option", { value: "en", lang: "en" }, ["English"])]);
     u.idiomaRot.appendChild(u.idiomaTxt = criar("span")); u.idiomaRot.appendChild(u.idioma);
@@ -310,7 +326,7 @@
     u.barra = barra;
     if (lugar) lugar.appendChild(barra); else doc.body.insertBefore(barra, doc.body.firstChild);
 
-    u.idioma.addEventListener("change", function () { var en = u.idioma.value === "en"; mudar({ idioma: en ? "en" : "pt" }, en ? UI.en.aEn : UI.pt.aPt); });
+    u.idioma.addEventListener("change", function () { var en = u.idioma.value === "en"; P.pelaPessoa = true; mudar({ idioma: en ? "en" : "pt" }, en ? UI.en.aEn : UI.pt.aPt); });
     u.tema.addEventListener("change", function () { var v = u.tema.value; mudar({ tema: v }, v === "auto" ? "aAuto" : v === "escuro" ? "aEsc" : "aClaro"); });
     u.conforto.addEventListener("click", function () { abrir(u.pConf, u.conforto, u.pConf.hidden); });
     u.a11y.addEventListener("click", function () { abrir(u.pA11y, u.a11y, u.pA11y.hidden); });
@@ -339,6 +355,7 @@
         else if (a === "pausar") pausarFala();
         else if (a === "parar") pararFala();
         else if (a === "relatar") relatar();
+        else if (a === "copiar-relato") copiarRelato();
         else if (a === "caa") caa(b.getAttribute("data-frase"));
       });
     });
@@ -412,6 +429,10 @@
     f.appendChild(criar("p", null, [txt("decD")]));
     f.appendChild(criar("div", { "class": "pp-acoes" }, [botao("relatar", "relatar"), botao("padrao", "padrao", "a"), botao("fechar", "fechar", "a")]));
     f.lastChild.lastChild.className = "pp-prim";
+    f.appendChild(criar("div", { id: "pp-relato", hidden: true }, [criar("p", null, [txt("relatarD")]),
+      criar("label", { "for": "pp-relato-t", style: "min-height:0;display:block" }, [txt("relatarCampo")]),
+      criar("textarea", { id: "pp-relato-t", rows: "4", style: "width:100%;font:inherit;font-size:14px;border:1px solid #8A9284;border-radius:8px;padding:8px;background:inherit;color:inherit" }),
+      criar("div", { "class": "pp-acoes" }, [botao("copiar-relato", "copiar")]), criar("p", { id: "pp-relato-msg", role: "status" })]));
   }
   function marcarPaineis() {
     var u = P.ui, e = P.estado;
@@ -451,7 +472,7 @@
   }
 
   /* ---------- pular, atalhos, régua, lembrar ---------- */
-  function alvoConteudo() { return el(P.op.conteudo) || doc.querySelector("main") || doc.querySelector("[role=main]"); }
+  function alvoConteudo() { var c = P.op.conteudo; if (typeof c === "function") { try { c = c(); } catch (e) { c = null; } } return el(c) || doc.querySelector("#px-conteudo") || doc.querySelector("main") || doc.querySelector("[role=main]"); }
   function irPara(x) {
     if (!x) return;
     if (!x.hasAttribute("tabindex") && !/^(A|BUTTON|INPUT|SELECT|TEXTAREA)$/.test(x.nodeName)) x.setAttribute("tabindex", "-1");
@@ -482,13 +503,13 @@
     var m = {}; try { m = JSON.parse(ler(lugarChave()) || "{}") || {}; } catch (e) { m = {}; }
     var o = { y: Math.round(global.scrollY || 0), hash: global.location.hash || "" };
     if (P.op.lembrar && typeof P.op.lembrar.salvar === "function") { try { o.pagina = P.op.lembrar.salvar(); } catch (e) {} }
-    m[global.location.pathname] = o;
+    m[P.op.tela || global.location.pathname] = o;
     gravar(lugarChave(), JSON.stringify(m));
   }
   function restaurarLugar() {
     if (!P.estado.lembrar) return;
     var m = {}; try { m = JSON.parse(ler(lugarChave()) || "{}") || {}; } catch (e) { return; }
-    var o = m[global.location.pathname]; if (!o) return;
+    var o = m[P.op.tela || global.location.pathname]; if (!o) return;
     if (P.op.lembrar && typeof P.op.lembrar.restaurar === "function" && o.pagina) { try { P.op.lembrar.restaurar(o.pagina); } catch (e) {} }
     if (o.hash && !global.location.hash) { try { global.history.replaceState(null, "", o.hash); global.dispatchEvent(new HashChangeEvent("hashchange")); } catch (e) {} }
     setTimeout(function () { global.scrollTo(0, o.y || 0); }, 60);
@@ -551,6 +572,10 @@
       try { alvo.scrollIntoView({ block: "center" }); } catch (e) {}
       alvo.focus();
       dizer(txt("caaFoi") + frase);
+    } else if (typeof P.op.suporte === "function") {
+      abrir(P.ui.pA11y, P.ui.a11y, false);
+      try { P.op.suporte(frase); } catch (e) {}
+      dizer(txt("caaSup") + frase);
     } else {
       var c = P.ui.cartao; c.hidden = false; c.textContent = "";
       c.appendChild(criar("span", { "class": "pp-d" }, [txt("caaMostra")])); c.appendChild(doc.createTextNode(frase));
@@ -561,7 +586,20 @@
     var r = P.op.relatar;
     if (typeof r === "function") return r();
     if (typeof r === "string" && r.charAt(0) === "#") { abrir(P.ui.pA11y, P.ui.a11y, false); irPara(el(r)); var c = el(P.op.contato); if (ehCampo(c)) c.focus(); return; }
-    global.location.href = typeof r === "string" ? r : "mailto:?subject=" + encodeURIComponent(txt("relatar") + " · " + doc.title);
+    if (typeof r === "string" && r) { global.location.href = r; return; }
+    /* sem canal na página: o relato é escrito aqui e copiado, para enviar pelo suporte da Physis (funciona sem internet) */
+    var box = doc.getElementById("pp-relato"); if (!box) return; box.hidden = false; var t = doc.getElementById("pp-relato-t"); if (t) t.focus();
+  }
+  function copiarRelato() {
+    var t = doc.getElementById("pp-relato-t"), e = estadoPublico();
+    var rel = (t && t.value.trim() ? t.value.trim() + "\n\n" : "") + "Tela: " + doc.title + "\nEndereço: " + global.location.pathname + global.location.hash +
+      "\nQuando: " + new Date().toISOString() + "\nNavegador: " + global.navigator.userAgent + "\nPreferências: tema " + e.temaEfetivo +
+      (e.conforto ? ", conforto" : "") + (e.texto ? ", texto maior" : "") + (e.contraste ? ", alto contraste" : "");
+    var feito = false;
+    try { if (global.navigator.clipboard && global.isSecureContext) { global.navigator.clipboard.writeText(rel); feito = true; } } catch (x) {}
+    if (!feito) { var a = criar("textarea", { style: "position:fixed;left:-9999px", "aria-hidden": "true" }); a.value = rel; doc.body.appendChild(a); a.select(); try { doc.execCommand("copy"); } catch (x) {} doc.body.removeChild(a); }
+    var m = doc.getElementById("pp-relato-msg"); if (m) m.textContent = txt("copiado");
+    dizer("copiado");
   }
 
   /* ---------- comandos de voz ---------- */
@@ -690,20 +728,29 @@
     if (doc.title !== P.tituloPt && doc.title !== P.tituloEn) P.tituloPt = doc.title;
     if (en) { var t = traduzir(P.tituloPt); P.tituloEn = t ? t.trim() : null; if (t) doc.title = t.trim(); } else if (doc.title !== P.tituloPt) doc.title = P.tituloPt;
   }
+  function traduzLocal() { return P.estado.idioma === "en" && !P.pausado && !externo(); }
   function tudo() {
-    var en = P.estado.idioma === "en" && !P.pausado;
+    if (externo()) return;
+    var en = traduzLocal();
     percorrer(doc.body, en); tituloDoc(en);
     if (P.obs) P.obs.takeRecords();
   }
   function definirIdioma(qual) {
-    doc.documentElement.setAttribute("lang", qual === "en" ? "en" : P.idiomaOriginal);
-    tudo();
+    var x = externo();
+    if (x) {   /* a tela traduz a si mesma: só pede a troca, uma vez, quando ela ainda está na outra língua */
+      var pela = !!P.pelaPessoa; P.pelaPessoa = false;
+      if (idiomaDaTela() !== qual) { try { x.definir(qual, pela); } catch (e) { if (global.console) console.error(e); } }
+    } else {
+      doc.documentElement.setAttribute("lang", qual === "en" ? "en" : P.idiomaOriginal);
+      tudo();
+    }
     if (P.ui.pular) P.ui.pular.textContent = txt("pular");
+    var pl = doc.querySelector("a.px-pular"); if (pl && !P.op.semFaixa) pl.textContent = txt("pular");
   }
   function observar() {
     if (!global.MutationObserver) return;
     P.obs = new MutationObserver(function (lista) {
-      var en = P.estado.idioma === "en" && !P.pausado;
+      var en = traduzLocal();
       lista.forEach(function (m) {
         if (m.type === "childList") {
           for (var i = 0; i < m.addedNodes.length; i++) {
@@ -723,7 +770,7 @@
 
   /* ---------- API ---------- */
   var API = {
-    versao: 2,
+    versao: 3,
     iniciar: function (op) {
       if (P.op) return API;
       P.op = op || {};
@@ -759,13 +806,22 @@
       global.addEventListener("scroll", function () { if (!P.estado.lembrar) return; clearTimeout(tempo); tempo = setTimeout(salvarLugar, 400); }, { passive: true });
       global.addEventListener("hashchange", salvarLugar);
       global.addEventListener("pagehide", salvarLugar);
+      /* tela com tradução própria trocou de língua pelo botão dela: a barra e a escolha guardada acompanham */
+      if (externo() && global.MutationObserver) {
+        new MutationObserver(function () {
+          var q = idiomaDaTela(); if (q === P.estado.idioma) return;
+          P.estado.idioma = q; P.idiomaAplicado = q; guardar(); desenharBarra();
+          if (typeof P.op.aoMudar === "function") { try { P.op.aoMudar(estadoPublico()); } catch (x) {} }
+        }).observe(doc.documentElement, { attributes: true, attributeFilter: ["lang"] });
+      }
       /* outra aba, ou a plataforma que abriu esta tela num quadro, mudou a escolha: segue */
       global.addEventListener("storage", function (ev) {
-        if (ev.key !== P.op.chave && ev.key !== "physis-idioma" && ev.key !== "physis-conforto" && ev.key !== "physis-fundo" && ev.key !== "physis-passaporte") return;
+        if (ev.key !== P.op.chave && ev.key !== "physis-pref-tema" && ev.key !== "physis-idioma" && ev.key !== "physis-conforto" && ev.key !== "physis-fundo" && ev.key !== "physis-passaporte") return;
         var antes = JSON.stringify(P.estado), novo;
         if (ev.key === P.op.chave) { try { novo = limpar(JSON.parse(ev.newValue || "null")); } catch (e) { return; } }
         else {
           novo = copia(P.estado);
+          if (ev.key === "physis-pref-tema" && /^(claro|escuro|auto)$/.test(ev.newValue || "")) novo.tema = ev.newValue;
           if (ev.key === "physis-idioma") novo.idioma = ev.newValue === "en" ? "en" : "pt";
           if (ev.key === "physis-conforto") novo.conforto = ev.newValue === "1";
           if (ev.key === "physis-fundo") novo.verde = ev.newValue === "verde";
@@ -801,4 +857,26 @@
     }
   };
   global.PhysisPreferencias = API;
+
+  /* ---------- PxPref: a mesma barra para as telas com tradução própria (plataforma, Gestão Physis, SCADA) ----------
+     Era um segundo módulo (px-preferencias v1); desde a v3 é só esta porta de entrada para o mesmo código.
+     PxPref.iniciar({ lugar, idioma:{atual,definir}, conteudo, menu, relatar, suporte, tela, lugarAtual, irPara, semFaixa, aoMudar })
+     aoMudar recebe { tema (o que vale: claro|escuro), temaEscolha (claro|escuro|auto), idioma, conforto, verde, texto, ... }. */
+  function formaPx(e) { if (!e) return null; var o = copia(e); o.temaEscolha = e.tema; o.tema = e.temaEfetivo; return o; }
+  var PX = {
+    versao: 3,
+    iniciar: function (op) {
+      op = op || {};
+      var lembrar = op.lugarAtual || op.irPara ? { salvar: op.lugarAtual, restaurar: op.irPara } : null;
+      API.iniciar({ chave: "physis-pref", ondeColocar: op.lugar, conteudo: op.conteudo, menu: op.menu, relatar: op.relatar, suporte: op.suporte,
+        tela: op.tela, semFaixa: op.semFaixa, variante: op.variante, esconderEmQuadro: op.esconderEmQuadro !== false, idiomaExterno: op.idioma,
+        lembrar: lembrar, aoMudar: op.aoMudar ? function (e) { op.aoMudar(formaPx(e)); } : null });
+      return PX;
+    },
+    estado: function () { return formaPx(API.estado()); },
+    definir: function (patch) { API.definir(patch); return PX.estado(); },
+    redesenhar: function () { P.painelIdioma = null; desenharBarra(); },
+    textos: UI
+  };
+  global.PxPref = PX;
 })(typeof window !== "undefined" ? window : this);

@@ -495,6 +495,34 @@ function partePessoas(S, P) {
   return h;
 }
 
+/* ════════ Bluetooth (sistema/physis-ble.js): caixinha e pulseira direto no celular ou no computador ════════
+   Só aparece com a biblioteca embutida; os botões só aparecem quando o aparelho tem Bluetooth disponível
+   (app nativo ou Web Bluetooth em HTTPS). O que chega é a linha V6 (MED/PUL), mostrada numa região de status. */
+function parteBluetooth() {
+  const B = window.PhysisBLE; if (!B) return "";
+  if (!ui.bleDisp && !ui.bleDispPedido) {
+    ui.bleDispPedido = true;
+    Promise.resolve().then(() => B.disponivel()).then(r => { ui.bleDisp = r || { ok: false }; }).catch(() => { ui.bleDisp = { ok: false }; }).then(() => desenhar(false));
+  }
+  const d = ui.bleDisp;
+  let corpo;
+  if (!d) corpo = `<p class="t2">Conferindo se este aparelho tem Bluetooth…</p>`;
+  else if (!d.ok) corpo = `<p class="t2">Bluetooth indisponível neste aparelho ou navegador.${d.texto ? " " + esc(d.texto) : ""} A caixinha e a pulseira continuam falando com o computador central pela rede.</p>`;
+  else corpo = `<p class="t2">Escolha o aparelho na lista que o sistema abre. A conexão fica só neste aparelho.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" id="saude-ble-med" data-saude-ble="med">Conectar caixinha por Bluetooth</button><button type="button" id="saude-ble-pul" data-saude-ble="pul">Conectar pulseira por Bluetooth</button></div>`;
+  return `<section class="cartao" aria-labelledby="saude-ble-h"><h3 id="saude-ble-h" class="t3">Bluetooth</h3>${corpo}
+    <p id="saude-ble-st" role="status" aria-live="polite" class="t2 pq">${esc(ui.bleMsg || "")}${ui.bleUltimo ? `<br>Última leitura: ${esc(ui.bleUltimo)}` : ""}</p></section>`;
+}
+function conectarBluetooth(tipo) {
+  const B = window.PhysisBLE; if (!B) return;
+  ui.bleMsg = "Procurando…"; desenhar(false);
+  Promise.resolve().then(() => B.procurar({ tipo })).then(ap => B.conectar(ap.id)).then(ap => {
+    ui.bleMsg = "Conectado: " + ((ap && ap.nome) || (tipo === "med" ? "caixinha" : "pulseira")) + ".";
+    if (!ui.bleCancelar) ui.bleCancelar = B.inscrever(ev => { if (ev && ev.texto) { ui.bleUltimo = String(ev.texto).slice(0, 160); desenhar(false); } });
+    desenhar(false);
+  }).catch(e => { ui.bleMsg = "Não foi possível conectar" + (e && e.message ? ": " + e.message : ".") ; desenhar(false); });
+}
+
 /* ════════ A aba ════════ */
 window.telaSaude = function telaSaude() {
   const S = estadoAtual(), sub = ui.saudeSub || "hoje";
@@ -518,7 +546,7 @@ window.telaSaude = function telaSaude() {
   if (sub === "horarios") return h + parteHorarios(S, P);
   if (sub === "historico") return h + parteHistorico(S, P);
   if (sub === "pulseira") return h + partePulseira(S, P);
-  return h + parteHoje(S, P);
+  return h + parteHoje(S, P) + parteBluetooth();
 };
 
 /* ════════ Eventos (atributos data-saude-…) ════════ */
@@ -563,6 +591,7 @@ if (typeof document !== "undefined" && !window.__saudeEventos) {
   document.addEventListener("click", ev => {
     const b = ev.target && ev.target.closest ? ev.target.closest("button") : null;
     if (!b || !b.dataset) return;
+    if (b.dataset.saudeBle) { conectarBluetooth(b.dataset.saudeBle); return; }
     if (b.dataset.saudeSub) { ui.saudeSub = b.dataset.saudeSub; ui.saudeMsg = ""; desenhar(false); const x = el("saude-sub-" + b.dataset.saudeSub); if (x) x.focus(); return; }
     if (b.dataset.saudePessoa) { ui.saudePessoa = Number(b.dataset.saudePessoa); ui.saudeMsg = ""; desenhar(false); const x = el("saude-p-" + b.dataset.saudePessoa); if (x) x.focus(); return; }
     const acao = b.dataset.saudeAcao;

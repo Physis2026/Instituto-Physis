@@ -30,7 +30,7 @@ try {
       if (bom) ok++; else { falha++; fc++; linhas.push("  FALHA " + p + ": esperado " + JSON.stringify(esp) + ", calculado " + JSON.stringify(v)); } });
     linhas.unshift((fc ? "FALHOU " : "PASSOU ") + c.nome + " (" + Object.keys(c.esperado).length + " valores, " + fc + " falhas)"); });
   /* desenho de todas as subabas e do quadro (não pode lançar erro) */
-  ["visao","tip","ac","vent","press","solar","piscina","dutos","resumo","memoria"].forEach(s => { ui.avacSub = s; const h = telaAvac();
+  ["visao","tip","carga","ac","vent","press","solar","piscina","dutos","resumo","memoria"].forEach(s => { ui.avacSub = s; const h = telaAvac();
     if ((h.match(/<h1/g) || []).length !== 1) { falha++; linhas.push("FALHA desenho " + s + ": h1"); } else ok++; });
   const q = telaQuadroEletrico(); if (/<h1/.test(q) || !/<h2/.test(q)) { falha++; linhas.push("FALHA quadro: cabeçalhos"); } else ok++;
   /* migração da tela antiga */

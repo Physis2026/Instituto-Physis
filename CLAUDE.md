@@ -24,7 +24,7 @@ Três sistemas separados, com pouca ligação entre eles:
 | Gestão Physis (interna) | `sistema/gestao-interna-physis.html` (servida em `/gestao/`) | Direção e administrativo |
 | Central de clientes | só desenho, em `desenhos/` | Equipe técnica |
 
-Programas da Physis que a plataforma abre: `SustainKit_Definitivo.html`, `physis-scada-demo.html`, `physis-tela-cliente.html`.
+Programas da Physis que a plataforma abre: `SustainKit_Definitivo.html`, `physis-scada-demo.html` e o Planejador. Dentro da plataforma eles escondem o próprio título (`html[data-em-quadro]`). A antiga `physis-tela-cliente.html` é legado: o que ela fazia está nas abas da plataforma.
 O servidor é `physis-hub/physis_hub/` (Python 3.10, sem dependências).
 
 ## Regras que não se quebram
@@ -34,7 +34,7 @@ O servidor é `physis-hub/physis_hub/` (Python 3.10, sem dependências).
 3. Na água, nenhum limite vem de fábrica, e limite provisório não gera alerta.
 4. Toda conta que existe na tela e no servidor é espelho: muda nos dois, com teste (`ph_eletrodo.py`, `agua.py`, `investimento.py`, `protocolo.py`).
 5. Acessibilidade: teclado, foco visível, nome em cada controle, contraste AA, alvos de 44 px (36 px nas ferramentas do cabeçalho), sem rolagem lateral a 320 px.
-6. Só cores de `physis-hub/docs/PALETA.md`. Sem tema escuro. Sem internet nas telas.
+6. Só cores de `physis-hub/docs/PALETA.md`, em tema claro **e** escuro (pedido de 15/11/2026): toda tela tem os dois, escolhidos na barra de preferências (Claro, Escuro, Automático) e guardados em `physis-pref`; o escuro usa as variantes da paleta sob `html[data-tema="escuro"]` e mantém contraste AA. Uma barra de preferências só, o módulo `sistema/physis-preferencias.js`, copiado igual em cada tela por `ferramentas/sincronizar.py`. Sem internet nas telas.
 7. A seleção de módulos existe só na loja.
 8. Nome, CPF ou CNPJ, e-mail e telefone são obrigatórios só no pagamento e no pedido de projeto personalizado.
 9. Plataforma, Gestão Physis e Central de clientes não se misturam.

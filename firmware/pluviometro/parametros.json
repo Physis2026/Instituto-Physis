@@ -1,0 +1,24 @@
+{
+ "_leia": "Parâmetros do pluviômetro de báscula Physis (TIPO:PLUV, docs/ROBOS.md seção 6). Fonte única dos valores que o firmware e o robô Pluviômetro usam. Quem revisa muda só 'valor' (e marca 'conferido'); 'aparelho' não muda (é o contrato da linha V6). 'valor' null = [MARCADOR]: o aparelho não é montado sem ele. Nada de fábrica sem fonte.",
+ "versao": 1,
+ "atualizado": "2026-11-15",
+ "como_o_firmware_le": "Na hora de montar o firmware: o robô Pluviômetro (physis_hub/robos.py) recebe mm_por_basculada, intervalo_envio_s e pino_gpio e escreve no YAML do ESPHome (o debounce vai no filtro do pulse_counter). Os limites de alerta são lidos pelo hub (limiares do painel municipal e dos alertas de clima), não pelo aparelho.",
+ "aparelho": {
+  "tipo": "PLUV",
+  "linha_exemplo": "ID:31,TIPO:PLUV,CHI:0.20,PUL:44,BAT:-,TS:1794600000",
+  "chaves": {"CHI": "mm de chuva no intervalo (0 a 200)", "PUL": "pulsos desde que o aparelho ligou (inteiro >= 0)"},
+  "fonte": "docs/ROBOS.md seção 6; physis_hub/protocolo.py"
+ },
+ "parametros": [
+  {"id": "id_no", "grandeza": "Número do aparelho na rede V6", "valor": null, "unidade": "—", "faixa_aceita": [1, 99], "fonte": "[MARCADOR] anotar na instalação; único na rede do cliente", "nota": "Mesmo contrato dos outros nós V6 (PROTOCOLO.md).", "verificar": true},
+  {"id": "mm_por_basculada", "grandeza": "Chuva por basculada (calibração)", "valor": 0.2794, "unidade": "mm", "faixa_aceita": [0.05, 2.0], "fonte": "báscula comum de 0,011 polegada (physis_hub/robos.py, MM_POR_PULSO); calibrar com 1 L de água medida e comparar com a estação do CEMADEN mais próxima", "nota": "Trocar pelo valor calibrado de cada aparelho.", "verificar": true},
+  {"id": "debounce_ms", "grandeza": "Filtro contra o quique da báscula", "valor": 50, "unidade": "ms", "faixa_aceita": [5, 500], "fonte": "docs/ROBOS.md seção 6 (filtro de 50 ms no pulse_counter)", "nota": "Conferir na bancada: contar 100 basculadas à mão e comparar com PUL.", "verificar": true},
+  {"id": "pino_gpio", "grandeza": "Pino da báscula", "valor": 27, "unidade": "GPIO", "faixa_aceita": [0, 39], "fonte": "padrão do robô Pluviômetro (ESP32); o robô recusa pinos de boot e de flash", "nota": "Um fio no pino, o outro no GND.", "verificar": false},
+  {"id": "intervalo_envio_s", "grandeza": "Intervalo de envio da linha ao hub", "valor": 300, "unidade": "s", "faixa_aceita": [60, 3600], "fonte": "padrão do robô Pluviômetro (5 min)", "nota": "Menor intervalo = alerta mais rápido e mais consumo.", "verificar": false},
+  {"id": "alerta_mm_h", "grandeza": "Intensidade de chuva para aviso", "valor": null, "unidade": "mm/h", "faixa_aceita": [1, 200], "fonte": "[MARCADOR] limiar da Defesa Civil do município", "nota": "Sem valor, o hub não avisa por intensidade (só por 24 h e 72 h).", "verificar": true},
+  {"id": "alerta_mm_24h_atencao", "grandeza": "Chuva em 24 h para atenção (encosta)", "valor": 40, "unidade": "mm/24 h", "faixa_aceita": [5, 500], "fonte": "padrão do painel municipal (physis_hub/municipio.py); trocar pelo limiar da Defesa Civil do município", "verificar": true},
+  {"id": "alerta_mm_24h_alerta", "grandeza": "Chuva em 24 h para alerta (encosta)", "valor": 80, "unidade": "mm/24 h", "faixa_aceita": [5, 500], "fonte": "padrão do painel municipal (physis_hub/municipio.py); trocar pelo limiar da Defesa Civil do município", "verificar": true},
+  {"id": "alerta_mm_72h_atencao", "grandeza": "Chuva em 72 h para atenção (encosta)", "valor": 60, "unidade": "mm/72 h", "faixa_aceita": [5, 800], "fonte": "padrão do painel municipal (physis_hub/municipio.py)", "verificar": true},
+  {"id": "alerta_mm_72h_alerta", "grandeza": "Chuva em 72 h para alerta (encosta)", "valor": 120, "unidade": "mm/72 h", "faixa_aceita": [5, 800], "fonte": "padrão do painel municipal (physis_hub/municipio.py)", "verificar": true}
+ ]
+}

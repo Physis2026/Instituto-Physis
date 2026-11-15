@@ -1,0 +1,1173 @@
+{
+ "_leia": "Mapa dos kits de revisão: para cada módulo, quem revisa, o que pode mudar (editaveis) e o que só lê (referencia). Usado por ferramentas/gerar_kits_revisao.py e ferramentas/validar_devolucao.py. 'partes' limita a mudança a um pedaço do arquivo: lista de caminhos; cada caminho é uma lista de chaves; 'id=x' escolhe o registro de uma lista pelo id. 'premissas_de' e 'normas_de' acrescentam as premissas e as normas citadas pelos cálculos daquele módulo em sistema/physis-metodologia.json. 'pos_aplicar' diz o que rodar depois de aplicar a mudança. Responsáveis confirmados pela direção (documento 18). 'i18n_de' corta a base de inglês (sistema/physis-i18n-modulos.json): 'referencia' = frases que aparecem nos arquivos de tela do módulo; 'resto' = as que não são de nenhum módulo, mais as regras I18N_RX. 'bloqueadas' = caminhos que não podem mudar. 'aba' = aba da plataforma que a prévia abre. Todo kit leva também editaveis/trocas-de-texto.json (troca literal de texto de tela).",
+ "versao": 1,
+ "atualizado": "2026-11-15",
+ "comandos_pos_aplicar": {
+  "copiar_metodologia_js": "copia sistema/physis-metodologia.json para o bloco DADOS de sistema/physis-metodologia.js (mesmo comando de docs/METODOLOGIA.md)",
+  "embutir_bases": "python ferramentas/embutir_bases.py (bases que viajam dentro de physis-hub/web/painel.html)",
+  "sincronizar_conferir": "python ferramentas/sincronizar.py --conferir (só confere as cópias embutidas)",
+  "gerar_harness_avac": "python ferramentas/testes-navegador/gerar_harness.py ferramentas/testes-navegador/teste-avac.html (página de conferência do AVAC com os casos novos)",
+  "sincronizar": "python ferramentas/sincronizar.py (refaz as cópias embutidas depois de troca de texto num programa)",
+  "gerar_demos": "python demos/gerar_demos.py (refaz as demonstrações depois de troca de texto nas telas)"
+ },
+ "arquivos_pos_aplicar": {
+  "sistema/physis-metodologia.json": [
+   "copiar_metodologia_js"
+  ],
+  "sistema/physis-certificacoes.json": [
+   "embutir_bases"
+  ],
+  "sistema/physis-plantas.json": [
+   "embutir_bases"
+  ],
+  "sistema/physis-fatores-emissao.json": [
+   "embutir_bases"
+  ],
+  "sistema/physis-evidencias.json": [
+   "embutir_bases"
+  ],
+  "sistema/physis-equipamentos.json": [
+   "embutir_bases"
+  ],
+  "sistema/physis-avac-casos.json": [
+   "gerar_harness_avac"
+  ],
+  "sistema/physis-i18n-modulos.json": [
+   "embutir_bases"
+  ]
+ },
+ "modulos": [
+  {
+   "id": "planejador",
+   "nome": "Planejador",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Rafaella"
+   ],
+   "metodologia": "planejador",
+   "doc17_secao": "Planejador",
+   "o_que_revisar": "Normas por bloco, APP, insolação, calhas (NBR 10844), conversão DWG, BIM.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "planejador"
+      ]
+     ],
+     "normas_de": "planejador"
+    },
+    {
+     "arquivo": "sistema/physis-premissas.json",
+     "premissas_de": "planejador"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "modulos/planejador/planejador-physis.html",
+    "servicos/calc/physis_calc/drenagem.py",
+    "servicos/calc/physis_calc/rede_agua.py",
+    "servicos/calc/physis_calc/comum.py",
+    "physis-hub/docs/METODOLOGIA.md",
+    "physis-hub/docs/MAPAS_E_DWG.md",
+    "physis-hub/tests/test_metodologia.py",
+    "physis-hub/tests/test_premissas.py",
+    "physis-hub/tests/test_mapas_dwg.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-planejador.html",
+     "como": "Abra no navegador (duplo clique). É o Planejador completo, sem internet."
+    }
+   ],
+   "testes": [
+    "test_metodologia",
+    "test_premissas",
+    "test_mapas_dwg"
+   ],
+   "aba": "planejador"
+  },
+  {
+   "id": "sustainkit",
+   "nome": "SustainKit",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Erick Lopes"
+   ],
+   "metodologia": "sustainkit",
+   "doc17_secao": "SustainKit",
+   "o_que_revisar": "Blocos, premissas unificadas, cisterna mês a mês (NBR 15527), custos.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "sustainkit"
+      ]
+     ],
+     "normas_de": "sustainkit"
+    },
+    {
+     "arquivo": "sistema/physis-premissas.json",
+     "premissas_de": "sustainkit"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/SustainKit_Definitivo.html",
+    "modulos/sustainkit/LEIA-ME.md",
+    "ferramentas/revisar_sustainkit.py",
+    "physis-hub/docs/METODOLOGIA.md",
+    "physis-hub/tests/test_premissas.py",
+    "physis-hub/tests/test_metodologia.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "ferramentas/conferir-sustainkit-blocos.html",
+     "como": "Abra no navegador. Se a leitura automática falhar, escolha o arquivo referencia/sistema/SustainKit_Definitivo.html no botão da página."
+    },
+    {
+     "arquivo": "ferramentas/conferir-sustainkit.html",
+     "como": "Abra no navegador."
+    },
+    {
+     "arquivo": "demos/physis-demo-sustainkit.html",
+     "como": "Abra no navegador (duplo clique)."
+    }
+   ],
+   "testes": [
+    "test_premissas",
+    "test_metodologia"
+   ],
+   "aba": "sustainkit"
+  },
+  {
+   "id": "solar",
+   "nome": "Energia solar",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Erick Lopes"
+   ],
+   "metodologia": "solar",
+   "doc17_secao": "Energia solar",
+   "o_que_revisar": "Perdas, inversor e strings (NBR 16690), Lei 14.300 (Fio B), irradiação no plano do painel.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "solar"
+      ]
+     ],
+     "normas_de": "solar"
+    },
+    {
+     "arquivo": "sistema/physis-premissas.json",
+     "premissas_de": "solar"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-solar.js",
+    "servicos/calc/physis_calc/pv.py",
+    "physis-hub/physis_hub/gis.py",
+    "physis-hub/docs/REVISAO_SOLAR.md",
+    "physis-hub/docs/METODOLOGIA.md",
+    "physis-hub/tests/test_solar.py",
+    "physis-hub/tests/test_gis.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba Energia solar."
+    }
+   ],
+   "testes": [
+    "test_solar",
+    "test_gis",
+    "test_metodologia",
+    "test_premissas"
+   ],
+   "aba": "solar"
+  },
+  {
+   "id": "avac",
+   "nome": "AVAC e carga térmica",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Ryan"
+   ],
+   "metodologia": "avac",
+   "doc17_secao": "AVAC e térmico",
+   "o_que_revisar": "Carga térmica (NBR 16401), correção do motor, pressurização (NBR 14880), quadro (NBR 5410).",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-avac-casos.json"
+    },
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "avac"
+      ]
+     ],
+     "normas_de": "avac"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-avac.js",
+    "sistema/physis-cargatermica.js",
+    "physis-hub/physis_hub/cargatermica.py",
+    "servicos/calc/physis_calc/termica.py",
+    "physis-hub/docs/REVISAO_AVAC.md",
+    "physis-hub/docs/CARGA_TERMICA.md",
+    "physis-hub/docs/METODOLOGIA.md",
+    "physis-hub/tests/test_cargatermica.py",
+    "physis-hub/tests/test_materiais.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "ferramentas/testes-navegador/teste-avac.html",
+     "como": "Abra no navegador: roda os casos de physis-avac-casos.json (os casos de quando o kit foi feito) contra o cálculo do AVAC."
+    },
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba AVAC e térmico."
+    }
+   ],
+   "testes": [
+    "test_cargatermica",
+    "test_materiais",
+    "test_metodologia"
+   ],
+   "aba": "avac"
+  },
+  {
+   "id": "turbinas",
+   "nome": "Turbinas",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Ryan",
+    "Emerson"
+   ],
+   "metodologia": "turbinas",
+   "doc17_secao": "Turbinas",
+   "o_que_revisar": "Hidráulica, eólica, curva certificada (IEC 61400-12-1), outorga de água.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "turbinas"
+      ]
+     ],
+     "normas_de": "turbinas"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-turbinas.js",
+    "physis-hub/physis_hub/vento.py",
+    "servicos/calc/physis_calc/eolica.py",
+    "physis-hub/docs/TURBINAS.md",
+    "physis-hub/tests/test_turbinas.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba Turbinas."
+    }
+   ],
+   "testes": [
+    "test_turbinas",
+    "test_metodologia"
+   ],
+   "aba": "turbinas"
+  },
+  {
+   "id": "agua",
+   "nome": "Qualidade da água",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Erick Lopes",
+    "Rafael"
+   ],
+   "metodologia": "agua",
+   "doc17_secao": "Qualidade da água",
+   "o_que_revisar": "Faixas por uso, calibração do pH, reúso (NBR 13969 / 17076). Lembrete: na água nenhum limite vem de fábrica e limite provisório não gera alerta.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "agua"
+      ]
+     ],
+     "normas_de": "agua"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "physis-hub/physis_hub/agua.py",
+    "physis-hub/physis_hub/ph_eletrodo.py",
+    "physis-hub/tests/test_agua.py",
+    "physis-hub/tests/test_ph.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba Qualidade da água."
+    }
+   ],
+   "testes": [
+    "test_agua",
+    "test_ph",
+    "test_metodologia"
+   ],
+   "aba": "agua"
+  },
+  {
+   "id": "sbn",
+   "nome": "SbN e viveiro",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Rafaella",
+    "Erick Lopes"
+   ],
+   "metodologia": "sbn",
+   "doc17_secao": "SbN e viveiro",
+   "o_que_revisar": "Itens 'Conferência', espaçamentos, consórcios, RENASEM, unidades de conservação.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-plantas.json"
+    },
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "sbn"
+      ]
+     ],
+     "normas_de": "sbn"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-sbn.js",
+    "physis-hub/docs/SBN.md",
+    "physis-hub/tests/test_sbn.py",
+    "physis-hub/tests/test_bases.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "ferramentas/conferir-sbn.html",
+     "como": "Abra no navegador e, no botão 'Base de plantas', escolha o arquivo editaveis/sistema/physis-plantas.json (o que você mudou). A página monta os consórcios e confere as regras."
+    },
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba SbN e viveiro (usa a base de quando o kit foi feito)."
+    }
+   ],
+   "testes": [
+    "test_sbn",
+    "test_bases",
+    "test_metodologia"
+   ],
+   "aba": "sbn"
+  },
+  {
+   "id": "circular",
+   "nome": "Economia circular",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Rafaella",
+    "Rafael"
+   ],
+   "metodologia": "circular",
+   "doc17_secao": "Economia circular",
+   "o_que_revisar": "NBR 10004:2024, rotas, fator de CO₂ do transporte, mapa de aterros.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "circular"
+      ]
+     ],
+     "normas_de": "circular"
+    },
+    {
+     "arquivo": "sistema/physis-premissas.json",
+     "premissas_de": "circular"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-circular-mapa.js",
+    "physis-hub/physis_hub/residuos_gis.py",
+    "physis-hub/docs/RESIDUOS_GIS.md",
+    "physis-hub/tests/test_residuos_gis.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba Economia circular."
+    }
+   ],
+   "testes": [
+    "test_residuos_gis",
+    "test_premissas",
+    "test_metodologia"
+   ],
+   "aba": "circular"
+  },
+  {
+   "id": "carbono",
+   "nome": "Carbono e ESG",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Marzia"
+   ],
+   "metodologia": "carbono",
+   "doc17_secao": "Carbono",
+   "o_que_revisar": "Fator da rede (MCTI), GWP, misturas de combustível, SBCE, dados sociais do relatório.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-fatores-emissao.json"
+    },
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "carbono"
+      ]
+     ],
+     "normas_de": "carbono"
+    },
+    {
+     "arquivo": "sistema/physis-premissas.json",
+     "premissas_de": "carbono"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-carbono.js",
+    "sistema/physis-relatorio-esg.js",
+    "physis-hub/physis_hub/carbono.py",
+    "physis-hub/docs/CARBONO_GHG.md",
+    "physis-hub/docs/RELATORIO_ESG.md",
+    "physis-hub/tests/test_carbono_ghg.py",
+    "physis-hub/tests/test_relatorio_esg.py",
+    "sistema/physis-odf.js"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba Carbono."
+    },
+    {
+     "arquivo": "ferramentas/conferir-odf.html",
+     "como": "Abra no navegador para ver como sai o documento aberto (ODF) do relatório."
+    }
+   ],
+   "testes": [
+    "test_carbono_ghg",
+    "test_relatorio_esg",
+    "test_premissas",
+    "test_metodologia"
+   ],
+   "aba": "carbono"
+  },
+  {
+   "id": "resiliencia",
+   "nome": "Resiliência climática",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Rafaella",
+    "Arthur"
+   ],
+   "metodologia": "resiliencia",
+   "doc17_secao": "Resiliência climática",
+   "o_que_revisar": "Limites de alerta, CEMADEN/INMET, painel municipal, avisos do INMET.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "resiliencia"
+      ]
+     ],
+     "normas_de": "resiliencia"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "physis-hub/physis_hub/alertas_clima.py",
+    "physis-hub/physis_hub/clima.py",
+    "physis-hub/physis_hub/municipio.py",
+    "physis-hub/web/municipio.html",
+    "physis-hub/docs/ALERTAS_CLIMA.md",
+    "physis-hub/docs/MUNICIPIO.md",
+    "physis-hub/tests/test_alertas_clima.py",
+    "physis-hub/tests/test_municipio.py",
+    "physis-hub/tests/test_clima.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba Resiliência climática."
+    }
+   ],
+   "testes": [
+    "test_alertas_clima",
+    "test_municipio",
+    "test_clima",
+    "test_metodologia"
+   ],
+   "aba": "resiliencia"
+  },
+  {
+   "id": "certificacoes",
+   "nome": "Certificações",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Rafaella",
+    "Laura",
+    "Ryan"
+   ],
+   "metodologia": "certificacoes",
+   "doc17_secao": "Certificações",
+   "o_que_revisar": "Quais critérios são pré-requisito de fato (hoje 233 de 356), evidências automáticas.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-certificacoes.json"
+    },
+    {
+     "arquivo": "sistema/physis-evidencias.json"
+    },
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "certificacoes"
+      ]
+     ],
+     "normas_de": "certificacoes"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-evidencias.js",
+    "physis-hub/physis_hub/evidencias.py",
+    "physis-hub/docs/EVIDENCIAS.md",
+    "physis-hub/tests/test_evidencias.py",
+    "physis-hub/tests/test_bases.py",
+    "physis-hub/tests/test_relatorio_esg.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba Certificações (usa a base de quando o kit foi feito)."
+    }
+   ],
+   "testes": [
+    "test_evidencias",
+    "test_bases",
+    "test_relatorio_esg",
+    "test_metodologia"
+   ],
+   "aba": "certificacoes"
+  },
+  {
+   "id": "equipamentos",
+   "nome": "Equipamentos e materiais",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Ryan"
+   ],
+   "metodologia": null,
+   "doc17_secao": null,
+   "o_que_revisar": "Itens 'verificar', preços por SINAPI ou cotação, Inmetro e CEC. Preço só com fonte (SINAPI do estado e mês, ou cotação); sem fonte fica [MARCADOR].",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-equipamentos.json"
+    },
+    {
+     "arquivo": "sistema/physis-materiais.json"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "physis-hub/docs/EQUIPAMENTOS.md",
+    "physis-hub/docs/MATERIAIS.md",
+    "ferramentas/importar_cec.py",
+    "ferramentas/importar_inmetro.py",
+    "physis-hub/tests/test_equipamentos.py",
+    "physis-hub/tests/test_materiais.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba AVAC e térmico (a sugestão de equipamento usa esta base)."
+    }
+   ],
+   "testes": [
+    "test_equipamentos",
+    "test_materiais",
+    "test_cargatermica"
+   ],
+   "aba": "avac"
+  },
+  {
+   "id": "monitoramento",
+   "nome": "Monitoramento verde e Caixinha (telas)",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Arthur"
+   ],
+   "metodologia": "campo",
+   "metodologia_extra": [
+    "zonas"
+   ],
+   "doc17_secao": "Monitoramento verde",
+   "o_que_revisar": "Tela original, mapa do receptor, rega automática.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "campo"
+      ],
+      [
+       "modulos",
+       "zonas"
+      ]
+     ],
+     "normas_de": "campo"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-tela-cliente.html",
+    "sistema/physis-mapa-local.js",
+    "physis-hub/physis_hub/zonas.py",
+    "physis-hub/physis_hub/mqtt.py",
+    "physis-hub/docs/MQTT.md",
+    "physis-hub/tests/test_mapa_local.py",
+    "physis-hub/tests/test_zonas.py",
+    "physis-hub/tests/test_mqtt.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "sistema/physis-tela-cliente.html",
+     "como": "Está em referencia/: abra no navegador (tela do cliente)."
+    },
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá às abas Monitoramento verde e Caixinha Physis IoT."
+    }
+   ],
+   "testes": [
+    "test_mapa_local",
+    "test_zonas",
+    "test_mqtt",
+    "test_metodologia"
+   ],
+   "aba": "campo"
+  },
+  {
+   "id": "saude",
+   "nome": "Saúde (telas e consentimento)",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Emerson",
+    "Rafael"
+   ],
+   "metodologia": "saude",
+   "doc17_secao": "Saúde",
+   "o_que_revisar": "Horários, alertas, consentimento, Bluetooth.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "saude"
+      ]
+     ],
+     "normas_de": "saude"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-saude.js",
+    "sistema/physis-ble.js",
+    "physis-hub/physis_hub/saude.py",
+    "physis-hub/docs/SAUDE.md",
+    "firmware/saude/BLE_PERFIL.md",
+    "physis-hub/tests/test_saude.py",
+    "physis-hub/tests/test_pluviometro_saude.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba Saúde."
+    }
+   ],
+   "testes": [
+    "test_saude",
+    "test_pluviometro_saude",
+    "test_metodologia"
+   ],
+   "aba": "saude"
+  },
+  {
+   "id": "scada",
+   "nome": "SCADA",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Erick Lopes",
+    "Laura",
+    "Rafaella"
+   ],
+   "metodologia": "supervisao",
+   "doc17_secao": "SCADA",
+   "o_que_revisar": "Sinótico com dados reais, comandos com confirmação, inglês.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "supervisao"
+      ]
+     ],
+     "normas_de": "supervisao"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-scada-demo.html",
+    "physis-hub/tests/test_preferencias_paginas.py",
+    "physis-hub/tests/test_sincronia.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-scada.html",
+     "como": "Abra no navegador (duplo clique)."
+    }
+   ],
+   "testes": [
+    "test_sincronia",
+    "test_metodologia"
+   ],
+   "aba": "supervisao"
+  },
+  {
+   "id": "cursos",
+   "nome": "Cursos",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Rafaella",
+    "Laura"
+   ],
+   "metodologia": "cursos",
+   "doc17_secao": null,
+   "o_que_revisar": "Curso de introdução, cursos à venda, preços. Preço só com decisão da direção; sem decisão fica [MARCADOR].",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "cursos"
+      ]
+     ]
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "physis-hub/docs/APRENDIZADO.md",
+    "physis-hub/docs/INSTITUTO.md"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador e vá à aba Cursos."
+    }
+   ],
+   "testes": [
+    "test_metodologia"
+   ],
+   "aba": "cursos"
+  },
+  {
+   "id": "acessibilidade",
+   "nome": "Acessibilidade, inglês e textos jurídicos",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Rafaella"
+   ],
+   "metodologia": "geral",
+   "doc17_secao": "Toda a plataforma",
+   "o_que_revisar": "Leitor de tela real (NVDA/JAWS), teste com pessoas PcD e neurodivergentes. Os textos jurídicos são editados no documento 09 (Minutas Jurídicas) e o Eric gera de novo o sistema/physis-juridico.js com ferramentas/gerar_juridico.py.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "geral"
+      ]
+     ],
+     "normas_de": "geral"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "resto"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-juridico.js",
+    "sistema/physis-preferencias.js",
+    "physis-hub/docs/PALETA.md",
+    "physis-hub/docs/SEGURANCA.md",
+    "physis-hub/docs/i18n-faltando.json",
+    "physis-hub/tests/test_preferencias.py",
+    "physis-hub/tests/test_seguranca.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "demos/physis-demo-cliente.html",
+     "como": "Abra no navegador; use o botão de preferências de leitura e o leitor de tela (NVDA ou JAWS)."
+    }
+   ],
+   "testes": [
+    "test_preferencias",
+    "test_seguranca",
+    "test_metodologia"
+   ],
+   "aba": "resumo"
+  },
+  {
+   "id": "hw-lora",
+   "nome": "Transmissor LoRa e Receptor V6",
+   "tipo": "hardware",
+   "responsaveis": [
+    "Arthur"
+   ],
+   "metodologia": null,
+   "doc17_secao": "Monitoramento verde",
+   "o_que_revisar": "Antes de ir a campo: firmware gravado, ID 1–99 anotado, chave do aparelho. Em campo: medir o sinal ponto a ponto, calibrar o solo (seco e saturado), bateria e painel. Atualizar os dois protocolo.cpp com PLUV, MED e PUL.",
+   "editaveis": [
+    {
+     "arquivo": "firmware/receptor-v6/src/config.h",
+     "texto": true
+    },
+    {
+     "arquivo": "firmware/transmissor-v6/src/config.h",
+     "texto": true
+    }
+   ],
+   "referencia": [
+    "firmware/receptor-v6/README.md",
+    "firmware/transmissor-v6/README.md",
+    "firmware/receptor-v6/src/protocolo.cpp",
+    "firmware/transmissor-v6/src/protocolo.cpp",
+    "firmware/receptor-v6/src/secrets.example.h",
+    "physis-hub/docs/PROTOCOLO.md",
+    "physis-hub/docs/EXTENSAO_V6.md",
+    "physis-hub/tests/test_protocolo.py"
+   ],
+   "conferir": [],
+   "testes": [
+    "test_protocolo",
+    "test_pluviometro_saude"
+   ],
+   "aba": "campo"
+  },
+  {
+   "id": "hw-caixinha",
+   "nome": "Caixinha Physis IoT (firmware)",
+   "tipo": "hardware",
+   "responsaveis": [
+    "Erick Lopes"
+   ],
+   "metodologia": "zonas",
+   "doc17_secao": "Caixinha Physis IoT",
+   "o_que_revisar": "Antes de ir a campo: ESPHome com secrets.yaml, nó cadastrado, Mosquitto com senha. Em campo: testar válvula e bomba, tempo máximo, falta de energia e queda do Wi-Fi.",
+   "editaveis": [
+    {
+     "arquivo": "firmware/caixinha/esphome/irrigacao-zona1.yaml",
+     "texto": true
+    },
+    {
+     "arquivo": "firmware/caixinha/homeassistant/automacoes-irrigacao.yaml",
+     "texto": true
+    }
+   ],
+   "referencia": [
+    "firmware/caixinha/README.md",
+    "firmware/caixinha/docs/caixinha-irrigacao-automatizada.md",
+    "firmware/caixinha/esphome/secrets.example.yaml",
+    "physis-hub/physis_hub/mqtt.py",
+    "physis-hub/docs/MQTT.md",
+    "physis-hub/tests/test_mqtt.py"
+   ],
+   "conferir": [],
+   "testes": [
+    "test_mqtt"
+   ],
+   "aba": "zonas"
+  },
+  {
+   "id": "hw-coleira",
+   "nome": "Coleira e comedouro",
+   "tipo": "hardware",
+   "responsaveis": [
+    "Rafael"
+   ],
+   "metodologia": "animais",
+   "doc17_secao": "Animais",
+   "o_que_revisar": "Antes de ir a campo: portar a coleira para RadioLib (TDMA); comedouro via serial e ESP32. Em campo: GPS e LoRa no pasto, resistência, bateria.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "animais"
+      ]
+     ],
+     "normas_de": "animais"
+    }
+   ],
+   "referencia": [
+    "firmware/animais/smartcolar_comentado/smartcolar_comentado.ino",
+    "firmware/animais/autofeeder_comentado/autofeeder_comentado.ino",
+    "physis-hub/docs/PROTOCOLO.md",
+    "physis-hub/docs/EXTENSAO_V6.md"
+   ],
+   "conferir": [],
+   "testes": [
+    "test_protocolo",
+    "test_metodologia"
+   ],
+   "aba": "animais"
+  },
+  {
+   "id": "hw-pluviometro",
+   "nome": "Pluviômetro Physis",
+   "tipo": "hardware",
+   "responsaveis": [
+    "Rafaella",
+    "Arthur"
+   ],
+   "metodologia": null,
+   "doc17_secao": "Resiliência climática",
+   "o_que_revisar": "Antes de ir a campo: protótipo de báscula, configuração gerada pelo robô. Em campo: calibrar em mm por basculada, comparando com a estação do CEMADEN mais próxima.",
+   "editaveis": [
+    {
+     "arquivo": "firmware/pluviometro/parametros.json",
+     "bloqueadas": [
+      [
+       "aparelho"
+      ]
+     ]
+    }
+   ],
+   "referencia": [
+    "physis-hub/docs/ROBOS.md",
+    "physis-hub/docs/PROTOCOLO.md",
+    "physis-hub/tests/test_pluviometro_saude.py",
+    "physis-hub/tests/test_robos.py",
+    "physis-hub/physis_hub/robos.py",
+    "physis-hub/physis_hub/municipio.py"
+   ],
+   "conferir": [],
+   "testes": [
+    "test_pluviometro_saude",
+    "test_robos"
+   ],
+   "aba": "resiliencia"
+  },
+  {
+   "id": "hw-remedios",
+   "nome": "Caixinha de remédios",
+   "tipo": "hardware",
+   "responsaveis": [
+    "Emerson",
+    "Rafael"
+   ],
+   "metodologia": null,
+   "doc17_secao": "Saúde",
+   "o_que_revisar": "Antes de ir a campo: firmware ESP32 com o perfil Bluetooth, horários e NTP. Em campo: teste com cuidadores (com termo de consentimento). Homologar as linhas MED e PUL com a equipe clínica.",
+   "editaveis": [
+    {
+     "arquivo": "firmware/saude/parametros-caixinha.json",
+     "bloqueadas": [
+      [
+       "ble"
+      ]
+     ]
+    },
+    {
+     "arquivo": "firmware/saude/BLE_PERFIL.md",
+     "texto": true
+    }
+   ],
+   "referencia": [
+    "physis-hub/docs/SAUDE.md",
+    "sistema/physis-ble.js",
+    "physis-hub/physis_hub/saude.py",
+    "physis-hub/tests/test_saude.py",
+    "physis-hub/tests/test_pluviometro_saude.py",
+    "physis-hub/tests/test_app_nativo.py"
+   ],
+   "conferir": [],
+   "testes": [
+    "test_saude",
+    "test_pluviometro_saude",
+    "test_app_nativo"
+   ],
+   "aba": "saude"
+  },
+  {
+   "id": "hw-pulseira",
+   "nome": "Pulseira",
+   "tipo": "hardware",
+   "responsaveis": [
+    "Emerson"
+   ],
+   "metodologia": null,
+   "doc17_secao": "Saúde",
+   "o_que_revisar": "Antes de ir a campo: placa, sensor, regra de crise validada por especialistas. Em campo: duração da bateria, teste com voluntários (com termo). Homologar o valor-limite de batimentos (LIMBPM) com a equipe clínica.",
+   "editaveis": [
+    {
+     "arquivo": "firmware/saude/parametros-pulseira.json",
+     "bloqueadas": [
+      [
+       "ble"
+      ]
+     ]
+    }
+   ],
+   "referencia": [
+    "physis-hub/docs/SAUDE.md",
+    "firmware/saude/BLE_PERFIL.md",
+    "physis-hub/physis_hub/saude.py",
+    "physis-hub/tests/test_saude.py",
+    "physis-hub/tests/test_pluviometro_saude.py",
+    "sistema/physis-ble.js"
+   ],
+   "conferir": [],
+   "testes": [
+    "test_saude",
+    "test_pluviometro_saude"
+   ],
+   "aba": "saude"
+  },
+  {
+   "id": "servidor",
+   "nome": "Servidor e implantação",
+   "tipo": "hardware",
+   "responsaveis": [
+    "Eric Oliveira"
+   ],
+   "metodologia": null,
+   "doc17_secao": null,
+   "o_que_revisar": "Máquina, domínio e HTTPS, e-mail de saída, serviços (docker compose), itens [CONFERIR], servidor de IA, cópias de segurança, monitoramento, Instituto, repositório próprio (documento 18, seções 1 e 2).",
+   "editaveis": [
+    {
+     "arquivo": "servicos/.env.exemplo",
+     "texto": true
+    },
+    {
+     "arquivo": "implantacao/physis.env.exemplo",
+     "texto": true
+    }
+   ],
+   "referencia": [
+    "physis-hub/docs/IMPLANTACAO.md",
+    "physis-hub/docs/SERVICOS_ABERTOS.md",
+    "physis-hub/docs/SEGURANCA.md",
+    "physis-hub/docs/INSTITUTO.md",
+    "servicos/docker-compose.yml",
+    "servicos/preparar.sh",
+    "implantacao/instalar.sh",
+    "implantacao/verificar.sh",
+    "implantacao/backup.sh",
+    "implantacao/restaurar.sh",
+    "physis-hub/tests/test_implantacao.py",
+    "physis-hub/tests/test_seguranca.py"
+   ],
+   "conferir": [],
+   "testes": [
+    "test_implantacao",
+    "test_seguranca"
+   ],
+   "aba": "resumo"
+  }
+ ]
+}

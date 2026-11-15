@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prévia da revisão · Physis</title>
+<style>
+  :root { --fundo:#F4F6F1; --sup:#FFFFFF; --texto:#1C2B21; --texto2:#4A4F44; --verde:#33512F; --linha:#C9D2C4;
+          --at:#8A6410; --at-f:#F6EAD0; --pr:#1F4A1C; --pr-f:#DCEBD8; --inf:#1C3550; --inf-f:#DBE7F1; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fundo); color: var(--texto); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1400px; margin: 0 auto; padding: 16px; }
+  h1 { font-family: Fraunces, Georgia, serif; color: var(--verde); font-size: 1.6rem; margin: 0 0 8px; }
+  h2 { font-size: 1.1rem; margin: 16px 0 6px; }
+  .caixa { background: var(--sup); border: 1px solid var(--linha); border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+  button, input[type=file] { font: inherit; min-height: 44px; }
+  button { background: var(--verde); color: #FFFFFF; border: 0; border-radius: 6px; padding: 8px 16px; cursor: pointer; margin: 4px 8px 4px 0; }
+  button.sec { background: var(--sup); color: var(--verde); border: 1px solid var(--verde); }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--inf); outline-offset: 2px; }
+  #estado { padding: 8px 12px; border-radius: 6px; background: var(--inf-f); color: var(--inf); }
+  #avisos li { color: var(--at); }
+  #avisos:empty, #mudancas:empty { display: none; }
+  ul { margin: 4px 0; padding-left: 20px; overflow-wrap: anywhere; }
+  #quadro { width: 100%; height: 80vh; border: 1px solid var(--linha); border-radius: 8px; background: var(--sup); }
+  .sec-texto { color: var(--texto2); }
+</style>
+</head>
+<body>
+<main>
+<h1>Prévia da revisão</h1>
+<p class="sec-texto" id="sobre">Mostra a plataforma de demonstração com os arquivos que você mudou, sem internet e sem servidor. Nada é gravado: é só para ver.</p>
+<p id="estado" role="status" aria-live="polite">Carregando…</p>
+<section class="caixa" aria-labelledby="t-escolher">
+  <h2 id="t-escolher">1. Escolha os arquivos que você mudou</h2>
+  <p><label for="arquivos">Arquivos da pasta <code>editaveis/</code> do kit (pode escolher vários de uma vez, com Ctrl):</label><br>
+  <input type="file" id="arquivos" multiple accept=".json,application/json"></p>
+  <p><button type="button" id="abrir">Abrir a plataforma com as mudanças</button>
+     <button type="button" class="sec" id="original">Abrir sem mudanças</button>
+     <button type="button" class="sec" id="cheia" disabled>Abrir em tela cheia</button></p>
+</section>
+<section class="caixa" aria-labelledby="t-mudou">
+  <h2 id="t-mudou">2. O que mudou</h2>
+  <ul id="avisos"></ul>
+  <ul id="mudancas"></ul>
+  <p id="nada" class="sec-texto">Nenhuma mudança carregada ainda.</p>
+</section>
+<iframe id="quadro" title="Plataforma de demonstração com as mudanças (prévia)"></iframe>
+</main>
+<script type="application/json" id="previa-dados">null</script>
+<script>
+(function () {
+"use strict";
+var el = function (id) { return document.getElementById(id); };
+var D = null;
+try { D = JSON.parse(el("previa-dados").textContent); } catch (e) { D = null; }
+var escolhidos = {}, urlAtual = null;
+
+function avisar(t) { el("estado").textContent = t; }
+function clonar(x) { return JSON.parse(JSON.stringify(x)); }
+function curto(v) { var t = JSON.stringify(v); if (t === undefined) t = String(v); return t.length > 90 ? t.slice(0, 89) + "…" : t; }
+function idx(lista, s) {
+  if (typeof s === "number") return s;
+  var i = String(s).indexOf("="); if (i < 0) return -1;
+  var k = s.slice(0, i), v = s.slice(i + 1);
+  for (var j = 0; j < lista.length; j++) { var x = lista[j]; if (x && typeof x === "object" && String(x[k]) === v) return j; }
+  return -1;
+}
+function pegar(d, cam) {
+  var a = d;
+  for (var i = 0; i < cam.length; i++) {
+    a = Array.isArray(a) ? a[idx(a, cam[i])] : (a ? a[cam[i]] : undefined);
+    if (a === undefined) throw new Error("caminho não encontrado: " + cam.join(" › "));
+  }
+  return a;
+}
+function trocar(d, cam, v) {
+  if (!cam.length) return v;
+  var pai = pegar(d, cam.slice(0, -1)), s = cam[cam.length - 1];
+  if (Array.isArray(pai)) { var i = idx(pai, s); if (i < 0) throw new Error("registro não encontrado: " + s); pai[i] = v; }
+  else pai[s] = v;
+  return d;
+}
+function chaveId(l) {
+  if (!l.length || !l.every(function (x) { return x && typeof x === "object" && !Array.isArray(x); })) return null;
+  var ks = ["id", "n", "codigo"];
+  for (var i = 0; i < ks.length; i++) {
+    var k = ks[i], vs = l.map(function (x) { return x[k]; });
+    if (vs.every(function (v) { return typeof v === "string" || typeof v === "number"; }) &&
+        new Set(vs.map(String)).size === vs.length) return k;
+  }
+  return null;
+}
+function nomeDe(x) { var ks = ["nome", "grandeza", "descricao", "titulo"]; for (var i = 0; i < ks.length; i++) if (x && typeof x[ks[i]] === "string") return " (" + x[ks[i]].slice(0, 40) + ")"; return ""; }
+function diff(o, n, cam, out) {
+  if (out.length > 300) return;
+  if (JSON.stringify(o) === JSON.stringify(n)) return;
+  var j = function (c) { return c.join(" › "); };
+  if (o && n && typeof o === "object" && typeof n === "object" && Array.isArray(o) === Array.isArray(n)) {
+    if (Array.isArray(o)) {
+      var k = chaveId(o);
+      if (k) {
+        var mapa = {}, velhos = {};
+        n.forEach(function (y) { if (y && typeof y === "object") mapa[String(y[k])] = y; });
+        o.forEach(function (x) { velhos[String(x[k])] = 1; var y = mapa[String(x[k])], s = k + "=" + x[k] + nomeDe(x);
+          if (y === undefined) out.push(j(cam.concat(s)) + ": apagado (a validação vai recusar)"); else diff(x, y, cam.concat(s), out); });
+        n.forEach(function (y) { if (y && !velhos[String(y[k])]) out.push(j(cam) + ": registro novo " + k + "=" + y[k] + nomeDe(y)); });
+        return;
+      }
+      if (o.length === n.length) { for (var i = 0; i < o.length; i++) diff(o[i], n[i], cam.concat(i), out); return; }
+    } else {
+      Object.keys(n).forEach(function (k2) { if (k2 in o) diff(o[k2], n[k2], cam.concat(k2), out); else out.push(j(cam.concat(k2)) + ": acrescentado " + curto(n[k2])); });
+      Object.keys(o).forEach(function (k2) { if (!(k2 in n)) out.push(j(cam.concat(k2)) + ": apagado (a validação vai recusar)"); });
+      return;
+    }
+  }
+  out.push((j(cam) || "(arquivo)") + ": era " + curto(o) + ", ficou " + curto(n));
+}
+function jsonEmScript(x, recuo) {
+  return JSON.stringify(x, null, recuo || 0).replace(/<\//g, "<\\/").replace(/<!--/g, "<\\u0021--");
+}
+function trocarBloco(t, id, dados) {
+  var ab = '<script type="application/json" id="' + id + '">', i = t.indexOf(ab);
+  if (i < 0) return null;
+  var f = t.indexOf("</script>", i + ab.length);
+  return t.slice(0, i + ab.length) + jsonEmScript(dados) + t.slice(f);
+}
+function trocarMetodologia(t, dados) {
+  var ab = '<script id="mod-metodologia">', i = t.indexOf(ab);
+  if (i < 0) return null;
+  var f = t.indexOf("</script>", i), bloco = t.slice(i, f);
+  var re = /(\/\*DADOS-INICIO\*\/\s*const DADOS = )[\s\S]*?(;\s*\/\*DADOS-FIM\*\/)/;
+  if (!re.test(bloco)) return null;
+  var novo = bloco.replace(re, function (m, a, b) { return a + jsonEmScript(dados, 1) + b; });
+  return t.slice(0, i) + novo + t.slice(f);
+}
+function contar(t, s) { return s ? t.split(s).length - 1 : 0; }
+
+function montar() {
+  var t = D.plataforma, lista = [], avisos = [];
+  D.editaveis.forEach(function (e) {
+    var txt = escolhidos[e.nome];
+    if (txt == null) return;
+    if (e.tipo === "texto") { lista.push(e.nome + ": arquivo de texto (firmware ou configuração); não aparece na plataforma."); return; }
+    var novo;
+    try { novo = JSON.parse(String(txt).replace(/^﻿/, "")); }
+    catch (err) { avisos.push(e.nome + ": o JSON não abre (" + err.message + "). Em geral é vírgula ou aspas faltando."); return; }
+    if (e.tipo === "trocas") {
+      (novo.trocas || []).forEach(function (tr) {
+        if (!tr || typeof tr.antes !== "string" || typeof tr.depois !== "string") return;
+        var n = contar(t, tr.antes);
+        if (n === 1) { t = t.replace(tr.antes, function () { return tr.depois; }); lista.push("Texto trocado: “" + tr.antes + "” → “" + tr.depois + "”"); }
+        else avisos.push("Troca de texto não mostrada na prévia (o texto aparece " + n + " vez(es) na plataforma): “" + tr.antes.slice(0, 80) + "”");
+      });
+      return;
+    }
+    var orig = D.originais[e.fonte];
+    if (orig === undefined) { avisos.push(e.nome + ": sem a cópia original no kit."); return; }
+    var completo = novo;
+    if (e.tipo === "json-partes") {
+      completo = clonar(orig);
+      (novo.partes || []).forEach(function (p) {
+        try { trocar(completo, p.caminho, p.valor); } catch (err) { avisos.push(e.nome + ": " + err.message); }
+      });
+    }
+    var difs = [];
+    diff(orig, completo, [e.fonte.split("/").pop()], difs);
+    lista = lista.concat(difs);
+    var bloco = D.blocos[e.fonte];
+    if (!bloco) { if (difs.length) avisos.push(e.nome + ": esta base não aparece na plataforma; a mudança está na lista abaixo."); return; }
+    var r = bloco === "mod-metodologia" ? trocarMetodologia(t, completo) : trocarBloco(t, bloco, completo);
+    if (r === null) avisos.push(e.nome + ": não achei o lugar desta base na plataforma."); else t = r;
+  });
+  return { texto: t, lista: lista, avisos: avisos };
+}
+
+function mostrar(lista, avisos) {
+  var ul = el("mudancas"), av = el("avisos");
+  ul.textContent = ""; av.textContent = "";
+  lista.forEach(function (x) { var li = document.createElement("li"); li.textContent = x; ul.appendChild(li); });
+  avisos.forEach(function (x) { var li = document.createElement("li"); li.textContent = x; av.appendChild(li); });
+  el("nada").hidden = !!(lista.length || avisos.length);
+}
+
+function abrir(semMudancas) {
+  if (!D) return;
+  var r = semMudancas ? { texto: D.plataforma, lista: [], avisos: [] } : montar();
+  mostrar(r.lista, r.avisos);
+  if (urlAtual) URL.revokeObjectURL(urlAtual);
+  urlAtual = URL.createObjectURL(new Blob([r.texto], { type: "text/html;charset=utf-8" }));
+  el("quadro").src = urlAtual + "#" + (D.aba || "resumo");
+  el("cheia").disabled = false;
+  avisar((semMudancas ? "Plataforma sem mudanças" : "Plataforma com " + r.lista.length + " mudança(s)") +
+         ", aberta na aba " + (D.aba || "resumo") + ". Use o menu da plataforma para ir a outras abas e o botão de idioma para ver o inglês.");
+  return r;
+}
+
+function carregarTextos(mapa) {
+  Object.keys(mapa).forEach(function (n) { escolhidos[n] = mapa[n]; });
+  return abrir(false);
+}
+
+el("arquivos").addEventListener("change", function () {
+  var fs = Array.prototype.slice.call(this.files || []), conhecidos = {}, ign = [];
+  D.editaveis.forEach(function (e) { conhecidos[e.nome] = 1; });
+  var lendo = fs.filter(function (f) { if (!conhecidos[f.name]) { ign.push(f.name); return false; } return true; })
+    .map(function (f) { return f.text().then(function (t) { escolhidos[f.name] = t; }); });
+  Promise.all(lendo).then(function () {
+    abrir(false);
+    if (ign.length) { var li = document.createElement("li"); li.textContent = "Ignorados (não são editáveis deste kit): " + ign.join(", "); el("avisos").appendChild(li); el("nada").hidden = true; }
+  });
+});
+el("abrir").addEventListener("click", function () { abrir(false); });
+el("original").addEventListener("click", function () { abrir(true); });
+el("cheia").addEventListener("click", function () { if (urlAtual) window.open(urlAtual + "#" + (D.aba || "resumo"), "_blank"); });
+
+if (!D) {
+  avisar("Esta é a cópia de referência. Abra o arquivo ABRIR-PREVIA.html na pasta de cima do kit: ele já traz a plataforma.");
+  ["arquivos", "abrir", "original"].forEach(function (id) { el(id).disabled = true; });
+} else {
+  document.title = "Prévia da revisão · " + D.nome;
+  el("sobre").textContent = "Kit " + D.kit + " (" + D.nome + "). Mostra a plataforma de demonstração com os arquivos que você mudou, sem internet e sem servidor. Nada é gravado: é só para ver.";
+  avisar("Pronto. Escolha os arquivos que você mudou ou abra a plataforma sem mudanças.");
+}
+window.PREVIA = { carregarTextos: carregarTextos, abrir: abrir, montar: montar };
+})();
+</script>
+</body>
+</html>

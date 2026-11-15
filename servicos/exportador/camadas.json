@@ -1,0 +1,31 @@
+{
+  "_leia": "Camadas do GeoServer da Physis. 'shapefile'/'geotiff': arquivos baixados à mão para ${PHYSIS_DADOS}/camadas/<pasta> (licença e data anotadas aqui). 'wfs_cascata': o GeoServer repassa um WFS público. URLs marcadas [CONFERIR] não foram verificadas; confira no portal da fonte antes de usar.",
+  "espaco": "physis",
+  "camadas": [
+    {"nome": "hub_lugar", "tipo": "postgis", "tabela": "hub_lugar", "titulo": "Lugar da instalação (Physis Hub)",
+     "fonte": "Physis Hub (exportar_hub.py)"},
+    {"nome": "ibge_biomas", "tipo": "shapefile", "pasta": "ibge/biomas", "titulo": "Biomas do Brasil",
+     "fonte": "IBGE - Biomas, escala 1:250.000", "licenca": "dados públicos do IBGE (citar a fonte)",
+     "download": "[CONFERIR] geoftp.ibge.gov.br - informacoes_ambientais/estudos_ambientais/biomas"},
+    {"nome": "ibge_vegetacao", "tipo": "shapefile", "pasta": "ibge/vegetacao", "titulo": "Vegetação",
+     "fonte": "IBGE - BDiA, vegetação 1:250.000", "licenca": "dados públicos do IBGE (citar a fonte)",
+     "download": "[CONFERIR] BDiA do IBGE ou geoftp.ibge.gov.br - informacoes_ambientais/vegetacao"},
+    {"nome": "ibge_pedologia", "tipo": "shapefile", "pasta": "ibge/pedologia", "titulo": "Pedologia (solos)",
+     "fonte": "IBGE - BDiA, pedologia 1:250.000", "licenca": "dados públicos do IBGE (citar a fonte)",
+     "download": "[CONFERIR] geoftp.ibge.gov.br - informacoes_ambientais/pedologia"},
+    {"nome": "ibge_geomorfologia", "tipo": "shapefile", "pasta": "ibge/geomorfologia", "titulo": "Geomorfologia",
+     "fonte": "IBGE - BDiA, geomorfologia 1:250.000", "licenca": "dados públicos do IBGE (citar a fonte)",
+     "download": "[CONFERIR] geoftp.ibge.gov.br - informacoes_ambientais/geomorfologia"},
+    {"nome": "ibge_clima", "tipo": "shapefile", "pasta": "ibge/clima", "titulo": "Clima do Brasil",
+     "fonte": "IBGE - Mapa de Clima do Brasil", "licenca": "dados públicos do IBGE (citar a fonte)",
+     "download": "[CONFERIR] geoftp.ibge.gov.br - informacoes_ambientais/climatologia"},
+    {"nome": "ibge_wfs", "tipo": "wfs_cascata", "titulo": "IBGE - serviço WFS (cascata)",
+     "capabilities": "[CONFERIR] https://geoservicos.ibge.gov.br/geoserver/wfs?service=WFS&version=1.0.0&request=GetCapabilities"},
+    {"nome": "mapbiomas_cobertura", "tipo": "geotiff", "arquivo": "mapbiomas/cobertura.tif",
+     "titulo": "MapBiomas - cobertura e uso da terra", "fonte": "Projeto MapBiomas - coleção [CONFERIR] (CC-BY 4.0, citar)",
+     "download": "[CONFERIR] downloads da coleção no MapBiomas; recortar o estado/bioma do cliente"},
+    {"nome": "sinir_destinacao", "tipo": "shapefile", "pasta": "sinir/destinacao", "titulo": "SINIR - unidades de destinação de resíduos",
+     "fonte": "SINIR / MMA [CONFERIR]",
+     "download": "[CONFERIR] sem WFS conhecido; converter a planilha com coordenadas em shapefile antes de importar"}
+  ]
+}

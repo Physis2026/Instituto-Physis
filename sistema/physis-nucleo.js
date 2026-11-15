@@ -126,13 +126,18 @@
   var FAIXAS = {
     energia: [0, 500, "kW"], tensao: [198, 242, "V"], corrente: [0, 630, "A"],
     fp: [0.92, 1, "-"], temperatura: [0, 80, "C"], umidade: [20, 90, "%"],
-    nivel: [5, 95, "%"], pressao: [0, 10, "bar"], vazao: [0, 100, "m3/h"]
+    nivel: [5, 95, "%"], pressao: [0, 10, "bar"], vazao: [0, 100, "m3/h"],
+    // pluviômetro de báscula (TIPO:PLUV): chuva no intervalo e intensidade (mm/h, calculada pelo hub)
+    chuva: [0, 200, "mm"], chuva_intensidade: [null, null, "mm/h"],
+    // secador solar (TIPO:SEC, a homologar): o limite de temperatura é do produto (physis-secador.js), não daqui
+    temperatura_interna: [null, null, "C"], umidade_interna: [0, 100, "%"], temperatura_coletor: [null, null, "C"],
+    peso_produto: [null, null, "kg"], irradiancia: [0, 1500, "W/m2"]
   };
   function avaliarAlarme(grandeza, valor, faixas) {
     var f = (faixas || FAIXAS)[grandeza];
-    if (!f) return "sem_faixa";
-    if (valor < f[0]) return "baixo";
-    if (valor > f[1]) return "alto";
+    if (!f || (f[0] == null && f[1] == null)) return "sem_faixa";
+    if (f[0] != null && valor < f[0]) return "baixo";
+    if (f[1] != null && valor > f[1]) return "alto";
     return "ok";
   }
 

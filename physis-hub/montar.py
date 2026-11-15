@@ -26,7 +26,7 @@ AQUI = Path(__file__).resolve().parent
 # "animais" = coleiras + comedouros (nome antigo, aceito); os demais com aba "em desenvolvimento" na plataforma
 MODULOS = ("monitoramento", "agua", "zonas", "animais", "coleiras", "comedouros", "sustainkit", "supervisao", "gestao",
            "painel", "planejador", "certificacoes", "solar", "avac", "turbinas", "sbn", "circular", "carbono",
-           "resiliencia", "medicamentos", "pulseira", "cursos")
+           "resiliencia", "medicamentos", "pulseira", "cursos", "secador", "servidor-verde")
 # instalação: "physis" (padrão: plataforma de cliente ou servidor da Physis) ou "instituto" (Instituto Physis:
 # pesquisa, cursos e projetos sociais; mesmo código, banco, marca, suporte e catálogo próprios; docs/INSTITUTO.md)
 INSTALACOES = ("physis", "instituto")
@@ -141,6 +141,8 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
     shutil.copy2(AQUI / "web" / "painel.html", pasta / "web" / "painel.html")
     if (AQUI / "web" / "app").is_dir():      # app instalável no celular (manifesto, ícones, service worker)
         shutil.copytree(AQUI / "web" / "app", pasta / "web" / "app")
+    if (AQUI.parent / "implantacao").is_dir():   # instalador do Raspberry/mini PC, backup, atualização e verificação
+        shutil.copytree(AQUI.parent / "implantacao", pasta / "implantacao", ignore=shutil.ignore_patterns("*.env"))
     if "sustainkit" in modulos:
         shutil.copy2(sustainkit, pasta / "web" / "sustainkit.html")
     if "supervisao" in modulos:

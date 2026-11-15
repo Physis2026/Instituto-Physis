@@ -34,9 +34,16 @@ FAIXAS: dict[str, tuple[float | None, float | None, str]] = {
     # pluviometro de bascula (TIPO:PLUV): chuva no intervalo e intensidade (mm/h, calculada pelo hub)
     "chuva": (0, 200, "mm"),
     "chuva_intensidade": (None, None, "mm/h"),
+    # secador solar (TIPO:SEC, a homologar): o limite de temperatura e do produto (secador.py), nao daqui
+    "temperatura_interna": (None, None, "C"),
+    "umidade_interna": (0, 100, "%"),
+    "temperatura_coletor": (None, None, "C"),
+    "peso_produto": (None, None, "kg"),
+    "irradiancia": (0, 1500, "W/m2"),
 }
 GRANDEZAS_NOVAS = ("umidade_solo", "estado", "previsao_min", "bateria", "rssi", "snr",
-                   "latitude", "longitude", "atividade", "impacto", "porcoes", "chuva", "chuva_intensidade")
+                   "latitude", "longitude", "atividade", "impacto", "porcoes", "chuva", "chuva_intensidade",
+                   "temperatura_interna", "umidade_interna", "temperatura_coletor", "peso_produto", "irradiancia")
 
 
 def org_valido(org: str) -> bool:

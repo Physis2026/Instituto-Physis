@@ -15,6 +15,7 @@ TIPOS = {
     "COL": "Coleira (SmartColar)",
     "COM": "Comedouro (AutoFeeder)",
     "PLUV": "Pluviometro de bascula",
+    "SEC": "Secador solar (a homologar)",
 }
 # MED e PUL (Saude) nunca passam por aqui: o hub as entrega a saude.py antes (dado sensivel fora de `medicao`).
 INTENSIDADE_INTERVALO_MAX_S = 3 * 3600     # intervalo maior que isso: a intensidade nao e calculada
@@ -87,6 +88,10 @@ def interpretar(campos: dict[str, str]) -> dict:
     elif tipo == "PLUV":
         pul = para_float(campos.get("PUL"))
         est.update({"chi": f("CHI"), "pul": int(pul) if pul is not None else None})
+    elif tipo == "SEC":
+        b = lambda k: None if para_float(campos.get(k)) is None else para_bool(campos.get(k))
+        est.update({"ti": f("TI"), "ui": f("UI"), "te": f("TE"), "ue": f("UE"), "tc": f("TC"),
+                    "vent": b("VENT"), "abt": b("ABT"), "peso": f("PESO"), "irr": f("IRR")})
     return est
 
 
@@ -127,4 +132,16 @@ def adaptar(campos: dict[str, str], org: str, lugar: str, intervalo_s: float | N
     elif e["tipo"] == "PLUV":
         _m(out, org, "chuva", base, e["chi"], ts)
         _m(out, org, "chuva_intensidade", base, intensidade_chuva(e["chi"], intervalo_s), ts)
+    elif e["tipo"] == "SEC":
+        _m(out, org, "temperatura_interna", base, e["ti"], ts)
+        _m(out, org, "umidade_interna", base, e["ui"], ts)
+        _m(out, org, "temperatura_coletor", base, e["tc"], ts)
+        _m(out, org, "temperatura", base + "-ext", e["te"], ts)
+        _m(out, org, "umidade", base + "-ext", e["ue"], ts)
+        _m(out, org, "peso_produto", base, e["peso"], ts)
+        _m(out, org, "irradiancia", base, e["irr"], ts)
+        if e["vent"] is not None:
+            _m(out, org, "estado", base + "-ventilador", 1.0 if e["vent"] else 0.0, ts)
+        if e["abt"] is not None:
+            _m(out, org, "estado", base + "-tampa", 1.0 if e["abt"] else 0.0, ts)
     return out

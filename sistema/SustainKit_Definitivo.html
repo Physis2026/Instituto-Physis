@@ -283,6 +283,7 @@ html[data-em-quadro] .sk-barra>.hdr-ctrl,html[data-em-quadro] .sk-barra>nav,html
 html[data-em-quadro] h1{display:none!important}
 @media (max-width:480px){.sk-barra>.hdr-ctrl,.sk-barra>nav,.content{padding-left:16px;padding-right:16px}.hdr-ctrl select{width:100%}}
 </style>
+<script type="application/json" id="base-materiais">{"_leia":"Base de materiais da Physis: propriedades térmicas (densidade, condutividade, calor específico), carbono incorporado e custo (custo fica [MARCADOR] até cotação/SINAPI). Composições típicas de paredes e coberturas com U, capacidade térmica e atraso calculados pelo método da ABNT NBR 15220-2 (redação própria) e comparados aos limites simplificados da NBR 15575 e às diretrizes da NBR 15220-3. Valores lembrados de tabelas públicas: 'verificar' = conferir antes de emitir.","versao":1,"compilado_em":"2026-11-15","unidades":{"densidade":"kg/m³","condutividade":"W/(m·K)","calor_especifico":"J/(kg·K)","ct":"kJ/(m²·K)","atraso":"h","u":"W/(m²·K)","carbono_incorporado":"kgCO2e/kg (berço ao portão, A1–A3)"},"resistencias_superficiais":{"parede":{"rsi":0.13,"rse":0.04},"cobertura_verao":{"rsi":0.17,"rse":0.04},"fonte":"ABNT NBR 15220-2 (tabela de resistências superficiais)"},"limites":{"nbr15575_parede":{"u_max_zb1_2":2.7,"u_max_zb3_8_alfa_ate_06":3.7,"u_max_zb3_8_alfa_acima_06":2.5,"ct_min_zb1_7":130,"fonte":"ABNT NBR 15575-4:2021, requisitos de transmitância e capacidade térmica de paredes externas (procedimento simplificado) — verificar valores na norma"},"nbr15575_cobertura":{"u_max_zb1_2":2.3,"u_max_zb3_6_alfa_ate_06":2.3,"u_max_zb3_6_alfa_acima_06":1.5,"u_max_zb7_8_alfa_ate_04":2.3,"u_max_zb7_8_alfa_acima_04":1.5,"fonte":"ABNT NBR 15575-5:2021, requisito de transmitância de coberturas (procedimento simplificado; em ZB7–8 multiplica pelo fator de ventilação) — verificar"},"nbr15220_3":{"parede":{"leve":{"u_max":3.0,"atraso_max":4.3,"zonas":[1,2]},"leve_refletora":{"u_max":3.6,"atraso_max":4.3,"zonas":[3,5,8]},"pesada":{"u_max":2.2,"atraso_min":6.5,"zonas":[4,6,7]}},"cobertura":{"leve_isolada":{"u_max":2.0,"atraso_max":3.3,"zonas":[1,2,3,4,5,6]},"leve_refletora":{"u_max":2.3,"atraso_max":3.3,"zonas":[8]},"pesada":{"u_max":2.0,"atraso_min":6.5,"zonas":[7]}},"fonte":"ABNT NBR 15220-3:2005, diretrizes construtivas por zona bioclimática (fator solar de opacos não avaliado aqui) — conferir a revisão vigente"}},"materiais":[{"id":"concreto_normal","nome":"Concreto normal (armado ou não)","grupo":"concreto e cimentícios","densidade":2300,"condutividade":1.75,"calor_especifico":1000,"espessura_tipica_m":0.1,"carbono_incorporado":{"valor":0.13,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":4.403},{"id":"concreto_leve_celular","nome":"Concreto celular autoclavado","grupo":"concreto e cimentícios","densidade":500,"condutividade":0.17,"calor_especifico":1000,"espessura_tipica_m":0.15,"carbono_incorporado":{"valor":0.3,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.95},{"id":"argamassa_cimento","nome":"Argamassa de cimento e areia (reboco, contrapiso)","grupo":"concreto e cimentícios","densidade":2000,"condutividade":1.15,"calor_especifico":1000,"espessura_tipica_m":0.025,"carbono_incorporado":{"valor":0.2,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.215},{"id":"argamassa_cal","nome":"Argamassa de cal e areia","grupo":"concreto e cimentícios","densidade":1700,"condutividade":0.8,"calor_especifico":1000,"espessura_tipica_m":0.025,"carbono_incorporado":{"valor":0.16,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":4.969},{"id":"cal_hidratada","nome":"Cal hidratada (pó)","grupo":"concreto e cimentícios","densidade":600,"condutividade":null,"calor_especifico":null,"espessura_tipica_m":null,"carbono_incorporado":{"valor":0.78,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/kg","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"cimento_portland","nome":"Cimento Portland (CP II / CP III, pó)","grupo":"concreto e cimentícios","densidade":1400,"condutividade":null,"calor_especifico":null,"espessura_tipica_m":null,"carbono_incorporado":{"valor":0.83,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/kg","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"nota":"SIDAC traz o cimento brasileiro, em geral abaixo da média mundial por adições — preferir SIDAC"},{"id":"fibrocimento","nome":"Placa ou telha de fibrocimento sem amianto","grupo":"concreto e cimentícios","densidade":1600,"condutividade":0.65,"calor_especifico":840,"espessura_tipica_m":0.006,"carbono_incorporado":{"valor":0.8,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.579},{"id":"bloco_concreto","nome":"Bloco de concreto (material do bloco)","grupo":"concreto e cimentícios","densidade":2100,"condutividade":1.75,"calor_especifico":1000,"espessura_tipica_m":null,"carbono_incorporado":{"valor":0.093,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/un.","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"gesso","nome":"Gesso (placa ou revestimento)","grupo":"concreto e cimentícios","densidade":900,"condutividade":0.35,"calor_especifico":840,"espessura_tipica_m":0.0125,"carbono_incorporado":{"valor":0.39,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":4.861},{"id":"piso_ceramico","nome":"Revestimento cerâmico (piso/azulejo)","grupo":"cerâmicos","densidade":2000,"condutividade":1.05,"calor_especifico":920,"espessura_tipica_m":0.01,"carbono_incorporado":{"valor":0.78,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.57},{"id":"ceramica_tijolo","nome":"Cerâmica vermelha (tijolo maciço, material)","grupo":"cerâmicos","densidade":1700,"condutividade":0.9,"calor_especifico":920,"espessura_tipica_m":0.1,"carbono_incorporado":{"valor":0.24,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/milheiro","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":3.557},{"id":"ceramica_bloco_vazado","nome":"Bloco cerâmico vazado (material da parede do bloco)","grupo":"cerâmicos","densidade":1700,"condutividade":0.9,"calor_especifico":920,"espessura_tipica_m":null,"carbono_incorporado":{"valor":0.24,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/milheiro","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"nota":"Bloco vazado não é camada homogênea: use as composições tabeladas"},{"id":"telha_ceramica","nome":"Telha cerâmica","grupo":"cerâmicos","densidade":1900,"condutividade":1.05,"calor_especifico":920,"espessura_tipica_m":0.01,"carbono_incorporado":{"valor":0.48,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.57},{"id":"vidro_comum","nome":"Vidro float comum","grupo":"vidros","densidade":2500,"condutividade":1.0,"calor_especifico":840,"espessura_tipica_m":0.006,"carbono_incorporado":{"valor":1.44,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.682},{"id":"vidro_laminado","nome":"Vidro laminado (float + PVB)","grupo":"vidros","densidade":2500,"condutividade":1.0,"calor_especifico":840,"espessura_tipica_m":0.008,"carbono_incorporado":{"valor":1.6,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.618},{"id":"vidro_temperado","nome":"Vidro temperado","grupo":"vidros","densidade":2500,"condutividade":1.0,"calor_especifico":840,"espessura_tipica_m":0.008,"carbono_incorporado":{"valor":1.67,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.618},{"id":"aco","nome":"Aço carbono","grupo":"metais","densidade":7800,"condutividade":55,"calor_especifico":460,"espessura_tipica_m":null,"carbono_incorporado":{"valor":1.55,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/kg","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"nota":"perfil; vergalhão reciclado no ICE ≈ 1,99 média mundial — conferir"},{"id":"aco_galvanizado","nome":"Aço galvanizado (telha, perfil leve)","grupo":"metais","densidade":7800,"condutividade":55,"calor_especifico":460,"espessura_tipica_m":0.0005,"carbono_incorporado":{"valor":2.76,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/kg","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.882},{"id":"aluminio","nome":"Alumínio (média mundial)","grupo":"metais","densidade":2700,"condutividade":230,"calor_especifico":880,"espessura_tipica_m":null,"carbono_incorporado":{"valor":13.1,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/kg","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"cobre","nome":"Cobre","grupo":"metais","densidade":8900,"condutividade":380,"calor_especifico":380,"espessura_tipica_m":null,"carbono_incorporado":{"valor":2.71,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/kg","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"madeira_pinus","nome":"Madeira de reflorestamento (pinus, eucalipto leve)","grupo":"madeiras e fibras","densidade":500,"condutividade":0.15,"calor_especifico":1340,"espessura_tipica_m":0.025,"carbono_incorporado":{"valor":0.26,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":2.97,"nota":"sem crédito de carbono biogênico; com certificação FSC/Cerflor"},{"id":"madeira_dura","nome":"Madeira dura certificada (ipê, cumaru, jatobá)","grupo":"madeiras e fibras","densidade":950,"condutividade":0.29,"calor_especifico":1340,"espessura_tipica_m":0.025,"carbono_incorporado":{"valor":0.39,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":3.903},{"id":"madeira_eucalipto_tratado","nome":"Eucalipto tratado em autoclave (peça roliça)","grupo":"madeiras e fibras","densidade":750,"condutividade":0.2,"calor_especifico":1340,"espessura_tipica_m":null,"carbono_incorporado":{"valor":0.3,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"mlc_glulam","nome":"Madeira laminada colada (MLC)","grupo":"madeiras e fibras","densidade":480,"condutividade":0.13,"calor_especifico":1600,"espessura_tipica_m":null,"carbono_incorporado":{"valor":0.51,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"clt","nome":"Madeira laminada cruzada (CLT)","grupo":"madeiras e fibras","densidade":480,"condutividade":0.13,"calor_especifico":1600,"espessura_tipica_m":0.1,"carbono_incorporado":{"valor":0.44,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":1.065},{"id":"compensado","nome":"Compensado","grupo":"madeiras e fibras","densidade":550,"condutividade":0.15,"calor_especifico":1600,"espessura_tipica_m":0.018,"carbono_incorporado":{"valor":0.68,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":3.448},{"id":"osb","nome":"Painel OSB","grupo":"madeiras e fibras","densidade":650,"condutividade":0.13,"calor_especifico":1700,"espessura_tipica_m":0.018,"carbono_incorporado":{"valor":0.45,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":3.242},{"id":"mdf","nome":"MDF","grupo":"madeiras e fibras","densidade":750,"condutividade":0.14,"calor_especifico":1700,"espessura_tipica_m":0.018,"carbono_incorporado":{"valor":0.72,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":3.349},{"id":"bambu_colmo","nome":"Bambu (colmo tratado, material)","grupo":"madeiras e fibras","densidade":700,"condutividade":0.18,"calor_especifico":1500,"espessura_tipica_m":null,"carbono_incorporado":{"valor":0.3,"unidade":"kgCO2e/kg","fonte":"literatura de bambu estrutural (INBAR) — muito variável com transporte e tratamento","verificar":true},"custo":{"valor":null,"unidade":"R$/m","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de bambu (INBAR, NBR 16828-1:2020 para estruturas de bambu)","verificar":true},{"id":"bambu_laminado","nome":"Bambu laminado colado (painel)","grupo":"madeiras e fibras","densidade":700,"condutividade":0.17,"calor_especifico":1500,"espessura_tipica_m":0.02,"carbono_incorporado":{"valor":1.1,"unidade":"kgCO2e/kg","fonte":"EPDs públicas de painéis de bambu — verificar","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":3.476},{"id":"palha_fardo","nome":"Fardo de palha (trigo, arroz, capim) prensado","grupo":"terra e bioconstrução","densidade":100,"condutividade":0.06,"calor_especifico":2000,"espessura_tipica_m":0.45,"carbono_incorporado":{"valor":0.01,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas; ensaios de fardos de palha (FASBA)","verificar":true,"u_camada_parede":0.13,"nota":"carbono biogênico armazenado não descontado"},{"id":"palha_sape","nome":"Palha ou sapê de cobertura","grupo":"terra e bioconstrução","densidade":150,"condutividade":0.07,"calor_especifico":1500,"espessura_tipica_m":0.2,"carbono_incorporado":{"valor":0.01,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas","verificar":true,"u_camada_parede":0.33},{"id":"cortica_expandida","nome":"Aglomerado de cortiça expandida","grupo":"isolantes","densidade":115,"condutividade":0.04,"calor_especifico":1560,"espessura_tipica_m":0.04,"carbono_incorporado":{"valor":0.19,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.855},{"id":"fibra_coco","nome":"Manta de fibra de coco","grupo":"isolantes","densidade":90,"condutividade":0.045,"calor_especifico":1300,"espessura_tipica_m":0.03,"carbono_incorporado":{"valor":0.1,"unidade":"kgCO2e/kg","fonte":"estimativa por fibras vegetais (ICE: fibras naturais) — verificar","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":1.195},{"id":"fibra_madeira","nome":"Painel isolante de fibra de madeira","grupo":"isolantes","densidade":160,"condutividade":0.04,"calor_especifico":2100,"espessura_tipica_m":0.04,"carbono_incorporado":{"valor":0.58,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.855},{"id":"celulose_soprada","nome":"Celulose reciclada soprada","grupo":"isolantes","densidade":45,"condutividade":0.04,"calor_especifico":2000,"espessura_tipica_m":0.1,"carbono_incorporado":{"valor":0.2,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.375},{"id":"canhamo_cal","nome":"Concreto de cânhamo e cal (hempcrete)","grupo":"terra e bioconstrução","densidade":350,"condutividade":0.07,"calor_especifico":1550,"espessura_tipica_m":0.3,"carbono_incorporado":{"valor":0.2,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas; literatura de hempcrete","verificar":true,"u_camada_parede":0.224,"nota":"com carbono biogênico do cânhamo o balanço pode ser negativo — conferir EPD"},{"id":"la_rocha","nome":"Lã de rocha (painel)","grupo":"isolantes","densidade":100,"condutividade":0.04,"calor_especifico":750,"espessura_tipica_m":0.05,"carbono_incorporado":{"valor":1.12,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.704},{"id":"la_vidro","nome":"Lã de vidro (manta/painel)","grupo":"isolantes","densidade":20,"condutividade":0.042,"calor_especifico":700,"espessura_tipica_m":0.05,"carbono_incorporado":{"valor":1.35,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.735},{"id":"la_pet","nome":"Lã de PET reciclado","grupo":"isolantes","densidade":25,"condutividade":0.04,"calor_especifico":1200,"espessura_tipica_m":0.05,"carbono_incorporado":{"valor":1.1,"unidade":"kgCO2e/kg","fonte":"EPDs públicas de isolante de PET reciclado — verificar","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.704},{"id":"eps","nome":"Poliestireno expandido (EPS)","grupo":"isolantes","densidade":20,"condutividade":0.04,"calor_especifico":1420,"espessura_tipica_m":0.05,"carbono_incorporado":{"valor":3.29,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.704},{"id":"xps","nome":"Poliestireno extrudado (XPS)","grupo":"isolantes","densidade":35,"condutividade":0.034,"calor_especifico":1420,"espessura_tipica_m":0.05,"carbono_incorporado":{"valor":3.42,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.61},{"id":"pu_rigido","nome":"Poliuretano rígido (PU/PIR)","grupo":"isolantes","densidade":35,"condutividade":0.03,"calor_especifico":1670,"espessura_tipica_m":0.03,"carbono_incorporado":{"valor":4.26,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.855},{"id":"manta_aluminizada","nome":"Manta subcobertura aluminizada (baixa emissividade)","grupo":"isolantes","densidade":200,"condutividade":0.2,"calor_especifico":1000,"espessura_tipica_m":0.002,"carbono_incorporado":{"valor":6.0,"unidade":"kgCO2e/kg","fonte":"estimativa por alumínio + polímero — verificar EPD","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.556,"nota":"o efeito vem da baixa emissividade da câmara de ar, não da condutividade"},{"id":"terra_taipa","nome":"Taipa de pilão (terra compactada)","grupo":"terra e bioconstrução","densidade":1900,"condutividade":1.1,"calor_especifico":900,"espessura_tipica_m":0.3,"carbono_incorporado":{"valor":0.005,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (terra crua) — ordem de grandeza","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas","verificar":true,"u_camada_parede":2.259},{"id":"terra_taipa_estabilizada","nome":"Taipa estabilizada com 5 a 8 % de cimento","grupo":"terra e bioconstrução","densidade":2000,"condutividade":1.25,"calor_especifico":900,"espessura_tipica_m":0.3,"carbono_incorporado":{"valor":0.045,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (terra estabilizada com cimento) — conferir","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas","verificar":true,"u_camada_parede":2.439},{"id":"terra_adobe","nome":"Adobe (bloco de terra seca ao sol)","grupo":"terra e bioconstrução","densidade":1600,"condutividade":0.7,"calor_especifico":900,"espessura_tipica_m":0.25,"carbono_incorporado":{"valor":0.006,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (terra crua) — ordem de grandeza","verificar":true},"custo":{"valor":null,"unidade":"R$/un.","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas","verificar":true,"u_camada_parede":1.897},{"id":"terra_btc","nome":"Tijolo de solo-cimento (BTC) prensado","grupo":"terra e bioconstrução","densidade":1800,"condutividade":1.0,"calor_especifico":900,"espessura_tipica_m":0.15,"carbono_incorporado":{"valor":0.04,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 e SIDAC (solo-cimento) — conferir","verificar":true},"custo":{"valor":null,"unidade":"R$/milheiro","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas; ABNT NBR 8491:2012 (tijolo de solo-cimento)","verificar":true,"u_camada_parede":3.125},{"id":"terra_cob","nome":"Cob (terra, palha e areia moldada)","grupo":"terra e bioconstrução","densidade":1600,"condutividade":0.7,"calor_especifico":950,"espessura_tipica_m":0.4,"carbono_incorporado":{"valor":0.006,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (terra crua) — ordem de grandeza","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas","verificar":true,"u_camada_parede":1.349},{"id":"terra_palha","nome":"Terra-palha (terra leve)","grupo":"terra e bioconstrução","densidade":800,"condutividade":0.25,"calor_especifico":1100,"espessura_tipica_m":0.25,"carbono_incorporado":{"valor":0.008,"unidade":"kgCO2e/kg","fonte":"estimativa por terra crua + palha","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas","verificar":true,"u_camada_parede":0.855},{"id":"terra_pau_a_pique","nome":"Pau a pique (taipa de mão, terra sobre trama)","grupo":"terra e bioconstrução","densidade":1500,"condutividade":0.8,"calor_especifico":950,"espessura_tipica_m":0.15,"carbono_incorporado":{"valor":0.01,"unidade":"kgCO2e/kg","fonte":"estimativa por terra crua + madeira","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas","verificar":true,"u_camada_parede":2.797},{"id":"terra_superadobe","nome":"Superadobe (terra em sacos de polipropileno)","grupo":"terra e bioconstrução","densidade":1800,"condutividade":1.0,"calor_especifico":900,"espessura_tipica_m":0.35,"carbono_incorporado":{"valor":0.01,"unidade":"kgCO2e/kg","fonte":"terra crua + sacos de PP — estimativa","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas","verificar":true,"u_camada_parede":1.923},{"id":"reboco_terra","nome":"Reboco de terra (barro)","grupo":"terra e bioconstrução","densidade":1600,"condutividade":0.8,"calor_especifico":950,"espessura_tipica_m":0.025,"carbono_incorporado":{"valor":0.01,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (terra crua) — ordem de grandeza","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas","verificar":true,"u_camada_parede":4.969},{"id":"solo_umido","nome":"Solo argiloso úmido (aterro)","grupo":"terra e bioconstrução","densidade":1800,"condutividade":1.5,"calor_especifico":1200,"espessura_tipica_m":null,"carbono_incorporado":{"valor":0.005,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"substrato_telhado_verde","nome":"Substrato de telhado verde (úmido, médio)","grupo":"terra e bioconstrução","densidade":1100,"condutividade":0.5,"calor_especifico":1500,"espessura_tipica_m":0.1,"carbono_incorporado":{"valor":0.05,"unidade":"kgCO2e/kg","fonte":"estimativa (substrato leve com agregado expandido) — conferir EPD do sistema","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de telhados verdes (FLL) — faixa","verificar":true,"u_camada_parede":2.703},{"id":"argila_expandida","nome":"Argila expandida (agregado leve)","grupo":"terra e bioconstrução","densidade":450,"condutividade":0.12,"calor_especifico":900,"espessura_tipica_m":0.05,"carbono_incorporado":{"valor":0.36,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":1.705},{"id":"pedra_granito","nome":"Pedra granítica","grupo":"pedras","densidade":2700,"condutividade":2.8,"calor_especifico":840,"espessura_tipica_m":0.3,"carbono_incorporado":{"valor":0.07,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":3.608},{"id":"pedra_arenito","nome":"Arenito","grupo":"pedras","densidade":2200,"condutividade":1.8,"calor_especifico":840,"espessura_tipica_m":0.3,"carbono_incorporado":{"valor":0.06,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":2.97},{"id":"brita","nome":"Brita / cascalho","grupo":"pedras","densidade":1600,"condutividade":0.9,"calor_especifico":840,"espessura_tipica_m":null,"carbono_incorporado":{"valor":0.005,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"pvc","nome":"PVC rígido","grupo":"plásticos","densidade":1400,"condutividade":0.2,"calor_especifico":1000,"espessura_tipica_m":null,"carbono_incorporado":{"valor":3.1,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/kg","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"pead","nome":"Polietileno de alta densidade (PEAD)","grupo":"plásticos","densidade":950,"condutividade":0.4,"calor_especifico":1900,"espessura_tipica_m":null,"carbono_incorporado":{"valor":1.93,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/kg","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"epdm","nome":"Membrana EPDM (impermeabilização)","grupo":"plásticos","densidade":1150,"condutividade":0.25,"calor_especifico":1000,"espessura_tipica_m":0.0015,"carbono_incorporado":{"valor":3.0,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (borrachas sintéticas) — conferir","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.682},{"id":"manta_asfaltica","nome":"Manta asfáltica","grupo":"plásticos","densidade":1100,"condutividade":0.17,"calor_especifico":1000,"espessura_tipica_m":0.004,"carbono_incorporado":{"valor":0.45,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.167},{"id":"policarbonato","nome":"Policarbonato (chapa)","grupo":"plásticos","densidade":1200,"condutividade":0.2,"calor_especifico":1200,"espessura_tipica_m":0.006,"carbono_incorporado":{"valor":7.6,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.0},{"id":"tinta_cal","nome":"Pintura à base de cal","grupo":"acabamentos","densidade":1500,"condutividade":null,"calor_especifico":null,"espessura_tipica_m":null,"carbono_incorporado":{"valor":0.8,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"tinta_acrilica","nome":"Tinta acrílica","grupo":"acabamentos","densidade":1300,"condutividade":null,"calor_especifico":null,"espessura_tipica_m":null,"carbono_incorporado":{"valor":2.9,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/L","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"telha_metalica","nome":"Telha metálica (aço galvanizado 0,5 mm)","grupo":"metais","densidade":7800,"condutividade":55,"calor_especifico":460,"espessura_tipica_m":0.0005,"carbono_incorporado":{"valor":2.76,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.882},{"id":"telha_sanduiche_pu","nome":"Telha sanduíche (aço + PU 30 mm), material isolante","grupo":"isolantes","densidade":40,"condutividade":0.03,"calor_especifico":1670,"espessura_tipica_m":0.03,"carbono_incorporado":{"valor":4.26,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.855},{"id":"piso_madeira","nome":"Assoalho de madeira","grupo":"madeiras e fibras","densidade":800,"condutividade":0.2,"calor_especifico":1340,"espessura_tipica_m":0.02,"carbono_incorporado":{"valor":0.39,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":3.704},{"id":"laje_mista_eps","nome":"Laje treliçada com EPS (camada equivalente)","grupo":"concreto e cimentícios","densidade":1200,"condutividade":0.8,"calor_especifico":1000,"espessura_tipica_m":0.12,"carbono_incorporado":{"valor":0.12,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":3.125,"nota":"equivalente simplificado — use composição tabelada no projeto"},{"id":"vidro_duplo_unidade","nome":"Unidade de vidro duplo (6 + câmara 12 + 6)","grupo":"vidros","densidade":2500,"condutividade":null,"calor_especifico":null,"espessura_tipica_m":null,"carbono_incorporado":{"valor":1.44,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_tabelado":2.8,"nota":"U de catálogo; fator solar na base de carga térmica"},{"id":"vidro_lowe_unidade","nome":"Unidade de vidro duplo com baixo emissivo","grupo":"vidros","densidade":2500,"condutividade":null,"calor_especifico":null,"espessura_tipica_m":null,"carbono_incorporado":{"valor":1.6,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_tabelado":1.8},{"id":"vidro_controle_solar","nome":"Vidro de controle solar monolítico","grupo":"vidros","densidade":2500,"condutividade":1.0,"calor_especifico":840,"espessura_tipica_m":0.006,"carbono_incorporado":{"valor":1.6,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":5.682,"u_tabelado":5.5},{"id":"drywall_placa","nome":"Placa de gesso acartonado","grupo":"concreto e cimentícios","densidade":750,"condutividade":0.35,"calor_especifico":840,"espessura_tipica_m":0.0125,"carbono_incorporado":{"valor":0.39,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":4.861},{"id":"steel_frame_perfil","nome":"Perfil leve de aço galvanizado (steel frame)","grupo":"metais","densidade":7800,"condutividade":55,"calor_especifico":460,"espessura_tipica_m":null,"carbono_incorporado":{"valor":2.76,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/kg","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true},{"id":"cortica_granulado","nome":"Granulado de cortiça solto","grupo":"isolantes","densidade":90,"condutividade":0.045,"calor_especifico":1560,"espessura_tipica_m":0.05,"carbono_incorporado":{"valor":0.19,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão","verificar":true},"custo":{"valor":null,"unidade":"R$/m³","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.781},{"id":"la_ovelha","nome":"Lã de ovelha (isolante)","grupo":"isolantes","densidade":25,"condutividade":0.04,"calor_especifico":1300,"espessura_tipica_m":0.05,"carbono_incorporado":{"valor":0.2,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 (lã) — conferir","verificar":true},"custo":{"valor":null,"unidade":"R$/m²","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)","verificar":true,"u_camada_parede":0.704},{"id":"tijolo_ecologico_vazado","nome":"Tijolo ecológico de solo-cimento vazado (material)","grupo":"terra e bioconstrução","densidade":1800,"condutividade":1.0,"calor_especifico":900,"espessura_tipica_m":0.125,"carbono_incorporado":{"valor":0.04,"unidade":"kgCO2e/kg","fonte":"ICE v3.0 / SIDAC (solo-cimento) — conferir","verificar":true},"custo":{"valor":null,"unidade":"R$/milheiro","data":null,"fonte":"[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"},"fonte":"literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas","verificar":true,"u_camada_parede":3.39,"nota":"peça vazada: valor de camada só para estimativa"}],"composicoes":[{"id":"tijolo_6f_14","nome":"Tijolo cerâmico 6 furos rebocado (14 cm)","tipo":"parede","camadas":[],"tabelado":{"u":2.48,"ct":159,"atraso":3.3,"fonte":"valores tabelados do anexo de paredes da ABNT NBR 15220-3 (tijolo 6 furos 9×14×19 na menor dimensão, reboco 2,5 cm nas duas faces) — verificar"},"nota":"","calculo":{"u":2.48,"ct":159,"atraso":3.3,"amortecimento":0.421,"origem":"tabelado"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":true,"alfa_acima_06":true},"2":{"alfa_ate_06":true,"alfa_acima_06":true},"3":{"alfa_ate_06":true,"alfa_acima_06":true},"4":{"alfa_ate_06":true,"alfa_acima_06":true},"5":{"alfa_ate_06":true,"alfa_acima_06":true},"6":{"alfa_ate_06":true,"alfa_acima_06":true},"7":{"alfa_ate_06":true,"alfa_acima_06":true},"8":{"alfa_ate_06":true,"alfa_acima_06":true}},"nbr15220_3":[{"classe":"leve","zonas":[1,2]},{"classe":"leve_refletora","zonas":[3,5,8]}]},"massa_kg_m2":null,"carbono_kgco2e_m2":null},{"id":"bloco_concreto_14","nome":"Bloco de concreto 14 cm rebocado","tipo":"parede","camadas":[],"tabelado":{"u":2.78,"ct":211,"atraso":3.6,"fonte":"ordem de grandeza de tabelas públicas de paredes (NBR 15220-3 e catálogos) — verificar"},"nota":"","calculo":{"u":2.78,"ct":211,"atraso":3.6,"amortecimento":0.39,"origem":"tabelado"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":false,"alfa_acima_06":false},"2":{"alfa_ate_06":false,"alfa_acima_06":false},"3":{"alfa_ate_06":true,"alfa_acima_06":false},"4":{"alfa_ate_06":true,"alfa_acima_06":false},"5":{"alfa_ate_06":true,"alfa_acima_06":false},"6":{"alfa_ate_06":true,"alfa_acima_06":false},"7":{"alfa_ate_06":true,"alfa_acima_06":false},"8":{"alfa_ate_06":true,"alfa_acima_06":false}},"nbr15220_3":[{"classe":"leve","zonas":[1,2]},{"classe":"leve_refletora","zonas":[3,5,8]}]},"massa_kg_m2":null,"carbono_kgco2e_m2":null},{"id":"concreto_10","nome":"Parede de concreto maciço (10 cm)","tipo":"parede","camadas":[{"material":"concreto_normal","espessura":0.1}],"tabelado":null,"nota":"","calculo":{"u":4.403,"ct":230.0,"atraso":2.641,"amortecimento":0.501,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":false,"alfa_acima_06":false},"2":{"alfa_ate_06":false,"alfa_acima_06":false},"3":{"alfa_ate_06":false,"alfa_acima_06":false},"4":{"alfa_ate_06":false,"alfa_acima_06":false},"5":{"alfa_ate_06":false,"alfa_acima_06":false},"6":{"alfa_ate_06":false,"alfa_acima_06":false},"7":{"alfa_ate_06":false,"alfa_acima_06":false},"8":{"alfa_ate_06":false,"alfa_acima_06":false}},"nbr15220_3":[]},"massa_kg_m2":230.0,"carbono_kgco2e_m2":29.9},{"id":"tijolo_macico_25","nome":"Tijolo maciço (25 cm) rebocado","tipo":"parede","camadas":[{"material":"argamassa_cimento","espessura":0.025},{"material":"ceramica_tijolo","espessura":0.25},{"material":"argamassa_cimento","espessura":0.025}],"tabelado":null,"nota":"","calculo":{"u":2.036,"ct":491.0,"atraso":7.82,"amortecimento":0.129,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":true,"alfa_acima_06":true},"2":{"alfa_ate_06":true,"alfa_acima_06":true},"3":{"alfa_ate_06":true,"alfa_acima_06":true},"4":{"alfa_ate_06":true,"alfa_acima_06":true},"5":{"alfa_ate_06":true,"alfa_acima_06":true},"6":{"alfa_ate_06":true,"alfa_acima_06":true},"7":{"alfa_ate_06":true,"alfa_acima_06":true},"8":{"alfa_ate_06":true,"alfa_acima_06":true}},"nbr15220_3":[{"classe":"pesada","zonas":[4,6,7]}]},"massa_kg_m2":525.0,"carbono_kgco2e_m2":122.0},{"id":"drywall_la","nome":"Drywall com lã mineral 50 mm","tipo":"parede","camadas":[{"material":"drywall_placa","espessura":0.0125},{"material":"la_rocha","espessura":0.05},{"material":"drywall_placa","espessura":0.0125}],"tabelado":null,"nota":"","calculo":{"u":0.67,"ct":19.5,"atraso":2.575,"amortecimento":0.51,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":false,"alfa_acima_06":false},"2":{"alfa_ate_06":false,"alfa_acima_06":false},"3":{"alfa_ate_06":false,"alfa_acima_06":false},"4":{"alfa_ate_06":false,"alfa_acima_06":false},"5":{"alfa_ate_06":false,"alfa_acima_06":false},"6":{"alfa_ate_06":false,"alfa_acima_06":false},"7":{"alfa_ate_06":false,"alfa_acima_06":false},"8":{"alfa_ate_06":true,"alfa_acima_06":true}},"nbr15220_3":[{"classe":"leve","zonas":[1,2]},{"classe":"leve_refletora","zonas":[3,5,8]}]},"massa_kg_m2":23.8,"carbono_kgco2e_m2":12.91},{"id":"madeira_tabua","nome":"Tábua de madeira (2,5 cm)","tipo":"parede","camadas":[{"material":"madeira_pinus","espessura":0.025}],"tabelado":null,"nota":"","calculo":{"u":2.97,"ct":16.75,"atraso":1.217,"amortecimento":0.727,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":false,"alfa_acima_06":false},"2":{"alfa_ate_06":false,"alfa_acima_06":false},"3":{"alfa_ate_06":false,"alfa_acima_06":false},"4":{"alfa_ate_06":false,"alfa_acima_06":false},"5":{"alfa_ate_06":false,"alfa_acima_06":false},"6":{"alfa_ate_06":false,"alfa_acima_06":false},"7":{"alfa_ate_06":false,"alfa_acima_06":false},"8":{"alfa_ate_06":true,"alfa_acima_06":false}},"nbr15220_3":[{"classe":"leve","zonas":[1,2]},{"classe":"leve_refletora","zonas":[3,5,8]}]},"massa_kg_m2":12.5,"carbono_kgco2e_m2":3.25},{"id":"taipa_30","nome":"Taipa de pilão (30 cm)","tipo":"parede","camadas":[{"material":"terra_taipa","espessura":0.3}],"tabelado":null,"nota":"","calculo":{"u":2.259,"ct":513.0,"atraso":8.615,"amortecimento":0.105,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":true,"alfa_acima_06":true},"2":{"alfa_ate_06":true,"alfa_acima_06":true},"3":{"alfa_ate_06":true,"alfa_acima_06":true},"4":{"alfa_ate_06":true,"alfa_acima_06":true},"5":{"alfa_ate_06":true,"alfa_acima_06":true},"6":{"alfa_ate_06":true,"alfa_acima_06":true},"7":{"alfa_ate_06":true,"alfa_acima_06":true},"8":{"alfa_ate_06":true,"alfa_acima_06":true}},"nbr15220_3":[]},"massa_kg_m2":570.0,"carbono_kgco2e_m2":2.85},{"id":"adobe_25","nome":"Adobe (25 cm) com reboco de terra","tipo":"parede","camadas":[{"material":"reboco_terra","espessura":0.02},{"material":"terra_adobe","espessura":0.25},{"material":"reboco_terra","espessura":0.02}],"tabelado":null,"nota":"","calculo":{"u":1.733,"ct":420.8,"atraso":8.283,"amortecimento":0.114,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":true,"alfa_acima_06":true},"2":{"alfa_ate_06":true,"alfa_acima_06":true},"3":{"alfa_ate_06":true,"alfa_acima_06":true},"4":{"alfa_ate_06":true,"alfa_acima_06":true},"5":{"alfa_ate_06":true,"alfa_acima_06":true},"6":{"alfa_ate_06":true,"alfa_acima_06":true},"7":{"alfa_ate_06":true,"alfa_acima_06":true},"8":{"alfa_ate_06":true,"alfa_acima_06":true}},"nbr15220_3":[{"classe":"pesada","zonas":[4,6,7]}]},"massa_kg_m2":464.0,"carbono_kgco2e_m2":3.04},{"id":"btc_15","nome":"BTC (15 cm) rebocado","tipo":"parede","camadas":[{"material":"argamassa_cimento","espessura":0.025},{"material":"terra_btc","espessura":0.15},{"material":"argamassa_cimento","espessura":0.025}],"tabelado":null,"nota":"","calculo":{"u":2.751,"ct":343.0,"atraso":5.026,"amortecimento":0.268,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":false,"alfa_acima_06":false},"2":{"alfa_ate_06":false,"alfa_acima_06":false},"3":{"alfa_ate_06":true,"alfa_acima_06":false},"4":{"alfa_ate_06":true,"alfa_acima_06":false},"5":{"alfa_ate_06":true,"alfa_acima_06":false},"6":{"alfa_ate_06":true,"alfa_acima_06":false},"7":{"alfa_ate_06":true,"alfa_acima_06":false},"8":{"alfa_ate_06":true,"alfa_acima_06":false}},"nbr15220_3":[]},"massa_kg_m2":370.0,"carbono_kgco2e_m2":30.8},{"id":"cob_40","nome":"Cob (40 cm)","tipo":"parede","camadas":[{"material":"terra_cob","espessura":0.4}],"tabelado":null,"nota":"","calculo":{"u":1.349,"ct":608.0,"atraso":13.577,"amortecimento":0.029,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":true,"alfa_acima_06":true},"2":{"alfa_ate_06":true,"alfa_acima_06":true},"3":{"alfa_ate_06":true,"alfa_acima_06":true},"4":{"alfa_ate_06":true,"alfa_acima_06":true},"5":{"alfa_ate_06":true,"alfa_acima_06":true},"6":{"alfa_ate_06":true,"alfa_acima_06":true},"7":{"alfa_ate_06":true,"alfa_acima_06":true},"8":{"alfa_ate_06":true,"alfa_acima_06":true}},"nbr15220_3":[{"classe":"pesada","zonas":[4,6,7]}]},"massa_kg_m2":640.0,"carbono_kgco2e_m2":3.84},{"id":"pau_a_pique_15","nome":"Pau a pique (15 cm)","tipo":"parede","camadas":[{"material":"terra_pau_a_pique","espessura":0.15}],"tabelado":null,"nota":"","calculo":{"u":2.797,"ct":213.75,"atraso":4.611,"amortecimento":0.299,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":false,"alfa_acima_06":false},"2":{"alfa_ate_06":false,"alfa_acima_06":false},"3":{"alfa_ate_06":true,"alfa_acima_06":false},"4":{"alfa_ate_06":true,"alfa_acima_06":false},"5":{"alfa_ate_06":true,"alfa_acima_06":false},"6":{"alfa_ate_06":true,"alfa_acima_06":false},"7":{"alfa_ate_06":true,"alfa_acima_06":false},"8":{"alfa_ate_06":true,"alfa_acima_06":false}},"nbr15220_3":[]},"massa_kg_m2":225.0,"carbono_kgco2e_m2":2.25},{"id":"superadobe_35","nome":"Superadobe (35 cm) com reboco de terra","tipo":"parede","camadas":[{"material":"reboco_terra","espessura":0.03},{"material":"terra_superadobe","espessura":0.35},{"material":"reboco_terra","espessura":0.03}],"tabelado":null,"nota":"","calculo":{"u":1.681,"ct":658.2,"atraso":10.601,"amortecimento":0.062,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":true,"alfa_acima_06":true},"2":{"alfa_ate_06":true,"alfa_acima_06":true},"3":{"alfa_ate_06":true,"alfa_acima_06":true},"4":{"alfa_ate_06":true,"alfa_acima_06":true},"5":{"alfa_ate_06":true,"alfa_acima_06":true},"6":{"alfa_ate_06":true,"alfa_acima_06":true},"7":{"alfa_ate_06":true,"alfa_acima_06":true},"8":{"alfa_ate_06":true,"alfa_acima_06":true}},"nbr15220_3":[{"classe":"pesada","zonas":[4,6,7]}]},"massa_kg_m2":726.0,"carbono_kgco2e_m2":7.26},{"id":"fardo_palha_45","nome":"Fardo de palha (45 cm) com reboco de terra","tipo":"parede","camadas":[{"material":"reboco_terra","espessura":0.03},{"material":"palha_fardo","espessura":0.45},{"material":"reboco_terra","espessura":0.03}],"tabelado":null,"nota":"","calculo":{"u":0.129,"ct":181.2,"atraso":21.056,"amortecimento":0.004,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":true,"alfa_acima_06":true},"2":{"alfa_ate_06":true,"alfa_acima_06":true},"3":{"alfa_ate_06":true,"alfa_acima_06":true},"4":{"alfa_ate_06":true,"alfa_acima_06":true},"5":{"alfa_ate_06":true,"alfa_acima_06":true},"6":{"alfa_ate_06":true,"alfa_acima_06":true},"7":{"alfa_ate_06":true,"alfa_acima_06":true},"8":{"alfa_ate_06":true,"alfa_acima_06":true}},"nbr15220_3":[{"classe":"pesada","zonas":[4,6,7]}]},"massa_kg_m2":141.0,"carbono_kgco2e_m2":1.41},{"id":"canhamo_cal_30","nome":"Cânhamo e cal (30 cm) com reboco de cal","tipo":"parede","camadas":[{"material":"argamassa_cal","espessura":0.02},{"material":"canhamo_cal","espessura":0.3},{"material":"argamassa_cal","espessura":0.02}],"tabelado":null,"nota":"","calculo":{"u":0.222,"ct":230.75,"atraso":19.189,"amortecimento":0.007,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":true,"alfa_acima_06":true},"2":{"alfa_ate_06":true,"alfa_acima_06":true},"3":{"alfa_ate_06":true,"alfa_acima_06":true},"4":{"alfa_ate_06":true,"alfa_acima_06":true},"5":{"alfa_ate_06":true,"alfa_acima_06":true},"6":{"alfa_ate_06":true,"alfa_acima_06":true},"7":{"alfa_ate_06":true,"alfa_acima_06":true},"8":{"alfa_ate_06":true,"alfa_acima_06":true}},"nbr15220_3":[{"classe":"pesada","zonas":[4,6,7]}]},"massa_kg_m2":173.0,"carbono_kgco2e_m2":31.88},{"id":"terra_palha_25","nome":"Terra-palha (25 cm) com reboco de terra","tipo":"parede","camadas":[{"material":"reboco_terra","espessura":0.02},{"material":"terra_palha","espessura":0.25},{"material":"reboco_terra","espessura":0.02}],"tabelado":null,"nota":"","calculo":{"u":0.82,"ct":280.8,"atraso":10.653,"amortecimento":0.061,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":true,"alfa_acima_06":true},"2":{"alfa_ate_06":true,"alfa_acima_06":true},"3":{"alfa_ate_06":true,"alfa_acima_06":true},"4":{"alfa_ate_06":true,"alfa_acima_06":true},"5":{"alfa_ate_06":true,"alfa_acima_06":true},"6":{"alfa_ate_06":true,"alfa_acima_06":true},"7":{"alfa_ate_06":true,"alfa_acima_06":true},"8":{"alfa_ate_06":true,"alfa_acima_06":true}},"nbr15220_3":[{"classe":"pesada","zonas":[4,6,7]}]},"massa_kg_m2":264.0,"carbono_kgco2e_m2":2.24},{"id":"telha_ceramica_forro_madeira","nome":"Telha cerâmica com forro de madeira","tipo":"cobertura","camadas":[],"tabelado":{"u":2.0,"ct":32,"atraso":1.3,"fonte":"valores tabelados do anexo de coberturas da ABNT NBR 15220-3 — verificar"},"nota":"","calculo":{"u":2.0,"ct":32,"atraso":1.3,"amortecimento":0.712,"origem":"tabelado"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_baixa":true,"alfa_alta":true},"2":{"alfa_baixa":true,"alfa_alta":true},"3":{"alfa_baixa":true,"alfa_alta":false},"4":{"alfa_baixa":true,"alfa_alta":false},"5":{"alfa_baixa":true,"alfa_alta":false},"6":{"alfa_baixa":true,"alfa_alta":false},"7":{"alfa_baixa":true,"alfa_alta":false},"8":{"alfa_baixa":true,"alfa_alta":false}},"nbr15220_3":[{"classe":"leve_isolada","zonas":[1,2,3,4,5,6]},{"classe":"leve_refletora","zonas":[8]}]},"massa_kg_m2":null,"carbono_kgco2e_m2":null},{"id":"telha_ceramica_laje","nome":"Telha cerâmica, câmara de ar e laje de concreto (10 cm)","tipo":"cobertura","camadas":[{"material":"telha_ceramica","espessura":0.01},{"resistencia":0.21,"nome":"câmara de ar não ventilada > 5 cm, fluxo descendente, superfícies comuns (NBR 15220-2, tabela de resistência de câmaras)"},{"material":"concreto_normal","espessura":0.1}],"tabelado":null,"nota":"","calculo":{"u":2.055,"ct":247.48,"atraso":5.241,"amortecimento":0.254,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_baixa":true,"alfa_alta":true},"2":{"alfa_baixa":true,"alfa_alta":true},"3":{"alfa_baixa":true,"alfa_alta":false},"4":{"alfa_baixa":true,"alfa_alta":false},"5":{"alfa_baixa":true,"alfa_alta":false},"6":{"alfa_baixa":true,"alfa_alta":false},"7":{"alfa_baixa":true,"alfa_alta":false},"8":{"alfa_baixa":true,"alfa_alta":false}},"nbr15220_3":[]},"massa_kg_m2":249.0,"carbono_kgco2e_m2":39.02},{"id":"fibrocimento_sem_forro","nome":"Telha de fibrocimento sem forro","tipo":"cobertura","camadas":[{"material":"fibrocimento","espessura":0.006}],"tabelado":null,"nota":"","calculo":{"u":4.561,"ct":8.064,"atraso":0.199,"amortecimento":0.949,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_baixa":false,"alfa_alta":false},"2":{"alfa_baixa":false,"alfa_alta":false},"3":{"alfa_baixa":false,"alfa_alta":false},"4":{"alfa_baixa":false,"alfa_alta":false},"5":{"alfa_baixa":false,"alfa_alta":false},"6":{"alfa_baixa":false,"alfa_alta":false},"7":{"alfa_baixa":false,"alfa_alta":false},"8":{"alfa_baixa":false,"alfa_alta":false}},"nbr15220_3":[]},"massa_kg_m2":9.6,"carbono_kgco2e_m2":7.68},{"id":"fibrocimento_laje","nome":"Telha de fibrocimento, câmara de ar e laje (10 cm)","tipo":"cobertura","camadas":[{"material":"fibrocimento","espessura":0.006},{"resistencia":0.21,"nome":"câmara de ar não ventilada > 5 cm, fluxo descendente, superfícies comuns (NBR 15220-2, tabela de resistência de câmaras)"},{"material":"concreto_normal","espessura":0.1}],"tabelado":null,"nota":"","calculo":{"u":2.056,"ct":238.064,"atraso":5.238,"amortecimento":0.254,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_baixa":true,"alfa_alta":true},"2":{"alfa_baixa":true,"alfa_alta":true},"3":{"alfa_baixa":true,"alfa_alta":false},"4":{"alfa_baixa":true,"alfa_alta":false},"5":{"alfa_baixa":true,"alfa_alta":false},"6":{"alfa_baixa":true,"alfa_alta":false},"7":{"alfa_baixa":true,"alfa_alta":false},"8":{"alfa_baixa":true,"alfa_alta":false}},"nbr15220_3":[]},"massa_kg_m2":239.6,"carbono_kgco2e_m2":37.58},{"id":"metalica_sem_forro","nome":"Telha metálica sem forro","tipo":"cobertura","camadas":[{"material":"aco_galvanizado","espessura":0.0005}],"tabelado":null,"nota":"","calculo":{"u":4.762,"ct":1.794,"atraso":0.003,"amortecimento":0.999,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_baixa":false,"alfa_alta":false},"2":{"alfa_baixa":false,"alfa_alta":false},"3":{"alfa_baixa":false,"alfa_alta":false},"4":{"alfa_baixa":false,"alfa_alta":false},"5":{"alfa_baixa":false,"alfa_alta":false},"6":{"alfa_baixa":false,"alfa_alta":false},"7":{"alfa_baixa":false,"alfa_alta":false},"8":{"alfa_baixa":false,"alfa_alta":false}},"nbr15220_3":[]},"massa_kg_m2":3.9,"carbono_kgco2e_m2":10.76},{"id":"sanduiche_pu_30","nome":"Telha sanduíche metálica com PU (30 mm)","tipo":"cobertura","camadas":[{"material":"aco_galvanizado","espessura":0.0005},{"material":"pu_rigido","espessura":0.03},{"material":"aco_galvanizado","espessura":0.0005}],"tabelado":null,"nota":"","calculo":{"u":0.826,"ct":5.341,"atraso":1.237,"amortecimento":0.723,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_baixa":true,"alfa_alta":true},"2":{"alfa_baixa":true,"alfa_alta":true},"3":{"alfa_baixa":true,"alfa_alta":true},"4":{"alfa_baixa":true,"alfa_alta":true},"5":{"alfa_baixa":true,"alfa_alta":true},"6":{"alfa_baixa":true,"alfa_alta":true},"7":{"alfa_baixa":true,"alfa_alta":true},"8":{"alfa_baixa":true,"alfa_alta":true}},"nbr15220_3":[{"classe":"leve_isolada","zonas":[1,2,3,4,5,6]},{"classe":"leve_refletora","zonas":[8]}]},"massa_kg_m2":8.8,"carbono_kgco2e_m2":26.0},{"id":"laje_exposta_10","nome":"Laje de concreto exposta (10 cm)","tipo":"cobertura","camadas":[{"material":"concreto_normal","espessura":0.1}],"tabelado":null,"nota":"","calculo":{"u":3.743,"ct":230.0,"atraso":2.641,"amortecimento":0.501,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_baixa":false,"alfa_alta":false},"2":{"alfa_baixa":false,"alfa_alta":false},"3":{"alfa_baixa":false,"alfa_alta":false},"4":{"alfa_baixa":false,"alfa_alta":false},"5":{"alfa_baixa":false,"alfa_alta":false},"6":{"alfa_baixa":false,"alfa_alta":false},"7":{"alfa_baixa":false,"alfa_alta":false},"8":{"alfa_baixa":false,"alfa_alta":false}},"nbr15220_3":[]},"massa_kg_m2":230.0,"carbono_kgco2e_m2":29.9},{"id":"telhado_verde_extensivo","nome":"Telhado verde extensivo (10 cm de substrato sobre laje de 10 cm)","tipo":"cobertura","camadas":[{"material":"substrato_telhado_verde","espessura":0.1},{"material":"epdm","espessura":0.0015},{"material":"concreto_normal","espessura":0.1}],"tabelado":null,"nota":"absortância efetiva 0,3 na carga térmica pela evapotranspiração — premissa Physis, verificar","calculo":{"u":2.114,"ct":396.725,"atraso":6.541,"amortecimento":0.18,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_baixa":true,"alfa_alta":true},"2":{"alfa_baixa":true,"alfa_alta":true},"3":{"alfa_baixa":true,"alfa_alta":false},"4":{"alfa_baixa":true,"alfa_alta":false},"5":{"alfa_baixa":true,"alfa_alta":false},"6":{"alfa_baixa":true,"alfa_alta":false},"7":{"alfa_baixa":true,"alfa_alta":false},"8":{"alfa_baixa":true,"alfa_alta":false}},"nbr15220_3":[]},"massa_kg_m2":341.7,"carbono_kgco2e_m2":40.58},{"id":"telhado_verde_intensivo","nome":"Telhado verde intensivo (30 cm de substrato sobre laje de 10 cm)","tipo":"cobertura","camadas":[{"material":"substrato_telhado_verde","espessura":0.3},{"material":"epdm","espessura":0.0015},{"material":"concreto_normal","espessura":0.1}],"tabelado":null,"nota":"","calculo":{"u":1.145,"ct":726.725,"atraso":13.91,"amortecimento":0.026,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_baixa":true,"alfa_alta":true},"2":{"alfa_baixa":true,"alfa_alta":true},"3":{"alfa_baixa":true,"alfa_alta":true},"4":{"alfa_baixa":true,"alfa_alta":true},"5":{"alfa_baixa":true,"alfa_alta":true},"6":{"alfa_baixa":true,"alfa_alta":true},"7":{"alfa_baixa":true,"alfa_alta":true},"8":{"alfa_baixa":true,"alfa_alta":true}},"nbr15220_3":[{"classe":"pesada","zonas":[7]}]},"massa_kg_m2":561.7,"carbono_kgco2e_m2":51.58},{"id":"palha_sape","nome":"Cobertura de palha ou sapê (20 cm)","tipo":"cobertura","camadas":[{"material":"palha_sape","espessura":0.2}],"tabelado":null,"nota":"","calculo":{"u":0.326,"ct":45.0,"atraso":8.259,"amortecimento":0.115,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_baixa":true,"alfa_alta":true},"2":{"alfa_baixa":true,"alfa_alta":true},"3":{"alfa_baixa":true,"alfa_alta":true},"4":{"alfa_baixa":true,"alfa_alta":true},"5":{"alfa_baixa":true,"alfa_alta":true},"6":{"alfa_baixa":true,"alfa_alta":true},"7":{"alfa_baixa":true,"alfa_alta":true},"8":{"alfa_baixa":true,"alfa_alta":true}},"nbr15220_3":[{"classe":"pesada","zonas":[7]}]},"massa_kg_m2":30.0,"carbono_kgco2e_m2":0.3},{"id":"laje_entre_pisos","nome":"Laje de concreto com piso cerâmico (12 cm)","tipo":"parede","camadas":[{"material":"piso_ceramico","espessura":0.01},{"material":"argamassa_cimento","espessura":0.02},{"material":"concreto_normal","espessura":0.1}],"tabelado":null,"nota":"calculada como elemento vertical (sem fluxo descendente)","calculo":{"u":3.936,"ct":288.4,"atraso":3.151,"amortecimento":0.438,"origem":"calculado (NBR 15220-2, camadas homogêneas)"},"avaliacao":{"nbr15575_simplificado":{"1":{"alfa_ate_06":false,"alfa_acima_06":false},"2":{"alfa_ate_06":false,"alfa_acima_06":false},"3":{"alfa_ate_06":false,"alfa_acima_06":false},"4":{"alfa_ate_06":false,"alfa_acima_06":false},"5":{"alfa_ate_06":false,"alfa_acima_06":false},"6":{"alfa_ate_06":false,"alfa_acima_06":false},"7":{"alfa_ate_06":false,"alfa_acima_06":false},"8":{"alfa_ate_06":false,"alfa_acima_06":false}},"nbr15220_3":[]},"massa_kg_m2":290.0,"carbono_kgco2e_m2":53.5}]}</script>
 </head>
 <body>
 
@@ -320,6 +321,7 @@ html[data-em-quadro] h1{display:none!important}
     <div class="card">
       <h3 class="sec-title">Local e uso</h3>
       <div class="inp-row"><label class="lbl" for="s-cidade">Cidade (sol e chuva do lugar)</label><select id="s-cidade" onchange="mudouCidade()"><option value="">Selecionar...</option></select></div>
+      <div class="inp-row"><label class="lbl" for="s-zona">Zona bioclimática (ABNT NBR 15220-3)</label><select id="s-zona" onchange="recalcular()"><option value="">Pela cidade escolhida</option><option value="1">Zona 1</option><option value="2">Zona 2</option><option value="3">Zona 3</option><option value="4">Zona 4</option><option value="5">Zona 5</option><option value="6">Zona 6</option><option value="7">Zona 7</option><option value="8">Zona 8</option></select><div class="note">Confira o município na lista da ABNT NBR 15220-3. Sem escolha aqui, vale a zona da cidade.</div></div>
       <div class="inp-row"><label class="lbl" for="s-pess">Pessoas que usam o lugar</label><div class="inp-wrap"><input type="number" id="s-pess" value="2" min="0" oninput="recalcular()"><span class="unit">pessoas</span></div></div>
       <div class="inp-row"><label class="lbl" for="s-area">Área de telhado para captação de chuva</label><div class="inp-wrap"><input type="number" id="s-area" value="84" min="0" oninput="recalcular()"><span class="unit">m²</span></div><div class="note">Sem medida do telhado, use a área construída.</div></div>
     </div>
@@ -560,7 +562,7 @@ html[data-em-quadro] h1{display:none!important}
 <!-- MATERIAIS E CONSTRUÇÃO (complementar) -->
 <section id="b-materiais" class="tab-panel" role="tabpanel" aria-labelledby="tab-materiais" tabindex="-1">
   <h2 class="blk-h">Materiais e construção</h2>
-  <p class="blk-intro">Materiais por clima, acabamentos e checklist de obra. A zona bioclimática vem da cidade do Cadastro.</p>
+  <p class="blk-intro">Materiais por clima, envoltória conferida pela NBR 15575, base de materiais com bioconstrução, acabamentos e checklist de obra. A zona bioclimática vem do Cadastro.</p>
   <h3 class="sub-h" style="margin-top:4px">Materiais</h3>
   <div class="grid2">
     <div class="card">
@@ -571,14 +573,35 @@ html[data-em-quadro] h1{display:none!important}
       </div>
       <div id="m-rec"></div>
     </div>
-    <div>
-      <div class="search-row">
-        <label class="sr-only" for="m-busca">Buscar material</label>
-        <input type="search" class="search-inp" id="m-busca" placeholder="Buscar material..." oninput="renderMat()">
-        <div id="m-filters" role="group" aria-label="Filtrar por categoria"></div>
-      </div>
-      <div class="mat-grid" id="m-grid"></div>
+    <div class="card">
+      <h4 class="sec-title">Envoltória: parede e cobertura</h4>
+      <div class="note" style="margin-bottom:8px">Escolha as composições do projeto. A conferência usa o procedimento simplificado da ABNT NBR 15575 na zona bioclimática do Cadastro.</div>
+      <div class="inp-row"><label class="lbl" for="m-parede">Parede externa</label><select id="m-parede" onchange="mudouEnvoltoria()"><option value="">— escolher —</option></select></div>
+      <div class="inp-row"><label class="lbl" for="m-parede-area">Área de parede externa</label><div class="inp-wrap"><input type="number" id="m-parede-area" min="0" step="any" oninput="mudouEnvoltoria()"><span class="unit">m²</span></div></div>
+      <div class="inp-row"><label class="lbl" for="m-cob">Cobertura</label><select id="m-cob" onchange="mudouEnvoltoria()"><option value="">— escolher —</option></select></div>
+      <div class="inp-row"><label class="lbl" for="m-cob-area">Área de cobertura</label><div class="inp-wrap"><input type="number" id="m-cob-area" min="0" step="any" oninput="mudouEnvoltoria()"><span class="unit">m²</span></div></div>
+      <div class="inp-row"><label class="lbl" for="m-cor">Cor externa (absortância solar)</label><select id="m-cor" onchange="mudouEnvoltoria()"><option value="clara">Clara: α até 0,6 (cobertura nas zonas 7 e 8: até 0,4)</option><option value="escura">Escura: acima desses limites</option></select></div>
+      <div id="m-env" aria-live="polite"></div>
     </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h4 class="sec-title">Composições de parede e cobertura</h4>
+    <div class="note" id="m-comp-zona">Escolha a cidade ou a zona bioclimática no Cadastro.</div>
+    <div id="m-sugestao" style="margin:8px 0"></div>
+    <div class="scroll" id="m-comp"></div>
+    <div class="note" style="margin-top:6px">U, capacidade térmica e atraso pelo método da ABNT NBR 15220-2 (ou tabelados na NBR 15220-3). Conferência pelo procedimento simplificado da ABNT NBR 15575-4 e 15575-5; quando não atende, o projeto pode ser avaliado por simulação. Limites a conferir na edição vigente das normas.</div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h4 class="sec-title">Base de materiais</h4>
+    <div class="search-row">
+      <label class="sr-only" for="m-busca">Buscar material</label>
+      <input type="search" class="search-inp" id="m-busca" placeholder="Buscar material..." oninput="renderMat()">
+      <div id="m-filters" role="group" aria-label="Filtrar por categoria"></div>
+    </div>
+    <div class="note" id="m-conta" aria-live="polite"></div>
+    <div class="scroll" id="m-grid"></div>
+    <div class="note" style="margin-top:6px">Custo: a cotar pelo SINAPI (Caixa) do estado e do mês do orçamento, ou por cotação; a base não guarda preço. * = valor a conferir antes de emitir. Carbono incorporado do berço ao portão (A1–A3).</div>
+    <details><summary>Fontes das propriedades térmicas</summary><ul class="lido" id="m-fontes"></ul></details>
   </div>
 
   <h3 class="sub-h">Acabamentos</h3>
@@ -822,24 +845,7 @@ function dec(n,d){return Number(n).toLocaleString('pt-BR',{minimumFractionDigits
 function brl(n){return 'R$ '+fmt(Math.round(n))}
 function cidadeAtual(){var k=sel('s-cidade');return k&&SK.CIDADES[k]?SK.CIDADES[k]:null}
 
-const MATERIAIS=[
-  {n:'CLT — Madeira Laminada Cruzada',c:'Estrutura',u:'0,28 W/m²K',co2:'−1,5 (negativo)',custo:'R$2.200–3.000/m³'},
-  {n:'SIP 100mm (OSB+EPS+OSB)',c:'Vedação',u:'0,22 W/m²K',co2:'0,08–0,14',custo:'R$1.400–1.900/m²'},
-  {n:'BTC — Bloco Terra Comprimida',c:'Vedação',u:'0,80 W/m²K',co2:'0,01–0,03',custo:'R$80–140/m²'},
-  {n:'Hempcrete (cânhamo + cal)',c:'Vedação',u:'0,22 W/m²K',co2:'−0,4 (negativo)',custo:'R$150–250/m²'},
-  {n:'Bambu Guadua (estrutural)',c:'Estrutura',u:'—',co2:'−0,8 (negativo)',custo:'R$80–140/colmo'},
-  {n:'Lã de PET Reciclado',c:'Isolamento',u:'λ=0,038 W/mK',co2:'0,03–0,06',custo:'R$35–55/m²'},
-  {n:'Lã de Rocha Mineral',c:'Isolamento',u:'λ=0,034 W/mK',co2:'0,50–0,80',custo:'R$25–45/m²'},
-  {n:'Aerogel (painel 10mm)',c:'Isolamento',u:'λ=0,015 W/mK',co2:'2,50–4,00',custo:'R$480–960/m²'},
-  {n:'Vidro duplo câmara ar',c:'Esquadria',u:'1,20–1,80 W/m²K',co2:'1,20–1,60',custo:'R$180–320/m²'},
-  {n:'Vidro Low-E',c:'Esquadria',u:'1,00–1,40 W/m²K',co2:'1,30–1,70',custo:'R$220–380/m²'},
-  {n:'Vidro eletrocrômico',c:'Esquadria',u:'0,90–1,20 W/m²K',co2:'3,50–5,00',custo:'R$1.200–2.400/m²'},
-  {n:'Tadelakt (cal marroquina)',c:'Revestimento',u:'—',co2:'0,45',custo:'R$280–420/m²'},
-  {n:'Tinta Argila Arpex',c:'Revestimento',u:'—',co2:'0,05',custo:'R$48/m² (2 demãos)'},
-  {n:'Telhado verde extensivo',c:'Cobertura',u:'0,21 W/m²K',co2:'negativo',custo:'R$220–280/m²'},
-  {n:'Geopolímero (concreto)',c:'Estrutura',u:'—',co2:'0,06–0,10',custo:'Similar ao concreto'},
-  {n:'Madeira TMT (modificada)',c:'Revestimento',u:'—',co2:'negativo',custo:'R$280–520/m²'},
-];
+/* A lista antiga de 16 materiais (texto, com preços) saiu em 15/11/2026: o bloco Materiais lê a base sistema/physis-materiais.json. */
 const CERTS={
   leed:{n:'LEED v5 BD+C (Abril 2025)',cor:'#2C5A6E',items:[
     'Descarbonização — NZEB + eletrificação + ACV obrigatório',
@@ -981,7 +987,7 @@ function lerPlataforma(){
   if(c.municipio){ const m=semAcento(String(c.municipio).split(/[—\-\/,]/)[0]);
     const k=Object.keys(SK.CIDADES).find(k=>semAcento(k.split('—')[0])===m);
     if(k){ $('s-cidade').value=k; lido.push('Cidade: '+k); } else lido.push('Município "'+esc(c.municipio)+'" não está na tabela de sol e chuva: escolha a cidade mais próxima.'); }
-  if(numBr(c.moradores)>0){ $('s-pess').value=numBr(c.moradores); lido.push('Pessoas: '+numBr(c.moradores)); }
+  if(numBr(c.moradores)>0){ $('s-pess').value=numBr(c.moradores); PLAT.pessoasLidas=true; lido.push('Pessoas: '+numBr(c.moradores)); }
   if(numBr(c.area_construida)>0){ $('s-area').value=numBr(c.area_construida); lido.push('Área de telhado: área construída do Início ('+fmt(numBr(c.area_construida))+' m²)'); }
   const consAno=numBr(PLAT.solar.consumo)>0?numBr(PLAT.solar.consumo):PLAT.kwhAno;
   if(consAno>0){ $('s-consumo').value=+(consAno/365).toFixed(1); lido.push('Consumo de energia: '+fmt(Math.round(consAno))+' kWh/ano ('+(numBr(PLAT.solar.consumo)>0?'Energia solar':'contas do Início, '+PLAT.kwhMeses+' meses')+')'); }
@@ -1055,6 +1061,7 @@ function calcAgua(){
   else statusBox('r-agua-status',r.captacao>=r.consumoAgua,r.captacao>=r.consumoAgua?'Autossuficiente em água':'Complementar com poço/rede','');
   const f=SK.fluxoAgua(r.consumoAgua,r.captacao||0,val('a-reuso'),val('a-dias'));
   ultimo.fluxo=r.captacao==null?null:f;
+  gravarEsgotoSK(pess,f);
   set('r-cist',r.captacao==null?'—':fmt(f.cisterna)+' L ('+dec(f.cisterna/1000,1)+' m³)');
   const L=v=>fmt(Math.round(v))+' L';
   setHtml('a-fluxo',[
@@ -1082,23 +1089,149 @@ function calcOri(){
 }
 
 // ── Materiais ──────────────────────────────
-function calcMat(){
-  const c=cidadeAtual(), box=$('m-zona-box');
-  if(!c){ if(box)box.style.background='#F4F6F1'; set('m-zona-label','Escolha a cidade no Cadastro'); setHtml('m-rec',''); return; }
-  const mat=SK.MAT_ZONA[c.zona];
-  if(box)box.style.background=mat.cor;
-  set('m-zona-label',mat.l+` · HPS: ${dec(c.hps,2)} h/dia`);
-  setHtml('m-rec',[['Estrutura',mat.e],['Vedação',mat.v],['Isolamento',mat.i],['Cobertura',mat.c],['Esquadrias',mat.es]].map(([i,v])=>`<div style="padding:7px 9px;background:#F4F6F1;border-radius:8px;margin-bottom:4px"><div style="font-size:10px;color:#4A4F44">${i}</div><div style="font-size:11px;font-weight:600;color:#33512F">${v}</div></div>`).join(''));
+// Zona bioclimática: a escolhida no Cadastro (lista de municípios da ABNT NBR 15220-3) ou, sem escolha, a da cidade.
+function zonaMat(){
+  const z=parseInt(sel('s-zona'),10); if(z>=1&&z<=8) return {z:z, origem:'cadastro'};
+  const c=cidadeAtual(); return c&&c.zona>=1&&c.zona<=8?{z:c.zona, origem:'cidade'}:null;
 }
+function calcMat(){
+  const c=cidadeAtual(), box=$('m-zona-box'), zs=parseInt(sel('s-zona'),10);
+  const zona=(zs>=1&&zs<=8)?zs:(c?c.zona:null);
+  if(zona==null){ if(box)box.style.background='#F4F6F1'; set('m-zona-label','Escolha a cidade no Cadastro'); setHtml('m-rec',''); renderEnvoltoria(); return; }
+  const mat=SK.MAT_ZONA[zona];
+  if(box)box.style.background=mat.cor;
+  set('m-zona-label',c?mat.l+` · HPS: ${dec(c.hps,2)} h/dia`:mat.l);
+  setHtml('m-rec',[['Estrutura',mat.e],['Vedação',mat.v],['Isolamento',mat.i],['Cobertura',mat.c],['Esquadrias',mat.es]].map(([i,v])=>`<div style="padding:7px 9px;background:#F4F6F1;border-radius:8px;margin-bottom:4px"><div style="font-size:10px;color:#4A4F44">${i}</div><div style="font-size:11px;font-weight:600;color:#33512F">${v}</div></div>`).join(''));
+  renderEnvoltoria();
+}
+
+// Base de materiais (sistema/physis-materiais.json): dentro da plataforma, a do documento pai;
+// aberto sozinho, a cópia embutida neste arquivo (ferramentas/embutir_materiais.py).
+let BASE_MAT;
+function baseMateriais(){
+  if(BASE_MAT!==undefined) return BASE_MAT;
+  const ler=el=>{ try{ const d=el?JSON.parse(el.textContent):null; return d&&Array.isArray(d.materiais)&&Array.isArray(d.composicoes)?d:null; }catch(e){ return null; } };
+  BASE_MAT=null;
+  try{ if(window.parent&&window.parent!==window) BASE_MAT=ler(window.parent.document.getElementById('base-materiais')); }catch(e){ BASE_MAT=null; }
+  if(!BASE_MAT) BASE_MAT=ler(document.getElementById('base-materiais'));
+  return BASE_MAT;
+}
+const CLASSE_15220={leve:'leve', leve_isolada:'leve isolada', leve_refletora:'leve refletora', pesada:'pesada'};
+// Procedimento simplificado da NBR 15575 (já avaliado na base, por zona e absortância) e diretriz da NBR 15220-3.
+function avaliarComp(c,z,escura){
+  if(!c||!z) return null;
+  const a=((c.avaliacao||{}).nbr15575_simplificado||{})[String(z)]; if(!a) return null;
+  const k=c.tipo==='cobertura'?(escura?'alfa_alta':'alfa_baixa'):(escura?'alfa_acima_06':'alfa_ate_06');
+  const d=((c.avaliacao||{}).nbr15220_3||[]).find(t=>(t.zonas||[]).indexOf(z)>=0);
+  return {atende:!!a[k], diretriz:d?d.classe:null};
+}
+function fontesCarbonoComp(c,B){
+  if(c.carbono_kgco2e_m2==null) return [];
+  const por={}; B.materiais.forEach(m=>{por[m.id]=m;});
+  const f=[]; (c.camadas||[]).forEach(k=>{ const m=por[k.material], s=m&&m.carbono_incorporado&&m.carbono_incorporado.fonte; if(s&&f.indexOf(s)<0) f.push(s); });
+  return f;
+}
+function nMat(v,d){ return v==null?'—':Number(v).toLocaleString('pt-BR',{maximumFractionDigits:d}); }
+function compsDe(B,tipo){ return B.composicoes.filter(c=>c.tipo===tipo&&c.id!=='laje_entre_pisos'); }
+let envRestaurado=false;
+function renderEnvoltoria(){
+  const B=baseMateriais();
+  if(!B){ setHtml('m-env','<div class="note">Base de materiais indisponível nesta cópia do SustainKit.</div>'); setHtml('m-comp',''); setHtml('m-sugestao',''); return; }
+  const sp=$('m-parede'), sc=$('m-cob');
+  if(sp&&sp.options.length<2){
+    sp.insertAdjacentHTML('beforeend',compsDe(B,'parede').map(c=>`<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join(''));
+    sc.insertAdjacentHTML('beforeend',compsDe(B,'cobertura').map(c=>`<option value="${esc(c.id)}">${esc(c.nome)}</option>`).join(''));
+  }
+  if(!envRestaurado){ envRestaurado=true;   // volta a escolha gravada antes (de qualquer programa), sem gravar de novo
+    const ant=lerJSON('physis-calc-materiais',null);
+    if(ant&&Array.isArray(ant.composicoes)) ant.composicoes.forEach(k=>{ const c=B.composicoes.find(x=>x.id===k.id); if(!c) return;
+      const [s,a]=c.tipo==='cobertura'?['m-cob','m-cob-area']:['m-parede','m-parede-area'];
+      if($(s)&&[...$(s).options].some(o=>o.value===c.id)){ $(s).value=c.id; if(k.area_m2>0) $(a).value=k.area_m2; } });
+    if(ant&&(ant.absortancia==='clara'||ant.absortancia==='escura')&&$('m-cor')) $('m-cor').value=ant.absortancia;
+    if(ant&&ant.zona>=1&&ant.zona<=8&&!zonaMat()&&$('s-zona')){ $('s-zona').value=String(ant.zona); calcMat(); return; }
+  }
+  const zm=zonaMat(), z=zm?zm.z:null, escura=sel('m-cor')==='escura';
+  set('m-comp-zona', zm?`Zona bioclimática usada: ${z} (${zm.origem==='cadastro'?'do Cadastro':'da cidade'})`:'Escolha a cidade ou a zona bioclimática no Cadastro.');
+  const st=a=>a==null?'—':(a.atende?'✓ atende':'✗ não atende');
+  const cl=a=>a==null?'—':(a.diretriz?CLASSE_15220[a.diretriz]:'fora da diretriz desta zona');
+  // tabela das composições
+  setHtml('m-comp',`<table class="tbl"><caption class="sr-only">Composições de parede e cobertura com desempenho térmico e carbono</caption><thead><tr><th scope="col">Composição</th><th scope="col">Tipo</th><th scope="col">U (W/(m²·K))</th><th scope="col">Capacidade térmica (kJ/(m²·K))</th><th scope="col">Atraso térmico (h)</th><th scope="col">Carbono (kgCO₂e/m²)</th><th scope="col">NBR 15575</th><th scope="col">NBR 15220-3</th></tr></thead><tbody>`+
+    B.composicoes.map(c=>{ const a=avaliarComp(c,z,escura), k=c.calculo||{};
+      return `<tr><th scope="row" style="text-align:left;font-weight:600">${esc(c.nome)}${c.nota?`<div class="note">${esc(c.nota)}</div>`:''}</th><td>${c.tipo==='cobertura'?'cobertura':'parede'}</td><td>${nMat(k.u,2)}</td><td>${nMat(k.ct,0)}</td><td>${nMat(k.atraso,1)}</td><td>${nMat(c.carbono_kgco2e_m2,1)}</td><td>${st(a)}</td><td>${cl(a)}</td></tr>`; }).join('')+'</tbody></table>');
+  // sugestões: atendem à NBR 15575 e seguem a diretriz da NBR 15220-3 na zona; menor carbono primeiro
+  if(z){
+    const sug=tipo=>compsDe(B,tipo).filter(c=>{ const a=avaliarComp(c,z,escura); return a&&a.atende&&a.diretriz; })
+      .sort((x,y)=>(x.carbono_kgco2e_m2==null?1e9:x.carbono_kgco2e_m2)-(y.carbono_kgco2e_m2==null?1e9:y.carbono_kgco2e_m2)).slice(0,5);
+    const lin=(rot,l)=>`<div class="res-row"><span class="res-label">${rot}</span><span class="res-value" style="text-align:right">${l.length?l.map(c=>`<span>${esc(c.nome)}</span>`).join('<br>'):'nenhuma composição da base'}</span></div>`;
+    setHtml('m-sugestao','<div class="sec-title" style="font-size:12px">Sugestões para esta zona: atendem à NBR 15575 e seguem a NBR 15220-3, com menor carbono primeiro</div>'+lin('Parede',sug('parede'))+lin('Cobertura',sug('cobertura')));
+  } else setHtml('m-sugestao','');
+  // envoltória escolhida
+  const esc1=[['parede','Parede externa',sel('m-parede'),num('m-parede-area')],['cobertura','Cobertura',sel('m-cob'),num('m-cob-area')]]
+    .map(([t,rot,id,area])=>{ const c=B.composicoes.find(x=>x.id===id); return c?{t,rot,c,area:area>0?area:null}:null; }).filter(Boolean);
+  if(!esc1.length){ setHtml('m-env','<div class="note">Escolha a parede ou a cobertura para conferir.</div>'); return; }
+  let total=0, temTotal=false;
+  setHtml('m-env',esc1.map(({rot,c,area})=>{ const a=avaliarComp(c,z,escura), k=c.calculo||{}, kg=c.carbono_kgco2e_m2;
+    if(kg!=null&&area){ total+=kg*area; temTotal=true; }
+    const fontes=fontesCarbonoComp(c,B);
+    return `<div style="margin-top:10px"><div class="sec-title" style="font-size:12px"><span>${rot}</span>: <span>${esc(c.nome)}</span></div>`+
+      [['U (transmitância)',nMat(k.u,2)+' W/(m²·K)'],['Capacidade térmica',nMat(k.ct,0)+' kJ/(m²·K)'],['Atraso térmico',nMat(k.atraso,1)+' h'],
+       ['NBR 15575 (procedimento simplificado)',a?st(a):'informe a zona no Cadastro'],['Diretriz da NBR 15220-3',a?cl(a):'—'],
+       ['Carbono incorporado',kg==null?'não calculado (composição tabelada)':nMat(kg,1)+' kgCO₂e/m²']].concat(kg!=null&&area?[['Carbono da área',nMat(kg*area,0)+' kgCO₂e']]:[])
+       .map(([l,v])=>`<div class="res-row"><span class="res-label">${l}</span><span class="res-value">${v}</span></div>`).join('')+
+      (fontes.length?`<div class="note">Fonte do carbono:</div>`+fontes.map(f=>`<div class="note">${esc(f)}</div>`).join(''):'')+'</div>';
+  }).join('')+(temTotal?`<div class="res-row hi" style="margin-top:8px"><span class="res-label">Carbono incorporado da envoltória</span><span class="res-value">${nMat(total,0)} kgCO₂e</span></div>`:''));
+  gravarCalcSK('physis-calc-materiais',{
+    composicoes:esc1.map(({t,c,area})=>{ const a=avaliarComp(c,z,escura), k=c.calculo||{}, kg=c.carbono_kgco2e_m2, f=fontesCarbonoComp(c,B);
+      return {id:c.id, nome:c.nome, tipo:t, area_m2:area, kgco2e_m2:kg==null?null:kg, kgco2e_total:kg!=null&&area?kg*area:null,
+        u_w_m2k:k.u==null?null:k.u, ct_kj_m2k:k.ct==null?null:k.ct, atraso_h:k.atraso==null?null:k.atraso,
+        nbr15575_atende:a?a.atende:null, fonte:f.length?f.join('; '):'composição tabelada sem camadas na base: carbono não calculado'}; }),
+    zona:z, zona_origem:zm?zm.origem:null, absortancia:escura?'escura':'clara',
+    base:{arquivo:'physis-materiais.json', versao:B.versao==null?null:B.versao, compilado_em:B.compilado_em||null},
+    fonte:'SustainKit', projeto:null, atualizado:new Date().toISOString()});
+}
+function mudouEnvoltoria(){ renderEnvoltoria(); }
 function renderMat(){
-  const busca=$('m-busca')?.value.toLowerCase()||'';
-  const grid=$('m-grid');
-  if(!grid)return;
-  const filtered=MATERIAIS.filter(m=>(matCat==='Todos'||m.c===matCat)&&m.n.toLowerCase().includes(busca));
-  grid.innerHTML=filtered.map(m=>`<div class="mat-card"><div class="mat-name">${m.n}</div><span class="mat-cat">${m.c}</span><div class="mat-row"><span class="mat-key">U/λ</span><span class="mat-val">${m.u}</span></div><div class="mat-row"><span class="mat-key">CO₂</span><span class="mat-val">${m.co2}</span></div><div class="mat-row"><span class="mat-key">Custo</span><span class="mat-val">${m.custo}</span></div></div>`).join('')||'<div class="note">Nenhum material encontrado.</div>';
-  const cats=['Todos',...new Set(MATERIAIS.map(m=>m.c))];
+  const B=baseMateriais(), grid=$('m-grid');
+  if(!grid) return;
+  if(!B){ grid.innerHTML='<div class="note">Base de materiais indisponível nesta cópia do SustainKit.</div>'; return; }
+  const busca=semAcento($('m-busca')?.value||'');
+  const lista=B.materiais.filter(m=>(matCat==='Todos'||m.grupo===matCat)&&(!busca||semAcento(m.nome).includes(busca)||semAcento(m.grupo).includes(busca)));
+  set('m-conta',`Mostrando ${lista.length} de ${B.materiais.length} materiais`);
+  grid.innerHTML=`<table class="tbl"><caption class="sr-only">Materiais com propriedades térmicas, carbono incorporado e custo</caption><thead><tr><th scope="col">Material</th><th scope="col">Grupo</th><th scope="col">Densidade (kg/m³)</th><th scope="col">Condutividade (W/(m·K))</th><th scope="col">Calor específico (J/(kg·K))</th><th scope="col">Carbono (kgCO₂e/kg)</th><th scope="col">Fonte do carbono</th><th scope="col">Custo</th></tr></thead><tbody>`+
+    lista.map(m=>{ const ci=m.carbono_incorporado||{}, cu=m.custo||{};
+      return `<tr><th scope="row" style="text-align:left;font-weight:600"><span>${esc(m.nome)}</span>${m.verificar?'<span aria-hidden="true"> *</span><span class="sr-only">(conferir)</span>':''}${m.nota?`<div class="note">${esc(m.nota)}</div>`:''}</th><td style="text-align:left">${esc(m.grupo)}</td><td>${nMat(m.densidade,0)}</td><td>${nMat(m.condutividade,3)}</td><td>${nMat(m.calor_especifico,0)}</td><td>${nMat(ci.valor,3)}</td><td style="text-align:left"><span class="note" style="font-style:normal">${esc(ci.fonte||'—')}</span></td><td style="text-align:left">${cu.valor==null?'a cotar (SINAPI/cotação)':nMat(cu.valor,2)}${cu.unidade?`<div class="note">${esc(cu.unidade)}</div>`:''}</td></tr>`; }).join('')+'</tbody></table>';
+  const cats=['Todos',...new Set(B.materiais.map(m=>m.grupo))].sort((a,b)=>a==='Todos'?-1:b==='Todos'?1:a==='terra e bioconstrução'?-1:b==='terra e bioconstrução'?1:0);
   const filt=$('m-filters');
-  if(filt)filt.innerHTML=cats.map(c=>`<button type="button" class="filter-btn${matCat===c?' active':''}" aria-pressed="${matCat===c}" onclick="matCat='${c}';renderMat()">${c}</button>`).join('');
+  if(filt) filt.innerHTML=cats.map(c=>`<button type="button" class="filter-btn${matCat===c?' active':''}" aria-pressed="${matCat===c}" data-cat="${esc(c)}" onclick="matCat=this.dataset.cat;renderMat()">${esc(c)}</button>`).join('');
+  const ul=$('m-fontes'); if(ul&&!ul.children.length) ul.innerHTML=[...new Set(B.materiais.map(m=>m.fonte).filter(Boolean))].map(f=>`<li>${esc(f)}</li>`).join('');
+}
+
+// ── Resultados para a plataforma (mesmo navegador) ──
+// Só grava depois que a pessoa mexeu em algum campo nesta sessão (ou, no esgoto, se as pessoas vieram do Início):
+// os valores de exemplo que o SustainKit abre não podem apagar o que o Planejador ou a pessoa já gravou.
+let skEditou=false;
+['input','change'].forEach(ev=>document.addEventListener(ev,e=>{ if(e.isTrusted) skEditou=true; },true));
+function gravarCalcSK(chave,obj,forcar){
+  if(!skEditou&&!forcar) return false;
+  try{
+    const ant=JSON.parse(localStorage.getItem(chave)||'null');
+    if(ant&&ant.fonte===obj.fonte){ const a=Object.assign({},ant,{atualizado:null}), b=Object.assign({},obj,{atualizado:null}); if(JSON.stringify(a)===JSON.stringify(b)) return true; }
+    localStorage.setItem(chave,JSON.stringify(obj)); return true;
+  }catch(e){ return false; }
+}
+// Esgoto: 80% da água usada vira esgoto (SK.RETORNO); o reúso sai do fluxo da água (ABNT NBR 13969). O SustainKit não dimensiona fossa, filtro nem infiltração: ficam null.
+function gravarEsgotoSK(pess,f){
+  if(!(pess>0)||!f) return;
+  gravarCalcSK('physis-calc-esgoto',{pessoas:pess, m3_dia:f.esgoto/1000, tratamento:null, reuso_m3_dia:f.reuso/1000, lodo:null,
+    fossa_m3:null, filtro_m3:null, infiltracao_m2:null, esgoto_para_tratamento_m3_dia:f.esgotoFinal/1000, fracao_agua_vira_esgoto:SK.RETORNO,
+    fonte:'SustainKit', projeto:null, atualizado:new Date().toISOString()}, PLAT.pessoasLidas===true);
+}
+// Biogás: o SustainKit só recebe o biogás produzido (m³/ano, aba Carbono); não dimensiona biodigestor nem substratos.
+function gravarBiogasSK(m3ano){
+  if(!(m3ano>0)) return;
+  gravarCalcSK('physis-calc-biogas',{substratos:[], biogas_m3_dia:m3ano/365, energia_kwh_dia:null, ch4_pct:null, biofertilizante_kg_dia:null,
+    biodigestor_m3:null, fogao_h_dia:null, origem:'biogás produzido informado na aba Carbono (m³/ano ÷ 365)',
+    fonte:'SustainKit', projeto:null, atualizado:new Date().toISOString()});
 }
 
 // ── Certificações ──────────────────────────
@@ -1239,6 +1372,7 @@ function calcCarbon(){
   var e={rede:val('c-rede'), solar:val('c-solar'), injeta:val('c-injeta'), diesel:val('c-diesel'), biogas:val('c-biogas'),
          clt:val('c-clt'), conc:val('c-conc'), aco:val('c-aco'), bambu:val('c-bambu')};
   var r=SK.carbono(e);
+  gravarBiogasSK(e.biogas);
   set('r-em-rede',   fmtCO2(r.emRede));
   set('r-em-diesel', fmtCO2(r.emDiesel));
   set('r-ev-solar',  '−'+fmtCO2(r.evSolar));
@@ -1373,19 +1507,19 @@ function iniciarDemo(){
 </script>
 <!-- Preferências de leitura e acessibilidade: cópia de sistema/physis-preferencias.js (não editar aqui) -->
 <script id="physis-preferencias">
-/* physis-preferencias.js v2 · Preferências de leitura e acessibilidade das telas da Physis
+/* physis-preferencias.js v3 · Preferências de leitura e acessibilidade das telas da Physis
    Barra com 4 controles: [Idioma: Português/English] [Tema: Claro/Escuro/Automático] [Modo de conforto ▾] [Acessibilidade (PcD) ▾].
    Modo de conforto (neurodivergência: autismo, TDAH, dislexia): fundo verde, texto maior, mais espaçamento, menos estímulo,
    foco reforçado, fonte para dislexia, régua de leitura, leitura simplificada, lembrar onde parei.
    Acessibilidade (PcD): cegueira e baixa visão (leitores de tela, ouvir esta tela, alto contraste, zoom, atalhos),
    surdez (alertas visuais, Libras, legendas), fala (comunicação alternativa · CAA), mobilidade (teclado, comandos de voz).
 
-   ORIGINAL: sistema/physis-preferencias.js. As telas são arquivos únicos, então cada uma leva uma CÓPIA IGUAL
-   dentro do bloco de script com id="physis-preferencias" (o arquivo inteiro, sem mudar nada):
-     physis-hub/web/consultoria.html · sistema/SustainKit_Definitivo.html · modulos/planejador/planejador-physis.html
-     demos/physis-demo-cliente.html · demos/physis-demo-gestao.html · demos/physis-demo-scada.html
-   Mudou aqui? Copie para todas (ou registre o bloco em ferramentas/sincronizar.py, BLOCOS). O teste
-   physis-hub/tests/test_preferencias.py confere que as cópias são iguais a este arquivo.
+   ORIGINAL ÚNICO: sistema/physis-preferencias.js (desde a v3 a antiga barra px-preferencias da plataforma, da Gestão e do
+   SCADA é esta mesma, pela porta PxPref, no fim do arquivo). As telas são arquivos únicos, então cada uma leva uma CÓPIA IGUAL
+   dentro do bloco <script id="physis-preferencias"> (o arquivo inteiro, sem mudar nada). Quem copia é ferramentas/sincronizar.py
+   (BLOCOS): physis-hub/web/painel.html, sistema/gestao-interna-physis.html, sistema/physis-scada-demo.html,
+   physis-hub/web/consultoria.html, sistema/SustainKit_Definitivo.html, modulos/planejador/planejador-physis.html (e as demos
+   geradas delas). O teste physis-hub/tests/test_preferencias.py confere que as cópias são iguais a este arquivo.
 
    Uso, uma vez por página, depois do conteúdo:
      PhysisPreferencias.iniciar({
@@ -1403,7 +1537,10 @@ function iniciarDemo(){
        contato: "#f-desc",                // campo onde a CAA escreve quando nenhum campo está em uso
        relatar: "#contato",               // "Relatar barreira" sem abrirJuridico(): link do contato
        lembrar: { salvar: function () { return {}; }, restaurar: function (o) {} },  // opcional: aba aberta etc.
-       esconderEmQuadro: true,            // aberta num quadro (iframe) da plataforma: sem barra própria, segue a escolha de lá
+       esconderEmQuadro: true,            // aberta num quadro (iframe) da plataforma ou com html[data-em-quadro]: sem barra própria, segue a escolha de lá
+       idiomaExterno: { atual, definir }, // tela que se traduz sozinha (o módulo só pede a troca; não traduz o DOM)
+       suporte: function (frase) {},      // CAA sem campo em uso: leva a frase ao suporte da tela
+       tela: "nome",                      // chave do "lembrar onde parei" (padrão: o endereço)
        aoMudar: function (estado) {}      // chamado depois de cada mudança
      });
 
@@ -1462,6 +1599,8 @@ function iniciarDemo(){
       voz: "Comandos de voz", vozD: "Começa desligado. Atenção à privacidade (LGPD): no Chrome e no Edge o áudio é enviado aos servidores do Google ou da Microsoft para ser entendido. Comandos: ir para conteúdo, próximo, voltar, ler tela, aumentar texto, diminuir texto, parar.",
       semRec: "Este navegador não reconhece voz.", vozOuve: "Ouvindo comandos de voz.", vozErro: "Os comandos de voz pararam: ",
       relatar: "Relatar barreira", decT: "Declaração de acessibilidade",
+      relatarD: "Descreva a barreira: o que tentou fazer, em que tela e o que aconteceu. Copie o relato e envie pelo canal de suporte da Physis.",
+      relatarCampo: "O que aconteceu", copiar: "Copiar relato", copiado: "Relato copiado.", caaSup: "Frase levada ao suporte: ",
       decD: "Estas telas seguem a Lei Brasileira de Inclusão (Lei 13.146/2015), o eMAG e as diretrizes de acessibilidade digital do gov.br, a WCAG 2.2 nível AA e a ABNT NBR 17225.",
       pular: "Pular para o conteúdo", ok: "Preferência aplicada.", aEn: "English on. Texts not yet translated stay in Portuguese.", aPt: "Português ligado.",
       aEsc: "Tema escuro ligado.", aClaro: "Tema claro ligado.", aAuto: "Tema automático: segue o aparelho.",
@@ -1494,6 +1633,8 @@ function iniciarDemo(){
       voz: "Voice commands", vozD: "Off by default. Privacy notice (LGPD): in Chrome and Edge the audio is sent to Google or Microsoft servers to be understood. Commands: go to content, next, back, read screen, bigger text, smaller text, stop.",
       semRec: "This browser does not recognise speech.", vozOuve: "Listening for voice commands.", vozErro: "Voice commands stopped: ",
       relatar: "Report a barrier", decT: "Accessibility statement",
+      relatarD: "Describe the barrier: what you tried to do, on which screen and what happened. Copy the report and send it through the Physis support channel.",
+      relatarCampo: "What happened", copiar: "Copy report", copiado: "Report copied.", caaSup: "Phrase taken to support: ",
       decD: "These screens follow the Brazilian Inclusion Law (Law 13.146/2015), eMAG and the gov.br digital accessibility guidelines, WCAG 2.2 level AA and ABNT NBR 17225.",
       pular: "Skip to content", ok: "Preference applied.", aEn: "English on. Texts not yet translated stay in Portuguese.", aPt: "Português ligado.",
       aEsc: "Dark theme on.", aClaro: "Light theme on.", aAuto: "Automatic theme: follows the device.",
@@ -1505,7 +1646,7 @@ function iniciarDemo(){
   var CSS = [
     /* barra */
     ".pp-barra{--pp-f:#FFFFFF;--pp-t:#1C2B21;--pp-l:#8A9284;--pp-a:#33512F;--pp-at:#FFFFFF;position:relative;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;line-height:1.3;font-family:inherit;color:var(--pp-t)}",
-    "html[data-tema=escuro] .pp-barra{--pp-f:#2A3829;--pp-t:#EEF2EA;--pp-l:#8A9182;--pp-a:#B9CDB3;--pp-at:#1C2B21}",
+    "html[data-tema=escuro] .pp-barra{--pp-f:#1C2B21;--pp-t:#EEF2EA;--pp-l:#8A9182;--pp-a:#B9CDB3;--pp-at:#1C2B21}",
     ".pp-barra.pp-sobre-verde{--pp-f:transparent;--pp-t:#DCEBD8;--pp-l:#B9CDB3;--pp-a:#DCEBD8;--pp-at:#1C2B21}",
     ".pp-barra .pp-b,.pp-barra select{font:inherit;font-size:13px;font-weight:600;min-height:36px;min-width:36px;padding:0 10px;border-radius:8px;border:1px solid var(--pp-l);background:var(--pp-f);color:var(--pp-t);cursor:pointer;margin:0;line-height:1.2;width:auto}",
     ".pp-barra select option{background:#FFFFFF;color:#1C2B21}",
@@ -1515,7 +1656,7 @@ function iniciarDemo(){
     ".pp-barra .pp-b .pp-on{font-weight:400}",
     ".pp-barra .pp-b:focus-visible,.pp-barra select:focus-visible,.pp-painel :focus-visible{outline:3px solid var(--pp-t);outline-offset:2px}",
     ".pp-painel{position:absolute;right:0;top:calc(100% + 6px);z-index:1000;width:400px;max-width:calc(100vw - 32px);max-height:calc(100vh - 110px);overflow:auto;background:#FFFFFF;color:#1C2B21;border:1px solid #8A9284;border-radius:12px;padding:14px 16px;box-shadow:0 8px 28px rgba(28,43,33,.22);text-align:left;font-size:15px;line-height:1.45;font-weight:400;letter-spacing:normal}",
-    "html[data-tema=escuro] .pp-painel{background:#2A3829;color:#EEF2EA;border-color:#8A9182}",
+    "html[data-tema=escuro] .pp-painel{background:#1C2B21;color:#EEF2EA;border-color:#8A9182}",
     ".pp-painel[hidden],.pp-painel [hidden]{display:none!important}",
     ".pp-painel h2{font:700 17px/1.3 inherit;margin:0 0 2px;color:inherit;font-family:inherit}",
     ".pp-painel h3{font:700 15px/1.3 inherit;margin:14px 0 4px;color:inherit;font-family:inherit;border-top:1px solid #C9D2C4;padding-top:10px}",
@@ -1534,7 +1675,7 @@ function iniciarDemo(){
     ".pp-painel .pp-acoes{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}",
     ".pp-painel button{font:inherit;font-size:14px;font-weight:600;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #33512F;background:#FFFFFF;color:#33512F;cursor:pointer}",
     ".pp-painel button.pp-prim{background:#33512F;color:#FFFFFF}",
-    "html[data-tema=escuro] .pp-painel button{background:#2A3829;color:#EEF2EA;border-color:#B9CDB3}",
+    "html[data-tema=escuro] .pp-painel button{background:#1C2B21;color:#EEF2EA;border-color:#B9CDB3}",
     "html[data-tema=escuro] .pp-painel button.pp-prim{background:#B9CDB3;color:#1C2B21}",
     ".pp-painel .pp-caa{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin:6px 0}",
     ".pp-painel .pp-caa button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 6px;min-height:76px;font-size:13px;line-height:1.2;text-align:center}",
@@ -1576,6 +1717,8 @@ function iniciarDemo(){
   function limpar(o) {
     var e = copia(PADRAO);
     if (o && typeof o === "object") {
+      for (var x in o) if (tem(o, x) && !tem(PADRAO, x) && x !== "legivel" && x !== "fundoVerde") e[x] = o[x];   /* guarda o que outras telas gravam */
+      if (o.fundoVerde) e.verde = true;
       if (o.idioma === "en" || o.idioma === "pt") e.idioma = o.idioma;
       if (o.tema === "claro" || o.tema === "escuro" || o.tema === "auto") e.tema = o.tema;
       var t = parseInt(o.texto, 10); if (t === 0 || t === 1 || t === 2) e.texto = t; else if (o.texto === true) e.texto = 1;
@@ -1595,23 +1738,29 @@ function iniciarDemo(){
     if (ler("physis-idioma") === "en") e.idioma = "en";
     if (ler("physis-conforto") === "1") { e.conforto = true; e.espaco = true; e.calma = true; }
     if (ler("physis-fundo") === "verde") e.verde = true;
-    try { var pp = JSON.parse(ler("physis-passaporte") || "null"); if (pp) { e.texto = pp.texto ? 1 : 0; e.espaco = e.espaco || !!pp.espaco; e.contraste = !!pp.contraste; e.calma = e.calma || !!pp.calma; } } catch (x) {}
+    try { var pp = JSON.parse(ler("physis-passaporte") || "null"); if (pp) { e.texto = pp.texto ? 1 : 0; e.espaco = e.espaco || !!pp.espaco; e.contraste = !!pp.contraste; e.calma = e.calma || !!pp.calma; e.foco = !!pp.foco; } } catch (x) {}
+    var t = ler("physis-pref-tema"); if (t === "claro" || t === "escuro" || t === "auto") e.tema = t;
     return e;
   }
   function guardar() {
     var e = P.estado;
     gravar(P.op.chave, JSON.stringify(e));
-    /* espelho nas chaves antigas, para a plataforma (painel.html) seguir a mesma escolha */
+    gravar("physis-pref-tema", e.tema);      /* lido pelo script cedo (pxp-cedo) antes de a tela desenhar */
+    /* espelho nas chaves antigas, para telas antigas seguirem a mesma escolha */
     gravar("physis-idioma", e.idioma);
     gravar("physis-conforto", e.conforto ? "1" : "0");
     gravar("physis-fundo", e.verde ? "verde" : "branco");
     var pp = {}; try { pp = JSON.parse(ler("physis-passaporte") || "{}") || {}; } catch (x) { pp = {}; }
-    pp.texto = e.texto > 0; pp.espaco = e.espaco; pp.contraste = e.contraste; pp.calma = e.calma;
+    pp.texto = e.texto > 0; pp.espaco = e.espaco; pp.contraste = e.contraste; pp.calma = e.calma; pp.foco = e.foco;
     gravar("physis-passaporte", JSON.stringify(pp));
   }
 
   function sistemaEscuro() { try { return !!(global.matchMedia && global.matchMedia("(prefers-color-scheme: dark)").matches); } catch (e) { return false; } }
-  function temaEfetivo() { return P.estado.tema === "auto" ? (sistemaEscuro() ? "escuro" : "claro") : P.estado.tema; }
+  /* o fundo verde é o escuro esverdeado: as telas o desenham com as cores do tema escuro mais html.a11y-verde */
+  function temaEfetivo() { return P.estado.verde ? "escuro" : P.estado.tema === "auto" ? (sistemaEscuro() ? "escuro" : "claro") : P.estado.tema; }
+  /* telas com tradução própria (plataforma, Gestão, SCADA): idiomaExterno = { atual(), definir(lingua, pelaPessoa) } */
+  function externo() { var i = P.op && P.op.idiomaExterno; return i && typeof i.definir === "function" ? i : null; }
+  function idiomaDaTela() { var i = externo(); if (i && i.atual) { try { return i.atual() === "en" ? "en" : "pt"; } catch (x) {} } return P.estado.idioma; }
   function txt(k) { return UI[P.estado && P.estado.idioma === "en" ? "en" : "pt"][k]; }
 
   /* ---------- aplicar no <html> ---------- */
@@ -1625,6 +1774,7 @@ function iniciarDemo(){
     CLASSES.forEach(function (k) { cl.toggle("a11y-" + k, !!e[k]); });
     cl.toggle("pp-zoom", P.op.escalaPorZoom !== false);
     r.style.setProperty("--pp-escala", String(ESCALAS[e.texto]));
+    var meta = doc.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute("content", temaEfetivo() === "escuro" ? "#1C2B21" : "#33512F");
     if (P.idiomaAplicado !== e.idioma) { P.idiomaAplicado = e.idioma; definirIdioma(e.idioma); }
     if (e.calma) pararMidias(doc);
     vozLigar(e.voz);
@@ -1668,8 +1818,8 @@ function iniciarDemo(){
     u.regua = criar("div", { "class": "pp-regua", "aria-hidden": "true", "data-pp-manter": "" });
     doc.body.appendChild(u.regua);
     /* dentro de um quadro da plataforma (esconderEmQuadro): a barra fica na plataforma; aqui só se aplica a escolha */
-    if (P.op.esconderEmQuadro) { var q = false; try { q = global.self !== global.top; } catch (e) { q = true; } if (q) return; }
-    var barra = criar("div", { "class": "pp-barra" + (P.op.variante ? " pp-" + P.op.variante : ""), role: "group", "data-pp-manter": "", "data-physis-preferencias": "barra" });
+    if (P.op.esconderEmQuadro) { var q = doc.documentElement.hasAttribute("data-em-quadro"); try { q = q || global.self !== global.top; } catch (e) { q = true; } if (q) return; }
+    var barra = criar("div", { "class": "pp-barra" + (P.op.variante ? " pp-" + P.op.variante : ""), id: "pxp-barra", role: "group", "data-pp-manter": "", translate: "no", "data-physis-preferencias": "barra" });
     u.idiomaRot = criar("label", { "for": "pp-idioma", "class": "pp-cx" });
     u.idioma = criar("select", { id: "pp-idioma" }, [criar("option", { value: "pt", lang: "pt-BR" }, ["Português"]), criar("option", { value: "en", lang: "en" }, ["English"])]);
     u.idiomaRot.appendChild(u.idiomaTxt = criar("span")); u.idiomaRot.appendChild(u.idioma);
@@ -1685,7 +1835,7 @@ function iniciarDemo(){
     u.barra = barra;
     if (lugar) lugar.appendChild(barra); else doc.body.insertBefore(barra, doc.body.firstChild);
 
-    u.idioma.addEventListener("change", function () { var en = u.idioma.value === "en"; mudar({ idioma: en ? "en" : "pt" }, en ? UI.en.aEn : UI.pt.aPt); });
+    u.idioma.addEventListener("change", function () { var en = u.idioma.value === "en"; P.pelaPessoa = true; mudar({ idioma: en ? "en" : "pt" }, en ? UI.en.aEn : UI.pt.aPt); });
     u.tema.addEventListener("change", function () { var v = u.tema.value; mudar({ tema: v }, v === "auto" ? "aAuto" : v === "escuro" ? "aEsc" : "aClaro"); });
     u.conforto.addEventListener("click", function () { abrir(u.pConf, u.conforto, u.pConf.hidden); });
     u.a11y.addEventListener("click", function () { abrir(u.pA11y, u.a11y, u.pA11y.hidden); });
@@ -1714,6 +1864,7 @@ function iniciarDemo(){
         else if (a === "pausar") pausarFala();
         else if (a === "parar") pararFala();
         else if (a === "relatar") relatar();
+        else if (a === "copiar-relato") copiarRelato();
         else if (a === "caa") caa(b.getAttribute("data-frase"));
       });
     });
@@ -1787,6 +1938,10 @@ function iniciarDemo(){
     f.appendChild(criar("p", null, [txt("decD")]));
     f.appendChild(criar("div", { "class": "pp-acoes" }, [botao("relatar", "relatar"), botao("padrao", "padrao", "a"), botao("fechar", "fechar", "a")]));
     f.lastChild.lastChild.className = "pp-prim";
+    f.appendChild(criar("div", { id: "pp-relato", hidden: true }, [criar("p", null, [txt("relatarD")]),
+      criar("label", { "for": "pp-relato-t", style: "min-height:0;display:block" }, [txt("relatarCampo")]),
+      criar("textarea", { id: "pp-relato-t", rows: "4", style: "width:100%;font:inherit;font-size:14px;border:1px solid #8A9284;border-radius:8px;padding:8px;background:inherit;color:inherit" }),
+      criar("div", { "class": "pp-acoes" }, [botao("copiar-relato", "copiar")]), criar("p", { id: "pp-relato-msg", role: "status" })]));
   }
   function marcarPaineis() {
     var u = P.ui, e = P.estado;
@@ -1826,7 +1981,7 @@ function iniciarDemo(){
   }
 
   /* ---------- pular, atalhos, régua, lembrar ---------- */
-  function alvoConteudo() { return el(P.op.conteudo) || doc.querySelector("main") || doc.querySelector("[role=main]"); }
+  function alvoConteudo() { var c = P.op.conteudo; if (typeof c === "function") { try { c = c(); } catch (e) { c = null; } } return el(c) || doc.querySelector("#px-conteudo") || doc.querySelector("main") || doc.querySelector("[role=main]"); }
   function irPara(x) {
     if (!x) return;
     if (!x.hasAttribute("tabindex") && !/^(A|BUTTON|INPUT|SELECT|TEXTAREA)$/.test(x.nodeName)) x.setAttribute("tabindex", "-1");
@@ -1857,13 +2012,13 @@ function iniciarDemo(){
     var m = {}; try { m = JSON.parse(ler(lugarChave()) || "{}") || {}; } catch (e) { m = {}; }
     var o = { y: Math.round(global.scrollY || 0), hash: global.location.hash || "" };
     if (P.op.lembrar && typeof P.op.lembrar.salvar === "function") { try { o.pagina = P.op.lembrar.salvar(); } catch (e) {} }
-    m[global.location.pathname] = o;
+    m[P.op.tela || global.location.pathname] = o;
     gravar(lugarChave(), JSON.stringify(m));
   }
   function restaurarLugar() {
     if (!P.estado.lembrar) return;
     var m = {}; try { m = JSON.parse(ler(lugarChave()) || "{}") || {}; } catch (e) { return; }
-    var o = m[global.location.pathname]; if (!o) return;
+    var o = m[P.op.tela || global.location.pathname]; if (!o) return;
     if (P.op.lembrar && typeof P.op.lembrar.restaurar === "function" && o.pagina) { try { P.op.lembrar.restaurar(o.pagina); } catch (e) {} }
     if (o.hash && !global.location.hash) { try { global.history.replaceState(null, "", o.hash); global.dispatchEvent(new HashChangeEvent("hashchange")); } catch (e) {} }
     setTimeout(function () { global.scrollTo(0, o.y || 0); }, 60);
@@ -1926,6 +2081,10 @@ function iniciarDemo(){
       try { alvo.scrollIntoView({ block: "center" }); } catch (e) {}
       alvo.focus();
       dizer(txt("caaFoi") + frase);
+    } else if (typeof P.op.suporte === "function") {
+      abrir(P.ui.pA11y, P.ui.a11y, false);
+      try { P.op.suporte(frase); } catch (e) {}
+      dizer(txt("caaSup") + frase);
     } else {
       var c = P.ui.cartao; c.hidden = false; c.textContent = "";
       c.appendChild(criar("span", { "class": "pp-d" }, [txt("caaMostra")])); c.appendChild(doc.createTextNode(frase));
@@ -1936,7 +2095,20 @@ function iniciarDemo(){
     var r = P.op.relatar;
     if (typeof r === "function") return r();
     if (typeof r === "string" && r.charAt(0) === "#") { abrir(P.ui.pA11y, P.ui.a11y, false); irPara(el(r)); var c = el(P.op.contato); if (ehCampo(c)) c.focus(); return; }
-    global.location.href = typeof r === "string" ? r : "mailto:?subject=" + encodeURIComponent(txt("relatar") + " · " + doc.title);
+    if (typeof r === "string" && r) { global.location.href = r; return; }
+    /* sem canal na página: o relato é escrito aqui e copiado, para enviar pelo suporte da Physis (funciona sem internet) */
+    var box = doc.getElementById("pp-relato"); if (!box) return; box.hidden = false; var t = doc.getElementById("pp-relato-t"); if (t) t.focus();
+  }
+  function copiarRelato() {
+    var t = doc.getElementById("pp-relato-t"), e = estadoPublico();
+    var rel = (t && t.value.trim() ? t.value.trim() + "\n\n" : "") + "Tela: " + doc.title + "\nEndereço: " + global.location.pathname + global.location.hash +
+      "\nQuando: " + new Date().toISOString() + "\nNavegador: " + global.navigator.userAgent + "\nPreferências: tema " + e.temaEfetivo +
+      (e.conforto ? ", conforto" : "") + (e.texto ? ", texto maior" : "") + (e.contraste ? ", alto contraste" : "");
+    var feito = false;
+    try { if (global.navigator.clipboard && global.isSecureContext) { global.navigator.clipboard.writeText(rel); feito = true; } } catch (x) {}
+    if (!feito) { var a = criar("textarea", { style: "position:fixed;left:-9999px", "aria-hidden": "true" }); a.value = rel; doc.body.appendChild(a); a.select(); try { doc.execCommand("copy"); } catch (x) {} doc.body.removeChild(a); }
+    var m = doc.getElementById("pp-relato-msg"); if (m) m.textContent = txt("copiado");
+    dizer("copiado");
   }
 
   /* ---------- comandos de voz ---------- */
@@ -2065,20 +2237,29 @@ function iniciarDemo(){
     if (doc.title !== P.tituloPt && doc.title !== P.tituloEn) P.tituloPt = doc.title;
     if (en) { var t = traduzir(P.tituloPt); P.tituloEn = t ? t.trim() : null; if (t) doc.title = t.trim(); } else if (doc.title !== P.tituloPt) doc.title = P.tituloPt;
   }
+  function traduzLocal() { return P.estado.idioma === "en" && !P.pausado && !externo(); }
   function tudo() {
-    var en = P.estado.idioma === "en" && !P.pausado;
+    if (externo()) return;
+    var en = traduzLocal();
     percorrer(doc.body, en); tituloDoc(en);
     if (P.obs) P.obs.takeRecords();
   }
   function definirIdioma(qual) {
-    doc.documentElement.setAttribute("lang", qual === "en" ? "en" : P.idiomaOriginal);
-    tudo();
+    var x = externo();
+    if (x) {   /* a tela traduz a si mesma: só pede a troca, uma vez, quando ela ainda está na outra língua */
+      var pela = !!P.pelaPessoa; P.pelaPessoa = false;
+      if (idiomaDaTela() !== qual) { try { x.definir(qual, pela); } catch (e) { if (global.console) console.error(e); } }
+    } else {
+      doc.documentElement.setAttribute("lang", qual === "en" ? "en" : P.idiomaOriginal);
+      tudo();
+    }
     if (P.ui.pular) P.ui.pular.textContent = txt("pular");
+    var pl = doc.querySelector("a.px-pular"); if (pl && !P.op.semFaixa) pl.textContent = txt("pular");
   }
   function observar() {
     if (!global.MutationObserver) return;
     P.obs = new MutationObserver(function (lista) {
-      var en = P.estado.idioma === "en" && !P.pausado;
+      var en = traduzLocal();
       lista.forEach(function (m) {
         if (m.type === "childList") {
           for (var i = 0; i < m.addedNodes.length; i++) {
@@ -2098,7 +2279,7 @@ function iniciarDemo(){
 
   /* ---------- API ---------- */
   var API = {
-    versao: 2,
+    versao: 3,
     iniciar: function (op) {
       if (P.op) return API;
       P.op = op || {};
@@ -2134,13 +2315,22 @@ function iniciarDemo(){
       global.addEventListener("scroll", function () { if (!P.estado.lembrar) return; clearTimeout(tempo); tempo = setTimeout(salvarLugar, 400); }, { passive: true });
       global.addEventListener("hashchange", salvarLugar);
       global.addEventListener("pagehide", salvarLugar);
+      /* tela com tradução própria trocou de língua pelo botão dela: a barra e a escolha guardada acompanham */
+      if (externo() && global.MutationObserver) {
+        new MutationObserver(function () {
+          var q = idiomaDaTela(); if (q === P.estado.idioma) return;
+          P.estado.idioma = q; P.idiomaAplicado = q; guardar(); desenharBarra();
+          if (typeof P.op.aoMudar === "function") { try { P.op.aoMudar(estadoPublico()); } catch (x) {} }
+        }).observe(doc.documentElement, { attributes: true, attributeFilter: ["lang"] });
+      }
       /* outra aba, ou a plataforma que abriu esta tela num quadro, mudou a escolha: segue */
       global.addEventListener("storage", function (ev) {
-        if (ev.key !== P.op.chave && ev.key !== "physis-idioma" && ev.key !== "physis-conforto" && ev.key !== "physis-fundo" && ev.key !== "physis-passaporte") return;
+        if (ev.key !== P.op.chave && ev.key !== "physis-pref-tema" && ev.key !== "physis-idioma" && ev.key !== "physis-conforto" && ev.key !== "physis-fundo" && ev.key !== "physis-passaporte") return;
         var antes = JSON.stringify(P.estado), novo;
         if (ev.key === P.op.chave) { try { novo = limpar(JSON.parse(ev.newValue || "null")); } catch (e) { return; } }
         else {
           novo = copia(P.estado);
+          if (ev.key === "physis-pref-tema" && /^(claro|escuro|auto)$/.test(ev.newValue || "")) novo.tema = ev.newValue;
           if (ev.key === "physis-idioma") novo.idioma = ev.newValue === "en" ? "en" : "pt";
           if (ev.key === "physis-conforto") novo.conforto = ev.newValue === "1";
           if (ev.key === "physis-fundo") novo.verde = ev.newValue === "verde";
@@ -2176,6 +2366,28 @@ function iniciarDemo(){
     }
   };
   global.PhysisPreferencias = API;
+
+  /* ---------- PxPref: a mesma barra para as telas com tradução própria (plataforma, Gestão Physis, SCADA) ----------
+     Era um segundo módulo (px-preferencias v1); desde a v3 é só esta porta de entrada para o mesmo código.
+     PxPref.iniciar({ lugar, idioma:{atual,definir}, conteudo, menu, relatar, suporte, tela, lugarAtual, irPara, semFaixa, aoMudar })
+     aoMudar recebe { tema (o que vale: claro|escuro), temaEscolha (claro|escuro|auto), idioma, conforto, verde, texto, ... }. */
+  function formaPx(e) { if (!e) return null; var o = copia(e); o.temaEscolha = e.tema; o.tema = e.temaEfetivo; return o; }
+  var PX = {
+    versao: 3,
+    iniciar: function (op) {
+      op = op || {};
+      var lembrar = op.lugarAtual || op.irPara ? { salvar: op.lugarAtual, restaurar: op.irPara } : null;
+      API.iniciar({ chave: "physis-pref", ondeColocar: op.lugar, conteudo: op.conteudo, menu: op.menu, relatar: op.relatar, suporte: op.suporte,
+        tela: op.tela, semFaixa: op.semFaixa, variante: op.variante, esconderEmQuadro: op.esconderEmQuadro !== false, idiomaExterno: op.idioma,
+        lembrar: lembrar, aoMudar: op.aoMudar ? function (e) { op.aoMudar(formaPx(e)); } : null });
+      return PX;
+    },
+    estado: function () { return formaPx(API.estado()); },
+    definir: function (patch) { API.definir(patch); return PX.estado(); },
+    redesenhar: function () { P.painelIdioma = null; desenharBarra(); },
+    textos: UI
+  };
+  global.PxPref = PX;
 })(typeof window !== "undefined" ? window : this);
 </script>
 <script id="pp-sustainkit">
@@ -2313,10 +2525,245 @@ function iniciarDemo(){
       "Definir terreno e verificar zoneamento": "Choose the land and check zoning", "Contratar equipe técnica especializada": "Hire a specialised technical team", "Elaborar PGRCC antes das obras": "Prepare the PGRCC before construction", "Solicitar LPLS e licença INEA": "Request the LPLS and INEA licence",
       "Physis Engineering · ASHRAE · ABNT NBR · PVGIS ERA5 · LEED v5 · FAO": "Physis Engineering · ASHRAE · ABNT NBR · PVGIS ERA5 · LEED v5 · FAO",
       "Nenhum dado da plataforma encontrado neste navegador. Os valores são de exemplo: troque pelos do projeto.": "No platform data found in this browser. The values are examples: replace them with the project's.",
-      "informe a tarifa no Cadastro": "enter the tariff in Project details", "Tunis — Tunísia": "Tunis — Tunisia", "Amsterdã — Holanda": "Amsterdam — Netherlands"
+      "informe a tarifa no Cadastro": "enter the tariff in Project details", "Tunis — Tunísia": "Tunis — Tunisia", "Amsterdã — Holanda": "Amsterdam — Netherlands",
+      /* materiais e envoltória (base sistema/physis-materiais.json, 15/11/2026) */
+      "Zona bioclimática (ABNT NBR 15220-3)": "Bioclimatic zone (ABNT NBR 15220-3)",
+      "Pela cidade escolhida": "From the chosen city",
+      "Confira o município na lista da ABNT NBR 15220-3. Sem escolha aqui, vale a zona da cidade.": "Check the municipality in the ABNT NBR 15220-3 list. Without a choice here, the city's zone applies.",
+      "Materiais por clima, envoltória conferida pela NBR 15575, base de materiais com bioconstrução, acabamentos e checklist de obra. A zona bioclimática vem do Cadastro.": "Materials by climate, building envelope checked against NBR 15575, materials database with bio-construction, finishes and construction checklist. The bioclimatic zone comes from Project details.",
+      "Envoltória: parede e cobertura": "Building envelope: wall and roof",
+      "Escolha as composições do projeto. A conferência usa o procedimento simplificado da ABNT NBR 15575 na zona bioclimática do Cadastro.": "Choose the project's assemblies. The check uses the simplified procedure of ABNT NBR 15575 in the bioclimatic zone from Project details.",
+      "Parede externa": "External wall",
+      "— escolher —": "— choose —",
+      "Área de parede externa": "External wall area",
+      "Área de cobertura": "Roof area",
+      "Cor externa (absortância solar)": "External colour (solar absorptance)",
+      "Clara: α até 0,6 (cobertura nas zonas 7 e 8: até 0,4)": "Light: α up to 0.6 (roof in zones 7 and 8: up to 0.4)",
+      "Escura: acima desses limites": "Dark: above these limits",
+      "Composições de parede e cobertura": "Wall and roof assemblies",
+      "Escolha a cidade ou a zona bioclimática no Cadastro.": "Choose the city or the bioclimatic zone in Project details.",
+      "U, capacidade térmica e atraso pelo método da ABNT NBR 15220-2 (ou tabelados na NBR 15220-3). Conferência pelo procedimento simplificado da ABNT NBR 15575-4 e 15575-5; quando não atende, o projeto pode ser avaliado por simulação. Limites a conferir na edição vigente das normas.": "U, thermal capacity and time lag by the ABNT NBR 15220-2 method (or tabulated in NBR 15220-3). Check by the simplified procedure of ABNT NBR 15575-4 and 15575-5; when it fails, the design may be assessed by simulation. Limits to be checked against the current edition of the standards.",
+      "Base de materiais": "Materials database",
+      "Custo: a cotar pelo SINAPI (Caixa) do estado e do mês do orçamento, ou por cotação; a base não guarda preço. * = valor a conferir antes de emitir. Carbono incorporado do berço ao portão (A1–A3).": "Cost: to be quoted from SINAPI (Caixa) for the state and month of the budget, or by quotation; the database stores no prices. * = value to be checked before issuing. Embodied carbon cradle to gate (A1–A3).",
+      "Fontes das propriedades térmicas": "Sources of the thermal properties",
+      "Base de materiais indisponível nesta cópia do SustainKit.": "Materials database unavailable in this copy of SustainKit.",
+      "✓ atende": "✓ complies",
+      "✗ não atende": "✗ does not comply",
+      "fora da diretriz desta zona": "outside this zone's guideline",
+      "leve": "light",
+      "leve isolada": "light and insulated",
+      "leve refletora": "light and reflective",
+      "pesada": "heavy",
+      "Composições de parede e cobertura com desempenho térmico e carbono": "Wall and roof assemblies with thermal performance and carbon",
+      "Composição": "Assembly",
+      "U (W/(m²·K))": "U (W/(m²·K))",
+      "Capacidade térmica (kJ/(m²·K))": "Thermal capacity (kJ/(m²·K))",
+      "Atraso térmico (h)": "Time lag (h)",
+      "Carbono (kgCO₂e/m²)": "Carbon (kgCO₂e/m²)",
+      "NBR 15575": "NBR 15575",
+      "NBR 15220-3": "NBR 15220-3",
+      "parede": "wall",
+      "cobertura": "roof",
+      "Sugestões para esta zona: atendem à NBR 15575 e seguem a NBR 15220-3, com menor carbono primeiro": "Suggestions for this zone: comply with NBR 15575 and follow NBR 15220-3, lowest carbon first",
+      "Parede": "Wall",
+      "nenhuma composição da base": "no assembly in the database",
+      "Escolha a parede ou a cobertura para conferir.": "Choose the wall or the roof to check.",
+      "U (transmitância)": "U (thermal transmittance)",
+      "Capacidade térmica": "Thermal capacity",
+      "Atraso térmico": "Time lag",
+      "NBR 15575 (procedimento simplificado)": "NBR 15575 (simplified procedure)",
+      "Diretriz da NBR 15220-3": "NBR 15220-3 guideline",
+      "Carbono incorporado": "Embodied carbon",
+      "Carbono da área": "Carbon for the area",
+      "informe a zona no Cadastro": "enter the zone in Project details",
+      "não calculado (composição tabelada)": "not calculated (tabulated assembly)",
+      "Fonte do carbono:": "Carbon source:",
+      "Carbono incorporado da envoltória": "Embodied carbon of the envelope",
+      "Materiais com propriedades térmicas, carbono incorporado e custo": "Materials with thermal properties, embodied carbon and cost",
+      "Material": "Material",
+      "Grupo": "Group",
+      "Densidade (kg/m³)": "Density (kg/m³)",
+      "Condutividade (W/(m·K))": "Conductivity (W/(m·K))",
+      "Calor específico (J/(kg·K))": "Specific heat (J/(kg·K))",
+      "Carbono (kgCO₂e/kg)": "Carbon (kgCO₂e/kg)",
+      "Fonte do carbono": "Carbon source",
+      "(conferir)": "(to be checked)",
+      "a cotar (SINAPI/cotação)": "to be quoted (SINAPI/quotation)",
+      "Zona 1": "Zone 1",
+      "Zona 2": "Zone 2",
+      "Zona 3": "Zone 3",
+      "Zona 4": "Zone 4",
+      "Zona 5": "Zone 5",
+      "Zona 6": "Zone 6",
+      "Zona 7": "Zone 7",
+      "Zona 8": "Zone 8",
+      "Concreto normal (armado ou não)": "Normal concrete (reinforced or not)",
+      "Concreto celular autoclavado": "Autoclaved aerated concrete",
+      "Argamassa de cimento e areia (reboco, contrapiso)": "Cement and sand mortar (render, screed)",
+      "Argamassa de cal e areia": "Lime and sand mortar",
+      "Cal hidratada (pó)": "Hydrated lime (powder)",
+      "Cimento Portland (CP II / CP III, pó)": "Portland cement (CP II / CP III, powder)",
+      "Placa ou telha de fibrocimento sem amianto": "Asbestos-free fibre cement board or roof sheet",
+      "Bloco de concreto (material do bloco)": "Concrete block (block material)",
+      "Gesso (placa ou revestimento)": "Gypsum (board or plaster)",
+      "Revestimento cerâmico (piso/azulejo)": "Ceramic tiles (floor/wall)",
+      "Cerâmica vermelha (tijolo maciço, material)": "Red clay ceramic (solid brick, material)",
+      "Bloco cerâmico vazado (material da parede do bloco)": "Hollow clay block (block shell material)",
+      "Telha cerâmica": "Clay roof tile",
+      "Vidro float comum": "Plain float glass",
+      "Vidro laminado (float + PVB)": "Laminated glass (float + PVB)",
+      "Vidro temperado": "Tempered glass",
+      "Aço carbono": "Carbon steel",
+      "Aço galvanizado (telha, perfil leve)": "Galvanised steel (roof sheet, light profile)",
+      "Alumínio (média mundial)": "Aluminium (world average)",
+      "Cobre": "Copper",
+      "Madeira de reflorestamento (pinus, eucalipto leve)": "Plantation timber (pine, light eucalyptus)",
+      "Madeira dura certificada (ipê, cumaru, jatobá)": "Certified hardwood (ipê, cumaru, jatobá)",
+      "Eucalipto tratado em autoclave (peça roliça)": "Pressure-treated eucalyptus (round pole)",
+      "Madeira laminada colada (MLC)": "Glued laminated timber (glulam)",
+      "Madeira laminada cruzada (CLT)": "Cross-laminated timber (CLT)",
+      "Compensado": "Plywood",
+      "Painel OSB": "OSB panel",
+      "MDF": "MDF",
+      "Bambu (colmo tratado, material)": "Bamboo (treated culm, material)",
+      "Bambu laminado colado (painel)": "Glued laminated bamboo (panel)",
+      "Fardo de palha (trigo, arroz, capim) prensado": "Compressed straw bale (wheat, rice, grass)",
+      "Palha ou sapê de cobertura": "Thatch (straw or sapê grass)",
+      "Aglomerado de cortiça expandida": "Expanded cork board",
+      "Manta de fibra de coco": "Coconut fibre blanket",
+      "Painel isolante de fibra de madeira": "Wood fibre insulation board",
+      "Celulose reciclada soprada": "Blown recycled cellulose",
+      "Concreto de cânhamo e cal (hempcrete)": "Hemp-lime concrete (hempcrete)",
+      "Lã de rocha (painel)": "Rock wool (board)",
+      "Lã de vidro (manta/painel)": "Glass wool (blanket/board)",
+      "Lã de PET reciclado": "Recycled PET wool",
+      "Poliestireno expandido (EPS)": "Expanded polystyrene (EPS)",
+      "Poliestireno extrudado (XPS)": "Extruded polystyrene (XPS)",
+      "Poliuretano rígido (PU/PIR)": "Rigid polyurethane (PU/PIR)",
+      "Manta subcobertura aluminizada (baixa emissividade)": "Foil-faced roof underlay (low emissivity)",
+      "Taipa de pilão (terra compactada)": "Rammed earth (compacted earth)",
+      "Taipa estabilizada com 5 a 8 % de cimento": "Rammed earth stabilised with 5 to 8 % cement",
+      "Adobe (bloco de terra seca ao sol)": "Adobe (sun-dried earth block)",
+      "Tijolo de solo-cimento (BTC) prensado": "Compressed soil-cement brick (CEB)",
+      "Cob (terra, palha e areia moldada)": "Cob (moulded earth, straw and sand)",
+      "Terra-palha (terra leve)": "Light earth (straw-clay)",
+      "Pau a pique (taipa de mão, terra sobre trama)": "Wattle and daub (earth on a lattice)",
+      "Superadobe (terra em sacos de polipropileno)": "Superadobe (earth in polypropylene bags)",
+      "Reboco de terra (barro)": "Earth plaster (clay)",
+      "Solo argiloso úmido (aterro)": "Moist clay soil (backfill)",
+      "Substrato de telhado verde (úmido, médio)": "Green roof substrate (moist, average)",
+      "Argila expandida (agregado leve)": "Expanded clay (lightweight aggregate)",
+      "Pedra granítica": "Granite stone",
+      "Arenito": "Sandstone",
+      "Brita / cascalho": "Crushed stone / gravel",
+      "PVC rígido": "Rigid PVC",
+      "Polietileno de alta densidade (PEAD)": "High-density polyethylene (HDPE)",
+      "Membrana EPDM (impermeabilização)": "EPDM membrane (waterproofing)",
+      "Manta asfáltica": "Bituminous membrane",
+      "Policarbonato (chapa)": "Polycarbonate (sheet)",
+      "Pintura à base de cal": "Lime-based paint",
+      "Tinta acrílica": "Acrylic paint",
+      "Telha metálica (aço galvanizado 0,5 mm)": "Metal roof sheet (galvanised steel 0.5 mm)",
+      "Telha sanduíche (aço + PU 30 mm), material isolante": "Sandwich roof panel (steel + PU 30 mm), insulating material",
+      "Assoalho de madeira": "Timber floorboards",
+      "Laje treliçada com EPS (camada equivalente)": "Lattice joist slab with EPS (equivalent layer)",
+      "Unidade de vidro duplo (6 + câmara 12 + 6)": "Double glazing unit (6 + 12 cavity + 6)",
+      "Unidade de vidro duplo com baixo emissivo": "Low-e double glazing unit",
+      "Vidro de controle solar monolítico": "Monolithic solar control glass",
+      "Placa de gesso acartonado": "Plasterboard",
+      "Perfil leve de aço galvanizado (steel frame)": "Light galvanised steel profile (steel frame)",
+      "Granulado de cortiça solto": "Loose cork granules",
+      "Lã de ovelha (isolante)": "Sheep's wool (insulation)",
+      "Tijolo ecológico de solo-cimento vazado (material)": "Hollow soil-cement eco brick (material)",
+      "concreto e cimentícios": "concrete and cement-based",
+      "cerâmicos": "ceramics",
+      "vidros": "glass",
+      "metais": "metals",
+      "madeiras e fibras": "timber and fibres",
+      "terra e bioconstrução": "earth and bio-construction",
+      "isolantes": "insulation",
+      "pedras": "stone",
+      "plásticos": "plastics",
+      "acabamentos": "finishes",
+      "Tijolo cerâmico 6 furos rebocado (14 cm)": "Rendered 6-hole clay brick (14 cm)",
+      "Bloco de concreto 14 cm rebocado": "Rendered 14 cm concrete block",
+      "Parede de concreto maciço (10 cm)": "Solid concrete wall (10 cm)",
+      "Tijolo maciço (25 cm) rebocado": "Rendered solid brick (25 cm)",
+      "Drywall com lã mineral 50 mm": "Drywall with 50 mm mineral wool",
+      "Tábua de madeira (2,5 cm)": "Timber boards (2.5 cm)",
+      "Taipa de pilão (30 cm)": "Rammed earth (30 cm)",
+      "Adobe (25 cm) com reboco de terra": "Adobe (25 cm) with earth plaster",
+      "BTC (15 cm) rebocado": "Rendered CEB (15 cm)",
+      "Cob (40 cm)": "Cob (40 cm)",
+      "Pau a pique (15 cm)": "Wattle and daub (15 cm)",
+      "Superadobe (35 cm) com reboco de terra": "Superadobe (35 cm) with earth plaster",
+      "Fardo de palha (45 cm) com reboco de terra": "Straw bale (45 cm) with earth plaster",
+      "Cânhamo e cal (30 cm) com reboco de cal": "Hemp-lime (30 cm) with lime plaster",
+      "Terra-palha (25 cm) com reboco de terra": "Light earth (25 cm) with earth plaster",
+      "Telha cerâmica com forro de madeira": "Clay tile with timber ceiling",
+      "Telha cerâmica, câmara de ar e laje de concreto (10 cm)": "Clay tile, air gap and concrete slab (10 cm)",
+      "Telha de fibrocimento sem forro": "Fibre cement sheet without ceiling",
+      "Telha de fibrocimento, câmara de ar e laje (10 cm)": "Fibre cement sheet, air gap and slab (10 cm)",
+      "Telha metálica sem forro": "Metal sheet without ceiling",
+      "Telha sanduíche metálica com PU (30 mm)": "Metal sandwich panel with PU (30 mm)",
+      "Laje de concreto exposta (10 cm)": "Exposed concrete slab (10 cm)",
+      "Telhado verde extensivo (10 cm de substrato sobre laje de 10 cm)": "Extensive green roof (10 cm substrate on a 10 cm slab)",
+      "Telhado verde intensivo (30 cm de substrato sobre laje de 10 cm)": "Intensive green roof (30 cm substrate on a 10 cm slab)",
+      "Cobertura de palha ou sapê (20 cm)": "Thatched roof (20 cm)",
+      "Laje de concreto com piso cerâmico (12 cm)": "Concrete slab with ceramic floor (12 cm)",
+      "ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)": "ABNT NBR 15220-2, material properties table (ranges of density, conductivity and specific heat)",
+      "EPDs públicas de isolante de PET reciclado — verificar": "Public EPDs of recycled PET insulation — to be checked",
+      "EPDs públicas de painéis de bambu — verificar": "Public EPDs of bamboo panels — to be checked",
+      "ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão": "ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. of Bath, 2019), cradle to gate",
+      "ICE v3.0 (borrachas sintéticas) — conferir": "ICE v3.0 (synthetic rubbers) — to be checked",
+      "ICE v3.0 (lã) — conferir": "ICE v3.0 (wool) — to be checked",
+      "ICE v3.0 (terra crua) — ordem de grandeza": "ICE v3.0 (raw earth) — order of magnitude",
+      "ICE v3.0 (terra estabilizada com cimento) — conferir": "ICE v3.0 (cement-stabilised earth) — to be checked",
+      "ICE v3.0 / SIDAC (solo-cimento) — conferir": "ICE v3.0 / SIDAC (soil-cement) — to be checked",
+      "ICE v3.0 e SIDAC (solo-cimento) — conferir": "ICE v3.0 and SIDAC (soil-cement) — to be checked",
+      "estimativa (substrato leve com agregado expandido) — conferir EPD do sistema": "estimate (light substrate with expanded aggregate) — check the system EPD",
+      "estimativa por alumínio + polímero — verificar EPD": "estimate from aluminium + polymer — check the EPD",
+      "estimativa por fibras vegetais (ICE: fibras naturais) — verificar": "estimate from plant fibres (ICE: natural fibres) — to be checked",
+      "estimativa por terra crua + madeira": "estimate from raw earth + timber",
+      "estimativa por terra crua + palha": "estimate from raw earth + straw",
+      "literatura de bambu (INBAR, NBR 16828-1:2020 para estruturas de bambu)": "bamboo literature (INBAR, NBR 16828-1:2020 for bamboo structures)",
+      "literatura de bambu estrutural (INBAR) — muito variável com transporte e tratamento": "structural bamboo literature (INBAR) — highly variable with transport and treatment",
+      "literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas": "earth building literature (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — ranges",
+      "literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas; ABNT NBR 8491:2012 (tijolo de solo-cimento)": "earth building literature (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — ranges; ABNT NBR 8491:2012 (soil-cement brick)",
+      "literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas; ensaios de fardos de palha (FASBA)": "earth building literature (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — ranges; straw bale tests (FASBA)",
+      "literatura de construção com terra (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — faixas; literatura de hempcrete": "earth building literature (Minke, Building with Earth; Houben & Guillaud, Earth Construction) — ranges; hempcrete literature",
+      "literatura de telhados verdes (FLL) — faixa": "green roof literature (FLL) — range",
+      "terra crua + sacos de PP — estimativa": "raw earth + PP bags — estimate",
+      "ordem de grandeza de tabelas públicas de paredes (NBR 15220-3 e catálogos) — verificar": "order of magnitude from public wall tables (NBR 15220-3 and catalogues) — to be checked",
+      "valores tabelados do anexo de coberturas da ABNT NBR 15220-3 — verificar": "tabulated values from the roof annex of ABNT NBR 15220-3 — to be checked",
+      "valores tabelados do anexo de paredes da ABNT NBR 15220-3 (tijolo 6 furos 9×14×19 na menor dimensão, reboco 2,5 cm nas duas faces) — verificar": "tabulated values from the wall annex of ABNT NBR 15220-3 (6-hole brick 9×14×19 laid on the smallest dimension, 2.5 cm render on both faces) — to be checked",
+      "calculado (NBR 15220-2, camadas homogêneas)": "calculated (NBR 15220-2, homogeneous layers)",
+      "tabelado": "tabulated",
+      "Bloco vazado não é camada homogênea: use as composições tabeladas": "A hollow block is not a homogeneous layer: use the tabulated compositions",
+      "SIDAC traz o cimento brasileiro, em geral abaixo da média mundial por adições — preferir SIDAC": "SIDAC covers Brazilian cement, usually below the world average thanks to additions — prefer SIDAC",
+      "U de catálogo; fator solar na base de carga térmica": "Catalogue U; solar factor in the thermal load base",
+      "absortância efetiva 0,3 na carga térmica pela evapotranspiração — premissa Physis, verificar": "effective absorptance 0.3 in the thermal load due to evapotranspiration — Physis assumption, to be checked",
+      "calculada como elemento vertical (sem fluxo descendente)": "calculated as a vertical element (no downward heat flow)",
+      "carbono biogênico armazenado não descontado": "stored biogenic carbon not deducted",
+      "com carbono biogênico do cânhamo o balanço pode ser negativo — conferir EPD": "with the hemp's biogenic carbon the balance may be negative — check the EPD",
+      "equivalente simplificado — use composição tabelada no projeto": "simplified equivalent — use a tabulated composition in the design",
+      "o efeito vem da baixa emissividade da câmara de ar, não da condutividade": "the effect comes from the low emissivity of the air gap, not from conductivity",
+      "perfil; vergalhão reciclado no ICE ≈ 1,99 média mundial — conferir": "profile; recycled rebar in ICE ≈ 1.99 world average — to be checked",
+      "peça vazada: valor de camada só para estimativa": "hollow unit: layer value for estimates only",
+      "sem crédito de carbono biogênico; com certificação FSC/Cerflor": "no biogenic carbon credit; with FSC/Cerflor certification",
+      "R$/milheiro": "R$/thousand",
+      "R$/un.": "R$/unit",
+      "R$/m²": "R$/m²",
+      "R$/m³": "R$/m³",
+      "R$/kg": "R$/kg",
+      "R$/m": "R$/m",
+      "R$/L": "R$/L"
     },
     padroes: [
       /* valores com unidade */
+      [/^Zona bioclimática usada: (\d) \((do Cadastro|da cidade)\)$/, function(_, z, o){ return "Bioclimatic zone used: " + z + " (" + (o === "do Cadastro" ? "from Project details" : "from the city") + ")"; }],
+      [/^Mostrando (\d+) de (\d+) materiais$/, "Showing $1 of $2 materials"],
+      [/^[\d.,—]+ (W\/\(m²·K\)|kJ\/\(m²·K\)|kgCO₂e\/m²|kgCO₂e)$/, "$&"],
       [/^(−?[\d.,]+) (kWh\/dia|kWh\/mês|kWh\/ano|L\/dia|h\/dia|kg\/mês|anos)$/, function(_, n, u){ return n + " " + unid[u]; }],
       [/^(R\$ [\d.,]+)\/mês$/, "$1/month"],
       [/^([\d.,]+)% a\.a\.$/, "$1% p.a."],

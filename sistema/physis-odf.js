@@ -37,16 +37,18 @@
       pagina: en ? "Page" : "Página", de: en ? "of" : "de", logo: en ? "Physis logo" : "Logo da Physis", imagem: en ? "Image" : "Imagem",
       tabela: en ? "Table" : "Tabela" };
   }
-  var UI = EN ? { odt: "ODT", ods: "ODS", pdfa: "PDF/A (server)", comp: "Share for comments", abertos: "Open formats",
+  var UI_EN = { odt: "ODT", ods: "ODS", pdfa: "PDF/A (server)", comp: "Share for comments", abertos: "Open formats",
       baixado: function (n) { return n + " saved."; }, vazio: "There is nothing on this screen to export.", semTabela: "There is no table on this screen.",
       gerando: "Generating…", semServidor: "PDF/A needs the Physis server with LibreOffice. Download the ODT and export it as PDF/A in LibreOffice.",
       publicando: "Publishing…", publicado: "Published for comments:", copiar: "Copy link", copiado: "Link copied.", abrir: "Open page",
-      falha: "It did not work: ", entrar: "Sign in to the Physis server first." }
-    : { odt: "ODT", ods: "ODS", pdfa: "PDF/A (servidor)", comp: "Compartilhar para comentários", abertos: "Formatos abertos",
+      falha: "It did not work: ", entrar: "Sign in to the Physis server first." };
+  var UI_PT = { odt: "ODT", ods: "ODS", pdfa: "PDF/A (servidor)", comp: "Compartilhar para comentários", abertos: "Formatos abertos",
       baixado: function (n) { return n + " baixado."; }, vazio: "Não há nada nesta tela para exportar.", semTabela: "Não há tabela nesta tela.",
       gerando: "Gerando…", semServidor: "O PDF/A precisa do servidor Physis com o LibreOffice. Baixe o ODT e exporte em PDF/A pelo LibreOffice.",
       publicando: "Publicando…", publicado: "Publicado para comentários:", copiar: "Copiar link", copiado: "Link copiado.", abrir: "Abrir página",
       falha: "Não deu certo: ", entrar: "Entre no servidor Physis primeiro." };
+  /* idioma dos botões: o do navegador, ou o da tela quando ela informa (op.idiomaTela, p. ex. a Gestão, que não traduz o DOM) */
+  var UI_PADRAO = EN ? UI_EN : UI_PT;
 
   /* ───────── utilidades ───────── */
   function bytes(s) { return new TextEncoder().encode(s); }
@@ -555,6 +557,7 @@
      op: { raiz(), titulo(), odt:true, ods:true, pdfa:false|true|fn, compartilhar:false|true|fn, origem() } */
   function acoplar(barra, op) {
     op = op || {};
+    var UI = UI_PADRAO; if (typeof op.idiomaTela === "function") { try { var qi = String(op.idiomaTela() || ""); if (qi) UI = /^en/i.test(qi) ? UI_EN : UI_PT; } catch (e) {} }
     var vale = function (v, padrao) { return typeof v === "function" ? !!v() : v == null ? padrao : !!v; };
     var linha = g.document.createElement("div");
     linha.className = "px-odf";

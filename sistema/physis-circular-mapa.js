@@ -47,16 +47,21 @@ const rotaInfo = id => { if (typeof RC_ROTAS === "object" && RC_ROTAS[id]) { con
   const m = ROTAS_MIN[id]; return m ? { nome:m[0], destino:m[1], interno:!!m[2] } : { nome:id || "—", destino:"", interno:false }; };
 const nomeTipo = id => (typeof RC_POR_ID === "object" && RC_POR_ID[id]) ? RC_POR_ID[id].nome : id;
 const kgMes = r => typeof rcKgMes === "function" ? rcKgMes(r) : ((typeof numBr === "function" ? numBr(r.qtd) : parseFloat(r.qtd)) || 0) * (UN_MIN[r.un] || 1);
-function planoLer() { if (typeof rcLer === "function") return rcLer();
-  try { const l = JSON.parse(localStorage.getItem("physis-residuos-plano") || "[]"); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
+/* plano de resíduos + linhas extras da parte Esgoto e biogás (rcExtrasFluxo da plataforma: lodo do tratamento ou esgoto que
+   vai ao biodigestor, marcadas extra:true): entram no fluxo, mas não no total nem no desvio do aterro (que são de resíduos sólidos) */
+function planoLer() { let l = [];
+  if (typeof rcLer === "function") l = rcLer();
+  else { try { const x = JSON.parse(localStorage.getItem("physis-residuos-plano") || "[]"); l = Array.isArray(x) ? x : []; } catch (e) { l = []; } }
+  try { if (typeof rcExtrasFluxo === "function") l = l.concat(rcExtrasFluxo()); } catch (e) {}
+  return l; }
 const desviados = () => (typeof RC_DESVIADO !== "undefined" && Array.isArray(RC_DESVIADO)) ? RC_DESVIADO : DESVIADO_MIN;
 function categoriasDoItem(r, info) { if (info.interno) return []; if (r.tipo === "rcc") return ["rcc"].concat(POR_DESTINO.reciclagem); return POR_DESTINO[info.destino] || []; }
 function maisProximo(pontos, cats) { let m = null; (pontos || []).forEach(p => { if (cats.includes(p.categoria) && (!m || p.dist_km < m.dist_km)) m = p; }); return m; }
 
 /* Indicadores do plano: kg/mês por destino, % de desvio do aterro e CO₂ do transporte até o destino mais próximo */
 function indicadores(plano, pontos, cfg) { const linhas = [], porRota = {}; let tot = 0, desv = 0;
-  plano.forEach(r => { const kg = kgMes(r), info = rotaInfo(r.rota); tot += kg; if (desviados().includes(info.destino)) desv += kg;
-    porRota[info.nome] = (porRota[info.nome] || 0) + kg;
+  plano.forEach(r => { const kg = kgMes(r), info = rotaInfo(r.rota); if (!r.extra) { tot += kg; if (desviados().includes(info.destino)) desv += kg;
+    porRota[info.nome] = (porRota[info.nome] || 0) + kg; }
     const cats = categoriasDoItem(r, info), alvo = cats.length ? maisProximo(pontos, cats) : null;
     const dist = alvo ? alvo.dist_km * (cfg.tort > 0 ? cfg.tort : 1) : null;
     const tp = (typeof RC_POR_ID === "object" && RC_POR_ID[r.tipo]) || null;
@@ -175,7 +180,7 @@ function telaCircularMapa(dados) { const o = cfgLer(), raio = RAIOS.includes(+o.
   const tabTrans = I.linhas.filter(l => !l.interno).map(l => `<tr><th scope="row">${esc(l.tipo)}</th><td>${esc(l.rota)}</td><td>${f1(l.kg, 0)}</td><td>${l.alvo ? esc(l.alvo.nome || (CAT[l.alvo.categoria] || [""])[0]) : l.semCategoria ? "sem destino no mapa (empresa licenciada)" : "nenhum no raio"}</td><td>${f1(l.dist, 1)}</td><td>${l.co2 ? f1(l.co2.t_km, 1) : "—"}</td><td>${l.co2 && l.co2.kg_co2_mes != null ? f1(l.co2.kg_co2_mes, 1) : "—"}</td></tr>`).join("");
   const painel = `<section class="cartao" aria-labelledby="h-rcm-ind"><h3 id="h-rcm-ind" class="t3">Painel de indicadores</h3>${plano.length ? `
       <div class="grade"><div><h4>Quilos por mês por destino</h4>${hbarras("Quilos por mês por destino", porRota, "kg/mês", 0)}
-        <table><caption class="so-leitor">Quilos por mês por destino</caption><thead><tr><th scope="col">Destino</th><th scope="col">kg/mês</th></tr></thead><tbody>${porRota.map(x => `<tr><th scope="row">${esc(x.rot)}</th><td>${f1(x.v, 0)}</td></tr>`).join("")}</tbody></table></div>
+        <div class="rolagem"><table><caption class="so-leitor">Quilos por mês por destino</caption><thead><tr><th scope="col">Destino</th><th scope="col">kg/mês</th></tr></thead><tbody>${porRota.map(x => `<tr><th scope="row">${esc(x.rot)}</th><td>${f1(x.v, 0)}</td></tr>`).join("")}</tbody></table></div></div>
       <div><h4>Desvio do aterro</h4>${hbarras("Desvio do aterro, meta de 90%", desvio, "%", 0, 90)}
         <p class="t2"><strong>${I.pct == null ? "—" : f1(I.pct * 100, 0) + "%"}</strong> desviado (meta de 90%, linha tracejada). Total ${f1(I.tot, 0)} kg/mês.</p></div>
       <div><h4>CO₂ do transporte</h4>${I.temCo2 ? hbarras("CO₂ do transporte por resíduo", co2, "kg CO₂e/mês", 1) + `<p class="t2"><strong>${f1(I.co2, 1)}</strong> kg CO₂e por mês · ${f1(I.co2 * 12 / 1000, 2)} t por ano</p>`

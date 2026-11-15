@@ -187,6 +187,22 @@
       "vidro": { "nome": "Vidro float", "kg": 1.44 }
     }
   },
+  "servidor": {
+    "_fonte": "Pegada do próprio sistema digital (as máquinas que rodam a Physis). Potência parada e em carga: ordem de grandeza de fichas técnicas e medições publicadas pelos fabricantes (Raspberry Pi, mini PCs, servidores de rack e placas de vídeo). Carbono de fabricação: declarações de pegada de carbono de produto (PCF) dos fabricantes de servidores e computadores e a base aberta Boavizta, arredondadas; Raspberry Pi sem PCF publicada: estimativa Physis pela massa de placa, fonte e cartão. Método: GHG Protocol (escopo 2 e escopo 3, categoria 2), Orientação Setorial de TIC do GHG Protocol e Recomendação ITU-T L.1450, citados pelo nome. Todos os valores: verificar antes de relato oficial; troque pela PCF do modelo comprado quando tiver.",
+    "verificar": true,
+    "classes": {
+      "rpi4": { "nome": "Raspberry Pi 4 (com fonte e cartão)", "w_ocioso": 3.0, "w_carga": 7.0, "w_resto": 1.5, "kgco2e_fabricacao": 15, "vida_anos": 5 },
+      "rpi5": { "nome": "Raspberry Pi 5 (com fonte, ventoinha e SSD)", "w_ocioso": 3.5, "w_carga": 10.0, "w_resto": 2.0, "kgco2e_fabricacao": 20, "vida_anos": 5 },
+      "mini_pc": { "nome": "Mini PC (tipo NUC)", "w_ocioso": 8, "w_carga": 45, "w_resto": 4, "kgco2e_fabricacao": 120, "vida_anos": 5 },
+      "workstation": { "nome": "Workstation ou desktop (placa ATX, sem placa de vídeo)", "w_ocioso": 40, "w_carga": 200, "w_resto": 25, "kgco2e_fabricacao": 350, "vida_anos": 5 },
+      "servidor_x86": { "nome": "Servidor x86 de rack ou torre (2 processadores)", "w_ocioso": 110, "w_carga": 330, "w_resto": 60, "kgco2e_fabricacao": 1300, "vida_anos": 5 },
+      "servidor_gpu": { "nome": "Servidor com GPU para IA (1 placa incluída na potência)", "w_ocioso": 150, "w_carga": 650, "w_resto": 70, "gpu_w_ocioso": 30, "gpu_w_carga": 300, "kgco2e_fabricacao": 1300, "vida_anos": 4 }
+    },
+    "gpu_placa": { "nome": "Placa de vídeo para IA (cada uma, somada à fabricação)", "kgco2e_fabricacao": 150, "vida_anos": 4 },
+    "pue": { "no_lugar": 1.0, "datacenter_padrao": 1.5, "nota": "PUE (eficiência do uso de energia do prédio) = energia total do datacenter ÷ energia dos equipamentos de TI. Servidor em casa ou no escritório: 1,0 (o ar-condicionado já está na conta de luz). Datacenter: use o PUE informado pelo contrato; sem ele, 1,5 (ordem de grandeza)." },
+    "uso_padrao": 0.3,
+    "amostra_min": 5
+  },
   "incerteza": {
     "_fonte": "Premissa Physis inspirada na ferramenta de incerteza do GHG Protocol: soma quadrática da incerteza do dado de atividade e do fator.",
     "dado": { "medido": 0.05, "estimado": 0.30 },

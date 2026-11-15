@@ -281,5 +281,44 @@ class TelaCarbono(unittest.TestCase):
             self.assertNotRegex(t, r"\bGIZ\b|INTEGRATION environment|PREEEP", arq.name)
 
 
+@unittest.skipUnless(NO_REPO, "só no repositório")
+class EsgotoEMateriais(unittest.TestCase):
+    """Parte Esgoto e biogás (Economia circular) e materiais da obra (physis-calc-materiais)."""
+    @classmethod
+    def setUpClass(cls):
+        cls.F = cb.carregar(BASE)
+
+    def test_materiais_da_obra_categoria_1(self):
+        mat = {"composicoes": [{"id": "a", "nome": "Parede", "area_m2": "120", "kgco2e_m2": 45},
+                               {"id": "b", "nome": "Cobertura", "area_m2": 80, "kgco2e_m2": None}], "zona": 3}
+        r = cb.calcular({"v": 2}, {"materiais": mat}, self.F)
+        perto(self, r["e3"], 120 * 45 / 1000)               # 5,4 tCO2e; a cobertura sem valor por m² fica [MARCADOR]
+        self.assertEqual(r["mat_falta"], ["Cobertura"])
+        r2 = cb.calcular({"v": 2, "e3": {"cats": [1], "mat_auto": False}}, {"materiais": mat}, self.F)
+        self.assertEqual(r2["e3"], 0)
+
+    def test_esgoto_sem_fator_fica_marcador(self):
+        r = cb.calcular({"v": 2}, {"esgoto": {"pessoas": 5, "tratamento": "fossa_filtro", "reuso_m3_dia": 0.65}}, self.F)
+        self.assertEqual(r["e1"], 0)
+        self.assertTrue(r["esgoto"]["marcador"])
+        self.assertTrue(r["reuso_marcador"] or "agua_fornecida" in self.F)
+        perto(self, r["reuso_m3"], 0.65 * 365)
+
+    def test_esgoto_com_fator_entra_no_escopo_1(self):
+        F = dict(self.F, efluentes={"dbo_kg_pessoa_dia": 0.05, "bo_kg_ch4_kg_dbo": 0.6, "mcf": {"fossa_filtro": 0.5}})   # valores de teste, não de base
+        r = cb.calcular({"v": 2, "gwp": "AR5"}, {"esgoto": {"pessoas": 4, "tratamento": "fossa_filtro"}}, F)
+        kg = 4 * 0.05 * 365 * 0.6 * 0.5
+        perto(self, r["e1"], kg * 28 / 1000)
+        self.assertFalse(r["esgoto"]["marcador"])
+
+    def test_js_le_esgoto_biogas_e_materiais(self):
+        js = JS.read_text(encoding="utf-8")
+        for trecho in ("ebAtual", "physis-calc-esgoto", "physis-calc-biogas", "physis-calc-materiais", "esgoto_no_lugar", "materiais_obra",
+                       "mat_auto", "[MARCADOR: fator de metano do tratamento de esgoto", "substitui a soma do plano de resíduos"):
+            self.assertIn(trecho, js)
+        # sem contar duas vezes: o biogás do registro substitui a soma do plano de resíduos
+        self.assertRegex(js, r"biogM3 = bioR \? num\(bioR\.biogas_m3_dia\) \* 365 :")
+
+
 if __name__ == "__main__":
     unittest.main()

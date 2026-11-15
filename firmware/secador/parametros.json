@@ -1,0 +1,27 @@
+{
+ "_leia": "Parâmetros do secador solar Physis (TIPO:SEC, a homologar; physis-hub/docs/SECADOR.md). Fonte única dos valores que o YAML do ESPHome (firmware/secador/secador-solar.yaml), a ponte MQTT e a tela usam. Quem revisa muda só 'valor' (e marca 'conferido'); 'aparelho' não muda (é o contrato da linha V6). 'valor' null = [MARCADOR]: o aparelho não é montado sem ele. Nada de fábrica sem fonte. Os limites por produto ficam em physis_hub/secador.py e sistema/physis-secador.js (premissas 'verificar').",
+ "versao": 1,
+ "atualizado": "2026-11-15",
+ "como_o_firmware_le": "Na hora de montar: t_seguranca e histerese vão para as 'substitutions' do YAML e para o 'tmax' do nó em instancia.json (ponte MQTT). Pinos e calibração vão no YAML. Os limites de alerta por produto são lidos pelo hub e pela tela, não pelo aparelho.",
+ "aparelho": {
+  "tipo": "SEC",
+  "linha_exemplo": "ID:41,TIPO:SEC,TI:38.5,UI:42.0,TE:27.1,UE:70.0,TC:52.3,VENT:1,PESO:84.20,IRR:820,BAT:3.95,TS:1794600000",
+  "chaves": {"TI": "temperatura do ar dentro do secador (°C, -20 a 120)", "UI": "umidade relativa dentro (%, 0 a 100)", "TE": "temperatura de fora (°C, -20 a 70)", "UE": "umidade relativa de fora (%, 0 a 100)", "TC": "temperatura na saída do coletor (°C, -20 a 150)", "VENT": "ventilador 0/1", "ABT": "tampa ou lona aberta 0/1 (opcional)", "PESO": "peso do produto (kg, 0 a 5000, opcional, célula de carga)", "IRR": "irradiância (W/m², 0 a 1500, opcional)"},
+  "comando": "CMD:<nn>:VENT:<0|1> (a homologar nos protocolo.cpp; pela ponte MQTT já funciona)",
+  "fonte": "physis-hub/docs/SECADOR.md; physis_hub/protocolo.py"
+ },
+ "parametros": [
+  {"id": "id_no", "grandeza": "Número do aparelho na rede V6", "valor": null, "unidade": "—", "faixa_aceita": [1, 99], "fonte": "[MARCADOR] anotar na instalação; único na rede do cliente", "nota": "Mesmo contrato dos outros nós V6 (PROTOCOLO.md).", "verificar": true},
+  {"id": "t_seguranca", "grandeza": "Temperatura interna que força o ventilador ligado", "valor": 60, "unidade": "°C", "faixa_aceita": [30, 90], "fonte": "padrão da ponte (physis_hub/secador.py, T_SEGURANCA_PADRAO); baixar para o produto mais sensível do secador (ervas 40 °C, café 45 °C)", "nota": "Segurança no próprio nó (YAML) e na ponte MQTT.", "verificar": true},
+  {"id": "histerese", "grandeza": "Queda de temperatura para soltar o ventilador forçado", "valor": 5, "unidade": "°C", "faixa_aceita": [1, 15], "fonte": "physis_hub/secador.py (HISTERESE_T)", "verificar": false},
+  {"id": "umidade_interna_alta", "grandeza": "Umidade dentro do secador sem ventilação para aviso", "valor": 80, "unidade": "% UR", "faixa_aceita": [50, 100], "fonte": "physis_hub/secador.py (UMIDADE_INTERNA_ALTA); conferir com a curva de equilíbrio do produto", "verificar": true},
+  {"id": "intervalo_leitura_s", "grandeza": "Intervalo de leitura de temperatura e umidade", "valor": 60, "unidade": "s", "faixa_aceita": [10, 900], "fonte": "padrão do YAML de exemplo", "verificar": false},
+  {"id": "intervalo_peso_s", "grandeza": "Intervalo de leitura da célula de carga", "valor": 300, "unidade": "s", "faixa_aceita": [60, 3600], "fonte": "padrão do YAML de exemplo", "verificar": false},
+  {"id": "peso_calibracao_kg", "grandeza": "Peso conhecido usado na calibração da balança", "valor": null, "unidade": "kg", "faixa_aceita": [1, 500], "fonte": "[MARCADOR] peso padrão usado na bancada", "nota": "Ler o valor cru vazio e com o peso conhecido; trocar no calibrate_linear do YAML.", "verificar": true},
+  {"id": "irradiancia_w_m2_por_v", "grandeza": "Fator do sensor de irradiância", "valor": null, "unidade": "W/m² por V", "faixa_aceita": [50, 2000], "fonte": "[MARCADOR] certificado do piranômetro ou da célula de referência", "nota": "O YAML de exemplo usa 454,5 (3,3 V ≈ 1500 W/m²) só como lugar.", "verificar": true},
+  {"id": "pino_ventilador", "grandeza": "Pino do relé do ventilador", "valor": 26, "unidade": "GPIO", "faixa_aceita": [0, 39], "fonte": "YAML de exemplo (ESP32 DevKit)", "verificar": false},
+  {"id": "pino_hx711_dout", "grandeza": "Pino de dados do HX711", "valor": 16, "unidade": "GPIO", "faixa_aceita": [0, 39], "fonte": "YAML de exemplo", "verificar": false},
+  {"id": "pino_hx711_clk", "grandeza": "Pino de relógio do HX711", "valor": 17, "unidade": "GPIO", "faixa_aceita": [0, 39], "fonte": "YAML de exemplo", "verificar": false},
+  {"id": "pino_tampa", "grandeza": "Pino do fim de curso da tampa", "valor": 27, "unidade": "GPIO", "faixa_aceita": [0, 39], "fonte": "YAML de exemplo", "verificar": false}
+ ]
+}

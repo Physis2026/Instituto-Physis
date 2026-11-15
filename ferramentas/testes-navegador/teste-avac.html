@@ -19,6 +19,7 @@ const CASOS = {
   "fonte": "PHYSIS_AVAC-5_quadro_eletrico 1.xlsx (valores em cache das células)",
   "casos": [
     {
+      "revisao": "Revisão de 15/11/2026 (docs/REVISAO_AVAC.md, item 1): potência no eixo = absorvida ÷ rendimento da transmissão (0,95, padrão) em vez de absorvida × rendimento do motor (0,88). Os motores sobem um degrau da tabela e o quadro elétrico acompanha.",
       "nome": "Exemplo da planilha — 308 unidades, 820 pessoas, 662 TR, 721 equipamentos",
       "entradas": {},
       "tolerancia": { "rel": 1e-9, "abs": 1e-9 },
@@ -44,28 +45,28 @@ const CASOS = {
         "dutos.sis.0.vazao": 37800, "dutos.sis.0.area": 1.3125, "dutos.sis.0.diam": 1292.7207364566027, "dutos.sis.0.reynolds": 686702.84222533775, "dutos.sis.0.atrito": 0.013561322631032094,
         "dutos.sis.0.perdaUnit": 0.40421876778246046, "dutos.sis.0.perdaTrecho": 28.295313744772233, "dutos.sis.0.pressao": 205.03961080648807, "dutos.sis.0.potAbs": 3.5881931891135417,
         "dutos.sis.0.largura": 2650, "dutos.sis.0.deRet": 1293.7361537090603, "dutos.sis.0.aspecto": 4.416666666666667, "dutos.sis.0.velRet": 6.6037735849056602,
-        "dutos.sis.0.potEixo": 3.1576100064199166, "dutos.sis.0.potMargem": 3.7891320077038997, "dutos.sis.0.motorKw": 4.5, "dutos.sis.0.motorCv": 6, "dutos.sis.0.situacao": "relação > 4:1 — rever altura",
+        "dutos.sis.0.potEixo": 3.777045462224781, "dutos.sis.0.potMargem": 4.532454554669737, "dutos.sis.0.motorKw": 5.5, "dutos.sis.0.motorCv": 7.5, "dutos.sis.0.situacao": "relação > 4:1 — rever altura",
         "dutos.sis.1.diam": 166.09291617222931, "dutos.sis.1.perdaUnit": 4.854661297173398, "dutos.sis.1.pressao": 254.57151229373517, "dutos.sis.1.potAbs": 0.073542881329301285,
         "dutos.sis.1.largura": 150, "dutos.sis.1.motorKw": 0.18, "dutos.sis.1.motorCv": 0.25, "dutos.sis.1.situacao": "ok",
         "dutos.sis.2.diam": 1311.0581167104949, "dutos.sis.2.reynolds": 870554.74326136406, "dutos.sis.2.perdaUnit": 0.60608892329187047, "dutos.sis.2.pressao": 303.18523748749334,
-        "dutos.sis.2.potAbs": 6.8216678434686004, "dutos.sis.2.largura": 2750, "dutos.sis.2.motorKw": 7.5, "dutos.sis.2.motorCv": 10,
+        "dutos.sis.2.potAbs": 6.8216678434686004, "dutos.sis.2.largura": 2750, "dutos.sis.2.motorKw": 9.2, "dutos.sis.2.motorCv": 12.5,
         "dutos.sis.3.vazao": 0, "dutos.sis.3.pressao": 287.5, "dutos.sis.3.situacaoVel": "ok", "dutos.sis.2.situacaoVel": "ok", "dutos.sis.2.limite": 12,
-        "dutos.potAbs": 10.483403913911443, "dutos.potEixo": 9.2253954442420714, "dutos.motores": 12.18, "dutos.ventiladores": 3,
-        "quadro.circ.0.kva": 6.0160427807486627, "quadro.circ.0.icalc": 9.1404313655830141, "quadro.circ.0.ib": 10.511496070420465, "quadro.circ.0.in": 16,
+        "dutos.potAbs": 10.483403913911443, "dutos.potEixo": 11.035162014643625, "dutos.motores": 14.879999999999999, "dutos.ventiladores": 3,
+        "quadro.circ.0.kva": 7.352941176470588, "quadro.circ.0.icalc": 11.171638335712574, "quadro.circ.0.ib": 12.847384086069459, "quadro.circ.0.in": 16,
         "quadro.circ.0.sCap": 2.5, "quadro.circ.0.sQueda": 1.5, "quadro.circ.0.sProt": 2.5, "quadro.circ.0.s": 2.5, "quadro.circ.0.sPE": 2.5, "quadro.circ.0.iz": 16.8,
-        "quadro.circ.0.dv": 0.011843771757002977, "quadro.circ.0.dvPartida": 0.080747161283167723, "quadro.circ.0.lmax": 33.373786407766985, "quadro.circ.0.situacao": "ok",
-        "quadro.circ.1.ib": 0.42045984281681864, "quadro.circ.1.in": 10, "quadro.circ.1.dvPartida": 0.009508906848734797, "quadro.circ.1.lmax": 53.398058252427184,
-        "quadro.circ.2.ib": 17.519160117367445, "quadro.circ.2.in": 20, "quadro.circ.2.sCap": 4, "quadro.circ.2.s": 4, "quadro.circ.2.iz": 22.400000000000002,
-        "quadro.circ.2.dv": 0.012337262246878103, "quadro.circ.2.dvPartida": 0.085160343970655111, "quadro.circ.2.lmax": 42.71844660194175,
+        "quadro.circ.0.dv": 0.014475721036336974, "quadro.circ.0.dvPartida": 0.09748684052111031, "quadro.circ.0.lmax": 33.373786407766985, "quadro.circ.0.situacao": "ok",
+        "quadro.circ.1.ib": 0.42045984281681864, "quadro.circ.1.in": 10, "quadro.circ.1.dvPartida": 0.009758249412040123, "quadro.circ.1.lmax": 53.398058252427184,
+        "quadro.circ.2.ib": 21.49016974397073, "quadro.circ.2.in": 25, "quadro.circ.2.sCap": 6, "quadro.circ.2.s": 6, "quadro.circ.2.iz": 28.8,
+        "quadro.circ.2.dv": 0.010089138904113648, "quadro.circ.2.dvPartida": 0.07252407642569095, "quadro.circ.2.lmax": 51.262135922330096,
         "quadro.circ.3.kw": 0,
         "quadro.circ.4.kwUnit": 6.5943728018757328, "quadro.circ.4.ib": 10.546434660109977, "quadro.circ.4.in": 16, "quadro.circ.4.s": 2.5, "quadro.circ.4.situacao": "ok",
         "quadro.circ.5.ib": 9.1334803350079419, "quadro.circ.5.in": 10, "quadro.circ.6.ib": 6.0889868900052928,
         "quadro.circ.7.kw": 64.35975000000002, "quadro.circ.7.ib": 97.784523651255356, "quadro.circ.7.in": 100, "quadro.circ.7.s": 50, "quadro.circ.7.situacao": "ok",
         "quadro.circ.8.kwUnit": 7.958534330685259, "quadro.circ.8.ib": 13.43526882507606, "quadro.circ.8.in": 16, "quadro.circ.8.s": 2.5,
-        "quadro.alim.ativos": 8, "quadro.alim.reserva": 3, "quadro.alim.kw": 96.587967800790778, "quadro.alim.kva": 102.21197098298775, "quadro.alim.dem": 102.21197098298775,
-        "quadro.alim.iR": 159.35082350205406, "quadro.alim.iS": 165.43981039205937, "quadro.alim.iT": 156.30633005705141, "quadro.alim.ib": 165.43981039205937,
-        "quadro.alim.deseq": 0.055207270326068626, "quadro.alim.in": 175, "quadro.alim.sCap": 95, "quadro.alim.sQueda": 50, "quadro.alim.sCurto": 35, "quadro.alim.s": 95,
-        "quadro.alim.sN": 50, "quadro.alim.sPE": 50, "quadro.alim.iz": 207, "quadro.alim.dv": 0.0065406462473000908, "quadro.alim.dvTot": 0.026724802259872123,
+        "quadro.alim.ativos": 8, "quadro.alim.reserva": 3, "quadro.alim.kw": 99.2879678007908, "quadro.alim.kva": 105.82159665143695, "quadro.alim.dem": 105.82159665143695,
+        "quadro.alim.iR": 165.65772114430635, "quadro.alim.iS": 171.74670803431164, "quadro.alim.iT": 162.6132276993037, "quadro.alim.ib": 171.74670803431164,
+        "quadro.alim.deseq": 0.053179944113882174, "quadro.alim.in": 175, "quadro.alim.sCap": 95, "quadro.alim.sQueda": 50, "quadro.alim.sCurto": 35, "quadro.alim.s": 95,
+        "quadro.alim.sN": 50, "quadro.alim.sPE": 50, "quadro.alim.iz": 207, "quadro.alim.dv": 0.006789988810605416, "quadro.alim.dvTot": 0.026974144823177455,
         "quadro.alim.iccQF": 8.3679164464589739, "quadro.alim.lmax": 159.93113013534841, "quadro.alim.situacao": "ok",
         "quadro.splits.0.qtd": 92, "quadro.splits.0.ib": 3.0675577892829695, "quadro.splits.0.in": 10, "quadro.splits.0.s": 2.5, "quadro.splits.0.iz": 19.200000000000003,
         "quadro.splits.0.dv": 0.0034468194795943185, "quadro.splits.0.lmax": 106.79611650485437, "quadro.splits.0.situacao": "ok",
@@ -77,10 +78,11 @@ const CASOS = {
         "resumo.12.valor": "bloqueado", "lista.0.qtd": 92, "lista.7.cap": 37800, "lista.10.qtd": 167, "lista.11.cap": 41000, "lista.13.cap": 39.792671653426297,
         "memoria.0.linhas.1": "Estar / preparo — compacto — 12,9 m² / 15,0 = 0,86 TR = 12.000 BTU/h  →  padronizado 12.000 BTU/h  ×  206 un.  =  2.472.000 BTU/h",
         "memoria.0.linhas.13": "Total: 7.946.000 BTU/h = 662,2 TR = 2.328,8 kW térmicos   ·   carga elétrica 727,8 kW (COP 3,20)",
-        "memoria.5.linhas.1": "Exaustão de banheiros: 37.800 m³/h a 8,0 m/s → D = 1.293 mm · 0,40 Pa/m × 70,0 m + 150 Pa localizadas × 1,15 = 205 Pa · 3,59 kW absorvidos · motor 4,50 kW"
+        "memoria.5.linhas.1": "Exaustão de banheiros: 37.800 m³/h a 8,0 m/s → D = 1.293 mm · 0,40 Pa/m × 70,0 m + 150 Pa localizadas × 1,15 = 205 Pa · 3,59 kW absorvidos · motor 5,50 kW"
       }
     },
     {
+      "revisao": "Revisão de 15/11/2026 (docs/REVISAO_AVAC.md, item 1): potência no eixo = absorvida ÷ rendimento da transmissão (0,95, padrão) em vez de absorvida × rendimento do motor (0,88). Os motores sobem um degrau da tabela e o quadro elétrico acompanha.",
       "nome": "Caso pequeno calculado à mão pelas fórmulas da planilha — 10 casas, 3 tipos de ambiente, escada com 10 portas, sem piscina",
       "entradas": {
         "controle": { "ativo": { "piscina": false } },
@@ -103,9 +105,9 @@ const CASOS = {
         "press.fTotal": 101.54545454545453, "press.situacao": "ok",
         "solar.consumo": 2000, "solar.demanda": 41.86, "solar.parcela": 29.302, "solar.areaNec": 16.278888888888886, "solar.coletores": 9, "solar.reservatorio": 2000, "solar.apoio": 3.1395,
         "status.piscina": "não aplicável", "quadro.circ.6.kw": 0,
-        "dutos.sis.0.diam": 199.47114020071635, "dutos.sis.0.pressao": 484.25051304551874, "dutos.sis.0.motorKw": 0.25,
-        "dutos.sis.2.diam": 437.0193722368316, "dutos.sis.2.perdaUnit": 2.2617726293620932, "dutos.sis.2.pressao": 503.10904499547274, "dutos.sis.2.potAbs": 1.2577726124886819, "dutos.sis.2.motorKw": 1.5,
-        "dutos.sis.3.vazao": 21220.39661789718, "dutos.sis.3.pressao": 378.86505698981324, "dutos.sis.3.potAbs": 3.7220679509194703, "dutos.sis.3.motorKw": 4.5,
+        "dutos.sis.0.diam": 199.47114020071635, "dutos.sis.0.pressao": 484.25051304551874, "dutos.sis.0.motorKw": 0.37,
+        "dutos.sis.2.diam": 437.0193722368316, "dutos.sis.2.perdaUnit": 2.2617726293620932, "dutos.sis.2.pressao": 503.10904499547274, "dutos.sis.2.potAbs": 1.2577726124886819, "dutos.sis.2.motorKw": 2.2,
+        "dutos.sis.3.vazao": 21220.39661789718, "dutos.sis.3.pressao": 378.86505698981324, "dutos.sis.3.potAbs": 3.7220679509194703, "dutos.sis.3.motorKw": 5.5,
         "quadro.circ.4.nome": "Ar condicionado — Salão", "quadro.circ.4.kwUnit": 3.2971864009378664, "quadro.circ.4.ib": 5.2732173300549885, "quadro.circ.4.in": 10,
         "quadro.splits.1.qtd": 20, "quadro.splits.3.qtd": 10, "quadro.splitsKw": 32.97186400937866, "quadro.conf": "confere"
       }
@@ -132,7 +134,7 @@ try {
       if (bom) ok++; else { falha++; fc++; linhas.push("  FALHA " + p + ": esperado " + JSON.stringify(esp) + ", calculado " + JSON.stringify(v)); } });
     linhas.unshift((fc ? "FALHOU " : "PASSOU ") + c.nome + " (" + Object.keys(c.esperado).length + " valores, " + fc + " falhas)"); });
   /* desenho de todas as subabas e do quadro (não pode lançar erro) */
-  ["visao","tip","ac","vent","press","solar","piscina","dutos","resumo","memoria"].forEach(s => { ui.avacSub = s; const h = telaAvac();
+  ["visao","tip","carga","ac","vent","press","solar","piscina","dutos","resumo","memoria"].forEach(s => { ui.avacSub = s; const h = telaAvac();
     if ((h.match(/<h1/g) || []).length !== 1) { falha++; linhas.push("FALHA desenho " + s + ": h1"); } else ok++; });
   const q = telaQuadroEletrico(); if (/<h1/.test(q) || !/<h2/.test(q)) { falha++; linhas.push("FALHA quadro: cabeçalhos"); } else ok++;
   /* migração da tela antiga */

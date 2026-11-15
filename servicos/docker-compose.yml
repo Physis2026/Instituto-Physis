@@ -13,7 +13,7 @@
 #   publica  — Caddy (80/443) e saída para o Let's Encrypt
 #   saida    — saída para a internet SEM porta publicada: hub (clima, e-mail) e GeoServer (WFS em cascata)
 #   borda    — Caddy -> hub, Node-RED, Superset, GeoServer (interna, IP fixo do Caddy = proxy confiável do hub)
-#   motores  — hub/Node-RED -> calc e IA (interna)
+#   motores  — hub/Node-RED -> calc, documentos (PDF/A) e IA (interna)
 #   iot      — Mosquitto <-> hub e Node-RED (interna)
 #   dados    — PostGIS <-> exportador, Superset, GeoServer (interna)
 #   meta     — Superset <-> banco de metadados (interna)
@@ -74,6 +74,7 @@ services:
       PHYSIS_MQTT_PORTA: "1883"
       PHYSIS_MQTT_USUARIO: physis-hub
       PHYSIS_CALC_URL: http://calc:8710
+      PHYSIS_DOC_URL: http://documentos:8720
       PHYSIS_IA_URL: http://ia:11434
       PHYSIS_IA_TIPO: ollama
     volumes:
@@ -208,11 +209,13 @@ services:
     image: physis/exportador:local
     profiles: ["bi"]
     restart: unless-stopped
+    user: "10701:10700"
     command: ["python", "/app/exportar_hub.py"]
     env_file: [env/exportador.env]
     volumes:
       - ${PHYSIS_DADOS:-/srv/physis}/instantaneos:/instantaneos:ro
       - ${PHYSIS_DADOS:-/srv/physis}/camadas/hub:/saida_geojson
+      - ${PHYSIS_DADOS:-/srv/physis}/camadas:/dados/camadas:ro
     networks: [dados, series]
     depends_on:
       postgis:
@@ -278,6 +281,25 @@ services:
     security_opt: ["no-new-privileges:true"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8710/saude', timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Documentos: LibreOffice headless (ODT/ODS -> PDF/A-2b) e veraPDF (validação). Processo separado do hub
+  # (veraPDF é GPLv3+/MPLv2+; nada é ligado ao código do hub). Rede só interna.
+  documentos:
+    build: ./documentos
+    image: physis/documentos:local
+    profiles: ["documentos"]
+    restart: unless-stopped
+    env_file: [env/documentos.env]
+    networks: [motores]
+    read_only: true
+    tmpfs: ["/tmp:size=1g"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8720/saude', timeout=4)"]
       interval: 30s
       timeout: 5s
       retries: 3

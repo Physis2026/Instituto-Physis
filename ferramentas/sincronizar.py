@@ -11,6 +11,7 @@ Copiar à mão gera versões diferentes; este script faz a cópia sempre igual a
 
 O que faz:
 1. Troca o bloco do exportador em cada HTML pelo conteúdo de sistema/physis-exportar.js.
+   Também os módulos compartilhados em blocos <script id="..."> (BLOCOS): preferências, conta, ODF, parceiros, pontes.
 2. Corrige textos pedidos pela Physis nos programas (ex.: o SCADA não se chama mais
    "fazenda net zero").
 3. Refaz as cópias em base64 (PROGRAMAS) dentro da plataforma com o mesmo tratamento.
@@ -30,9 +31,12 @@ ALVOS = [
     RAIZ / "physis-hub" / "docs" / "physis-exportar.js",
     RAIZ / "sistema" / "gestao-interna-physis.html",
     RAIZ / "sistema" / "physis-scada-demo.html",
-    RAIZ / "sistema" / "physis-tela-cliente.html",
+    RAIZ / "physis-hub" / "web" / "consultoria.html",
+    RAIZ / "sistema" / "SustainKit_Definitivo.html",
+    RAIZ / "modulos" / "planejador" / "planejador-physis.html",
     RAIZ / "physis-hub" / "web" / "painel.html",
 ]
+# A "Tela do cliente" (sistema/physis-tela-cliente.html) saiu em 15/11/2026: tudo o que ela fazia está nas abas da plataforma.
 PLATAFORMA = RAIZ / "physis-hub" / "web" / "painel.html"
 # Textos que a Physis pediu para mudar (14/11/2026): o SCADA é da organização do cliente, não de uma "fazenda net zero".
 TROCAS = [
@@ -55,10 +59,24 @@ def trocar_exportar(texto: str, novo: str) -> str:
 
 
 # Outros originais embutidos como bloco <script id="..."> (o conteúdo do bloco é o arquivo, igual).
-BLOCOS = {"gp-ponte": RAIZ / "sistema" / "gestao-ponte.js"}
+# Só troca o bloco que já existe na página (ninguém ganha um módulo que não usa).
+BLOCOS = {
+    "gp-ponte": RAIZ / "sistema" / "gestao-ponte.js",
+    # Preferências (idioma, tema, conforto, acessibilidade): UM módulo para todas as telas desde 15/11/2026.
+    "physis-preferencias": RAIZ / "sistema" / "physis-preferencias.js",
+    "physis-conta": RAIZ / "sistema" / "physis-conta.js",          # conta e segurança (CSRF, 2FA, convites, chaves)
+    "physis-odf": RAIZ / "sistema" / "physis-odf.js",              # ODT, ODS, PDF/A e "compartilhar para comentários"
+    "physis-parceiros": RAIZ / "sistema" / "physis-parceiros.js",  # profissionais parceiros
+    "pc-ponte": RAIZ / "sistema" / "physis-ponte-cliente.js",      # ponte da plataforma com o servidor (dados do cliente)
+}
+# Nome antigo do bloco de preferências (px-preferencias v1, a segunda implementação que existia até 15/11/2026):
+# vira o bloco do módulo único na primeira rodada.
+ANTIGOS = {"px-preferencias": "physis-preferencias"}
 
 
 def trocar_blocos(texto: str) -> str:
+    for velho, novo in ANTIGOS.items():
+        texto = re.sub(r'<script id="%s">\n.*?</script>' % re.escape(velho), '<script id="%s">\n</script>' % novo, texto, count=1, flags=re.S)
     for ident, fonte in BLOCOS.items():
         abre = f'<script id="{ident}">\n'
         i = texto.find(abre)
@@ -81,7 +99,6 @@ def tratar(texto: str, novo: str) -> str:
 FONTES = {
     "sustainkit": RAIZ / "sistema" / "SustainKit_Definitivo.html",
     "supervisao": RAIZ / "sistema" / "physis-scada-demo.html",
-    "painel": RAIZ / "sistema" / "physis-tela-cliente.html",
 }
 
 
@@ -97,12 +114,33 @@ def tratar_programas(html: str, novo: str) -> str:
     return html[:m.start(1)] + corpo + html[m.end(1):]
 
 
+def _materiais():
+    arq = RAIZ / "ferramentas" / "embutir_materiais.py"
+    if not arq.is_file():
+        return None
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("embutir_materiais", arq)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
 def main() -> int:
     conferir = "--conferir" in sys.argv
     novo = ORIGEM.read_text(encoding="utf-8").replace("\r\n", "\n").rstrip("\n")
     if not novo.startswith(INICIO) or not novo.endswith(FIM):
         raise SystemExit("o original do exportador precisa começar e terminar com as marcas conhecidas")
     diferentes = []
+    # 1º a base de materiais dentro do SustainKit e do Planejador (a cópia do SustainKit vai embutida na plataforma)
+    em = _materiais()
+    if em:
+        for a in em.ALVOS:
+            h = a.read_text(encoding="utf-8")
+            n = em.embutir(h)
+            if n != h:
+                diferentes.append(a.relative_to(RAIZ))
+                if not conferir:
+                    a.write_text(n, encoding="utf-8", newline="")
     for arq in ALVOS:
         antes = arq.read_text(encoding="utf-8")
         depois = tratar(antes, novo) if arq.suffix == ".html" else novo + "\n"

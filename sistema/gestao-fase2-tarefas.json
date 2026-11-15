@@ -1,0 +1,4370 @@
+{
+ "_formato": "physis/1",
+ "_gerado_em": "2026-11-15T08:09:06.168143+00:00",
+ "_gerado_por": "checklist-implantacao",
+ "_app": "gestao-physis",
+ "org_id": "physis",
+ "tabelas": {
+  "pessoa": [
+   {
+    "org_id": "physis",
+    "pessoa_id": "rafaella",
+    "nome": "Rafaella",
+    "papel": "",
+    "idioma": "pt",
+    "extras": {
+     "admin": false,
+     "papelEn": "",
+     "arvore": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "pessoa_id": "laura",
+    "nome": "Laura",
+    "papel": "",
+    "idioma": "pt",
+    "extras": {
+     "admin": false,
+     "papelEn": "",
+     "arvore": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "pessoa_id": "marzia",
+    "nome": "Marzia",
+    "papel": "",
+    "idioma": "pt",
+    "extras": {
+     "admin": false,
+     "papelEn": "",
+     "arvore": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "pessoa_id": "arthur",
+    "nome": "Arthur",
+    "papel": "",
+    "idioma": "pt",
+    "extras": {
+     "admin": false,
+     "papelEn": "",
+     "arvore": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "pessoa_id": "ericklopes",
+    "nome": "Erick Lopes",
+    "papel": "",
+    "idioma": "pt",
+    "extras": {
+     "admin": false,
+     "papelEn": "",
+     "arvore": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "pessoa_id": "ryan",
+    "nome": "Ryan",
+    "papel": "",
+    "idioma": "pt",
+    "extras": {
+     "admin": false,
+     "papelEn": "",
+     "arvore": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "pessoa_id": "emerson",
+    "nome": "Emerson",
+    "papel": "",
+    "idioma": "pt",
+    "extras": {
+     "admin": false,
+     "papelEn": "",
+     "arvore": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "pessoa_id": "rafael",
+    "nome": "Rafael",
+    "papel": "",
+    "idioma": "pt",
+    "extras": {
+     "admin": false,
+     "papelEn": "",
+     "arvore": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "pessoa_id": "erickoliveira",
+    "nome": "Eric Oliveira",
+    "papel": "",
+    "idioma": "pt",
+    "extras": {
+     "admin": false,
+     "papelEn": "",
+     "arvore": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "pessoa_id": "leonardomacedo",
+    "nome": "Leonardo Macedo",
+    "papel": "",
+    "idioma": "pt",
+    "extras": {
+     "admin": false,
+     "papelEn": "",
+     "arvore": ""
+    }
+   }
+  ],
+  "projeto": [
+   {
+    "org_id": "physis",
+    "projeto_id": "imp-4eda7c98",
+    "nome": "Fase 2 · 1. Servidor da Physis",
+    "extras": {
+     "nomeEn": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "projeto_id": "imp-b46b5d4f",
+    "nome": "Fase 2 · 2. Segurança e LGPD",
+    "extras": {
+     "nomeEn": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "projeto_id": "imp-aaa704d9",
+    "nome": "Fase 2 · 3. Jurídico",
+    "extras": {
+     "nomeEn": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "projeto_id": "imp-0072df0e",
+    "nome": "Fase 2 · 4. Revisão técnica dos módulos",
+    "extras": {
+     "nomeEn": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "projeto_id": "imp-62017554",
+    "nome": "Fase 2 · 5. Hardware e firmware",
+    "extras": {
+     "nomeEn": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "projeto_id": "imp-8aa436ab",
+    "nome": "Fase 2 · 6. App nativo",
+    "extras": {
+     "nomeEn": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "projeto_id": "imp-a2030fcf",
+    "nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais",
+    "extras": {
+     "nomeEn": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "projeto_id": "imp-f2fec5ae",
+    "nome": "Fase 2 · 8. Instalação no cliente e teste em campo",
+    "extras": {
+     "nomeEn": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "projeto_id": "imp-22109d26",
+    "nome": "Fase 2 · 9. Entrega, treinamento e suporte",
+    "extras": {
+     "nomeEn": ""
+    }
+   },
+   {
+    "org_id": "physis",
+    "projeto_id": "imp-46408004",
+    "nome": "Fase 2 · 10. Depois da implantação",
+    "extras": {
+     "nomeEn": ""
+    }
+   }
+  ],
+  "tarefa": [
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-9774c2d0befa",
+    "titulo": "Máquina e sistema: Linux instalado, usuário sem privilégio, atualizações automáticas, relógio por NTP. Feito quando: verificar.sh passa.",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-92a90977f878",
+    "titulo": "Domínio e HTTPS: DNS apontando, Caddy com Let's Encrypt, HSTS e só as portas 80/443 abertas. Feito quando: o certificado é válido e o celular oferece \"Instalar app\".",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a4546f55b197",
+    "titulo": "E-mail de saída: configurar PHYSIS_SMTP_, SPF, DKIM e DMARC. Feito quando: recuperar senha, convite e alerta chegam na caixa de entrada, não no spam.",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e9b5257fcc1b",
+    "titulo": "Subir os serviços (servicos/preparar.sh + docker compose up), com os perfis hub, caddy, mosquitto, superset, geoserver, calc, documentos e ia. Feito quando: todos os healthchecks ficam verdes. (junto com Rafaella, Arthur, Laura, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4c63556db077",
+    "titulo": "Subir os serviços (servicos/preparar.sh + docker compose up), com os perfis hub, caddy, mosquitto, superset, geoserver, calc, documentos e ia. Feito quando: todos os healthchecks ficam verdes. (junto com Erick Lopes, Arthur, Laura, Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-93bfc5df9c78",
+    "titulo": "Subir os serviços (servicos/preparar.sh + docker compose up), com os perfis hub, caddy, mosquitto, superset, geoserver, calc, documentos e ia. Feito quando: todos os healthchecks ficam verdes. (junto com Erick Lopes, Rafaella, Laura, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-68dbd5be3efe",
+    "titulo": "Subir os serviços (servicos/preparar.sh + docker compose up), com os perfis hub, caddy, mosquitto, superset, geoserver, calc, documentos e ia. Feito quando: todos os healthchecks ficam verdes. (junto com Erick Lopes, Rafaella, Arthur, Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1cd2992179af",
+    "titulo": "Subir os serviços (servicos/preparar.sh + docker compose up), com os perfis hub, caddy, mosquitto, superset, geoserver, calc, documentos e ia. Feito quando: todos os healthchecks ficam verdes. (junto com Erick Lopes, Rafaella, Arthur, Laura)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-35826567e025",
+    "titulo": "Preencher o que está marcado [CONFERIR]: (junto com Rafaella, Arthur)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4c712b32bc61",
+    "titulo": "Preencher o que está marcado [CONFERIR]: (junto com Eric Oliveira, Arthur)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ad444befa67d",
+    "titulo": "Preencher o que está marcado [CONFERIR]: (junto com Eric Oliveira, Rafaella)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-44b9da237c2d",
+    "titulo": "Servidor de IA: começar com 2×8 GB e chegar a 4×16 GB, rodando Ollama ou vLLM só na rede interna. Feito quando: PHYSIS_IA_URL responde e o robô de suporte usa a IA. (junto com Marzia, Arthur, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-5ca8f3d4b2f0",
+    "titulo": "Servidor de IA: começar com 2×8 GB e chegar a 4×16 GB, rodando Ollama ou vLLM só na rede interna. Feito quando: PHYSIS_IA_URL responde e o robô de suporte usa a IA. (junto com Erick Lopes, Arthur, Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0bbbb7442396",
+    "titulo": "Servidor de IA: começar com 2×8 GB e chegar a 4×16 GB, rodando Ollama ou vLLM só na rede interna. Feito quando: PHYSIS_IA_URL responde e o robô de suporte usa a IA. (junto com Erick Lopes, Marzia, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-08ef5c313f5a",
+    "titulo": "Servidor de IA: começar com 2×8 GB e chegar a 4×16 GB, rodando Ollama ou vLLM só na rede interna. Feito quando: PHYSIS_IA_URL responde e o robô de suporte usa a IA. (junto com Erick Lopes, Marzia, Arthur)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-edeb651d6096",
+    "titulo": "Cópias de segurança cifradas diárias, com guarda fora do servidor. Feito quando: uma restauração de teste funciona.",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-42440d9ddc4f",
+    "titulo": "Monitoramento: alerta se o serviço cair, o disco encher ou o backup atrasar.",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-2b94e5a45461",
+    "titulo": "Instituto Physis como instância separada (porta ou domínio próprios, banco próprio). Feito quando: os dados de um não aparecem no outro.",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-58a6aa4615f7",
+    "titulo": "Repositório próprio: passar do GitHub ao Forgejo do servidor, mantendo o histórico.",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b8209e0bb654",
+    "titulo": "Encarregado de dados (DPO): a LGPD pede uma pessoa nomeada como contato público. Decidir qual das três e publicar o e-mail de privacidade.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-44fae364a489",
+    "titulo": "Contas da direção: criar as contas com verificação em duas etapas ligada e guardar os códigos de recuperação. (junto com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-dbb1575980f5",
+    "titulo": "Contas da direção: criar as contas com verificação em duas etapas ligada e guardar os códigos de recuperação. (junto com Rafaella)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-374277223e71",
+    "titulo": "Ligar o modo estrito: PHYSIS_CSRF_ESTRITO=1 e PHYSIS_CONSENTIMENTO_ESTRITO=1, depois que as telas estiverem integradas.",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-27914097222d",
+    "titulo": "Exposição na internet: PHYSIS_EXPOSTO=1 e PHYSIS_ACEITAR_SEM_CHAVE=0 no servidor exposto; criar uma chave para cada aparelho. (junto com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f06d75295c97",
+    "titulo": "Exposição na internet: PHYSIS_EXPOSTO=1 e PHYSIS_ACEITAR_SEM_CHAVE=0 no servidor exposto; criar uma chave para cada aparelho. (junto com Arthur)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1084b2ebf855",
+    "titulo": "Contato de segurança: PHYSIS_SEGURANCA_CONTATO preenchido (aparece em /.well-known/security.txt).",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1a89b5dc5baa",
+    "titulo": "Teste de invasão básico: login, limites, CSRF, rotas privadas e upload, seguindo o checklist ASVS do SEGURANCA.md. (junto com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e08d891090ba",
+    "titulo": "Teste de invasão básico: login, limites, CSRF, rotas privadas e upload, seguindo o checklist ASVS do SEGURANCA.md. (junto com Arthur)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d325a9029f84",
+    "titulo": "Regra para apagar dados da organização (cliente_estado) quando a conta for apagada. Feito quando: decidido e implementado.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d00b295c97c0",
+    "titulo": "Prazos de guarda: definir os PHYSIS_RETENCAO_DIAS_ de cada dado.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-b46b5d4f",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 2. Segurança e LGPD"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c436148e767f",
+    "titulo": "Revisar com a assessoria os termos de uso, a privacidade, a licença Physis e os contratos (documento 09).",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-aaa704d9",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 3. Jurídico"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-06059892bc18",
+    "titulo": "Preencher os dados da empresa nos textos: razão social, CNPJ, endereço e foro.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-aaa704d9",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 3. Jurídico"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d04cc0e6b77d",
+    "titulo": "Revisar o termo de consentimento da Saúde, incluindo menores de idade, e verificar o enquadramento na Anvisa.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-aaa704d9",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 3. Jurídico"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-3ad103ee6891",
+    "titulo": "Decidir as regras de documentos dos parceiros (hoje: ART/RRT e seguro para todos, NR-10 para elétrica, NR-35 para solar).",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-aaa704d9",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 3. Jurídico"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7fc9dfbf5782",
+    "titulo": "Publicar o canal de acessibilidade e a declaração de acessibilidade (LBI, eMAG, WCAG 2.2 AA, NBR 17225).",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-aaa704d9",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 3. Jurídico"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-3a2721839487",
+    "titulo": "Revisar Planejador: Normas por bloco, APP, insolação, calhas (NBR 10844), conversão DWG, BIM",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-dbbfe1724b6f",
+    "titulo": "Revisar SustainKit: Blocos, premissas unificadas, cisterna mês a mês (NBR 15527), custos",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-85eef484b0cd",
+    "titulo": "Revisar Energia solar: Perdas, inversor e strings (NBR 16690), Lei 14.300 (Fio B), irradiação no plano do painel",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f78409741a57",
+    "titulo": "Revisar AVAC e carga térmica: Carga térmica (NBR 16401), correção do motor, pressurização (NBR 14880), quadro (NBR 5410)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-dc2ea4e2f626",
+    "titulo": "Revisar Turbinas: Hidráulica, eólica, curva certificada (IEC 61400-12-1), outorga de água (junto com Ryan)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-38138b38ee65",
+    "titulo": "Revisar Turbinas: Hidráulica, eólica, curva certificada (IEC 61400-12-1), outorga de água (junto com Emerson)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-734e4affa100",
+    "titulo": "Revisar Qualidade da água: Faixas por uso, calibração do pH, reúso (NBR 13969 / 17076) (junto com Rafael)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f7d42c79749e",
+    "titulo": "Revisar Qualidade da água: Faixas por uso, calibração do pH, reúso (NBR 13969 / 17076) (junto com Erick Lopes)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-89d6059e0ddd",
+    "titulo": "Revisar SbN e viveiro: Itens \"Conferência\", espaçamentos, consórcios, RENASEM, unidades de conservação (junto com Rafaella)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-9802c1971e61",
+    "titulo": "Revisar SbN e viveiro: Itens \"Conferência\", espaçamentos, consórcios, RENASEM, unidades de conservação (junto com Erick Lopes)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f6298ce0f1cd",
+    "titulo": "Revisar Economia circular: NBR 10004:2024, rotas, fator de CO₂ do transporte, mapa de aterros (junto com Rafael)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-bb7967497686",
+    "titulo": "Revisar Economia circular: NBR 10004:2024, rotas, fator de CO₂ do transporte, mapa de aterros (junto com Rafaella)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-21ddcad8bf44",
+    "titulo": "Revisar Carbono e ESG (calculadora de carbono): Fator da rede (MCTI), GWP, misturas de combustível, SBCE, dados sociais do relatório",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-3a53a2ace20b",
+    "titulo": "Revisar Resiliência climática: Limites de alerta, CEMADEN/INMET, painel municipal, avisos do INMET (junto com Arthur)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-81e8e2fc9aca",
+    "titulo": "Revisar Resiliência climática: Limites de alerta, CEMADEN/INMET, painel municipal, avisos do INMET (junto com Rafaella)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-17f42649c907",
+    "titulo": "Revisar Certificações: Quais critérios são pré-requisito de fato (hoje 233 de 356), evidências automáticas (junto com Laura, Ryan)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f20409bf0d3e",
+    "titulo": "Revisar Certificações: Quais critérios são pré-requisito de fato (hoje 233 de 356), evidências automáticas (junto com Rafaella, Ryan)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c5297ab613be",
+    "titulo": "Revisar Certificações: Quais critérios são pré-requisito de fato (hoje 233 de 356), evidências automáticas (junto com Rafaella, Laura)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b0a3d7779e2d",
+    "titulo": "Revisar Equipamentos e materiais: Itens \"verificar\", preços por SINAPI ou cotação, Inmetro e CEC",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-48df7d7cf898",
+    "titulo": "Revisar Servidor verde (dimensionamento para projetos externos e pegada do servidor): Cargas, processamento e IA, armazenamento, energia, nobreak e solar, térmico e PUE, carbono e custos, relatório de consultoria",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0306eb8e100a",
+    "titulo": "Revisar Secador solar (monitoramento): Leituras, lotes e curva de secagem, alertas, dimensionamento do coletor (junto com Laura)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e207e9d27fd8",
+    "titulo": "Revisar Secador solar (monitoramento): Leituras, lotes e curva de secagem, alertas, dimensionamento do coletor (junto com Arthur)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f433d062a9b1",
+    "titulo": "Revisar Monitoramento verde e Caixinha (telas): Tela original, mapa do receptor, rega automática",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-22d75a64b5c8",
+    "titulo": "Revisar Saúde (telas e consentimento): Horários, alertas, consentimento, Bluetooth (junto com Rafael)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-281f421cdb81",
+    "titulo": "Revisar Saúde (telas e consentimento): Horários, alertas, consentimento, Bluetooth (junto com Emerson)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1494440637d4",
+    "titulo": "Revisar SCADA: Sinótico com dados reais, comandos com confirmação, inglês (junto com Rafaella, Laura)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-449f18c2cbda",
+    "titulo": "Revisar SCADA: Sinótico com dados reais, comandos com confirmação, inglês (junto com Erick Lopes, Laura)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-87000ff65c5c",
+    "titulo": "Revisar SCADA: Sinótico com dados reais, comandos com confirmação, inglês (junto com Erick Lopes, Rafaella)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-731c377ad296",
+    "titulo": "Revisar Cursos: Curso de introdução, cursos à venda, preços (junto com Laura)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-453913a3bb57",
+    "titulo": "Revisar Cursos: Curso de introdução, cursos à venda, preços (junto com Rafaella)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-232987197a6a",
+    "titulo": "Revisar Acessibilidade, inglês e textos jurídicos: Leitor de tela real (NVDA/JAWS), teste com pessoas PcD e neurodivergentes",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-9bd8f74f2770",
+    "titulo": "Resolver os itens marcados \"verificar\" ou \"a conferir\". Feito quando: todos marcados como conferidos, com fonte e data.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-eb2d31b619ba",
+    "titulo": "Conferir um caso real à mão. Feito quando: o resultado bate com o sistema dentro da tolerância combinada.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-14f600c219c3",
+    "titulo": "Passar as normas de \"simplificado\" ou \"só citado\" para \"conforme\", ou justificar (documento 17).",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-dc9361bfb72b",
+    "titulo": "Revisar as telas nos dois idiomas, nos dois temas e no celular.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-655829ebf486",
+    "titulo": "Transmissor LoRa e Receptor V6: antes de ir a campo — Firmware gravado, ID 1–99 anotado, chave do aparelho",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4433e77ccc81",
+    "titulo": "Transmissor LoRa e Receptor V6: em campo — Medir o sinal ponto a ponto, calibrar o solo (seco e saturado), bateria e painel",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-203a5c3ba0b9",
+    "titulo": "Caixinha Physis IoT (ESP32 + MQTT): antes de ir a campo — ESPHome com `secrets.yaml`, nó cadastrado, Mosquitto com senha",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7ee076ea65f9",
+    "titulo": "Caixinha Physis IoT (ESP32 + MQTT): em campo — Testar válvula e bomba, tempo máximo, falta de energia e queda do Wi-Fi",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0800733aed62",
+    "titulo": "Coleira e comedouro: antes de ir a campo — Portar a coleira para RadioLib (TDMA); comedouro via serial e ESP32",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ed5e4a0958c9",
+    "titulo": "Coleira e comedouro: em campo — GPS e LoRa no pasto, resistência, bateria",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-80a79465d00f",
+    "titulo": "Pluviômetro Physis: antes de ir a campo — Protótipo de báscula, configuração gerada pelo robô (junto com Arthur)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d54b8d46b87a",
+    "titulo": "Pluviômetro Physis: antes de ir a campo — Protótipo de báscula, configuração gerada pelo robô (junto com Rafaella)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c7390b67e439",
+    "titulo": "Pluviômetro Physis: em campo — Calibrar em mm por basculada, comparando com a estação do CEMADEN mais próxima (junto com Arthur)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-026eafa893f2",
+    "titulo": "Pluviômetro Physis: em campo — Calibrar em mm por basculada, comparando com a estação do CEMADEN mais próxima (junto com Rafaella)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-6fca24931960",
+    "titulo": "Caixinha de remédios: antes de ir a campo — Firmware ESP32 com o perfil Bluetooth, horários e NTP (junto com Rafael)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d90562b5d0ec",
+    "titulo": "Caixinha de remédios: antes de ir a campo — Firmware ESP32 com o perfil Bluetooth, horários e NTP (junto com Emerson)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-add6f44420a7",
+    "titulo": "Caixinha de remédios: em campo — Teste com cuidadores (com termo de consentimento) (junto com Rafael)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-15c7dbd23eb4",
+    "titulo": "Caixinha de remédios: em campo — Teste com cuidadores (com termo de consentimento) (junto com Emerson)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1a0f0450857d",
+    "titulo": "Pulseira: antes de ir a campo — Placa, sensor, regra de crise validada por especialistas",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-9ff92380137c",
+    "titulo": "Pulseira: em campo — Duração da bateria, teste com voluntários (com termo)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ca633ed5d7ce",
+    "titulo": "Atualizar os dois protocolo.cpp com PLUV, MED e PUL (hoje marcados \"a homologar\"). (junto com Arthur, Rafael)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-57ce7253ca8b",
+    "titulo": "Atualizar os dois protocolo.cpp com PLUV, MED e PUL (hoje marcados \"a homologar\"). (junto com Erick Lopes, Rafael)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-892badbbeb57",
+    "titulo": "Atualizar os dois protocolo.cpp com PLUV, MED e PUL (hoje marcados \"a homologar\"). (junto com Erick Lopes, Arthur)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-78d5479f7e46",
+    "titulo": "Homologar as linhas MED e PUL e o valor-limite de batimentos (LIMBPM) com a equipe clínica.",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-62017554",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 5. Hardware e firmware"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-24c313324800",
+    "titulo": "Definir o identificador final do app (br.com.physisengineering.app). Ele não muda depois de publicado. (junto com Rafaella)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7b98212f1ada",
+    "titulo": "Definir o identificador final do app (br.com.physisengineering.app). Ele não muda depois de publicado. (junto com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d7093435849e",
+    "titulo": "Preparar as máquinas: Node 18+, Android Studio (SDK 34, JDK 17) e um Mac com Xcode 15+. (junto com Rafaella)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-10853f519203",
+    "titulo": "Preparar as máquinas: Node 18+, Android Studio (SDK 34, JDK 17) e um Mac com Xcode 15+. (junto com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-402beecd1db5",
+    "titulo": "Criar as contas Google Play Console e Apple Developer (empresa, com D-U-N-S). (junto com Rafaella)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a68a8271b9d3",
+    "titulo": "Criar as contas Google Play Console e Apple Developer (empresa, com D-U-N-S). (junto com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ce6b131ee5c7",
+    "titulo": "Gerar a chave de assinatura do Android e guardá-la em cofre, em 2 cópias. (junto com Rafaella)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-bba414566bf9",
+    "titulo": "Gerar a chave de assinatura do Android e guardá-la em cofre, em 2 cópias. (junto com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a1aeb545c233",
+    "titulo": "Testar em aparelhos reais: Android 8–11, Android 12+ e iPhone com iOS 15+. Ler os QR codes com um celular de verdade. (junto com Rafaella)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ce9326b64a23",
+    "titulo": "Testar em aparelhos reais: Android 8–11, Android 12+ e iPhone com iOS 15+. Ler os QR codes com um celular de verdade. (junto com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-44b45208a6eb",
+    "titulo": "Preencher nas lojas os formulários de dados de saúde e de privacidade; publicar a URL da política de privacidade. (junto com Rafaella)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-93a62d1a1f54",
+    "titulo": "Preencher nas lojas os formulários de dados de saúde e de privacidade; publicar a URL da política de privacidade. (junto com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b781f6f12230",
+    "titulo": "Publicar a página \"Baixar o app\" e o APK direto com o código de conferência. (junto com Rafaella)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-5ba8a4524812",
+    "titulo": "Publicar a página \"Baixar o app\" e o APK direto com o código de conferência. (junto com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-8aa436ab",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 6. App nativo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-faaec4a60713",
+    "titulo": "Revisar e publicar os 8 módulos prontos, com preço e situação. (junto com Marzia, Arthur, Laura)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-50d57a9ec733",
+    "titulo": "Revisar e publicar os 8 módulos prontos, com preço e situação. (junto com Rafaella, Arthur, Laura)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-482c8f0197e1",
+    "titulo": "Revisar e publicar os 8 módulos prontos, com preço e situação. (junto com Rafaella, Marzia, Laura)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1321bcec4ea2",
+    "titulo": "Revisar e publicar os 8 módulos prontos, com preço e situação. (junto com Rafaella, Marzia, Arthur)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7e0c51a55573",
+    "titulo": "Trocar os marcadores da consultoria: valores das diárias, prazo de resposta e resultados dos casos.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d7228971f6f2",
+    "titulo": "Revisar as páginas da consultoria: textos, serviços, casos, chamadas para contato, versão em inglês, modo escuro e acessibilidade. (junto com Rafaella)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-bf360cb236e8",
+    "titulo": "Revisar as páginas da consultoria: textos, serviços, casos, chamadas para contato, versão em inglês, modo escuro e acessibilidade. (junto com Leonardo Macedo)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-be95974dcae2",
+    "titulo": "Escolher o provedor de pagamento (Pix e boleto) e de nota fiscal.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-5fa93b50def7",
+    "titulo": "Produzir os posts, artigos e roteiros de vídeo. (junto com Marzia)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-718925eb5ec6",
+    "titulo": "Produzir os posts, artigos e roteiros de vídeo. (junto com Rafaella)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ae57bed84c51",
+    "titulo": "Aprovar antes de publicar. (junto com Marzia)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b3213af20b3a",
+    "titulo": "Aprovar antes de publicar. (junto com Rafaella)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-8a0f248fd6df",
+    "titulo": "Acompanhar as métricas. (junto com Marzia)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e441593918fd",
+    "titulo": "Acompanhar as métricas. (junto com Rafaella)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c1ad9581502d",
+    "titulo": "Cadastrar os links dos modelos do Canva na Gestão. (junto com Marzia, Laura)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-53effa29ed17",
+    "titulo": "Cadastrar os links dos modelos do Canva na Gestão. (junto com Rafaella, Laura)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a348fd4d6cbc",
+    "titulo": "Cadastrar os links dos modelos do Canva na Gestão. (junto com Rafaella, Marzia)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e50712246fb4",
+    "titulo": "Revisar os modelos de propostas e contratos. (junto com Arthur, Laura)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-474cc3636170",
+    "titulo": "Revisar os modelos de propostas e contratos. (junto com Rafaella, Laura)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f178113d9a2f",
+    "titulo": "Revisar os modelos de propostas e contratos. (junto com Rafaella, Arthur)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c1f367bf585f",
+    "titulo": "Financeiro.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-40f28a43e4b0",
+    "titulo": "Fornecedores e compras. (junto com Emerson, Arthur, Rafael, Ryan)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-231d4d43a209",
+    "titulo": "Fornecedores e compras. (junto com Erick Lopes, Arthur, Rafael, Ryan)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b7fb26e51b25",
+    "titulo": "Fornecedores e compras. (junto com Erick Lopes, Emerson, Rafael, Ryan)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4198c3ee7634",
+    "titulo": "Fornecedores e compras. (junto com Erick Lopes, Emerson, Arthur, Ryan)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-be9577d7f5a2",
+    "titulo": "Fornecedores e compras. (junto com Erick Lopes, Emerson, Arthur, Rafael)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e3177674e275",
+    "titulo": "Central de clientes e chamados de suporte, com resposta por e-mail e WhatsApp. (junto com Rafaella, Arthur, Rafael)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-352e944cd3f4",
+    "titulo": "Central de clientes e chamados de suporte, com resposta por e-mail e WhatsApp. (junto com Erick Lopes, Arthur, Rafael)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4e5225943bbe",
+    "titulo": "Central de clientes e chamados de suporte, com resposta por e-mail e WhatsApp. (junto com Erick Lopes, Rafaella, Rafael)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b2598ee6ba9f",
+    "titulo": "Central de clientes e chamados de suporte, com resposta por e-mail e WhatsApp. (junto com Erick Lopes, Rafaella, Arthur)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e149e4976f47",
+    "titulo": "Contas da equipe e convites.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a3007059aad6",
+    "titulo": "Criar a demo da Gestão interna com dados fictícios para o site.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c66df804d678",
+    "titulo": "Acesso aos Editais. (junto com Rafaella, Marzia)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f0dc4c5f42f1",
+    "titulo": "Acesso aos Editais. (junto com Erick Lopes, Marzia)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f4ddbf4bad10",
+    "titulo": "Acesso aos Editais. (junto com Erick Lopes, Rafaella)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0f7bdc4db7bf",
+    "titulo": "Conferir uma vez cada fonte marcada \"a conferir\" e fazer a triagem. (junto com Laura, Marzia, Arthur, Erick Lopes, Ryan, Emerson, Rafael, Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-8d78d2723647",
+    "titulo": "Conferir uma vez cada fonte marcada \"a conferir\" e fazer a triagem. (junto com Rafaella, Marzia, Arthur, Erick Lopes, Ryan, Emerson, Rafael, Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-2d74edb745a3",
+    "titulo": "Conferir uma vez cada fonte marcada \"a conferir\" e fazer a triagem. (junto com Rafaella, Laura, Arthur, Erick Lopes, Ryan, Emerson, Rafael, Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a064d2dc32aa",
+    "titulo": "Conferir uma vez cada fonte marcada \"a conferir\" e fazer a triagem. (junto com Rafaella, Laura, Marzia, Erick Lopes, Ryan, Emerson, Rafael, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e541ad58b14f",
+    "titulo": "Conferir uma vez cada fonte marcada \"a conferir\" e fazer a triagem. (junto com Rafaella, Laura, Marzia, Arthur, Ryan, Emerson, Rafael, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0d6154a68143",
+    "titulo": "Conferir uma vez cada fonte marcada \"a conferir\" e fazer a triagem. (junto com Rafaella, Laura, Marzia, Arthur, Erick Lopes, Emerson, Rafael, Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0aae24b330a6",
+    "titulo": "Conferir uma vez cada fonte marcada \"a conferir\" e fazer a triagem. (junto com Rafaella, Laura, Marzia, Arthur, Erick Lopes, Ryan, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4ed26a319d00",
+    "titulo": "Conferir uma vez cada fonte marcada \"a conferir\" e fazer a triagem. (junto com Rafaella, Laura, Marzia, Arthur, Erick Lopes, Ryan, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a0210ae56540",
+    "titulo": "Conferir uma vez cada fonte marcada \"a conferir\" e fazer a triagem. (junto com Rafaella, Laura, Marzia, Arthur, Erick Lopes, Ryan, Emerson, Rafael)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-93b486164cca",
+    "titulo": "Montar as propostas. (junto com Rafaella, Marzia)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-26f1a3143d1a",
+    "titulo": "Montar as propostas. (junto com Erick Lopes, Marzia)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a4ceecd28e6d",
+    "titulo": "Montar as propostas. (junto com Erick Lopes, Rafaella)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-af5012156020",
+    "titulo": "Aprovação final e envio. (junto com Rafaella, Marzia, Arthur, Laura)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7a50abaa4f65",
+    "titulo": "Aprovação final e envio. (junto com Erick Lopes, Marzia, Arthur, Laura)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ca224c34b4d7",
+    "titulo": "Aprovação final e envio. (junto com Erick Lopes, Rafaella, Arthur, Laura)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4b4915c7c1e2",
+    "titulo": "Aprovação final e envio. (junto com Erick Lopes, Rafaella, Marzia, Laura)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e54af8f64e40",
+    "titulo": "Aprovação final e envio. (junto com Erick Lopes, Rafaella, Marzia, Arthur)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-a2030fcf",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 7. Site, loja, marketing, gestão e editais"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c32bf4f57fc5",
+    "titulo": "Montar o pacote do cliente (montar_clientes.py). (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-062be4ab12d1",
+    "titulo": "Montar o pacote do cliente (montar_clientes.py). (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-205730214a55",
+    "titulo": "Montar o pacote do cliente (montar_clientes.py). (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-fa02ba30efbc",
+    "titulo": "Montar o pacote do cliente (montar_clientes.py). (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a29fa16eeb49",
+    "titulo": "Montar o pacote do cliente (montar_clientes.py). (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-11b743a5c6a3",
+    "titulo": "Instalar no Pi com implantacao/instalar.sh --mosquitto --caddy lan --ufw. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-bf30ac9729e6",
+    "titulo": "Instalar no Pi com implantacao/instalar.sh --mosquitto --caddy lan --ufw. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f2296bcdacc9",
+    "titulo": "Instalar no Pi com implantacao/instalar.sh --mosquitto --caddy lan --ufw. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-84bca878f25a",
+    "titulo": "Instalar no Pi com implantacao/instalar.sh --mosquitto --caddy lan --ufw. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-79835d40e434",
+    "titulo": "Instalar no Pi com implantacao/instalar.sh --mosquitto --caddy lan --ufw. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f44f2cf4ad06",
+    "titulo": "Abrir todas as telas uma vez com internet, para guardar clima, mapas e solo. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e9fa7d6aa1bc",
+    "titulo": "Abrir todas as telas uma vez com internet, para guardar clima, mapas e solo. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1d1aa6b28009",
+    "titulo": "Abrir todas as telas uma vez com internet, para guardar clima, mapas e solo. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0fa6d3e52c6c",
+    "titulo": "Abrir todas as telas uma vez com internet, para guardar clima, mapas e solo. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-db9c300ea539",
+    "titulo": "Abrir todas as telas uma vez com internet, para guardar clima, mapas e solo. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-57f131fe3d32",
+    "titulo": "Criar o primeiro acesso do cliente (com consentimento) e as chaves dos aparelhos. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-dc0338e4ffab",
+    "titulo": "Criar o primeiro acesso do cliente (com consentimento) e as chaves dos aparelhos. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-487a73701e19",
+    "titulo": "Criar o primeiro acesso do cliente (com consentimento) e as chaves dos aparelhos. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1e539db6acf7",
+    "titulo": "Criar o primeiro acesso do cliente (com consentimento) e as chaves dos aparelhos. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b5b0efc8f76f",
+    "titulo": "Criar o primeiro acesso do cliente (com consentimento) e as chaves dos aparelhos. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-fceb38f3be49",
+    "titulo": "Rodar os testes (python3 -m unittest) e verificar.sh. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-494ae7aa0855",
+    "titulo": "Rodar os testes (python3 -m unittest) e verificar.sh. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-897e586a8c86",
+    "titulo": "Rodar os testes (python3 -m unittest) e verificar.sh. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a5aa6470d6e6",
+    "titulo": "Rodar os testes (python3 -m unittest) e verificar.sh. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-12596e425a9e",
+    "titulo": "Rodar os testes (python3 -m unittest) e verificar.sh. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1043c6ce63b6",
+    "titulo": "Ligar o Pi com nobreak. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-5442acf6850b",
+    "titulo": "Ligar o Pi com nobreak. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7faaf82050a5",
+    "titulo": "Ligar o Pi com nobreak. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ed5f593b0d17",
+    "titulo": "Ligar o Pi com nobreak. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1c28f55be73c",
+    "titulo": "Ligar o Pi com nobreak. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a94a09deaaf4",
+    "titulo": "Medir o sinal LoRa nos pontos planejados. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b611ba04e4d0",
+    "titulo": "Medir o sinal LoRa nos pontos planejados. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c5341384489d",
+    "titulo": "Medir o sinal LoRa nos pontos planejados. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-766685d9bdd9",
+    "titulo": "Medir o sinal LoRa nos pontos planejados. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-8631250a6677",
+    "titulo": "Medir o sinal LoRa nos pontos planejados. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-8424e1815d5b",
+    "titulo": "Instalar 1 transmissor e 1 Caixinha e calibrar os sensores. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-316562b75b1b",
+    "titulo": "Instalar 1 transmissor e 1 Caixinha e calibrar os sensores. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-2870ae62dc1c",
+    "titulo": "Instalar 1 transmissor e 1 Caixinha e calibrar os sensores. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-19fbf595b73a",
+    "titulo": "Instalar 1 transmissor e 1 Caixinha e calibrar os sensores. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e9708e85a059",
+    "titulo": "Instalar 1 transmissor e 1 Caixinha e calibrar os sensores. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-382516f9b84d",
+    "titulo": "Marcar no mapa do Monitoramento verde o ponto da lavoura. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-848500de107c",
+    "titulo": "Marcar no mapa do Monitoramento verde o ponto da lavoura. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b71cdacdefe4",
+    "titulo": "Marcar no mapa do Monitoramento verde o ponto da lavoura. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-fb42a03c5d34",
+    "titulo": "Marcar no mapa do Monitoramento verde o ponto da lavoura. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1dea04f07701",
+    "titulo": "Marcar no mapa do Monitoramento verde o ponto da lavoura. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f9642834d5d6",
+    "titulo": "Leituras chegando. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-db6869258fef",
+    "titulo": "Leituras chegando. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a0f2b00704d6",
+    "titulo": "Leituras chegando. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-26efe0de99ed",
+    "titulo": "Leituras chegando. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c26acdf07bf0",
+    "titulo": "Leituras chegando. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-205e6e995519",
+    "titulo": "Alertas: nó fora, bateria, chuva. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-2b9fb8506bb0",
+    "titulo": "Alertas: nó fora, bateria, chuva. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-99a88e1b6d90",
+    "titulo": "Alertas: nó fora, bateria, chuva. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7b0f7c09d773",
+    "titulo": "Alertas: nó fora, bateria, chuva. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-cf4158d3ae64",
+    "titulo": "Alertas: nó fora, bateria, chuva. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d5cbe4f41756",
+    "titulo": "Rega automática. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-515cb87e55e2",
+    "titulo": "Rega automática. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-481eb70c0e05",
+    "titulo": "Rega automática. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-97e956eb5880",
+    "titulo": "Rega automática. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-892756d2a36f",
+    "titulo": "Rega automática. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1e88bad74b2d",
+    "titulo": "E-mails saindo. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-eb718a13c122",
+    "titulo": "E-mails saindo. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-33a2ead954fb",
+    "titulo": "E-mails saindo. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e1548ca88f12",
+    "titulo": "E-mails saindo. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-92a1dd11beb6",
+    "titulo": "E-mails saindo. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-53083738de97",
+    "titulo": "Backup feito. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-840458b39810",
+    "titulo": "Backup feito. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0c7206c0a4b8",
+    "titulo": "Backup feito. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ab66c7b3044d",
+    "titulo": "Backup feito. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-69a9a7731b77",
+    "titulo": "Backup feito. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-285a6c7218e1",
+    "titulo": "95% das leituras recebidas. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-12a40f4348ce",
+    "titulo": "95% das leituras recebidas. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-46d02ae1b6e5",
+    "titulo": "95% das leituras recebidas. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d77677af9a2d",
+    "titulo": "95% das leituras recebidas. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e8a514e222ef",
+    "titulo": "95% das leituras recebidas. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-af8b6facd3eb",
+    "titulo": "Nenhuma válvula aberta além do tempo máximo. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-2cc1cb9f8d0e",
+    "titulo": "Nenhuma válvula aberta além do tempo máximo. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-2e182593a314",
+    "titulo": "Nenhuma válvula aberta além do tempo máximo. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d1e106395b9a",
+    "titulo": "Nenhuma válvula aberta além do tempo máximo. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f875cc6049e3",
+    "titulo": "Nenhuma válvula aberta além do tempo máximo. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a0a281a9298e",
+    "titulo": "Alertas chegando em menos de 5 minutos. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-db6c357c48eb",
+    "titulo": "Alertas chegando em menos de 5 minutos. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-49cd0ebe687e",
+    "titulo": "Alertas chegando em menos de 5 minutos. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-71f30ae7db6d",
+    "titulo": "Alertas chegando em menos de 5 minutos. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-31246502de26",
+    "titulo": "Alertas chegando em menos de 5 minutos. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-9178f29c816a",
+    "titulo": "Nenhum dado perdido em queda de energia. (junto com Erick Lopes, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-bef3761098b3",
+    "titulo": "Nenhum dado perdido em queda de energia. (junto com Arthur, Rafael, Emerson, Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c3b3755a1a8b",
+    "titulo": "Nenhum dado perdido em queda de energia. (junto com Arthur, Erick Lopes, Emerson, Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f272fe0c8a0d",
+    "titulo": "Nenhum dado perdido em queda de energia. (junto com Arthur, Erick Lopes, Rafael, Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-822af16b4eec",
+    "titulo": "Nenhum dado perdido em queda de energia. (junto com Arthur, Erick Lopes, Rafael, Emerson)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-f2fec5ae",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 8. Instalação no cliente e teste em campo"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-8e6d246bb985",
+    "titulo": "Treinar o cliente: curso de introdução, mais uma visita guiada pela plataforma. (junto com Laura)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-22109d26",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 9. Entrega, treinamento e suporte"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a45bd41715bf",
+    "titulo": "Treinar o cliente: curso de introdução, mais uma visita guiada pela plataforma. (junto com Rafaella)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-22109d26",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 9. Entrega, treinamento e suporte"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e5476b8cea01",
+    "titulo": "Entregar o \"LEIA-ME\", o contato do Suporte Physis e o WhatsApp. (junto com Arthur)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-22109d26",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 9. Entrega, treinamento e suporte"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-cec2fa60d487",
+    "titulo": "Entregar o \"LEIA-ME\", o contato do Suporte Physis e o WhatsApp. (junto com Rafaella)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-22109d26",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 9. Entrega, treinamento e suporte"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-265f05bec1eb",
+    "titulo": "Gerar o relatório da semana de teste com \"Baixar esta tela\" (ODT ou PDF/A) e compartilhar para comentários. (responsável do módulo)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-22109d26",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 9. Entrega, treinamento e suporte"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-019c6058247d",
+    "titulo": "Combinar com o cliente a rotina de atualização (atualizar.sh) e de backup.",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-22109d26",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 9. Entrega, treinamento e suporte"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e20482b267d6",
+    "titulo": "Checar backups e saúde do sistema toda semana (verificar.sh).",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-46408004",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 10. Depois da implantação"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a58684733dfd",
+    "titulo": "Responder chamados dentro do prazo combinado. (junto com Rafaella, Erick Lopes, Rafael)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-46408004",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 10. Depois da implantação"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-344491e8b972",
+    "titulo": "Responder chamados dentro do prazo combinado. (junto com Arthur, Erick Lopes, Rafael)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-46408004",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 10. Depois da implantação"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-cb5598dde592",
+    "titulo": "Responder chamados dentro do prazo combinado. (junto com Arthur, Rafaella, Rafael)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-46408004",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 10. Depois da implantação"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-bff9ed30ff5b",
+    "titulo": "Responder chamados dentro do prazo combinado. (junto com Arthur, Rafaella, Erick Lopes)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-46408004",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 10. Depois da implantação"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-bbd5f5109023",
+    "titulo": "Revisar a curadoria das bases a cada 6 meses: equipamentos, materiais, fatores de emissão e normas. (responsáveis da seção 4)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-46408004",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 10. Depois da implantação"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-db2c92902340",
+    "titulo": "Publicar o resumo semestral de acessibilidade: relatos recebidos, resolvidos e tempo médio.",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-46408004",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 10. Depois da implantação"
+    }
+   }
+  ]
+ },
+ "fluxo_residuo": [],
+ "requisito": [],
+ "indicadores": null,
+ "trilha_auditoria": [],
+ "resumo": {
+  "pessoas": 10,
+  "projetos": 10,
+  "tarefas": 259,
+  "concluidas": 0,
+  "bloqueadas": 0
+ }
+}

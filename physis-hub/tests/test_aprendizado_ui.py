@@ -263,6 +263,22 @@ class TelaAprendizado(unittest.TestCase):
         painel = re.sub(r'<script id="mod-[\w-]+">.*?</script>', "", painel, flags=re.S)      # os módulos embutidos ficam de fora
         self.assertNotRegex(painel, r"data-pau-|dataset\.pau[A-Z]", "o painel não usa o prefixo do módulo")
 
+    def test_avisos_marcam_as_atividades_do_perfil_do_servidor(self):
+        # GET /api/alertas/assinaturas devolve atividades_perfil (servidor.py); o formulário já abre com elas marcadas
+        srv = (HUB / "physis_hub" / "servidor.py").read_text(encoding="utf-8")
+        self.assertIn('"atividades_perfil"', srv)
+        self.assertIn("R.assinaturas.dados.atividades_perfil", self.js)
+
+    def test_ligado_no_painel(self):
+        painel = (HUB / "web" / "painel.html").read_text(encoding="utf-8")
+        self.assertEqual(painel.count('<script id="mod-aprendizado-ui">'), 1)
+        app = painel.split('<script id="mod-aprendizado-ui">', 1)[1]
+        self.assertIn("PhysisAprendizadoUI.iniciar({", painel)
+        self.assertIn("PhysisAprendizadoUI.secaoResiliencia(2)", painel)      # Resiliência climática, antes da matriz
+        self.assertLess(painel.index("PhysisAprendizadoUI.secaoResiliencia(2)"), painel.index('<h2 id="h-re-mat">Matriz de riscos</h2>'))
+        self.assertIn("PhysisAprendizadoUI.resumoAnomalias()", painel)        # e no Resumo
+        self.assertIn('ligado: () => ui.modo === "hub" && !ui.demo', painel)  # na demonstração nada é buscado
+
 
 if __name__ == "__main__":
     unittest.main()

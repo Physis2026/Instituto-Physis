@@ -16,10 +16,27 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 PAINEL = RAIZ / "physis-hub" / "web" / "painel.html"
-BASES = {"base-certificacoes": RAIZ / "sistema" / "physis-certificacoes.json", "base-plantas": RAIZ / "sistema" / "physis-plantas.json"}
+S = RAIZ / "sistema"
+BASES = {"base-certificacoes": S / "physis-certificacoes.json", "base-plantas": S / "physis-plantas.json",
+         "base-equipamentos": S / "physis-equipamentos.json",        # solar (módulos e inversores) e carga térmica
+         "base-fatores-emissao": S / "physis-fatores-emissao.json",  # carbono (GHG Protocol)
+         "base-evidencias": S / "physis-evidencias.json",            # certificação assistida
+         "base-materiais": S / "physis-materiais.json",              # materiais e composições (SustainKit na plataforma, Certificações)
+         "base-servidor-catalogo": S / "physis-servidor-catalogo.json",  # catálogo de módulos do Servidor verde
+         "base-i18n-modulos": S / "physis-i18n-modulos.json"}        # inglês das telas dos módulos
 # módulos de cálculo em arquivo próprio (testados à parte), embutidos como <script> no <head>
-MODULOS = {"mod-avac": RAIZ / "sistema" / "physis-avac.js", "mod-saude": RAIZ / "sistema" / "physis-saude.js",
-           "mod-juridico": RAIZ / "sistema" / "physis-juridico.js"}
+MODULOS = {"mod-avac": S / "physis-avac.js", "mod-saude": S / "physis-saude.js", "mod-juridico": S / "physis-juridico.js",
+           "mod-turbinas": S / "physis-turbinas.js", "mod-solar": S / "physis-solar.js",
+           "mod-circular-mapa": S / "physis-circular-mapa.js", "mod-cargatermica": S / "physis-cargatermica.js",
+           "mod-metodologia": S / "physis-metodologia.js", "mod-sbn": S / "physis-sbn.js",
+           "mod-carbono": S / "physis-carbono.js", "mod-relatorio-esg": S / "physis-relatorio-esg.js",
+           "mod-evidencias": S / "physis-evidencias.js", "mod-parceiros": S / "physis-parceiros.js",
+           "mod-ble": S / "physis-ble.js",
+           "mod-mapa-local": S / "physis-mapa-local.js",          # mapa do local (como no receptor V6)
+           "mod-aprendizado-ui": S / "physis-aprendizado-ui.js",  # o que o hub aprendeu + avisos de clima
+           "mod-odf": S / "physis-odf.js",                        # ODT, ODS e PDF/A ao lado do "Baixar esta tela"
+           "mod-secador": S / "physis-secador.js",                # aba Secador solar (em desenvolvimento)
+           "mod-servidor-verde": S / "physis-servidor-verde.js"}  # aba Servidor verde (em desenvolvimento)
 
 
 def bloco(ident: str, arq: Path) -> str:
