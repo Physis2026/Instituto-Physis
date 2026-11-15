@@ -27,6 +27,7 @@ Sem `TIPO`, a linha e do no de solo e irrigacao (compatibilidade com o que esta 
 | `COL` | Coleira | `LAT LON GPS ATV IMP BAT TS` | `ID:41,TIPO:COL,LAT:-22.51003,LON:-43.18012,GPS:1,ATV:1,IMP:0,BAT:3.92,TS:1794600000` |
 | `COM` | Comedouro | `NIV PORC TAG BLOQ BAT TS` | `ID:71,TIPO:COM,NIV:62.0,PORC:3,TAG:A1B2,BLOQ:0,BAT:-,TS:1794600000` |
 | `PLUV` | Pluviômetro de báscula | `CHI PUL BAT TS` | `ID:31,TIPO:PLUV,CHI:0.20,PUL:44,BAT:-,TS:1794600000` |
+| `SEC` | Secador solar (monitoramento, **em desenvolvimento**) | `TI UI TE UE TC VENT ABT PESO IRR BAT TS` (`ABT`, `PESO` e `IRR` opcionais) | `ID:41,TIPO:SEC,TI:38.5,UI:42.0,TE:27.1,UE:70.0,TC:52.3,VENT:1,PESO:84.20,IRR:820,BAT:3.95,TS:1794600000` |
 | `MED` | Caixinha de remédios (Saúde, **a homologar**) | `CMP EVT BAT TS` | `ID:31,TIPO:MED,CMP:1,EVT:TOMADO,BAT:3.91,TS:1794650400` |
 | `PUL` | Pulseira (Saúde, **a homologar**) | `LAT LON GPS CRISE BPM MOV BAT TS` | `ID:51,TIPO:PUL,LAT:-22.51003,LON:-43.18012,GPS:1,CRISE:1,BPM:128,MOV:2,BAT:3.80,TS:1794650400` |
 

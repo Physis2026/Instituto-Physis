@@ -1,7 +1,7 @@
 """Envio dos e-mails da fila (email_saida) pelo servidor de e-mail PRÓPRIO da Physis.
 
 Nada de serviço de terceiros: o Hub fala SMTP direto com o servidor da Physis (por
-exemplo Stalwart ou Mailcow, instalado pelo Erick Oliveira). As credenciais vêm de
+exemplo Stalwart ou Mailcow, instalado pelo Eric Oliveira). As credenciais vêm de
 variáveis de ambiente do servidor, nunca do código:
 
     PHYSIS_SMTP_HOST       endereço do servidor de e-mail (sem ele, nada é enviado)

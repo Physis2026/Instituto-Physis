@@ -59,10 +59,12 @@ quebra de linha dentro da mensagem vira espaço; chaves desconhecidas são aceit
 e repassadas ao computador central (ver `EXTENSAO_V6.md`).
 
 Tipos (`TIPO`) que o hub aceita (`physis_hub/protocolo.py`, `TIPOS_CONHECIDOS`): `SOLO` (ou ausente), `ZONA`, `COL`,
-`COM`, `PLUV` (pluviômetro, desde 15/11/2026) e, com `PHYSIS_SAUDE_V6=1` (padrão), `MED` e `PUL` (Saúde, a homologar;
-vão para a Saúde, nunca para `medicao`). Outro `TIPO` = `tipo_desconhecido`. Chaves e exemplos em `EXTENSAO_V6.md`.
-**Pendente:** levar `PLUV`, `MED` e `PUL` aos dois `protocolo.cpp` (o receptor repassa chaves e tipos sem conferir, então
-funciona hoje sem regravar, mas a lista comum deve ficar igual).
+`COM`, `PLUV` (pluviômetro, desde 15/11/2026), `SEC` (secador solar, em desenvolvimento; chaves e faixas em `SECADOR.md`) e,
+com `PHYSIS_SAUDE_V6=1` (padrão), `MED` e `PUL` (Saúde, a homologar; vão para a Saúde, nunca para `medicao`). Outro `TIPO` =
+`tipo_desconhecido`. Chaves e exemplos em `EXTENSAO_V6.md`.
+**Firmware (conferido em 15/11/2026):** os dois `protocolo.cpp` (receptor e transmissor V6) não têm lista de `TIPO`. O
+receptor repassa chaves e tipos sem conferir, e quem confere é só o hub (`TIPOS_CONHECIDOS`). Um tipo novo, portanto, não exige
+regravar o receptor; o firmware só muda no aparelho que passa a mandar o tipo novo.
 
 ## 4. Comandos (receptor → nó)
 

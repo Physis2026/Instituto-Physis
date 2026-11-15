@@ -87,8 +87,23 @@ def trocar_blocos(texto: str) -> str:
     return texto
 
 
+NUCLEO = RAIZ / "sistema" / "physis-nucleo.js"
+NUCLEO_MARCA = "/* physis-nucleo.js v1 — embutido, verbatim */\n"
+
+
+def trocar_nucleo(texto: str) -> str:
+    """Cópia do contrato de dados (physis-nucleo.js) embutida na Gestão: sempre igual ao original."""
+    i = texto.find(NUCLEO_MARCA)
+    if i < 0:
+        return texto
+    j = texto.find("</script>", i)
+    # "</script" dentro do código (num comentário de exemplo) fecharia a tag antes da hora: vai escapado.
+    novo = NUCLEO.read_text(encoding="utf-8").replace("\r\n", "\n").rstrip("\n").replace("</script", "<\\/script") + "\n\n"
+    return texto[:i + len(NUCLEO_MARCA)] + novo + texto[j:]
+
+
 def tratar(texto: str, novo: str) -> str:
-    texto = trocar_blocos(trocar_exportar(texto, novo))
+    texto = trocar_nucleo(trocar_blocos(trocar_exportar(texto, novo)))
     for a, b in TROCAS:
         texto = texto.replace(a, b)
     return texto

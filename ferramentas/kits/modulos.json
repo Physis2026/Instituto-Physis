@@ -700,7 +700,7 @@
     }
    ],
    "referencia": [
-    "sistema/physis-tela-cliente.html",
+    "demos/physis-demo-monitoramento.html",
     "sistema/physis-mapa-local.js",
     "physis-hub/physis_hub/zonas.py",
     "physis-hub/physis_hub/mqtt.py",
@@ -711,8 +711,8 @@
    ],
    "conferir": [
     {
-     "arquivo": "sistema/physis-tela-cliente.html",
-     "como": "Está em referencia/: abra no navegador (tela do cliente)."
+     "arquivo": "demos/physis-demo-monitoramento.html",
+     "como": "Está em referencia/: abra no navegador (demonstração do Monitoramento verde, com o mapa do receptor)."
     },
     {
      "arquivo": "demos/physis-demo-cliente.html",
@@ -861,6 +861,99 @@
     "test_metodologia"
    ],
    "aba": "cursos"
+  },
+  {
+   "id": "secador",
+   "nome": "Secador solar (monitoramento)",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Arthur",
+    "Laura"
+   ],
+   "metodologia": "secador",
+   "doc17_secao": null,
+   "o_que_revisar": "Em desenvolvimento. Produtos e limites de umidade de cada lote, curva de secagem, alertas, sensores do secador e textos da aba. Limite sem fonte fica [MARCADOR].",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "secador"
+      ]
+     ],
+     "normas_de": "secador"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "physis-hub/docs/SECADOR.md",
+    "physis-hub/physis_hub/secador.py",
+    "sistema/physis-secador.js",
+    "physis-hub/tests/test_secador.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "physis-hub/web/painel.html",
+     "como": "Abra a plataforma da Casa Physis (pesquisa) e vá à aba Secador solar."
+    }
+   ],
+   "testes": [
+    "test_secador",
+    "test_metodologia"
+   ],
+   "aba": "secador"
+  },
+  {
+   "id": "servidor-verde",
+   "nome": "Servidor verde (dimensionamento para projetos externos e pegada do servidor)",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Eric Oliveira"
+   ],
+   "metodologia": "servidor-verde",
+   "doc17_secao": null,
+   "o_que_revisar": "Em desenvolvimento. Cargas, processamento e IA, armazenamento, energia, nobreak e solar, térmico e PUE, carbono e custos, módulos de hardware e software, relatório de consultoria e pegada do servidor da Physis. Preço sem fonte fica [MARCADOR].",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "servidor-verde"
+      ]
+     ],
+     "normas_de": "servidor-verde"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "physis-hub/docs/SERVIDOR_VERDE.md",
+    "physis-hub/docs/PEGADA_SERVIDOR.md",
+    "physis-hub/physis_hub/servidor_verde.py",
+    "physis-hub/physis_hub/pegada_servidor.py",
+    "sistema/physis-servidor-verde.js",
+    "physis-hub/tests/test_servidor_verde.py",
+    "physis-hub/tests/test_pegada_servidor.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "physis-hub/web/painel.html",
+     "como": "Abra a plataforma da Casa Physis (pesquisa) e vá à aba Servidor verde."
+    }
+   ],
+   "testes": [
+    "test_servidor_verde",
+    "test_pegada_servidor",
+    "test_metodologia"
+   ],
+   "aba": "servidor-verde"
   },
   {
    "id": "acessibilidade",

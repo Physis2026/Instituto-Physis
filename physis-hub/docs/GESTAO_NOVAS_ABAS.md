@@ -46,7 +46,7 @@ As propostas criadas a partir de um edital entram na lista que já existe (`gest
 ## 2. Editais (só Rafaella, Erick Lopes e Marzia)
 - **Quem vê:** a lista fica em `ACESSO_EDITAIS` no HTML e em `ACESSO_PADRAO` no servidor (ou na variável
   `PHYSIS_EDITAIS_ACESSO=rafaella,ericklopes,marzia`). O botão do menu some para as outras pessoas e o servidor responde 403.
-  **Confirmar:** "Erick" foi entendido como **Erick Lopes** (`ericklopes`). Se for o Erick Oliveira, troque nos dois lugares.
+  **Confirmar:** "Erick" foi entendido como **Erick Lopes** (`ericklopes`). Se for o Eric Oliveira, troque nos dois lugares.
 - **Fontes:** FINEP, BNDES, Fundo Clima, CNPq, FAPERJ, FAPESP, FAPEMIG, FAPDF, Prosas, EMBRAPII, União Europeia, BID, BID Lab
   e Green Climate Fund. São páginas públicas. Todas estão marcadas como **"a conferir"**: os sites mudam de endereço, e a
   equipe precisa olhar uma vez se cada uma ainda lista editais. A tela "Fontes" mostra o resultado da última busca de cada
@@ -123,7 +123,7 @@ Arquivos de cache: `editais-cache.json`, `eventos-cache.json`, `editais-fontes.j
 
 ## O que falta
 
-- Colar as rotas no `servidor.py` (Erick Oliveira) e conferir, uma vez, o endereço de cada fonte padrão.
+- Colar as rotas no `servidor.py` (Eric Oliveira) e conferir, uma vez, o endereço de cada fonte padrão.
 - Confirmar se o "Erick" dos editais é o Erick Lopes.
 - Nomes dos cursos (o roteiro do vídeo tem `[nome do curso]`).
 - Servidor de IA local: quando existir, ligar `GANCHO_IA` (servidor) e `PHYSIS_IA_LOCAL` (navegador).

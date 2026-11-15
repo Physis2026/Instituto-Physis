@@ -35,7 +35,8 @@ RESPONSAVEIS = {
     "circular": ["Rafaella", "Rafael"], "carbono": ["Marzia"],
     "resiliencia": ["Rafaella", "Arthur"], "certificacoes": ["Rafaella", "Laura", "Ryan"], "equipamentos": ["Ryan"],
     "monitoramento": ["Arthur"], "saude": ["Emerson", "Rafael"], "scada": ["Erick Lopes", "Laura", "Rafaella"],
-    "cursos": ["Rafaella", "Laura"], "acessibilidade": ["Rafaella"], "hw-lora": ["Arthur"],
+    "cursos": ["Rafaella", "Laura"], "secador": ["Arthur", "Laura"], "servidor-verde": ["Eric Oliveira"],
+    "acessibilidade": ["Rafaella"], "hw-lora": ["Arthur"],
     "hw-caixinha": ["Erick Lopes"], "hw-coleira": ["Rafael"], "hw-pluviometro": ["Rafaella", "Arthur"],
     "hw-remedios": ["Emerson", "Rafael"], "hw-pulseira": ["Emerson"], "servidor": ["Eric Oliveira"],
 }
