@@ -26,7 +26,7 @@ PROGRAMAS = {
 # partes de exemplo (medidor "lugar01/no7", servidor de IA e clientes hospedados): essas entram quando existirem de fato.
 # Uma ficha de clientes.json com "pegada_servidor" vale no lugar desta.
 PEGADA_PADRAO = {
-    "casa-physis": {"classe": "rpi5", "nome": "Hub da Casa Physis", "local": "no_lugar", "controle": "proprio",
+    "casa-physis": {"classe": "notebook", "nome": "Hub da Casa Physis (notebook, 16 GB de RAM: 2 × 8 GB)", "local": "no_lugar", "controle": "proprio",
                     "intervalo_min": 5, "contagem": "auto", "fator_rede": None},
 }
 

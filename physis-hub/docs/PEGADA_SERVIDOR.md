@@ -68,8 +68,13 @@ Fabricação entra sempre (não está na conta de luz), com a categoria 2 marcad
  "clientes": [{"id": "cliente-a", "nome": "Cliente A", "peso": 1}]}
 ```
 
-Classes: `rpi4`, `rpi5`, `mini_pc`, `workstation`, `servidor_x86`, `servidor_gpu` (sem `classe`: detecta Raspberry
+Classes: `rpi4`, `rpi5`, `mini_pc`, `notebook`, `workstation`, `servidor_x86`, `servidor_gpu` (sem `classe`: detecta Raspberry
 Pi pelo `/proc/device-tree/model`; com placa NVIDIA, `servidor_gpu`; senão `mini_pc`).
+
+**Casa Physis (decidido em 15/11/2026):** o hub começa num **notebook com 16 GB de RAM (2 × 8 GB)**, classe `notebook`
+(`montar_clientes.py`, `PEGADA_PADRAO`). Os valores da classe são ordem de grandeza (8 W parado, 45 W em carga, 200 kgCO₂e de
+fabricação, 4 anos): troque pela PCF e pela ficha do modelo comprado. Com uma tomada medidora ligada ao hub, o método passa a
+"medido" e a estimativa deixa de valer.
 
 ## Rota
 

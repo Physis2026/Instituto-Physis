@@ -58,6 +58,7 @@ PADRAO = {
         "rpi4": {"nome": "Raspberry Pi 4 (com fonte e cartão)", "w_ocioso": 3.0, "w_carga": 7.0, "w_resto": 1.5, "kgco2e_fabricacao": 15, "vida_anos": 5},
         "rpi5": {"nome": "Raspberry Pi 5 (com fonte, ventoinha e SSD)", "w_ocioso": 3.5, "w_carga": 10.0, "w_resto": 2.0, "kgco2e_fabricacao": 20, "vida_anos": 5},
         "mini_pc": {"nome": "Mini PC (tipo NUC)", "w_ocioso": 8, "w_carga": 45, "w_resto": 4, "kgco2e_fabricacao": 120, "vida_anos": 5},
+        "notebook": {"nome": "Notebook (tela fechada ou desligada, carregador incluído)", "w_ocioso": 8, "w_carga": 45, "w_resto": 3, "kgco2e_fabricacao": 200, "vida_anos": 4},
         "workstation": {"nome": "Workstation ou desktop (placa ATX, sem placa de vídeo)", "w_ocioso": 40, "w_carga": 200, "w_resto": 25, "kgco2e_fabricacao": 350, "vida_anos": 5},
         "servidor_x86": {"nome": "Servidor x86 de rack ou torre (2 processadores)", "w_ocioso": 110, "w_carga": 330, "w_resto": 60, "kgco2e_fabricacao": 1300, "vida_anos": 5},
         "servidor_gpu": {"nome": "Servidor com GPU para IA (1 placa incluída na potência)", "w_ocioso": 150, "w_carga": 650, "w_resto": 70, "gpu_w_ocioso": 30, "gpu_w_carga": 300, "kgco2e_fabricacao": 1300, "vida_anos": 4},
