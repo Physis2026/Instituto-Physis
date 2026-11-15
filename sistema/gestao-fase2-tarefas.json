@@ -212,6 +212,40 @@
   "tarefa": [
    {
     "org_id": "physis",
+    "tarefa_id": "imp-ia-chave-p0",
+    "titulo": "PRIORIDADE 0 (Fase 1): criar a chave da Physis no console da Anthropic (conta da organização), guardar só no servidor (PHYSIS_CLAUDE_CHAVE_ARQUIVO) e definir o limite de gasto. Passo a passo: physis-hub/docs/IA_CLAUDE.md. Feito quando: chave no servidor, fora do código e do Git.",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 5,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis",
+     "prioridade": 0
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ia-servidor-p0",
+    "titulo": "PRIORIDADE 0 (Fase 1): deixar um servidor Physis rodando com internet (hub da Casa Physis, o notebook Acer, ou outro já instalado) e rodar o teste com a chave real. Feito quando: os robôs respondem pelo Claude e o gasto aparece no contador.",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 5,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis",
+     "prioridade": 0
+    }
+   },
+   {
+    "org_id": "physis",
     "tarefa_id": "imp-9774c2d0befa",
     "titulo": "Máquina e sistema: Linux instalado, usuário sem privilégio, atualizações automáticas, relógio por NTP. Feito quando: verificar.sh passa.",
     "pessoa_id": "erickoliveira",
