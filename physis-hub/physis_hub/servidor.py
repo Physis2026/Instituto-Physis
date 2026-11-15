@@ -36,6 +36,7 @@ from urllib.parse import parse_qs, quote, unquote, urlparse
 import re
 
 from . import clima as clima_mod
+from . import gis as gis_mod
 from . import correio
 from .hub import Hub
 from .protocolo import para_int, validar_telemetria
@@ -240,8 +241,10 @@ fetch(criar?"/api/conta/criar":"/api/conta/entrar",{method:"POST",headers:{"Cont
 </script></body></html>"""
 
 
-def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None, clima=None):
+def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None, clima=None, irradiacao=None):
     instancia = instancia if instancia is not None else ler_instancia()
+    if irradiacao is None:
+        irradiacao = gis_mod.Irradiacao(hub)
     if clima is None:
         rx = os.environ.get("PHYSIS_RX_URL")
         clima = clima_mod.Clima(hub, receptor_url=rx, enviar_local=clima_mod.receptor_local(rx) if rx else None)
@@ -607,6 +610,14 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             if u.path == "/api/clima":
                 # previsão das fontes guardadas no hub (a tela nunca chama a internet)
                 return self._json(200, clima.estado())
+            if u.path == "/api/gis/irradiacao":
+                # base GIS de irradiação (ponto + grade da região), buscada uma vez e guardada no hub
+                try:
+                    lat, lon = float(q.get("lat", [""])[0]), float(q.get("lon", [""])[0])
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "lat e lon são obrigatórios"})
+                r = irradiacao.consultar(lat, lon)
+                return self._json(200 if r["ok"] or not r.get("erro") else 400, r)
             if u.path == "/api/saude":
                 integra, n = hub.verificar_cadeia()
                 p = hub.painel()["saude"]
@@ -913,8 +924,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
 
 def iniciar(hub: Hub, porta: int = 8700, token: str | None = None, endereco: str = "0.0.0.0", instancia: dict | None = None,
-            clima=None):
-    srv = ThreadingHTTPServer((endereco, porta), criar_manipulador(hub, token, instancia, clima))
+            clima=None, irradiacao=None):
+    srv = ThreadingHTTPServer((endereco, porta), criar_manipulador(hub, token, instancia, clima, irradiacao))
     srv.daemon_threads = True
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return srv

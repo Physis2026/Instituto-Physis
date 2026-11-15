@@ -1,0 +1,4006 @@
+{
+  "_leia": "Base única de critérios da aba Certificações do Sistema Physis. Redação própria da Physis: não reproduz texto de normas; cita só cláusula, crédito ou medida. Validação preliminar: a decisão final é da certificadora. 'auto' indica que o sistema pode sugerir a situação a partir de outros módulos. 'escala' no grupo: ausente = situacao; 'pdca' = níveis 0–1 (atende=1, parcial=0,5, nao=0); 'maturidade' = 1 a 5. IDs anteriores da CERT_LISTA foram mantidos quando há correspondência direta.",
+  "versao": "2026-11-15",
+  "escala": {
+    "situacao": [
+      "atende",
+      "parcial",
+      "nao",
+      "na"
+    ],
+    "maturidade": "1 a 5 (IGEA)",
+    "pdca": [
+      0,
+      0.25,
+      0.5,
+      0.75,
+      1
+    ]
+  },
+  "certificacoes": [
+    {
+      "id": "iso9001",
+      "nome": "ISO 9001:2015 (qualidade)",
+      "edicao": "ISO 9001:2015 + Emenda 1:2024 (mudança do clima no contexto)",
+      "tipo": "iso",
+      "fonte_physis": [
+        "estrutura Annex SL comum às ISO de gestão (sem planilha Physis específica)"
+      ],
+      "grupos": [
+        {
+          "id": "i9_c4",
+          "nome": "4 Contexto",
+          "criterios": [
+            {
+              "id": "i9_4",
+              "texto": "Questões internas e externas (incluindo clima) e partes interessadas relevantes identificadas.",
+              "ref": "ISO 9001:2015 4.1 / 4.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de contexto",
+              "auto": "perfil"
+            },
+            {
+              "id": "i9_4_3",
+              "texto": "Escopo do sistema documentado, com justificativa de requisitos não aplicáveis.",
+              "ref": "ISO 9001:2015 4.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Declaração de escopo",
+              "auto": null
+            },
+            {
+              "id": "i9_4_4",
+              "texto": "Processos, entradas, saídas, responsáveis e indicadores mapeados.",
+              "ref": "ISO 9001:2015 4.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Mapa de processos",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i9_c5",
+          "nome": "5 Liderança",
+          "criterios": [
+            {
+              "id": "i9_5",
+              "texto": "Direção responde pela eficácia do sistema e mantém o foco no cliente.",
+              "ref": "ISO 9001:2015 5.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Atas da direção",
+              "auto": null
+            },
+            {
+              "id": "i9_5_2",
+              "texto": "Política da qualidade aprovada, comunicada e coerente com a estratégia.",
+              "ref": "ISO 9001:2015 5.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Política da qualidade",
+              "auto": null
+            },
+            {
+              "id": "i9_5_3",
+              "texto": "Responsabilidades e autoridades atribuídas e comunicadas.",
+              "ref": "ISO 9001:2015 5.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Matriz de responsabilidades",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i9_c6",
+          "nome": "6 Planejamento",
+          "criterios": [
+            {
+              "id": "i9_6",
+              "texto": "Riscos e oportunidades tratados e objetivos da qualidade mensuráveis com plano.",
+              "ref": "ISO 9001:2015 6.1 / 6.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Matriz de riscos, plano de objetivos",
+              "auto": "riscos"
+            },
+            {
+              "id": "i9_6_3",
+              "texto": "Mudanças no sistema planejadas de forma controlada.",
+              "ref": "ISO 9001:2015 6.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de mudanças",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i9_c7",
+          "nome": "7 Apoio",
+          "criterios": [
+            {
+              "id": "i9_7",
+              "texto": "Recursos, infraestrutura, ambiente e equipamentos de medição calibrados disponíveis.",
+              "ref": "ISO 9001:2015 7.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de calibração",
+              "auto": "medicao"
+            },
+            {
+              "id": "i9_7_2",
+              "texto": "Competência, conscientização e comunicação garantidas e registradas.",
+              "ref": "ISO 9001:2015 7.2–7.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Matriz de treinamento",
+              "auto": null
+            },
+            {
+              "id": "i9_7_5",
+              "texto": "Informação documentada controlada (versão, acesso, retenção).",
+              "ref": "ISO 9001:2015 7.5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Lista mestra",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i9_c8",
+          "nome": "8 Operação",
+          "criterios": [
+            {
+              "id": "i9_8",
+              "texto": "Requisitos do cliente analisados antes de aceitar pedidos e contratos.",
+              "ref": "ISO 9001:2015 8.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de análise de pedido",
+              "auto": null
+            },
+            {
+              "id": "i9_8_3",
+              "texto": "Projeto e desenvolvimento com etapas de verificação e validação, quando aplicável.",
+              "ref": "ISO 9001:2015 8.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de projeto",
+              "auto": null
+            },
+            {
+              "id": "i9_8_4",
+              "texto": "Fornecedores avaliados e produtos/serviços externos controlados.",
+              "ref": "ISO 9001:2015 8.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Avaliação de fornecedores",
+              "auto": null
+            },
+            {
+              "id": "i9_8_5",
+              "texto": "Produção e serviço sob condições controladas, com rastreabilidade e liberação.",
+              "ref": "ISO 9001:2015 8.5 / 8.6",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Instruções de trabalho, registros de inspeção",
+              "auto": null
+            },
+            {
+              "id": "i9_8_7",
+              "texto": "Saídas não conformes identificadas e tratadas.",
+              "ref": "ISO 9001:2015 8.7",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de produto não conforme",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i9_c9",
+          "nome": "9 Avaliação de desempenho",
+          "criterios": [
+            {
+              "id": "i9_9",
+              "texto": "Satisfação do cliente e indicadores de processo analisados.",
+              "ref": "ISO 9001:2015 9.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Pesquisa de satisfação, painel de indicadores",
+              "auto": null
+            },
+            {
+              "id": "i9_9_2",
+              "texto": "Auditoria interna e análise crítica pela direção realizadas.",
+              "ref": "ISO 9001:2015 9.2 / 9.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatórios e ata",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i9_c10",
+          "nome": "10 Melhoria",
+          "criterios": [
+            {
+              "id": "i9_10",
+              "texto": "Não conformidades com análise de causa, ação corretiva e verificação de eficácia.",
+              "ref": "ISO 9001:2015 10.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de ações corretivas",
+              "auto": null
+            },
+            {
+              "id": "i9_10_3",
+              "texto": "Melhoria contínua evidenciada.",
+              "ref": "ISO 9001:2015 10.1 / 10.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de melhorias",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iso14001",
+      "nome": "ISO 14001:2015 (gestão ambiental)",
+      "edicao": "ISO 14001:2015 + Emenda 1:2024 (mudança do clima no contexto)",
+      "tipo": "iso",
+      "fonte_physis": [
+        "Modulos em desenvolvimento/Certificação/ISO 14001/gap analysis ISO 14001.xlsx",
+        "Modulos em desenvolvimento/Certificação/ISO 14001/EMS_Handbook_modelo.docx",
+        "physis-hub/web/painel.html (CERT_LISTA anterior)"
+      ],
+      "grupos": [
+        {
+          "id": "i14_c4",
+          "nome": "4 Contexto da organização",
+          "criterios": [
+            {
+              "id": "i14_4",
+              "texto": "Questões internas e externas relevantes mapeadas, incluindo se a mudança do clima é relevante.",
+              "ref": "ISO 14001:2015 4.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-DOC-01 Registro de contexto",
+              "auto": "riscos"
+            },
+            {
+              "id": "i14_4_2",
+              "texto": "Partes interessadas e suas expectativas identificadas, indicando quais viram obrigações.",
+              "ref": "ISO 14001:2015 4.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-DOC-02 Registro de partes interessadas",
+              "auto": "perfil"
+            },
+            {
+              "id": "i14_4_3",
+              "texto": "Escopo do sistema documentado (unidades, atividades, limites físicos) e disponível.",
+              "ref": "ISO 14001:2015 4.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-DOC-04 Declaração de escopo",
+              "auto": null
+            },
+            {
+              "id": "i14_4_4",
+              "texto": "Processos do sistema e suas interações definidos.",
+              "ref": "ISO 14001:2015 4.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-DOC-05 Mapa de processos",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i14_c5",
+          "nome": "5 Liderança",
+          "criterios": [
+            {
+              "id": "i14_5",
+              "texto": "Direção demonstra compromisso: recursos, integração ao negócio, comunicação.",
+              "ref": "ISO 14001:2015 5.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-03 Ata da reunião de liderança",
+              "auto": null
+            },
+            {
+              "id": "i14_5_2",
+              "texto": "Política ambiental assinada com compromissos de proteção, cumprimento legal e melhoria.",
+              "ref": "ISO 14001:2015 5.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-DOC-06 Política ambiental",
+              "auto": null
+            },
+            {
+              "id": "i14_5_3",
+              "texto": "Papéis e autoridades atribuídos, incluindo quem reporta o desempenho à direção.",
+              "ref": "ISO 14001:2015 5.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-DOC-07 Papéis e responsabilidades",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i14_c6",
+          "nome": "6 Planejamento",
+          "criterios": [
+            {
+              "id": "i14_6",
+              "texto": "Riscos, oportunidades e emergências potenciais identificados e registrados.",
+              "ref": "ISO 14001:2015 6.1.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-05 Registro de riscos e oportunidades",
+              "auto": "riscos"
+            },
+            {
+              "id": "i14_6_asp",
+              "texto": "Aspectos e impactos levantados com perspectiva de ciclo de vida e critério de significância.",
+              "ref": "ISO 14001:2015 6.1.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-DOC-08 Aspectos e controles operacionais",
+              "auto": null
+            },
+            {
+              "id": "i14_6_leg",
+              "texto": "Requisitos legais e outros identificados, com acesso ao texto e licenças.",
+              "ref": "ISO 14001:2015 6.1.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-DOC-03 Registro de obrigações de conformidade",
+              "auto": null
+            },
+            {
+              "id": "i14_6_acao",
+              "texto": "Ações planejadas para aspectos significativos, obrigações e riscos.",
+              "ref": "ISO 14001:2015 6.1.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-ACT-01 Plano de ação",
+              "auto": null
+            },
+            {
+              "id": "i14_6_obj",
+              "texto": "Objetivos ambientais mensuráveis, com responsável, prazo, recursos e indicador.",
+              "ref": "ISO 14001:2015 6.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-04 e EMS-FRM-06 Objetivos e plano",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i14_c7",
+          "nome": "7 Apoio",
+          "criterios": [
+            {
+              "id": "i14_7",
+              "texto": "Recursos e competências definidos; necessidades de treinamento atendidas.",
+              "ref": "ISO 14001:2015 7.1 / 7.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-07 Competência e conscientização",
+              "auto": null
+            },
+            {
+              "id": "i14_7_3",
+              "texto": "Pessoas conhecem a política, os aspectos do seu trabalho e as consequências de falhas.",
+              "ref": "ISO 14001:2015 7.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de conscientização",
+              "auto": null
+            },
+            {
+              "id": "i14_7_4",
+              "texto": "Comunicação interna e externa planejada (o quê, quando, com quem, como) e registrada.",
+              "ref": "ISO 14001:2015 7.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-08 Comunicação",
+              "auto": null
+            },
+            {
+              "id": "i14_7_5",
+              "texto": "Informação documentada criada, aprovada e controlada, incluindo documentos externos.",
+              "ref": "ISO 14001:2015 7.5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-REG-01 Índice de documentos e registros",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i14_c8",
+          "nome": "8 Operação",
+          "criterios": [
+            {
+              "id": "i14_8",
+              "texto": "Critérios operacionais para processos com aspectos significativos, incluindo resíduos.",
+              "ref": "ISO 14001:2015 8.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-DOC-11 Controle operacional; registros de resíduos",
+              "auto": "residuos"
+            },
+            {
+              "id": "i14_8_ext",
+              "texto": "Processos terceirizados e fornecedores controlados; requisitos ambientais comunicados.",
+              "ref": "ISO 14001:2015 8.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-10 Requisitos a fornecedores",
+              "auto": null
+            },
+            {
+              "id": "i14_8_cv",
+              "texto": "Ciclo de vida considerado no projeto, compras, transporte, uso e descarte.",
+              "ref": "ISO 14001:2015 8.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Critérios de compra e projeto",
+              "auto": null
+            },
+            {
+              "id": "i14_8_2",
+              "texto": "Plano de emergência ambiental testado periodicamente e revisado após eventos.",
+              "ref": "ISO 14001:2015 8.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-09 Registro de teste/evento",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i14_c9",
+          "nome": "9 Avaliação de desempenho",
+          "criterios": [
+            {
+              "id": "i14_9",
+              "texto": "Plano de monitoramento com parâmetros, métodos, frequência e equipamentos calibrados.",
+              "ref": "ISO 14001:2015 9.1.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-11 Plano de monitoramento",
+              "auto": "medicao"
+            },
+            {
+              "id": "i14_9_leg",
+              "texto": "Avaliação periódica do atendimento legal com ações quando necessário.",
+              "ref": "ISO 14001:2015 9.1.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-12 Avaliação de conformidade",
+              "auto": null
+            },
+            {
+              "id": "i14_9_aud",
+              "texto": "Programa de auditoria interna com auditores imparciais e resultados reportados.",
+              "ref": "ISO 14001:2015 9.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-13 Auditoria interna",
+              "auto": null
+            },
+            {
+              "id": "i14_9_ac",
+              "texto": "Análise crítica pela direção com entradas e decisões registradas.",
+              "ref": "ISO 14001:2015 9.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-14 Análise crítica",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i14_c10",
+          "nome": "10 Melhoria",
+          "criterios": [
+            {
+              "id": "i14_10",
+              "texto": "Não conformidades tratadas: correção, análise de causa e verificação de eficácia.",
+              "ref": "ISO 14001:2015 10.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-15 Ação corretiva",
+              "auto": null
+            },
+            {
+              "id": "i14_10_3",
+              "texto": "Melhoria contínua evidenciada nos indicadores ambientais.",
+              "ref": "ISO 14001:2015 10.1 / 10.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "EMS-FRM-16 Registro de melhorias",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iso45001",
+      "nome": "ISO 45001:2018 (saúde e segurança)",
+      "edicao": "ISO 45001:2018 + Emenda 1:2024; integra com NR-1 (GRO/PGR) e NR-18 em obras",
+      "tipo": "iso",
+      "fonte_physis": [
+        "physis-hub/web/painel.html (CERT_LISTA anterior)"
+      ],
+      "grupos": [
+        {
+          "id": "i45_c4",
+          "nome": "4 Contexto",
+          "criterios": [
+            {
+              "id": "i45_4",
+              "texto": "Contexto (incluindo clima), necessidades dos trabalhadores e partes interessadas, e escopo definidos.",
+              "ref": "ISO 45001:2018 4.1–4.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de contexto e escopo",
+              "auto": "perfil"
+            }
+          ]
+        },
+        {
+          "id": "i45_c5",
+          "nome": "5 Liderança e participação",
+          "criterios": [
+            {
+              "id": "i45_5",
+              "texto": "Direção assume responsabilidade por prevenir lesões e doenças; política de SST assinada.",
+              "ref": "ISO 45001:2018 5.1 / 5.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Política de SST",
+              "auto": null
+            },
+            {
+              "id": "i45_5_3",
+              "texto": "Papéis de SST atribuídos (SESMT, CIPA, responsáveis de área).",
+              "ref": "ISO 45001:2018 5.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Organograma de SST",
+              "auto": null
+            },
+            {
+              "id": "i45_5_4",
+              "texto": "Trabalhadores consultados e participando da identificação de perigos e das decisões.",
+              "ref": "ISO 45001:2018 5.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Atas da CIPA, registros de consulta",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i45_c6",
+          "nome": "6 Planejamento",
+          "criterios": [
+            {
+              "id": "i45_6",
+              "texto": "Perigos identificados e riscos avaliados para todas as atividades, rotineiras ou não.",
+              "ref": "ISO 45001:2018 6.1.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "PGR / inventário de riscos (NR-1)",
+              "auto": "riscos"
+            },
+            {
+              "id": "i45_6_leg",
+              "texto": "Requisitos legais de SST (NRs) mapeados e acessíveis.",
+              "ref": "ISO 45001:2018 6.1.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Matriz de requisitos legais",
+              "auto": null
+            },
+            {
+              "id": "i45_6_obj",
+              "texto": "Objetivos de SST mensuráveis com plano de ação.",
+              "ref": "ISO 45001:2018 6.1.4 / 6.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de ação do PGR",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i45_c7",
+          "nome": "7 Apoio",
+          "criterios": [
+            {
+              "id": "i45_7",
+              "texto": "Competência, treinamentos obrigatórios (NRs) e conscientização registrados.",
+              "ref": "ISO 45001:2018 7.2 / 7.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Certificados de treinamento",
+              "auto": null
+            },
+            {
+              "id": "i45_7_4",
+              "texto": "Comunicação de SST e informação documentada controladas.",
+              "ref": "ISO 45001:2018 7.4 / 7.5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Procedimentos e registros",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i45_c8",
+          "nome": "8 Operação",
+          "criterios": [
+            {
+              "id": "i45_8",
+              "texto": "Controles seguem a hierarquia: eliminar, substituir, engenharia, administrativos, EPI.",
+              "ref": "ISO 45001:2018 8.1.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Procedimentos, permissões de trabalho, fichas de EPI",
+              "auto": null
+            },
+            {
+              "id": "i45_8_mud",
+              "texto": "Mudanças (processo, equipamento, layout) avaliadas antes de implantar.",
+              "ref": "ISO 45001:2018 8.1.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de gestão de mudanças",
+              "auto": null
+            },
+            {
+              "id": "i45_8_terc",
+              "texto": "Contratados e compras controlados quanto a SST.",
+              "ref": "ISO 45001:2018 8.1.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Requisitos de SST em contratos",
+              "auto": null
+            },
+            {
+              "id": "i45_8_2",
+              "texto": "Plano de emergência com brigada, simulados e revisão após eventos.",
+              "ref": "ISO 45001:2018 8.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de emergência, registros de simulado",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i45_c9",
+          "nome": "9 Avaliação",
+          "criterios": [
+            {
+              "id": "i45_9",
+              "texto": "Indicadores de SST monitorados e conformidade legal avaliada.",
+              "ref": "ISO 45001:2018 9.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Indicadores (taxa de frequência, gravidade)",
+              "auto": "medicao"
+            },
+            {
+              "id": "i45_9_aud",
+              "texto": "Auditoria interna e análise crítica pela direção.",
+              "ref": "ISO 45001:2018 9.2 / 9.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatórios de auditoria e ata",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i45_c10",
+          "nome": "10 Melhoria",
+          "criterios": [
+            {
+              "id": "i45_10",
+              "texto": "Incidentes investigados com participação dos trabalhadores e ações corretivas eficazes.",
+              "ref": "ISO 45001:2018 10.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatórios de investigação, CAT",
+              "auto": null
+            },
+            {
+              "id": "i45_10_3",
+              "texto": "Melhoria contínua do desempenho de SST demonstrada.",
+              "ref": "ISO 45001:2018 10.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Série histórica de indicadores",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iso22000",
+      "nome": "ISO 22000:2018 (segurança de alimentos)",
+      "edicao": "ISO 22000:2018 + Emenda 1:2024; PRP conforme ISO/TS 22002-1 e normas sanitárias brasileiras (RDC 275/2002, RDC 216/2004)",
+      "tipo": "iso",
+      "fonte_physis": [
+        "estrutura Annex SL + princípios APPCC do Codex (sem planilha Physis específica)"
+      ],
+      "grupos": [
+        {
+          "id": "i22_c4",
+          "nome": "4 Contexto",
+          "criterios": [
+            {
+              "id": "i22_4",
+              "texto": "Contexto, partes interessadas e escopo (produtos, linhas, locais) definidos.",
+              "ref": "ISO 22000:2018 4.1–4.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Declaração de escopo",
+              "auto": "perfil"
+            }
+          ]
+        },
+        {
+          "id": "i22_c5",
+          "nome": "5 Liderança",
+          "criterios": [
+            {
+              "id": "i22_5",
+              "texto": "Política de segurança de alimentos aprovada e comunicada.",
+              "ref": "ISO 22000:2018 5.1–5.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Política",
+              "auto": null
+            },
+            {
+              "id": "i22_5_3",
+              "texto": "Coordenador e equipe de segurança de alimentos nomeados.",
+              "ref": "ISO 22000:2018 5.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Carta de nomeação",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i22_c6",
+          "nome": "6 Planejamento",
+          "criterios": [
+            {
+              "id": "i22_6",
+              "texto": "Riscos do sistema e objetivos de segurança de alimentos planejados.",
+              "ref": "ISO 22000:2018 6.1–6.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Matriz de riscos e objetivos",
+              "auto": "riscos"
+            }
+          ]
+        },
+        {
+          "id": "i22_c7",
+          "nome": "7 Apoio",
+          "criterios": [
+            {
+              "id": "i22_7",
+              "texto": "Competência, infraestrutura, ambiente de trabalho e comunicação interna e externa (cadeia).",
+              "ref": "ISO 22000:2018 7.1–7.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de treinamento, comunicação com fornecedores",
+              "auto": null
+            },
+            {
+              "id": "i22_7_5",
+              "texto": "Documentos e registros controlados.",
+              "ref": "ISO 22000:2018 7.5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Lista mestra",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i22_prp",
+          "nome": "Programas de pré-requisitos e APPCC (HACCP)",
+          "criterios": [
+            {
+              "id": "i22_prp",
+              "texto": "Boas práticas implantadas: higiene, limpeza, pragas, água, saúde dos manipuladores, manutenção.",
+              "ref": "ISO 22000 8.2 / ISO/TS 22002-1 / RDC 275/2002",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Manual de boas práticas e POP",
+              "auto": null
+            },
+            {
+              "id": "i22_rast",
+              "texto": "Rastreabilidade de insumos e produtos uma etapa antes e depois.",
+              "ref": "ISO 22000 8.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Teste de rastreabilidade",
+              "auto": null
+            },
+            {
+              "id": "i22_emerg",
+              "texto": "Preparação para emergências que afetem a segurança do alimento.",
+              "ref": "ISO 22000 8.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de emergência",
+              "auto": null
+            },
+            {
+              "id": "i22_equipe",
+              "texto": "Equipe APPCC multidisciplinar e descrição de produtos, uso pretendido e fluxogramas verificados no local.",
+              "ref": "ISO 22000 8.5.1 / Codex etapas 1–5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Fluxogramas validados",
+              "auto": null
+            },
+            {
+              "id": "i22_perigos",
+              "texto": "Perigos biológicos, químicos, físicos e alergênicos analisados por etapa.",
+              "ref": "ISO 22000 8.5.2 / Codex princípio 1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Análise de perigos",
+              "auto": null
+            },
+            {
+              "id": "i22_pcc",
+              "texto": "Medidas de controle classificadas em PPRO ou PCC, com limites críticos validados.",
+              "ref": "ISO 22000 8.5.4 / Codex princípios 2–3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano APPCC",
+              "auto": null
+            },
+            {
+              "id": "i22_monit",
+              "texto": "Monitoramento, correções e ações corretivas definidas para cada PCC e PPRO.",
+              "ref": "ISO 22000 8.5.4 / 8.9 / Codex princípios 4–5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de monitoramento",
+              "auto": "medicao"
+            },
+            {
+              "id": "i22_verif",
+              "texto": "Verificação do plano e controle de produto potencialmente inseguro, incluindo recolhimento.",
+              "ref": "ISO 22000 8.8 / 8.9 / Codex princípios 6–7",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de verificação, teste de recall",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i22_c9",
+          "nome": "9 Avaliação de desempenho",
+          "criterios": [
+            {
+              "id": "i22_9",
+              "texto": "Análise dos resultados de verificação, auditoria interna e análise crítica pela direção.",
+              "ref": "ISO 22000:2018 9.1–9.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatórios e ata",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i22_c10",
+          "nome": "10 Melhoria",
+          "criterios": [
+            {
+              "id": "i22_10",
+              "texto": "Não conformidades corrigidas e sistema atualizado continuamente.",
+              "ref": "ISO 22000:2018 10.1–10.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de ações corretivas",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iso50001",
+      "nome": "ISO 50001:2018 (gestão de energia)",
+      "edicao": "ISO 50001:2018 + Emenda 1:2024. Inclui o roteiro de implementação em 7 passos e a avaliação de maturidade IGEA (13 elementos).",
+      "tipo": "iso",
+      "fonte_physis": [
+        "RECP_TOOL_translated_EN.xlsx (abas 15–20)",
+        "Projetos em desenvolvimento/Casa Physis - Net zero/TOOL PT -  Data collection Physis Engineering.xlsx",
+        "Projetos em desenvolvimento/Casa Physis - Net zero/IGEA_Compilation_Tool_v7.xlsx",
+        "Modulos em desenvolvimento/Certificação/ISO 50001/Step 1–7 (pastas de implementação)",
+        "Modulos em desenvolvimento/Certificação/ISO 50001/Step 2/Step 2.5.4 Prioritizing Energy Opportunities.xlsx",
+        "physis-hub/web/painel.html (CERT_LISTA anterior)"
+      ],
+      "grupos": [
+        {
+          "id": "i50_c4",
+          "nome": "4 Contexto",
+          "criterios": [
+            {
+              "id": "i50_4",
+              "texto": "Questões internas e externas (incluindo clima) e partes interessadas que afetam o desempenho energético.",
+              "ref": "ISO 50001:2018 4.1 / 4.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de contexto e partes interessadas",
+              "auto": "perfil"
+            },
+            {
+              "id": "i50_4_3",
+              "texto": "Escopo e fronteiras do sistema de gestão de energia definidos (unidades, processos, transporte).",
+              "ref": "ISO 50001:2018 4.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Declaração de escopo e fronteiras",
+              "auto": null
+            }
+          ],
+          "escala": "pdca"
+        },
+        {
+          "id": "i50_c5",
+          "nome": "5 Liderança",
+          "criterios": [
+            {
+              "id": "i50_5",
+              "texto": "Direção comprometida: aloca recursos, acompanha resultados em reuniões regulares e inclui energia no plano de negócio.",
+              "ref": "ISO 50001:2018 5.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Atas e plano de negócios 3–5 anos",
+              "auto": null
+            },
+            {
+              "id": "i50_5_2",
+              "texto": "Política energética assinada, com compromisso de melhoria e de compras eficientes.",
+              "ref": "ISO 50001:2018 5.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Política energética",
+              "auto": null
+            },
+            {
+              "id": "i50_5_3",
+              "texto": "Gestor de energia e equipe multifuncional nomeados, com mandato e reuniões periódicas.",
+              "ref": "ISO 50001:2018 5.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Carta de nomeação, atas da equipe de energia",
+              "auto": null
+            }
+          ],
+          "escala": "pdca"
+        },
+        {
+          "id": "i50_c6",
+          "nome": "6 Planejamento",
+          "criterios": [
+            {
+              "id": "i50_6_1",
+              "texto": "Riscos e oportunidades do sistema e requisitos legais de energia identificados e atualizados.",
+              "ref": "ISO 50001:2018 6.1 / 9.1.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Matriz de requisitos legais",
+              "auto": "riscos"
+            },
+            {
+              "id": "i50_6",
+              "texto": "Revisão energética: fontes, usos e consumo histórico analisados; usos significativos (USE) identificados.",
+              "ref": "ISO 50001:2018 6.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório de revisão energética",
+              "auto": "energia_hist"
+            },
+            {
+              "id": "i50_6_var",
+              "texto": "Variáveis relevantes de cada USE identificadas (clima, produção, ocupação, horas).",
+              "ref": "ISO 50001:2018 6.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Lista de variáveis por USE",
+              "auto": null
+            },
+            {
+              "id": "i50_6_opt",
+              "texto": "Oportunidades de melhoria listadas e priorizadas por critérios (economia, prazo, retorno, impacto).",
+              "ref": "ISO 50001:2018 6.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Planilha de priorização (Step 2.5.4)",
+              "auto": "custos"
+            },
+            {
+              "id": "i50_6_obj",
+              "texto": "Objetivos e metas energéticas mensuráveis aprovados, com planos de ação e verificação de resultado.",
+              "ref": "ISO 50001:2018 6.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de ação energética",
+              "auto": null
+            },
+            {
+              "id": "i50_6_enpi",
+              "texto": "Indicadores de desempenho energético (EnPI) definidos, normalizados e revisados.",
+              "ref": "ISO 50001:2018 6.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Planilha de EnPI",
+              "auto": null
+            },
+            {
+              "id": "i50_6_enb",
+              "texto": "Linha de base energética estabelecida, com regra de ajuste em mudanças relevantes.",
+              "ref": "ISO 50001:2018 6.5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Linha de base e procedimento de ajuste",
+              "auto": "energia_hist"
+            },
+            {
+              "id": "i50_6_6",
+              "texto": "Plano de coleta de dados: o que medir, frequência, responsável e registros.",
+              "ref": "ISO 50001:2018 6.6",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de medição e coleta",
+              "auto": null
+            }
+          ],
+          "escala": "pdca"
+        },
+        {
+          "id": "i50_c7",
+          "nome": "7 Apoio",
+          "criterios": [
+            {
+              "id": "i50_7",
+              "texto": "Competência de quem afeta os USE definida; plano de treinamento priorizado e registrado.",
+              "ref": "ISO 50001:2018 7.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Matriz de treinamento",
+              "auto": null
+            },
+            {
+              "id": "i50_7_3",
+              "texto": "Funcionários sabem como influenciam o consumo em sua área; campanhas de conscientização feitas.",
+              "ref": "ISO 50001:2018 7.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de campanhas",
+              "auto": null
+            },
+            {
+              "id": "i50_7_4",
+              "texto": "Comunicação interna planejada e canal para sugestões de melhoria.",
+              "ref": "ISO 50001:2018 7.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de comunicação, formulário de sugestões",
+              "auto": null
+            },
+            {
+              "id": "i50_7_5",
+              "texto": "Documentos e registros de energia controlados e fáceis de localizar.",
+              "ref": "ISO 50001:2018 7.5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Índice de documentos e registros",
+              "auto": null
+            }
+          ],
+          "escala": "pdca"
+        },
+        {
+          "id": "i50_c8",
+          "nome": "8 Operação",
+          "criterios": [
+            {
+              "id": "i50_8",
+              "texto": "Critérios de operação e manutenção dos USE definidos e comunicados (vazamentos, ociosidade).",
+              "ref": "ISO 50001:2018 8.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Instruções operacionais por USE",
+              "auto": null
+            },
+            {
+              "id": "i50_8_2",
+              "texto": "Desempenho energético considerado em projetos novos, reformas e modificações.",
+              "ref": "ISO 50001:2018 8.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Checklist de energia no projeto",
+              "auto": null
+            },
+            {
+              "id": "i50_8_3",
+              "texto": "Compras de equipamentos e energia com critério de eficiência e custo de ciclo de vida.",
+              "ref": "ISO 50001:2018 8.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Planilha de custo de ciclo de vida",
+              "auto": "custos"
+            }
+          ],
+          "escala": "pdca"
+        },
+        {
+          "id": "i50_c9",
+          "nome": "9 Avaliação de desempenho",
+          "criterios": [
+            {
+              "id": "i50_9",
+              "texto": "Submedição dos USE, equipamentos calibrados, análise de desvios com ação.",
+              "ref": "ISO 50001:2018 9.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de medição, certificados de calibração",
+              "auto": "medicao"
+            },
+            {
+              "id": "i50_9_aud",
+              "texto": "Auditoria interna com auditores imparciais e resultados reportados à direção.",
+              "ref": "ISO 50001:2018 9.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Programa e relatórios de auditoria",
+              "auto": null
+            },
+            {
+              "id": "i50_9_3",
+              "texto": "Análise crítica pela direção ao menos anual, com pauta definida e decisões.",
+              "ref": "ISO 50001:2018 9.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Ata da análise crítica",
+              "auto": null
+            }
+          ],
+          "escala": "pdca"
+        },
+        {
+          "id": "i50_c10",
+          "nome": "10 Melhoria",
+          "criterios": [
+            {
+              "id": "i50_10",
+              "texto": "Não conformidades tratadas com análise de causa e verificação de eficácia.",
+              "ref": "ISO 50001:2018 10.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de ações corretivas",
+              "auto": null
+            },
+            {
+              "id": "i50_10_2",
+              "texto": "Melhoria contínua do desempenho energético demonstrada pelos EnPI.",
+              "ref": "ISO 50001:2018 10.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Série histórica de EnPI",
+              "auto": "energia_hist"
+            }
+          ],
+          "escala": "pdca"
+        },
+        {
+          "id": "i50_passos",
+          "nome": "Implementação em 7 passos (roteiro Physis)",
+          "criterios": [
+            {
+              "id": "i50_p1",
+              "texto": "Passo 1 – Começar: apoio da direção, escopo, equipe, política e plano de implementação.",
+              "ref": "Step 1 (1.1–1.4)",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Roster da equipe, política, plano de implementação",
+              "auto": null
+            },
+            {
+              "id": "i50_p2",
+              "texto": "Passo 2 – Planejamento energético: requisitos legais, dados, USE, oportunidades priorizadas, EnPI e linha de base.",
+              "ref": "Step 2 (2.1–2.6)",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Matriz legal, balanço energético, priorização 2.5.4",
+              "auto": "energia_hist"
+            },
+            {
+              "id": "i50_p3",
+              "texto": "Passo 3 – Objetivos, metas e planos de ação aprovados pela direção.",
+              "ref": "Step 3 (3.1–3.2)",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Plano de ação energética",
+              "auto": null
+            },
+            {
+              "id": "i50_p4",
+              "texto": "Passo 4 – Verificação de realidade: recursos e prazos conferidos com a direção.",
+              "ref": "Step 4 (4.1–4.4)",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Checklist de verificação, pauta de revisão",
+              "auto": null
+            },
+            {
+              "id": "i50_p5",
+              "texto": "Passo 5 – Implantar controles: documentos, operação dos USE, competência, compras, projeto e comunicação.",
+              "ref": "Step 5 (5.1–5.9)",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Índices de documentos, planilhas de controle de USE",
+              "auto": null
+            },
+            {
+              "id": "i50_p6",
+              "texto": "Passo 6 – Verificar: medição, calibração, conformidade legal, auditoria interna e ações corretivas.",
+              "ref": "Step 6 (6.1–6.5)",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Plano de medição, plano de calibração, registros CA/PA",
+              "auto": "medicao"
+            },
+            {
+              "id": "i50_p7",
+              "texto": "Passo 7 – Análise crítica pela direção e decisão de certificar.",
+              "ref": "Step 7 (7.1–7.2)",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Relatório de análise crítica",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "i50_igea",
+          "nome": "Maturidade do sistema de gestão de energia (IGEA, 1 a 5)",
+          "criterios": [
+            {
+              "id": "igea_01",
+              "texto": "Contexto e partes interessadas compreendidos.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 4.1–4.2",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": "perfil"
+            },
+            {
+              "id": "igea_02",
+              "texto": "Liderança e compromisso visíveis da direção.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 5.1",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": null
+            },
+            {
+              "id": "igea_03",
+              "texto": "Política energética documentada e comunicada.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 5.2",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": null
+            },
+            {
+              "id": "igea_04",
+              "texto": "Papéis, responsabilidades e autoridade definidos.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 5.3",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": null
+            },
+            {
+              "id": "igea_05",
+              "texto": "Revisão energética sistemática.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 6.3",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": "energia_hist"
+            },
+            {
+              "id": "igea_06",
+              "texto": "Linha de base e EnPI conforme ISO 50006.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 6.4–6.5",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": "energia_hist"
+            },
+            {
+              "id": "igea_07",
+              "texto": "Objetivos e metas energéticas.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 6.2",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": null
+            },
+            {
+              "id": "igea_08",
+              "texto": "Competência e conscientização da equipe.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 7.2–7.3",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": null
+            },
+            {
+              "id": "igea_09",
+              "texto": "Planejamento e controle operacional.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 8.1",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": null
+            },
+            {
+              "id": "igea_10",
+              "texto": "Projeto e compras de equipamentos eficientes.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 8.2–8.3",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": "custos"
+            },
+            {
+              "id": "igea_11",
+              "texto": "Monitoramento, medição e análise.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 9.1",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": "medicao"
+            },
+            {
+              "id": "igea_12",
+              "texto": "Análise crítica pela direção.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 9.3",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": null
+            },
+            {
+              "id": "igea_13",
+              "texto": "Não conformidade e ação corretiva.",
+              "ref": "IGEA 09_EnMS_Assessment · ISO 50001:2018 10.1",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Evidência revisada e ações recomendadas (aba 09)",
+              "auto": null
+            }
+          ],
+          "escala": "maturidade"
+        }
+      ]
+    },
+    {
+      "id": "netzero",
+      "nome": "Net zero (ISO 14068-1 · IWA 42)",
+      "edicao": "Checklist Physis baseado em GHG Protocol, ISO 14064-1:2018, ISO 14068-1:2023 e IWA 42:2022",
+      "tipo": "netzero",
+      "fonte_physis": [
+        "Modulos base/SustainKit_Pacote_2026-11-13.zip (Tela do cliente)",
+        "RECP_TOOL_translated_EN.xlsx (abas 15–20)",
+        "aba Carbono do Sistema Physis"
+      ],
+      "grupos": [
+        {
+          "id": "nz_inv",
+          "nome": "Inventário de emissões",
+          "criterios": [
+            {
+              "id": "nz_limites",
+              "texto": "Limites organizacionais (controle ou participação) e operacionais definidos.",
+              "ref": "GHG Protocol / ISO 14064-1 cl. 5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório de inventário – limites",
+              "auto": "perfil"
+            },
+            {
+              "id": "nz_esc1",
+              "texto": "Escopo 1 quantificado: combustíveis, veículos, gás, refrigerantes, processos.",
+              "ref": "ISO 14064-1 – emissões diretas",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Planilha de inventário",
+              "auto": "carbono"
+            },
+            {
+              "id": "nz_esc2",
+              "texto": "Escopo 2 quantificado pelos métodos localização e mercado.",
+              "ref": "GHG Protocol Escopo 2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Contas de energia, contratos/I-REC",
+              "auto": "energia_hist"
+            },
+            {
+              "id": "nz_esc3",
+              "texto": "Escopo 3: triagem das 15 categorias e quantificação das relevantes.",
+              "ref": "GHG Protocol Escopo 3 / ISO 14064-1 cat. 3–6",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Triagem de relevância do escopo 3",
+              "auto": null
+            },
+            {
+              "id": "nz_ano_base",
+              "texto": "Ano-base escolhido, justificado e com regra de recálculo.",
+              "ref": "ISO 14064-1 – ano-base",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Política de recálculo",
+              "auto": null
+            },
+            {
+              "id": "nz_fatores",
+              "texto": "Fatores de emissão e GWP atualizados (IPCC AR6) e qualidade dos dados avaliada.",
+              "ref": "ISO 14064-1 – quantificação",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Lista de fatores e fontes",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "nz_metas",
+          "nome": "Metas",
+          "criterios": [
+            {
+              "id": "nz_meta_curta",
+              "texto": "Meta de curto prazo (5–10 anos) alinhada a 1,5 °C cobrindo escopos 1, 2 e 3 relevantes.",
+              "ref": "IWA 42 / SBTi",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Declaração de metas aprovada",
+              "auto": null
+            },
+            {
+              "id": "nz_meta_longa",
+              "texto": "Meta net zero de longo prazo com redução profunda (ordem de 90%) antes de neutralizar o residual.",
+              "ref": "IWA 42 / SBTi Net-Zero",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de transição",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "nz_reducao",
+          "nome": "Plano de redução (reduzir antes de compensar)",
+          "criterios": [
+            {
+              "id": "nz_ef",
+              "texto": "Eficiência energética priorizada e quantificada por medida.",
+              "ref": "ISO 14068-1 – hierarquia de mitigação",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Lista de medidas com custos e economia",
+              "auto": "custos"
+            },
+            {
+              "id": "nz_ren",
+              "texto": "Eletricidade renovável: geração própria ou contratos com rastreabilidade.",
+              "ref": "Redução de escopo 2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Geração FV, contratos, certificados",
+              "auto": "solar"
+            },
+            {
+              "id": "nz_eletr",
+              "texto": "Eletrificação de usos térmicos e frota.",
+              "ref": "Redução de escopo 1",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Plano de eletrificação",
+              "auto": null
+            },
+            {
+              "id": "nz_resid",
+              "texto": "Resíduos desviados do aterro e orgânicos tratados (compostagem/biodigestão).",
+              "ref": "Escopo 3 cat. 5",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Registros de destinação",
+              "auto": "residuos50"
+            },
+            {
+              "id": "nz_cadeia",
+              "texto": "Engajamento de fornecedores e escolha de materiais de baixo carbono.",
+              "ref": "Escopo 3 cat. 1–2",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Critérios de compra",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "nz_neutral",
+          "nome": "Neutralização e compensação",
+          "criterios": [
+            {
+              "id": "nz_so_residual",
+              "texto": "Créditos usados apenas para emissões residuais ou além da cadeia de valor, nunca no lugar da redução.",
+              "ref": "ISO 14068-1 / IWA 42",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Cálculo do residual",
+              "auto": null
+            },
+            {
+              "id": "nz_remocao",
+              "texto": "Residual neutralizado com remoções de carbono de longa permanência.",
+              "ref": "IWA 42 – neutralização",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Projetos de remoção selecionados",
+              "auto": null
+            },
+            {
+              "id": "nz_qualidade",
+              "texto": "Créditos com adicionalidade, permanência, sem dupla contagem e rotulados como de alta integridade.",
+              "ref": "ISO 14068-1 – créditos / ICVCM CCP",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Certificados e due diligence",
+              "auto": null
+            },
+            {
+              "id": "nz_aposent",
+              "texto": "Créditos aposentados em registro público em nome da organização.",
+              "ref": "ISO 14068-1 – aposentadoria",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Comprovante de aposentadoria",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "nz_verif",
+          "nome": "Verificação e comunicação",
+          "criterios": [
+            {
+              "id": "nz_verif3",
+              "texto": "Inventário verificado por terceira parte (garantia limitada ou razoável).",
+              "ref": "ISO 14064-3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Declaração de verificação",
+              "auto": null
+            },
+            {
+              "id": "nz_claim",
+              "texto": "Alegação pública só após cumprir os requisitos; texto claro sobre escopo, período e uso de créditos.",
+              "ref": "ISO 14068-1 – declaração / IWA 42",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório de neutralidade / declaração pública",
+              "auto": null
+            },
+            {
+              "id": "nz_anual",
+              "texto": "Relato anual de progresso frente à meta e ao ano-base.",
+              "ref": "IWA 42 – transparência",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório anual de progresso",
+              "auto": "carbono"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leed",
+      "nome": "LEED v5 BD+C (nova construção)",
+      "edicao": "LEED v5 BD+C NC, 2025 (revisão jul/2026). Níveis: Certified 40, Silver 50, Gold 60, Platinum 80 de 110 pontos. Projetos já registrados em v4.1 seguem a versão legada.",
+      "tipo": "selo",
+      "fonte_physis": [
+        "Modulos em desenvolvimento/Certificação/LEED/LEED_v5_Scorecard_BDC_New_Construction.xlsx",
+        "Modulos em desenvolvimento/GapAnalysis_Bioconstrucao_Physis_v4.xlsx",
+        "physis-hub/web/painel.html (CERT_LISTA anterior)"
+      ],
+      "grupos": [
+        {
+          "id": "leed_ip",
+          "nome": "Processo integrativo, planejamento e avaliações (IP)",
+          "criterios": [
+            {
+              "id": "leed_ipp1",
+              "texto": "Avaliação de riscos climáticos do local (calor, chuva extrema, deslizamento) com plano de adaptação no projeto.",
+              "ref": "LEED v5 BD+C IPp1 Climate Resilience Assessment",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório de avaliação de riscos climáticos",
+              "auto": "riscos"
+            },
+            {
+              "id": "leed_ipp2",
+              "texto": "Avaliação dos impactos do projeto sobre pessoas: comunidade do entorno, usuários e acessibilidade.",
+              "ref": "LEED v5 BD+C IPp2 Human Impact Assessment",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório de impacto humano",
+              "auto": null
+            },
+            {
+              "id": "leed_ipp3",
+              "texto": "Metas de carbono definidas cedo: operação e carbono incorporado estimados para orientar decisões.",
+              "ref": "LEED v5 BD+C IPp3 Carbon Assessment",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Avaliação de carbono do projeto",
+              "auto": "carbono"
+            },
+            {
+              "id": "leed_ipc1",
+              "texto": "Equipe multidisciplinar reunida desde o conceito, com oficinas e metas integradas de desempenho.",
+              "ref": "LEED v5 BD+C IPc1 Integrative Design Process",
+              "pontos": 1,
+              "obrigatorio": false,
+              "evidencia": "Atas de oficina integrativa e metas",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "leed_lt",
+          "nome": "Localização e transporte (LT)",
+          "criterios": [
+            {
+              "id": "leed_ltc1",
+              "texto": "Evitar áreas sensíveis (vegetação nativa, várzea, habitat) ou implantar em terreno já alterado.",
+              "ref": "LEED v5 BD+C LTc1 Sensitive Land Protection",
+              "pontos": 1,
+              "obrigatorio": false,
+              "evidencia": "Mapa de uso do solo e restrições",
+              "auto": null
+            },
+            {
+              "id": "leed_ltc2",
+              "texto": "Contribuir para desenvolvimento equitativo: moradia acessível, comércio local ou benefício à comunidade.",
+              "ref": "LEED v5 BD+C LTc2 Equitable Development",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_ltc3",
+              "texto": "Lote em área urbana densa e conectada, com serviços a pé e infraestrutura existente.",
+              "ref": "LEED v5 BD+C LTc3 Compact and Connected Development",
+              "pontos": 6,
+              "obrigatorio": false,
+              "evidencia": "Mapa de densidade e serviços próximos",
+              "auto": "perfil"
+            },
+            {
+              "id": "leed_loc",
+              "texto": "Plano de mobilidade: transporte coletivo, bicicleta, vagas reduzidas ou compartilhadas.",
+              "ref": "LEED v5 BD+C LTc4 Transportation Demand Management",
+              "pontos": 4,
+              "obrigatorio": false,
+              "evidencia": "Plano de gestão da demanda de transporte",
+              "auto": null
+            },
+            {
+              "id": "leed_ltc5",
+              "texto": "Recarga para veículos elétricos e infraestrutura preparada para ampliação.",
+              "ref": "LEED v5 BD+C LTc5 Electric Vehicles",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "Projeto elétrico com pontos de recarga",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "leed_ss",
+          "nome": "Terreno sustentável (SS)",
+          "criterios": [
+            {
+              "id": "leed_sitio",
+              "texto": "Proteger solo e vegetação durante a obra; limitar área de intervenção e controlar erosão e sedimentos.",
+              "ref": "LEED v5 BD+C SSp1 Minimize Site Disturbance",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de controle de erosão e canteiro",
+              "auto": null
+            },
+            {
+              "id": "leed_ssc1",
+              "texto": "Restaurar ou criar habitat com espécies nativas e proteger biodiversidade.",
+              "ref": "LEED v5 BD+C SSc1 Biodiverse Habitat",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "Projeto paisagístico com espécies nativas",
+              "auto": null
+            },
+            {
+              "id": "leed_ssc2",
+              "texto": "Área externa acessível e utilizável pelos ocupantes.",
+              "ref": "LEED v5 BD+C SSc2 Accessible Outdoor Space",
+              "pontos": 1,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_ssc3",
+              "texto": "Reter e infiltrar chuva no lote (jardins de chuva, telhado verde, pavimento permeável).",
+              "ref": "LEED v5 BD+C SSc3 Rainwater Management",
+              "pontos": 3,
+              "obrigatorio": false,
+              "evidencia": "Memória de cálculo de drenagem",
+              "auto": "agua"
+            },
+            {
+              "id": "leed_ssc4",
+              "texto": "Projeto do terreno resiliente a eventos extremos identificados na avaliação climática.",
+              "ref": "LEED v5 BD+C SSc4 Enhanced Resilient Site Design",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "Medidas de resiliência no projeto",
+              "auto": "riscos"
+            },
+            {
+              "id": "leed_ssc5",
+              "texto": "Reduzir ilha de calor com cobertura refletiva ou vegetada e sombreamento de pisos.",
+              "ref": "LEED v5 BD+C SSc5 Heat Island Reduction",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_ssc6",
+              "texto": "Iluminação externa sem ofuscamento nem luz para o céu.",
+              "ref": "LEED v5 BD+C SSc6 Light Pollution Reduction",
+              "pontos": 1,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "leed_we",
+          "nome": "Eficiência hídrica (WE)",
+          "criterios": [
+            {
+              "id": "leed_wep1",
+              "texto": "Medidor geral de água e compromisso de compartilhar dados de consumo.",
+              "ref": "LEED v5 BD+C WEp1 Water Metering and Reporting",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Projeto com hidrômetro e termo de compartilhamento",
+              "auto": "medicao"
+            },
+            {
+              "id": "leed_wep2",
+              "texto": "Redução mínima do consumo de água interno e de irrigação frente à referência.",
+              "ref": "LEED v5 BD+C WEp2 Minimum Water Efficiency",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Calculadora de louças e metais",
+              "auto": "agua"
+            },
+            {
+              "id": "leed_wec1",
+              "texto": "Submedição dos principais usos de água e detecção de vazamentos.",
+              "ref": "LEED v5 BD+C WEc1 Water Metering and Leak Detection",
+              "pontos": 1,
+              "obrigatorio": false,
+              "evidencia": "Projeto de submedição",
+              "auto": "medicao"
+            },
+            {
+              "id": "leed_agua",
+              "texto": "Redução adicional do consumo total de água, incluindo fontes alternativas (chuva, reúso).",
+              "ref": "LEED v5 BD+C WEc2 Enhanced Water Efficiency",
+              "pontos": 8,
+              "obrigatorio": false,
+              "evidencia": "Calculadora de uso de água do projeto",
+              "auto": "agua"
+            }
+          ]
+        },
+        {
+          "id": "leed_ea",
+          "nome": "Energia e atmosfera (EA)",
+          "criterios": [
+            {
+              "id": "leed_carbono",
+              "texto": "Projeção do carbono operacional e plano de descarbonização de longo prazo.",
+              "ref": "LEED v5 BD+C EAp1 Operational Carbon Projection and Decarbonization Plan",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de descarbonização",
+              "auto": "carbono"
+            },
+            {
+              "id": "leed_eap2",
+              "texto": "Desempenho energético mínimo exigido (norma de referência ou simulação).",
+              "ref": "LEED v5 BD+C EAp2 Minimum Energy Efficiency",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Simulação energética ou rota prescritiva",
+              "auto": null
+            },
+            {
+              "id": "leed_eap3",
+              "texto": "Comissionamento básico dos sistemas de energia e água.",
+              "ref": "LEED v5 BD+C EAp3 Fundamental Commissioning",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano e relatório de comissionamento",
+              "auto": null
+            },
+            {
+              "id": "leed_eap4",
+              "texto": "Medição de energia do edifício e compartilhamento dos dados.",
+              "ref": "LEED v5 BD+C EAp4 Energy Metering and Reporting",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Projeto de medição",
+              "auto": "medicao"
+            },
+            {
+              "id": "leed_eap5",
+              "texto": "Sem CFC e controle básico dos fluidos refrigerantes.",
+              "ref": "LEED v5 BD+C EAp5 Fundamental Refrigerant Management",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Inventário de refrigerantes",
+              "auto": null
+            },
+            {
+              "id": "leed_eac1",
+              "texto": "Eletrificar usos (aquecimento, cocção, água quente) eliminando combustão no local.",
+              "ref": "LEED v5 BD+C EAc1 Electrification",
+              "pontos": 5,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_eac2",
+              "texto": "Reduzir cargas térmicas de pico com envoltória e projeto passivo.",
+              "ref": "LEED v5 BD+C EAc2 Reduce Peak Thermal Loads",
+              "pontos": 5,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_energia",
+              "texto": "Desempenho energético além do mínimo, comprovado por simulação ou medidas prescritivas.",
+              "ref": "LEED v5 BD+C EAc3 Enhanced Energy Efficiency",
+              "pontos": 10,
+              "obrigatorio": false,
+              "evidencia": "Relatório de simulação",
+              "auto": "energia_hist"
+            },
+            {
+              "id": "leed_eac4",
+              "texto": "Energia renovável gerada no local ou contratada por longo prazo.",
+              "ref": "LEED v5 BD+C EAc4 Renewable Energy",
+              "pontos": 5,
+              "obrigatorio": false,
+              "evidencia": "Calculadora de renováveis / contrato",
+              "auto": "solar"
+            },
+            {
+              "id": "leed_eac5",
+              "texto": "Comissionamento ampliado, incluindo envoltória e monitoramento contínuo.",
+              "ref": "LEED v5 BD+C EAc5 Enhanced Commissioning",
+              "pontos": 4,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_eac6",
+              "texto": "Capacidade de interagir com a rede: deslocar carga, armazenar energia, responder a sinais.",
+              "ref": "LEED v5 BD+C EAc6 Grid Interactive",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_eac7",
+              "texto": "Refrigerantes de baixo potencial de aquecimento e baixo vazamento.",
+              "ref": "LEED v5 BD+C EAc7 Enhanced Refrigerant Management",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "leed_mr",
+          "nome": "Materiais e recursos (MR)",
+          "criterios": [
+            {
+              "id": "leed_mrp1",
+              "texto": "Plano para operação lixo zero: espaços de separação e coleta de recicláveis e orgânicos.",
+              "ref": "LEED v5 BD+C MRp1 Planning for Zero Waste Operations",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de resíduos da operação",
+              "auto": "residuos"
+            },
+            {
+              "id": "leed_mrp2",
+              "texto": "Quantificar o carbono incorporado da estrutura e envoltória.",
+              "ref": "LEED v5 BD+C MRp2 Quantify and Assess Embodied Carbon",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Calculadora de carbono incorporado / ACV",
+              "auto": null
+            },
+            {
+              "id": "leed_mrc1",
+              "texto": "Reaproveitar edificação existente ou materiais recuperados.",
+              "ref": "LEED v5 BD+C MRc1 Building and Materials Reuse",
+              "pontos": 3,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_mat",
+              "texto": "Reduzir o carbono incorporado frente à linha de base (ACV de edifício ou produtos com DAP).",
+              "ref": "LEED v5 BD+C MRc2 Reduce Embodied Carbon",
+              "pontos": 6,
+              "obrigatorio": false,
+              "evidencia": "ACV comparativa, DAPs (EPD)",
+              "auto": null
+            },
+            {
+              "id": "leed_mrc3",
+              "texto": "Materiais internos de baixa emissão (tintas, adesivos, pisos, madeira composta).",
+              "ref": "LEED v5 BD+C MRc3 Low-Emitting Materials",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "Fichas técnicas e laudos de emissão",
+              "auto": null
+            },
+            {
+              "id": "leed_mrc4",
+              "texto": "Produtos com divulgação ambiental e origem responsável (DAP, madeira certificada, reciclado).",
+              "ref": "LEED v5 BD+C MRc4 Building Product Selection and Procurement",
+              "pontos": 5,
+              "obrigatorio": false,
+              "evidencia": "Calculadora de produtos, certificados FSC",
+              "auto": null
+            },
+            {
+              "id": "leed_resid",
+              "texto": "Desviar do aterro resíduos de construção e demolição.",
+              "ref": "LEED v5 BD+C MRc5 Construction and Demolition Waste Diversion",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "Calculadora de desvio e comprovantes de destinação",
+              "auto": "residuos50"
+            }
+          ]
+        },
+        {
+          "id": "leed_eq",
+          "nome": "Qualidade ambiental interna (EQ)",
+          "criterios": [
+            {
+              "id": "leed_eqp1",
+              "texto": "Gestão da obra para proteger a qualidade do ar e materiais (umidade, poeira, dutos).",
+              "ref": "LEED v5 BD+C EQp1 Construction Management",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Checklist de gestão da obra",
+              "auto": null
+            },
+            {
+              "id": "leed_eqp2",
+              "texto": "Ventilação mínima e filtragem adequadas ao uso.",
+              "ref": "LEED v5 BD+C EQp2 Fundamental Air Quality",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Cálculo de ventilação",
+              "auto": null
+            },
+            {
+              "id": "leed_eqp3",
+              "texto": "Proibição de fumo e de veículos ligados em marcha lenta junto às tomadas de ar.",
+              "ref": "LEED v5 BD+C EQp3 No Smoking or Vehicle Idling",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Política e sinalização",
+              "auto": null
+            },
+            {
+              "id": "leed_qai",
+              "texto": "Qualidade do ar reforçada (mais ventilação, filtragem superior, controle de fontes).",
+              "ref": "LEED v5 BD+C EQc1 Enhanced Air Quality",
+              "pontos": 1,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_eqc2",
+              "texto": "Experiência do ocupante: luz natural, vistas, conforto térmico, acústico e iluminação.",
+              "ref": "LEED v5 BD+C EQc2 Occupant Experience",
+              "pontos": 7,
+              "obrigatorio": false,
+              "evidencia": "Calculadoras de luz natural, vistas e acústica",
+              "auto": null
+            },
+            {
+              "id": "leed_eqc3",
+              "texto": "Espaços acessíveis e inclusivos além do mínimo legal.",
+              "ref": "LEED v5 BD+C EQc3 Accessibility and Inclusion",
+              "pontos": 1,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_eqc4",
+              "texto": "Espaços que funcionam em falta de energia ou água (refúgio, ventilação passiva).",
+              "ref": "LEED v5 BD+C EQc4 Resilient Spaces",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": "riscos"
+            },
+            {
+              "id": "leed_eqc5",
+              "texto": "Ensaios de qualidade do ar antes da ocupação e monitoramento contínuo.",
+              "ref": "LEED v5 BD+C EQc5 Air Quality Testing and Monitoring",
+              "pontos": 2,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "leed_pr",
+          "nome": "Prioridades do projeto e processo (PR)",
+          "criterios": [
+            {
+              "id": "leed_prc1",
+              "texto": "Créditos de prioridade regional ou estratégias inovadoras escolhidas pelo projeto (até 9 pontos).",
+              "ref": "LEED v5 BD+C PRc1 Project Priorities",
+              "pontos": 9,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "leed_prc2",
+              "texto": "Profissional LEED AP com especialidade atuando no projeto.",
+              "ref": "LEED v5 BD+C PRc2 LEED AP",
+              "pontos": 1,
+              "obrigatorio": false,
+              "evidencia": "Credencial LEED AP",
+              "auto": null
+            },
+            {
+              "id": "leed_reg",
+              "texto": "Projeto registrado na plataforma da certificadora antes da obra, com meta de nível definida.",
+              "ref": "LEED v5 BD+C Registro / níveis Certified–Platinum",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Comprovante de registro",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "leed_zero",
+      "nome": "LEED Zero",
+      "edicao": "Programa LEED Zero (GBCI) – verificação de 12 meses de operação; conferir regras para projetos LEED v5",
+      "tipo": "selo",
+      "fonte_physis": [
+        "Modulos em desenvolvimento/Certificação/LEED/ (pasta de referência)"
+      ],
+      "grupos": [
+        {
+          "id": "lz_base",
+          "nome": "Pré-condições",
+          "criterios": [
+            {
+              "id": "lz_cert",
+              "texto": "Projeto com certificação LEED (BD+C ou O+M) ou em processo.",
+              "ref": "LEED Zero – elegibilidade",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Certificado LEED",
+              "auto": null
+            },
+            {
+              "id": "lz_dados",
+              "texto": "12 meses de dados de operação registrados na plataforma de desempenho.",
+              "ref": "LEED Zero – período de desempenho",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatórios da plataforma",
+              "auto": "medicao"
+            },
+            {
+              "id": "lz_medidor",
+              "texto": "Medição contínua de energia, água e resíduos que permita fechar o balanço anual.",
+              "ref": "LEED Zero – dados de desempenho",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Medidores e planilhas de resíduos",
+              "auto": "energia_hist"
+            },
+            {
+              "id": "lz_renov",
+              "texto": "Selo válido por tempo limitado; renovação com novo período de dados verificado.",
+              "ref": "LEED Zero – validade e renovação",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Cronograma de renovação",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "lz_cat",
+          "nome": "Categorias (escolher uma ou mais)",
+          "criterios": [
+            {
+              "id": "lz_carbono",
+              "texto": "Emissões de energia (e opcionalmente transporte) compensadas por carbono evitado em 12 meses.",
+              "ref": "LEED Zero – Zero Carbon",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Balanço de carbono, certificados",
+              "auto": "carbono"
+            },
+            {
+              "id": "lz_energia",
+              "texto": "Energia de fonte renovável igual ou maior que o consumo em 12 meses.",
+              "ref": "LEED Zero – Zero Energy",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Balanço de energia, geração FV",
+              "auto": "solar"
+            },
+            {
+              "id": "lz_agua",
+              "texto": "Água potável consumida reposta por fontes alternativas ou devolvida em 12 meses.",
+              "ref": "LEED Zero – Zero Water",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Balanço hídrico",
+              "auto": "agua"
+            },
+            {
+              "id": "lz_residuos",
+              "texto": "Desempenho de resíduos equivalente ao nível máximo do TRUE.",
+              "ref": "LEED Zero – Zero Waste",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Certificado TRUE Platinum",
+              "auto": "residuos50"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "edge",
+      "nome": "EDGE (inclui Advanced e Zero Carbon)",
+      "edicao": "EDGE v3 (aplicativo/metodologia), Protocolo de Certificação 5.0",
+      "tipo": "selo",
+      "fonte_physis": [
+        "Modulos em desenvolvimento/Certificação/EDGE/ (protocolo 5.0 e guia do usuário v3)",
+        "Modulos em desenvolvimento/GapAnalysis_Bioconstrucao_Physis_v4.xlsx",
+        "physis-hub/web/painel.html (CERT_LISTA anterior)"
+      ],
+      "grupos": [
+        {
+          "id": "edge_niveis",
+          "nome": "Níveis de certificação",
+          "criterios": [
+            {
+              "id": "edge_energia",
+              "texto": "Energia operacional pelo menos 20% abaixo da referência local do EDGE.",
+              "ref": "EDGE EDGE Certified – Energia ≥20%",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório do aplicativo EDGE",
+              "auto": "energia_hist"
+            },
+            {
+              "id": "edge_agua",
+              "texto": "Consumo de água pelo menos 20% abaixo da referência local.",
+              "ref": "EDGE EDGE Certified – Água ≥20%",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório do aplicativo EDGE",
+              "auto": "agua"
+            },
+            {
+              "id": "edge_mat",
+              "texto": "Carbono incorporado dos materiais pelo menos 20% abaixo da referência.",
+              "ref": "EDGE EDGE Certified – Materiais ≥20%",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório do aplicativo e especificações",
+              "auto": null
+            },
+            {
+              "id": "edge_adv",
+              "texto": "Nível Advanced: economia de energia de pelo menos 40%.",
+              "ref": "EDGE EDGE Advanced – Energia ≥40%",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Relatório do aplicativo EDGE",
+              "auto": "solar"
+            },
+            {
+              "id": "edge_zc",
+              "texto": "Nível Zero Carbon: Advanced mais 100% da energia restante de renováveis ou compensação, comprovado com dados de operação.",
+              "ref": "EDGE EDGE Zero Carbon",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "12 meses de contas, contratos de renovável, créditos aposentados",
+              "auto": "carbono"
+            }
+          ]
+        },
+        {
+          "id": "edge_medidas_en",
+          "nome": "Medidas de energia (EEM)",
+          "criterios": [
+            {
+              "id": "edge_e_env",
+              "texto": "Envoltória eficiente: proporção janela/parede adequada, sombreamento externo, cobertura refletiva e isolamento.",
+              "ref": "EDGE EEM – envoltória",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "edge_e_vent",
+              "texto": "Ventilação natural ou ventiladores de teto reduzindo uso de ar-condicionado.",
+              "ref": "EDGE EEM – ventilação",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "edge_e_ac",
+              "texto": "Ar-condicionado e bombas de calor de alta eficiência.",
+              "ref": "EDGE EEM – climatização",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "edge_e_aq",
+              "texto": "Aquecimento de água solar ou bomba de calor.",
+              "ref": "EDGE EEM – água quente",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "edge_e_luz",
+              "texto": "Iluminação LED e controles (sensores de presença, luz natural).",
+              "ref": "EDGE EEM – iluminação",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "edge_e_fv",
+              "texto": "Geração fotovoltaica no local.",
+              "ref": "EDGE EEM – renováveis",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Projeto FV e homologação",
+              "auto": "solar"
+            },
+            {
+              "id": "edge_e_med",
+              "texto": "Medidores inteligentes de energia.",
+              "ref": "EDGE EEM – medição",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": "medicao"
+            }
+          ]
+        },
+        {
+          "id": "edge_medidas_ag",
+          "nome": "Medidas de água (WEM)",
+          "criterios": [
+            {
+              "id": "edge_w_metais",
+              "texto": "Torneiras, chuveiros e bacias de baixa vazão ou duplo acionamento.",
+              "ref": "EDGE WEM – louças e metais",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Fichas técnicas de vazão",
+              "auto": "agua"
+            },
+            {
+              "id": "edge_w_chuva",
+              "texto": "Aproveitamento de água de chuva e/ou reúso de águas cinzas.",
+              "ref": "EDGE WEM – fontes alternativas",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Projeto conforme NBR 15527:2019 e NBR 16783:2019",
+              "auto": "agua"
+            }
+          ]
+        },
+        {
+          "id": "edge_medidas_mat",
+          "nome": "Medidas de materiais (MEM)",
+          "criterios": [
+            {
+              "id": "edge_m_estr",
+              "texto": "Lajes, paredes e cobertura com sistemas de menor carbono incorporado (madeira engenheirada, SIP, blocos de baixo impacto).",
+              "ref": "EDGE MEM – sistemas construtivos",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Especificações e DAPs",
+              "auto": null
+            },
+            {
+              "id": "edge_m_isol",
+              "texto": "Isolamento térmico e esquadrias com materiais de menor impacto.",
+              "ref": "EDGE MEM – isolamento e esquadrias",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "edge_processo",
+          "nome": "Processo de certificação",
+          "criterios": [
+            {
+              "id": "edge_reg",
+              "texto": "Projeto registrado na plataforma EDGE e certificadora contratada.",
+              "ref": "EDGE Protocolo 5.0 – registro",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Comprovante de registro",
+              "auto": null
+            },
+            {
+              "id": "edge_auditor",
+              "texto": "Auditor EDGE licenciado designado para auditoria de projeto e de obra.",
+              "ref": "EDGE Protocolo 5.0 – auditoria",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Contrato com auditor",
+              "auto": null
+            },
+            {
+              "id": "edge_evid",
+              "texto": "Pasta de evidências por medida (fichas técnicas, DAPs, projetos, fotos de obra).",
+              "ref": "EDGE Protocolo 5.0 – documentação",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Pasta de evidências por categoria",
+              "auto": null
+            },
+            {
+              "id": "edge_posobra",
+              "texto": "Auditoria in loco após a obra para certificação final.",
+              "ref": "EDGE Protocolo 5.0 – certificação final",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório de vistoria",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "true_zw",
+      "nome": "TRUE Zero Waste",
+      "edicao": "TRUE Rating System (GBCI), versão vigente; níveis Certified, Silver, Gold e Platinum",
+      "tipo": "selo",
+      "fonte_physis": [
+        "aba Economia circular do Sistema Physis"
+      ],
+      "grupos": [
+        {
+          "id": "tr_pre",
+          "nome": "Pré-requisitos",
+          "criterios": [
+            {
+              "id": "tr_pol",
+              "texto": "Política lixo zero escrita e assinada pela direção.",
+              "ref": "TRUE – pré-requisito política",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Política lixo zero",
+              "auto": null
+            },
+            {
+              "id": "tr_90",
+              "texto": "Média de pelo menos 90% de desvio de aterro, incineração e meio ambiente por 12 meses.",
+              "ref": "TRUE – pré-requisito desvio ≥90%",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatórios mensais de destinação",
+              "auto": "residuos50"
+            },
+            {
+              "id": "tr_base",
+              "texto": "Linha de base de resíduos com dados por fluxo (peso) e documentos de destino.",
+              "ref": "TRUE – pré-requisito dados",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Planilha por fluxo e comprovantes",
+              "auto": "residuos"
+            },
+            {
+              "id": "tr_legal",
+              "texto": "Cumprimento das leis de resíduos e destinação licenciada.",
+              "ref": "TRUE – pré-requisito conformidade",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Licenças, MTR",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "tr_cred",
+          "nome": "Créditos",
+          "criterios": [
+            {
+              "id": "tr_red",
+              "texto": "Redesenho e redução na fonte: compras sem embalagem, reutilizáveis, menos descartáveis.",
+              "ref": "TRUE – Redesign / Reduce",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "tr_reuso",
+              "texto": "Reúso e doação de materiais e equipamentos.",
+              "ref": "TRUE – Reuse",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "tr_comp",
+              "texto": "Compostagem ou biodigestão dos orgânicos.",
+              "ref": "TRUE – Compost",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "tr_recic",
+              "texto": "Reciclagem com ciclo fechado e compra de reciclados.",
+              "ref": "TRUE – Recycle / Closed loop",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "tr_forn",
+              "texto": "Fornecedores engajados em retirar embalagens e reduzir resíduos a montante.",
+              "ref": "TRUE – Upstream management",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "tr_trein",
+              "texto": "Treinamento da equipe e liderança em lixo zero.",
+              "ref": "TRUE – Training / Leadership",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "tr_audit",
+              "texto": "Caracterização periódica dos resíduos (análise gravimétrica).",
+              "ref": "TRUE – Zero waste analysis",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "tr_perig",
+              "texto": "Prevenção e substituição de resíduos perigosos.",
+              "ref": "TRUE – Hazardous waste prevention",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aqua_hqe",
+      "nome": "AQUA-HQE",
+      "edicao": "Referencial AQUA-HQE (Fundação Vanzolini) para edifícios; categorias com níveis Bom, Superior e Excelente",
+      "tipo": "selo",
+      "fonte_physis": [
+        "conhecimento técnico Physis (sem planilha específica)"
+      ],
+      "grupos": [
+        {
+          "id": "aq_sge",
+          "nome": "Sistema de gestão do empreendimento",
+          "criterios": [
+            {
+              "id": "aq_sge",
+              "texto": "Sistema de gestão do empreendimento com perfil ambiental definido e auditorias nas fases.",
+              "ref": "AQUA-HQE – SGE",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Perfil de desempenho e registros de auditoria",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "aq_eco",
+          "nome": "Eco-construção e eco-gestão",
+          "criterios": [
+            {
+              "id": "aq_1",
+              "texto": "Relação com o entorno: insolação, vento, vizinhança, biodiversidade.",
+              "ref": "AQUA-HQE – Categoria 1",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": "perfil"
+            },
+            {
+              "id": "aq_2",
+              "texto": "Produtos e sistemas escolhidos por durabilidade e impacto ambiental.",
+              "ref": "AQUA-HQE – Categoria 2",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "aq_3",
+              "texto": "Canteiro de baixo impacto: resíduos, ruído, poluição.",
+              "ref": "AQUA-HQE – Categoria 3",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "PGRCC",
+              "auto": "residuos50"
+            },
+            {
+              "id": "aq_4",
+              "texto": "Gestão da energia: redução do consumo e renováveis.",
+              "ref": "AQUA-HQE – Categoria 4",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": "solar"
+            },
+            {
+              "id": "aq_5",
+              "texto": "Gestão da água: economia, chuva, drenagem.",
+              "ref": "AQUA-HQE – Categoria 5",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": "agua"
+            },
+            {
+              "id": "aq_6",
+              "texto": "Resíduos de uso e operação: espaços e logística de separação.",
+              "ref": "AQUA-HQE – Categoria 6",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": "residuos"
+            },
+            {
+              "id": "aq_7",
+              "texto": "Manutenção facilitada e desempenho ambiental mantido.",
+              "ref": "AQUA-HQE – Categoria 7",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "aq_conf",
+          "nome": "Conforto e saúde",
+          "criterios": [
+            {
+              "id": "aq_8_11",
+              "texto": "Conforto higrotérmico, acústico, visual e olfativo.",
+              "ref": "AQUA-HQE – Categorias 8–11",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "aq_12_14",
+              "texto": "Qualidade sanitária dos ambientes, do ar e da água.",
+              "ref": "AQUA-HQE – Categorias 12–14",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "casa_azul",
+      "nome": "Selo Casa Azul + CAIXA",
+      "edicao": "Guia Selo Casa Azul + CAIXA (versão vigente; níveis Cristal, Topázio, Safira e Diamante). Substitui a 2ª edição citada na planilha.",
+      "tipo": "selo",
+      "fonte_physis": [
+        "Modulos em desenvolvimento/GapAnalysis_Bioconstrucao_Physis_v4.xlsx",
+        "physis-hub/web/painel.html (CERT_LISTA anterior)"
+      ],
+      "grupos": [
+        {
+          "id": "ca_qu",
+          "nome": "Qualidade urbana e bem-estar",
+          "criterios": [
+            {
+              "id": "ca_qualidade",
+              "texto": "Terreno com infraestrutura (acesso, água, esgoto, energia, drenagem) e serviços próximos.",
+              "ref": "Selo Casa Azul + CAIXA – Qualidade Urbana",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Declarações das concessionárias, mapa do entorno",
+              "auto": "perfil"
+            },
+            {
+              "id": "ca_qu_risco",
+              "texto": "Local fora de áreas de risco geológico ou de inundação.",
+              "ref": "Selo Casa Azul + CAIXA – Qualidade Urbana",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Laudo geotécnico / consulta à Defesa Civil",
+              "auto": "riscos"
+            },
+            {
+              "id": "ca_qu_verde",
+              "texto": "Áreas verdes, arborização e espaços de convívio.",
+              "ref": "Selo Casa Azul + CAIXA – Qualidade Urbana",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "ca_ee",
+          "nome": "Eficiência energética e conforto ambiental",
+          "criterios": [
+            {
+              "id": "ca_projeto",
+              "texto": "Desempenho térmico, ventilação e iluminação natural adequados à zona bioclimática.",
+              "ref": "Selo Casa Azul + CAIXA – Eficiência Energética e Conforto",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Avaliação NBR 15575 / NBR 15220-3",
+              "auto": null
+            },
+            {
+              "id": "ca_energia",
+              "texto": "Equipamentos eficientes (selo Procel/ENCE A) e geração renovável ou aquecimento solar.",
+              "ref": "Selo Casa Azul + CAIXA – Eficiência Energética e Conforto",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Especificações, projeto FV/solar térmico",
+              "auto": "solar"
+            },
+            {
+              "id": "ca_ee_ac",
+              "texto": "Conforto acústico entre unidades e com o exterior.",
+              "ref": "Selo Casa Azul + CAIXA – Eficiência Energética e Conforto",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Ensaio ou cálculo acústico (NBR 15575)",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "ca_ga",
+          "nome": "Gestão eficiente da água",
+          "criterios": [
+            {
+              "id": "ca_agua",
+              "texto": "Medição individualizada e dispositivos economizadores.",
+              "ref": "Selo Casa Azul + CAIXA – Gestão da Água",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Projeto hidráulico e fichas técnicas",
+              "auto": "agua"
+            },
+            {
+              "id": "ca_ga_chuva",
+              "texto": "Aproveitamento de chuva e/ou reúso, com retenção ou infiltração no lote.",
+              "ref": "Selo Casa Azul + CAIXA – Gestão da Água",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Projeto conforme NBR 15527:2019",
+              "auto": "agua"
+            }
+          ]
+        },
+        {
+          "id": "ca_ps",
+          "nome": "Produção sustentável",
+          "criterios": [
+            {
+              "id": "ca_mat",
+              "texto": "Plano de gestão de resíduos da obra com destinação licenciada e reaproveitamento.",
+              "ref": "Selo Casa Azul + CAIXA – Produção Sustentável",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "PGRCC e comprovantes de destinação (CTR/MTR)",
+              "auto": "residuos50"
+            },
+            {
+              "id": "ca_ps_mad",
+              "texto": "Madeira de origem legal ou certificada e materiais de fornecedores qualificados PBQP-H.",
+              "ref": "Selo Casa Azul + CAIXA – Produção Sustentável",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "DOF, notas, certificados FSC",
+              "auto": null
+            },
+            {
+              "id": "ca_ps_coord",
+              "texto": "Coordenação modular e componentes industrializados para reduzir perdas.",
+              "ref": "Selo Casa Azul + CAIXA – Produção Sustentável",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "ca_ds",
+          "nome": "Desenvolvimento social",
+          "criterios": [
+            {
+              "id": "ca_social",
+              "texto": "Manual do proprietário e educação ambiental dos moradores.",
+              "ref": "Selo Casa Azul + CAIXA – Desenvolvimento Social",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Manual de uso e manutenção (NBR 14037), registros de oficinas",
+              "auto": null
+            },
+            {
+              "id": "ca_ds_trab",
+              "texto": "Capacitação e boas condições para os trabalhadores da obra.",
+              "ref": "Selo Casa Azul + CAIXA – Desenvolvimento Social",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Registros de treinamento",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "ca_in",
+          "nome": "Inovação",
+          "criterios": [
+            {
+              "id": "ca_in1",
+              "texto": "Soluções inovadoras com ganho ambiental ou social comprovado.",
+              "ref": "Selo Casa Azul + CAIXA – Inovação",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Memorial descritivo da inovação",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "greenkey",
+      "nome": "Green Key (hospedagem)",
+      "edicao": "Critérios Green Key para hotéis/hospedagem, ciclo 2022–2025 (13 áreas; revisar ciclo 2026+ no operador nacional)",
+      "tipo": "selo",
+      "fonte_physis": [
+        "Modulos em desenvolvimento/GapAnalysis_Bioconstrucao_Physis_v4.xlsx",
+        "physis-hub/web/painel.html (CERT_LISTA anterior)"
+      ],
+      "grupos": [
+        {
+          "id": "gk_g",
+          "nome": "Gestão e pessoas",
+          "criterios": [
+            {
+              "id": "gk_gestao",
+              "texto": "Política ambiental escrita, responsável nomeado e metas anuais.",
+              "ref": "Green Key – 1 Gestão ambiental",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Política assinada e plano de metas",
+              "auto": null
+            },
+            {
+              "id": "gk_equipe",
+              "texto": "Equipe treinada e envolvida nas rotinas ambientais.",
+              "ref": "Green Key – 2 Envolvimento da equipe",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de treinamento",
+              "auto": null
+            },
+            {
+              "id": "gk_hospede",
+              "texto": "Hóspedes informados sobre as práticas e como participar.",
+              "ref": "Green Key – 3 Informação ao hóspede",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Manual digital, QR codes, sinalização",
+              "auto": null
+            },
+            {
+              "id": "gk_adm",
+              "texto": "Consumo de energia, água e resíduos registrado e enviado ao programa anualmente.",
+              "ref": "Green Key – 13 Administração",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Planilha anual de indicadores",
+              "auto": "medicao"
+            }
+          ]
+        },
+        {
+          "id": "gk_rec",
+          "nome": "Recursos",
+          "criterios": [
+            {
+              "id": "gk_agua",
+              "texto": "Vazões reduzidas em chuveiros, torneiras e bacias; troca de toalhas sob pedido.",
+              "ref": "Green Key – 4 Água",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Medição de vazões",
+              "auto": "agua"
+            },
+            {
+              "id": "gk_limpeza",
+              "texto": "Produtos de limpeza com rótulo ambiental e dosagem controlada.",
+              "ref": "Green Key – 5 Lavanderia e limpeza",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Fichas dos produtos",
+              "auto": null
+            },
+            {
+              "id": "gk_resid",
+              "texto": "Separação de resíduos, compostagem e redução de descartáveis.",
+              "ref": "Green Key – 6 Resíduos",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registro de quantidades destinadas",
+              "auto": "residuos50"
+            },
+            {
+              "id": "gk_energia",
+              "texto": "Medição de energia, iluminação eficiente e uso de renováveis.",
+              "ref": "Green Key – 7 Energia",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Contas e medição por circuito",
+              "auto": "solar"
+            },
+            {
+              "id": "gk_compras",
+              "texto": "Alimentos locais, orgânicos e da estação; redução de desperdício.",
+              "ref": "Green Key – 8 Alimentos e bebidas",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Lista de fornecedores locais",
+              "auto": null
+            },
+            {
+              "id": "gk_ar",
+              "texto": "Ambientes livres de fumo e boa qualidade do ar interno.",
+              "ref": "Green Key – 9 Ambiente interno",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "gk_jardim",
+              "texto": "Áreas verdes com espécies nativas e sem pesticidas químicos.",
+              "ref": "Green Key – 10 Áreas verdes",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "gk_soc",
+          "nome": "Responsabilidade e atividades",
+          "criterios": [
+            {
+              "id": "gk_rse",
+              "texto": "Ações sociais com a comunidade local.",
+              "ref": "Green Key – 11 Responsabilidade social",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "gk_ativ",
+              "texto": "Atividades verdes para hóspedes (trilhas, bicicletas, visitas a sistemas sustentáveis).",
+              "ref": "Green Key – 12 Atividades verdes",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pbe",
+      "nome": "PBE Edifica · INI-C/INI-R (Portaria Inmetro 309/2022)",
+      "edicao": "Portaria Inmetro 309/2022 (INI-C comercial/serviços/público e INI-R residencial). Substitui RTQ-C/RTQ-R.",
+      "tipo": "selo",
+      "fonte_physis": [
+        "Modulos em desenvolvimento/GapAnalysis_Bioconstrucao_Physis_v4.xlsx",
+        "physis-hub/web/painel.html (CERT_LISTA anterior)"
+      ],
+      "grupos": [
+        {
+          "id": "pbe_metodo",
+          "nome": "Método e processo",
+          "criterios": [
+            {
+              "id": "pbe_tipo",
+              "texto": "Tipologia definida (INI-C ou INI-R) e método escolhido: simplificado ou simulação.",
+              "ref": "Portaria 309/2022 – escopo",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Memorial de enquadramento",
+              "auto": "perfil"
+            },
+            {
+              "id": "pbe_oia",
+              "texto": "Organismo de Inspeção Acreditado contratado para ENCE de projeto e de edificação construída.",
+              "ref": "Portaria 309/2022 – avaliação da conformidade",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Contrato com OIA",
+              "auto": null
+            },
+            {
+              "id": "pbe_classe",
+              "texto": "Classe de eficiência energética estimada (A a E) pelo consumo de energia primária frente à referência.",
+              "ref": "INI-C/INI-R – classificação geral",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Planilha/simulação de classificação",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "pbe_sist",
+          "nome": "Envoltória e sistemas",
+          "criterios": [
+            {
+              "id": "pbe_env",
+              "texto": "Envoltória: transmitância, absortância, sombreamento e área de aberturas adequados à zona bioclimática.",
+              "ref": "INI – envoltória",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Cálculo térmico (NBR 15220/15575)",
+              "auto": null
+            },
+            {
+              "id": "pbe_ilum",
+              "texto": "Iluminação com densidade de potência reduzida e controles.",
+              "ref": "INI-C – iluminação",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "pbe_sist",
+              "texto": "Condicionamento de ar com equipamentos eficientes (ENCE A).",
+              "ref": "INI – condicionamento de ar",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "pbe_aq",
+              "texto": "Aquecimento de água solar, bomba de calor ou gás eficiente.",
+              "ref": "INI – aquecimento de água",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "pbe_ren",
+              "texto": "Geração renovável no local abatendo o consumo de energia primária.",
+              "ref": "INI – geração local de energia renovável",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Projeto FV e homologação",
+              "auto": "solar"
+            },
+            {
+              "id": "pbe_agua",
+              "texto": "Uso racional de água avaliado (indicador complementar).",
+              "ref": "INI – uso racional de água",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": "agua"
+            },
+            {
+              "id": "pbe_nzeb",
+              "texto": "Avaliação como edificação de energia quase zero ou positiva (geração ≥ consumo).",
+              "ref": "INI – NZEB / energia positiva",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "12 meses de geração vs consumo",
+              "auto": "energia_hist"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pbqph",
+      "nome": "PBQP-H (SiAC – Execução de Obras)",
+      "edicao": "Regimento SiAC vigente (níveis B e A), estrutura alinhada à ISO 9001:2015",
+      "tipo": "selo",
+      "fonte_physis": [
+        "Modulos em desenvolvimento/GapAnalysis_Bioconstrucao_Physis_v4.xlsx",
+        "physis-hub/web/painel.html (CERT_LISTA anterior)"
+      ],
+      "grupos": [
+        {
+          "id": "pb_sgq",
+          "nome": "Sistema de gestão da qualidade",
+          "criterios": [
+            {
+              "id": "pb_qual",
+              "texto": "Sistema de gestão da qualidade da construtora com escopo, política e objetivos.",
+              "ref": "PBQP-H SiAC – Requisitos 4–6",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "pb_resp",
+              "texto": "Responsabilidades e autoridades definidas para a qualidade da obra.",
+              "ref": "PBQP-H SiAC – Requisito 5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "pb_doc",
+              "texto": "Documentos e registros controlados (projetos, procedimentos, revisões).",
+              "ref": "PBQP-H SiAC – Requisito 7.5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Lista mestra de documentos",
+              "auto": null
+            },
+            {
+              "id": "pb_trein",
+              "texto": "Equipe treinada nos procedimentos de execução e inspeção.",
+              "ref": "PBQP-H SiAC – Requisito 7.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de treinamento",
+              "auto": null
+            },
+            {
+              "id": "pb_plano",
+              "texto": "Plano da qualidade da obra elaborado antes do início.",
+              "ref": "PBQP-H SiAC – Requisito 8.1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "PQO",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "pb_exec",
+          "nome": "Execução e controle",
+          "criterios": [
+            {
+              "id": "pb_mat",
+              "texto": "Materiais controlados com especificação, inspeção no recebimento e fornecedores qualificados.",
+              "ref": "PBQP-H SiAC – Requisito 8.4",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Fichas de verificação de materiais",
+              "auto": null
+            },
+            {
+              "id": "pb_servicos",
+              "texto": "Serviços controlados com procedimento de execução e inspeção.",
+              "ref": "PBQP-H SiAC – Requisito 8.5",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Fichas de verificação de serviços",
+              "auto": null
+            },
+            {
+              "id": "pb_projeto",
+              "texto": "Projetos analisados, compatibilizados e com ART/RRT de cada disciplina.",
+              "ref": "PBQP-H SiAC – Requisito 8.3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "ARTs/RRTs (Res. Confea 1.137/2023)",
+              "auto": null
+            },
+            {
+              "id": "pb_desemp",
+              "texto": "Atendimento à norma de desempenho NBR 15575 comprovado.",
+              "ref": "PBQP-H SiAC – Requisito 8.3 / NBR 15575",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Avaliação de desempenho / simulação",
+              "auto": null
+            },
+            {
+              "id": "pb_naturais",
+              "texto": "Materiais naturais ou reciclados especificados e com controle de qualidade próprio.",
+              "ref": "PBQP-H SiAC – Controle de materiais (bioconstrução)",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Catálogo de materiais com ensaios",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "pb_aval",
+          "nome": "Avaliação e melhoria",
+          "criterios": [
+            {
+              "id": "pb_aud",
+              "texto": "Auditorias internas e análise crítica pela direção.",
+              "ref": "PBQP-H SiAC – Requisito 9",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "",
+              "auto": null
+            },
+            {
+              "id": "pb_nc",
+              "texto": "Tratamento de não conformidades e satisfação do cliente.",
+              "ref": "PBQP-H SiAC – Requisito 10 / 9.1.2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "obra",
+      "nome": "Obra sustentável (licenças, segurança e resíduos)",
+      "edicao": "Checklist Physis v2026 – normas e resoluções vigentes em nov/2026",
+      "tipo": "gestao",
+      "fonte_physis": [
+        "Modulos em desenvolvimento/GapAnalysis_Bioconstrucao_Physis_v4.xlsx (abas Gap Analysis e Checklist Obra)"
+      ],
+      "grupos": [
+        {
+          "id": "ob_lic",
+          "nome": "Licenciamento e regularização",
+          "criterios": [
+            {
+              "id": "ob_zona",
+              "texto": "Zoneamento, recuos, APP e áreas de risco verificados antes de comprar ou projetar.",
+              "ref": "Código de Obras municipal / Lei 12.651/2012 / Lei 12.608/2012",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Certidão de uso do solo, consulta à Defesa Civil",
+              "auto": "riscos"
+            },
+            {
+              "id": "ob_geotec",
+              "texto": "Sondagem e laudo geotécnico, obrigatório em encostas e áreas de risco.",
+              "ref": "Lei 12.608/2012 / NBR 6484 / NBR 11682",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Laudo geotécnico com ART",
+              "auto": "riscos"
+            },
+            {
+              "id": "ob_amb",
+              "texto": "Licença ou dispensa ambiental, incluindo supressão de vegetação de Mata Atlântica se houver.",
+              "ref": "Lei 11.428/2006 / órgão ambiental estadual",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Licença ou certidão de dispensa",
+              "auto": null
+            },
+            {
+              "id": "ob_alvara",
+              "texto": "Alvará de construção emitido antes do início da obra.",
+              "ref": "Código de Obras municipal",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Alvará",
+              "auto": null
+            },
+            {
+              "id": "ob_gd",
+              "texto": "Acesso à rede para geração distribuída solicitado e homologado pela distribuidora.",
+              "ref": "Lei 14.300/2022 / REN ANEEL 1.000/2021",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Parecer de acesso",
+              "auto": "solar"
+            },
+            {
+              "id": "ob_habite",
+              "texto": "Habite-se e averbação da construção no registro de imóveis.",
+              "ref": "Código de Obras / Lei 6.015/1973",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Habite-se, matrícula averbada",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "ob_proj",
+          "nome": "Projetos e responsabilidade técnica",
+          "criterios": [
+            {
+              "id": "ob_art",
+              "texto": "ART/RRT de todos os projetos e da execução.",
+              "ref": "Lei 6.496/1977 / Res. Confea 1.137/2023",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "ARTs/RRTs",
+              "auto": null
+            },
+            {
+              "id": "ob_desemp",
+              "texto": "Desempenho térmico, acústico e lumínico comprovado.",
+              "ref": "NBR 15575 / NBR 15220-3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Simulação ou cálculo",
+              "auto": null
+            },
+            {
+              "id": "ob_eletr",
+              "texto": "Instalações elétricas e fotovoltaicas conforme norma.",
+              "ref": "NBR 5410 / NBR 16690",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Projeto elétrico e FV",
+              "auto": null
+            },
+            {
+              "id": "ob_gas",
+              "texto": "Gás e biogás com tubulação, ventilação e válvulas de segurança adequadas.",
+              "ref": "NBR 15526 / NBR 13103",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Projeto de gás",
+              "auto": null
+            },
+            {
+              "id": "ob_manual",
+              "texto": "Manual de uso, operação e manutenção entregue ao proprietário.",
+              "ref": "NBR 14037 / NBR 5674",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Manual do proprietário",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "ob_spda",
+          "nome": "Proteção contra descargas atmosféricas (SPDA)",
+          "criterios": [
+            {
+              "id": "ob_spda_risco",
+              "texto": "Análise de risco de descargas para definir necessidade e nível de proteção.",
+              "ref": "NBR 5419-2",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório de gerenciamento de risco",
+              "auto": null
+            },
+            {
+              "id": "ob_spda",
+              "texto": "SPDA projetado e executado conforme o nível definido, com ART.",
+              "ref": "NBR 5419-3",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Projeto SPDA com ART",
+              "auto": null
+            },
+            {
+              "id": "ob_aterr",
+              "texto": "Aterramento em anel na fundação, executado durante a concretagem, com medição.",
+              "ref": "NBR 5419-3 / NBR 5410",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Relatório de medição de aterramento",
+              "auto": null
+            },
+            {
+              "id": "ob_dps",
+              "texto": "DPS coordenados no quadro geral e no lado CA/CC do sistema fotovoltaico.",
+              "ref": "NBR 5419-4 / NBR 5410 / NBR 16690",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Diagrama unifilar com DPS",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "ob_resid",
+          "nome": "Resíduos da construção",
+          "criterios": [
+            {
+              "id": "ob_pgrcc",
+              "texto": "Plano de gerenciamento de resíduos da construção aprovado antes da obra.",
+              "ref": "Res. CONAMA 307/2002 art. 8º–9º",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "PGRCC",
+              "auto": "residuos"
+            },
+            {
+              "id": "ob_classes",
+              "texto": "Resíduos segregados por classe A, B, C e D na origem.",
+              "ref": "Res. CONAMA 307/2002 art. 3º (com alterações 348/2004, 431/2011, 469/2015)",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Fotos de baias, registros",
+              "auto": "residuos"
+            },
+            {
+              "id": "ob_perig",
+              "texto": "Resíduos perigosos (tintas, solventes, óleos) classificados e destinados adequadamente.",
+              "ref": "NBR 10004:2024 / Lei 12.305/2010",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Laudo de classificação, MTR",
+              "auto": null
+            },
+            {
+              "id": "ob_dest",
+              "texto": "Transportadores e destinos licenciados, com manifesto de transporte de cada carga.",
+              "ref": "Lei 12.305/2010 / MTR (SINIR)",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "MTR/CTR e licenças dos destinos",
+              "auto": "residuos"
+            },
+            {
+              "id": "ob_desvio",
+              "texto": "Meta de desvio do aterro (≥50%) com reaproveitamento no próprio canteiro.",
+              "ref": "Boas práticas / LEED MRc5",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Planilha de desvio",
+              "auto": "residuos50"
+            }
+          ]
+        },
+        {
+          "id": "ob_rec",
+          "nome": "Água, materiais e canteiro",
+          "criterios": [
+            {
+              "id": "ob_chuva",
+              "texto": "Aproveitamento de chuva e fontes não potáveis conforme normas.",
+              "ref": "NBR 15527:2019 / NBR 16783:2019",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Projeto hidráulico",
+              "auto": "agua"
+            },
+            {
+              "id": "ob_madeira",
+              "texto": "Madeira com origem legal (DOF) ou certificada (FSC/Cerflor).",
+              "ref": "IN Ibama DOF / FSC",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "DOF, notas, certificados",
+              "auto": null
+            },
+            {
+              "id": "ob_voc",
+              "texto": "Tintas, colas e painéis de baixa emissão (sem formaldeído).",
+              "ref": "Boas práticas / LEED MRc3",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Fichas técnicas",
+              "auto": null
+            },
+            {
+              "id": "ob_erosao",
+              "texto": "Controle de erosão, sedimentos e proteção da vegetação durante a obra.",
+              "ref": "Licença ambiental / LEED SSp1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de canteiro",
+              "auto": null
+            },
+            {
+              "id": "ob_nr18",
+              "texto": "Segurança no canteiro conforme NR-18 e PGR da obra.",
+              "ref": "NR-18 / NR-1",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "PGR da obra, registros de treinamento",
+              "auto": null
+            },
+            {
+              "id": "ob_monit",
+              "texto": "Monitoramento de energia, água e geração por 12 meses após a entrega.",
+              "ref": "Operação / declaração NZEB",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Relatório de 12 meses",
+              "auto": "medicao"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rainforest",
+      "nome": "Rainforest Alliance (agricultura sustentável)",
+      "edicao": "Norma de Agricultura Sustentável 2020 (requisitos de fazenda; versão 1.3+), com requisitos básicos e de melhoria",
+      "tipo": "selo",
+      "fonte_physis": [
+        "conhecimento técnico Physis (projetos de fazenda e café)"
+      ],
+      "grupos": [
+        {
+          "id": "ra_gest",
+          "nome": "Gestão e rastreabilidade",
+          "criterios": [
+            {
+              "id": "ra_gestao",
+              "texto": "Responsável pela certificação, plano de gestão e autoavaliação interna anual.",
+              "ref": "Rainforest Alliance 2020 – Cap. 1 Gestão",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de gestão, autoavaliação",
+              "auto": "perfil"
+            },
+            {
+              "id": "ra_mapa",
+              "texto": "Mapa da fazenda com áreas de produção, ecossistemas naturais e corpos d'água.",
+              "ref": "Rainforest Alliance 2020 – Cap. 1 Gestão",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Mapa georreferenciado",
+              "auto": null
+            },
+            {
+              "id": "ra_rast",
+              "texto": "Rastreabilidade do produto certificado e registro de volumes.",
+              "ref": "Rainforest Alliance 2020 – Cap. 2 Rastreabilidade",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de colheita e vendas",
+              "auto": null
+            },
+            {
+              "id": "ra_renda",
+              "texto": "Diferencial de sustentabilidade e investimentos repassados conforme exigido.",
+              "ref": "Rainforest Alliance 2020 – Cap. 3 Renda e responsabilidade compartilhada",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Comprovantes de pagamento e plano de investimento",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "ra_agro",
+          "nome": "Práticas agrícolas",
+          "criterios": [
+            {
+              "id": "ra_mip",
+              "texto": "Manejo integrado de pragas; sem agrotóxicos proibidos; aplicação segura com EPI.",
+              "ref": "Rainforest Alliance 2020 – Cap. 4 Agricultura",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano MIP, registros de aplicação",
+              "auto": null
+            },
+            {
+              "id": "ra_solo",
+              "texto": "Conservação do solo, cobertura vegetal e adubação baseada em análise.",
+              "ref": "Rainforest Alliance 2020 – Cap. 4 Agricultura",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Análises de solo",
+              "auto": null
+            },
+            {
+              "id": "ra_irrig",
+              "texto": "Uso eficiente da água de irrigação e outorga quando exigida.",
+              "ref": "Rainforest Alliance 2020 – Cap. 4 / Cap. 6",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Registro de consumo, outorga",
+              "auto": "agua"
+            }
+          ]
+        },
+        {
+          "id": "ra_social",
+          "nome": "Social",
+          "criterios": [
+            {
+              "id": "ra_trab",
+              "texto": "Sem trabalho infantil, forçado, discriminação ou assédio; sistema de avaliar e tratar casos.",
+              "ref": "Rainforest Alliance 2020 – Cap. 5 Social – avaliar e tratar",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Avaliação de riscos sociais, canal de queixas",
+              "auto": null
+            },
+            {
+              "id": "ra_salario",
+              "texto": "Salário mínimo legal, contratos, jornada e liberdade de associação respeitados.",
+              "ref": "Rainforest Alliance 2020 – Cap. 5 Social",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Folha de pagamento, contratos",
+              "auto": null
+            },
+            {
+              "id": "ra_sst",
+              "texto": "Saúde e segurança: água potável, sanitários, primeiros socorros, moradia digna quando houver.",
+              "ref": "Rainforest Alliance 2020 – Cap. 5 Social",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Inspeções de SST",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "ra_amb",
+          "nome": "Ambiente",
+          "criterios": [
+            {
+              "id": "ra_desmat",
+              "texto": "Sem conversão de florestas ou ecossistemas naturais após a data de corte da norma.",
+              "ref": "Rainforest Alliance 2020 – Cap. 6 Ambiente – desmatamento",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Imagens de satélite, CAR",
+              "auto": null
+            },
+            {
+              "id": "ra_app",
+              "texto": "Proteção de matas ciliares, APP e fauna; sem caça.",
+              "ref": "Rainforest Alliance 2020 – Cap. 6 Ambiente",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "CAR, fotos das APP",
+              "auto": null
+            },
+            {
+              "id": "ra_resid",
+              "texto": "Resíduos e águas residuais gerenciados sem queima ou descarte irregular.",
+              "ref": "Rainforest Alliance 2020 – Cap. 6 Ambiente",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de destinação",
+              "auto": "residuos"
+            },
+            {
+              "id": "ra_clima",
+              "texto": "Eficiência energética e redução de emissões na fazenda.",
+              "ref": "Rainforest Alliance 2020 – Cap. 6 Ambiente – clima",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Inventário de GEE",
+              "auto": "carbono"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "organico",
+      "nome": "Orgânico Brasil (SisOrg)",
+      "edicao": "Lei 10.831/2003, Decreto 6.323/2007 e Portaria MAPA 52/2021 (regulamento técnico de produção orgânica; conferir alterações posteriores)",
+      "tipo": "selo",
+      "fonte_physis": [
+        "conhecimento técnico Physis (projetos de fazenda)"
+      ],
+      "grupos": [
+        {
+          "id": "og_mod",
+          "nome": "Modalidade e gestão",
+          "criterios": [
+            {
+              "id": "og_modal",
+              "texto": "Modalidade definida: certificação por auditoria, sistema participativo (OPAC) ou venda direta com OCS.",
+              "ref": "Decreto 6.323/2007",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Contrato com certificadora/OPAC ou cadastro OCS",
+              "auto": "perfil"
+            },
+            {
+              "id": "og_plano",
+              "texto": "Plano de manejo orgânico descrevendo áreas, práticas, insumos e controles.",
+              "ref": "Portaria MAPA 52/2021 – plano de manejo",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Plano de manejo",
+              "auto": null
+            },
+            {
+              "id": "og_conv",
+              "texto": "Período de conversão cumprido nas áreas antes da venda como orgânico.",
+              "ref": "Portaria MAPA 52/2021 – conversão",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Histórico das áreas",
+              "auto": null
+            },
+            {
+              "id": "og_rast",
+              "texto": "Registros de produção, insumos, colheita e vendas que permitam rastrear.",
+              "ref": "Portaria MAPA 52/2021 – registros",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Caderno de campo",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "og_prat",
+          "nome": "Práticas de produção",
+          "criterios": [
+            {
+              "id": "og_insumos",
+              "texto": "Apenas insumos permitidos; sem agrotóxicos sintéticos, transgênicos ou adubos solúveis proibidos.",
+              "ref": "Portaria MAPA 52/2021 – insumos permitidos",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Notas fiscais e fichas dos insumos",
+              "auto": null
+            },
+            {
+              "id": "og_solo",
+              "texto": "Fertilidade mantida com adubação verde, compostagem e rotação.",
+              "ref": "Lei 10.831/2003 art. 1º",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de manejo",
+              "auto": "residuos"
+            },
+            {
+              "id": "og_barreira",
+              "texto": "Barreiras e medidas contra contaminação de vizinhos convencionais.",
+              "ref": "Portaria MAPA 52/2021 – contaminação",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Mapa com barreiras",
+              "auto": null
+            },
+            {
+              "id": "og_paralela",
+              "texto": "Produção paralela convencional separada e identificada, quando permitida.",
+              "ref": "Portaria MAPA 52/2021 – produção paralela",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Plano de separação",
+              "auto": null
+            },
+            {
+              "id": "og_agua",
+              "texto": "Água de irrigação e de lavagem de qualidade adequada.",
+              "ref": "Portaria MAPA 52/2021",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Análise de água",
+              "auto": "agua"
+            },
+            {
+              "id": "og_social",
+              "texto": "Relações de trabalho legais e respeito ao ambiente e às APP.",
+              "ref": "Lei 10.831/2003",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "CAR, contratos",
+              "auto": null
+            },
+            {
+              "id": "og_selo",
+              "texto": "Uso correto do selo SisOrg e da rotulagem.",
+              "ref": "Decreto 6.323/2007 – rotulagem",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Rótulos aprovados",
+              "auto": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cafe_4c",
+      "nome": "4C (café sustentável)",
+      "edicao": "Código de Conduta 4C (versão vigente, 4C Services) – dimensões econômica, social e ambiental, com práticas inaceitáveis",
+      "tipo": "selo",
+      "fonte_physis": [
+        "conhecimento técnico Physis (projetos de café)"
+      ],
+      "grupos": [
+        {
+          "id": "c4_inac",
+          "nome": "Práticas inaceitáveis (eliminatórias)",
+          "criterios": [
+            {
+              "id": "c4_infantil",
+              "texto": "Sem trabalho infantil ou forçado e sem tráfico de pessoas.",
+              "ref": "4C Código de Conduta – práticas inaceitáveis",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de empregados, idade",
+              "auto": null
+            },
+            {
+              "id": "c4_desmat",
+              "texto": "Sem desmatamento ou conversão de áreas naturais após a data de corte.",
+              "ref": "4C Código de Conduta – práticas inaceitáveis",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Imagens de satélite, CAR",
+              "auto": null
+            },
+            {
+              "id": "c4_pest",
+              "texto": "Sem agrotóxicos da lista proibida do 4C.",
+              "ref": "4C Código de Conduta – práticas inaceitáveis",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Registros de aplicação",
+              "auto": null
+            },
+            {
+              "id": "c4_despejo",
+              "texto": "Sem despejo ou violação de direitos de terra.",
+              "ref": "4C Código de Conduta – práticas inaceitáveis",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Documentos da terra",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "c4_econ",
+          "nome": "Econômica",
+          "criterios": [
+            {
+              "id": "c4_gestao",
+              "texto": "Registros de produção, custos e vendas; boas práticas agrícolas e de qualidade.",
+              "ref": "4C Código de Conduta – dimensão econômica",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Caderno de campo, custos",
+              "auto": "custos"
+            },
+            {
+              "id": "c4_qual",
+              "texto": "Pós-colheita e armazenagem preservando a qualidade.",
+              "ref": "4C Código de Conduta – dimensão econômica",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "c4_soc",
+          "nome": "Social",
+          "criterios": [
+            {
+              "id": "c4_trab",
+              "texto": "Contratos, salário legal, jornada e liberdade de associação.",
+              "ref": "4C Código de Conduta – dimensão social",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Folha, contratos",
+              "auto": null
+            },
+            {
+              "id": "c4_sst",
+              "texto": "Saúde e segurança, EPI e moradia adequada quando oferecida.",
+              "ref": "4C Código de Conduta – dimensão social",
+              "pontos": null,
+              "obrigatorio": true,
+              "evidencia": "Fichas de EPI, inspeções",
+              "auto": null
+            }
+          ]
+        },
+        {
+          "id": "c4_amb",
+          "nome": "Ambiental",
+          "criterios": [
+            {
+              "id": "c4_solo",
+              "texto": "Conservação do solo e adubação com base em análise.",
+              "ref": "4C Código de Conduta – dimensão ambiental",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Análises de solo",
+              "auto": null
+            },
+            {
+              "id": "c4_agua",
+              "texto": "Proteção de nascentes e uso racional da água.",
+              "ref": "4C Código de Conduta – dimensão ambiental",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Outorga, CAR",
+              "auto": "agua"
+            },
+            {
+              "id": "c4_resid",
+              "texto": "Resíduos (casca, embalagens de agrotóxico) gerenciados e devolvidos.",
+              "ref": "4C Código de Conduta – dimensão ambiental",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "Comprovantes de devolução",
+              "auto": "residuos"
+            },
+            {
+              "id": "c4_clima",
+              "texto": "Uso eficiente de energia e boas práticas climáticas.",
+              "ref": "4C Código de Conduta – dimensão ambiental",
+              "pontos": null,
+              "obrigatorio": false,
+              "evidencia": "",
+              "auto": "carbono"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

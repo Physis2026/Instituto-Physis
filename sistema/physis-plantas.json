@@ -1,0 +1,7313 @@
+{
+ "_leia": "Base de plantas, espaços, combinações e viveiro da Physis (planilhas v88 da Casa Physis). Ampliável para outros clientes: acrescente plantas e espaços.",
+ "funcoes": [
+  {
+   "id": "ar",
+   "nome": "Filtra o ar"
+  },
+  {
+   "id": "agua",
+   "nome": "Filtra a água"
+  },
+  {
+   "id": "solo",
+   "nome": "Recupera e filtra o solo"
+  },
+  {
+   "id": "barranco",
+   "nome": "Segura barranco"
+  },
+  {
+   "id": "nitrogenio",
+   "nome": "Fixa nitrogênio"
+  },
+  {
+   "id": "biomassa",
+   "nome": "Biomassa para composto e biogás"
+  },
+  {
+   "id": "polinizadores",
+   "nome": "Atrai polinizadores e abelhas"
+  },
+  {
+   "id": "alimento",
+   "nome": "Alimento para pessoas"
+  },
+  {
+   "id": "animais",
+   "nome": "Alimento para animais"
+  },
+  {
+   "id": "protecao",
+   "nome": "Proteção (repele pragas, planta-isca)"
+  },
+  {
+   "id": "oleo",
+   "nome": "Óleo essencial"
+  },
+  {
+   "id": "medicinal",
+   "nome": "Erva medicinal"
+  },
+  {
+   "id": "sombra",
+   "nome": "Sombra e quebra-vento"
+  },
+  {
+   "id": "ornamental",
+   "nome": "Flores e ornamental"
+  }
+ ],
+ "plantas": [
+  {
+   "n": 1,
+   "nome": "Jabuticabeira",
+   "cientifico": "Plinia cauliflora",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "4–8 m",
+   "luz": "sol/meia-sombra",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "enxertada 3 anos, set–nov",
+   "imagem": ""
+  },
+  {
+   "n": 2,
+   "nome": "Pitangueira",
+   "cientifico": "Eugenia uniflora",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "3–6 m",
+   "luz": "sol",
+   "preco": 25.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    6,
+    7,
+    8,
+    9,
+    15
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "2–3 anos, out–dez",
+   "imagem": ""
+  },
+  {
+   "n": 3,
+   "nome": "Grumixama",
+   "cientifico": "Eugenia brasiliensis",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "4–8 m",
+   "luz": "meia-sombra",
+   "preco": 30.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "4 anos, nov–dez",
+   "imagem": ""
+  },
+  {
+   "n": 4,
+   "nome": "Uvaia",
+   "cientifico": "Eugenia pyriformis",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "4–8 m",
+   "luz": "sol",
+   "preco": 30.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "3–4 anos, set–nov",
+   "imagem": ""
+  },
+  {
+   "n": 5,
+   "nome": "Cambuci",
+   "cientifico": "Campomanesia phaea",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "3–6 m",
+   "luz": "sol",
+   "preco": 35.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "4 anos, jan–mar",
+   "imagem": ""
+  },
+  {
+   "n": 6,
+   "nome": "Araçá-amarelo",
+   "cientifico": "Psidium cattleianum",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "2–4 m",
+   "luz": "sol",
+   "preco": 20.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "2 anos, dez–mar",
+   "imagem": ""
+  },
+  {
+   "n": 7,
+   "nome": "Cabeludinha",
+   "cientifico": "Myrciaria glazioviana",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "2–4 m",
+   "luz": "sol/meia-sombra",
+   "preco": 30.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "3 anos, set–nov",
+   "imagem": ""
+  },
+  {
+   "n": 8,
+   "nome": "Cereja-do-rio-grande",
+   "cientifico": "Eugenia involucrata",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "4–8 m",
+   "luz": "sol",
+   "preco": 35.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "3 anos, out–nov",
+   "imagem": ""
+  },
+  {
+   "n": 9,
+   "nome": "Guabiroba",
+   "cientifico": "Campomanesia xanthocarpa",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "5–10 m",
+   "luz": "sol",
+   "preco": 25.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "3 anos, nov–dez",
+   "imagem": ""
+  },
+  {
+   "n": 10,
+   "nome": "Palmito-juçara",
+   "cientifico": "Euterpe edulis",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "8–12 m",
+   "luz": "meia-sombra",
+   "preco": 15.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    23
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "8 anos, frutos mar–jun",
+   "imagem": ""
+  },
+  {
+   "n": 11,
+   "nome": "Feijoa (goiaba-serrana)",
+   "cientifico": "Acca sellowiana",
+   "tipo": "Frutífera",
+   "origem": "Nativa do Brasil",
+   "porte": "2–4 m",
+   "luz": "sol",
+   "preco": 35.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–nov",
+   "colheita": "3 anos, mar–mai",
+   "imagem": ""
+  },
+  {
+   "n": 12,
+   "nome": "Maracujazeiro",
+   "cientifico": "Passiflora edulis",
+   "tipo": "Frutífera",
+   "origem": "Nativa do Brasil",
+   "porte": "trepadeira",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "ornamental"
+   ],
+   "espacos": [
+    22,
+    27
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "1 ano, dez–jun",
+   "imagem": ""
+  },
+  {
+   "n": 13,
+   "nome": "Citros (laranja, ponkan, limão)",
+   "cientifico": "Citrus spp.",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–5 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "3 anos, abr–set",
+   "imagem": ""
+  },
+  {
+   "n": 14,
+   "nome": "Abacateiro",
+   "cientifico": "Persea americana",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "8–12 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "4 anos, mar–ago",
+   "imagem": ""
+  },
+  {
+   "n": 15,
+   "nome": "Bananeira (prata, nanica)",
+   "cientifico": "Musa spp.",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–5 m",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "ar",
+    "agua",
+    "biomassa",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    18
+   ],
+   "adaptacao": "Boa (proteger de geada)",
+   "plantio": "set–dez",
+   "colheita": "1 ano, o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 16,
+   "nome": "Caquizeiro",
+   "cientifico": "Diospyros kaki",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "4–6 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "jun–ago",
+   "colheita": "3 anos, mar–mai",
+   "imagem": ""
+  },
+  {
+   "n": 17,
+   "nome": "Nespereira (ameixa-amarela)",
+   "cientifico": "Eriobotrya japonica",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "4–6 m",
+   "luz": "sol",
+   "preco": 35.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "3 anos, jul–set",
+   "imagem": ""
+  },
+  {
+   "n": 18,
+   "nome": "Pessegueiro (variedade de altitude)",
+   "cientifico": "Prunus persica",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–4 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "jun–ago",
+   "colheita": "3 anos, out–dez",
+   "imagem": ""
+  },
+  {
+   "n": 19,
+   "nome": "Figueira",
+   "cientifico": "Ficus carica",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–4 m",
+   "luz": "sol",
+   "preco": 40.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "jun–ago",
+   "colheita": "2 anos, dez–mar",
+   "imagem": ""
+  },
+  {
+   "n": 20,
+   "nome": "Amora-preta",
+   "cientifico": "Rubus spp.",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–2 m",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "jun–ago",
+   "colheita": "1 ano, out–dez",
+   "imagem": ""
+  },
+  {
+   "n": 21,
+   "nome": "Mirtileiro (blueberry)",
+   "cientifico": "Vaccinium spp.",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–2 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "alimento",
+    "ornamental"
+   ],
+   "espacos": [
+    15
+   ],
+   "adaptacao": "Boa (solo ácido)",
+   "plantio": "jun–ago",
+   "colheita": "2 anos, nov–jan",
+   "imagem": ""
+  },
+  {
+   "n": 22,
+   "nome": "Ingá",
+   "cientifico": "Inga edulis / I. vera",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "8–15 m",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "ar",
+    "agua",
+    "barranco",
+    "nitrogenio",
+    "biomassa",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    23
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 23,
+   "nome": "Pau-jacaré",
+   "cientifico": "Piptadenia gonoacantha",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "10–15 m",
+   "luz": "sol",
+   "preco": 10.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "nitrogenio",
+    "biomassa",
+    "sombra"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 24,
+   "nome": "Aroeira-pimenteira",
+   "cientifico": "Schinus terebinthifolia",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "5–10 m",
+   "luz": "sol",
+   "preco": 10.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "oleo",
+    "medicinal",
+    "sombra"
+   ],
+   "espacos": [
+    23
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 25,
+   "nome": "Embaúba",
+   "cientifico": "Cecropia glaziovii",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "10–15 m",
+   "luz": "sol",
+   "preco": 10.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    23
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 26,
+   "nome": "Bracatinga",
+   "cientifico": "Mimosa scabrella",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa do Brasil",
+   "porte": "10–15 m",
+   "luz": "sol",
+   "preco": 10.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "nitrogenio",
+    "polinizadores",
+    "sombra"
+   ],
+   "espacos": [
+    19
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 27,
+   "nome": "Guapuruvu",
+   "cientifico": "Schizolobium parahyba",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "15–25 m",
+   "luz": "sol",
+   "preco": 12.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 28,
+   "nome": "Angico",
+   "cientifico": "Anadenanthera colubrina",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa do Brasil",
+   "porte": "10–20 m",
+   "luz": "sol",
+   "preco": 12.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "nitrogenio",
+    "polinizadores",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 29,
+   "nome": "Ipê-amarelo",
+   "cientifico": "Handroanthus chrysotrichus",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "6–10 m",
+   "luz": "sol",
+   "preco": 20.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [
+    23
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 30,
+   "nome": "Quaresmeira",
+   "cientifico": "Pleroma granulosum",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "6–10 m",
+   "luz": "sol",
+   "preco": 18.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [
+    15,
+    23
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 31,
+   "nome": "Manacá-da-serra",
+   "cientifico": "Pleroma mutabile",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "4–8 m",
+   "luz": "sol",
+   "preco": 18.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [
+    15
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 32,
+   "nome": "Cedro-rosa",
+   "cientifico": "Cedrela fissilis",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "15–25 m",
+   "luz": "sol",
+   "preco": 12.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "sombra"
+   ],
+   "espacos": [
+    23
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 33,
+   "nome": "Guanandi",
+   "cientifico": "Calophyllum brasiliense",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "15–20 m",
+   "luz": "sol/brejo",
+   "preco": 15.0,
+   "funcoes": [
+    "ar",
+    "agua",
+    "barranco",
+    "sombra"
+   ],
+   "espacos": [
+    18
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 34,
+   "nome": "Sangra-d’água",
+   "cientifico": "Croton urucurana",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa do Brasil",
+   "porte": "6–12 m",
+   "luz": "sol/brejo",
+   "preco": 12.0,
+   "funcoes": [
+    "ar",
+    "agua",
+    "barranco",
+    "medicinal",
+    "sombra"
+   ],
+   "espacos": [
+    18
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 35,
+   "nome": "Ingá-do-brejo",
+   "cientifico": "Inga vera subsp. affinis",
+   "tipo": "Árvore nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "6–10 m",
+   "luz": "brejo",
+   "preco": 15.0,
+   "funcoes": [
+    "ar",
+    "agua",
+    "barranco",
+    "nitrogenio",
+    "biomassa",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    18
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 36,
+   "nome": "Eucalipto-limão (talhadia)",
+   "cientifico": "Corymbia citriodora",
+   "tipo": "Árvore produtiva",
+   "origem": "Exótica (não invasora)",
+   "porte": "talhadia 4–8 m",
+   "luz": "sol",
+   "preco": 8.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "protecao",
+    "oleo",
+    "sombra"
+   ],
+   "espacos": [
+    19
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 37,
+   "nome": "Brinco-de-princesa",
+   "cientifico": "Fuchsia regia",
+   "tipo": "Flor nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "1–3 m",
+   "luz": "meia-sombra",
+   "preco": 15.0,
+   "funcoes": [
+    "polinizadores",
+    "ornamental"
+   ],
+   "espacos": [
+    15
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 38,
+   "nome": "Sálvia-azul",
+   "cientifico": "Salvia guaranitica",
+   "tipo": "Flor nativa",
+   "origem": "Nativa do Brasil",
+   "porte": "0,8–1,5 m",
+   "luz": "sol",
+   "preco": 12.0,
+   "funcoes": [
+    "polinizadores",
+    "oleo",
+    "medicinal",
+    "ornamental"
+   ],
+   "espacos": [
+    5,
+    14
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 39,
+   "nome": "Caliandra",
+   "cientifico": "Calliandra brevipes",
+   "tipo": "Flor nativa",
+   "origem": "Nativa do Brasil",
+   "porte": "1–2 m",
+   "luz": "sol",
+   "preco": 18.0,
+   "funcoes": [
+    "nitrogenio",
+    "polinizadores",
+    "ornamental"
+   ],
+   "espacos": [
+    14
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 40,
+   "nome": "Lantana",
+   "cientifico": "Lantana camara (nativa americana)",
+   "tipo": "Flor nativa",
+   "origem": "Nativa do Brasil",
+   "porte": "0,5–1,5 m",
+   "luz": "sol",
+   "preco": 8.0,
+   "funcoes": [
+    "polinizadores",
+    "protecao",
+    "ornamental"
+   ],
+   "espacos": [
+    14,
+    20
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 41,
+   "nome": "Erva-baleeira",
+   "cientifico": "Varronia curassavica",
+   "tipo": "Flor nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "1–2 m",
+   "luz": "sol",
+   "preco": 10.0,
+   "funcoes": [
+    "barranco",
+    "polinizadores",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    14,
+    20
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 42,
+   "nome": "Assa-peixe",
+   "cientifico": "Vernonanthura polyanthes",
+   "tipo": "Flor nativa",
+   "origem": "Nativa do Brasil",
+   "porte": "2–3 m",
+   "luz": "sol",
+   "preco": 8.0,
+   "funcoes": [
+    "barranco",
+    "polinizadores",
+    "medicinal"
+   ],
+   "espacos": [
+    14
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 43,
+   "nome": "Helicônia-da-mata",
+   "cientifico": "Heliconia farinosa",
+   "tipo": "Flor nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "1–2 m",
+   "luz": "meia-sombra",
+   "preco": 20.0,
+   "funcoes": [
+    "agua",
+    "polinizadores",
+    "ornamental"
+   ],
+   "espacos": [
+    1,
+    15
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 44,
+   "nome": "Bromélias (Vriesea, Aechmea)",
+   "cientifico": "Vriesea / Aechmea spp.",
+   "tipo": "Flor nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "0,3–0,8 m",
+   "luz": "meia-sombra",
+   "preco": 25.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "ornamental"
+   ],
+   "espacos": [
+    5,
+    15,
+    25
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 45,
+   "nome": "Orquídea-da-pedra",
+   "cientifico": "Epidendrum secundum",
+   "tipo": "Flor nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "0,3–1 m",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "polinizadores",
+    "ornamental"
+   ],
+   "espacos": [
+    15,
+    25
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 46,
+   "nome": "Begônia nativa",
+   "cientifico": "Begonia spp.",
+   "tipo": "Flor nativa",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "0,3–0,8 m",
+   "luz": "sombra",
+   "preco": 10.0,
+   "funcoes": [
+    "ornamental"
+   ],
+   "espacos": [
+    15,
+    25
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 47,
+   "nome": "Camarão-amarelo",
+   "cientifico": "Pachystachys lutea",
+   "tipo": "Flor nativa",
+   "origem": "Nativa do Brasil",
+   "porte": "0,8–1,2 m",
+   "luz": "meia-sombra",
+   "preco": 10.0,
+   "funcoes": [
+    "polinizadores",
+    "ornamental"
+   ],
+   "espacos": [
+    15
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 48,
+   "nome": "Hortênsia (tradição serrana)",
+   "cientifico": "Hydrangea macrophylla",
+   "tipo": "Flor",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–2 m",
+   "luz": "meia-sombra",
+   "preco": 18.0,
+   "funcoes": [
+    "ornamental"
+   ],
+   "espacos": [
+    5
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 49,
+   "nome": "Azaleia",
+   "cientifico": "Rhododendron simsii",
+   "tipo": "Flor",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–2 m",
+   "luz": "meia-sombra",
+   "preco": 15.0,
+   "funcoes": [
+    "polinizadores",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 50,
+   "nome": "Capuchinha (PANC)",
+   "cientifico": "Tropaeolum majus",
+   "tipo": "Flor",
+   "origem": "Exótica (não invasora)",
+   "porte": "forração",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "protecao",
+    "ornamental"
+   ],
+   "espacos": [
+    2,
+    3,
+    4,
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jul",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 51,
+   "nome": "Capim-limão",
+   "cientifico": "Cymbopogon citratus",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–1,5 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "barranco",
+    "alimento",
+    "animais",
+    "protecao",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    16,
+    20
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "4 meses (chá) / o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 52,
+   "nome": "Citronela (Java)",
+   "cientifico": "Cymbopogon winterianus",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–1,5 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "barranco",
+    "protecao",
+    "oleo"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    16
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 53,
+   "nome": "Alecrim",
+   "cientifico": "Salvia rosmarinus",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,6–1,2 m",
+   "luz": "sol",
+   "preco": 6.0,
+   "funcoes": [
+    "barranco",
+    "polinizadores",
+    "alimento",
+    "protecao",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    5,
+    16
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "6 meses",
+   "imagem": ""
+  },
+  {
+   "n": 54,
+   "nome": "Lavanda (dentata)",
+   "cientifico": "Lavandula dentata",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,6–1 m",
+   "luz": "sol",
+   "preco": 8.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "protecao",
+    "oleo",
+    "medicinal",
+    "ornamental"
+   ],
+   "espacos": [
+    5,
+    16
+   ],
+   "adaptacao": "Boa",
+   "plantio": "mar–jun",
+   "colheita": "1 ano",
+   "imagem": ""
+  },
+  {
+   "n": 55,
+   "nome": "Erva-cidreira-brasileira",
+   "cientifico": "Lippia alba",
+   "tipo": "Aromática",
+   "origem": "Nativa do Brasil",
+   "porte": "1–1,5 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    16
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 56,
+   "nome": "Guaco",
+   "cientifico": "Mikania glomerata",
+   "tipo": "Aromática",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "trepadeira",
+   "luz": "meia-sombra",
+   "preco": 6.0,
+   "funcoes": [
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 57,
+   "nome": "Manjericão",
+   "cientifico": "Ocimum basilicum",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,5 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "protecao",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    2,
+    4,
+    10
+   ],
+   "adaptacao": "Boa (verão)",
+   "plantio": "set–dez",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 58,
+   "nome": "Hortelã",
+   "cientifico": "Mentha spp.",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,3 m",
+   "luz": "meia-sombra",
+   "preco": 4.0,
+   "funcoes": [
+    "agua",
+    "alimento",
+    "protecao",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 59,
+   "nome": "Orégano",
+   "cientifico": "Origanum vulgare",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,3 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    2,
+    4
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 60,
+   "nome": "Papiro-brasileiro",
+   "cientifico": "Cyperus giganteus",
+   "tipo": "Aquática filtrante",
+   "origem": "Nativa do Brasil",
+   "porte": "1,5–2,5 m",
+   "luz": "sol/água",
+   "preco": 12.0,
+   "funcoes": [
+    "agua",
+    "ornamental"
+   ],
+   "espacos": [
+    1,
+    11
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 61,
+   "nome": "Taboa",
+   "cientifico": "Typha domingensis",
+   "tipo": "Aquática filtrante",
+   "origem": "Nativa do Brasil",
+   "porte": "1,5–2,5 m",
+   "luz": "sol/água",
+   "preco": 8.0,
+   "funcoes": [
+    "agua",
+    "barranco"
+   ],
+   "espacos": [
+    1,
+    11
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 62,
+   "nome": "Biri (cana-índica)",
+   "cientifico": "Canna indica",
+   "tipo": "Aquática filtrante",
+   "origem": "Nativa do Brasil",
+   "porte": "1–1,5 m",
+   "luz": "sol/brejo",
+   "preco": 8.0,
+   "funcoes": [
+    "agua",
+    "polinizadores",
+    "alimento",
+    "ornamental"
+   ],
+   "espacos": [
+    1,
+    18
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 63,
+   "nome": "Tália",
+   "cientifico": "Thalia geniculata",
+   "tipo": "Aquática filtrante",
+   "origem": "Nativa do Brasil",
+   "porte": "1–2 m",
+   "luz": "água rasa",
+   "preco": 15.0,
+   "funcoes": [
+    "agua",
+    "ornamental"
+   ],
+   "espacos": [
+    11,
+    17
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 64,
+   "nome": "Sagitária",
+   "cientifico": "Sagittaria montevidensis",
+   "tipo": "Aquática filtrante",
+   "origem": "Nativa do Brasil",
+   "porte": "0,5 m",
+   "luz": "água rasa",
+   "preco": 10.0,
+   "funcoes": [
+    "agua",
+    "ornamental"
+   ],
+   "espacos": [
+    11,
+    17
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 65,
+   "nome": "Ninfeia nativa",
+   "cientifico": "Nymphaea ampla",
+   "tipo": "Aquática filtrante",
+   "origem": "Nativa do Brasil",
+   "porte": "flutuante",
+   "luz": "sol/água",
+   "preco": 20.0,
+   "funcoes": [
+    "agua",
+    "ornamental"
+   ],
+   "espacos": [
+    11,
+    17
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 66,
+   "nome": "Cavalinha",
+   "cientifico": "Equisetum giganteum",
+   "tipo": "Aquática filtrante",
+   "origem": "Nativa do Brasil",
+   "porte": "1–2 m",
+   "luz": "brejo",
+   "preco": 8.0,
+   "funcoes": [
+    "agua",
+    "medicinal"
+   ],
+   "espacos": [
+    1
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 67,
+   "nome": "Junco",
+   "cientifico": "Eleocharis interstincta",
+   "tipo": "Aquática filtrante",
+   "origem": "Nativa do Brasil",
+   "porte": "0,5–1 m",
+   "luz": "água rasa",
+   "preco": 6.0,
+   "funcoes": [
+    "agua"
+   ],
+   "espacos": [
+    11,
+    17
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 68,
+   "nome": "Vetiver",
+   "cientifico": "Chrysopogon zizanioides",
+   "tipo": "Contenção de encosta",
+   "origem": "Exótica (não invasora)",
+   "porte": "1,5 m (raiz 3 m)",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "agua",
+    "solo",
+    "barranco",
+    "protecao",
+    "oleo"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    20,
+    29,
+    30
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 69,
+   "nome": "Amendoim-forrageiro",
+   "cientifico": "Arachis pintoi",
+   "tipo": "Cobertura de solo",
+   "origem": "Nativa do Brasil",
+   "porte": "forração",
+   "luz": "sol/meia-sombra",
+   "preco": 3.0,
+   "funcoes": [
+    "solo",
+    "barranco",
+    "nitrogenio",
+    "animais",
+    "ornamental"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    20,
+    29,
+    30
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 70,
+   "nome": "Feijão-guandu",
+   "cientifico": "Cajanus cajan",
+   "tipo": "Adubo verde",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–2 m",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "solo",
+    "barranco",
+    "nitrogenio",
+    "biomassa",
+    "alimento",
+    "animais"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    12,
+    13
+   ],
+   "adaptacao": "Boa",
+   "plantio": "out–dez",
+   "colheita": "5–6 meses",
+   "imagem": ""
+  },
+  {
+   "n": 71,
+   "nome": "Gliricídia (estaca viva)",
+   "cientifico": "Gliricidia sepium",
+   "tipo": "Adubo verde",
+   "origem": "Exótica (não invasora)",
+   "porte": "4–6 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "solo",
+    "barranco",
+    "nitrogenio",
+    "biomassa",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    12,
+    13,
+    19
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 72,
+   "nome": "Capim-elefante anão (BRS Kurumi)",
+   "cientifico": "Pennisetum purpureum",
+   "tipo": "Forrageira",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–1,5 m",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "solo",
+    "barranco",
+    "biomassa",
+    "animais"
+   ],
+   "espacos": [
+    13
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 73,
+   "nome": "Amoreira (folha para animais)",
+   "cientifico": "Morus nigra",
+   "tipo": "Forrageira",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–5 m",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "alimento",
+    "animais"
+   ],
+   "espacos": [
+    12,
+    13
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 74,
+   "nome": "Ora-pro-nóbis",
+   "cientifico": "Pereskia aculeata",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "trepadeira",
+   "luz": "sol",
+   "preco": 8.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "animais",
+    "ornamental"
+   ],
+   "espacos": [
+    3,
+    4,
+    12,
+    22,
+    28
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 75,
+   "nome": "Taioba",
+   "cientifico": "Xanthosoma taioba",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Nativa do Brasil",
+   "porte": "1 m",
+   "luz": "meia-sombra",
+   "preco": 6.0,
+   "funcoes": [
+    "agua",
+    "alimento"
+   ],
+   "espacos": [
+    3,
+    4,
+    7,
+    8,
+    9,
+    18
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 76,
+   "nome": "Samambaia-de-metro",
+   "cientifico": "Nephrolepis spp.",
+   "tipo": "Interior",
+   "origem": "Nativa do Brasil",
+   "porte": "vaso",
+   "luz": "sombra",
+   "preco": 25.0,
+   "funcoes": [
+    "ar"
+   ],
+   "espacos": [
+    21
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 77,
+   "nome": "Jiboia",
+   "cientifico": "Epipremnum aureum",
+   "tipo": "Interior",
+   "origem": "Exótica (não invasora)",
+   "porte": "vaso",
+   "luz": "sombra",
+   "preco": 25.0,
+   "funcoes": [
+    "ar"
+   ],
+   "espacos": [
+    21
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 78,
+   "nome": "Espada-de-são-jorge",
+   "cientifico": "Dracaena trifasciata",
+   "tipo": "Interior",
+   "origem": "Exótica (não invasora)",
+   "porte": "vaso",
+   "luz": "meia-sombra",
+   "preco": 25.0,
+   "funcoes": [
+    "ar"
+   ],
+   "espacos": [
+    21
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 79,
+   "nome": "Lírio-da-paz",
+   "cientifico": "Spathiphyllum wallisii",
+   "tipo": "Interior",
+   "origem": "Exótica (não invasora)",
+   "porte": "vaso",
+   "luz": "sombra",
+   "preco": 30.0,
+   "funcoes": [
+    "ar",
+    "ornamental"
+   ],
+   "espacos": [
+    21
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 80,
+   "nome": "Guaimbê",
+   "cientifico": "Thaumatophyllum bipinnatifidum",
+   "tipo": "Interior",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "vaso grande",
+   "luz": "meia-sombra",
+   "preco": 35.0,
+   "funcoes": [
+    "ar"
+   ],
+   "espacos": [
+    21
+   ],
+   "adaptacao": "Ótima (nativa da região)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 81,
+   "nome": "Alface, rúcula, almeirão",
+   "cientifico": "Lactuca / Eruca / Cichorium",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.5,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    2,
+    3,
+    4,
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "1–2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 82,
+   "nome": "Couve e brócolis",
+   "cientifico": "Brassica oleracea",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.5,
+   "funcoes": [
+    "alimento",
+    "animais"
+   ],
+   "espacos": [
+    2,
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jul",
+   "colheita": "2–3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 83,
+   "nome": "Tomate",
+   "cientifico": "Solanum lycopersicum",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "tutorado",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    2,
+    10
+   ],
+   "adaptacao": "Boa (estufa no inverno)",
+   "plantio": "set–dez",
+   "colheita": "3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 84,
+   "nome": "Feijão-vagem e ervilha",
+   "cientifico": "Phaseolus / Pisum",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "tutorado",
+   "luz": "sol",
+   "preco": 1.5,
+   "funcoes": [
+    "nitrogenio",
+    "alimento"
+   ],
+   "espacos": [
+    3,
+    4,
+    10,
+    27
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–nov e mar–mai",
+   "colheita": "2–3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 85,
+   "nome": "Morango",
+   "cientifico": "Fragaria × ananassa",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [
+    2,
+    4
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–mai",
+   "colheita": "jul–dez",
+   "imagem": ""
+  },
+  {
+   "n": 86,
+   "nome": "Cenoura, beterraba, rabanete",
+   "cientifico": "Daucus / Beta / Raphanus",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    2,
+    3,
+    4,
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–ago",
+   "colheita": "1–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 87,
+   "nome": "Chuchu",
+   "cientifico": "Sechium edule",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "trepadeira",
+   "luz": "sol/meia-sombra",
+   "preco": 4.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "animais"
+   ],
+   "espacos": [
+    22,
+    27,
+    28
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–nov",
+   "colheita": "o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 88,
+   "nome": "Batata-inglesa",
+   "cientifico": "Solanum tuberosum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.5,
+   "funcoes": [
+    "biomassa",
+    "alimento"
+   ],
+   "espacos": [
+    3,
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "fev–abr e jul–ago",
+   "colheita": "3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 89,
+   "nome": "Batata-doce",
+   "cientifico": "Ipomoea batatas",
+   "tipo": "Cultivo alimentar",
+   "origem": "Nativa do Brasil",
+   "porte": "rasteira",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "barranco",
+    "biomassa",
+    "polinizadores",
+    "alimento",
+    "animais"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "4–5 meses",
+   "imagem": ""
+  },
+  {
+   "n": 90,
+   "nome": "Mandioca (aipim)",
+   "cientifico": "Manihot esculenta",
+   "tipo": "Cultivo alimentar",
+   "origem": "Nativa do Brasil",
+   "porte": "1,5–2,5 m",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "barranco",
+    "biomassa",
+    "alimento",
+    "animais"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Boa (proteger de geada)",
+   "plantio": "set–nov",
+   "colheita": "8–12 meses",
+   "imagem": ""
+  },
+  {
+   "n": 91,
+   "nome": "Inhame e cará",
+   "cientifico": "Dioscorea spp.",
+   "tipo": "Cultivo alimentar",
+   "origem": "Nativa do Brasil",
+   "porte": "trepadeira",
+   "luz": "sol/meia-sombra",
+   "preco": 2.0,
+   "funcoes": [
+    "biomassa",
+    "alimento"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    28
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "8 meses",
+   "imagem": ""
+  },
+  {
+   "n": 92,
+   "nome": "Taro",
+   "cientifico": "Colocasia esculenta",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "1 m",
+   "luz": "meia-sombra/úmido",
+   "preco": 2.0,
+   "funcoes": [
+    "agua",
+    "biomassa",
+    "alimento"
+   ],
+   "espacos": [
+    18
+   ],
+   "adaptacao": "Ótima em solo úmido",
+   "plantio": "set–dez",
+   "colheita": "7–9 meses",
+   "imagem": ""
+  },
+  {
+   "n": 93,
+   "nome": "Yacon",
+   "cientifico": "Smallanthus sonchifolius",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "1,5 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "biomassa",
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "set–nov",
+   "colheita": "7–8 meses",
+   "imagem": ""
+  },
+  {
+   "n": 94,
+   "nome": "Milho verde",
+   "cientifico": "Zea mays",
+   "tipo": "Cultivo alimentar",
+   "origem": "Nativa do Brasil",
+   "porte": "2 m",
+   "luz": "sol",
+   "preco": 0.5,
+   "funcoes": [
+    "alimento",
+    "animais"
+   ],
+   "espacos": [
+    3,
+    7,
+    8,
+    9,
+    10
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 95,
+   "nome": "Feijão (grão)",
+   "cientifico": "Phaseolus vulgaris",
+   "tipo": "Cultivo alimentar",
+   "origem": "Nativa do Brasil",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 0.5,
+   "funcoes": [
+    "nitrogenio",
+    "alimento"
+   ],
+   "espacos": [
+    3,
+    7,
+    8,
+    9,
+    10
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–nov e fev–mar",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 96,
+   "nome": "Abóbora e moranga",
+   "cientifico": "Cucurbita spp.",
+   "tipo": "Cultivo alimentar",
+   "origem": "Nativa do Brasil",
+   "porte": "rasteira",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "animais"
+   ],
+   "espacos": [
+    3,
+    7,
+    8,
+    9,
+    10
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 97,
+   "nome": "Abobrinha",
+   "cientifico": "Cucurbita pepo",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [
+    3,
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–mar",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 98,
+   "nome": "Repolho e couve-flor",
+   "cientifico": "Brassica oleracea",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.5,
+   "funcoes": [
+    "alimento",
+    "animais"
+   ],
+   "espacos": [
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jul",
+   "colheita": "3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 99,
+   "nome": "Espinafre e acelga",
+   "cientifico": "Spinacia / Beta vulgaris",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol/meia-sombra",
+   "preco": 1.5,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    3
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–ago",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 100,
+   "nome": "Ervilha-torta",
+   "cientifico": "Pisum sativum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "tutorada",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "nitrogenio",
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (gosta de frio)",
+   "plantio": "abr–jun",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 101,
+   "nome": "Berinjela e jiló",
+   "cientifico": "Solanum melongena / S. aethiopicum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    4
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–jan",
+   "colheita": "3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 102,
+   "nome": "Cebolinha",
+   "cientifico": "Allium fistulosum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "protecao"
+   ],
+   "espacos": [
+    2,
+    3,
+    4,
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "1–2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 103,
+   "nome": "Gengibre e açafrão-da-terra",
+   "cientifico": "Zingiber / Curcuma",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,8 m",
+   "luz": "meia-sombra",
+   "preco": 3.0,
+   "funcoes": [
+    "alimento",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "8–10 meses",
+   "imagem": ""
+  },
+  {
+   "n": 104,
+   "nome": "Bertalha (PANC)",
+   "cientifico": "Basella alba",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "trepadeira",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    27,
+    28
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–jan",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 105,
+   "nome": "Amaranto (PANC)",
+   "cientifico": "Amaranthus cruentus",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Nativa do Brasil",
+   "porte": "1–1,5 m",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "animais"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 106,
+   "nome": "Fisális",
+   "cientifico": "Physalis peruviana",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–1,5 m",
+   "luz": "sol",
+   "preco": 8.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [
+    15
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–nov",
+   "colheita": "4–5 meses",
+   "imagem": ""
+  },
+  {
+   "n": 107,
+   "nome": "Framboesa",
+   "cientifico": "Rubus idaeus",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–1,5 m",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [
+    15
+   ],
+   "adaptacao": "Ótima (altitude)",
+   "plantio": "jun–ago",
+   "colheita": "2º ano, nov–jan",
+   "imagem": ""
+  },
+  {
+   "n": 108,
+   "nome": "Tomate-de-árvore",
+   "cientifico": "Solanum betaceum",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "2–3 m",
+   "luz": "sol/meia-sombra",
+   "preco": 15.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (andina)",
+   "plantio": "set–nov",
+   "colheita": "2º ano, o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 109,
+   "nome": "Lichieira",
+   "cientifico": "Litchi chinensis",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "6–10 m",
+   "luz": "sol",
+   "preco": 60.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Boa (florada com frio)",
+   "plantio": "out–dez",
+   "colheita": "4–5 anos, dez–jan",
+   "imagem": ""
+  },
+  {
+   "n": 110,
+   "nome": "Macadâmia",
+   "cientifico": "Macadamia integrifolia",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "8–12 m",
+   "luz": "sol",
+   "preco": 55.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Boa",
+   "plantio": "out–dez",
+   "colheita": "5–6 anos, mar–jun",
+   "imagem": ""
+  },
+  {
+   "n": 111,
+   "nome": "Macieira de baixo frio (Eva, Princesa)",
+   "cientifico": "Malus domestica",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–4 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Boa",
+   "plantio": "jun–ago (muda de raiz nua)",
+   "colheita": "3 anos, dez–fev",
+   "imagem": ""
+  },
+  {
+   "n": 112,
+   "nome": "Ameixeira de baixo frio",
+   "cientifico": "Prunus salicina",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–4 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Boa",
+   "plantio": "jun–ago",
+   "colheita": "3 anos, nov–dez",
+   "imagem": ""
+  },
+  {
+   "n": 113,
+   "nome": "Goiabeira",
+   "cientifico": "Psidium guajava",
+   "tipo": "Frutífera",
+   "origem": "Nativa do Brasil",
+   "porte": "3–6 m",
+   "luz": "sol",
+   "preco": 25.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "2 anos, jan–abr",
+   "imagem": ""
+  },
+  {
+   "n": 114,
+   "nome": "Tangerina (ponkan, murcote)",
+   "cientifico": "Citrus reticulata",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–4 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "3 anos, abr–jul",
+   "imagem": ""
+  },
+  {
+   "n": 115,
+   "nome": "Romãzeira",
+   "cientifico": "Punica granatum",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "2–4 m",
+   "luz": "sol",
+   "preco": 35.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "2–3 anos, fev–abr",
+   "imagem": ""
+  },
+  {
+   "n": 116,
+   "nome": "Videira (Niágara, Isabel)",
+   "cientifico": "Vitis labrusca",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "trepadeira",
+   "luz": "sol",
+   "preco": 30.0,
+   "funcoes": [
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    22,
+    28
+   ],
+   "adaptacao": "Ótima (pergolado)",
+   "plantio": "jun–ago",
+   "colheita": "2 anos, dez–fev",
+   "imagem": ""
+  },
+  {
+   "n": 117,
+   "nome": "Kiwi (baixo frio)",
+   "cientifico": "Actinidia deliciosa",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "trepadeira",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    22,
+    28
+   ],
+   "adaptacao": "Com cuidado (precisa de frio no inverno)",
+   "plantio": "jun–ago",
+   "colheita": "4 anos, abr–mai",
+   "imagem": ""
+  },
+  {
+   "n": 118,
+   "nome": "Cambucá",
+   "cientifico": "Plinia edulis",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "6–10 m",
+   "luz": "sol/meia-sombra",
+   "preco": 40.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Ótima (nativa do RJ)",
+   "plantio": "out–dez",
+   "colheita": "6–8 anos, jan–mar",
+   "imagem": ""
+  },
+  {
+   "n": 119,
+   "nome": "Bacupari",
+   "cientifico": "Garcinia gardneriana",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "5–8 m",
+   "luz": "meia-sombra",
+   "preco": 35.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "5 anos, nov–jan",
+   "imagem": ""
+  },
+  {
+   "n": 120,
+   "nome": "Mangueira (variedades de altitude)",
+   "cientifico": "Mangifera indica",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "6–10 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    6,
+    7
+   ],
+   "adaptacao": "Com cuidado (geada e florada irregular acima de 800 m)",
+   "plantio": "set–dez",
+   "colheita": "4–5 anos, dez–fev",
+   "imagem": ""
+  },
+  {
+   "n": 121,
+   "nome": "Limoeiro (taiti, cravo, siciliano)",
+   "cientifico": "Citrus × latifolia / C. limonia",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–4 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "sombra"
+   ],
+   "espacos": [
+    6
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "2–3 anos, o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 122,
+   "nome": "Jabuticabeira-branca",
+   "cientifico": "Plinia aureana",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "4–6 m",
+   "luz": "sol/meia-sombra",
+   "preco": 50.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "5 anos, set–nov",
+   "imagem": ""
+  },
+  {
+   "n": 123,
+   "nome": "Pitangatuba",
+   "cientifico": "Eugenia selloi",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "1–3 m",
+   "luz": "sol",
+   "preco": 35.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "2 anos, nov–dez",
+   "imagem": ""
+  },
+  {
+   "n": 124,
+   "nome": "Araticum-do-mato",
+   "cientifico": "Annona sylvatica",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "5–10 m",
+   "luz": "sol/meia-sombra",
+   "preco": 25.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa (nativa)",
+   "plantio": "out–dez",
+   "colheita": "4 anos, fev–abr",
+   "imagem": ""
+  },
+  {
+   "n": 125,
+   "nome": "Jaracatiá (mamãozinho-do-mato)",
+   "cientifico": "Jacaratia spinosa",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "8–15 m",
+   "luz": "sol",
+   "preco": 25.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa (nativa)",
+   "plantio": "out–dez",
+   "colheita": "4 anos, dez–mar",
+   "imagem": ""
+  },
+  {
+   "n": 126,
+   "nome": "Amora-do-mato",
+   "cientifico": "Rubus rosifolius",
+   "tipo": "Frutífera",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "1–2 m",
+   "luz": "sol/meia-sombra",
+   "preco": 10.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "animais"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "set–nov",
+   "colheita": "1 ano, out–jan",
+   "imagem": ""
+  },
+  {
+   "n": 127,
+   "nome": "Maracujá-doce",
+   "cientifico": "Passiflora alata",
+   "tipo": "Frutífera",
+   "origem": "Nativa do Brasil",
+   "porte": "trepadeira",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "ornamental"
+   ],
+   "espacos": [
+    28
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "1 ano, dez–mai",
+   "imagem": ""
+  },
+  {
+   "n": 128,
+   "nome": "Pinheiro-do-paraná (pinhão)",
+   "cientifico": "Araucaria angustifolia",
+   "tipo": "Frutífera",
+   "origem": "Nativa do Brasil",
+   "porte": "15–25 m",
+   "luz": "sol",
+   "preco": 25.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa (gosta de frio; plantar casal)",
+   "plantio": "jun–ago",
+   "colheita": "10–15 anos, abr–jul",
+   "imagem": ""
+  },
+  {
+   "n": 129,
+   "nome": "Laranjeira (pera, lima, bahia)",
+   "cientifico": "Citrus sinensis",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "4–6 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "3 anos, mai–set",
+   "imagem": ""
+  },
+  {
+   "n": 130,
+   "nome": "Lima-da-pérsia",
+   "cientifico": "Citrus limettioides",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–4 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "3 anos, mar–jul",
+   "imagem": ""
+  },
+  {
+   "n": 131,
+   "nome": "Kinkan",
+   "cientifico": "Citrus japonica",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "2–3 m",
+   "luz": "sol",
+   "preco": 40.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "2 anos, jun–set",
+   "imagem": ""
+  },
+  {
+   "n": 132,
+   "nome": "Pereira de baixo frio",
+   "cientifico": "Pyrus pyrifolia",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–5 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (precisa de algum frio)",
+   "plantio": "jun–ago",
+   "colheita": "3–4 anos, jan–mar",
+   "imagem": ""
+  },
+  {
+   "n": 133,
+   "nome": "Marmeleiro",
+   "cientifico": "Cydonia oblonga",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–5 m",
+   "luz": "sol",
+   "preco": 40.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "jun–ago",
+   "colheita": "3 anos, jan–mar",
+   "imagem": ""
+  },
+  {
+   "n": 134,
+   "nome": "Noz-pecã",
+   "cientifico": "Carya illinoinensis",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "15–20 m",
+   "luz": "sol",
+   "preco": 60.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (precisa de inverno frio)",
+   "plantio": "jun–ago",
+   "colheita": "6–8 anos, abr–jun",
+   "imagem": ""
+  },
+  {
+   "n": 135,
+   "nome": "Mamoeiro",
+   "cientifico": "Carica papaya",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "2–4 m",
+   "luz": "sol",
+   "preco": 12.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (sensível à geada; local abrigado)",
+   "plantio": "set–nov",
+   "colheita": "1 ano, o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 136,
+   "nome": "Aceroleira",
+   "cientifico": "Malpighia emarginata",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "2–3 m",
+   "luz": "sol",
+   "preco": 25.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [
+    6,
+    7
+   ],
+   "adaptacao": "Com cuidado (sensível à geada)",
+   "plantio": "set–nov",
+   "colheita": "1–2 anos, nov–abr",
+   "imagem": ""
+  },
+  {
+   "n": 137,
+   "nome": "Caramboleira",
+   "cientifico": "Averrhoa carambola",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "4–6 m",
+   "luz": "sol",
+   "preco": 35.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (local quente e abrigado)",
+   "plantio": "set–nov",
+   "colheita": "3 anos, jan–jun",
+   "imagem": ""
+  },
+  {
+   "n": 138,
+   "nome": "Atemoia",
+   "cientifico": "Annona × atemoya",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "4–6 m",
+   "luz": "sol",
+   "preco": 45.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (local quente e abrigado)",
+   "plantio": "set–nov",
+   "colheita": "3 anos, mar–jun",
+   "imagem": ""
+  },
+  {
+   "n": 139,
+   "nome": "Pitaya",
+   "cientifico": "Selenicereus undatus",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "trepadeira (cacto)",
+   "luz": "sol",
+   "preco": 25.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa (local quente, encostada em muro)",
+   "plantio": "set–nov",
+   "colheita": "2 anos, dez–abr",
+   "imagem": ""
+  },
+  {
+   "n": 140,
+   "nome": "Abacaxi",
+   "cientifico": "Ananas comosus",
+   "tipo": "Frutífera",
+   "origem": "Nativa do Brasil",
+   "porte": "0,8–1 m",
+   "luz": "sol",
+   "preco": 6.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [
+    6,
+    7
+   ],
+   "adaptacao": "Com cuidado (geada; sol pleno e local abrigado, 18–24 meses até o fruto)",
+   "plantio": "set–nov",
+   "colheita": "18–24 meses, dez–mar",
+   "imagem": ""
+  },
+  {
+   "n": 141,
+   "nome": "Pimentão",
+   "cientifico": "Capsicum annuum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,6–1 m",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    2,
+    10
+   ],
+   "adaptacao": "Boa (estufa ou abrigo no inverno)",
+   "plantio": "set–dez",
+   "colheita": "3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 142,
+   "nome": "Tomate-cereja",
+   "cientifico": "Solanum lycopersicum var. cerasiforme",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "tutorado",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [
+    2,
+    4
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 143,
+   "nome": "Maxixe",
+   "cientifico": "Cucumis anguria",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "trepadeira",
+   "luz": "sol",
+   "preco": 1.5,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    27
+   ],
+   "adaptacao": "Boa (verão)",
+   "plantio": "out–jan",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 144,
+   "nome": "Melão",
+   "cientifico": "Cucumis melo",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "rasteira ou treliça",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    27
+   ],
+   "adaptacao": "Com cuidado (precisa de verão quente)",
+   "plantio": "out–dez",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 145,
+   "nome": "Salsa",
+   "cientifico": "Petroselinum crispum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol/meia-sombra",
+   "preco": 1.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento"
+   ],
+   "espacos": [
+    2,
+    4
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 146,
+   "nome": "Coentro",
+   "cientifico": "Coriandrum sativum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "protecao",
+    "oleo"
+   ],
+   "espacos": [
+    2,
+    3,
+    10
+   ],
+   "adaptacao": "Ótima (prefere o outono e a primavera)",
+   "plantio": "mar–mai e ago–out",
+   "colheita": "1–2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 147,
+   "nome": "Ciboulette (cebolinha-francesa)",
+   "cientifico": "Allium schoenoprasum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 148,
+   "nome": "Couve-chinesa (pak choi)",
+   "cientifico": "Brassica rapa subsp. chinensis",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol/meia-sombra",
+   "preco": 1.5,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "mar–ago",
+   "colheita": "1–2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 149,
+   "nome": "Aipo (salsão)",
+   "cientifico": "Apium graveolens",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol/meia-sombra",
+   "preco": 2.0,
+   "funcoes": [
+    "alimento",
+    "oleo"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (clima ameno)",
+   "plantio": "mar–jun",
+   "colheita": "4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 150,
+   "nome": "Espinafre-da-nova-zelândia",
+   "cientifico": "Tetragonia tetragonioides",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "rasteira",
+   "luz": "sol/meia-sombra",
+   "preco": 2.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 151,
+   "nome": "Milho-pipoca",
+   "cientifico": "Zea mays var. everta",
+   "tipo": "Cultivo alimentar",
+   "origem": "Nativa do Brasil",
+   "porte": "2 m",
+   "luz": "sol",
+   "preco": 0.5,
+   "funcoes": [
+    "alimento",
+    "animais"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 152,
+   "nome": "Girassol",
+   "cientifico": "Helianthus annuus",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "1,5–2,5 m",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "agua",
+    "solo",
+    "biomassa",
+    "polinizadores",
+    "alimento",
+    "animais",
+    "ornamental"
+   ],
+   "espacos": [
+    29,
+    30
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 153,
+   "nome": "Grão-de-bico",
+   "cientifico": "Cicer arietinum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "nitrogenio",
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (umidade causa doenças; plantar no inverno seco)",
+   "plantio": "abr–mai",
+   "colheita": "4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 154,
+   "nome": "Tomilho",
+   "cientifico": "Thymus vulgaris",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,3 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "protecao",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    2,
+    4
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 155,
+   "nome": "Sálvia (tempero)",
+   "cientifico": "Salvia officinalis",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,5 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 156,
+   "nome": "Manjerona",
+   "cientifico": "Origanum majorana",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,4 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "oleo"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 157,
+   "nome": "Poejo",
+   "cientifico": "Mentha pulegium",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,2 m",
+   "luz": "meia-sombra",
+   "preco": 4.0,
+   "funcoes": [
+    "alimento",
+    "protecao",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 158,
+   "nome": "Hortelã-pimenta",
+   "cientifico": "Mentha × piperita",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,3 m",
+   "luz": "meia-sombra",
+   "preco": 4.0,
+   "funcoes": [
+    "alimento",
+    "protecao",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 159,
+   "nome": "Alfavaca",
+   "cientifico": "Ocimum gratissimum",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–1,5 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "protecao",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa (verão)",
+   "plantio": "set–dez",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 160,
+   "nome": "Manjericão-roxo",
+   "cientifico": "Ocimum basilicum var. purpurascens",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,5 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "protecao",
+    "oleo",
+    "medicinal",
+    "ornamental"
+   ],
+   "espacos": [
+    2,
+    4
+   ],
+   "adaptacao": "Boa (verão)",
+   "plantio": "set–dez",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 161,
+   "nome": "Estragão",
+   "cientifico": "Artemisia dracunculus",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,6 m",
+   "luz": "sol",
+   "preco": 8.0,
+   "funcoes": [
+    "alimento",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (prefere clima seco)",
+   "plantio": "mar–mai",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 162,
+   "nome": "Boldo-brasileiro",
+   "cientifico": "Plectranthus barbatus",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "1 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "polinizadores",
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 163,
+   "nome": "Calêndula",
+   "cientifico": "Calendula officinalis",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,5 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "protecao",
+    "oleo",
+    "medicinal",
+    "ornamental"
+   ],
+   "espacos": [
+    2,
+    4,
+    5,
+    30
+   ],
+   "adaptacao": "Ótima (gosta de frio)",
+   "plantio": "mar–jun",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 164,
+   "nome": "Chicória-do-pará (PANC)",
+   "cientifico": "Eryngium foetidum",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Nativa do Brasil",
+   "porte": "0,3 m",
+   "luz": "meia-sombra",
+   "preco": 4.0,
+   "funcoes": [
+    "alimento",
+    "oleo"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa (meia-sombra úmida)",
+   "plantio": "set–dez",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 165,
+   "nome": "Jambu (PANC)",
+   "cientifico": "Acmella oleracea",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Nativa do Brasil",
+   "porte": "0,3 m",
+   "luz": "sol/meia-sombra",
+   "preco": 4.0,
+   "funcoes": [
+    "alimento",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (prefere calor)",
+   "plantio": "out–dez",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 166,
+   "nome": "Dente-de-leão (PANC)",
+   "cientifico": "Taraxacum officinale",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,2 m",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 167,
+   "nome": "Babosa (aloe)",
+   "cientifico": "Aloe vera",
+   "tipo": "Erva medicinal",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,5 m",
+   "luz": "sol",
+   "preco": 8.0,
+   "funcoes": [
+    "ar",
+    "medicinal"
+   ],
+   "espacos": [
+    2,
+    4,
+    5,
+    25
+   ],
+   "adaptacao": "Ótima (local ensolarado e seco)",
+   "plantio": "set–dez",
+   "colheita": "folhas a partir do 2º ano",
+   "imagem": ""
+  },
+  {
+   "n": 168,
+   "nome": "Confrei",
+   "cientifico": "Symphytum officinale",
+   "tipo": "Erva medicinal",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,8 m",
+   "luz": "sol/meia-sombra",
+   "preco": 6.0,
+   "funcoes": [
+    "solo",
+    "biomassa",
+    "polinizadores",
+    "animais",
+    "medicinal"
+   ],
+   "espacos": [
+    2,
+    4,
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "folhas em 3 meses (uso externo)",
+   "imagem": ""
+  },
+  {
+   "n": 169,
+   "nome": "Espinheira-santa",
+   "cientifico": "Maytenus ilicifolia",
+   "tipo": "Erva medicinal",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "2–4 m",
+   "luz": "meia-sombra",
+   "preco": 15.0,
+   "funcoes": [
+    "medicinal"
+   ],
+   "espacos": [
+    15
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "folhas a partir do 2º ano",
+   "imagem": ""
+  },
+  {
+   "n": 170,
+   "nome": "Carqueja",
+   "cientifico": "Baccharis trimera",
+   "tipo": "Erva medicinal",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "0,8 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "polinizadores",
+    "medicinal"
+   ],
+   "espacos": [
+    2,
+    4,
+    15
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "set–dez",
+   "colheita": "3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 171,
+   "nome": "Arnica-brasileira",
+   "cientifico": "Solidago chilensis",
+   "tipo": "Erva medicinal",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "1 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "polinizadores",
+    "medicinal",
+    "ornamental"
+   ],
+   "espacos": [
+    5
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "set–dez",
+   "colheita": "flores a partir do 1º ano",
+   "imagem": ""
+  },
+  {
+   "n": 172,
+   "nome": "Pata-de-vaca",
+   "cientifico": "Bauhinia forficata",
+   "tipo": "Erva medicinal",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "5–8 m",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "nitrogenio",
+    "polinizadores",
+    "medicinal",
+    "ornamental"
+   ],
+   "espacos": [
+    15
+   ],
+   "adaptacao": "Ótima (nativa)",
+   "plantio": "out–dez",
+   "colheita": "folhas a partir do 2º ano",
+   "imagem": ""
+  },
+  {
+   "n": 173,
+   "nome": "Tansagem",
+   "cientifico": "Plantago major",
+   "tipo": "Erva medicinal",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,3 m",
+   "luz": "sol/meia-sombra",
+   "preco": 3.0,
+   "funcoes": [
+    "alimento",
+    "medicinal"
+   ],
+   "espacos": [
+    2,
+    4
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "2–3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 174,
+   "nome": "Malvarisco (hortelã-gorda)",
+   "cientifico": "Plectranthus amboinicus",
+   "tipo": "Erva medicinal",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,5 m",
+   "luz": "sol/meia-sombra",
+   "preco": 4.0,
+   "funcoes": [
+    "alimento",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    2,
+    4
+   ],
+   "adaptacao": "Boa (proteger da geada)",
+   "plantio": "set–dez",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 175,
+   "nome": "Quebra-pedra",
+   "cientifico": "Phyllanthus niruri",
+   "tipo": "Erva medicinal",
+   "origem": "Nativa do Brasil",
+   "porte": "0,4 m",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 176,
+   "nome": "Mil-folhas (aquileia)",
+   "cientifico": "Achillea millefolium",
+   "tipo": "Erva medicinal",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,5 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "polinizadores",
+    "medicinal",
+    "ornamental"
+   ],
+   "espacos": [
+    2,
+    4,
+    5
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 177,
+   "nome": "Mastruz (erva-de-santa-maria)",
+   "cientifico": "Dysphania ambrosioides",
+   "tipo": "Erva medicinal",
+   "origem": "Nativa do Brasil",
+   "porte": "0,6 m",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "protecao",
+    "medicinal"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 178,
+   "nome": "Terramicina",
+   "cientifico": "Alternanthera brasiliana",
+   "tipo": "Erva medicinal",
+   "origem": "Nativa do Brasil",
+   "porte": "0,6 m",
+   "luz": "sol/meia-sombra",
+   "preco": 5.0,
+   "funcoes": [
+    "medicinal",
+    "ornamental"
+   ],
+   "espacos": [
+    25
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 179,
+   "nome": "Cravo-de-defunto (tagetes)",
+   "cientifico": "Tagetes erecta",
+   "tipo": "Planta de proteção",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,6 m",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "solo",
+    "polinizadores",
+    "protecao",
+    "ornamental"
+   ],
+   "espacos": [
+    2,
+    3,
+    4,
+    5,
+    10,
+    29,
+    30
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "flores em 2–3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 180,
+   "nome": "Arruda",
+   "cientifico": "Ruta graveolens",
+   "tipo": "Planta de proteção",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,6 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "protecao",
+    "medicinal"
+   ],
+   "espacos": [
+    2,
+    3,
+    4,
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 181,
+   "nome": "Losna (artemísia)",
+   "cientifico": "Artemisia absinthium",
+   "tipo": "Planta de proteção",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,8 m",
+   "luz": "sol",
+   "preco": 5.0,
+   "funcoes": [
+    "protecao",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    2,
+    3,
+    4,
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 182,
+   "nome": "Nabo-forrageiro",
+   "cientifico": "Raphanus sativus var. oleiferus",
+   "tipo": "Adubo verde",
+   "origem": "Exótica (não invasora)",
+   "porte": "1 m",
+   "luz": "sol",
+   "preco": 0.5,
+   "funcoes": [
+    "solo",
+    "biomassa",
+    "polinizadores",
+    "animais"
+   ],
+   "espacos": [
+    2,
+    3,
+    10
+   ],
+   "adaptacao": "Ótima (inverno)",
+   "plantio": "mar–mai",
+   "colheita": "corte em 2–3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 183,
+   "nome": "Aveia-preta",
+   "cientifico": "Avena strigosa",
+   "tipo": "Adubo verde",
+   "origem": "Exótica (não invasora)",
+   "porte": "1 m",
+   "luz": "sol",
+   "preco": 0.5,
+   "funcoes": [
+    "solo",
+    "biomassa",
+    "animais"
+   ],
+   "espacos": [
+    2,
+    3,
+    10
+   ],
+   "adaptacao": "Ótima (inverno)",
+   "plantio": "mar–mai",
+   "colheita": "corte em 3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 184,
+   "nome": "Tremoço-branco",
+   "cientifico": "Lupinus albus",
+   "tipo": "Adubo verde",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,8 m",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "solo",
+    "nitrogenio",
+    "polinizadores"
+   ],
+   "espacos": [
+    2,
+    3,
+    10
+   ],
+   "adaptacao": "Ótima (inverno)",
+   "plantio": "abr–mai",
+   "colheita": "corte em 3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 185,
+   "nome": "Ervilhaca",
+   "cientifico": "Vicia sativa",
+   "tipo": "Adubo verde",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,5 m",
+   "luz": "sol",
+   "preco": 0.5,
+   "funcoes": [
+    "solo",
+    "nitrogenio",
+    "animais"
+   ],
+   "espacos": [
+    2,
+    3,
+    10
+   ],
+   "adaptacao": "Ótima (inverno)",
+   "plantio": "abr–mai",
+   "colheita": "corte em 3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 186,
+   "nome": "Crotalária",
+   "cientifico": "Crotalaria juncea",
+   "tipo": "Adubo verde",
+   "origem": "Exótica (não invasora)",
+   "porte": "2 m",
+   "luz": "sol",
+   "preco": 0.5,
+   "funcoes": [
+    "solo",
+    "nitrogenio",
+    "biomassa",
+    "polinizadores",
+    "ornamental"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Boa (verão)",
+   "plantio": "out–dez",
+   "colheita": "corte em 3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 187,
+   "nome": "Feijão-de-porco",
+   "cientifico": "Canavalia ensiformis",
+   "tipo": "Adubo verde",
+   "origem": "Nativa do Brasil",
+   "porte": "1 m",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "solo",
+    "nitrogenio",
+    "biomassa"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa (verão)",
+   "plantio": "out–dez",
+   "colheita": "corte em 3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 188,
+   "nome": "Mucuna-preta",
+   "cientifico": "Mucuna pruriens",
+   "tipo": "Adubo verde",
+   "origem": "Exótica (não invasora)",
+   "porte": "trepadeira",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "solo",
+    "nitrogenio",
+    "biomassa"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (precisa de calor)",
+   "plantio": "out–dez",
+   "colheita": "corte em 4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 189,
+   "nome": "Margaridão (girassol-mexicano)",
+   "cientifico": "Tithonia diversifolia",
+   "tipo": "Adubo verde",
+   "origem": "Exótica (não invasora)",
+   "porte": "2–3 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "solo",
+    "biomassa",
+    "polinizadores",
+    "animais",
+    "ornamental"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    29
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "podas a cada 2–3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 190,
+   "nome": "Clorofito (gravatinha)",
+   "cientifico": "Chlorophytum comosum",
+   "tipo": "Forração",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,3 m",
+   "luz": "meia-sombra",
+   "preco": 6.0,
+   "funcoes": [
+    "ar",
+    "ornamental"
+   ],
+   "espacos": [
+    15,
+    25
+   ],
+   "adaptacao": "Ótima (sombra)",
+   "plantio": "o ano todo",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 191,
+   "nome": "Bambu-gigante-verde (Bambusa oldhamii)",
+   "cientifico": "Bambusa oldhamii",
+   "tipo": "Bambu",
+   "origem": "Exótica (não invasora)",
+   "porte": "10–15 m",
+   "luz": "sol",
+   "preco": 60.0,
+   "funcoes": [
+    "ar",
+    "agua",
+    "barranco",
+    "biomassa",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    26
+   ],
+   "adaptacao": "Ótima (entouceirante; tolera geada forte)",
+   "plantio": "out–dez",
+   "colheita": "brotos a partir do 3º ano, nov–mar",
+   "imagem": ""
+  },
+  {
+   "n": 192,
+   "nome": "Bambu-doce (Dendrocalamus latiflorus)",
+   "cientifico": "Dendrocalamus latiflorus",
+   "tipo": "Bambu",
+   "origem": "Exótica (não invasora)",
+   "porte": "12–15 m",
+   "luz": "sol",
+   "preco": 70.0,
+   "funcoes": [
+    "ar",
+    "agua",
+    "barranco",
+    "biomassa",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    26
+   ],
+   "adaptacao": "Boa (entouceirante; geadas leves)",
+   "plantio": "out–dez",
+   "colheita": "brotos doces a partir do 3º ano, dez–mar",
+   "imagem": ""
+  },
+  {
+   "n": 193,
+   "nome": "Bambu-gigante (Dendrocalamus asper)",
+   "cientifico": "Dendrocalamus asper",
+   "tipo": "Bambu",
+   "origem": "Exótica (não invasora)",
+   "porte": "15–20 m",
+   "luz": "sol",
+   "preco": 80.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "biomassa",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    26
+   ],
+   "adaptacao": "Com cuidado (sensível a geada; colmos para construção)",
+   "plantio": "out–dez",
+   "colheita": "colmos a partir do 4º ano",
+   "imagem": ""
+  },
+  {
+   "n": 194,
+   "nome": "Bambu-taquara (Bambusa tuldoides)",
+   "cientifico": "Bambusa tuldoides",
+   "tipo": "Bambu",
+   "origem": "Exótica (não invasora)",
+   "porte": "6–10 m",
+   "luz": "sol",
+   "preco": 40.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "biomassa",
+    "sombra"
+   ],
+   "espacos": [
+    26
+   ],
+   "adaptacao": "Ótima (entouceirante)",
+   "plantio": "out–dez",
+   "colheita": "colmos a partir do 3º ano",
+   "imagem": ""
+  },
+  {
+   "n": 195,
+   "nome": "Bambu-de-jardim (Bambusa textilis gracilis)",
+   "cientifico": "Bambusa textilis var. gracilis",
+   "tipo": "Bambu",
+   "origem": "Exótica (não invasora)",
+   "porte": "6–8 m",
+   "luz": "sol/meia-sombra",
+   "preco": 50.0,
+   "funcoes": [
+    "ar",
+    "biomassa",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [
+    26
+   ],
+   "adaptacao": "Ótima (entouceirante, ornamental)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 196,
+   "nome": "Bambu-multiplex (Bambusa multiplex)",
+   "cientifico": "Bambusa multiplex",
+   "tipo": "Bambu",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–5 m",
+   "luz": "sol",
+   "preco": 35.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "biomassa",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    26
+   ],
+   "adaptacao": "Ótima (entouceirante, cerca viva)",
+   "plantio": "out–dez",
+   "colheita": "folhas para forragem o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 197,
+   "nome": "Taquarinha nativa (Chusquea)",
+   "cientifico": "Chusquea spp.",
+   "tipo": "Bambu",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "2–5 m",
+   "luz": "meia-sombra",
+   "preco": 25.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    26
+   ],
+   "adaptacao": "Ótima (nativa da serra)",
+   "plantio": "out–dez",
+   "colheita": "—",
+   "imagem": ""
+  },
+  {
+   "n": 198,
+   "nome": "Bambu-mossô (Phyllostachys edulis)",
+   "cientifico": "Phyllostachys edulis",
+   "tipo": "Bambu",
+   "origem": "Exótica (não invasora)",
+   "porte": "10–20 m",
+   "luz": "sol",
+   "preco": 80.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "biomassa",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    26
+   ],
+   "adaptacao": "Com cuidado (alastrante: só com barreira antirrizoma)",
+   "plantio": "out–dez",
+   "colheita": "brotos a partir do 4º ano",
+   "imagem": ""
+  },
+  {
+   "n": 199,
+   "nome": "Bandeja de mudas de hortaliças (128 células)",
+   "cientifico": "várias",
+   "tipo": "Muda (viveiro)",
+   "origem": "Exótica (não invasora)",
+   "porte": "bandeja",
+   "luz": "meia-sombra",
+   "preco": 30.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    24
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "30–45 dias por ciclo",
+   "imagem": ""
+  },
+  {
+   "n": 200,
+   "nome": "Tubetes de nativas da Mata Atlântica (54 por bandeja)",
+   "cientifico": "várias",
+   "tipo": "Muda (viveiro)",
+   "origem": "Nativa da Mata Atlântica",
+   "porte": "bandeja",
+   "luz": "meia-sombra",
+   "preco": 60.0,
+   "funcoes": [
+    "barranco",
+    "polinizadores",
+    "sombra"
+   ],
+   "espacos": [
+    24
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "set–dez",
+   "colheita": "4–8 meses",
+   "imagem": ""
+  },
+  {
+   "n": 201,
+   "nome": "Mudas de aromáticas e PANC (bandeja de 72)",
+   "cientifico": "várias",
+   "tipo": "Muda (viveiro)",
+   "origem": "Exótica (não invasora)",
+   "porte": "bandeja",
+   "luz": "meia-sombra",
+   "preco": 35.0,
+   "funcoes": [
+    "alimento",
+    "oleo"
+   ],
+   "espacos": [
+    24
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "45–60 dias",
+   "imagem": ""
+  },
+  {
+   "n": 202,
+   "nome": "Sacos de frutíferas e café (12 por bandeja)",
+   "cientifico": "várias",
+   "tipo": "Muda (viveiro)",
+   "origem": "Exótica (não invasora)",
+   "porte": "bandeja",
+   "luz": "meia-sombra",
+   "preco": 45.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    24
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "6–12 meses",
+   "imagem": ""
+  },
+  {
+   "n": 203,
+   "nome": "Estacas de bambu e cerca viva (12 por bandeja)",
+   "cientifico": "várias",
+   "tipo": "Muda (viveiro)",
+   "origem": "Exótica (não invasora)",
+   "porte": "bandeja",
+   "luz": "meia-sombra",
+   "preco": 25.0,
+   "funcoes": [
+    "barranco",
+    "sombra"
+   ],
+   "espacos": [
+    24
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "3–6 meses",
+   "imagem": ""
+  },
+  {
+   "n": 204,
+   "nome": "Café arábica (sombreado)",
+   "cientifico": "Coffea arabica",
+   "tipo": "Cultivo agroflorestal",
+   "origem": "Exótica (não invasora)",
+   "porte": "2–3 m",
+   "luz": "meia-sombra",
+   "preco": 12.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Ótima (altitude ideal, à meia-sombra)",
+   "plantio": "out–dez",
+   "colheita": "3 anos, mai–ago",
+   "imagem": ""
+  },
+  {
+   "n": 205,
+   "nome": "Cana-de-açúcar",
+   "cientifico": "Saccharum officinarum",
+   "tipo": "Cultivo agroflorestal",
+   "origem": "Exótica (não invasora)",
+   "porte": "2–4 m",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "ar",
+    "barranco",
+    "biomassa",
+    "alimento",
+    "animais",
+    "sombra"
+   ],
+   "espacos": [
+    7,
+    8,
+    9,
+    13
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "12 meses, mai–set",
+   "imagem": ""
+  },
+  {
+   "n": 206,
+   "nome": "Uva para suco e vinho (Bordô, Isabel)",
+   "cientifico": "Vitis labrusca",
+   "tipo": "Frutífera",
+   "origem": "Exótica (não invasora)",
+   "porte": "trepadeira",
+   "luz": "sol",
+   "preco": 30.0,
+   "funcoes": [
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [
+    22
+   ],
+   "adaptacao": "Ótima (pergolado/espaldeira)",
+   "plantio": "jun–ago",
+   "colheita": "2 anos, jan–mar",
+   "imagem": ""
+  },
+  {
+   "n": 207,
+   "nome": "Erva-mate",
+   "cientifico": "Ilex paraguariensis",
+   "tipo": "Cultivo agroflorestal",
+   "origem": "Nativa do Brasil",
+   "porte": "4–8 m",
+   "luz": "meia-sombra",
+   "preco": 15.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa (à sombra)",
+   "plantio": "jun–ago",
+   "colheita": "4 anos, folhas o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 208,
+   "nome": "Louro",
+   "cientifico": "Laurus nobilis",
+   "tipo": "Cultivo agroflorestal",
+   "origem": "Exótica (não invasora)",
+   "porte": "3–6 m",
+   "luz": "sol",
+   "preco": 20.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "oleo",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "2 anos, folhas o ano todo",
+   "imagem": ""
+  },
+  {
+   "n": 209,
+   "nome": "Urucum",
+   "cientifico": "Bixa orellana",
+   "tipo": "Cultivo agroflorestal",
+   "origem": "Nativa do Brasil",
+   "porte": "3–5 m",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "ar",
+    "polinizadores",
+    "alimento",
+    "sombra",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (prefere calor)",
+   "plantio": "set–nov",
+   "colheita": "2 anos, mai–ago",
+   "imagem": ""
+  },
+  {
+   "n": 210,
+   "nome": "Pupunha (palmito)",
+   "cientifico": "Bactris gasipaes",
+   "tipo": "Cultivo agroflorestal",
+   "origem": "Nativa do Brasil",
+   "porte": "5–10 m",
+   "luz": "sol",
+   "preco": 15.0,
+   "funcoes": [
+    "ar",
+    "alimento",
+    "sombra"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (o frio reduz o crescimento)",
+   "plantio": "out–dez",
+   "colheita": "18 meses (palmito)",
+   "imagem": ""
+  },
+  {
+   "n": 211,
+   "nome": "Araruta",
+   "cientifico": "Maranta arundinacea",
+   "tipo": "Cultivo alimentar",
+   "origem": "Nativa do Brasil",
+   "porte": "1 m",
+   "luz": "meia-sombra",
+   "preco": 3.0,
+   "funcoes": [
+    "biomassa",
+    "alimento"
+   ],
+   "espacos": [
+    7,
+    8,
+    9
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "10 meses",
+   "imagem": ""
+  },
+  {
+   "n": 212,
+   "nome": "Mandioquinha (batata-baroa)",
+   "cientifico": "Arracacia xanthorrhiza",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "biomassa",
+    "alimento"
+   ],
+   "espacos": [
+    2
+   ],
+   "adaptacao": "Ótima (clássica da serra)",
+   "plantio": "mar–mai",
+   "colheita": "8–10 meses",
+   "imagem": ""
+  },
+  {
+   "n": 213,
+   "nome": "Alho",
+   "cientifico": "Allium sativum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "alimento",
+    "protecao"
+   ],
+   "espacos": [
+    2,
+    4
+   ],
+   "adaptacao": "Boa (gosta de frio)",
+   "plantio": "mar–mai",
+   "colheita": "5 meses",
+   "imagem": ""
+  },
+  {
+   "n": 214,
+   "nome": "Cebola",
+   "cientifico": "Allium cepa",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 0.5,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    2,
+    10
+   ],
+   "adaptacao": "Boa",
+   "plantio": "mar–mai",
+   "colheita": "4–5 meses",
+   "imagem": ""
+  },
+  {
+   "n": 215,
+   "nome": "Alho-poró",
+   "cientifico": "Allium porrum",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "alimento",
+    "protecao"
+   ],
+   "espacos": [
+    2
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "fev–jun",
+   "colheita": "4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 216,
+   "nome": "Agrião",
+   "cientifico": "Nasturtium officinale",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro úmido",
+   "luz": "sol/meia-sombra",
+   "preco": 2.0,
+   "funcoes": [
+    "agua",
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (com água corrente ou irrigação)",
+   "plantio": "mar–ago",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 217,
+   "nome": "Mostarda e chicória",
+   "cientifico": "Brassica juncea / Cichorium endivia",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "solo",
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "mar–ago",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 218,
+   "nome": "Nabo",
+   "cientifico": "Brassica rapa",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "alimento",
+    "animais"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jul",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 219,
+   "nome": "Pepino",
+   "cientifico": "Cucumis sativus",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "tutorado",
+   "luz": "sol",
+   "preco": 1.5,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    3,
+    10,
+    27
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–fev",
+   "colheita": "2–3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 220,
+   "nome": "Quiabo",
+   "cientifico": "Abelmoschus esculentus",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–2 m",
+   "luz": "sol",
+   "preco": 1.5,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (só no verão)",
+   "plantio": "out–jan",
+   "colheita": "2–3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 221,
+   "nome": "Pimentas (dedo-de-moça, biquinho, malagueta)",
+   "cientifico": "Capsicum spp.",
+   "tipo": "Cultivo alimentar",
+   "origem": "Nativa do Brasil",
+   "porte": "0,6–1 m",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "alimento",
+    "protecao"
+   ],
+   "espacos": [
+    2,
+    10
+   ],
+   "adaptacao": "Boa",
+   "plantio": "set–dez",
+   "colheita": "3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 222,
+   "nome": "Amendoim",
+   "cientifico": "Arachis hypogaea",
+   "tipo": "Cultivo alimentar",
+   "origem": "Nativa do Brasil",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "nitrogenio",
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "out–dez",
+   "colheita": "4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 223,
+   "nome": "Fava e feijão-de-corda",
+   "cientifico": "Vicia faba / Vigna unguiculata",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 1.0,
+   "funcoes": [
+    "nitrogenio",
+    "alimento"
+   ],
+   "espacos": [
+    10
+   ],
+   "adaptacao": "Boa (fava no frio, feijão-de-corda no verão)",
+   "plantio": "abr–jun e out–dez",
+   "colheita": "3–4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 224,
+   "nome": "Aspargo",
+   "cientifico": "Asparagus officinalis",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro perene",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "jun–ago",
+   "colheita": "2º ano, set–nov",
+   "imagem": ""
+  },
+  {
+   "n": 225,
+   "nome": "Alcachofra",
+   "cientifico": "Cynara scolymus",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–1,5 m",
+   "luz": "sol",
+   "preco": 8.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "medicinal",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa (clima ameno de serra)",
+   "plantio": "mar–mai",
+   "colheita": "1 ano, set–nov",
+   "imagem": ""
+  },
+  {
+   "n": 226,
+   "nome": "Couve-de-bruxelas e couve-rábano",
+   "cientifico": "Brassica oleracea",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "canteiro",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (precisa de frio)",
+   "plantio": "mar–mai",
+   "colheita": "4 meses",
+   "imagem": ""
+  },
+  {
+   "n": 227,
+   "nome": "Melancia",
+   "cientifico": "Citrullus lanatus",
+   "tipo": "Cultivo alimentar",
+   "origem": "Exótica (não invasora)",
+   "porte": "rasteira",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    10
+   ],
+   "adaptacao": "Com cuidado (precisa de verão quente)",
+   "plantio": "out–dez",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 228,
+   "nome": "Estévia",
+   "cientifico": "Stevia rebaudiana",
+   "tipo": "Aromática",
+   "origem": "Nativa do Brasil",
+   "porte": "0,5 m",
+   "luz": "sol",
+   "preco": 6.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Boa",
+   "plantio": "set–nov",
+   "colheita": "3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 229,
+   "nome": "Camomila e melissa",
+   "cientifico": "Matricaria / Melissa",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,4 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "2–3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 230,
+   "nome": "Endro e erva-doce",
+   "cientifico": "Anethum / Foeniculum",
+   "tipo": "Aromática",
+   "origem": "Exótica (não invasora)",
+   "porte": "1 m",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "polinizadores",
+    "alimento",
+    "oleo",
+    "medicinal"
+   ],
+   "espacos": [
+    3,
+    10
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "mar–jun",
+   "colheita": "2–3 meses",
+   "imagem": ""
+  },
+  {
+   "n": 231,
+   "nome": "Peixinho-da-horta (PANC)",
+   "cientifico": "Stachys byzantina",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,3 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [
+    3,
+    4
+   ],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 232,
+   "nome": "Beldroega e serralha (PANC)",
+   "cientifico": "Portulaca oleracea / Sonchus oleraceus",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "0,2 m",
+   "luz": "sol",
+   "preco": 2.0,
+   "funcoes": [
+    "alimento",
+    "animais"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima (espontâneas)",
+   "plantio": "o ano todo",
+   "colheita": "1–2 meses",
+   "imagem": ""
+  },
+  {
+   "n": 233,
+   "nome": "Vinagreira (PANC)",
+   "cientifico": "Hibiscus sabdariffa",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Exótica (não invasora)",
+   "porte": "1–2 m",
+   "luz": "sol",
+   "preco": 4.0,
+   "funcoes": [
+    "alimento",
+    "ornamental"
+   ],
+   "espacos": [],
+   "adaptacao": "Com cuidado (prefere calor)",
+   "plantio": "out–dez",
+   "colheita": "3–5 meses",
+   "imagem": ""
+  },
+  {
+   "n": 234,
+   "nome": "Azedinha e major-gomes (PANC)",
+   "cientifico": "Rumex acetosa / Talinum paniculatum",
+   "tipo": "Hortaliça/PANC",
+   "origem": "Nativa do Brasil",
+   "porte": "0,3–0,6 m",
+   "luz": "sol",
+   "preco": 3.0,
+   "funcoes": [
+    "alimento"
+   ],
+   "espacos": [],
+   "adaptacao": "Ótima",
+   "plantio": "o ano todo",
+   "colheita": "2 meses",
+   "imagem": ""
+  }
+ ],
+ "espacos": [
+  {
+   "n": 1,
+   "nome": "Jardim de chuva (Rua H)",
+   "zona": "Zona 1",
+   "covas": 9.0,
+   "area_m2": null,
+   "recomendada": "Biri (cana-índica)",
+   "combinacoes": {
+    "A": "4 × Biri (cana-índica), 2 × Papiro-brasileiro, 2 × Helicônia-da-mata, 1 × Taboa",
+    "B": "3 × Helicônia-da-mata, 2 × Biri (cana-índica), 2 × Taboa, 1 × Papiro-brasileiro, 1 × Cavalinha",
+    "C": "Mais flores e polinizadores: 3 × Biri (cana-índica), 2 × Helicônia-da-mata, 2 × Papiro-brasileiro, 1 × Taboa, 1 × Cavalinha"
+   }
+  },
+  {
+   "n": 2,
+   "nome": "Horta A (zona 1)",
+   "zona": "Zona 1",
+   "covas": null,
+   "area_m2": 18.0,
+   "recomendada": "consórcios: 4× H2, 3× H16, 2× H20, 1× H21, 1× H15, 5× H3, 1× H4, 3× H6, 1× H13",
+   "combinacoes": {
+    "A": "4 × Tomate + cenoura + manjericão, 3 × Canteiro de temperos, 2 × Horto de ervas de cura, 1 × Bordadura de proteção, 1 × Pimentão + pimenta + coentro + alface, 5 × Alface + rabanete + cebolinha, 1 × Couve + cebola + alface, 3 × Alho-poró + cenoura, 1 × Mandioquinha + alface + salsa → 134 cenoura, beterraba, rabanete, 32 cebolinha, 30 alface, rúcula, almeirão, 18 alho-poró, 16 salsa, 14 manjericão, 12 cebola, 8 tomate, 6 orégano, 6 tomilho, 6 tansagem, 6 calêndula, 6 cravo-de-defunto, 6 coentro, 4 carqueja, 4 malvarisco, 4 mil-folhas, 4 capuchinha, 4 mandioquinha, 2 babosa, 2 confrei, 2 pimentão, 2 couve e brócolis, 1 arruda, 1 losna, 1 pimentas, 0 morango, 0 alho, 0 tomate-cereja, 0 manjericão-roxo, 0 aveia-preta, 0 tremoço-branco, 0 nabo-forrageiro, 0 ervilhaca",
+    "B": "5 × Alface + rabanete + cebolinha, 5 × Couve + cebola + alface, 7 × Alho-poró + cenoura, 5 × Mandioquinha + alface + salsa, 2 × Morango + alho + alface → 110 cenoura, beterraba, rabanete, 64 alface, rúcula, almeirão, 60 cebola, 42 alho-poró, 20 salsa, 20 cebolinha, 20 mandioquinha, 16 alho, 12 morango, 10 couve e brócolis, 0 tomate, 0 manjericão, 0 orégano, 0 tomilho, 0 babosa, 0 confrei, 0 carqueja, 0 tansagem, 0 malvarisco, 0 mil-folhas, 0 calêndula, 0 cravo-de-defunto, 0 capuchinha, 0 arruda, 0 losna, 0 pimentão, 0 pimentas, 0 coentro, 0 tomate-cereja, 0 manjericão-roxo, 0 aveia-preta, 0 tremoço-branco, 0 nabo-forrageiro, 0 ervilhaca",
+    "C": "Consórcios de máxima produção de alimento: 7 × Tomate + cenoura + manjericão, 8 × Alface + rabanete + cebolinha, 4 × Couve + cebola + alface, 3 × Morango + alho + alface → 176 cenoura, beterraba, rabanete, 54 alface, rúcula, almeirão, 48 cebola, 32 cebolinha, 24 alho, 18 morango, 14 tomate, 14 manjericão, 8 couve e brócolis, 0 orégano, 0 tomilho, 0 salsa, 0 babosa, 0 confrei, 0 carqueja, 0 tansagem, 0 malvarisco, 0 mil-folhas, 0 calêndula, 0 cravo-de-defunto, 0 capuchinha, 0 arruda, 0 losna, 0 pimentão, 0 pimentas, 0 coentro, 0 alho-poró, 0 mandioquinha, 0 tomate-cereja, 0 manjericão-roxo, 0 aveia-preta, 0 tremoço-branco, 0 nabo-forrageiro, 0 ervilhaca"
+   }
+  },
+  {
+   "n": 3,
+   "nome": "Horta leste (divisa, zona 1)",
+   "zona": "Zona 1",
+   "covas": null,
+   "area_m2": 21.7,
+   "recomendada": "consórcios: 4× H1, 4× H7, 2× H9, 2× H14, 2× H18, 1× H21, 1× H22, 1× H12",
+   "combinacoes": {
+    "A": "4 × Três irmãs, 4 × Ervilha/vagem + espinafre + rabanete, 2 × Batata + vagem + coentro, 2 × Abobrinha + rúcula + cebolinha, 2 × Pepino na treliça + rabanete + endro, 1 × Bordadura de proteção, 1 × Adubação verde de inverno, 1 × PANC perenes → 40 cenoura, beterraba, rabanete, 32 feijão-vagem e ervilha, 16 milho verde, 16 feijão, 16 espinafre e acelga, 12 batata-inglesa, 12 alface, rúcula, almeirão, 12 aveia-preta, 8 coentro, 8 cebolinha, 8 ervilhaca, 7 capuchinha, 6 pepino, 6 cravo-de-defunto, 6 nabo-forrageiro, 4 abóbora e moranga, 4 abobrinha, 4 endro e erva-doce, 4 tremoço-branco, 2 taioba, 2 peixinho-da-horta, 1 arruda, 1 losna, 1 ora-pro-nóbis",
+    "B": "3 × Três irmãs, 7 × Ervilha/vagem + espinafre + rabanete, 2 × Pepino + milho + capuchinha, 7 × PANC perenes → 42 feijão-vagem e ervilha, 42 cenoura, beterraba, rabanete, 28 espinafre e acelga, 25 capuchinha, 20 milho verde, 14 taioba, 14 peixinho-da-horta, 12 feijão, 7 ora-pro-nóbis, 6 pepino, 3 abóbora e moranga, 0 batata-inglesa, 0 coentro, 0 abobrinha, 0 alface, rúcula, almeirão, 0 cebolinha, 0 endro e erva-doce, 0 cravo-de-defunto, 0 arruda, 0 losna, 0 aveia-preta, 0 tremoço-branco, 0 nabo-forrageiro, 0 ervilhaca",
+    "C": "Consórcios de máxima produção de alimento: 5 × Três irmãs, 5 × Batata + vagem + coentro, 4 × Pepino + milho + capuchinha → 36 milho verde, 30 batata-inglesa, 20 feijão, 20 feijão-vagem e ervilha, 20 coentro, 12 pepino, 8 capuchinha, 5 abóbora e moranga, 0 espinafre e acelga, 0 cenoura, beterraba, rabanete, 0 abobrinha, 0 alface, rúcula, almeirão, 0 cebolinha, 0 endro e erva-doce, 0 cravo-de-defunto, 0 arruda, 0 losna, 0 aveia-preta, 0 tremoço-branco, 0 nabo-forrageiro, 0 ervilhaca, 0 ora-pro-nóbis, 0 taioba, 0 peixinho-da-horta"
+   }
+  },
+  {
+   "n": 4,
+   "nome": "Horta oeste (divisa, zona 1)",
+   "zona": "Zona 1",
+   "covas": null,
+   "area_m2": 10.8,
+   "recomendada": "consórcios: 2× H20, 3× H10, 1× H16, 1× H19, 1× H21, 3× H3",
+   "combinacoes": {
+    "A": "2 × Horto de ervas de cura, 3 × Berinjela + vagem + manjericão, 1 × Canteiro de temperos, 1 × Tomate-cereja + manjericão-roxo + calêndula, 1 × Bordadura de proteção, 3 × Alface + rabanete + cebolinha → 24 cenoura, beterraba, rabanete, 16 cebolinha, 12 feijão-vagem e ervilha, 12 alface, rúcula, almeirão, 9 calêndula, 8 manjericão, 6 tansagem, 6 berinjela e jiló, 6 cravo-de-defunto, 4 carqueja, 4 malvarisco, 4 mil-folhas, 4 salsa, 4 capuchinha, 2 babosa, 2 confrei, 2 orégano, 2 tomilho, 2 tomate-cereja, 2 manjericão-roxo, 1 arruda, 1 losna, 0 morango, 0 alho, 0 ora-pro-nóbis, 0 taioba, 0 peixinho-da-horta",
+    "B": "3 × Berinjela + vagem + manjericão, 7 × Alface + rabanete + cebolinha, 4 × PANC perenes → 56 cenoura, beterraba, rabanete, 28 cebolinha, 28 alface, rúcula, almeirão, 12 feijão-vagem e ervilha, 12 capuchinha, 8 taioba, 8 peixinho-da-horta, 6 berinjela e jiló, 6 manjericão, 4 ora-pro-nóbis, 0 babosa, 0 confrei, 0 carqueja, 0 tansagem, 0 malvarisco, 0 mil-folhas, 0 calêndula, 0 orégano, 0 tomilho, 0 salsa, 0 tomate-cereja, 0 manjericão-roxo, 0 cravo-de-defunto, 0 arruda, 0 losna, 0 morango, 0 alho",
+    "C": "Consórcios de máxima produção de alimento: 3 × Berinjela + vagem + manjericão, 7 × Alface + rabanete + cebolinha, 4 × Morango + alho + alface → 56 cenoura, beterraba, rabanete, 36 alface, rúcula, almeirão, 32 alho, 28 cebolinha, 24 morango, 12 feijão-vagem e ervilha, 6 berinjela e jiló, 6 manjericão, 0 babosa, 0 confrei, 0 carqueja, 0 tansagem, 0 malvarisco, 0 mil-folhas, 0 calêndula, 0 orégano, 0 tomilho, 0 salsa, 0 tomate-cereja, 0 manjericão-roxo, 0 cravo-de-defunto, 0 capuchinha, 0 arruda, 0 losna, 0 ora-pro-nóbis, 0 taioba, 0 peixinho-da-horta"
+   }
+  },
+  {
+   "n": 5,
+   "nome": "Canteiros e terraços da zona 1",
+   "zona": "Zona 1",
+   "covas": 41.0,
+   "area_m2": null,
+   "recomendada": "Lavanda (dentata)",
+   "combinacoes": {
+    "A": "12 × Lavanda (dentata), 11 × Alecrim, 8 × Sálvia-azul, 5 × Babosa (aloe), 5 × Calêndula",
+    "B": "14 × Bromélias (Vriesea, Aechmea), 11 × Arnica-brasileira, 8 × Sálvia-azul, 5 × Alecrim, 3 × Lavanda (dentata)",
+    "C": "Mais alimento: 23 × Calêndula, 18 × Alecrim"
+   }
+  },
+  {
+   "n": 6,
+   "nome": "Pomar oeste (zona 2)",
+   "zona": "Zona 2",
+   "covas": 5.0,
+   "area_m2": null,
+   "recomendada": "Jabuticabeira",
+   "combinacoes": {
+    "A": "1 × Jabuticabeira, 1 × Citros (laranja, ponkan, limão), 1 × Abacateiro, 1 × Caquizeiro, 1 × Nespereira (ameixa-amarela)",
+    "B": "1 × Jabuticabeira, 1 × Pitangueira, 1 × Cambucá, 1 × Feijoa (goiaba-serrana), 1 × Goiabeira",
+    "C": "Mais alimento: 1 × Pitangueira, 1 × Cambucá, 1 × Jabuticabeira, 1 × Nespereira (ameixa-amarela), 1 × Feijoa (goiaba-serrana)"
+   }
+  },
+  {
+   "n": 7,
+   "nome": "Agrofloresta · faixas do sul (módulos em camadas)",
+   "zona": "Zona 2",
+   "covas": null,
+   "area_m2": 26.2,
+   "recomendada": "consórcios: 1× A6, 1× A1, 1× A7",
+   "combinacoes": {
+    "A": "1 × Módulo frutas tropicais (local abrigado), 1 × Módulo café sombreado, 1 × Módulo biomassa (energia para composto e biogás) → 12 amendoim-forrageiro, 8 abacaxi, 8 crotalária, 7 feijão-guandu, 4 café arábica, 4 confrei, 3 mandioca, 3 margaridão, 2 aceroleira, 1 mangueira, 1 pitangueira, 1 ingá, 1 bananeira, 0 pau-jacaré, 0 grumixama, 0 uvaia, 0 inhame e cará, 0 batata-doce, 0 capim-limão, 0 palmito-juçara, 0 cambuci, 0 araçá-amarelo, 0 taioba, 0 gengibre e açafrão-da-terra, 0 milho verde, 0 feijão, 0 abóbora e moranga, 0 vetiver, 0 citronela, 0 cana-de-açúcar, 0 araruta",
+    "B": "1 × Módulo frutíferas nativas, 1 × Módulo palmito e frutas → 6 amendoim-forrageiro, 5 batata-doce, 4 capim-limão, 4 gengibre e açafrão-da-terra, 3 inhame e cará, 3 taioba, 2 palmito-juçara, 1 pitangueira, 1 bananeira, 1 pau-jacaré, 1 grumixama, 1 uvaia, 1 cambuci, 1 araçá-amarelo, 0 mangueira, 0 aceroleira, 0 abacaxi, 0 feijão-guandu, 0 ingá, 0 café arábica, 0 mandioca, 0 margaridão, 0 crotalária, 0 confrei, 0 milho verde, 0 feijão, 0 abóbora e moranga, 0 vetiver, 0 citronela, 0 cana-de-açúcar, 0 araruta",
+    "C": "Consórcios de máxima produção de alimento: 2 × Módulo frutas tropicais (local abrigado), 1 × Módulo roça com cordões → 16 abacaxi, 12 amendoim-forrageiro, 6 milho verde, 6 feijão, 6 vetiver, 4 aceroleira, 4 feijão-guandu, 4 mandioca, 2 mangueira, 2 pitangueira, 2 abóbora e moranga, 2 citronela, 0 ingá, 0 bananeira, 0 café arábica, 0 margaridão, 0 crotalária, 0 confrei, 0 pau-jacaré, 0 grumixama, 0 uvaia, 0 inhame e cará, 0 batata-doce, 0 capim-limão, 0 palmito-juçara, 0 cambuci, 0 araçá-amarelo, 0 taioba, 0 gengibre e açafrão-da-terra, 0 cana-de-açúcar, 0 araruta"
+   }
+  },
+  {
+   "n": 8,
+   "nome": "Agrofloresta · faixas do meio (módulos em camadas)",
+   "zona": "Zona 2/3",
+   "covas": null,
+   "area_m2": 15.6,
+   "recomendada": "consórcios: 1× A4, 1× A7",
+   "combinacoes": {
+    "A": "1 × Módulo palmito e frutas, 1 × Módulo biomassa (energia para composto e biogás) → 8 crotalária, 6 amendoim-forrageiro, 4 gengibre e açafrão-da-terra, 4 confrei, 3 taioba, 3 margaridão, 3 feijão-guandu, 2 palmito-juçara, 1 cambuci, 1 araçá-amarelo, 1 bananeira, 0 pau-jacaré, 0 pitangueira, 0 grumixama, 0 uvaia, 0 inhame e cará, 0 batata-doce, 0 capim-limão, 0 ingá, 0 café arábica, 0 mandioca, 0 milho verde, 0 feijão, 0 abóbora e moranga, 0 vetiver, 0 citronela, 0 cana-de-açúcar, 0 araruta",
+    "B": "1 × Módulo palmito e frutas → 6 amendoim-forrageiro, 4 gengibre e açafrão-da-terra, 3 taioba, 2 palmito-juçara, 1 cambuci, 1 araçá-amarelo, 1 bananeira, 0 margaridão, 0 crotalária, 0 feijão-guandu, 0 confrei, 0 pau-jacaré, 0 pitangueira, 0 grumixama, 0 uvaia, 0 inhame e cará, 0 batata-doce, 0 capim-limão, 0 ingá, 0 café arábica, 0 mandioca, 0 milho verde, 0 feijão, 0 abóbora e moranga, 0 vetiver, 0 citronela, 0 cana-de-açúcar, 0 araruta",
+    "C": "Consórcios de máxima produção de alimento: 1 × Módulo café sombreado, 1 × Módulo roça com cordões → 7 mandioca, 6 amendoim-forrageiro, 6 milho verde, 6 feijão, 6 vetiver, 4 café arábica, 2 feijão-guandu, 2 abóbora e moranga, 2 citronela, 1 bananeira, 1 ingá, 0 palmito-juçara, 0 cambuci, 0 araçá-amarelo, 0 taioba, 0 gengibre e açafrão-da-terra, 0 margaridão, 0 crotalária, 0 confrei, 0 pau-jacaré, 0 pitangueira, 0 grumixama, 0 uvaia, 0 inhame e cará, 0 batata-doce, 0 capim-limão, 0 cana-de-açúcar, 0 araruta"
+   }
+  },
+  {
+   "n": 9,
+   "nome": "Agrofloresta · faixas do norte (módulos em camadas)",
+   "zona": "Zona 2/3",
+   "covas": null,
+   "area_m2": 25.2,
+   "recomendada": "consórcios: 2× A3, 1× A5, 1× A7",
+   "combinacoes": {
+    "A": "2 × Módulo roça com cordões, 1 × Módulo cana e roça, 1 × Módulo biomassa (energia para composto e biogás) → 12 milho verde, 12 feijão, 12 vetiver, 8 mandioca, 8 crotalária, 6 batata-doce, 5 feijão-guandu, 4 abóbora e moranga, 4 citronela, 4 cana-de-açúcar, 4 araruta, 4 capim-limão, 4 confrei, 3 margaridão, 0 ingá, 0 bananeira, 0 café arábica, 0 amendoim-forrageiro, 0 pau-jacaré, 0 pitangueira, 0 grumixama, 0 uvaia, 0 inhame e cará, 0 palmito-juçara, 0 cambuci, 0 araçá-amarelo, 0 taioba, 0 gengibre e açafrão-da-terra",
+    "B": "2 × Módulo roça com cordões, 1 × Módulo frutíferas nativas → 12 milho verde, 12 feijão, 12 vetiver, 8 mandioca, 5 batata-doce, 4 abóbora e moranga, 4 citronela, 4 capim-limão, 3 inhame e cará, 1 pau-jacaré, 1 pitangueira, 1 grumixama, 1 uvaia, 0 cana-de-açúcar, 0 araruta, 0 feijão-guandu, 0 margaridão, 0 crotalária, 0 confrei, 0 ingá, 0 bananeira, 0 café arábica, 0 amendoim-forrageiro, 0 palmito-juçara, 0 cambuci, 0 araçá-amarelo, 0 taioba, 0 gengibre e açafrão-da-terra",
+    "C": "Consórcios de máxima produção de alimento: 3 × Módulo roça com cordões, 1 × Módulo cana e roça → 18 milho verde, 18 feijão, 18 vetiver, 12 mandioca, 6 abóbora e moranga, 6 citronela, 6 batata-doce, 4 cana-de-açúcar, 4 araruta, 4 capim-limão, 2 feijão-guandu, 0 margaridão, 0 crotalária, 0 confrei, 0 ingá, 0 bananeira, 0 café arábica, 0 amendoim-forrageiro, 0 pau-jacaré, 0 pitangueira, 0 grumixama, 0 uvaia, 0 inhame e cará, 0 palmito-juçara, 0 cambuci, 0 araçá-amarelo, 0 taioba, 0 gengibre e açafrão-da-terra"
+   }
+  },
+  {
+   "n": 10,
+   "nome": "Hortas B, C e D (zona 2)",
+   "zona": "Zona 2",
+   "covas": null,
+   "area_m2": 22.3,
+   "recomendada": "consórcios: 2× H1, 3× H2, 2× H14, 3× H15, 1× H17, 2× H18, 1× H21, 1× H22, 1× H4, 1× H11, 3× H3",
+   "combinacoes": {
+    "A": "2 × Três irmãs, 3 × Tomate + cenoura + manjericão, 2 × Abobrinha + rúcula + cebolinha, 3 × Pimentão + pimenta + coentro + alface, 1 × Melancia + milho + feijão-de-corda (verão), 2 × Pepino na treliça + rabanete + endro, 1 × Bordadura de proteção, 1 × Adubação verde de inverno, 1 × Couve + cebola + alface, 1 × Repolho + beterraba + camomila, 3 × Alface + rabanete + cebolinha → 96 cenoura, beterraba, rabanete, 34 alface, rúcula, almeirão, 20 cebolinha, 18 coentro, 12 milho verde, 12 aveia-preta, 12 cebola, 8 feijão, 8 ervilhaca, 6 tomate, 6 manjericão, 6 pimentão, 6 pepino, 6 cravo-de-defunto, 6 nabo-forrageiro, 4 abobrinha, 4 fava e feijão-de-corda, 4 endro e erva-doce, 4 capuchinha, 4 tremoço-branco, 3 pimentas, 2 abóbora e moranga, 2 couve e brócolis, 2 repolho e couve-flor, 2 camomila e melissa, 1 melancia, 1 arruda, 1 losna, 0 batata-inglesa, 0 feijão-vagem e ervilha",
+    "B": "2 × Três irmãs, 6 × Couve + cebola + alface, 6 × Repolho + beterraba + camomila, 8 × Alface + rabanete + cebolinha, 2 × Pepino + milho + capuchinha → 112 cenoura, beterraba, rabanete, 72 cebola, 56 alface, rúcula, almeirão, 32 cebolinha, 16 milho verde, 12 couve e brócolis, 12 repolho e couve-flor, 12 camomila e melissa, 8 feijão, 6 pepino, 4 capuchinha, 2 abóbora e moranga, 0 tomate, 0 manjericão, 0 abobrinha, 0 pimentão, 0 pimentas, 0 coentro, 0 melancia, 0 fava e feijão-de-corda, 0 endro e erva-doce, 0 cravo-de-defunto, 0 arruda, 0 losna, 0 aveia-preta, 0 tremoço-branco, 0 nabo-forrageiro, 0 ervilhaca, 0 batata-inglesa, 0 feijão-vagem e ervilha",
+    "C": "Consórcios de máxima produção de alimento: 4 × Três irmãs, 6 × Tomate + cenoura + manjericão, 2 × Batata + vagem + coentro, 8 × Alface + rabanete + cebolinha, 2 × Pepino + milho + capuchinha → 160 cenoura, beterraba, rabanete, 32 alface, rúcula, almeirão, 32 cebolinha, 24 milho verde, 16 feijão, 12 tomate, 12 manjericão, 12 batata-inglesa, 8 coentro, 8 feijão-vagem e ervilha, 6 pepino, 4 abóbora e moranga, 4 capuchinha, 0 abobrinha, 0 pimentão, 0 pimentas, 0 melancia, 0 fava e feijão-de-corda, 0 endro e erva-doce, 0 cravo-de-defunto, 0 arruda, 0 losna, 0 aveia-preta, 0 tremoço-branco, 0 nabo-forrageiro, 0 ervilhaca, 0 couve e brócolis, 0 cebola, 0 repolho e couve-flor, 0 camomila e melissa"
+   }
+  },
+  {
+   "n": 11,
+   "nome": "Lago + wetland (zona 2)",
+   "zona": "Zona 2",
+   "covas": 30.0,
+   "area_m2": null,
+   "recomendada": "Papiro-brasileiro",
+   "combinacoes": {
+    "A": "9 × Papiro-brasileiro, 7 × Tália, 6 × Sagitária, 4 × Ninfeia nativa, 4 × Junco",
+    "B": "10 × Taboa, 8 × Papiro-brasileiro, 6 × Tália, 4 × Sagitária, 2 × Ninfeia nativa",
+    "C": "Mais flores e polinizadores: 10 × Papiro-brasileiro, 8 × Tália, 6 × Sagitária, 4 × Ninfeia nativa, 2 × Junco"
+   }
+  },
+  {
+   "n": 12,
+   "nome": "Faixa das galinhas",
+   "zona": "Zona 2",
+   "covas": 6.0,
+   "area_m2": null,
+   "recomendada": "Amoreira (folha para animais)",
+   "combinacoes": {
+    "A": "3 × Feijão-guandu, 1 × Amoreira (folha para animais), 1 × Ora-pro-nóbis, 1 × Gliricídia (estaca viva)",
+    "B": "3 × Ora-pro-nóbis, 1 × Gliricídia (estaca viva), 1 × Feijão-guandu, 1 × Amoreira (folha para animais)",
+    "C": "Mais alimento: 3 × Ora-pro-nóbis, 2 × Feijão-guandu, 1 × Amoreira (folha para animais)"
+   }
+  },
+  {
+   "n": 13,
+   "nome": "Faixa dos cabritos",
+   "zona": "Zona 2",
+   "covas": 11.0,
+   "area_m2": null,
+   "recomendada": "Capim-elefante anão (BRS Kurumi)",
+   "combinacoes": {
+    "A": "6 × Capim-elefante anão (BRS Kurumi), 2 × Feijão-guandu, 1 × Gliricídia (estaca viva), 1 × Cana-de-açúcar, 1 × Amoreira (folha para animais)",
+    "B": "6 × Feijão-guandu, 2 × Capim-elefante anão (BRS Kurumi), 1 × Gliricídia (estaca viva), 1 × Cana-de-açúcar, 1 × Amoreira (folha para animais)",
+    "C": "Mais alimento: 9 × Feijão-guandu, 1 × Cana-de-açúcar, 1 × Amoreira (folha para animais)"
+   }
+  },
+  {
+   "n": 14,
+   "nome": "Entorno dos dois meliponários",
+   "zona": "Zona 2",
+   "covas": 8.0,
+   "area_m2": null,
+   "recomendada": "Assa-peixe",
+   "combinacoes": {
+    "A": "2 × Assa-peixe, 2 × Erva-baleeira, 2 × Sálvia-azul, 1 × Caliandra, 1 × Lantana",
+    "B": "2 × Erva-baleeira, 2 × Assa-peixe, 2 × Caliandra, 1 × Sálvia-azul, 1 × Lantana",
+    "C": "Mais flores e polinizadores: 2 × Sálvia-azul, 2 × Caliandra, 2 × Lantana, 1 × Assa-peixe, 1 × Erva-baleeira"
+   }
+  },
+  {
+   "n": 15,
+   "nome": "Jardins entre os lofts (zona 3)",
+   "zona": "Zona 3",
+   "covas": 71.0,
+   "area_m2": null,
+   "recomendada": "Brinco-de-princesa",
+   "combinacoes": {
+    "A": "19 × Brinco-de-princesa, 16 × Bromélias (Vriesea, Aechmea), 12 × Helicônia-da-mata, 12 × Camarão-amarelo, 12 × Orquídea-da-pedra",
+    "B": "38 × Bromélias (Vriesea, Aechmea), 21 × Helicônia-da-mata, 4 × Manacá-da-serra, 4 × Quaresmeira, 4 × Pitangueira",
+    "C": "Mais alimento: 30 × Fisális, 23 × Framboesa, 14 × Mirtileiro (blueberry), 4 × Pitangueira"
+   }
+  },
+  {
+   "n": 16,
+   "nome": "Bordas dos caminhos entre os lofts",
+   "zona": "Zona 3",
+   "covas": 40.0,
+   "area_m2": null,
+   "recomendada": "Citronela (Java)",
+   "combinacoes": {
+    "A": "12 × Citronela (Java), 10 × Capim-limão, 8 × Lavanda (dentata), 6 × Alecrim, 4 × Erva-cidreira-brasileira",
+    "B": "13 × Erva-cidreira-brasileira, 11 × Alecrim, 8 × Lavanda (dentata), 5 × Capim-limão, 3 × Citronela (Java)",
+    "C": "Mais alimento: 17 × Capim-limão, 13 × Erva-cidreira-brasileira, 10 × Alecrim"
+   }
+  },
+  {
+   "n": 17,
+   "nome": "Mini-lago dos lofts",
+   "zona": "Zona 3",
+   "covas": 7.0,
+   "area_m2": null,
+   "recomendada": "Ninfeia nativa",
+   "combinacoes": {
+    "A": "2 × Ninfeia nativa, 2 × Tália, 2 × Sagitária, 1 × Junco",
+    "B": "3 × Ninfeia nativa, 2 × Tália, 1 × Sagitária, 1 × Junco",
+    "C": "—"
+   }
+  },
+  {
+   "n": 18,
+   "nome": "Floresta filtrante (extremidades da zona 3)",
+   "zona": "Zona 3",
+   "covas": 13.0,
+   "area_m2": null,
+   "recomendada": "Bananeira (prata, nanica)",
+   "combinacoes": {
+    "A": "4 × Biri (cana-índica), 3 × Taro, 2 × Bananeira (prata, nanica), 2 × Guanandi, 2 × Ingá-do-brejo",
+    "B": "5 × Biri (cana-índica), 2 × Ingá-do-brejo, 2 × Guanandi, 2 × Sangra-d’água, 2 × Taioba",
+    "C": "Mais alimento: 4 × Taro, 4 × Taioba, 3 × Biri (cana-índica), 2 × Bananeira (prata, nanica)"
+   }
+  },
+  {
+   "n": 19,
+   "nome": "Talhadia da ponta leste",
+   "zona": "Zona 3",
+   "covas": 12.0,
+   "area_m2": null,
+   "recomendada": "Eucalipto-limão (talhadia)",
+   "combinacoes": {
+    "A": "12 × Eucalipto-limão (talhadia)",
+    "B": "5 × Bracatinga, 4 × Eucalipto-limão (talhadia), 3 × Gliricídia (estaca viva)",
+    "C": "—"
+   }
+  },
+  {
+   "n": 20,
+   "nome": "Encostas e topo dos gabiões",
+   "zona": "Lote",
+   "covas": 60.0,
+   "area_m2": null,
+   "recomendada": "Vetiver",
+   "combinacoes": {
+    "A": "30 × Vetiver, 10 × Capim-limão, 10 × Amendoim-forrageiro, 5 × Lantana, 5 × Erva-baleeira",
+    "B": "20 × Erva-baleeira, 16 × Amendoim-forrageiro, 12 × Lantana, 8 × Vetiver, 4 × Capim-limão",
+    "C": "Mais flores e polinizadores: 20 × Lantana, 16 × Amendoim-forrageiro, 12 × Erva-baleeira, 8 × Vetiver, 4 × Capim-limão"
+   }
+  },
+  {
+   "n": 21,
+   "nome": "Interior da casa e dos lofts",
+   "zona": "Casa e lofts",
+   "covas": 18.0,
+   "area_m2": null,
+   "recomendada": "Samambaia-de-metro",
+   "combinacoes": {
+    "A": "6 × Samambaia-de-metro, 4 × Espada-de-são-jorge, 3 × Guaimbê, 3 × Lírio-da-paz, 2 × Jiboia",
+    "B": "6 × Guaimbê, 5 × Samambaia-de-metro, 4 × Espada-de-são-jorge, 2 × Lírio-da-paz, 1 × Jiboia",
+    "C": "Mais flores e polinizadores: 6 × Lírio-da-paz, 5 × Samambaia-de-metro, 4 × Espada-de-são-jorge, 2 × Guaimbê, 1 × Jiboia"
+   }
+  },
+  {
+   "n": 22,
+   "nome": "Pergolados e cercas (gourmet, área comum, divisas)",
+   "zona": "Zona 1/2",
+   "covas": 10.0,
+   "area_m2": null,
+   "recomendada": "Videira (Niágara, Isabel)",
+   "combinacoes": {
+    "A": "4 × Videira (Niágara, Isabel), 2 × Uva para suco e vinho (Bordô, Isabel), 2 × Maracujazeiro, 1 × Chuchu, 1 × Kiwi (baixo frio)",
+    "B": "3 × Ora-pro-nóbis, 3 × Maracujazeiro, 2 × Videira (Niágara, Isabel), 1 × Uva para suco e vinho (Bordô, Isabel), 1 × Chuchu",
+    "C": "Mais alimento: 3 × Chuchu, 3 × Ora-pro-nóbis, 2 × Videira (Niágara, Isabel), 1 × Uva para suco e vinho (Bordô, Isabel), 1 × Maracujazeiro"
+   }
+  },
+  {
+   "n": 23,
+   "nome": "Floresta nativa oeste (zona 3)",
+   "zona": "Zona 3",
+   "covas": 4.0,
+   "area_m2": null,
+   "recomendada": "Palmito-juçara",
+   "combinacoes": {
+    "A": "1 × Palmito-juçara, 1 × Quaresmeira, 1 × Embaúba, 1 × Cedro-rosa",
+    "B": "1 × Ingá, 1 × Aroeira-pimenteira, 1 × Quaresmeira, 1 × Embaúba",
+    "C": "Mais alimento: 2 × Aroeira-pimenteira, 1 × Palmito-juçara, 1 × Ingá"
+   }
+  },
+  {
+   "n": 24,
+   "nome": "Viveiro (terraços sobre os contêineres + sombrite sobre o biodigestor)",
+   "zona": "Zona 2",
+   "covas": 84.0,
+   "area_m2": null,
+   "recomendada": "Bandeja de mudas de hortaliças (128 células)",
+   "combinacoes": {
+    "A": "32 × Bandeja de mudas de hortaliças (128 células), 21 × Tubetes de nativas da Mata Atlântica (54 por bandeja), 16 × Mudas de aromáticas e PANC (bandeja de 72), 10 × Sacos de frutíferas e café (12 por bandeja), 5 × Estacas de bambu e cerca viva (12 por bandeja)",
+    "B": "28 × Tubetes de nativas da Mata Atlântica (54 por bandeja), 22 × Estacas de bambu e cerca viva (12 por bandeja), 17 × Bandeja de mudas de hortaliças (128 células), 11 × Mudas de aromáticas e PANC (bandeja de 72), 6 × Sacos de frutíferas e café (12 por bandeja)",
+    "C": "Mais alimento: 35 × Bandeja de mudas de hortaliças (128 células), 28 × Mudas de aromáticas e PANC (bandeja de 72), 21 × Sacos de frutíferas e café (12 por bandeja)"
+   }
+  },
+  {
+   "n": 25,
+   "nome": "Jardim do pátio (zona 1)",
+   "zona": "Zona 1",
+   "covas": 3.0,
+   "area_m2": null,
+   "recomendada": "Bromélias (Vriesea, Aechmea)",
+   "combinacoes": {
+    "A": "1 × Bromélias (Vriesea, Aechmea), 1 × Clorofito (gravatinha), 1 × Babosa (aloe)",
+    "B": "1 × Bromélias (Vriesea, Aechmea), 1 × Orquídea-da-pedra, 1 × Begônia nativa",
+    "C": "Mais flores e polinizadores: 1 × Bromélias (Vriesea, Aechmea), 1 × Orquídea-da-pedra, 1 × Clorofito (gravatinha)"
+   }
+  },
+  {
+   "n": 27,
+   "nome": "Treliças nas cercas das divisas (hortas leste e oeste)",
+   "zona": "Zona 1",
+   "covas": 21.0,
+   "area_m2": null,
+   "recomendada": "Maracujazeiro",
+   "combinacoes": {
+    "A": "7 × Maracujazeiro, 5 × Pepino, 4 × Chuchu, 3 × Feijão-vagem e ervilha, 2 × Bertalha (PANC)",
+    "B": "7 × Maracujazeiro, 6 × Chuchu, 4 × Feijão-vagem e ervilha, 3 × Pepino, 1 × Bertalha (PANC)",
+    "C": "Mais alimento: 7 × Chuchu, 6 × Feijão-vagem e ervilha, 4 × Pepino, 3 × Maxixe, 1 × Bertalha (PANC)"
+   }
+  },
+  {
+   "n": 28,
+   "nome": "Paredes verdes nas faces norte dos contêineres (cabos e telas)",
+   "zona": "Zona 2",
+   "covas": 12.0,
+   "area_m2": null,
+   "recomendada": "Maracujá-doce",
+   "combinacoes": {
+    "A": "3 × Maracujá-doce, 3 × Bertalha (PANC), 2 × Ora-pro-nóbis, 2 × Inhame e cará, 2 × Chuchu",
+    "B": "4 × Ora-pro-nóbis, 3 × Maracujá-doce, 2 × Inhame e cará, 2 × Chuchu, 1 × Videira (Niágara, Isabel)",
+    "C": "Mais alimento: 4 × Chuchu, 3 × Ora-pro-nóbis, 2 × Videira (Niágara, Isabel), 2 × Inhame e cará, 1 × Bertalha (PANC)"
+   }
+  },
+  {
+   "n": 29,
+   "nome": "Jardim de girassóis junto aos contêineres (faixa de filtro)",
+   "zona": "Zona 2",
+   "covas": 40.0,
+   "area_m2": null,
+   "recomendada": "Girassol",
+   "combinacoes": {
+    "A": "20 × Girassol, 7 × Vetiver, 5 × Cravo-de-defunto (tagetes), 5 × Amendoim-forrageiro, 3 × Margaridão (girassol-mexicano)",
+    "B": "13 × Amendoim-forrageiro, 11 × Girassol, 8 × Vetiver, 5 × Cravo-de-defunto (tagetes), 3 × Margaridão (girassol-mexicano)",
+    "C": "Mais flores e polinizadores: 13 × Girassol, 11 × Cravo-de-defunto (tagetes), 8 × Margaridão (girassol-mexicano), 5 × Amendoim-forrageiro, 3 × Vetiver"
+   }
+  },
+  {
+   "n": 30,
+   "nome": "Jardim de girassóis junto ao restaurante e aos decks (faixa de filtro)",
+   "zona": "Zona 2",
+   "covas": 24.0,
+   "area_m2": null,
+   "recomendada": "Girassol",
+   "combinacoes": {
+    "A": "13 × Girassol, 3 × Vetiver, 3 × Cravo-de-defunto (tagetes), 3 × Amendoim-forrageiro, 2 × Calêndula",
+    "B": "8 × Amendoim-forrageiro, 6 × Girassol, 5 × Vetiver, 3 × Cravo-de-defunto (tagetes), 2 × Calêndula",
+    "C": "Mais alimento: 13 × Calêndula, 11 × Girassol"
+   }
+  },
+  {
+   "n": 26,
+   "nome": "Bambus (touceiras entouceirantes)",
+   "zona": "Lote",
+   "covas": 9.0,
+   "area_m2": null,
+   "recomendada": "Bambu-de-jardim (Bambusa textilis gracilis)",
+   "combinacoes": {
+    "A": "3 × Bambu-de-jardim (Bambusa textilis gracilis), 2 × Bambu-gigante-verde (Bambusa oldhamii), 1 × Bambu-doce (Dendrocalamus latiflorus), 1 × Bambu-taquara (Bambusa tuldoides), 1 × Taquarinha nativa (Chusquea), 1 × Bambu-multiplex (Bambusa multiplex)",
+    "B": "3 × Taquarinha nativa (Chusquea), 2 × Bambu-gigante-verde (Bambusa oldhamii), 2 × Bambu-doce (Dendrocalamus latiflorus), 1 × Bambu-taquara (Bambusa tuldoides), 1 × Bambu-multiplex (Bambusa multiplex)",
+    "C": "Mais alimento: 3 × Bambu-gigante-verde (Bambusa oldhamii), 3 × Bambu-doce (Dendrocalamus latiflorus), 2 × Bambu-gigante (Dendrocalamus asper), 1 × Bambu-mossô (Phyllostachys edulis)"
+   }
+  }
+ ],
+ "viveiro": [
+  {
+   "Planta": "Cebolinha",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "76",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "1",
+   "Valor (R$)": "76"
+  },
+  {
+   "Planta": "Girassol",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "33",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "1",
+   "Valor (R$)": "33"
+  },
+  {
+   "Planta": "Coentro",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "32",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "1",
+   "Valor (R$)": "32"
+  },
+  {
+   "Planta": "Cebola",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "24",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "0.5",
+   "Valor (R$)": "12"
+  },
+  {
+   "Planta": "Salsa",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "20",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "1",
+   "Valor (R$)": "20"
+  },
+  {
+   "Planta": "Pepino",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "17",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "1.5",
+   "Valor (R$)": "25.5"
+  },
+  {
+   "Planta": "Espinafre e acelga",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "16",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "1.5",
+   "Valor (R$)": "24"
+  },
+  {
+   "Planta": "Pimentão",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "8",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "2",
+   "Valor (R$)": "16"
+  },
+  {
+   "Planta": "Abobrinha",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "8",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "2",
+   "Valor (R$)": "16"
+  },
+  {
+   "Planta": "Chuchu",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "7",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "28"
+  },
+  {
+   "Planta": "Berinjela e jiló",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "6",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "2",
+   "Valor (R$)": "12"
+  },
+  {
+   "Planta": "Pimentas (dedo-de-moça, biquinho, malagueta)",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "4",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "12"
+  },
+  {
+   "Planta": "Tomate-cereja",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "2",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "2",
+   "Valor (R$)": "4"
+  },
+  {
+   "Planta": "Repolho e couve-flor",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "2",
+   "Como obter": "Viveiro: semente em bandeja de 128",
+   "Recipiente": "bandeja 128",
+   "Mudas por bandeja": "128",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "5",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "1.5",
+   "Valor (R$)": "3"
+  },
+  {
+   "Planta": "Alface, rúcula, almeirão",
+   "Tipo": "Hortaliça/PANC",
+   "Mudas no plantio": "88",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "2",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "1.5",
+   "Valor (R$)": "132"
+  },
+  {
+   "Planta": "Cravo-de-defunto (tagetes)",
+   "Tipo": "Planta de proteção",
+   "Mudas no plantio": "32",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "96"
+  },
+  {
+   "Planta": "Manjericão",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "28",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "112"
+  },
+  {
+   "Planta": "Calêndula",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "22",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "88"
+  },
+  {
+   "Planta": "Capuchinha (PANC)",
+   "Tipo": "Flor",
+   "Mudas no plantio": "19",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "5",
+   "Valor (R$)": "95"
+  },
+  {
+   "Planta": "Tomate",
+   "Tipo": "Hortaliça/PANC",
+   "Mudas no plantio": "14",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "2",
+   "Valor (R$)": "28"
+  },
+  {
+   "Planta": "Tansagem",
+   "Tipo": "Erva medicinal",
+   "Mudas no plantio": "12",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "36"
+  },
+  {
+   "Planta": "Orégano",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "8",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "5",
+   "Valor (R$)": "40"
+  },
+  {
+   "Planta": "Tomilho",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "8",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "5",
+   "Valor (R$)": "40"
+  },
+  {
+   "Planta": "Carqueja",
+   "Tipo": "Erva medicinal",
+   "Mudas no plantio": "8",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "5",
+   "Valor (R$)": "40"
+  },
+  {
+   "Planta": "Malvarisco (hortelã-gorda)",
+   "Tipo": "Erva medicinal",
+   "Mudas no plantio": "8",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "32"
+  },
+  {
+   "Planta": "Mil-folhas (aquileia)",
+   "Tipo": "Erva medicinal",
+   "Mudas no plantio": "8",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "5",
+   "Valor (R$)": "40"
+  },
+  {
+   "Planta": "Endro e erva-doce",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "8",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "24"
+  },
+  {
+   "Planta": "Bertalha (PANC)",
+   "Tipo": "Hortaliça/PANC",
+   "Mudas no plantio": "5",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "15"
+  },
+  {
+   "Planta": "Couve e brócolis",
+   "Tipo": "Hortaliça/PANC",
+   "Mudas no plantio": "4",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "1.5",
+   "Valor (R$)": "6"
+  },
+  {
+   "Planta": "Arruda",
+   "Tipo": "Planta de proteção",
+   "Mudas no plantio": "4",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "5",
+   "Valor (R$)": "20"
+  },
+  {
+   "Planta": "Losna (artemísia)",
+   "Tipo": "Planta de proteção",
+   "Mudas no plantio": "4",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "5",
+   "Valor (R$)": "20"
+  },
+  {
+   "Planta": "Peixinho-da-horta (PANC)",
+   "Tipo": "Hortaliça/PANC",
+   "Mudas no plantio": "2",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "8"
+  },
+  {
+   "Planta": "Manjericão-roxo",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "2",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "8"
+  },
+  {
+   "Planta": "Camomila e melissa",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "2",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "8"
+  },
+  {
+   "Planta": "Assa-peixe",
+   "Tipo": "Flor nativa",
+   "Mudas no plantio": "2",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "8",
+   "Valor (R$)": "16"
+  },
+  {
+   "Planta": "Caliandra",
+   "Tipo": "Flor nativa",
+   "Mudas no plantio": "1",
+   "Como obter": "Viveiro: semente em bandeja de 72",
+   "Recipiente": "bandeja 72",
+   "Mudas por bandeja": "72",
+   "Perdas": "0.2",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "18",
+   "Valor (R$)": "18"
+  },
+  {
+   "Planta": "Cenoura, beterraba, rabanete",
+   "Tipo": "Hortaliça/PANC",
+   "Mudas no plantio": "294",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "1",
+   "Valor (R$)": "294"
+  },
+  {
+   "Planta": "Feijão-vagem e ervilha",
+   "Tipo": "Hortaliça/PANC",
+   "Mudas no plantio": "47",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "1.5",
+   "Valor (R$)": "70.5"
+  },
+  {
+   "Planta": "Milho verde",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "40",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "0.5",
+   "Valor (R$)": "20"
+  },
+  {
+   "Planta": "Feijão (grão)",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "36",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "0.5",
+   "Valor (R$)": "18"
+  },
+  {
+   "Planta": "Amendoim-forrageiro",
+   "Tipo": "Cobertura de solo",
+   "Mudas no plantio": "36",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "108"
+  },
+  {
+   "Planta": "Aveia-preta",
+   "Tipo": "Adubo verde",
+   "Mudas no plantio": "24",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "0.5",
+   "Valor (R$)": "12"
+  },
+  {
+   "Planta": "Crotalária",
+   "Tipo": "Adubo verde",
+   "Mudas no plantio": "24",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "0.5",
+   "Valor (R$)": "12"
+  },
+  {
+   "Planta": "Feijão-guandu",
+   "Tipo": "Adubo verde",
+   "Mudas no plantio": "20",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "2",
+   "Valor (R$)": "40"
+  },
+  {
+   "Planta": "Alho-poró",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "18",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "1",
+   "Valor (R$)": "18"
+  },
+  {
+   "Planta": "Ervilhaca",
+   "Tipo": "Adubo verde",
+   "Mudas no plantio": "16",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "0.5",
+   "Valor (R$)": "8"
+  },
+  {
+   "Planta": "Batata-inglesa",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "12",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "1.5",
+   "Valor (R$)": "18"
+  },
+  {
+   "Planta": "Nabo-forrageiro",
+   "Tipo": "Adubo verde",
+   "Mudas no plantio": "12",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "0.5",
+   "Valor (R$)": "6"
+  },
+  {
+   "Planta": "Mandioca (aipim)",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "11",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "1",
+   "Valor (R$)": "11"
+  },
+  {
+   "Planta": "Abóbora e moranga",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "10",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "2",
+   "Valor (R$)": "20"
+  },
+  {
+   "Planta": "Tremoço-branco",
+   "Tipo": "Adubo verde",
+   "Mudas no plantio": "8",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "1",
+   "Valor (R$)": "8"
+  },
+  {
+   "Planta": "Batata-doce",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "6",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "1",
+   "Valor (R$)": "6"
+  },
+  {
+   "Planta": "Cana-de-açúcar",
+   "Tipo": "Cultivo agroflorestal",
+   "Mudas no plantio": "5",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "15"
+  },
+  {
+   "Planta": "Mandioquinha (batata-baroa)",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "4",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "2",
+   "Valor (R$)": "8"
+  },
+  {
+   "Planta": "Gengibre e açafrão-da-terra",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "4",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "12"
+  },
+  {
+   "Planta": "Araruta",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "4",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "12"
+  },
+  {
+   "Planta": "Fava e feijão-de-corda",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "4",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "1",
+   "Valor (R$)": "4"
+  },
+  {
+   "Planta": "Taro",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "3",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "2",
+   "Valor (R$)": "6"
+  },
+  {
+   "Planta": "Inhame e cará",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "2",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "2",
+   "Valor (R$)": "4"
+  },
+  {
+   "Planta": "Melancia",
+   "Tipo": "Cultivo alimentar",
+   "Mudas no plantio": "1",
+   "Como obter": "Campo: semente, rama, maniva ou tubérculo",
+   "Recipiente": "campo",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "3"
+  },
+  {
+   "Planta": "Eucalipto-limão (talhadia)",
+   "Tipo": "Árvore produtiva",
+   "Mudas no plantio": "12",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "8",
+   "Valor (R$)": "96"
+  },
+  {
+   "Planta": "Maracujazeiro",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "9",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "135"
+  },
+  {
+   "Planta": "Abacaxi",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "8",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "6",
+   "Valor (R$)": "48"
+  },
+  {
+   "Planta": "Samambaia-de-metro",
+   "Tipo": "Interior",
+   "Mudas no plantio": "6",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "25",
+   "Valor (R$)": "150"
+  },
+  {
+   "Planta": "Café arábica (sombreado)",
+   "Tipo": "Cultivo agroflorestal",
+   "Mudas no plantio": "4",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "12",
+   "Valor (R$)": "48"
+  },
+  {
+   "Planta": "Bananeira (prata, nanica)",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "4",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "60"
+  },
+  {
+   "Planta": "Espada-de-são-jorge",
+   "Tipo": "Interior",
+   "Mudas no plantio": "4",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "25",
+   "Valor (R$)": "100"
+  },
+  {
+   "Planta": "Videira (Niágara, Isabel)",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "4",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "30",
+   "Valor (R$)": "120"
+  },
+  {
+   "Planta": "Palmito-juçara",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "3",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "45"
+  },
+  {
+   "Planta": "Guaimbê",
+   "Tipo": "Interior",
+   "Mudas no plantio": "3",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "35",
+   "Valor (R$)": "105"
+  },
+  {
+   "Planta": "Lírio-da-paz",
+   "Tipo": "Interior",
+   "Mudas no plantio": "3",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "30",
+   "Valor (R$)": "90"
+  },
+  {
+   "Planta": "Maracujá-doce",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "3",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "45"
+  },
+  {
+   "Planta": "Bambu-de-jardim (Bambusa textilis gracilis)",
+   "Tipo": "Bambu",
+   "Mudas no plantio": "3",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "50",
+   "Valor (R$)": "150"
+  },
+  {
+   "Planta": "Aceroleira",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "2",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "25",
+   "Valor (R$)": "50"
+  },
+  {
+   "Planta": "Guanandi",
+   "Tipo": "Árvore nativa",
+   "Mudas no plantio": "2",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "30"
+  },
+  {
+   "Planta": "Ingá-do-brejo",
+   "Tipo": "Árvore nativa",
+   "Mudas no plantio": "2",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "30"
+  },
+  {
+   "Planta": "Jiboia",
+   "Tipo": "Interior",
+   "Mudas no plantio": "2",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "25",
+   "Valor (R$)": "50"
+  },
+  {
+   "Planta": "Uva para suco e vinho (Bordô, Isabel)",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "2",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "30",
+   "Valor (R$)": "60"
+  },
+  {
+   "Planta": "Bambu-gigante-verde (Bambusa oldhamii)",
+   "Tipo": "Bambu",
+   "Mudas no plantio": "2",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "60",
+   "Valor (R$)": "120"
+  },
+  {
+   "Planta": "Jabuticabeira",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "45",
+   "Valor (R$)": "45"
+  },
+  {
+   "Planta": "Citros (laranja, ponkan, limão)",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "45",
+   "Valor (R$)": "45"
+  },
+  {
+   "Planta": "Abacateiro",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "45",
+   "Valor (R$)": "45"
+  },
+  {
+   "Planta": "Caquizeiro",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "45",
+   "Valor (R$)": "45"
+  },
+  {
+   "Planta": "Nespereira (ameixa-amarela)",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "35",
+   "Valor (R$)": "35"
+  },
+  {
+   "Planta": "Mangueira (variedades de altitude)",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "45",
+   "Valor (R$)": "45"
+  },
+  {
+   "Planta": "Pitangueira",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "25",
+   "Valor (R$)": "25"
+  },
+  {
+   "Planta": "Ingá",
+   "Tipo": "Árvore nativa",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "15"
+  },
+  {
+   "Planta": "Cambuci",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "35",
+   "Valor (R$)": "35"
+  },
+  {
+   "Planta": "Araçá-amarelo",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "20",
+   "Valor (R$)": "20"
+  },
+  {
+   "Planta": "Kiwi (baixo frio)",
+   "Tipo": "Frutífera",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "45",
+   "Valor (R$)": "45"
+  },
+  {
+   "Planta": "Quaresmeira",
+   "Tipo": "Árvore nativa",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "18",
+   "Valor (R$)": "18"
+  },
+  {
+   "Planta": "Embaúba",
+   "Tipo": "Árvore nativa",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "10",
+   "Valor (R$)": "10"
+  },
+  {
+   "Planta": "Cedro-rosa",
+   "Tipo": "Árvore nativa",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "12",
+   "Valor (R$)": "12"
+  },
+  {
+   "Planta": "Bambu-doce (Dendrocalamus latiflorus)",
+   "Tipo": "Bambu",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "70",
+   "Valor (R$)": "70"
+  },
+  {
+   "Planta": "Bambu-taquara (Bambusa tuldoides)",
+   "Tipo": "Bambu",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "40",
+   "Valor (R$)": "40"
+  },
+  {
+   "Planta": "Taquarinha nativa (Chusquea)",
+   "Tipo": "Bambu",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "25",
+   "Valor (R$)": "25"
+  },
+  {
+   "Planta": "Bambu-multiplex (Bambusa multiplex)",
+   "Tipo": "Bambu",
+   "Mudas no plantio": "1",
+   "Como obter": "Comprar para o 1º plantio (crescimento lento); o viveiro produz as reposições e as vendas",
+   "Recipiente": "compra",
+   "Bandejas": "0",
+   "Preço da muda (R$)": "35",
+   "Valor (R$)": "35"
+  },
+  {
+   "Planta": "Vetiver",
+   "Tipo": "Contenção de encosta",
+   "Mudas no plantio": "52",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "5",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "208"
+  },
+  {
+   "Planta": "Capim-limão",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "24",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "3",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "96"
+  },
+  {
+   "Planta": "Bromélias (Vriesea, Aechmea)",
+   "Tipo": "Flor nativa",
+   "Mudas no plantio": "17",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "2",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "25",
+   "Valor (R$)": "425"
+  },
+  {
+   "Planta": "Confrei",
+   "Tipo": "Erva medicinal",
+   "Mudas no plantio": "16",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "2",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "6",
+   "Valor (R$)": "96"
+  },
+  {
+   "Planta": "Citronela (Java)",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "16",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "2",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "64"
+  },
+  {
+   "Planta": "Helicônia-da-mata",
+   "Tipo": "Flor nativa",
+   "Mudas no plantio": "14",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "2",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "20",
+   "Valor (R$)": "280"
+  },
+  {
+   "Planta": "Margaridão (girassol-mexicano)",
+   "Tipo": "Adubo verde",
+   "Mudas no plantio": "12",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "2",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "4",
+   "Valor (R$)": "48"
+  },
+  {
+   "Planta": "Orquídea-da-pedra",
+   "Tipo": "Flor nativa",
+   "Mudas no plantio": "12",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "2",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "180"
+  },
+  {
+   "Planta": "Babosa (aloe)",
+   "Tipo": "Erva medicinal",
+   "Mudas no plantio": "10",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "8",
+   "Valor (R$)": "80"
+  },
+  {
+   "Planta": "Taioba",
+   "Tipo": "Hortaliça/PANC",
+   "Mudas no plantio": "5",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "6",
+   "Valor (R$)": "30"
+  },
+  {
+   "Planta": "Clorofito (gravatinha)",
+   "Tipo": "Forração",
+   "Mudas no plantio": "1",
+   "Como obter": "Viveiro: divisão de touceira em sacos",
+   "Recipiente": "saco 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.15",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "6",
+   "Valor (R$)": "6"
+  },
+  {
+   "Planta": "Lavanda (dentata)",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "20",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "8",
+   "Valor (R$)": "160"
+  },
+  {
+   "Planta": "Brinco-de-princesa",
+   "Tipo": "Flor nativa",
+   "Mudas no plantio": "19",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "285"
+  },
+  {
+   "Planta": "Alecrim",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "17",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "6",
+   "Valor (R$)": "102"
+  },
+  {
+   "Planta": "Camarão-amarelo",
+   "Tipo": "Flor nativa",
+   "Mudas no plantio": "12",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "10",
+   "Valor (R$)": "120"
+  },
+  {
+   "Planta": "Sálvia-azul",
+   "Tipo": "Flor nativa",
+   "Mudas no plantio": "10",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "12",
+   "Valor (R$)": "120"
+  },
+  {
+   "Planta": "Erva-baleeira",
+   "Tipo": "Flor nativa",
+   "Mudas no plantio": "7",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "10",
+   "Valor (R$)": "70"
+  },
+  {
+   "Planta": "Capim-elefante anão (BRS Kurumi)",
+   "Tipo": "Forrageira",
+   "Mudas no plantio": "6",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "3",
+   "Valor (R$)": "18"
+  },
+  {
+   "Planta": "Lantana",
+   "Tipo": "Flor nativa",
+   "Mudas no plantio": "6",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "8",
+   "Valor (R$)": "48"
+  },
+  {
+   "Planta": "Ora-pro-nóbis",
+   "Tipo": "Hortaliça/PANC",
+   "Mudas no plantio": "4",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "8",
+   "Valor (R$)": "32"
+  },
+  {
+   "Planta": "Erva-cidreira-brasileira",
+   "Tipo": "Aromática",
+   "Mudas no plantio": "4",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "5",
+   "Valor (R$)": "20"
+  },
+  {
+   "Planta": "Amoreira (folha para animais)",
+   "Tipo": "Forrageira",
+   "Mudas no plantio": "2",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "30"
+  },
+  {
+   "Planta": "Gliricídia (estaca viva)",
+   "Tipo": "Adubo verde",
+   "Mudas no plantio": "2",
+   "Como obter": "Viveiro: estaca em tubete",
+   "Recipiente": "tubete 54",
+   "Mudas por bandeja": "54",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "10",
+   "Mês de semear": "0",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "5",
+   "Valor (R$)": "10"
+  },
+  {
+   "Planta": "Papiro-brasileiro",
+   "Tipo": "Aquática filtrante",
+   "Mudas no plantio": "11",
+   "Como obter": "Viveiro: divisão de matrizes em vasos",
+   "Recipiente": "vaso 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.25",
+   "Bandejas": "2",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "12",
+   "Valor (R$)": "132"
+  },
+  {
+   "Planta": "Tália",
+   "Tipo": "Aquática filtrante",
+   "Mudas no plantio": "9",
+   "Como obter": "Viveiro: divisão de matrizes em vasos",
+   "Recipiente": "vaso 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "15",
+   "Valor (R$)": "135"
+  },
+  {
+   "Planta": "Biri (cana-índica)",
+   "Tipo": "Aquática filtrante",
+   "Mudas no plantio": "8",
+   "Como obter": "Viveiro: divisão de matrizes em vasos",
+   "Recipiente": "vaso 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "8",
+   "Valor (R$)": "64"
+  },
+  {
+   "Planta": "Sagitária",
+   "Tipo": "Aquática filtrante",
+   "Mudas no plantio": "8",
+   "Como obter": "Viveiro: divisão de matrizes em vasos",
+   "Recipiente": "vaso 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "10",
+   "Valor (R$)": "80"
+  },
+  {
+   "Planta": "Ninfeia nativa",
+   "Tipo": "Aquática filtrante",
+   "Mudas no plantio": "6",
+   "Como obter": "Viveiro: divisão de matrizes em vasos",
+   "Recipiente": "vaso 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "20",
+   "Valor (R$)": "120"
+  },
+  {
+   "Planta": "Junco",
+   "Tipo": "Aquática filtrante",
+   "Mudas no plantio": "5",
+   "Como obter": "Viveiro: divisão de matrizes em vasos",
+   "Recipiente": "vaso 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "6",
+   "Valor (R$)": "30"
+  },
+  {
+   "Planta": "Taboa",
+   "Tipo": "Aquática filtrante",
+   "Mudas no plantio": "1",
+   "Como obter": "Viveiro: divisão de matrizes em vasos",
+   "Recipiente": "vaso 12",
+   "Mudas por bandeja": "12",
+   "Perdas": "0.25",
+   "Bandejas": "1",
+   "Semanas até a muda": "8",
+   "Mês de semear": "1",
+   "Mês pronto": "3",
+   "Preço da muda (R$)": "8",
+   "Valor (R$)": "8"
+  }
+ ]
+}
