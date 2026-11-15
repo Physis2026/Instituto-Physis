@@ -289,7 +289,7 @@ function polyDist(A,B){if(A.some(p=>GEO.inside(p,B))||B.some(p=>GEO.inside(p,A))
 function areaItem(i){return i.tipo==='acesso'?0:i.w*i.d}
 function run(){if(CALC)return CALC;const g=T.build();const A=S.terreno.poly.length?GEO.area(S.terreno.poly):0;const R={A,chk:[],normas:new Map(),lic:[]};
  const N=(cod,tit,tema)=>{if(!R.normas.has(cod))R.normas.set(cod,{cod,tit,tema,st:'aplicável'})};const C=(sev,msg,step,norma)=>R.chk.push([sev,msg,step,norma||'']);
- if(!S.terreno.poly.length){C('bad','Importe a topografia ou o arquivo GIS do terreno','terreno');CALC=R;return R}
+ if(!S.terreno.poly.length){C('bad','Importe a topografia ou o arquivo GIS do terreno','terreno');/* sem terreno, a etapa de clima continua usável: sol pela latitude informada (ou padrão) */const lat0=S.terreno.lat0??-23,H00=SOL.H0(lat0),dd=[31,28,31,30,31,30,31,31,30,31,30,31];R.H0=H00;R.Hh=S.clima.H.length===12?S.clima.H:H00.map(v=>v*S.clima.kt);R.yield=S.clima.pvgis?.length===12?S.clima.pvgis.reduce((a,b)=>a+b,0):R.Hh.reduce((a,v,k)=>a+v*dd[k],0)*S.clima.pr*1.05;CALC=R;return R}
  /* terreno */
  R.desnivel=g.zmax-g.zmin;if(g.plano)C('bad','O arquivo não tem cotas: importe pontos com altitude ou um modelo de elevação (.asc)','terreno');
  if(S.terreno.lat0==null)C('warn','Sem latitude: a modelagem solar usa −23°; informe a latitude','terreno');

@@ -181,6 +181,7 @@ select{width:100%;font-size:12px}
         <div class="inp-row"><div class="lbl">Tecnologia</div><select id="s-dod" onchange="calcSolar()"><option value="0.90">LiFePO4 — DoD 90%</option><option value="0.85">Li-NMC — DoD 85%</option><option value="0.50">AGM — DoD 50%</option></select></div>
         <div class="inp-row"><div class="lbl">Área de captação</div><div class="inp-wrap"><input type="number" id="s-area" value="84" oninput="calcSolar()"><span class="unit">m²</span></div></div>
         <div class="inp-row"><div class="lbl">Ocupantes</div><div class="inp-wrap"><input type="number" id="s-pess" value="2" oninput="calcSolar()"><span class="unit">pessoas</span></div></div>
+        <div class="inp-row"><div class="lbl">Padrão de consumo de água</div><select id="s-padrao" onchange="calcSolar()"><option value="160">Alto — 160 L/pessoa·dia</option><option value="130" selected>Médio — 130 L/pessoa·dia</option><option value="100">Baixo — 100 L/pessoa·dia</option></select></div>
       </div>
     </div>
     <div class="col-stack">
@@ -575,8 +576,8 @@ const CERTS={
     'Registro em edgebuildings.com',
   ]},
   casaazul:{n:'Selo Casa Azul — Caixa',cor:'#2C5A6E',items:[
-    'RTQ-R Nível A (PROCEL Edifica)',
-    'Captação pluvial (NBR 15527)',
+    'INI-R Nível A (PBE Edifica, Portaria Inmetro 309/2022)',
+    'Captação pluvial (NBR 15527:2019)',
     'Coleta seletiva e compostagem',
     'Ventilação e iluminação natural (NBR 15575)',
     'Manual do proprietário entregue',
@@ -661,8 +662,8 @@ function calcSolar(){
   const ger=Math.round(pot*hps*365*pr);
   const saldo=ger-consumo*365;
   const capBat=Math.round((consumo*(auto/24))/dod*1.2);
-  const captacao=Math.round((c.prec/1000)*(areaT*0.85)*1000/365);
-  const consumoAgua=pess*130;
+  const captacao=Math.round((c.prec/1000)*(areaT*0.80)*1000/365); // coeficiente de escoamento 0,80 (sistema/physis-premissas.json, chuva.coef_escoamento)
+  const consumoAgua=pess*(parseFloat(sel('s-padrao'))||130); // L/pessoa·dia por padrão (agua.per_capita)
   $('s-hps-info').innerText=`HPS: ${hps}h/dia · PR: ${pr} · PVGIS ERA5`;
   set('r-potmin',potMin+' kWp');
   set('r-pot',pot+' kWp');

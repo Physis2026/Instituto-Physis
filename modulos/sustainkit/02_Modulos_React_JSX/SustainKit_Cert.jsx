@@ -103,7 +103,7 @@ const MODELOS=[
   {id:"sede",icon:"🏢",nome:"Sede Physis",escala:"200–400m²",
    solar:"15–25 kWp",cert:"LEED Platinum + PBQP-H",
    forca:"Credibilidade · vitrine · captação editais",
-   oportunidade:"GIZ · Banco Mundial · laboratório",cor:"#FFF9C4"},
+   oportunidade:"Cooperação internacional · Banco Mundial · laboratório",cor:"#FFF9C4"},
   {id:"hotel",icon:"🏨",nome:"Hotel Boutique",escala:"8–15 quartos · 800–1.500m²",
    solar:"60–100 kWp",cert:"LEED Gold + WELL + GreenKey",
    forca:"Maior receita · marca consolidada",

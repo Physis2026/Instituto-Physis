@@ -351,6 +351,15 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if not self._quem():
                     return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
                 return self._json(200, hub.loja_catalogo(interno=True))
+            # ── Consultoria ── página pública e textos editáveis do site (leitura pública, como a loja)
+            if u.path in ("/consultoria", "/consultoria/"):
+                if not (WEB / "consultoria.html").exists():
+                    return self._json(404, {"ok": False, "erro": "consultoria.html ausente"})
+                return self._arquivo(WEB / "consultoria.html", "text/html; charset=utf-8")
+            if u.path.startswith("/api/site/textos/"):
+                r = hub.site_textos(u.path[len("/api/site/textos/"):])
+                return self._json(200 if r["ok"] else 404, r)
+            # ── fim Consultoria ──
             if u.path.startswith("/ativar/"):
                 numero = u.path.rstrip("/").rsplit("/", 1)[-1]
                 if not re.fullmatch(r"PH-\d{4,6}", numero):
@@ -555,6 +564,25 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                           papel=d.get("papel") if isinstance(d.get("papel"), str) else None,
                                           pessoa=d.get("pessoa") if isinstance(d.get("pessoa"), str) else None)
                 return self._json(200 if r["ok"] else 400, r)
+            # ── Consultoria ── gravar textos do site: sempre com sessão, mesmo em instalação sem login
+            if u.path.startswith("/api/site/textos/"):
+                # lê o corpo antes de responder, mesmo sem sessão: no Windows, fechar com bytes
+                # não lidos corta a conexão (RST) e quem enviou não vê o 401
+                bruto = self._corpo_grande(1024 * 1024)
+                if bruto is None:
+                    return self._recusar_corpo("textos ausentes ou maiores que 1 MB")
+                q = self._quem()
+                if not q:
+                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                try:
+                    d = json.loads(bruto.decode("utf-8"))
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                if isinstance(d, dict) and isinstance(d.get("textos"), dict) and len(d) == 1:
+                    d = d["textos"]          # aceita {"textos": {...}} ou {chave: texto}
+                r = hub.site_gravar(u.path[len("/api/site/textos/"):], d, q["usuario"])
+                return self._json(200 if r["ok"] else 400, r)
+            # ── fim Consultoria ──
             if u.path == "/api/central/arquivo":
                 # arquivo de apoio do pedido: corpo binario, ate 20 MB; publico como o proprio pedido
                 q = parse_qs(u.query)

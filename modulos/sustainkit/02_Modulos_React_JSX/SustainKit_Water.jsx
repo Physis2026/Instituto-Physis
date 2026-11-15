@@ -101,7 +101,7 @@ function TabCaptacao(){
         <Inp label="Dias de reserva na cisterna" value={reserva} onChange={setReserva} unit="dias" min={7} max={180}
           note="Recomendado: 30–60 dias. Semiárido: 90 dias"/>
         <div style={{fontSize:10,color:C.muted,fontStyle:"italic",padding:"7px",background:C.gray,borderRadius:6}}>
-          Precipitação local: {prec}mm/ano · ABNT NBR 15527:2007
+          Precipitação local: {prec}mm/ano · ABNT NBR 15527:2019
         </div>
       </Card>
       <div style={{display:"flex",flexDirection:"column",gap:10}}>

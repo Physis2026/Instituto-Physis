@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Consultoria · Physis Engineering</title>
+<meta name="description" content="Consultoria em engenharia para a sustentabilidade: energia solar, água, sensores, resíduos, carbono, certificações e gestão ambiental. Physis Engineering, Petrópolis/RJ.">
+<!-- Página pública da consultoria. TEXTO PROVISÓRIO — REVISAR antes de divulgar.
+     Cada bloco com data-chave pode ser trocado pela equipe Physis (botão "Editar textos", só com sessão);
+     as trocas ficam no servidor em /api/site/textos/consultoria e substituem o texto daqui ao abrir a página. -->
+<style>
+:root{
+  color-scheme:light;
+  --verde:#33512F;--escuro:#1C2B21;--fundo:#F4F6F1;--sup:#FFFFFF;--linha:#C9D2C4;--tinta2:#4A4F44;--marca:#4B7547;
+  --ok-f:#DCEBD8;--ok-t:#1F4A1C;--al-f:#F5E2D7;--al-t:#7A2214;--at-f:#F6EAD0;--at-t:#5C3F00;
+  --titulo:Fraunces,Georgia,"Times New Roman",serif;
+  --fonte:Lexend,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--fundo);color:var(--escuro);font:16px/1.6 var(--fonte)}
+a{color:var(--verde)}
+:focus-visible{outline:3px solid var(--verde);outline-offset:2px}
+.pular{position:absolute;left:-9999px;top:8px;background:var(--verde);color:#fff;padding:8px 14px;border-radius:8px;z-index:10}
+.pular:focus{left:8px}
+.in{max-width:1080px;margin:0 auto;padding:0 16px}
+[data-chave]{white-space:pre-line}
+
+/* faixa de identidade, como a .px-faixa do painel */
+.px-faixa{background:var(--fundo);border-bottom:1px solid var(--linha)}
+.heroi{padding:36px 0 30px}
+.px-id{display:flex;align-items:center;gap:16px;min-width:0}
+.px-id img{height:64px;width:64px;object-fit:cover;object-position:0 50%;display:block;flex:none;background:transparent}
+h1{font:500 clamp(1.8rem,4.6vw,2.7rem)/1.15 var(--titulo);letter-spacing:-.012em;color:var(--verde);margin:0}
+.heroi .sub{font-size:1.12rem;max-width:720px;margin:18px 0 0;color:var(--escuro)}
+.heroi .t2{color:var(--tinta2);margin:10px 0 0;max-width:720px}
+.acoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.botao{display:inline-flex;align-items:center;justify-content:center;font:inherit;font-weight:600;min-height:46px;padding:0 20px;border-radius:8px;border:1px solid var(--verde);background:var(--verde);color:#fff;text-decoration:none;cursor:pointer}
+.botao.sec{background:transparent;color:var(--verde)}
+.botao[disabled]{opacity:.6;cursor:wait}
+.aviso{background:var(--at-f);color:var(--at-t);border-bottom:1px solid #E3D3A8;font-size:.92rem;padding:8px 0}
+
+nav.menu{background:var(--sup);border-bottom:1px solid var(--linha);position:sticky;top:0;z-index:5}
+nav.menu ul{list-style:none;margin:0;padding:0;display:flex;gap:4px;overflow-x:auto}
+nav.menu a{display:block;padding:12px 12px;text-decoration:none;font-weight:600;white-space:nowrap;color:var(--escuro)}
+nav.menu a:hover{color:var(--verde);text-decoration:underline}
+
+section{padding:44px 0 8px;scroll-margin-top:52px}
+h2{font:500 clamp(1.45rem,3.2vw,1.9rem)/1.2 var(--titulo);color:var(--verde);margin:0 0 8px}
+h3{font:600 1.08rem/1.35 var(--fonte);margin:0 0 6px;color:var(--escuro)}
+.intro{color:var(--tinta2);max-width:760px;margin:0 0 20px}
+.cartao{background:var(--sup);border:1px solid var(--linha);border-radius:12px;padding:18px}
+.grade{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.grade p{margin:0}
+.cartao p + p{margin-top:8px}
+.rotulo{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--marca);margin-bottom:4px}
+
+/* fases e portões */
+.fases{list-style:none;margin:0;padding:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.fase{position:relative}
+.fase .num{font:500 2rem/1 var(--titulo);color:var(--verde)}
+.fase ul{margin:8px 0 0;padding-left:20px}
+.portao{margin-top:12px;padding:10px 12px;border-left:4px solid var(--verde);background:var(--ok-f);color:var(--ok-t);border-radius:0 8px 8px 0;font-size:.95rem}
+.portao strong{display:block}
+
+/* tabela de diárias */
+.rolagem{overflow-x:auto;border:1px solid var(--linha);border-radius:12px;background:var(--sup)}
+table{border-collapse:collapse;width:100%;min-width:560px}
+caption{text-align:left;padding:12px 14px 0;color:var(--tinta2);font-size:.95rem}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--linha);vertical-align:top}
+thead th{background:#EEF2EA;font-weight:700}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:0}
+.valor{font-weight:600;color:var(--at-t);white-space:nowrap}
+.nota{color:var(--tinta2);font-size:.92rem;margin:10px 0 0}
+
+.exemplo{display:inline-block;font-size:.78rem;font-weight:700;background:var(--at-f);color:var(--at-t);border:1px solid #E3D3A8;border-radius:999px;padding:2px 10px;margin-bottom:8px}
+.caso dl{margin:8px 0 0;display:grid;gap:6px}
+.caso dt{font-weight:700;font-size:.9rem;color:var(--marca)}
+.caso dd{margin:0}
+
+/* formulário */
+form{display:grid;gap:14px}
+.duas{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+label,legend{font-weight:600}
+.campo label{display:block;margin-bottom:4px}
+.obrig{color:var(--al-t)}
+input[type=text],input[type=email],input[type=tel],textarea{font:inherit;width:100%;min-height:46px;padding:8px 12px;border:1px solid #8A9284;border-radius:8px;background:#fff;color:var(--escuro)}
+textarea{min-height:130px;resize:vertical}
+fieldset{border:1px solid var(--linha);border-radius:10px;padding:12px 14px;margin:0}
+.opcoes{display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));margin-top:6px}
+.opcoes label,.aceite label{font-weight:400;display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+input[type=checkbox]{width:20px;height:20px;margin:3px 0 0;accent-color:var(--verde);flex:none}
+.aceite{background:#EEF2EA;border-radius:10px;padding:12px 14px}
+.dica{color:var(--tinta2);font-size:.9rem;margin:4px 0 0}
+.msg{min-height:1.5em;font-weight:600;margin:0}
+.msg.erro{color:var(--al-t)}
+.msg.ok{color:var(--ok-t)}
+.sucesso{background:var(--ok-f);color:var(--ok-t);border:1px solid #B7D3B0;border-radius:10px;padding:14px 16px}
+.escondido{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+footer{margin-top:48px;border-top:1px solid var(--linha);background:var(--sup);padding:22px 0 90px;color:var(--tinta2);font-size:.95rem}
+footer p{margin:4px 0}
+
+/* edição pela equipe (só aparece com sessão) */
+.edicao{position:fixed;right:16px;bottom:16px;z-index:20;display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end;max-width:calc(100% - 32px);background:var(--sup);border:1px solid var(--linha);border-radius:12px;padding:10px;box-shadow:0 4px 18px rgba(28,43,33,.18)}
+.edicao .msg{flex-basis:100%;text-align:right;font-size:.9rem}
+.edicao[hidden],.edicao [hidden]{display:none}
+body.editando [data-chave]{outline:2px dashed var(--marca);outline-offset:3px;border-radius:4px;cursor:text}
+body.editando [data-chave]:focus{outline:3px solid var(--verde);background:#FFFDF2}
+
+@media (max-width:520px){
+  .px-id{align-items:flex-start}
+  .px-id img{height:52px;width:52px}
+  .heroi{padding:26px 0 22px}
+  section{padding-top:34px}
+  .acoes .botao{flex:1 1 100%}
+}
+</style>
+</head>
+<body>
+<a class="pular" href="#conteudo">Ir para o conteúdo</a>
+
+<div class="aviso" role="note"><div class="in" data-chave="aviso.provisorio">Página em revisão: textos provisórios e valores a revisar. Os casos mostrados são exemplos ilustrativos.</div></div>
+
+<header class="px-faixa">
+  <div class="in heroi">
+    <div class="px-id">
+      <img alt="Physis Engineering" src="data:image/png;base64,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" width="64" height="64">
+      <h1 data-chave="heroi.titulo">Engenharia para uma operação mais sustentável</h1>
+    </div>
+    <p class="sub" data-chave="heroi.sub">A Physis Engineering, de Petrópolis/RJ, ajuda propriedades rurais, indústrias e instituições a usar melhor a energia, a água e os recursos, com dados medidos em campo e decisões tomadas em etapas.</p>
+    <p class="t2" data-chave="heroi.t2">Energia solar, água, sensores e IoT, resíduos, carbono, certificações e gestão ambiental, com uma única equipe responsável do diagnóstico à operação.</p>
+    <div class="acoes">
+      <a class="botao" href="#contato" data-chave="heroi.cta1">Pedir uma conversa</a>
+      <a class="botao sec" href="#servicos" data-chave="heroi.cta2">Ver os serviços</a>
+    </div>
+  </div>
+</header>
+
+<nav class="menu" aria-label="Seções da página">
+  <div class="in"><ul>
+    <li><a href="#como">Como trabalhamos</a></li>
+    <li><a href="#servicos">Serviços</a></li>
+    <li><a href="#diarias">Diárias técnicas</a></li>
+    <li><a href="#casos">Casos</a></li>
+    <li><a href="#contato">Fale com a Physis</a></li>
+  </ul></div>
+</nav>
+
+<main id="conteudo" tabindex="-1">
+
+<section id="como" aria-labelledby="como-t">
+  <div class="in">
+    <h2 id="como-t" data-chave="como.titulo">Como trabalhamos</h2>
+    <p class="intro" data-chave="como.intro">Todo projeto começa pequeno e medido. Cada fase termina num ponto de decisão (portão): você só segue para a próxima quando os resultados combinados forem atingidos.</p>
+    <ol class="fases">
+      <li class="fase cartao">
+        <span class="num" aria-hidden="true">0</span>
+        <h3 data-chave="como.f0.titulo">Fase 0 · Diagnóstico</h3>
+        <p data-chave="como.f0.texto">Visita técnica, questionário e levantamento de dados: contas de energia e água, plantas, equipamentos e rotina da operação. Medimos o que falta medir (sinal de rádio, qualidade da água, consumo) antes de recomendar qualquer compra.</p>
+        <ul>
+          <li data-chave="como.f0.e1">Relatório de diagnóstico com os pontos observados</li>
+          <li data-chave="como.f0.e2">Alternativas comparadas, com ordem de grandeza de investimento</li>
+          <li data-chave="como.f0.e3">Proposta de piloto com critérios de aceite</li>
+        </ul>
+        <p class="portao"><strong data-chave="como.f0.portao.t">Portão 1</strong><span data-chave="como.f0.portao">Você escolhe a alternativa e aprova o piloto, os critérios de aceite e os valores fechados.</span></p>
+      </li>
+      <li class="fase cartao">
+        <span class="num" aria-hidden="true">1</span>
+        <h3 data-chave="como.f1.titulo">Fase 1 · Piloto</h3>
+        <p data-chave="como.f1.texto">Projeto, montagem e instalação em escala reduzida: poucos pontos de medição, uma primeira usina ou um primeiro sensor. Seguimos com operação assistida, calibração em campo e treinamento da equipe.</p>
+        <ul>
+          <li data-chave="como.f1.e1">Projeto com responsabilidade técnica (ART) quando aplicável</li>
+          <li data-chave="como.f1.e2">Painel com os dados e alertas, funcionando mesmo sem internet</li>
+          <li data-chave="como.f1.e3">Relatório de desempenho do piloto</li>
+        </ul>
+        <p class="portao"><strong data-chave="como.f1.portao.t">Portão 2</strong><span data-chave="como.f1.portao">Conferimos os critérios de aceite (por exemplo, leituras recebidas, diferença em relação ao laboratório, geração medida contra a prevista) e decidimos juntos se vale ampliar.</span></p>
+      </li>
+      <li class="fase cartao">
+        <span class="num" aria-hidden="true">2</span>
+        <h3 data-chave="como.f2.titulo">Fase 2 · Ampliação</h3>
+        <p data-chave="como.f2.texto">Com o piloto aprovado, a solução cresce para toda a área ou operação, aproveitando o que foi aprendido. Os dados medidos realimentam o dimensionamento.</p>
+        <ul>
+          <li data-chave="como.f2.e1">Expansão planejada em etapas</li>
+          <li data-chave="como.f2.e2">Manual de operação e plano de manutenção</li>
+          <li data-chave="como.f2.e3">Acompanhamento periódico de indicadores</li>
+        </ul>
+        <p class="portao"><strong data-chave="como.f2.portao.t">Portão 3</strong><span data-chave="como.f2.portao">Entrega final, transferência para a sua equipe e, se você quiser, contrato de acompanhamento.</span></p>
+      </li>
+    </ol>
+    <div class="grade" style="margin-top:14px">
+      <div class="cartao"><h3 data-chave="como.dif1.t">Dados seus, em formato aberto</h3><p data-chave="como.dif1">Os dados ficam no seu local, em formato aberto e de sua propriedade, com cópia na nuvem se você quiser.</p></div>
+      <div class="cartao"><h3 data-chave="como.dif2.t">Tecnologia própria</h3><p data-chave="como.dif2">Sensores e automação desenvolvidos e configurados pela Physis, com ferramentas próprias de cálculo para dimensionar antes de comprar.</p></div>
+      <div class="cartao"><h3 data-chave="como.dif3.t">Transparência nas fontes</h3><p data-chave="como.dif3">Separamos o que é fato com fonte, o que é cálculo nosso e o que ainda é hipótese a confirmar em campo.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="servicos" aria-labelledby="serv-t">
+  <div class="in">
+    <h2 id="serv-t" data-chave="serv.titulo">Serviços</h2>
+    <p class="intro" data-chave="serv.intro">Os serviços podem ser contratados separados ou combinados, compartilhando o mesmo painel de dados.</p>
+    <div class="grade">
+      <article class="cartao"><span class="rotulo" data-chave="serv.diag.r">Energia e água</span><h3 data-chave="serv.diag.t">Diagnóstico energético e hídrico</h3><p data-chave="serv.diag">Levantamento de consumo, perdas e oportunidades a partir das contas, das cargas e de medições em campo. Resultado: lista priorizada de ações com estimativa de economia.</p></article>
+      <article class="cartao"><span class="rotulo" data-chave="serv.solar.r">Energia</span><h3 data-chave="serv.solar.t">Projeto de energia solar</h3><p data-chave="serv.solar">Dimensionamento de usinas conectadas à rede ou híbridas com baterias, escolha das áreas, soluções para terrenos com desnível, proteção contra surtos e acompanhamento da conexão com a distribuidora.</p></article>
+      <article class="cartao"><span class="rotulo" data-chave="serv.iot.r">Sensores e IoT</span><h3 data-chave="serv.iot.t">Monitoramento com sensores (IoT)</h3><p data-chave="serv.iot">Redes sem fio de longo alcance para solo, clima, água e energia, com painel local, alertas e funcionamento sem internet. Medimos o sinal antes de comprar.</p></article>
+      <article class="cartao"><span class="rotulo" data-chave="serv.agua.r">Água</span><h3 data-chave="serv.agua.t">Qualidade da água</h3><p data-chave="serv.agua">Plano de amostragem, análises de laboratório, sensores contínuos de pH e turbidez e interpretação para irrigação, reúso ou abastecimento.</p></article>
+      <article class="cartao"><span class="rotulo" data-chave="serv.res.r">Resíduos e clima</span><h3 data-chave="serv.res.t">Resíduos e carbono</h3><p data-chave="serv.res">Inventário de emissões de gases de efeito estufa, plano de gerenciamento de resíduos e caminhos de economia circular, com metas e indicadores acompanháveis.</p></article>
+      <article class="cartao"><span class="rotulo" data-chave="serv.cert.r">Certificações</span><h3 data-chave="serv.cert.t">Certificações e gap analysis</h3><p data-chave="serv.cert">Avaliação do quanto falta para uma certificação ou selo de sustentabilidade, plano de adequação e preparação das evidências para a auditoria.</p></article>
+      <article class="cartao"><span class="rotulo" data-chave="serv.iso.r">Gestão</span><h3 data-chave="serv.iso.t">Gestão ambiental · ISO 14001 e ISO 50001</h3><p data-chave="serv.iso">Implantação ou revisão de sistemas de gestão ambiental e de energia: levantamento de aspectos, requisitos legais, indicadores, procedimentos e auditoria interna.</p></article>
+      <article class="cartao"><span class="rotulo" data-chave="serv.cur.r">Capacitação</span><h3 data-chave="serv.cur.t">Cursos in-company</h3><p data-chave="serv.cur">Treinamentos práticos para a sua equipe em eficiência energética, uso da água, operação dos sensores e do painel e rotinas de gestão ambiental.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="diarias" aria-labelledby="dia-t">
+  <div class="in">
+    <h2 id="dia-t" data-chave="dia.titulo">Diárias técnicas</h2>
+    <p class="intro" data-chave="dia.intro">Para visitas, coletas, acompanhamento de obra ou apoio pontual, trabalhamos também por diária. Os valores abaixo ainda estão em revisão.</p>
+    <div class="rolagem" role="region" aria-labelledby="dia-t" tabindex="0">
+      <table>
+        <caption data-chave="dia.legenda">Referência por profissional, diária de 8 horas</caption>
+        <thead><tr><th scope="col">Profissional</th><th scope="col">Diária</th><th scope="col">Inclui</th></tr></thead>
+        <tbody>
+          <tr><th scope="row" data-chave="dia.l1.p">Engenheiro(a) sênior</th><td class="valor" data-chave="dia.l1.v">[valor a revisar]</td><td data-chave="dia.l1.i">Diagnóstico, reuniões de decisão, revisão de projeto e responsabilidade técnica.</td></tr>
+          <tr><th scope="row" data-chave="dia.l2.p">Engenheiro(a) pleno</th><td class="valor" data-chave="dia.l2.v">[valor a revisar]</td><td data-chave="dia.l2.i">Levantamentos, dimensionamento, instalação e operação assistida.</td></tr>
+          <tr><th scope="row" data-chave="dia.l3.p">Técnico(a) de campo</th><td class="valor" data-chave="dia.l3.v">[valor a revisar]</td><td data-chave="dia.l3.i">Montagem, coletas de água e solo, medições de sinal e calibração.</td></tr>
+          <tr><th scope="row" data-chave="dia.l4.p">Instrutor(a) de curso in-company</th><td class="valor" data-chave="dia.l4.v">[valor a revisar]</td><td data-chave="dia.l4.i">Preparação e aplicação do curso, material didático e certificado.</td></tr>
+          <tr><th scope="row" data-chave="dia.l5.p">Meia diária (até 4 horas)</th><td class="valor" data-chave="dia.l5.v">[valor a revisar]</td><td data-chave="dia.l5.i">Atendimentos curtos em Petrópolis e região.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota" data-chave="dia.nota">Deslocamento, hospedagem, alimentação, análises de laboratório e equipamentos são orçados à parte. Equipamentos e análises podem ser pagos diretamente aos fornecedores, com apoio da Physis na escolha.</p>
+  </div>
+</section>
+
+<section id="casos" aria-labelledby="casos-t">
+  <div class="in">
+    <h2 id="casos-t" data-chave="casos.titulo">Casos</h2>
+    <p class="intro" data-chave="casos.intro">Exemplos ilustrativos do tipo de trabalho que fazemos. Não representam clientes reais.</p>
+    <div class="grade">
+      <article class="cartao caso">
+        <span class="exemplo" data-chave="casos.c1.selo">Exemplo ilustrativo</span>
+        <h3 data-chave="casos.c1.t">Fazenda de café no interior de SP (exemplo)</h3>
+        <dl>
+          <dt>Desafio</dt><dd data-chave="casos.c1.d">Quedas de energia frequentes, sinal de rádio que não chega ao alto da propriedade e pH da água de irrigação sem acompanhamento.</dd>
+          <dt>O que fizemos</dt><dd data-chave="casos.c1.f">Diagnóstico, piloto com poucos pontos de solo e clima, usina solar com baterias para os equipamentos essenciais e sensor de pH no ponto do adubo.</dd>
+          <dt>Resultado esperado</dt><dd data-chave="casos.c1.r">Decisões de irrigação com dados por área e operação que continua nas quedas de energia. [resultado a revisar]</dd>
+        </dl>
+      </article>
+      <article class="cartao caso">
+        <span class="exemplo" data-chave="casos.c2.selo">Exemplo ilustrativo</span>
+        <h3 data-chave="casos.c2.t">Indústria de alimentos na Serra Fluminense (exemplo)</h3>
+        <dl>
+          <dt>Desafio</dt><dd data-chave="casos.c2.d">Conta de energia alta e preparação para a ISO 50001.</dd>
+          <dt>O que fizemos</dt><dd data-chave="casos.c2.f">Diagnóstico energético, medição por setor com sensores, gap analysis da norma e curso in-company para a equipe de manutenção.</dd>
+          <dt>Resultado esperado</dt><dd data-chave="casos.c2.r">Plano de ações priorizado e indicadores de energia acompanhados mês a mês. [resultado a revisar]</dd>
+        </dl>
+      </article>
+      <article class="cartao caso">
+        <span class="exemplo" data-chave="casos.c3.selo">Exemplo ilustrativo</span>
+        <h3 data-chave="casos.c3.t">Escola em Petrópolis/RJ (exemplo)</h3>
+        <dl>
+          <dt>Desafio</dt><dd data-chave="casos.c3.d">Desperdício de água, resíduos sem separação e vontade de envolver os alunos.</dd>
+          <dt>O que fizemos</dt><dd data-chave="casos.c3.f">Diagnóstico hídrico, plano de resíduos, inventário simples de carbono e oficinas com professores e alunos.</dd>
+          <dt>Resultado esperado</dt><dd data-chave="casos.c3.r">Consumo de água acompanhado e coleta seletiva funcionando. [resultado a revisar]</dd>
+        </dl>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="contato" aria-labelledby="contato-t">
+  <div class="in">
+    <h2 id="contato-t" data-chave="contato.titulo">Fale com a Physis</h2>
+    <p class="intro" data-chave="contato.intro">Conte o que você precisa. A equipe responde em até [prazo a revisar] dias úteis com os próximos passos, geralmente começando por uma conversa e um diagnóstico.</p>
+    <div class="cartao">
+      <div id="sucesso" class="sucesso" tabindex="-1" role="status" aria-live="polite" hidden></div>
+      <form id="pedido" novalidate>
+        <div class="duas">
+          <div class="campo"><label for="f-nome">Nome <span class="obrig" aria-hidden="true">*</span></label><input id="f-nome" name="nome" type="text" autocomplete="name" required maxlength="120"></div>
+          <div class="campo"><label for="f-empresa">Empresa ou instituição</label><input id="f-empresa" name="empresa" type="text" autocomplete="organization" maxlength="160"></div>
+          <div class="campo"><label for="f-email">E-mail <span class="obrig" aria-hidden="true">*</span></label><input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="160"></div>
+          <div class="campo"><label for="f-tel">Telefone com DDD <span class="obrig" aria-hidden="true">*</span></label><input id="f-tel" name="telefone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="40" aria-describedby="f-tel-d"><p class="dica" id="f-tel-d">Ex.: (24) 99999-0000</p></div>
+        </div>
+        <fieldset>
+          <legend>Áreas de interesse</legend>
+          <div class="opcoes" id="areas">
+            <label><input type="checkbox" name="areas" value="Diagnóstico energético e hídrico"><span>Diagnóstico energético e hídrico</span></label>
+            <label><input type="checkbox" name="areas" value="Energia solar"><span>Energia solar</span></label>
+            <label><input type="checkbox" name="areas" value="Monitoramento com sensores (IoT)"><span>Monitoramento com sensores (IoT)</span></label>
+            <label><input type="checkbox" name="areas" value="Qualidade da água"><span>Qualidade da água</span></label>
+            <label><input type="checkbox" name="areas" value="Resíduos e carbono"><span>Resíduos e carbono</span></label>
+            <label><input type="checkbox" name="areas" value="Certificações e gap analysis"><span>Certificações e gap analysis</span></label>
+            <label><input type="checkbox" name="areas" value="Gestão ambiental (ISO 14001 / 50001)"><span>Gestão ambiental (ISO 14001 / 50001)</span></label>
+            <label><input type="checkbox" name="areas" value="Cursos in-company"><span>Cursos in-company</span></label>
+            <label><input type="checkbox" name="areas" value="Diárias técnicas"><span>Diárias técnicas</span></label>
+          </div>
+        </fieldset>
+        <div class="campo"><label for="f-desc">O que você precisa? <span class="obrig" aria-hidden="true">*</span></label><textarea id="f-desc" name="descricao" required maxlength="6000" aria-describedby="f-desc-d"></textarea><p class="dica" id="f-desc-d">Onde fica, o tamanho da operação, o que já foi feito e o prazo que você imagina.</p></div>
+        <div class="escondido" aria-hidden="true"><label for="f-site">Não preencha</label><input id="f-site" name="site" type="text" tabindex="-1" autocomplete="off"></div>
+        <div class="aceite"><label><input type="checkbox" id="f-lgpd" name="lgpd" required><span>Autorizo a Physis Engineering a usar estes dados apenas para responder a este pedido e preparar uma proposta, conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018). Posso pedir a exclusão a qualquer momento. <span class="obrig" aria-hidden="true">*</span></span></label></div>
+        <p class="dica">Campos com <span class="obrig">*</span> são obrigatórios.</p>
+        <div><button class="botao" type="submit" id="f-enviar">Enviar pedido</button></div>
+        <p id="f-msg" class="msg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="in">
+    <p><strong>Physis Engineering</strong> · <span data-chave="rodape.local">Petrópolis/RJ</span></p>
+    <p data-chave="rodape.texto">Engenharia para a sustentabilidade: energia, água, dados e gestão ambiental.</p>
+    <p><a href="/loja/">Conheça também a loja de soluções Physis</a></p>
+  </div>
+</footer>
+
+<div class="edicao" id="edicao" hidden>
+  <button type="button" class="botao sec" id="ed-alternar" aria-pressed="false">Editar textos</button>
+  <button type="button" class="botao" id="ed-salvar" hidden>Salvar</button>
+  <button type="button" class="botao sec" id="ed-cancelar" hidden>Cancelar</button>
+  <p id="ed-msg" class="msg" role="status" aria-live="polite"></p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var PAGINA = "consultoria";
+  var blocos = Array.prototype.slice.call(document.querySelectorAll("[data-chave]"));
+  var original = {};          // texto que veio no HTML (padrão)
+  blocos.forEach(function (b) { original[b.getAttribute("data-chave")] = b.textContent; });
+  function el(id) { return document.getElementById(id); }
+  function aplicar(textos) {
+    blocos.forEach(function (b) {
+      var k = b.getAttribute("data-chave");
+      b.textContent = (textos && typeof textos[k] === "string" && textos[k]) ? textos[k] : original[k];
+    });
+  }
+  // texto como foi digitado (innerText traria o efeito do CSS, como letras maiúsculas dos rótulos)
+  function textoDe(b) {
+    var s = "";
+    (function andar(n) {
+      for (var c = n.firstChild; c; c = c.nextSibling) {
+        if (c.nodeType === 3) s += c.data;
+        else if (c.nodeName === "BR") s += "\n";
+        else if (c.nodeType === 1) { if (/^(DIV|P|LI)$/.test(c.nodeName) && s && s.slice(-1) !== "\n") s += "\n"; andar(c); }
+      }
+    })(b);
+    return s.replace(/\r\n?/g, "\n").replace(/ /g, " ").trim();
+  }
+
+  // 1. textos salvos pela equipe substituem os padrões (público)
+  var salvos = {};
+  fetch("/api/site/textos/" + PAGINA, { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { if (j && j.ok && j.textos) { salvos = j.textos; aplicar(salvos); } }).catch(function () {});
+
+  // 2. edição: só aparece para quem tem sessão da Physis
+  var barra = el("edicao"), bAlt = el("ed-alternar"), bSal = el("ed-salvar"), bCan = el("ed-cancelar"), msgEd = el("ed-msg");
+  var editando = false, antes = null;
+  function dizerEd(t, erro) { msgEd.textContent = t; msgEd.className = "msg" + (erro ? " erro" : (t ? " ok" : "")); }
+  function modoEdicao(liga) {
+    editando = liga;
+    document.body.classList.toggle("editando", liga);
+    bAlt.setAttribute("aria-pressed", liga ? "true" : "false");
+    bAlt.textContent = liga ? "Parar de editar" : "Editar textos";
+    bSal.hidden = !liga; bCan.hidden = !liga;
+    blocos.forEach(function (b) {
+      if (liga) {
+        try { b.contentEditable = "plaintext-only"; } catch (e) { b.contentEditable = "true"; }
+        if (b.contentEditable !== "plaintext-only") b.contentEditable = "true";
+        b.setAttribute("spellcheck", "true");
+      } else {
+        b.removeAttribute("contenteditable");
+        b.removeAttribute("spellcheck");
+      }
+    });
+  }
+  // colar sempre como texto puro; Enter em link/botão não navega durante a edição
+  document.addEventListener("paste", function (e) {
+    if (!editando || !e.target.closest || !e.target.closest("[data-chave]")) return;
+    e.preventDefault();
+    var t = (e.clipboardData || window.clipboardData).getData("text");
+    document.execCommand("insertText", false, t);
+  });
+  document.addEventListener("click", function (e) {
+    if (editando && e.target.closest && e.target.closest("a[data-chave]")) e.preventDefault();
+  });
+  fetch("/api/instancia", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { if (j && j.autenticado) barra.hidden = false; }).catch(function () {});
+  bAlt.addEventListener("click", function () {
+    if (!editando) {
+      antes = {}; blocos.forEach(function (b) { antes[b.getAttribute("data-chave")] = b.textContent; });
+      modoEdicao(true); dizerEd("Clique num texto marcado para editar. Texto apagado volta ao original ao salvar.");
+      if (blocos[0]) blocos[0].focus();
+    } else { modoEdicao(false); dizerEd(""); }
+  });
+  bCan.addEventListener("click", function () {
+    if (antes) blocos.forEach(function (b) { b.textContent = antes[b.getAttribute("data-chave")]; });
+    modoEdicao(false); dizerEd("Edição cancelada."); bAlt.focus();
+  });
+  bSal.addEventListener("click", function () {
+    var envio = {}, n = 0;
+    blocos.forEach(function (b) {
+      var k = b.getAttribute("data-chave"), t = textoDe(b);
+      if (t.length > 4000) { n = -1; b.focus(); }
+      var padrao = original[k].trim();
+      if (t === padrao || t === "") { if (salvos[k]) envio[k] = ""; }   // volta ao original
+      else if (t !== (salvos[k] || "")) envio[k] = t;
+    });
+    if (n < 0) return dizerEd("Um dos textos passou de 4000 caracteres. Encurte e salve de novo.", true);
+    if (!Object.keys(envio).length) { modoEdicao(false); return dizerEd("Nada mudou."); }
+    bSal.disabled = true; dizerEd("Salvando…");
+    fetch("/api/site/textos/" + PAGINA, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(envio) })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+      .then(function (x) {
+        if (x.s === 401) return dizerEd("Sua sessão expirou. Entre de novo em /gestao e salve outra vez.", true);
+        if (!x.j.ok) return dizerEd("Não foi salvo: " + (x.j.erro || "erro desconhecido") + ".", true);
+        salvos = x.j.textos || {}; aplicar(salvos); modoEdicao(false);
+        dizerEd("Textos salvos (" + Object.keys(envio).length + "). Já aparecem para os visitantes."); bAlt.focus();
+      })
+      .catch(function () { dizerEd("Sem resposta do servidor. Nada foi perdido: tente salvar de novo.", true); })
+      .then(function () { bSal.disabled = false; });
+  });
+
+  // 3. pedido de consultoria -> /api/central/pedido (mesmo formato do pedido da loja: physis-pedido/1)
+  var form = el("pedido"), msg = el("f-msg"), bEnv = el("f-enviar"), caixaOk = el("sucesso");
+  function dizer(t, erro) { msg.textContent = t; msg.className = "msg" + (erro ? " erro" : ""); }
+  function falta(id, t) { var x = el(id); dizer(t, true); x.setAttribute("aria-invalid", "true"); x.focus(); }
+  form.addEventListener("input", function (e) { if (e.target.removeAttribute) e.target.removeAttribute("aria-invalid"); });
+  function numeroPedido() {
+    var d = new Date(), a = new Uint8Array(4), s = "", L = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    (window.crypto || window.msCrypto).getRandomValues(a);
+    for (var i = 0; i < 4; i++) s += L[a[i] % L.length];
+    return "PP-" + String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0") + "-" + s;
+  }
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (editando) return dizer("Termine a edição dos textos antes de enviar o formulário.", true);
+    var nome = el("f-nome").value.trim(), org = el("f-empresa").value.trim(), email = el("f-email").value.trim(),
+        tel = el("f-tel").value.trim(), desc = el("f-desc").value.trim();
+    if (!nome) return falta("f-nome", "Informe o seu nome.");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return falta("f-email", "Informe um e-mail válido, como nome@exemplo.com.");
+    if (tel.replace(/\D/g, "").length < 10) return falta("f-tel", "Informe o telefone com DDD, com pelo menos 10 números.");
+    if (!desc) return falta("f-desc", "Escreva o que você precisa antes de enviar.");
+    if (!el("f-lgpd").checked) return falta("f-lgpd", "Marque a autorização de uso dos dados para enviar.");
+    if (el("f-site").value) return dizer("Pedido enviado.", false);     // robô: finge sucesso e não envia
+    var areas = Array.prototype.slice.call(form.querySelectorAll("input[name=areas]:checked")).map(function (c) { return c.value; });
+    var agora = new Date(), num = numeroPedido();
+    var ped = {
+      _formato: "physis-pedido/1", numero: num, data: agora.toISOString(), origem: "consultoria",
+      texto: desc, nome: nome, doc: "", org: org, email: email, telefone: tel, areas: areas, itens: [],
+      lgpd: { aceite: true, em: agora.toISOString(), texto: "uso dos dados para responder ao pedido e preparar proposta (Lei 13.709/2018)" }
+    };
+    bEnv.disabled = true; dizer("Enviando…", false);
+    fetch("/api/central/pedido", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(ped) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok && j.ok }; }, function () { return { ok: false }; }); })
+      .then(function (x) {
+        if (!x.ok) return dizer("O servidor não recebeu o pedido. Tente de novo em instantes.", true);
+        form.reset(); dizer("", false);
+        caixaOk.textContent = "Pedido " + num + " recebido. Obrigado, " + nome.split(" ")[0] + "! A equipe Physis vai responder no e-mail " + email + ". Guarde o número do pedido.";
+        caixaOk.hidden = false; caixaOk.focus();
+      })
+      .catch(function () { dizer("Sem resposta do servidor. Confira a conexão e tente de novo.", true); })
+      .then(function () { bEnv.disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>

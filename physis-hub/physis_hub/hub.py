@@ -617,7 +617,9 @@ class Hub:
     # Aprovar o uso de uma compra cria, sozinho: o número da instalação, a plataforma só com os
     # módulos comprados, um código de ativação secreto (guardado só como resumo com sal) e o
     # e-mail de acesso na fila de saída. O código nunca aparece na loja: só no e-mail.
-    MODULOS_PLATAFORMA = ("monitoramento", "agua", "zonas", "animais", "sustainkit", "supervisao", "gestao", "painel")
+    MODULOS_PLATAFORMA = ("monitoramento", "agua", "zonas", "animais", "coleiras", "comedouros", "sustainkit", "supervisao",
+                          "gestao", "painel", "planejador", "certificacoes", "solar", "avac", "turbinas", "sbn", "circular",
+                          "carbono", "resiliencia", "medicamentos", "pulseira")
     ATIVAR_ERROS = 5
     ATIVAR_ESPERA_S = 15 * 60
 
@@ -631,6 +633,47 @@ class Hub:
     def _resumo_codigo(sal: bytes, codigo: str) -> bytes:
         limpo = re.sub(r"[^A-Z0-9]", "", (codigo or "").upper())
         return hashlib.pbkdf2_hmac("sha256", limpo.encode(), sal, 100_000)
+
+    # Do contrato à plataforma: cada item vendido (da loja ou de uma proposta personalizada) liga os módulos
+    # que ele traz. Assim a plataforma nasce já com as abas certas, sem ninguém escolher à mão.
+    ITEM_MODULOS = {"mon-sw": ("monitoramento",), "campo": ("monitoramento",), "zonas": ("zonas",), "col": ("coleiras",),
+                    "com": ("comedouros",), "P6": ("agua",), "scada": ("supervisao",), "gestao": ("gestao",),
+                    "cliente": ("painel",), "sk-e": ("sustainkit", "solar"), "sk-w": ("sustainkit",), "sk-m": ("sustainkit",),
+                    "sk-c": ("sustainkit", "certificacoes"), "sk-pacote": ("sustainkit", "certificacoes", "carbono"),
+                    "P5": ("turbinas",), "P9": ("pulseira",), "P10": ("medicamentos",), "P12": ("carbono",),
+                    "P13": ("planejador",), "P15": ("resiliencia",), "P14": ("avac",), "P26": ("avac",),
+                    "P17": ("sbn",), "P18": ("sbn",), "P19": ("sbn",), "P11": ("circular",), "P16": ("circular",),
+                    "P20": ("circular",), "P22": ("circular",), "P27": ("circular",)}
+    # propostas personalizadas descrevem os itens em texto: palavras que identificam cada módulo
+    PALAVRAS_MODULOS = (("solar", "solar"), ("fotovolt", "solar"), ("usina", "solar"), ("sensor", "monitoramento"),
+                        ("umidade do solo", "monitoramento"), ("estação meteorol", "resiliencia"), ("ph", "agua"),
+                        ("qualidade da água", "agua"), ("scada", "supervisao"), ("supervis", "supervisao"),
+                        ("gestão", "gestao"), ("certifica", "certificacoes"), ("avac", "avac"), ("ar-condicionado", "avac"),
+                        ("turbina", "turbinas"), ("coleira", "coleiras"), ("comedouro", "comedouros"), ("caixinha", "zonas"),
+                        ("irrigação por zona", "zonas"), ("viveiro", "sbn"), ("sbn", "sbn"), ("resíduo", "circular"),
+                        ("carbono", "carbono"), ("planejador", "planejador"))
+
+    def modulos_do_contrato(self, dados: dict) -> list[str]:
+        """Módulos da plataforma a partir do contrato: a lista explícita, os itens da loja e o texto dos itens."""
+        achados: list[str] = []
+        def por(m):
+            if m in self.MODULOS_PLATAFORMA and m not in achados:
+                achados.append(m)
+        for m in dados.get("modulos") or []:
+            if m == "animais":
+                por("coleiras"); por("comedouros")
+            else:
+                por(m)
+        for item in dados.get("itens") or []:
+            if not isinstance(item, dict):
+                continue
+            for m in self.ITEM_MODULOS.get(str(item.get("id") or item.get("cod") or ""), ()):
+                por(m)
+            texto = " " + re.sub(r"\s+", " ", f"{item.get('nome', '')} {item.get('descricao', '')}".lower()) + " "
+            for palavra, m in self.PALAVRAS_MODULOS:
+                if (f" {palavra} " in texto) if len(palavra) <= 3 else (palavra in texto):
+                    por(m)
+        return achados
 
     def instalar_compra(self, numero_compra: str, link_base: str, fabricar=None, quem: str = "") -> dict:
         """Monta a instalação de uma compra aprovada. Repetir não cria outra nem troca o código."""
@@ -646,7 +689,7 @@ class Hub:
             email, nome = str(pag.get("email") or "").strip(), str(pag.get("nome") or "Cliente").strip()[:120]
             if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
                 return {"ok": False, "erro": "compra sem e-mail valido"}
-            modulos = [m for m in (dados.get("modulos") or []) if m in self.MODULOS_PLATAFORMA]
+            modulos = self.modulos_do_contrato(dados)
             cursos = [c for c in (dados.get("cursos") or []) if isinstance(c, dict) and str(c.get("link", "")).startswith("https://")]
             seq = self._db.execute("SELECT COUNT(*) FROM instalacao").fetchone()[0] + 1
             numero = "PH-%04d" % seq
@@ -846,6 +889,74 @@ class Hub:
             if d.get("publicado") and d.get("revisado") and d.get("st") in self.LOJA_PUBLICAVEL:
                 visiveis[i] = {k: v for k, v in d.items() if k not in ("revisado", "publicado")}
         return {"ok": True, "itens": visiveis}
+
+    # ── Consultoria ── textos editáveis das páginas públicas do site (ex.: /consultoria)
+    # Só texto puro: qualquer marcação HTML é retirada antes de gravar. Texto vazio apaga a
+    # troca e a página volta ao texto original.
+    SITE_PAGINA = re.compile(r"^[a-z0-9-]{1,40}$")
+    SITE_CHAVE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,59}$")
+    SITE_TEXTO_MAX = 4000
+    SITE_BLOCOS_MAX = 200
+
+    def _site_tabela(self) -> None:
+        if not getattr(self, "_site_pronto", False):
+            self._db.execute("CREATE TABLE IF NOT EXISTS site_texto (pagina TEXT NOT NULL, chave TEXT NOT NULL, texto TEXT NOT NULL, "
+                             "atualizado REAL NOT NULL, por TEXT NOT NULL, PRIMARY KEY (pagina, chave))")
+            self._db.commit()
+            self._site_pronto = True
+
+    @staticmethod
+    def _site_limpar(texto: str) -> str:
+        t = re.sub(r"<[^>]*>", "", texto)                       # tira tags
+        t = t.replace("<", "").replace(">", "")                 # e o que sobrar de tag aberta
+        t = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", t).replace("\r\n", "\n").replace("\r", "\n")
+        return t.strip()
+
+    def site_textos(self, pagina: str) -> dict:
+        if not self.SITE_PAGINA.match(pagina or ""):
+            return {"ok": False, "erro": "pagina invalida"}
+        with self._trava:
+            self._site_tabela()
+            linhas = self._db.execute("SELECT chave, texto, atualizado FROM site_texto WHERE pagina=? ORDER BY chave", (pagina,)).fetchall()
+        return {"ok": True, "pagina": pagina, "textos": {c: t for c, t, _ in linhas},
+                "atualizado": max((a for _, _, a in linhas), default=None)}
+
+    def site_gravar(self, pagina: str, textos, por: str) -> dict:
+        """Grava {chave: texto}. Texto vazio apaga a troca daquela chave."""
+        if not self.SITE_PAGINA.match(pagina or ""):
+            return {"ok": False, "erro": "pagina invalida"}
+        if not isinstance(textos, dict) or not textos:
+            return {"ok": False, "erro": "envie {chave: texto}"}
+        if len(textos) > self.SITE_BLOCOS_MAX:
+            return {"ok": False, "erro": f"no maximo {self.SITE_BLOCOS_MAX} blocos"}
+        limpos: dict[str, str] = {}
+        for k, v in textos.items():
+            if not isinstance(k, str) or not self.SITE_CHAVE.match(k):
+                return {"ok": False, "erro": "chave invalida"}
+            if not isinstance(v, str):
+                return {"ok": False, "erro": f"texto invalido em {k}"}
+            t = self._site_limpar(v)
+            if len(t) > self.SITE_TEXTO_MAX:
+                return {"ok": False, "erro": f"texto maior que {self.SITE_TEXTO_MAX} caracteres em {k}"}
+            limpos[k] = t
+        with self._trava:
+            self._site_tabela()
+            ja = {r[0] for r in self._db.execute("SELECT chave FROM site_texto WHERE pagina=?", (pagina,))}
+            depois = (ja | {k for k, t in limpos.items() if t}) - {k for k, t in limpos.items() if not t}
+            if len(depois) > self.SITE_BLOCOS_MAX:
+                return {"ok": False, "erro": f"no maximo {self.SITE_BLOCOS_MAX} blocos por pagina"}
+            agora = self.relogio()
+            for k, t in limpos.items():
+                if t:
+                    self._db.execute("INSERT INTO site_texto(pagina,chave,texto,atualizado,por) VALUES(?,?,?,?,?) "
+                                     "ON CONFLICT(pagina,chave) DO UPDATE SET texto=excluded.texto, atualizado=excluded.atualizado, por=excluded.por",
+                                     (pagina, k, t, agora, por))
+                else:
+                    self._db.execute("DELETE FROM site_texto WHERE pagina=? AND chave=?", (pagina, k))
+            self.registrar("site", por, {"o_que": "textos alterados", "pagina": pagina, "chaves": sorted(limpos)[:50]})
+            self._db.commit()
+        return dict(self.site_textos(pagina), gravados=len(limpos))
+    # ── fim Consultoria ──
 
     def fechar(self) -> None:
         with self._trava:

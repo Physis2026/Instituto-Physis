@@ -1,40 +1,60 @@
 {
-  "_leia": "Uma ficha por cliente. O código é um só; cada plataforma é montada a partir desta ficha com: python physis-hub/montar_clientes.py --saida <pasta>. Mudou um módulo? Mude aqui e monte de novo.",
+  "_leia": "Uma ficha por cliente (ou por versão a enviar para a equipe). O código é um só; cada plataforma é montada a partir desta ficha com: python physis-hub/montar_clientes.py --saida <pasta>. Mudou um módulo? Mude aqui e monte de novo. Na compra pela loja ou por proposta aprovada, os módulos saem sozinhos do contrato (Hub.modulos_do_contrato).",
   "clientes": [
     {
       "org": "physis-site",
       "nome": "Physis Engineering",
       "lugar": "servidor-physis",
-      "projeto": "Servidor do site da Physis: loja (/loja/), área interna da loja (/loja/interna/), demonstração gratuita (/demo/) e Gestão Physis (/gestao/)",
+      "projeto": "Servidor do site da Physis: loja (/loja/), área interna da loja (/loja/interna/), demonstração gratuita (/demo/), consultoria (/consultoria/) e Gestão Physis (/gestao/)",
       "modulos": ["gestao"],
       "gestao_interna": true,
       "pesquisa": false,
-      "confirmar": "Pacote do servidor da Physis, para o Erick Oliveira. A primeira conta criada vira administradora: criar logo após subir, antes de abrir ao público. Exige HTTPS na frente (Caddy)."
+      "confirmar": "Pacote do servidor da Physis, para o Eric Oliveira. A primeira conta criada vira administradora: criar logo após subir, antes de abrir ao público. Exige HTTPS na frente (Caddy)."
+    },
+    {
+      "org": "plataforma-basica",
+      "nome": "Plataforma básica (exemplo)",
+      "lugar": "lugar01",
+      "projeto": "Versão básica: só Início e Cursos. Cada módulo comprado acrescenta a sua aba.",
+      "modulos": [],
+      "pesquisa": false,
+      "confirmar": "Versão para a equipe conferir a plataforma mínima."
     },
     {
       "org": "fazenda-mf",
       "nome": "Fazenda MF",
       "lugar": "sede",
       "projeto": "Monitoramento Verde (projeto 1 da Physis), já instalado",
-      "modulos": ["monitoramento", "zonas", "animais", "supervisao", "gestao"],
+      "modulos": ["monitoramento", "zonas", "coleiras", "comedouros", "supervisao", "gestao"],
       "pesquisa": false,
-      "confirmar": "Módulos escolhidos a partir dos equipamentos da pasta do projeto (Receptor e Transmissor V6, Caixinha, SmartColar, AutoFeeder). Confirmar com a Physis se o SustainKit também entra."
+      "confirmar": "Módulos escolhidos a partir dos equipamentos da pasta do projeto (Receptor e Transmissor V6, Caixinha Physis IoT, coleira SmartColar, comedouro AutoFeeder). Confirmar com a Physis se o SustainKit também entra."
     },
     {
       "org": "fazenda-santa-clara",
       "nome": "Fazenda Santa Clara",
       "lugar": "itirapua-sp",
-      "projeto": "Sensores de solo e clima, qualidade da água (pH) e, depois, energia solar",
-      "modulos": ["monitoramento", "agua", "supervisao", "gestao"],
+      "projeto": "Proposta compilada: sensores de solo e clima, qualidade da água (pH), energia solar com baterias, SCADA e gestão",
+      "modulos": ["monitoramento", "agua", "solar", "resiliencia", "supervisao", "gestao"],
       "pesquisa": false,
-      "confirmar": "Solar ainda não tem módulo (em desenvolvimento): entra quando estiver pronto. A proposta de sensores fala em LoRaWAN; o Hub hoje fala V6 (decisão em aberto no documento 04)."
+      "confirmar": "Energia solar e resiliência (estação meteorológica) entram com aba em desenvolvimento até a leitura do inversor e da estação ficar pronta. A proposta de sensores fala em LoRaWAN; o Hub hoje fala V6 (decisão em aberto no documento 04)."
+    },
+    {
+      "org": "fazenda-santa-clara-basica",
+      "nome": "Fazenda Santa Clara (sem SCADA e gestão)",
+      "lugar": "itirapua-sp",
+      "projeto": "Mesmas frentes das propostas (sensores, água e solar), sem SCADA e sem gestão",
+      "modulos": ["monitoramento", "agua", "solar", "resiliencia"],
+      "pesquisa": false,
+      "confirmar": "Variante pedida em 14/11/2026 para comparar com a versão completa."
     },
     {
       "org": "casa-physis",
       "nome": "Casa Physis · Net Zero",
       "lugar": "lote-168",
-      "projeto": "Projeto de pesquisa: modelo do sistema net zero",
-      "modulos": ["monitoramento", "agua", "zonas", "animais", "sustainkit", "supervisao", "gestao", "painel", "planejador"],
+      "projeto": "Projeto de pesquisa: modelo do sistema net zero (todos os módulos, inclusive os em desenvolvimento)",
+      "modulos": ["planejador", "sustainkit", "painel", "certificacoes", "solar", "avac", "turbinas", "agua", "zonas", "sbn",
+                  "circular", "carbono", "resiliencia", "monitoramento", "coleiras", "comedouros", "medicamentos", "pulseira",
+                  "supervisao", "gestao"],
       "pesquisa": true,
       "confirmar": "Instalação de pesquisa: mostra também o que está em desenvolvimento, sempre marcado como tal."
     }

@@ -1434,8 +1434,8 @@ const CERTS=[
 {id:"leed", base:"LEED v5 · USGBC/GBCI",
  pt:"LEED — projeto, construção, interiores ou operação",
  en:"LEED — design, construction, interiors or operation",
- ptE:"110 pontos possíveis: Certified 40, Silver 50, Gold 60, Platinum 80. O v5 saiu em abril de 2025 e concentra cerca de metade dos pontos em descarbonização; o registro nas versões v4 e v4.1 fechou no fim do primeiro trimestre de 2026 e o v5 passa a ser plenamente aplicável em 30 de junho de 2027. Certificações v4 já emitidas seguem válidas até 2032. Exige profissional credenciado, registro e revisão pela GBCI, com taxas em dólar.",
- enE:"110 points available: Certified 40, Silver 50, Gold 60, Platinum 80. v5 was released in April 2025 and puts around half the points on decarbonisation; registration under v4 and v4.1 closed at the end of the first quarter of 2026 and v5 becomes fully applicable on 30 June 2027. Existing v4 certifications remain valid until 2032. Requires a credentialed professional, registration and GBCI review, with fees in dollars.",
+ ptE:"110 pontos possíveis: Certified 40, Silver 50, Gold 60, Platinum 80. O v5 saiu em abril de 2025 e concentra cerca de metade dos pontos em descarbonização; o registro nas versões v4 e v4.1 (legado) fechou no fim do primeiro trimestre de 2026 e o v5 passa a ser plenamente aplicável em 30 de junho de 2027. Certificações v4 já emitidas seguem válidas até 2032. Exige profissional credenciado, registro e revisão pela GBCI, com taxas em dólar.",
+ enE:"110 points available: Certified 40, Silver 50, Gold 60, Platinum 80. v5 was released in April 2025 and puts around half the points on decarbonisation; registration under v4 and v4.1 (legacy) closed at the end of the first quarter of 2026 and v5 becomes fully applicable on 30 June 2027. Existing v4 certifications remain valid until 2032. Requires a credentialed professional, registration and GBCI review, with fees in dollars.",
  f:function(c){
   if(c.tipo==="industrial")return{s:"avaliar",pt:"Alcança o prédio administrativo, não a linha de produção. Vale se a empresa quer o selo para a sede ou para o escritório da planta.",en:"Reaches the office building, not the production line. Worth it if the company wants the label for its head office or plant offices."};
   if(c.nivel==="platinum")return{s:"aplica",pt:"Platinum no v5 é travado: além dos 80 pontos, exige eletrificação, eficiência energética reforçada, renovável cobrindo 100% da energia do site e redução de 20% no carbono incorporado. Não é só somar ponto.",en:"Platinum under v5 is gated: beyond the 80 points it requires electrification, enhanced energy efficiency, renewables covering 100% of site energy and a 20% embodied carbon reduction. It is not just adding points."};
@@ -1459,7 +1459,7 @@ const CERTS=[
   if(!isFinite(c.desvio))return{s:"avaliar",pt:"Preencha os resíduos para medir o desvio atual.",en:"Fill in the waste tab to measure current diversion."};
   if(c.desvio>=90)return{s:"aplica",pt:"O desvio medido já passa de 90% no recorte atual. Falta a série de 12 meses e a política formal.",en:"Measured diversion already exceeds 90% on the current data. The 12-month series and the formal policy are still missing."};
   return{s:"nao",pt:"Desvio medido em "+fmt(c.desvio,0)+"%, contra os 90% exigidos. A distância é grande demais para virar meta de curto prazo — mas o número é ótimo argumento de diagnóstico.",en:"Measured diversion of "+fmt(c.desvio,0)+"% against the 90% required. Too far to be a short-term target — but the figure is a strong diagnostic argument."};}},
-{id:"ence", base:"PBE Edifica · ENCE · Res. CGIEE 4/2025",
+{id:"ence", base:"PBE Edifica · ENCE · INI-C/INI-R (Portaria Inmetro 309/2022) · Res. CGIEE 4/2025",
  pt:"ENCE — etiqueta brasileira de eficiência energética",
  en:"Brazilian energy efficiency label for buildings",
  ptE:"Escala de A a E, avaliada por organismo de inspeção acreditado pelo Inmetro, em projeto e em edificação construída. A Resolução CGIEE nº 4/2025 passou a exigir comprovação de desempenho energético para alvará de construção e habite-se em novas edificações públicas, comerciais, de serviços e residenciais. O atestado do caminho simplificado vai acompanhado de ART ou RRT.",
@@ -1483,7 +1483,7 @@ const CERTS=[
  ptE:"Baseado em economia percentual medida contra uma linha de base local, em energia, água e energia incorporada nos materiais, com níveis crescentes até carbono zero. Processo mais leve e mais barato que o LEED.",
  enE:"Based on percentage savings against a local baseline in energy, water and embodied energy in materials, with increasing levels up to zero carbon. A lighter and cheaper process than LEED.",
  f:function(c){
-  return{s:"avaliar",pt:"É o selo com melhor encaixe no perfil GIZ e em financiador internacional de desenvolvimento — o mesmo público que a Physis já atende em Uganda, Egito e Palestina. Confirmar os limiares vigentes de cada nível antes de propor.",en:"The best fit for the development-finance profile Physis already serves in Uganda, Egypt and Palestine. Confirm the current thresholds for each level before proposing."};}},
+  return{s:"avaliar",pt:"É o selo com melhor encaixe no perfil de financiador internacional de desenvolvimento — o mesmo público que a Physis já atende em Uganda, Egito e Palestina. Confirmar os limiares vigentes de cada nível antes de propor.",en:"The best fit for the development-finance profile Physis already serves in Uganda, Egypt and Palestine. Confirm the current thresholds for each level before proposing."};}},
 {id:"well", base:"WELL · IWBI",
  pt:"WELL — desempenho de saúde dos ocupantes",
  en:"WELL — occupant health performance",

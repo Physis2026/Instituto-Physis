@@ -286,7 +286,7 @@ export default function App(){
       </div>
       <div style={{maxWidth:900,margin:"16px auto",padding:"0 16px"}}><Tab/></div>
       <div style={{textAlign:"center",padding:"12px",fontSize:10,color:C.muted}}>
-        Physis Engineering · GIZ/Physis PUE Solar Manual · FAO · EMBRAPA · Fraunhofer ISE · ABNT
+        Physis Engineering · Manual PUE Solar (metodologia própria da Physis) · FAO · EMBRAPA · Fraunhofer ISE · ABNT
       </div>
     </div>
   );

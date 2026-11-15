@@ -97,6 +97,22 @@ class InstalacaoNoHub(unittest.TestCase):
         self.h.central_por("compra", "LJ-SEM-EMAIL", dict(COMPRA, numero="LJ-SEM-EMAIL", pagador={"nome": "X"}))
         self.assertFalse(self.h.instalar_compra("LJ-SEM-EMAIL", "https://s", self.fabricar)["ok"])
 
+    def test_modulos_saem_do_contrato(self):
+        """Proposta personalizada (texto dos itens) e itens da loja viram os módulos certos, sem escolha à mão."""
+        proposta = {"itens": [{"nome": "Sensores de umidade do solo e estação meteorológica (17 a 25 pontos)"},
+                              {"nome": "Qualidade da água: sensor de pH no ponto do adubo"},
+                              {"nome": "Usina solar de 30 a 48 kWp com baterias"},
+                              {"nome": "Painel SCADA"}, {"nome": "Gestão da fazenda"}]}
+        self.assertEqual(self.h.modulos_do_contrato(proposta),
+                         ["monitoramento", "resiliencia", "agua", "solar", "supervisao", "gestao"])
+        sem = {"itens": [{"nome": "Sensores de umidade do solo"}, {"nome": "Usina solar com baterias"},
+                         {"nome": "Qualidade da água (pH)"}]}
+        self.assertNotIn("supervisao", self.h.modulos_do_contrato(sem)); self.assertNotIn("gestao", self.h.modulos_do_contrato(sem))
+        loja = {"itens": [{"id": "col"}, {"id": "P10"}], "modulos": ["animais"]}
+        self.assertEqual(self.h.modulos_do_contrato(loja), ["coleiras", "comedouros", "medicamentos"])
+        self.assertEqual(self.h.modulos_do_contrato({"itens": [{"nome": "Comedouro automático"}]}), ["comedouros"])
+        self.assertEqual(self.h.modulos_do_contrato({"itens": [{"nome": "Phosphate"}]}), [])          # "ph" só como palavra inteira
+
     def test_so_curso_nao_monta_plataforma(self):
         self.h.central_por("compra", "LJ-CURSO", dict(COMPRA, numero="LJ-CURSO", modulos=[]))
         r = self.h.instalar_compra("LJ-CURSO", "https://s", self.fabricar)

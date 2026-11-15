@@ -1,0 +1,122 @@
+{
+  "versao": 1,
+  "atualizado": "2026-11-14",
+  "regra": "Valores de referência não são únicos: a base de dados é por projeto. Cada projeto guarda as suas premissas; aqui fica o padrão técnico sugerido, as opções aceitas e a fonte de cada uma. Quem muda o valor de um projeto registra o motivo.",
+  "premissas": [
+    {
+      "id": "agua.per_capita",
+      "grandeza": "Consumo de água por pessoa",
+      "valor_padrao": 130,
+      "unidade": "L/pessoa·dia",
+      "opcoes": [
+        {"rotulo": "Residência, padrão alto", "valor": 160, "quando": "casas de padrão alto; é o valor da Residência no Planejador"},
+        {"rotulo": "Residência, padrão médio", "valor": 130, "quando": "padrão do SustainKit para moradia"},
+        {"rotulo": "Residência, padrão baixo", "valor": 100, "quando": "moradia de padrão baixo ou uso muito econômico"},
+        {"rotulo": "Edifício residencial (Planejador)", "valor": 150, "quando": "prédio de apartamentos, valor de catálogo do Planejador"},
+        {"rotulo": "Hospedagem sem cozinha e lavanderia", "valor": 100, "quando": "hotel ou pousada em que cozinha e lavanderia são contadas à parte"},
+        {"rotulo": "Hospedagem (Planejador)", "valor": 120, "quando": "chalé ou pousada, valor de catálogo do Planejador"},
+        {"rotulo": "Escritório", "valor": 50, "quando": "escritório, estúdio, prédio comercial ou público"}
+      ],
+      "fonte": "ABNT NBR 7229:1993, tabela de contribuição (os valores de residência, hospedagem e escritório); Planejador Physis (edifício residencial 150 e hospedagem 120, premissa Physis)",
+      "nota": "A tabela da NBR 7229 dá a contribuição de esgoto; aqui ela é usada como estimativa de consumo de água. Medição real do projeto sempre vale mais que este número."
+    },
+    {
+      "id": "chuva.coef_escoamento",
+      "grandeza": "Coeficiente de escoamento do telhado (parte da chuva que chega à cisterna)",
+      "valor_padrao": 0.80,
+      "unidade": "adimensional (0 a 1)",
+      "opcoes": [
+        {"rotulo": "Telha cerâmica", "valor": 0.80, "quando": "telhado de telha cerâmica"},
+        {"rotulo": "Telha metálica", "valor": 0.90, "quando": "telhado metálico"},
+        {"rotulo": "Fibrocimento", "valor": 0.85, "quando": "telha de fibrocimento"},
+        {"rotulo": "Concreto ou laje", "valor": 0.80, "quando": "laje impermeabilizada"},
+        {"rotulo": "Telhado verde", "valor": 0.30, "quando": "cobertura vegetada"}
+      ],
+      "fonte": "premissa Physis (literatura técnica de aproveitamento de água de chuva); ABNT NBR 15527:2019 não fixa um valor único",
+      "nota": "Usado no SustainKit (captação) e no Planejador (balanço da cisterna). Valor do projeto escolhido pelo material real do telhado."
+    },
+    {
+      "id": "app.declividade",
+      "grandeza": "Declividade a partir da qual a encosta é APP",
+      "valor_padrao": 45,
+      "unidade": "graus (°)",
+      "opcoes": [
+        {"rotulo": "Limite legal", "valor": 45, "quando": "sempre: encostas acima de 45° são APP"}
+      ],
+      "fonte": "Lei 12.651/2012 (Código Florestal), art. 4º, V",
+      "nota": "45° = 100% de declividade (sobe 100 m em 100 m andados). Não confundir com 45% (cerca de 24°). Lei municipal ou plano de manejo da APA podem ser mais restritivos."
+    },
+    {
+      "id": "pv.pr",
+      "grandeza": "Rendimento global do sistema solar (PR)",
+      "valor_padrao": 0.78,
+      "unidade": "adimensional (0 a 1)",
+      "opcoes": [
+        {"rotulo": "Padrão Physis", "valor": 0.78, "quando": "estudo preliminar, sem simulação do sistema real"}
+      ],
+      "fonte": "premissa Physis",
+      "nota": "Inclui perdas de temperatura, sujeira, cabos e inversor. Trocar pelo valor simulado quando houver projeto executivo."
+    },
+    {
+      "id": "bateria.dod",
+      "grandeza": "Profundidade de descarga da bateria (DoD)",
+      "valor_padrao": 0.90,
+      "unidade": "adimensional (0 a 1)",
+      "opcoes": [
+        {"rotulo": "LiFePO4 (lítio-ferro-fosfato)", "valor": 0.90, "quando": "bateria de lítio-ferro-fosfato"},
+        {"rotulo": "Li-NMC", "valor": 0.85, "quando": "bateria de lítio NMC"},
+        {"rotulo": "Chumbo-ácido ou AGM", "valor": 0.50, "quando": "bateria de chumbo-ácido ou AGM"}
+      ],
+      "fonte": "premissa Physis (conferir na folha de dados do fabricante escolhido)",
+      "nota": "Usado no SustainKit para dimensionar o banco de baterias."
+    },
+    {
+      "id": "rede.fator_emissao",
+      "grandeza": "Fator de emissão da energia da rede (SIN)",
+      "valor_padrao": 0.0289,
+      "unidade": "tCO2/MWh",
+      "opcoes": [
+        {"rotulo": "Fator médio do SIN", "valor": 0.0289, "quando": "inventário de emissões da energia comprada da rede"}
+      ],
+      "fonte": "fator médio SIN (MCTI), conferir ano",
+      "nota": "Mesmo valor de FATORES.rede em sistema/physis-nucleo.js. O fator muda todo ano; atualizar aqui e no núcleo juntos."
+    },
+    {
+      "id": "combustivel.diesel",
+      "grandeza": "Fator de emissão do diesel",
+      "valor_padrao": 2.671,
+      "unidade": "kgCO2e/L",
+      "opcoes": [],
+      "fonte": "valor usado em sistema/physis-nucleo.js (FATORES.diesel); conferir fonte e ano",
+      "nota": "Mantido igual ao núcleo."
+    },
+    {
+      "id": "combustivel.glp",
+      "grandeza": "Fator de emissão do GLP",
+      "valor_padrao": 2.939,
+      "unidade": "kgCO2e/kg",
+      "opcoes": [],
+      "fonte": "valor usado em sistema/physis-nucleo.js (FATORES.glp); conferir fonte e ano",
+      "nota": "Mantido igual ao núcleo."
+    },
+    {
+      "id": "combustivel.gn",
+      "grandeza": "Fator de emissão do gás natural",
+      "valor_padrao": 1.999,
+      "unidade": "kgCO2e/m³",
+      "opcoes": [],
+      "fonte": "valor usado em sistema/physis-nucleo.js (FATORES.gn); conferir fonte e ano",
+      "nota": "Mantido igual ao núcleo."
+    }
+  ],
+  "normas": {
+    "ABNT NBR 15527": {"edicao": "2019", "assunto": "aproveitamento de água de chuva", "situacao": "vigente", "nota": "a edição de 2007 foi substituída; não citar 2007"},
+    "ABNT NBR 5419": {"edicao": "2015", "partes": "1 a 4", "assunto": "proteção contra descargas atmosféricas (SPDA)", "situacao": "conferir", "nota": "conferir se há revisão publicada; propostas citam 2026"},
+    "Portaria Inmetro nº 309/2022": {"edicao": "2022", "assunto": "INI-C e INI-R (classificação de eficiência energética de edificações, PBE Edifica)", "situacao": "vigente", "nota": "a citação \"Portaria MDIC 309/2019\" está errada; o RTQ-R e o RTQ-C são as regras antigas"},
+    "ABNT NBR 10004": {"edicao": "2024", "partes": "1 e 2", "assunto": "classificação de resíduos sólidos", "situacao": "vigente (revisada)", "nota": "a classificação usada na Tela do cliente precisa ser conferida com a edição de 2024"},
+    "ABNT NBR 15220": {"edicao": "sem ano nos nossos arquivos", "partes": "1 a 5 (zoneamento na parte 3)", "assunto": "desempenho térmico e zoneamento bioclimático", "situacao": "conferir revisão vigente", "nota": "nenhum programa cita a edição; conferir a revisão vigente antes de usar o zoneamento em projeto"},
+    "ABNT NBR 7229": {"edicao": "1993", "assunto": "tanques sépticos", "situacao": "vigente", "nota": "fonte da tabela de contribuição por pessoa"},
+    "LEED": {"edicao": "v5", "assunto": "certificação de edificações (USGBC/GBCI)", "situacao": "vigente", "nota": "v4.1 é legado: só para projetos já registrados"},
+    "Lei 12.651/2012": {"edicao": "2012", "assunto": "Código Florestal (APP em encosta acima de 45°, art. 4º, V)", "situacao": "vigente", "nota": "45° = 100%"}
+  }
+}

@@ -23,7 +23,10 @@ import zipfile
 from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
-MODULOS = ("monitoramento", "agua", "zonas", "animais", "sustainkit", "supervisao", "gestao", "painel", "planejador")
+# "animais" = coleiras + comedouros (nome antigo, aceito); os demais com aba "em desenvolvimento" na plataforma
+MODULOS = ("monitoramento", "agua", "zonas", "animais", "coleiras", "comedouros", "sustainkit", "supervisao", "gestao",
+           "painel", "planejador", "certificacoes", "solar", "avac", "turbinas", "sbn", "circular", "carbono",
+           "resiliencia", "medicamentos", "pulseira")
 LICENCA_PADRAO = "[LICENÇA A DEFINIR PELA PHYSIS]"
 
 GUIA = """# Sua plataforma Physis
@@ -72,7 +75,7 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
     if not re.fullmatch(r"[a-z0-9][a-z0-9._-]{1,63}", org):
         raise SystemExit("org: use de 2 a 64 letras minúsculas, números, ponto, hífen ou sublinhado")
     desconhecidos = [m for m in modulos if m not in MODULOS]
-    if desconhecidos or not modulos:
+    if desconhecidos:              # lista vazia é a plataforma básica: Início e Cursos
         raise SystemExit(f"módulos aceitos: {', '.join(MODULOS)}; recebi: {', '.join(desconhecidos) or 'nenhum'}")
     if "sustainkit" in modulos and (sustainkit is None or not sustainkit.is_file()):
         raise SystemExit("o módulo sustainkit precisa de --sustainkit apontando para o arquivo HTML do SustainKit")
@@ -96,6 +99,8 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         shutil.copy2(planejador, pasta / "web" / "planejador.html")
     if gestao is not None and gestao.is_file():      # só o pacote interno da Physis leva o programa de gestão interna
         shutil.copy2(gestao, pasta / "web" / "gestao.html")
+        if (AQUI / "web" / "consultoria.html").exists():      # página pública de consultoria do site da Physis
+            shutil.copy2(AQUI / "web" / "consultoria.html", pasta / "web" / "consultoria.html")
         # o servidor da Physis monta sozinho a plataforma de quem compra: leva o montador e os programas
         shutil.copy2(AQUI / "montar.py", pasta / "montar.py")
         (pasta / "programas").mkdir(exist_ok=True)
