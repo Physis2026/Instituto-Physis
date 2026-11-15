@@ -1,0 +1,8 @@
+# Contêiner da trilha quântica (P&D, Fase 2) — Linux, fora do hub. Versões fixadas pelo Eric na hora de construir
+# [CONFERIR versões]: qiskit 2.x, qiskit-aer, qiskit-optimization, qiskit-algorithms (todos Apache-2.0).
+FROM python:3.12-slim
+RUN pip install --no-cache-dir qiskit qiskit-aer qiskit-optimization qiskit-algorithms
+WORKDIR /app
+COPY qubo_qiskit.py /app/qubo_qiskit.py
+USER nobody
+ENTRYPOINT ["python", "/app/qubo_qiskit.py"]

@@ -1,0 +1,228 @@
+{
+ "projeto": {
+  "id": "exemplo-mapeamento",
+  "nome": "Projeto exemplo (dados ficticios)"
+ },
+ "site": {
+  "nome": "Lote exemplo",
+  "lat": -22.5,
+  "lon": -43.2,
+  "altitude_m": 2
+ },
+ "edificacoes": [
+  {
+   "id": "casa",
+   "nome": "Casa exemplo",
+   "pavimentos": [
+    {
+     "id": "terreo",
+     "nome": "Térreo",
+     "elevacao_m": 0
+    },
+    {
+     "id": "cobertura",
+     "nome": "Cobertura",
+     "elevacao_m": 3.0
+    }
+   ]
+  }
+ ],
+ "elementos": [
+  {
+   "id": "pv-casa-agua1",
+   "tipo": "pv",
+   "nome": "Arranjo casa-agua1 (exemplo)",
+   "pavimento": "cobertura",
+   "posicao": {
+    "x": -6.0,
+    "y": 0,
+    "z": 0.1
+   },
+   "caixa": {
+    "dx": 12.0,
+    "dy": 4.0,
+    "dz": 0.05
+   },
+   "propriedades": {
+    "modulos": 9,
+    "kwp": 4.95,
+    "incl_graus": 20.0,
+    "azim_graus": 0.0,
+    "passo_fileiras_m": 2.3,
+    "inversor": "inv-string-mono-3-6"
+   },
+   "modulos": [
+    {
+     "x": -5.135,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": -3.9850000000000003,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": -2.8350000000000004,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": -1.6850000000000005,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": -0.5350000000000001,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": 0.6149999999999984,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": 1.7649999999999988,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": 2.914999999999999,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": 4.0649999999999995,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    }
+   ]
+  },
+  {
+   "id": "pv-casa-agua2",
+   "tipo": "pv",
+   "nome": "Arranjo casa-agua2 (exemplo)",
+   "pavimento": "cobertura",
+   "posicao": {
+    "x": -6.0,
+    "y": -4.0,
+    "z": 0.1
+   },
+   "caixa": {
+    "dx": 12.0,
+    "dy": 4.0,
+    "dz": 0.05
+   },
+   "propriedades": {
+    "modulos": 9,
+    "kwp": 4.95,
+    "incl_graus": 20.0,
+    "azim_graus": 180.0,
+    "passo_fileiras_m": 2.3,
+    "inversor": "inv-string-mono-3-6"
+   },
+   "modulos": [
+    {
+     "x": -5.135,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": -3.9850000000000003,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": -2.8350000000000004,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": -1.6850000000000005,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": -0.5350000000000001,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": 0.6149999999999984,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": 1.7649999999999988,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": 2.914999999999999,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    },
+    {
+     "x": 4.0649999999999995,
+     "y": 2.8167110899036487,
+     "z": 0.1
+    }
+   ]
+  },
+  {
+   "id": "inv1",
+   "tipo": "inversor",
+   "nome": "Inversor (exemplo)",
+   "propriedades": {
+    "potencia_kw": 5
+   }
+  },
+  {
+   "id": "cist",
+   "tipo": "cisterna",
+   "nome": "Cisterna (exemplo)",
+   "propriedades": {
+    "volume_m3": 5
+   },
+   "materiais": [
+    {
+     "id": "concreto_normal",
+     "quantidade": 0.8,
+     "unidade": "m3"
+    }
+   ]
+  }
+ ],
+ "premissas": {
+  "eletrica.fator_potencia_padrao": 0.92
+ },
+ "materiais_base": [
+  {
+   "id": "concreto_normal",
+   "nome": "Concreto normal (armado ou não)",
+   "grupo": "concreto e cimentícios",
+   "densidade": 2300,
+   "condutividade": 1.75,
+   "calor_especifico": 1000,
+   "espessura_tipica_m": 0.1,
+   "carbono_incorporado": {
+    "valor": 0.13,
+    "unidade": "kgCO2e/kg",
+    "fonte": "ICE v3.0 (Inventory of Carbon and Energy, Circular Ecology / Univ. de Bath, 2019), berço ao portão",
+    "verificar": true
+   },
+   "custo": {
+    "valor": null,
+    "unidade": "R$/m³",
+    "data": null,
+    "fonte": "[MARCADOR] preencher com SINAPI (Caixa) do estado e mês do orçamento ou cotação; a base não guarda preço inventado"
+   },
+   "fonte": "ABNT NBR 15220-2, tabela de propriedades de materiais (faixas de densidade, condutividade e calor específico)",
+   "verificar": true,
+   "u_camada_parede": 4.403
+  }
+ ],
+ "aviso": "EXEMPLO / DADOS FICTÍCIOS — só para conferir os visualizadores; não usar em projeto",
+ "agora": 1794700000
+}

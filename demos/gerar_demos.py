@@ -67,6 +67,19 @@ LIGACOES = [
 
 SELO = ("Demonstração · dados simulados", "Demo · simulated data")
 
+# Demos por cliente (15/11/2026): a mesma plataforma, com os módulos da ficha de clientes/clientes.json (ficam em dia
+# com ela), o lugar de exemplo da demonstração e os nós V6 simulados. arquivo → (org da ficha, dispositivos, rótulo en)
+FICHAS = RAIZ / "clientes" / "clientes.json"
+DEMOS_CLIENTES = {
+    "physis-demo-casa-physis.html": ("casa-physis", "{ campo:6, zonas:1, col:3, com:1 }", "Casa Physis · Net Zero"),
+    "physis-demo-santa-clara.html": ("fazenda-santa-clara", "{ campo:6, zonas:0, col:0, com:0 }", "Fazenda Santa Clara"),
+    "physis-demo-santa-clara-v2.html": ("fazenda-santa-clara-v2", "{ campo:6, zonas:0, col:0, com:0 }", "Fazenda Santa Clara · version 2"),
+}
+
+
+def ficha(org: str) -> dict:
+    return next(f for f in json.loads(FICHAS.read_text(encoding="utf-8"))["clientes"] if f["org"] == org)
+
 # O que cada demo diz. Números só do próprio programa (dados simulados ou de exemplo); nada de preço nem limite novo.
 TEXTOS = {
     "physis-demo-sustainkit.html": {
@@ -115,6 +128,15 @@ TEXTOS = {
         "extra": None,
     },
 }
+
+for _arq, (_org, _q, _en) in DEMOS_CLIENTES.items():
+    _f = ficha(_org)
+    TEXTOS[_arq] = {"produto": ("Sistema Physis · " + _f["nome"], "Physis System · " + _en),
+                    "beneficio": ("A plataforma com os módulos de " + _f["nome"] + ", com dados simulados.",
+                                  "The platform with the " + _en + " modules, with simulated data."),
+                    "convite": ("Na versão completa você salva, exporta, usa os seus dados e liga os seus sensores.",
+                                "In the full version you save, export, use your own data and connect your own sensors."),
+                    "compra": "/loja/", "extra": None}
 
 # ── Resultado na hora e linha ao vivo: lidos do próprio programa (as contas não mudam) ─────────────────────────
 # Cada provedor devolve resultado(en, F) -> [destaque, resto] e linha(en, F) -> {texto, alerta}; pausar(p) é opcional.
@@ -373,7 +395,7 @@ def marcar(texto: str, nome: str, atual: str, demo_id: str) -> str:
     return texto[:fim] + rodape + "\n" + texto[fim:]
 
 
-def plataforma(atual: str, aba_inicial: str, modulos: list[str], q: str, demo_id: str) -> str:
+def plataforma(atual: str, aba_inicial: str, modulos: list[str], q: str, demo_id: str, pesquisa: bool = False) -> str:
     t = PAINEL.read_text(encoding="utf-8")
     nome = atual
     # 1. modo demonstração ligado em qualquer endereço (o original só liga em /demo/)
@@ -381,8 +403,9 @@ def plataforma(atual: str, aba_inicial: str, modulos: list[str], q: str, demo_id
     # 2. sem service worker (a demo é arquivo solto no site)
     t = troca(t, '!location.pathname.startsWith("/demo")', "false", nome)
     # 3. módulos da demo, com dados simulados (nós V6 do campo e Caixinha IoT)
-    t = troca(t, 'abrirPlataformaCliente(["monitoramento","agua","zonas"], { campo:6, zonas:1, col:0, com:0 }, false);',
-              "abrirPlataformaCliente(" + json.dumps(modulos).replace(" ", "") + ", " + q + ", false);", nome)
+    t = troca(t, 'abrirPlataformaCliente(["monitoramento","agua","zonas","solar"], { campo:6, zonas:1, col:0, com:0 }, false);',
+              "abrirPlataformaCliente(" + json.dumps(modulos).replace(" ", "") + ", " + q + ", false);"
+              + (" ui.inst.pesquisa = true; aplicarInstancia(ui.inst);" if pesquisa else ""), nome)   # pesquisa: todas as abas, as em desenvolvimento com selo
     # 4. aba inicial (o endereço #aba continua valendo)
     t = troca(t, 'ui.inst.demo = true; } ui.aba = "resumo"; desenhar(false);',
               'ui.inst.demo = true; } ui.aba = TELAS[location.hash.slice(1)] ? location.hash.slice(1) : "' + aba_inicial + '"; desenhar(false);', nome)
@@ -455,6 +478,8 @@ def gerar() -> dict[str, str]:
         "physis-demo-cliente.html": plataforma("physis-demo-cliente.html", "resumo", MODULOS_DEMO,
                                                "{ campo:6, zonas:1, col:0, com:0 }", "plataforma"),
         "physis-demo-planejador.html": planejador(),
+        **{arq: plataforma(arq, "resumo", ficha(org)["modulos"], q, org, bool(ficha(org).get("pesquisa")))
+           for arq, (org, q, _en) in DEMOS_CLIENTES.items()},
     }
 
 

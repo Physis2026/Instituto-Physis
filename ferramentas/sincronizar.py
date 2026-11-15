@@ -71,6 +71,7 @@ BLOCOS = {
     "physis-conta": RAIZ / "sistema" / "physis-conta.js",          # conta e segurança (CSRF, 2FA, convites, chaves)
     "physis-odf": RAIZ / "sistema" / "physis-odf.js",              # ODT, ODS, PDF/A e "compartilhar para comentários"
     "physis-parceiros": RAIZ / "sistema" / "physis-parceiros.js",  # profissionais parceiros
+    "physis-fornecedores": RAIZ / "sistema" / "physis-fornecedores.js",  # fornecedores e equipamentos (Gestão)
     "pc-ponte": RAIZ / "sistema" / "physis-ponte-cliente.js",      # ponte da plataforma com o servidor (dados do cliente)
     # contas comuns (Lei 14.300, plano inclinado, baterias, cisterna, calhas, aquecimento solar) com a base de premissas
     "physis-calc-comum": RAIZ / "sistema" / "physis-calc-comum.js",

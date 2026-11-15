@@ -121,11 +121,17 @@ def main():
     elementos.append({"id": "inv1", "tipo": "inversor", "nome": "Inversor (exemplo)", "propriedades": {"potencia_kw": 5}})
     elementos.append({"id": "cist", "tipo": "cisterna", "nome": "Cisterna (exemplo)", "propriedades": {"volume_m3": 5},
                       "materiais": [{"id": "concreto_normal", "quantidade": 0.8, "unidade": "m3"}]})
-    texto = ifc.escrever({"projeto": {"id": "exemplo-mapeamento", "nome": "Projeto exemplo (dados ficticios)"},
-                          "site": {"nome": "Lote exemplo", "lat": LAT0, "lon": LON0, "altitude_m": 2},
-                          "edificacoes": [{"id": "casa", "nome": "Casa exemplo", "pavimentos": [{"id": "terreo", "nome": "Térreo", "elevacao_m": 0},
-                                                                                                 {"id": "cobertura", "nome": "Cobertura", "elevacao_m": 3.0}]}],
-                          "elementos": elementos}, agora=1794700000)
+    # a entrada do IFC também vai para o disco: o escritor do navegador (sistema/physis-ifc.js) gera o mesmo arquivo
+    # a partir dela em ferramentas/testes-navegador/conferir-modelos.html (paridade Python × navegador)
+    usados = {m["id"] for e in elementos for m in e.get("materiais") or []}
+    entrada = {"projeto": {"id": "exemplo-mapeamento", "nome": "Projeto exemplo (dados ficticios)"},
+               "site": {"nome": "Lote exemplo", "lat": LAT0, "lon": LON0, "altitude_m": 2},
+               "edificacoes": [{"id": "casa", "nome": "Casa exemplo", "pavimentos": [{"id": "terreo", "nome": "Térreo", "elevacao_m": 0},
+                                                                                      {"id": "cobertura", "nome": "Cobertura", "elevacao_m": 3.0}]}],
+               "elementos": elementos, "premissas": {ifc.PREMISSA_FP: ifc.premissa(ifc.PREMISSA_FP)},
+               "materiais_base": [m for i, m in sorted(ifc.materiais_base().items()) if i in usados]}
+    escrever("modelo-entrada.json", dict(entrada, aviso=AVISO, agora=1794700000))
+    texto = ifc.escrever(entrada, agora=1794700000)
     (AQUI / "modelo.ifc").write_text(texto, encoding="utf-8", newline="\n")
     escrever("ifc-resumo.json", {"aviso": AVISO, **{k: v for k, v in ifc.ler(texto.encode()).items() if k != "tipos"}})
     local = {"lat": LAT0, "lon": LON0, "municipio": "[exemplo]", "uf": "RJ", "poligono": None, "area_m2": None, "fonte": "exemplo"}

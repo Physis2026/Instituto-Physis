@@ -1,0 +1,46 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conferir simulação</title>
+<style>
+:root { --fundo:#F4F6F1; --sup:#FFFFFF; --texto:#1C2B21; --t2:#4A4F44; --linha:#C9D2C4; --ok:#1F4A1C; --okf:#DCEBD8; --al:#7A2214; --alf:#F5E2D7; --in:#1C3550; --inf:#DBE7F1; --at:#8A6410; --atf:#F6EAD0; }
+@media (prefers-color-scheme: dark) { :root { --fundo:#1C2B21; --sup:#2A3829; --texto:#EEF2EA; --t2:#C9D3C4; --linha:#4A5A47; } }
+body { background:var(--fundo); color:var(--texto); font:16px/1.5 system-ui, sans-serif; margin:0 auto; max-width:980px; padding:16px; }
+h1 { font-family:Fraunces, Georgia, serif; color:#33512F; } @media (prefers-color-scheme: dark) { h1 { color:#8FB183; } }
+.cartao { background:var(--sup); border:1px solid var(--linha); border-radius:8px; padding:12px 16px; margin:12px 0; }
+table { border-collapse:collapse; width:100%; } th, td { border-bottom:1px solid var(--linha); padding:4px 6px; text-align:left; vertical-align:top; }
+.ok { color:var(--ok); background:var(--okf); } .falha { color:var(--al); background:var(--alf); }
+.faixa { padding:8px 12px; border-radius:6px; margin:8px 0; } .faixa.in { background:var(--inf); color:var(--in); } .faixa.at { background:var(--atf); color:var(--at); } .faixa.al { background:var(--alf); color:var(--al); }
+.t2 { color:var(--t2); } .pq { font-size:14px; } .rolagem { overflow-x:auto; } code { word-break:break-all; }
+button, select { min-height:44px; } :focus-visible { outline:3px solid #3D6E8F; outline-offset:2px; }
+</style>
+<script>
+/* stubs mínimos dos globais da plataforma (mesmas definições do painel.html) */
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const ui = {};
+</script>
+<script src="../../sistema/physis-turbinas.js"></script>
+<script src="../../sistema/simulacao-exemplos/casos.js"></script>
+<script src="../../sistema/physis-simulacao.js"></script>
+</head><body>
+<h1>Conferir simulação (Fase 1)</h1>
+<p class="t2">Roda no navegador cada caso de <code>sistema/simulacao-exemplos/casos.js</code> com <code>sistema/physis-simulacao.js</code> e compara com os valores do Python (paridade) e com as soluções analíticas (benchmarks). Exemplo / dados fictícios.</p>
+<p id="resumo" role="status" class="faixa in">rodando…</p>
+<section class="cartao" aria-labelledby="h-res"><h2 id="h-res">Resultado de cada conferência</h2><div class="rolagem"><table><caption class="t2">Passou ou falhou, por caso</caption>
+<thead><tr><th scope="col">Situação</th><th scope="col">Conferência</th><th scope="col">Detalhe</th></tr></thead><tbody id="linhas"></tbody></table></div></section>
+<section class="cartao" aria-labelledby="h-ex"><h2 id="h-ex">Exemplos desenhados</h2><div id="exemplos"></div></section>
+<script>
+(() => {
+  const resumo = document.getElementById("resumo"), tb = document.getElementById("linhas");
+  let R;
+  try { R = SIMULACAO.autoteste(); } catch (e) { R = { ok: 0, falhas: 1, linhas: [{ ok: false, nome: "erro geral", info: String(e && e.stack || e) }] }; }
+  tb.innerHTML = R.linhas.map(l => `<tr class="${l.ok ? "ok" : "falha"}"><td>${l.ok ? "passou" : "FALHOU"}</td><th scope="row">${esc(l.nome)}</th><td>${esc(l.info || "")}</td></tr>`).join("");
+  resumo.textContent = (R.falhas ? R.falhas + " falha(s)" : "TUDO OK") + " · " + R.ok + " valores conferidos";
+  resumo.className = "faixa " + (R.falhas ? "al" : "in");
+  document.title = R.falhas ? "FALHOU" : "OK";
+  window.__resultado = R;
+  const ex = (SIMULACAO_CASOS.casos || []).filter(c => c.exemplo);
+  document.getElementById("exemplos").innerHTML = ex.map((c, i) => {
+    let h; try { h = SIMULACAO.desenhoCaso(c, SIMULACAO.rodarCaso(c), "fig-" + i); } catch (e) { h = `<p class="faixa al">${esc(e.message)}</p>`; }
+    return `<section aria-labelledby="hx-${i}"><h3 id="hx-${i}">${esc(c.nome)}</h3><p class="t2 pq">${esc(c.descricao)}</p>${h}</section>`;
+  }).join("");
+})();
+</script></body></html>

@@ -79,6 +79,10 @@ from . import municipio as municipio_mod
 from . import parceiros as parceiros_mod
 from . import impressao3d as impressao3d_mod
 from . import mapeamento as mapeamento_mod
+from . import simulacao as simulacao_mod
+from . import cep as cep_mod
+from . import fornecedores as fornecedores_mod
+from .simulacao import biogas as sim_biogas_mod
 from . import pegada_servidor as pegada_mod
 from . import seguranca as seg
 from . import suporte_remoto as suporte_mod
@@ -130,6 +134,8 @@ VENDOR_TIPOS = {"maplibre-gl.js": "text/javascript; charset=utf-8", "maplibre-gl
                 "pmtiles.js": "text/javascript; charset=utf-8", "web-ifc-api-iife.js": "text/javascript; charset=utf-8",
                 "web-ifc.wasm": "application/wasm", "three.min.js": "text/javascript; charset=utf-8"}
 INSTANCIA = Path(__file__).resolve().parent.parent / "instancia.json"
+# catálogo inicial da loja (pacote do site Physis; ferramentas/gerar_loja_catalogo.py): publicado ao ligar se a loja está vazia
+LOJA_CATALOGO_INICIAL = Path(__file__).resolve().parent.parent / "loja-catalogo-inicial.json"
 
 
 def arquivo_instancia() -> Path:
@@ -147,6 +153,7 @@ def ler_instancia() -> dict:
 
 
 MAPEAMENTO_CORPO_MAX = 20 * 1024 * 1024        # arquivo do cliente ou IFC da aba Mapeamento
+SIMULACAO_CORPO_MAX = 8 * 1024 * 1024          # entrada de uma simulação (grade do terreno até 250.000 células)
 
 
 def banco_da_instancia(inst: dict) -> str:
@@ -543,9 +550,14 @@ ESQUEMAS_ROTAS = {
     "map_planta_solar": {"poligono": (list, 5000, True), "modulo": (dict, 60, True), "arranjo": (dict, 60, True),
                          "lat": ((int, float), 90, False), "obstaculos": (list, 5000, False)},
     "map_ifc": {"projeto": (dict, 20, False), "site": (dict, 20, True), "elementos": (list, 5000, False), "premissas": (dict, 60, False)},
+    # Simulação (physis_hub/simulacao; docs/SIMULACAO.md): cada parte tem a sua entrada; o motor confere os campos e o tamanho
+    # (simulacao.LIMITES). Aqui só: objeto JSON e campos de primeiro nível conhecidos (lido sem modo estrito).
+    "sim_corpo": {},
 }
 ESQUEMAS_ROTAS["parc_editar"] = {k: v for k, v in ESQUEMAS_ROTAS["parc_cadastro"].items() if k != "consentimento"}
 for _k, _v in ESQUEMAS_ROTAS.items():
+    seg.ESQUEMAS.setdefault(_k, _v)
+for _k, _v in fornecedores_mod.ESQUEMAS.items():          # fornecedores e equipamentos (docs/FORNECEDORES.md)
     seg.ESQUEMAS.setdefault(_k, _v)
 
 
@@ -777,6 +789,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
     editais_col = editais_mod.Coletor(pasta_editais, tipo="edital")
     # "Permitir suporte": acesso da equipe Physis com prazo, só pela VPN (PHYSIS_SUPORTE_REDES); docs/SUPORTE_REMOTO.md
     suporte = suporte_mod.SuporteRemoto(hub)
+    cep_srv = cep_mod.ServicoCEP(hub)                       # CEP → endereço e coordenadas (só o CEP sai do servidor)
     uploads_map = mapeamento_mod.Uploads(hub._db)          # arquivos do cliente da aba Mapeamento (GeoJSON, KML, SHP em zip…)
     eventos_col = editais_mod.Coletor(pasta_editais, tipo="evento")
     # Aprendizado local (sem internet), robôs com regras (+ IA local opcional) e alertas de clima por e-mail/WhatsApp
@@ -800,7 +813,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                        "municipio": lambda: municipio_mod.Municipio(hub, clima=clima, aprendizado=aprendizado),
                                        "parceiros": lambda: parceiros_mod.Parceiros(hub),
                                        "impressao3d": lambda: impressao3d_mod.Impressao3D(
-                                           hub, impressao3d_mod.pasta_padrao(banco_da_instancia(instancia)))}[nome]()
+                                           hub, impressao3d_mod.pasta_padrao(banco_da_instancia(instancia))),
+                                       "fornecedores": lambda: fornecedores_mod.Fornecedores(
+                                           hub, pasta=fornecedores_mod.pasta_padrao(banco_da_instancia(instancia)))}[nome]()
             return modulos_vivos[nome]
     cfg_pegada = pegada_mod.config_de(instancia)          # None = desligada (PHYSIS_PEGADA=0)
     # ── Segurança (seguranca.py; docs/SEGURANCA.md) ──
@@ -1022,12 +1037,28 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if qe:
                     self._json(200, {"ok": True, "dados": evidencias_mod.dados_servidor(hub, incluir_arquivos=seg.pode(qe, seg.EQUIPE))})
                 return True
+            # CEP do Início (cep.py): com sessão e limite por IP; vai para o provedor só o CEP (LGPD); cache no SQLite
+            if p.startswith("/api/local/cep/"):
+                if self._exigir(seg.CLIENTE) and not self._limitado("cep"):
+                    self._json(*cep_srv.consultar(unquote(p.rsplit("/", 1)[-1])[:12]))
+                return True
             # Mapeamento: catálogo e camadas abertas sem login; contexto e arquivos do cliente com sessão
             if p.startswith("/api/mapeamento/"):
                 aberto = p.rstrip("/") in ("/api/mapeamento/camadas", "/api/mapeamento/camada")
                 qm = None if aberto else self._exigir(seg.CLIENTE)
                 if aberto or qm:
                     self._rota_mapeamento("GET", u, q, None, qm)
+                return True
+            # Fornecedores e equipamentos (fornecedores.py; docs/FORNECEDORES.md): cliente só /regiao e arquivo público; o resto equipe
+            if p.startswith("/api/fornecedores"):
+                qf = self._exigir(seg.CLIENTE)
+                if qf:
+                    cod, r = modulo("fornecedores").rota("GET", p, qf, None, q)
+                    if isinstance(r, tuple):                       # ("bytes", nome, tipo, dados): CSV ou catálogo
+                        self._enviar_bytes(r[3], r[2], {"Content-Disposition": "attachment; filename*=UTF-8''" + quote(r[1]),
+                                                        "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
+                    else:
+                        self._json(cod, r)
                 return True
             # Physis 3D (impressao3d.py; docs/PHYSIS_3D.md): só com sessão de participante (cliente ou acima)
             if p.startswith("/api/3d/"):
@@ -1116,6 +1147,38 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     self._json(*r)
                     return True
                 return False
+            # Fornecedores: só a equipe grava (CSV até 1 MB e arquivo até 20 MB); apagar pede senha recente
+            if p.startswith("/api/fornecedores"):
+                qf = self._exigir(seg.EQUIPE)
+                if not qf or (p in ("/api/fornecedores/importar", "/api/fornecedores/arquivo") and self._limitado("arquivo")):
+                    return True
+                corpo = self._corpo_grande(fornecedores_mod.ARQ_MAX + 64 * 1024)
+                if corpo is None and (self.headers.get("Content-Length") or "0").strip() == "0":
+                    corpo = b"{}"
+                if corpo is None:
+                    self._recusar_corpo("arquivo grande demais (máximo 20 MB)")
+                    return True
+                if p.endswith("/apagar") and not self._sensivel(qf):
+                    return True
+                self._json(*modulo("fornecedores").rota("POST", p, qf, corpo, parse_qs(u.query)))
+                return True
+            # Simulação (Fase 1): POST /api/simulacao/<parte>; 422 = dado faltando ([MARCADOR]); 400 = entrada inválida ou grande
+            if p.startswith("/api/simulacao/"):
+                qs = self._exigir(seg.CLIENTE)
+                if not qs or self._limitado("arquivo"):
+                    return True
+                corpo = self._corpo_grande(SIMULACAO_CORPO_MAX)
+                if corpo is None:
+                    self._recusar_corpo("caso grande demais para a Fase 1")
+                    return True
+                d = self._ler(corpo, "sim_corpo", estrito=False)
+                if d is None:
+                    return True
+                ctx = None
+                if p.rstrip("/") == "/api/simulacao/biogas" and d.get("regime") == "ambiente" and not d.get("temperatura_mensal"):
+                    ctx = sim_biogas_mod.clima_do_local(hub, irradiacao)      # temperatura do local da instalação (nunca um padrão)
+                self._json(*simulacao_mod.rota(p.rstrip("/"), d, ctx))
+                return True
             # Mapeamento: arquivo do cliente e IFC até 20 MB; corpos JSON conferidos pelos ESQUEMAS map_*
             if p.startswith("/api/mapeamento/"):
                 qm = self._exigir(seg.CLIENTE)
@@ -2611,8 +2674,22 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
     return Manipulador
 
 
+def semear_loja(hub: Hub, caminho: Path | str | None = None) -> dict | None:
+    """Site novo: publica o catálogo inicial (loja-catalogo-inicial.json ao lado do instancia.json, ou PHYSIS_LOJA_CATALOGO)
+    quando nada foi publicado ainda. Sem o arquivo (instalação de cliente), não faz nada."""
+    arq = Path(caminho or os.environ.get("PHYSIS_LOJA_CATALOGO") or LOJA_CATALOGO_INICIAL)
+    if not arq.is_file():
+        return None
+    try:
+        cat = json.loads(arq.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return hub.loja_semear_inicial(cat)
+
+
 def iniciar(hub: Hub, porta: int = 8700, token: str | None = None, endereco: str = "0.0.0.0", instancia: dict | None = None,
             clima=None, irradiacao=None):
+    semear_loja(hub)
     srv = ThreadingHTTPServer((endereco, porta), criar_manipulador(hub, token, instancia, clima, irradiacao))
     srv.daemon_threads = True
     threading.Thread(target=srv.serve_forever, daemon=True).start()

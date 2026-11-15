@@ -50,8 +50,11 @@ class LocalUnico(unittest.TestCase):
         self.assertIn("const gisLugar = () => { const l = localDaInstalacao();", self.p)
 
     def test_inicio_pede_o_local_e_mostra_o_mapa(self):
-        for k in ("endereco", "municipio", "uf", "lat", "lon"):
+        # regra de 15/11/2026 (tarde): CEP obrigatório; latitude e longitude opcionais (vêm do CEP, do mapa ou digitadas)
+        for k in ("cep", "endereco", "municipio", "uf"):
             self.assertRegex(self.p, r'\{ k:"' + k + r'", r:"[^"]+", o:1,', f"{k} não é obrigatório no Início")
+        for k in ("lat", "lon"):
+            self.assertRegex(self.p, r'\{ k:"' + k + r'", r:"[^"]+", q:', f"{k} deveria ser opcional")
         self.assertIn('${s === "unidade" ? mapaDoInicio(p) : ""}', self.p)
         self.assertIn('id:"pf-mapa"', self.p)
 

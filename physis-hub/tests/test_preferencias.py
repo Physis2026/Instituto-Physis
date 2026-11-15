@@ -325,12 +325,21 @@ class Demos(unittest.TestCase):
 
     def test_cada_demo(self):
         nomes = {p.name for p in DEMOS}
+        clientes = {"physis-demo-casa-physis.html": "casa-physis", "physis-demo-santa-clara.html": "fazenda-santa-clara",
+                    "physis-demo-santa-clara-v2.html": "fazenda-santa-clara-v2"}         # demos por cliente (15/11/2026)
         self.assertEqual(nomes, {"physis-demo-cliente.html", "physis-demo-scada.html", "physis-demo-planejador.html",
-                                 "physis-demo-sustainkit.html", "physis-demo-monitoramento.html"})
+                                 "physis-demo-sustainkit.html", "physis-demo-monitoramento.html"} | set(clientes))
+        # os módulos de cada demo de cliente são os da ficha (clientes/clientes.json)
+        fichas = {f["org"]: f for f in json.loads((RAIZ / "clientes" / "clientes.json").read_text(encoding="utf-8"))["clientes"]}
+        for arq, org in clientes.items():
+            html = (RAIZ / "demos" / arq).read_text(encoding="utf-8")
+            self.assertIn("abrirPlataformaCliente(" + json.dumps(fichas[org]["modulos"]).replace(" ", "") + ", ", html, arq)
+            self.assertIn(fichas[org]["nome"].split(" · ")[0], html, arq)
+            self.assertEqual(" ui.inst.pesquisa = true;" in html, bool(fichas[org].get("pesquisa")), arq)
         # cada demo promove a compra do item certo da loja
         compra = {"physis-demo-sustainkit.html": "/loja/?item=sk-pacote", "physis-demo-scada.html": "/loja/?item=scada",
                   "physis-demo-monitoramento.html": "/loja/?item=mon-sw", "physis-demo-planejador.html": "/loja/?item=P13",
-                  "physis-demo-cliente.html": "/loja/"}
+                  "physis-demo-cliente.html": "/loja/", **{arq: "/loja/" for arq in clientes}}
         for pag in DEMOS:
             with self.subTest(pag.name):
                 html = pag.read_text(encoding="utf-8")

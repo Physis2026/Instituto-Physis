@@ -1,6 +1,6 @@
 {
  "_formato": "physis/1",
- "_gerado_em": "2026-11-15T19:41:32.933888+00:00",
+ "_gerado_em": "2026-11-15T20:05:16.775273+00:00",
  "_gerado_por": "checklist-implantacao",
  "_app": "gestao-physis",
  "org_id": "physis",
@@ -240,7 +240,7 @@
     "titulo": "PRIORIDADE 0 (Fase 1): criar a chave da Physis no console da Anthropic (conta da organização), guardar só no servidor (PHYSIS_CLAUDE_CHAVE_ARQUIVO) e configurar Claude Opus 5.5, teto de US$ 25/mês (D15) e tetos por robô (D18). Guia: IA_CLAUDE.md. Feito quando: a chave está no servidor, fora do Git.",
     "pessoa_id": "erickoliveira",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -257,7 +257,7 @@
     "titulo": "PRIORIDADE 0 (Fase 1): deixar um servidor Physis rodando com internet (hub da Casa Physis, o notebook Acer, ou outro já instalado) e rodar o teste com a chave real. Feito quando: os robôs respondem pelo Claude e o gasto aparece no contador.",
     "pessoa_id": "erickoliveira",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -498,7 +498,7 @@
     "titulo": "Encarregado de dados (DPO): a LGPD pede uma pessoa nomeada como contato público. Decidir qual das três e publicar o e-mail de privacidade.",
     "pessoa_id": "rafaella",
     "projeto_id": "imp-b46b5d4f",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -514,7 +514,7 @@
     "titulo": "Contas da direção: criar as contas com verificação em duas etapas ligada e guardar os códigos de recuperação. (responsável principal; com Eric Oliveira)",
     "pessoa_id": "rafaella",
     "projeto_id": "imp-b46b5d4f",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -610,7 +610,7 @@
     "titulo": "Teste de invasão básico: login, limites, CSRF, rotas privadas e upload, seguindo o checklist ASVS do SEGURANCA.md. (responsável principal; com Eric Oliveira)",
     "pessoa_id": "arthur",
     "projeto_id": "imp-b46b5d4f",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -786,7 +786,7 @@
     "titulo": "Publicar o canal de acessibilidade e a declaração de acessibilidade (LBI, eMAG, WCAG 2.2 AA, NBR 17225). (com Rafaella)",
     "pessoa_id": "leonardomacedo",
     "projeto_id": "imp-aaa704d9",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -962,7 +962,7 @@
     "titulo": "Revisar SustainKit: Blocos, premissas unificadas, cisterna mês a mês (NBR 15527), custos",
     "pessoa_id": "ericklopes",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -978,7 +978,7 @@
     "titulo": "Revisar Energia solar: Perdas, inversor e strings (NBR 16690), Lei 14.300 (Fio B), irradiação no plano do painel",
     "pessoa_id": "ericklopes",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -994,7 +994,7 @@
     "titulo": "Revisar AVAC e carga térmica: Carga térmica (NBR 16401), correção do motor, pressurização (NBR 14880), quadro (NBR 5410)",
     "pessoa_id": "ryan",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -1010,7 +1010,7 @@
     "titulo": "Revisar Turbinas: Hidráulica, eólica, curva certificada (IEC 61400-12-1), outorga de água (responsável principal; com Ryan)",
     "pessoa_id": "emerson",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -1106,7 +1106,7 @@
     "titulo": "Revisar Economia circular: NBR 10004:2024, rotas, fator de CO₂ do transporte, mapa de aterros (responsável principal; com Rafaella)",
     "pessoa_id": "rafael",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -1138,7 +1138,7 @@
     "titulo": "Revisar Carbono e ESG (calculadora de carbono): Fator da rede (MCTI), GWP, misturas de combustível, SBCE, dados sociais do relatório (responsável principal; com Laura)",
     "pessoa_id": "marzia",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -1170,7 +1170,7 @@
     "titulo": "Revisar Resiliência climática: Limites de alerta, CEMADEN/INMET, painel municipal, avisos do INMET (responsável principal; com Rafaella)",
     "pessoa_id": "arthur",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -1266,7 +1266,7 @@
     "titulo": "Revisar Equipamentos e fornecedores: itens \"verificar\", preços por SINAPI ou cotação, Inmetro e CEC",
     "pessoa_id": "ryan",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -1362,7 +1362,7 @@
     "titulo": "Revisar Saúde (telas e consentimento): Horários, alertas, consentimento, Bluetooth (responsável principal; com Emerson)",
     "pessoa_id": "rafael",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -1442,7 +1442,7 @@
     "titulo": "Revisar Cursos: Curso de introdução, cursos à venda, preços (responsável principal; com Marzia, Ryan, Leonardo Macedo, Rafaella)",
     "pessoa_id": "laura",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -2578,7 +2578,7 @@
     "titulo": "Pulseira: antes de ir a campo — Placa, sensor, regra de crise validada por especialistas",
     "pessoa_id": "emerson",
     "projeto_id": "imp-62017554",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -3266,7 +3266,7 @@
     "titulo": "Revisar as páginas da consultoria: textos, serviços, casos, chamadas para contato, versão em inglês, modo escuro e acessibilidade. (responsável principal; com Erick Lopes, Arthur, Rafael)",
     "pessoa_id": "leonardomacedo",
     "projeto_id": "imp-a2030fcf",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -3330,7 +3330,7 @@
     "titulo": "Pagamento (Fase 2): decidir o provedor e as regras pela lista da seção 5 do 21_Pagamento_Provedor_e_Integracao.md (recomendado: Asaas; reserva: Mercado Pago), abrir a conta e combinar a nota fiscal com o contador. A integração é do Eric Oliveira.",
     "pessoa_id": "rafaella",
     "projeto_id": "imp-a2030fcf",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -3346,7 +3346,7 @@
     "titulo": "Produzir os posts, artigos e roteiros de vídeo. (responsável principal; com Rafaella)",
     "pessoa_id": "marzia",
     "projeto_id": "imp-a2030fcf",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -5298,7 +5298,7 @@
     "titulo": "Treinar o cliente: curso de introdução, mais uma visita guiada pela plataforma. (responsável principal; com Marzia, Ryan, Leonardo Macedo, Rafaella)",
     "pessoa_id": "laura",
     "projeto_id": "imp-22109d26",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -5938,7 +5938,7 @@
     "titulo": "PRIORIDADE 0 (Fase 1): acesso remoto ao servidor de teste (notebook Acer; até lá, a versão 0 no computador da Rafaella) por VPN (WireGuard ou Tailscale/Headscale). Guia: lista 10, item 0.3, e SUPORTE_REMOTO.md. Feito quando: painel e SSH só pela VPN, acessos registrados e acesso desligado no fim.",
     "pessoa_id": "erickoliveira",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -5955,7 +5955,7 @@
     "titulo": "Conferir as premissas \"conferir\" (Fio B, custo de disponibilidade, calhas NBR 10844, descarte de 2 mm, APP de rios, nascentes e topo de morro, qualidade da água, limiares da Defesa Civil, dutos do AVAC, fator de potência padrão). Feito quando: \"conferido\" em physis-premissas.json, com fonte e data",
     "pessoa_id": "consultores",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6291,7 +6291,7 @@
     "titulo": "Integrar o provedor de pagamento escolhido pela Rafaella (Fase 2), seguindo o plano do 21_Pagamento_Provedor_e_Integracao.md, passos 2 a 11: segredos no servidor, cobrança, webhook, idempotência, estorno, conciliação, nota fiscal e testes no sandbox",
     "pessoa_id": "erickoliveira",
     "projeto_id": "imp-a2030fcf",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6515,7 +6515,7 @@
     "titulo": "PRIORIDADE 0: mapeamento solar no servidor para a \"Planta solar (BIM)\": pvlib, irradiação do local (fonte [CONFERIR]) e arquivos de clima EPW instalados. Feito quando: a Planta solar calcula a irradiação do local pelo servidor, sem internet (responsável principal; com toda a equipe do Planejador)",
     "pessoa_id": "erickoliveira",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -6532,7 +6532,7 @@
     "titulo": "PRIORIDADE 0: mapeamento solar no servidor para a \"Planta solar (BIM)\": pvlib, irradiação do local (fonte [CONFERIR]) e arquivos de clima EPW instalados. Feito quando: a Planta solar calcula a irradiação do local pelo servidor, sem internet (com Eric Oliveira)",
     "pessoa_id": "rafaella",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -6549,7 +6549,7 @@
     "titulo": "PRIORIDADE 0: mapeamento solar no servidor para a \"Planta solar (BIM)\": pvlib, irradiação do local (fonte [CONFERIR]) e arquivos de clima EPW instalados. Feito quando: a Planta solar calcula a irradiação do local pelo servidor, sem internet (com Eric Oliveira)",
     "pessoa_id": "ericklopes",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -6566,7 +6566,7 @@
     "titulo": "PRIORIDADE 0: mapeamento solar no servidor para a \"Planta solar (BIM)\": pvlib, irradiação do local (fonte [CONFERIR]) e arquivos de clima EPW instalados. Feito quando: a Planta solar calcula a irradiação do local pelo servidor, sem internet (com Eric Oliveira)",
     "pessoa_id": "arthur",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -6583,7 +6583,7 @@
     "titulo": "PRIORIDADE 0: mapeamento solar no servidor para a \"Planta solar (BIM)\": pvlib, irradiação do local (fonte [CONFERIR]) e arquivos de clima EPW instalados. Feito quando: a Planta solar calcula a irradiação do local pelo servidor, sem internet (com Eric Oliveira)",
     "pessoa_id": "rafael",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -6600,7 +6600,7 @@
     "titulo": "PRIORIDADE 0: mapeamento solar no servidor para a \"Planta solar (BIM)\": pvlib, irradiação do local (fonte [CONFERIR]) e arquivos de clima EPW instalados. Feito quando: a Planta solar calcula a irradiação do local pelo servidor, sem internet (com Eric Oliveira)",
     "pessoa_id": "emerson",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -6617,7 +6617,7 @@
     "titulo": "PRIORIDADE 0: mapeamento solar no servidor para a \"Planta solar (BIM)\": pvlib, irradiação do local (fonte [CONFERIR]) e arquivos de clima EPW instalados. Feito quando: a Planta solar calcula a irradiação do local pelo servidor, sem internet (com Eric Oliveira)",
     "pessoa_id": "ryan",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -6634,7 +6634,7 @@
     "titulo": "PRIORIDADE 0: mapeamento solar no servidor para a \"Planta solar (BIM)\": pvlib, irradiação do local (fonte [CONFERIR]) e arquivos de clima EPW instalados. Feito quando: a Planta solar calcula a irradiação do local pelo servidor, sem internet (com Eric Oliveira)",
     "pessoa_id": "laura",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -6651,7 +6651,7 @@
     "titulo": "PRIORIDADE 0: mapeamento solar no servidor para a \"Planta solar (BIM)\": pvlib, irradiação do local (fonte [CONFERIR]) e arquivos de clima EPW instalados. Feito quando: a Planta solar calcula a irradiação do local pelo servidor, sem internet (com Eric Oliveira)",
     "pessoa_id": "marzia",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -6668,7 +6668,7 @@
     "titulo": "PRIORIDADE 0: mapeamento solar no servidor para a \"Planta solar (BIM)\": pvlib, irradiação do local (fonte [CONFERIR]) e arquivos de clima EPW instalados. Feito quando: a Planta solar calcula a irradiação do local pelo servidor, sem internet (com Eric Oliveira)",
     "pessoa_id": "leonardomacedo",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 5,
     "concluida": false,
     "concluida_em": null,
@@ -6845,7 +6845,7 @@
     "titulo": "Contêineres de simulação (doc 23b): CalculiX ou Code_Aster + Gmsh, OpenFOAM (escolher uma distribuição), Radiance/Ladybug, EnergyPlus multizona, OpenModelica, Chrono, Yade, Qiskit/PennyLane, PrusaSlicer. AGPL: publicar mudanças. Feito quando: cada um roda um teste (responsável principal)",
     "pessoa_id": "erickoliveira",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6861,7 +6861,7 @@
     "titulo": "Contêineres de simulação (doc 23b): CalculiX ou Code_Aster + Gmsh, OpenFOAM (escolher uma distribuição), Radiance/Ladybug, EnergyPlus multizona, OpenModelica, Chrono, Yade, Qiskit/PennyLane, PrusaSlicer. AGPL: publicar mudanças. Feito quando: cada um roda um teste (com Eric Oliveira)",
     "pessoa_id": "rafaella",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6877,7 +6877,7 @@
     "titulo": "Contêineres de simulação (doc 23b): CalculiX ou Code_Aster + Gmsh, OpenFOAM (escolher uma distribuição), Radiance/Ladybug, EnergyPlus multizona, OpenModelica, Chrono, Yade, Qiskit/PennyLane, PrusaSlicer. AGPL: publicar mudanças. Feito quando: cada um roda um teste (com Eric Oliveira)",
     "pessoa_id": "ericklopes",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6893,7 +6893,7 @@
     "titulo": "Contêineres de simulação (doc 23b): CalculiX ou Code_Aster + Gmsh, OpenFOAM (escolher uma distribuição), Radiance/Ladybug, EnergyPlus multizona, OpenModelica, Chrono, Yade, Qiskit/PennyLane, PrusaSlicer. AGPL: publicar mudanças. Feito quando: cada um roda um teste (com Eric Oliveira)",
     "pessoa_id": "arthur",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6909,7 +6909,7 @@
     "titulo": "Contêineres de simulação (doc 23b): CalculiX ou Code_Aster + Gmsh, OpenFOAM (escolher uma distribuição), Radiance/Ladybug, EnergyPlus multizona, OpenModelica, Chrono, Yade, Qiskit/PennyLane, PrusaSlicer. AGPL: publicar mudanças. Feito quando: cada um roda um teste (com Eric Oliveira)",
     "pessoa_id": "rafael",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6925,7 +6925,7 @@
     "titulo": "Contêineres de simulação (doc 23b): CalculiX ou Code_Aster + Gmsh, OpenFOAM (escolher uma distribuição), Radiance/Ladybug, EnergyPlus multizona, OpenModelica, Chrono, Yade, Qiskit/PennyLane, PrusaSlicer. AGPL: publicar mudanças. Feito quando: cada um roda um teste (com Eric Oliveira)",
     "pessoa_id": "emerson",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6941,7 +6941,7 @@
     "titulo": "Contêineres de simulação (doc 23b): CalculiX ou Code_Aster + Gmsh, OpenFOAM (escolher uma distribuição), Radiance/Ladybug, EnergyPlus multizona, OpenModelica, Chrono, Yade, Qiskit/PennyLane, PrusaSlicer. AGPL: publicar mudanças. Feito quando: cada um roda um teste (com Eric Oliveira)",
     "pessoa_id": "ryan",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6957,7 +6957,7 @@
     "titulo": "Contêineres de simulação (doc 23b): CalculiX ou Code_Aster + Gmsh, OpenFOAM (escolher uma distribuição), Radiance/Ladybug, EnergyPlus multizona, OpenModelica, Chrono, Yade, Qiskit/PennyLane, PrusaSlicer. AGPL: publicar mudanças. Feito quando: cada um roda um teste (com Eric Oliveira)",
     "pessoa_id": "laura",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6973,7 +6973,7 @@
     "titulo": "Contêineres de simulação (doc 23b): CalculiX ou Code_Aster + Gmsh, OpenFOAM (escolher uma distribuição), Radiance/Ladybug, EnergyPlus multizona, OpenModelica, Chrono, Yade, Qiskit/PennyLane, PrusaSlicer. AGPL: publicar mudanças. Feito quando: cada um roda um teste (com Eric Oliveira)",
     "pessoa_id": "marzia",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -6989,7 +6989,7 @@
     "titulo": "Contêineres de simulação (doc 23b): CalculiX ou Code_Aster + Gmsh, OpenFOAM (escolher uma distribuição), Radiance/Ladybug, EnergyPlus multizona, OpenModelica, Chrono, Yade, Qiskit/PennyLane, PrusaSlicer. AGPL: publicar mudanças. Feito quando: cada um roda um teste (com Eric Oliveira)",
     "pessoa_id": "leonardomacedo",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -7597,7 +7597,7 @@
     "titulo": "Decidir com a assessoria jurídica a licença do código do Sistema Physis (Fase 2). Feito quando: licença escolhida, registrada e aplicada ao repositório e aos pacotes",
     "pessoa_id": "rafaella",
     "projeto_id": "imp-aaa704d9",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -7613,7 +7613,7 @@
     "titulo": "Assinar o relatório de validação das simulações (Fase 2) antes de elas entrarem no Planejador. Feito quando: cada simulação tem o caso de validação comparado e o relatório assinado",
     "pessoa_id": "consultorespecialista",
     "projeto_id": "imp-0072df0e",
-    "horizonte": "media",
+    "horizonte": "micro",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -7677,7 +7677,7 @@
     "titulo": "Portal para fornecedores atualizarem os próprios dados e importação automática de preços (Fase 2). Feito quando: um fornecedor atualiza os dados pelo portal e os preços entram sozinhos no banco (responsável principal; com Ryan)",
     "pessoa_id": "erickoliveira",
     "projeto_id": "imp-4eda7c98",
-    "horizonte": "media",
+    "horizonte": "longa",
     "peso": 3,
     "concluida": false,
     "concluida_em": null,
@@ -7693,6 +7693,198 @@
     "titulo": "Portal para fornecedores atualizarem os próprios dados e importação automática de preços (Fase 2). Feito quando: um fornecedor atualiza os dados pelo portal e os preços entram sozinhos no banco (com Eric Oliveira)",
     "pessoa_id": "ryan",
     "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-f2-01",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem calculix (ccx + Gmsh + ParaView pvbatch), com volume de trabalho, fila de jobs e limite de CPU e memória por job. Feito quando: o caso de viga da Fase 1 roda no contêiner (responsável principal; com toda a equipe do Planejador)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0e6db67d2895",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem calculix (ccx + Gmsh + ParaView pvbatch), com volume de trabalho, fila de jobs e limite de CPU e memória por job. Feito quando: o caso de viga da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-be972dbfea38",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem calculix (ccx + Gmsh + ParaView pvbatch), com volume de trabalho, fila de jobs e limite de CPU e memória por job. Feito quando: o caso de viga da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4e7961962a71",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem calculix (ccx + Gmsh + ParaView pvbatch), com volume de trabalho, fila de jobs e limite de CPU e memória por job. Feito quando: o caso de viga da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-aa857fce8461",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem calculix (ccx + Gmsh + ParaView pvbatch), com volume de trabalho, fila de jobs e limite de CPU e memória por job. Feito quando: o caso de viga da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-6c9a407a3465",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem calculix (ccx + Gmsh + ParaView pvbatch), com volume de trabalho, fila de jobs e limite de CPU e memória por job. Feito quando: o caso de viga da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4e2b012199d4",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem calculix (ccx + Gmsh + ParaView pvbatch), com volume de trabalho, fila de jobs e limite de CPU e memória por job. Feito quando: o caso de viga da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-3cdf65cb3846",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem calculix (ccx + Gmsh + ParaView pvbatch), com volume de trabalho, fila de jobs e limite de CPU e memória por job. Feito quando: o caso de viga da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-180d867d0f0e",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem calculix (ccx + Gmsh + ParaView pvbatch), com volume de trabalho, fila de jobs e limite de CPU e memória por job. Feito quando: o caso de viga da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7c90ba63b9ee",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem calculix (ccx + Gmsh + ParaView pvbatch), com volume de trabalho, fila de jobs e limite de CPU e memória por job. Feito quando: o caso de viga da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-f2-02",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openfoam de uma distribuição só (Foundation v14 ou ESI v2606), com casos-modelo de vento em prédio e de câmara de secador. Feito quando: os dois casos-modelo rodam (responsável principal; com toda a equipe do Planejador)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4d010adb8d2c",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openfoam de uma distribuição só (Foundation v14 ou ESI v2606), com casos-modelo de vento em prédio e de câmara de secador. Feito quando: os dois casos-modelo rodam (com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
     "horizonte": "media",
     "peso": 3,
     "concluida": false,
@@ -7701,6 +7893,1430 @@
     "extras": {
      "tituloEn": "",
      "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-435c7d12e962",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openfoam de uma distribuição só (Foundation v14 ou ESI v2606), com casos-modelo de vento em prédio e de câmara de secador. Feito quando: os dois casos-modelo rodam (com Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b25991394ef0",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openfoam de uma distribuição só (Foundation v14 ou ESI v2606), com casos-modelo de vento em prédio e de câmara de secador. Feito quando: os dois casos-modelo rodam (com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7dcd56e5e8df",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openfoam de uma distribuição só (Foundation v14 ou ESI v2606), com casos-modelo de vento em prédio e de câmara de secador. Feito quando: os dois casos-modelo rodam (com Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-fba542166584",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openfoam de uma distribuição só (Foundation v14 ou ESI v2606), com casos-modelo de vento em prédio e de câmara de secador. Feito quando: os dois casos-modelo rodam (com Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-07499ad31648",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openfoam de uma distribuição só (Foundation v14 ou ESI v2606), com casos-modelo de vento em prédio e de câmara de secador. Feito quando: os dois casos-modelo rodam (com Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1677e365330b",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openfoam de uma distribuição só (Foundation v14 ou ESI v2606), com casos-modelo de vento em prédio e de câmara de secador. Feito quando: os dois casos-modelo rodam (com Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-2d11ea037ba2",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openfoam de uma distribuição só (Foundation v14 ou ESI v2606), com casos-modelo de vento em prédio e de câmara de secador. Feito quando: os dois casos-modelo rodam (com Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-cf8eb23eef08",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openfoam de uma distribuição só (Foundation v14 ou ESI v2606), com casos-modelo de vento em prédio e de câmara de secador. Feito quando: os dois casos-modelo rodam (com Eric Oliveira)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-f2-03",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem fenicsx (imagem oficial [CONFERIR]) para calor e umidade em parede de terra. Feito quando: o caso de parede da Fase 1 roda no contêiner (responsável principal; com toda a equipe do Planejador)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1477d823e883",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem fenicsx (imagem oficial [CONFERIR]) para calor e umidade em parede de terra. Feito quando: o caso de parede da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-fea41b398d53",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem fenicsx (imagem oficial [CONFERIR]) para calor e umidade em parede de terra. Feito quando: o caso de parede da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b13efed2fa95",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem fenicsx (imagem oficial [CONFERIR]) para calor e umidade em parede de terra. Feito quando: o caso de parede da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4c1b0877ad3e",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem fenicsx (imagem oficial [CONFERIR]) para calor e umidade em parede de terra. Feito quando: o caso de parede da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4cb45a65deda",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem fenicsx (imagem oficial [CONFERIR]) para calor e umidade em parede de terra. Feito quando: o caso de parede da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-26d72272306c",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem fenicsx (imagem oficial [CONFERIR]) para calor e umidade em parede de terra. Feito quando: o caso de parede da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-42c67f4fdee9",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem fenicsx (imagem oficial [CONFERIR]) para calor e umidade em parede de terra. Feito quando: o caso de parede da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-2e0b9fff44dc",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem fenicsx (imagem oficial [CONFERIR]) para calor e umidade em parede de terra. Feito quando: o caso de parede da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-cf66274a9424",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem fenicsx (imagem oficial [CONFERIR]) para calor e umidade em parede de terra. Feito quando: o caso de parede da Fase 1 roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-f2-04",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem energyplus + OpenStudio e Radiance; Ladybug Tools como serviço separado e sem modificação (AGPL). Feito quando: uma zona e um estudo de luz natural rodam (responsável principal; com toda a equipe do Planejador)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-21eb59617e63",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem energyplus + OpenStudio e Radiance; Ladybug Tools como serviço separado e sem modificação (AGPL). Feito quando: uma zona e um estudo de luz natural rodam (com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-edfb648def28",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem energyplus + OpenStudio e Radiance; Ladybug Tools como serviço separado e sem modificação (AGPL). Feito quando: uma zona e um estudo de luz natural rodam (com Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-9d840b2697ef",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem energyplus + OpenStudio e Radiance; Ladybug Tools como serviço separado e sem modificação (AGPL). Feito quando: uma zona e um estudo de luz natural rodam (com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d865776c3e1a",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem energyplus + OpenStudio e Radiance; Ladybug Tools como serviço separado e sem modificação (AGPL). Feito quando: uma zona e um estudo de luz natural rodam (com Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-304167280db1",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem energyplus + OpenStudio e Radiance; Ladybug Tools como serviço separado e sem modificação (AGPL). Feito quando: uma zona e um estudo de luz natural rodam (com Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-66dae125ebfb",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem energyplus + OpenStudio e Radiance; Ladybug Tools como serviço separado e sem modificação (AGPL). Feito quando: uma zona e um estudo de luz natural rodam (com Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-5afdf72d937d",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem energyplus + OpenStudio e Radiance; Ladybug Tools como serviço separado e sem modificação (AGPL). Feito quando: uma zona e um estudo de luz natural rodam (com Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4ab23a222ac8",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem energyplus + OpenStudio e Radiance; Ladybug Tools como serviço separado e sem modificação (AGPL). Feito quando: uma zona e um estudo de luz natural rodam (com Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f6f1a37278ef",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem energyplus + OpenStudio e Radiance; Ladybug Tools como serviço separado e sem modificação (AGPL). Feito quando: uma zona e um estudo de luz natural rodam (com Eric Oliveira)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-f2-05",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem yade (DEM dos grãos no secador) e, se preciso, chrono. Feito quando: um caso de grãos do secador roda no contêiner (responsável principal; com toda a equipe do Planejador)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a77c3d8977a4",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem yade (DEM dos grãos no secador) e, se preciso, chrono. Feito quando: um caso de grãos do secador roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-6c5ed12c3908",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem yade (DEM dos grãos no secador) e, se preciso, chrono. Feito quando: um caso de grãos do secador roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7959f7d65353",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem yade (DEM dos grãos no secador) e, se preciso, chrono. Feito quando: um caso de grãos do secador roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e5e71abc4c34",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem yade (DEM dos grãos no secador) e, se preciso, chrono. Feito quando: um caso de grãos do secador roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-12d698d8ffb1",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem yade (DEM dos grãos no secador) e, se preciso, chrono. Feito quando: um caso de grãos do secador roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-869404fdb864",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem yade (DEM dos grãos no secador) e, se preciso, chrono. Feito quando: um caso de grãos do secador roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c94238675255",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem yade (DEM dos grãos no secador) e, se preciso, chrono. Feito quando: um caso de grãos do secador roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c6615f1449a1",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem yade (DEM dos grãos no secador) e, se preciso, chrono. Feito quando: um caso de grãos do secador roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0b7886ccdf1e",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem yade (DEM dos grãos no secador) e, se preciso, chrono. Feito quando: um caso de grãos do secador roda no contêiner (com Eric Oliveira)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-f2-06",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openmodelica (omc) só para compilar FMU (AGPL: sem modificar). Feito quando: uma FMU compilada roda na Fase 1 (responsável principal; com toda a equipe do Planejador)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-2b042f1d5308",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openmodelica (omc) só para compilar FMU (AGPL: sem modificar). Feito quando: uma FMU compilada roda na Fase 1 (com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ebda64d08675",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openmodelica (omc) só para compilar FMU (AGPL: sem modificar). Feito quando: uma FMU compilada roda na Fase 1 (com Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-000e8b57a06c",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openmodelica (omc) só para compilar FMU (AGPL: sem modificar). Feito quando: uma FMU compilada roda na Fase 1 (com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b9dd65c3f61f",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openmodelica (omc) só para compilar FMU (AGPL: sem modificar). Feito quando: uma FMU compilada roda na Fase 1 (com Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-68199e937fa2",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openmodelica (omc) só para compilar FMU (AGPL: sem modificar). Feito quando: uma FMU compilada roda na Fase 1 (com Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-938018766a9f",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openmodelica (omc) só para compilar FMU (AGPL: sem modificar). Feito quando: uma FMU compilada roda na Fase 1 (com Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-1e477874bd06",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openmodelica (omc) só para compilar FMU (AGPL: sem modificar). Feito quando: uma FMU compilada roda na Fase 1 (com Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-ffa31a1ef9e0",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openmodelica (omc) só para compilar FMU (AGPL: sem modificar). Feito quando: uma FMU compilada roda na Fase 1 (com Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-654fb3b591ef",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem openmodelica (omc) só para compilar FMU (AGPL: sem modificar). Feito quando: uma FMU compilada roda na Fase 1 (com Eric Oliveira)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-f2-07",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem qubo-qiskit a partir de physis_hub/simulacao/conteiner/Containerfile.qiskit (versões fixadas), sem acesso à rede de produção; só P&D. Feito quando: o caso QUBO da Fase 1 roda no simulador (responsável principal; com toda a equipe do Planejador)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-5bd92e5e23a5",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem qubo-qiskit a partir de physis_hub/simulacao/conteiner/Containerfile.qiskit (versões fixadas), sem acesso à rede de produção; só P&D. Feito quando: o caso QUBO da Fase 1 roda no simulador (com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-843ad7f85784",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem qubo-qiskit a partir de physis_hub/simulacao/conteiner/Containerfile.qiskit (versões fixadas), sem acesso à rede de produção; só P&D. Feito quando: o caso QUBO da Fase 1 roda no simulador (com Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c286f1d7b6c8",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem qubo-qiskit a partir de physis_hub/simulacao/conteiner/Containerfile.qiskit (versões fixadas), sem acesso à rede de produção; só P&D. Feito quando: o caso QUBO da Fase 1 roda no simulador (com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-86b13ee27bd6",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem qubo-qiskit a partir de physis_hub/simulacao/conteiner/Containerfile.qiskit (versões fixadas), sem acesso à rede de produção; só P&D. Feito quando: o caso QUBO da Fase 1 roda no simulador (com Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b9d90de9df73",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem qubo-qiskit a partir de physis_hub/simulacao/conteiner/Containerfile.qiskit (versões fixadas), sem acesso à rede de produção; só P&D. Feito quando: o caso QUBO da Fase 1 roda no simulador (com Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-3406844a7793",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem qubo-qiskit a partir de physis_hub/simulacao/conteiner/Containerfile.qiskit (versões fixadas), sem acesso à rede de produção; só P&D. Feito quando: o caso QUBO da Fase 1 roda no simulador (com Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f5a2d23c3db1",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem qubo-qiskit a partir de physis_hub/simulacao/conteiner/Containerfile.qiskit (versões fixadas), sem acesso à rede de produção; só P&D. Feito quando: o caso QUBO da Fase 1 roda no simulador (com Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7b435c50c773",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem qubo-qiskit a partir de physis_hub/simulacao/conteiner/Containerfile.qiskit (versões fixadas), sem acesso à rede de produção; só P&D. Feito quando: o caso QUBO da Fase 1 roda no simulador (com Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-469c71cb4c20",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): imagem qubo-qiskit a partir de physis_hub/simulacao/conteiner/Containerfile.qiskit (versões fixadas), sem acesso à rede de produção; só P&D. Feito quando: o caso QUBO da Fase 1 roda no simulador (com Eric Oliveira)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-f2-08",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): fila de jobs com rota no hub (/api/simulacao/fase2/...), resultados guardados com hash (integridade) e limpeza. Feito quando: um job entra, roda, guarda o resultado com hash e é limpo (responsável principal; com toda a equipe do Planejador)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-9b03420d487c",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): fila de jobs com rota no hub (/api/simulacao/fase2/...), resultados guardados com hash (integridade) e limpeza. Feito quando: um job entra, roda, guarda o resultado com hash e é limpo (com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-dd9db7d51816",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): fila de jobs com rota no hub (/api/simulacao/fase2/...), resultados guardados com hash (integridade) e limpeza. Feito quando: um job entra, roda, guarda o resultado com hash e é limpo (com Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-2c9f3a0819d0",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): fila de jobs com rota no hub (/api/simulacao/fase2/...), resultados guardados com hash (integridade) e limpeza. Feito quando: um job entra, roda, guarda o resultado com hash e é limpo (com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-db1b5e19c62a",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): fila de jobs com rota no hub (/api/simulacao/fase2/...), resultados guardados com hash (integridade) e limpeza. Feito quando: um job entra, roda, guarda o resultado com hash e é limpo (com Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-4cf107390436",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): fila de jobs com rota no hub (/api/simulacao/fase2/...), resultados guardados com hash (integridade) e limpeza. Feito quando: um job entra, roda, guarda o resultado com hash e é limpo (com Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f822aefd2f81",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): fila de jobs com rota no hub (/api/simulacao/fase2/...), resultados guardados com hash (integridade) e limpeza. Feito quando: um job entra, roda, guarda o resultado com hash e é limpo (com Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-8167e4f9745a",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): fila de jobs com rota no hub (/api/simulacao/fase2/...), resultados guardados com hash (integridade) e limpeza. Feito quando: um job entra, roda, guarda o resultado com hash e é limpo (com Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-9107ae9b91bf",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): fila de jobs com rota no hub (/api/simulacao/fase2/...), resultados guardados com hash (integridade) e limpeza. Feito quando: um job entra, roda, guarda o resultado com hash e é limpo (com Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e6290970f0c5",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): fila de jobs com rota no hub (/api/simulacao/fase2/...), resultados guardados com hash (integridade) e limpeza. Feito quando: um job entra, roda, guarda o resultado com hash e é limpo (com Eric Oliveira)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-f2-09",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): dados: EPW do lugar, modelo de elevação do lote, ensaios de material (bambu, madeira, filamentos; BMP dos substratos) e malhas dos casos-modelo. Feito quando: os dados estão no servidor, com fonte (responsável principal; com toda a equipe do Planejador)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-b0319e010e90",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): dados: EPW do lugar, modelo de elevação do lote, ensaios de material (bambu, madeira, filamentos; BMP dos substratos) e malhas dos casos-modelo. Feito quando: os dados estão no servidor, com fonte (com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-5c918d291d6e",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): dados: EPW do lugar, modelo de elevação do lote, ensaios de material (bambu, madeira, filamentos; BMP dos substratos) e malhas dos casos-modelo. Feito quando: os dados estão no servidor, com fonte (com Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-fbd4074ee06a",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): dados: EPW do lugar, modelo de elevação do lote, ensaios de material (bambu, madeira, filamentos; BMP dos substratos) e malhas dos casos-modelo. Feito quando: os dados estão no servidor, com fonte (com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-717820c3a93e",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): dados: EPW do lugar, modelo de elevação do lote, ensaios de material (bambu, madeira, filamentos; BMP dos substratos) e malhas dos casos-modelo. Feito quando: os dados estão no servidor, com fonte (com Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-cbf4a6aad1b1",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): dados: EPW do lugar, modelo de elevação do lote, ensaios de material (bambu, madeira, filamentos; BMP dos substratos) e malhas dos casos-modelo. Feito quando: os dados estão no servidor, com fonte (com Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-8826d50e9811",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): dados: EPW do lugar, modelo de elevação do lote, ensaios de material (bambu, madeira, filamentos; BMP dos substratos) e malhas dos casos-modelo. Feito quando: os dados estão no servidor, com fonte (com Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-c4ca47632df8",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): dados: EPW do lugar, modelo de elevação do lote, ensaios de material (bambu, madeira, filamentos; BMP dos substratos) e malhas dos casos-modelo. Feito quando: os dados estão no servidor, com fonte (com Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-bb6dad3cd56e",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): dados: EPW do lugar, modelo de elevação do lote, ensaios de material (bambu, madeira, filamentos; BMP dos substratos) e malhas dos casos-modelo. Feito quando: os dados estão no servidor, com fonte (com Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-28901c5a3b07",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): dados: EPW do lugar, modelo de elevação do lote, ensaios de material (bambu, madeira, filamentos; BMP dos substratos) e malhas dos casos-modelo. Feito quando: os dados estão no servidor, com fonte (com Eric Oliveira)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-f2-10",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): regressão: o mesmo caso da Fase 1 rodado no solver da Fase 2 bate na ordem de grandeza (benchmarks do SIMULACAO.md). Feito quando: o teste de regressão passa para cada solver (responsável principal; com toda a equipe do Planejador)",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-5a80f9ee4790",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): regressão: o mesmo caso da Fase 1 rodado no solver da Fase 2 bate na ordem de grandeza (benchmarks do SIMULACAO.md). Feito quando: o teste de regressão passa para cada solver (com Eric Oliveira)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-8a1019782340",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): regressão: o mesmo caso da Fase 1 rodado no solver da Fase 2 bate na ordem de grandeza (benchmarks do SIMULACAO.md). Feito quando: o teste de regressão passa para cada solver (com Eric Oliveira)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-92138dbcfac9",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): regressão: o mesmo caso da Fase 1 rodado no solver da Fase 2 bate na ordem de grandeza (benchmarks do SIMULACAO.md). Feito quando: o teste de regressão passa para cada solver (com Eric Oliveira)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-92299ed59578",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): regressão: o mesmo caso da Fase 1 rodado no solver da Fase 2 bate na ordem de grandeza (benchmarks do SIMULACAO.md). Feito quando: o teste de regressão passa para cada solver (com Eric Oliveira)",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-e6df6e338a6a",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): regressão: o mesmo caso da Fase 1 rodado no solver da Fase 2 bate na ordem de grandeza (benchmarks do SIMULACAO.md). Feito quando: o teste de regressão passa para cada solver (com Eric Oliveira)",
+    "pessoa_id": "emerson",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7931fb058596",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): regressão: o mesmo caso da Fase 1 rodado no solver da Fase 2 bate na ordem de grandeza (benchmarks do SIMULACAO.md). Feito quando: o teste de regressão passa para cada solver (com Eric Oliveira)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-7b58a24197c6",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): regressão: o mesmo caso da Fase 1 rodado no solver da Fase 2 bate na ordem de grandeza (benchmarks do SIMULACAO.md). Feito quando: o teste de regressão passa para cada solver (com Eric Oliveira)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-eba4b05ec133",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): regressão: o mesmo caso da Fase 1 rodado no solver da Fase 2 bate na ordem de grandeza (benchmarks do SIMULACAO.md). Feito quando: o teste de regressão passa para cada solver (com Eric Oliveira)",
+    "pessoa_id": "marzia",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-48e044e5df5a",
+    "titulo": "Simulação Fase 2 (SIMULACAO.md): regressão: o mesmo caso da Fase 1 rodado no solver da Fase 2 bate na ordem de grandeza (benchmarks do SIMULACAO.md). Feito quando: o teste de regressão passa para cada solver (com Eric Oliveira)",
+    "pessoa_id": "leonardomacedo",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "media",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-sim-validar-premissas",
+    "titulo": "Validar as premissas do biogás (BMP, ST, SV e fração de CH₄ de cada substrato, sim.biogas.substratos) e as premissas de simulação marcadas \"conferir\". Feito quando: cada valor passa a \"conferido\" em physis-premissas.json, com fonte e data, assinado",
+    "pessoa_id": "consultorespecialista",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "micro",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
     }
    }
   ]
@@ -7712,7 +9328,7 @@
  "resumo": {
   "pessoas": 12,
   "projetos": 10,
-  "tarefas": 466,
+  "tarefas": 567,
   "concluidas": 0,
   "bloqueadas": 0
  }

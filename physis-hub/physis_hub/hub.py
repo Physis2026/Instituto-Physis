@@ -677,7 +677,10 @@ class Hub:
         município e UF: Início > Planejador > Monitoramento > instancia.json. Estação do CEMADEN e IBGE: Monitoramento >
            instancia.json > Início.
         Sem coordenadas: fonte "nao_informado", lat e lon None, e quem usa diz "local não informado" (nunca um ponto padrão).
-        Devolve {lat, lon, municipio, uf, ibge, cemaden_estacao, poligono, area_m2, fonte, fontes}."""
+        CEP (obrigatório no Início desde 15/11/2026) e fonte_coordenadas: "cep" (aproximado, do CEP), "mapa" (marcado no
+        mapa), "digitado", ou a fonte da geometria (planejador, monitoramento, instalacao). Ponto do mapa ou digitado vale
+        sobre o do CEP (a tela grava assim).
+        Devolve {lat, lon, municipio, uf, ibge, cep, cemaden_estacao, poligono, area_m2, fonte, fonte_coordenadas, fontes}."""
         with self._trava:
             try:
                 r = self._db.execute("SELECT dados FROM clima_local WHERE id=1").fetchone()
@@ -701,12 +704,16 @@ class Hub:
         perfil = {"lat": c.get("lat", c.get("latitude")), "lon": c.get("lon", c.get("longitude")),
                   "municipio": c.get("municipio"), "uf": c.get("uf"), "ibge": c.get("ibge")}
         geo = [("planejador", ter), ("inicio", perfil), ("monitoramento", mon), ("instalacao", inst)]
-        out = {"lat": None, "lon": None, "municipio": "", "uf": "", "ibge": "", "cemaden_estacao": "", "poligono": None,
-               "area_m2": None, "fonte": "nao_informado", "fontes": {}}
+        out = {"lat": None, "lon": None, "municipio": "", "uf": "", "ibge": "", "cep": "", "cemaden_estacao": "", "poligono": None,
+               "area_m2": None, "fonte": "nao_informado", "fonte_coordenadas": None, "fontes": {}}
+        _cep = re.sub(r"\D", "", str(c.get("cep") or ""))
+        if len(_cep) == 8:
+            out["cep"] = _cep[:5] + "-" + _cep[5:]
         for fonte, d in geo:
             if d.get("lat") in (None, "") or d.get("lon") in (None, ""):
                 continue
-            loc, _ = clima_mod.validar_local({"lat": d.get("lat"), "lon": d.get("lon")})
+            ponto = lambda v: v.strip().replace(",", ".") if isinstance(v, str) else v   # o Início grava "-22,505"
+            loc, _ = clima_mod.validar_local({"lat": ponto(d.get("lat")), "lon": ponto(d.get("lon"))})
             if loc:
                 out.update(lat=loc["lat"], lon=loc["lon"], fonte=fonte)
                 break
@@ -729,6 +736,8 @@ class Hub:
                     break
         if out["fonte"] != "nao_informado":
             out["fontes"]["coordenadas"] = out["fonte"]
+            fc = str(c.get("fonte_coordenadas") or "").strip()
+            out["fonte_coordenadas"] = (fc if fc in ("cep", "mapa", "digitado") else "digitado") if out["fonte"] == "inicio" else out["fonte"]
         return out
 
     # ── Lote diário de integridade (ruptura R6; docs/INTEGRIDADE_DADOS.md) ─────────────────────────
@@ -1460,6 +1469,39 @@ class Hub:
             self.registrar("loja", quem, {"o_que": "publicado" if publico else "retirado do publico", "id": ident})
             self._db.commit()
             return {"ok": True, "item": self._loja_ler(ident)}
+
+    QUEM_CATALOGO_INICIAL = "catálogo inicial da instalação"
+
+    def loja_semear_inicial(self, catalogo: dict) -> dict:
+        """Site novo: se NADA foi publicado ainda, grava, revisa e publica o catálogo inicial (sistema/loja-catalogo-inicial.json),
+        registrado como "catálogo inicial da instalação". Nunca mexe num catálogo que a equipe já publicou; item que a equipe já
+        gravou (mesmo sem publicar) fica como está. Só entra item em funcionamento; o resto é recusado."""
+        with self._trava:
+            publicados = self._db.execute("SELECT COUNT(*) FROM loja_item WHERE publicado IS NOT NULL").fetchone()[0]
+            existentes = {r[0] for r in self._db.execute("SELECT id FROM loja_item")}
+        if publicados:
+            return {"ok": True, "semeado": 0, "motivo": "a loja já tem catálogo publicado"}
+        quem, feitos, recusados = self.QUEM_CATALOGO_INICIAL, [], {}
+        for ident, campos in sorted((catalogo or {}).get("itens", {}).items()):
+            if ident in existentes:
+                continue
+            if campos.get("st") not in self.LOJA_PUBLICAVEL:
+                recusados[ident] = "não está em funcionamento"
+                continue
+            r = self.loja_gravar(ident, {k: v for k, v in campos.items() if k in ("st", "preco", "categ", *self.LOJA_TEXTOS)}, quem)
+            if r.get("ok"):
+                r = self.loja_revisar(ident, quem)
+            if r.get("ok"):
+                r = self.loja_publicar(ident, quem)
+            if r.get("ok"):
+                feitos.append(ident)
+            else:
+                recusados[ident] = r.get("erro", "erro")
+        if feitos:
+            with self._trava:
+                self.registrar("loja", quem, {"o_que": quem, "itens": len(feitos)})
+                self._db.commit()
+        return {"ok": True, "semeado": len(feitos), "recusados": recusados}
 
     def loja_catalogo(self, interno: bool = False) -> dict:
         """Público: só itens revisados, em funcionamento e publicados, sem dados de revisão.

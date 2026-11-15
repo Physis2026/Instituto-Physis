@@ -175,11 +175,13 @@ function metodologia() { return `<details class="cartao"><summary><h2 style="dis
   <li>Inmetro — registro de módulos e inversores (conferir a portaria vigente).</li></ul></details>`; }
 
 const TITULO_SOLAR = "<h1>Energia solar</h1>";   /* um só título (com ou sem o local) */
-const SUBS_SOLAR = [["calculo", "Dimensionamento"], ["planta", "Planta solar (BIM)"]];
-function subSolar() { const s = typeof ui !== "undefined" && ui && ui.solSub; return SUBS_SOLAR.some(x => x[0] === s) ? s : "calculo"; }
+const SUBS_SOLAR = [["calculo", "Dimensionamento"], ["planta", "Planta solar (BIM)"], ["fornecedores", "Fornecedores na sua região"]];
+/* sub-aba: padrão Dimensionamento; a escolha vale só nesta sessão do navegador (sessionStorage) */
+function subSolar() { let s = null; try { s = sessionStorage.getItem("physis-solar-sub"); } catch (e) {} if (typeof ui !== "undefined" && ui && ui.solSub) s = ui.solSub; return SUBS_SOLAR.some(x => x[0] === s) ? s : "calculo"; }
 function chipsSolar() { const at = subSolar();
   return `<div class="chips" role="group" aria-label="Partes da Energia solar">${SUBS_SOLAR.map(([k, n]) => `<button type="button" id="so-sub-${k}" data-sol-sub="${k}" aria-pressed="${k === at}">${n}${k === "planta" ? ' <span class="selo at">Em desenvolvimento</span>' : ""}</button>`).join("")}</div>`; }
-function telaSolar() { if (subSolar() === "planta") return TITULO_SOLAR + chipsSolar() + (window.PhysisMapeamento && PhysisMapeamento.telaPlantaSolar ? PhysisMapeamento.telaPlantaSolar() : `<p class="faixa in" role="status">A planta solar vem do módulo Mapeamento, que não está nesta instalação.</p>`);
+function telaSolar() { if (subSolar() === "fornecedores") return TITULO_SOLAR + chipsSolar() + (window.FORNECEDORES ? FORNECEDORES.htmlSolar() : `<p class="faixa in" role="status">Fornecedores: módulo não instalado.</p>`);
+  if (subSolar() === "planta") return TITULO_SOLAR + chipsSolar() + (window.PhysisMapeamento && PhysisMapeamento.telaPlantaSolar ? PhysisMapeamento.telaPlantaSolar() : `<p class="faixa in" role="status">A planta solar vem do módulo Mapeamento, que não está nesta instalação.</p>`);
   const o = ler(), E = entradas(o);
   if (E.P.lat == null) return `${TITULO_SOLAR}${chipsSolar()}${typeof avisoSemLocal === "function" ? avisoSemLocal() : '<p class="faixa at" role="status">Local não informado — preencha na página Início.</p>'}<p class="t2">Sem o local, a solar não calcula o sol do lugar nem a geração. Também dá para digitar latitude e longitude só para esta tela:</p><div class="precos">${campo(o, "lat", "Latitude", "ex.: -22,505")}${campo(o, "lon", "Longitude", "ex.: -43,183")}</div>${metodologia()}`;
   const R = calcular(E.p), M = E.m, V = E.v;
@@ -239,7 +241,7 @@ function telaSolar() { if (subSolar() === "planta") return TITULO_SOLAR + chipsS
     ${lista(o, "ligacao", "Tipo de ligação", [["monofasico", "Monofásica"], ["bifasico", "Bifásica"], ["trifasico", "Trifásica"]], "bifasico")}
     ${lista(o, "regra", "Pedido de acesso à rede", [["lei14300", "Depois de 07/01/2023 (regra de transição)"], ["antiga", "Até 07/01/2023 (regra antiga até 2045)"]], "lei14300")}</div>${leiTab}${finTab}${bat ? `<p class="t2">Bateria: <strong>${f1(bat, 1)} kWh</strong> para ${f1(autH, 0)} h de autonomia.</p>` : ""}</section>`;
   const mapa = typeof mapaCalorSolar === "function" ? mapaCalorSolar(E.P.lat, E.P.lon) : "";
-  return `${TITULO_SOLAR}${chipsSolar()}<p class="t2 apoio">Potencial do lugar, perdas uma a uma, tamanho do sistema, inversor e strings, e o retorno. A geração calculada aqui vai para o Carbono e para a Gestão (compras e investimentos).</p>${ent}${eq}${per}${mapa}${res}${casc}${mes}${st}${fin}${metodologia()}`; }
+  return `${TITULO_SOLAR}${chipsSolar()}${typeof avisoLocalCep === "function" ? avisoLocalCep() : ""}<p class="t2 apoio">Potencial do lugar, perdas uma a uma, tamanho do sistema, inversor e strings, e o retorno. A geração calculada aqui vai para o Carbono e para a Gestão (compras e investimentos).</p>${ent}${eq}${per}${mapa}${res}${casc}${mes}${st}${fin}${metodologia()}`; }
 
 /* ════════ Eventos (atributos data-sol-…) ════════ */
 if (typeof document !== "undefined" && !window.__solEventos) { window.__solEventos = true;
@@ -248,7 +250,7 @@ if (typeof document !== "undefined" && !window.__solEventos) { window.__solEvent
     if (k === "inv") ["eta_inv", "vdc_max", "mppt_min", "mppt_max", "n_mppt", "imax_mppt"].forEach(x => { o[x] = ""; });
     gravar(o); const id = t.id; desenhar(false); const x = el(id); if (x) x.focus(); });
   document.addEventListener("click", ev => { const b = ev.target && ev.target.closest ? ev.target.closest("button[data-sol-sub]") : null; if (!b) return;
-    if (typeof ui !== "undefined" && ui) ui.solSub = b.dataset.solSub; desenhar(false); const x = el(b.id); if (x) x.focus(); }); }
+    if (typeof ui !== "undefined" && ui) ui.solSub = b.dataset.solSub; try { sessionStorage.setItem("physis-solar-sub", b.dataset.solSub); } catch (e) {} desenhar(false); const x = el(b.id); if (x) x.focus(); }); }
 
 window.SOLAR = { calcular, strings, tCelula, fTemp, compat, plantaSalva, MODULOS, INVERSORES, PERDAS_PADRAO };
 window.telaSolar = telaSolar;   /* global: a plataforma chama telaSolar() na hora de desenhar */

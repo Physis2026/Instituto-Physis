@@ -158,6 +158,8 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
     shutil.copytree(AQUI / "tests", pasta / "tests", ignore=shutil.ignore_patterns("__pycache__"))
     shutil.copytree(AQUI / "docs", pasta / "docs")
     shutil.copy2(AQUI / "web" / "painel.html", pasta / "web" / "painel.html")
+    if org == "physis-site":    # a loja do site abre com o catálogo inicial (servidor.semear_loja; ferramentas/gerar_loja_catalogo.py)
+        shutil.copy2(AQUI.parent / "sistema" / "loja-catalogo-inicial.json", pasta / "loja-catalogo-inicial.json")
     if (AQUI / "web" / "app").is_dir():      # app instalável no celular (manifesto, ícones, service worker)
         shutil.copytree(AQUI / "web" / "app", pasta / "web" / "app")
     # documento para comentários (/documento/<id>): toda plataforma tem equipe que publica e revisor que comenta

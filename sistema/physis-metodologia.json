@@ -3497,6 +3497,157 @@
           "o_que_falta": "Histórico de impressões reais."
         }
       ]
+    },
+    "simulacao": {
+      "nome": "Simulação (Fase 1)",
+      "resumo": "Simulações leves de pré-dimensionamento (calor, estrutura, ventilação, terreno e água, incerteza, QUBO e biogás), iguais no servidor e no navegador (em desenvolvimento).",
+      "calculos": [
+        {
+          "premissas": [],
+          "status": "simplificado",
+          "onde": "sistema/physis-simulacao.js (espelho: physis_hub/simulacao/)",
+          "id": "sim.termica",
+          "nome": "Calor em paredes e coberturas",
+          "o_que_calcula": "U das camadas, transiente 1D (atraso e amortecimento) e corte 2D (ponte térmica).",
+          "formula": {
+            "texto": "U = 1 ÷ (Rsi + Σ e/λ + Rse); transiente por diferenças finitas (implícito, explícito ou Crank-Nicolson)",
+            "variaveis": [
+              {
+                "simbolo": "e/λ",
+                "significado": "resistência de cada camada",
+                "unidade": "m²K/W"
+              }
+            ]
+          },
+          "normas": [
+            {
+              "codigo": "ABNT NBR 15220",
+              "edicao": "a conferir",
+              "item": "parte 2, método de cálculo da transmitância",
+              "como_e_usada": "Mesma soma de resistências; Rsi e Rse de premissa."
+            }
+          ],
+          "limites_de_validade": "Fluxo unidimensional por camada; propriedades da base de materiais.",
+          "fonte_de_dados": "physis-materiais.json; premissas sim.termica.*",
+          "o_que_falta": "Ensaios de materiais de terra e fibras."
+        },
+        {
+          "premissas": [],
+          "status": "simplificado",
+          "onde": "sistema/physis-simulacao.js (espelho: physis_hub/simulacao/)",
+          "id": "sim.estrutura",
+          "nome": "Estrutura linear (treliça, pórtico, chapa)",
+          "o_que_calcula": "Deslocamentos, esforços e tensões; flambagem de Euler; verificação simplificada.",
+          "formula": {
+            "texto": "K·u = F (barra e viga de Euler-Bernoulli; triângulos CST); Pcr = π²EI/(KL)²",
+            "variaveis": [
+              {
+                "simbolo": "E, I",
+                "significado": "módulo de elasticidade e inércia",
+                "unidade": "Pa, m⁴"
+              }
+            ]
+          },
+          "normas": [
+            {
+              "codigo": "sem norma aplicável",
+              "edicao": "—",
+              "item": "—",
+              "como_e_usada": "Cálculo linear clássico; vento pelo método da pressão dinâmica da ABNT NBR 6123, com V0, S1, S2, S3 e Cf digitados [CONFERIR NA NORMA]."
+            }
+          ],
+          "limites_de_validade": "Linear, pequenas deformações; não substitui o cálculo estrutural assinado.",
+          "fonte_de_dados": "Material da premissa sim.estrutura.materiais ou do ensaio.",
+          "o_que_falta": "E e fy de bambu, madeira e filamentos medidos."
+        },
+        {
+          "premissas": [],
+          "status": "simplificado",
+          "onde": "sistema/physis-simulacao.js (espelho: physis_hub/simulacao/)",
+          "id": "sim.terreno",
+          "nome": "Terreno e água (D8, SCS-CN, USLE)",
+          "o_que_calcula": "Caminho da água, enxurrada de um evento e perda de solo na grade do lote.",
+          "formula": {
+            "texto": "Q = (P − 0,2S)² ÷ (P + 0,8S), S = 25400/CN − 254; A = R·K·LS·C·P",
+            "variaveis": [
+              {
+                "simbolo": "CN",
+                "significado": "número da curva por uso do solo",
+                "unidade": "—"
+              }
+            ]
+          },
+          "normas": [
+            {
+              "codigo": "sem norma aplicável",
+              "edicao": "—",
+              "item": "—",
+              "como_e_usada": "Métodos clássicos (SCS-CN, USLE); CN por uso de premissa [CONFERIR]."
+            }
+          ],
+          "limites_de_validade": "Grade do lote; um evento de chuva; sem rede de drenagem.",
+          "fonte_de_dados": "Geometria do lugar (Mapeamento).",
+          "o_que_falta": "Modelo de elevação do lote em campo."
+        },
+        {
+          "premissas": [],
+          "status": "simplificado",
+          "onde": "sistema/physis-simulacao.js (espelho: physis_hub/simulacao/)",
+          "id": "sim.biogas",
+          "nome": "Biodigestor: produção de biogás",
+          "o_que_calcula": "Biogás e metano por dia e por mês, volume, carga orgânica, energia e CO₂e evitado.",
+          "formula": {
+            "texto": "produção = Σ massa × ST × SV × BMP × fração(k(T), TRH); k(T) = k_ref·θ^(T − T_ref)",
+            "variaveis": [
+              {
+                "simbolo": "BMP",
+                "significado": "potencial de metano do substrato",
+                "unidade": "m³/kg SV"
+              }
+            ]
+          },
+          "normas": [
+            {
+              "codigo": "sem norma aplicável",
+              "edicao": "—",
+              "item": "—",
+              "como_e_usada": "Cinética de 1ª ordem e BMP de tabela (premissas sim.biogas.*, conferir)."
+            }
+          ],
+          "limites_de_validade": "Mistura completa ou fluxo pistonado; temperatura do local quando sem aquecimento.",
+          "fonte_de_dados": "Plano de resíduos (rota biodigestor) e local da instalação.",
+          "o_que_falta": "BMP medido dos substratos do cliente."
+        },
+        {
+          "premissas": [],
+          "status": "simplificado",
+          "onde": "sistema/physis-simulacao.js (espelho: physis_hub/simulacao/)",
+          "id": "sim.incerteza",
+          "nome": "Faixa de incerteza (Monte Carlo)",
+          "o_que_calcula": "Média e percentis da geração, do inventário de carbono e do retorno.",
+          "formula": {
+            "texto": "N sorteios das entradas (normal, uniforme, triangular, lognormal) pelo gerador mulberry32",
+            "variaveis": [
+              {
+                "simbolo": "P5, P95",
+                "significado": "percentis",
+                "unidade": "—"
+              }
+            ]
+          },
+          "normas": [
+            {
+              "codigo": "sem norma aplicável",
+              "edicao": "—",
+              "item": "—",
+              "como_e_usada": "Método estatístico; semente fixa nos testes."
+            }
+          ],
+          "limites_de_validade": "Entradas independentes.",
+          "fonte_de_dados": "Desvios digitados ou da incerteza do inventário.",
+          "o_que_falta": "Correlação entre entradas."
+        }
+      ]
     }
   },
   "adequacoes": [

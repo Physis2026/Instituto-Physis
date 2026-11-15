@@ -66,7 +66,7 @@ def apagar_pasta(pasta: Path, tentativas: int = 6):
 PAGINAS_PEDIDAS = ["site-loja-e-plataforma.html", "consultoria.html", "gestao-interna.html", "scada-supervisorio.html",
                    "sustainkit.html", "planejador.html", "painel-municipal.html", "documento-para-comentarios.html",
                    "baixar-o-app.html", "index.html"]
-DOCS_PEDIDOS = ["00_", "01_", "04_", "10_", "17_", "18_", "20_", "21_", "22_", "23_"]
+DOCS_PEDIDOS = ["00_", "01_", "04_", "10_", "17_", "18_", "20_", "21_", "22_", "23_", "23b_", "24_"]
 
 
 def conferir_inventario(saida: Path, rep: Path, mapa: list) -> list[str]:
@@ -221,6 +221,26 @@ def main():
         if (rep / "app-nativo").is_dir():
             zipar(rep / "app-nativo", P("08_App_nativo") / f"app-nativo_{commit}.zip")
         shutil.copy2(arq_zip, P("09_Codigo_fonte") / f"sistema-physis_{commit}.zip")
+
+        # 11 metodologia, modelagem e informações da Fase 1, legíveis sem abrir o código
+        mt = P("11_Metodologia_e_Modelagem")
+        if (rep / "physis-hub" / "docs").is_dir():
+            shutil.copytree(rep / "physis-hub" / "docs", mt / "documentacao_tecnica",
+                            ignore=shutil.ignore_patterns("*.js", "*.db*"))
+        bases = mt / "bases_e_modelos"
+        bases.mkdir(exist_ok=True)
+        for rel in ("sistema/physis-metodologia.json", "sistema/physis-premissas.json", "sistema/physis-variaveis.json",
+                    "sistema/physis-fatores-emissao.json", "sistema/physis-certificacoes.json", "sistema/physis-simulacao-premissas.json",
+                    "sistema/physis-3d-premissas.json", "sistema/loja-catalogo-inicial.json"):
+            if (rep / rel).is_file():
+                shutil.copy2(rep / rel, bases / Path(rel).name)
+        for rel, nome in (("sistema/simulacao-exemplos", "exemplos_simulacao"), ("modulos/mapeamento/exemplos", "exemplos_mapeamento")):
+            if (rep / rel).is_dir():
+                shutil.copytree(rep / rel, mt / nome)
+        conf = mt / "paginas_de_conferencia"
+        conf.mkdir(exist_ok=True)
+        for f in (rep / "ferramentas" / "testes-navegador").glob("conferir-*.html"):
+            shutil.copy2(f, conf / f.name)
 
         # 00 versão de envio: uma pasta por pessoa e o índice de tudo (pedido de 15/11/2026: "todos os itens, projetos,
         #    módulos e páginas claramente indicados para a versão de envio")
@@ -542,6 +562,7 @@ Uma cópia desta pasta inteira em ZIP fica em `_backup_arquivos/`.
 | 08_App_nativo | Projeto do app Android e iPhone e página de download | Rafaella, Eric |
 | 09_Codigo_fonte | Repositório completo desta versão | Eric |
 | 10_Gestao_tarefas_Fase2 | Arquivo para importar na Gestão (Plano de ação → Importar → Substituir) | Rafaella |
+| 11_Metodologia_e_Modelagem | Documentação técnica (metodologia, simulação, mapeamento, variáveis, IA, documentos, fornecedores, suporte), bases e premissas, exemplos de modelos e as páginas de conferência | Equipe toda |
 
 Nenhum banco de teste, senha, chave ou arquivo `.env` vai nesta entrega.
 """

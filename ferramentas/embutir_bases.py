@@ -28,6 +28,7 @@ BASES = {"base-certificacoes": S / "physis-certificacoes.json", "base-plantas": 
 # módulos de cálculo em arquivo próprio (testados à parte), embutidos como <script> no <head>
 MODULOS = {"mod-avac": S / "physis-avac.js", "mod-saude": S / "physis-saude.js", "mod-juridico": S / "physis-juridico.js",
            "mod-turbinas": S / "physis-turbinas.js", "mod-solar": S / "physis-solar.js",
+           "mod-ifc": S / "physis-ifc.js",                        # IFC no navegador (Mapeamento sem servidor)
            "mod-mapeamento": S / "physis-mapeamento.js",          # Mapeamento (camadas, BIM, planta solar); depois da solar
            "mod-circular-mapa": S / "physis-circular-mapa.js", "mod-cargatermica": S / "physis-cargatermica.js",
            "mod-metodologia": S / "physis-metodologia.js", "mod-sbn": S / "physis-sbn.js",
@@ -40,7 +41,10 @@ MODULOS = {"mod-avac": S / "physis-avac.js", "mod-saude": S / "physis-saude.js",
            "mod-secador": S / "physis-secador.js",                # aba Secador solar (em desenvolvimento)
            "mod-servidor-verde": S / "physis-servidor-verde.js",  # aba Servidor verde (em desenvolvimento)
            "mod-suporte-remoto": S / "physis-suporte-remoto.js",  # "Permitir suporte" (Minha conta da direção)
-           "mod-physis-3d": S / "physis-3d.js"}                   # aba Physis 3D (em desenvolvimento)
+           "mod-physis-3d": S / "physis-3d.js",                   # aba Physis 3D (em desenvolvimento)
+           "mod-simulacao-casos": S / "simulacao-exemplos" / "casos.js",   # exemplos da Simulação (dados fictícios)
+           "mod-simulacao": S / "physis-simulacao.js",
+           "mod-fornecedores": S / "physis-fornecedores.js"}      # Fornecedores na sua região (aba Solar)            # aba Simulação + cartões nas outras abas
 
 
 def bloco(ident: str, arq: Path) -> str:

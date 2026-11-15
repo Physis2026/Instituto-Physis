@@ -124,6 +124,27 @@ grandes: `ogr2ogr -f GeoJSON -clipsrc <lon_min> <lat_min> <lon_max> <lat_max> sa
   `solar.arranjo_folga_modulos` (m), `solar.arranjo_hora_critica_inicio` e `solar.arranjo_hora_critica_fim` (hora
   solar no solstício de inverno). Todas [CONFERIR] com a norma e o fabricante do suporte.
 
+## CEP do Início (15/11/2026)
+
+Regra do dono: **CEP obrigatório; latitude e longitude opcionais e preenchidas com o CEP**.
+- O navegador nunca chama o provedor: pede ao servidor `GET /api/local/cep/<cep>` (sessão, limite por IP `PHYSIS_LIMITE_CEP`,
+  cache de 30 dias na tabela `cep_cache`). Vai para o provedor **só o CEP**, com User-Agent genérico (LGPD); a tela avisa.
+- `PHYSIS_CEP_PROVEDOR` (ordem, vírgula): `brasilapi` (BrasilAPI CEP v2, pode trazer coordenadas), `viacep` (endereço,
+  município e código IBGE), `nominatim` (instância própria em `PHYSIS_NOMINATIM_URL`; a pública só dentro da política de
+  uso: 1 pedido por segundo, User-Agent descritivo) ou `desligado`. Padrão `brasilapi,viacep`. **[CONFERIR]** os termos de
+  uso de cada um na página oficial antes de ligar em produção.
+- Sem coordenadas do provedor: **não há centróide do município embutido** (falta uma base do IBGE com licença conferida);
+  a tela diz "coordenadas não encontradas — marque no mapa". Nunca um ponto inventado.
+- Fonte das coordenadas (`fonte_coordenadas` em `localDaInstalacao()` e `hub.local_da_instalacao()`): "cep" (aproximado),
+  "mapa" ou "digitado"; mapa e digitado valem sobre o CEP. Solar, planta solar e previsão mostram "Local aproximado pelo
+  CEP" quando a fonte é o CEP.
+- Sem internet ou provedor desligado: o CEP continua obrigatório, o endereço é digitado e as coordenadas são opcionais.
+- Testes: `tests/test_cep.py`.
+
+**Tarefa do Eric (Fase 2):** subir um Nominatim próprio (contêiner Linux, extrato do Brasil do OpenStreetMap) e uma base
+de CEP/municípios do IBGE com licença conferida (centróides), para a consulta não depender de serviços de fora; depois
+trocar `PHYSIS_CEP_PROVEDOR` para `nominatim` e preencher `PHYSIS_NOMINATIM_URL`.
+
 ## Fase 2 (ainda não feito)
 
 - Instalar as bases nacionais no servidor (com o Eric): baixar, conferir licença, recortar e manter atualizado.

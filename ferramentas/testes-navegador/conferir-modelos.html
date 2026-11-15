@@ -38,6 +38,7 @@
 <section class="cartao" aria-labelledby="h-planta"><h2 id="h-planta">Planta solar: arranjo, carta solar e curva do dia</h2><div id="planta"></div></section>
 <script src="../../sistema/physis-calc-comum.js"></script>
 <script src="../../sistema/physis-solar.js"></script>
+<script src="../../sistema/physis-ifc.js"></script>
 <script src="../../sistema/physis-mapeamento.js"></script>
 <script>
 "use strict";
@@ -56,7 +57,7 @@ const quase = (a, b, tol) => Math.abs(a - b) <= tol * Math.max(1, Math.abs(b));
 
 async function principal() {
   const pega = async (n, tipo) => { const r = await fetch(EX + n, { cache: "no-store" }); if (!r.ok) throw new Error(n + ": " + r.status); return tipo === "bin" ? r.arrayBuffer() : tipo === "txt" ? r.text() : r.json(); };
-  const [lote, plan, planta, ctx, kml, shp, ifcTxt, ifcRes] = await Promise.all([pega("lote.geojson"), pega("planejador-exemplo.json"), pega("planta-solar.json"), pega("contexto-lugar.json"), pega("pocos.kml", "txt"), pega("nascentes-shp.zip", "bin"), pega("modelo.ifc", "txt"), pega("ifc-resumo.json")]);
+  const [lote, plan, planta, ctx, kml, shp, ifcTxt, ifcRes, ifcEnt] = await Promise.all([pega("lote.geojson"), pega("planejador-exemplo.json"), pega("planta-solar.json"), pega("contexto-lugar.json"), pega("pocos.kml", "txt"), pega("nascentes-shp.zip", "bin"), pega("modelo.ifc", "txt"), pega("ifc-resumo.json"), pega("modelo-entrada.json")]);
   const M = window.MAPEAMENTO;
   /* ── 1. arquivos de exemplo ── */
   confere("Todos os arquivos marcados como exemplo", [lote.aviso, plan.aviso, planta.aviso, ctx.aviso, ifcRes.aviso].every(a => /FICTÍCIOS/.test(a || "")) && /FICTÍCIOS/.test(kml), "aviso em cada arquivo");
@@ -78,6 +79,12 @@ async function principal() {
   const guids = (ifcTxt.match(/^#\d+=IFC\w+\('([^']{22})'/gm) || []).map(l => l.match(/'([^']{22})'/)[1]);
   confere("IFC: GlobalId com 22 caracteres e sem repetição", guids.length > 20 && guids.every(g => /^[0-3][0-9A-Za-z_$]{21}$/.test(g)) && new Set(guids).size === guids.length, guids.length + " GlobalId");
   confere("IFC: fator de potência com P, Q e S", /'Physis_Eletrica'/.test(ifcTxt) && /'FatorPotencia'/.test(ifcTxt) && /'PotenciaReativa'/.test(ifcTxt) && /'PotenciaAparente'/.test(ifcTxt), "");
+  /* sem servidor: o escritor e o leitor do navegador (physis-ifc.js) dão o mesmo que o ifc.py */
+  const ifcJs = PhysisIFC.escrever(ifcEnt, { agora: ifcEnt.agora });
+  const difLinha = (() => { const a = ifcJs.split("\n"), b = ifcTxt.split("\n"); for (let i = 0; i < Math.max(a.length, b.length); i++) if (a[i] !== b[i]) return "linha " + (i + 1) + ": " + (a[i] || "").slice(0, 80) + " × " + (b[i] || "").slice(0, 80); return ""; })();
+  confere("IFC no navegador = IFC do servidor (mesmo texto)", ifcJs === ifcTxt, difLinha || ifcJs.length + " caracteres");
+  const resJs = PhysisIFC.ler(ifcTxt), resPy = Object.assign({}, ifcRes); delete resPy.aviso; delete resJs.tipos;
+  confere("Leitor do navegador = leitor do servidor (resumo)", JSON.stringify(resJs) === JSON.stringify(resPy), resJs.elementos + " elementos");
   confere("IFC: módulos do arranjo = planta", tipos.IFCSOLARDEVICE === planta.total.modulos + planta.aguas.length, `${tipos.IFCSOLARDEVICE} IfcSolarDevice`);
   document.getElementById("ifc").innerHTML = `<div class="rolagem"><table><caption>Lido pelo leitor do servidor (ifc-resumo.json)</caption><tbody><tr><th scope="row">Esquema</th><td>${esc(ifcRes.esquema)}</td></tr><tr><th scope="row">Projeto</th><td>${esc(ifcRes.projeto)}</td></tr><tr><th scope="row">Terreno</th><td>${ifcRes.terrenos.map(s => `${esc(s.nome)} · ${s.lat.toFixed(5)}, ${s.lon.toFixed(5)}`).join("")}</td></tr><tr><th scope="row">Pavimentos</th><td>${ifcRes.pavimentos.map(p => esc(p.nome)).join(", ")}</td></tr>${Object.entries(ifcRes.elementos_por_tipo).map(([a, c]) => `<tr><th scope="row">${esc(a)}</th><td>${c}</td></tr>`).join("")}</tbody></table></div>`;
   /* ── 3. contas: o espelho do navegador bate com o do servidor ── */

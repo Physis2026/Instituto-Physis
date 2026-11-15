@@ -191,6 +191,7 @@ LIMITES_PADRAO = {
     "arquivo": ("PHYSIS_LIMITE_ARQUIVO", "10/600"),           # anexos de até 20 MB do pedido
     "entrar": ("PHYSIS_LIMITE_ENTRAR", "10/300"),             # login, criar conta, código de ativação (por IP)
     "dispositivo": ("PHYSIS_LIMITE_DISPOSITIVO", "1200/60"),  # linhas dos aparelhos
+    "cep": ("PHYSIS_LIMITE_CEP", "30/600"),                   # consulta de CEP do Início (provedor externo)
 }
 
 

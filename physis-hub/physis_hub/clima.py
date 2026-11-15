@@ -16,6 +16,10 @@ Aprendizado: cada previsão de "vai chover amanhã?" fica guardada; quando o dia
 com a chuva observada (pluviômetro da Physis, se houver, senão o CEMADEN mais próximo). A taxa de
 acerto de cada fonte no lugar decide o peso dela na previsão combinada.
 
+Consulta automática (15/11/2026): o laço `rodar` (classe Agendador) busca ao ligar, logo depois que o local muda no
+Início/Planejador/Monitoramento e depois no ritmo de cada fonte, com espera crescente nos erros e sem passar dos limites
+publicados (PISO_S). "Consultar agora" na tela continua valendo.
+
 Os endereços das fontes podem ser trocados por variáveis de ambiente (PHYSIS_CLIMA_<FONTE>_URL),
 porque serviços públicos mudam de endereço. Nenhuma chave fica no código.
 """
@@ -36,6 +40,21 @@ FUSO = timezone(timedelta(hours=-3))
 CHUVA_MM = 1.0              # a partir de quanto um dia conta como "choveu"
 VALIDADE_S = {"receptor": 1.5 * 3600, "openmeteo": 6 * 3600, "inmet": 12 * 3600, "cemaden": 2 * 3600}
 INTERVALO_S = {"receptor": 5 * 60, "openmeteo": 60 * 60, "inmet": 3 * 3600, "cemaden": 15 * 60}
+# Ritmo das consultas automáticas (laço `rodar`, abaixo). Limites publicados pelas fontes:
+#  - Open-Meteo (https://open-meteo.com/en/terms, lido em 15/11/2026): API gratuita com menos de 10.000 chamadas por dia,
+#    5.000 por hora e 600 por minuto, e SÓ para uso não comercial. O hub faz 1 por hora (24 por dia) mais as de troca de
+#    local, nunca mais de 1 a cada 10 min. Instalação de cliente pagante pode ser uso comercial: plano pago do Open-Meteo
+#    ou servidor próprio (o código do Open-Meteo é aberto) [CONFERIR com o jurídico].
+#  - INMET (apiprevmet3) e CEMADEN (getJson2.php): nenhum limite publicado encontrado [CONFERIR]; ritmo conservador.
+# PISO_S: o menor espaço entre duas chamadas da mesma fonte, mesmo com troca de local ou erro (vale entre reinícios,
+# pela hora da última consulta guardada). TETO_S: a maior espera depois de erros seguidos (espera dobra a cada erro).
+PISO_S = {"receptor": 60, "openmeteo": 10 * 60, "inmet": 30 * 60, "cemaden": 10 * 60}
+PISO_MUDANCA_S = 60         # local acabou de mudar: consulta já, mas não mais que 1 vez por minuto por fonte
+TETO_S = {"receptor": 30 * 60, "openmeteo": 6 * 3600, "inmet": 12 * 3600, "cemaden": 2 * 3600}
+FONTES_DO_LOCAL = ("openmeteo", "inmet", "cemaden")
+SEM_LOCAL = "local não informado (preencha o CEP no Início)"
+FALTA_MUNICIPIO = "falta município/UF (preencha o CEP no Início)"
+IBGE_ESPERA_S = 6 * 3600     # município que o IBGE não achou: tenta de novo só depois disso
 NOMES = {"receptor": "Receptor (previsão original)", "openmeteo": "Open-Meteo", "inmet": "INMET",
          "cemaden": "CEMADEN (chuva medida)", "physis": "Pluviômetro Physis"}
 PALAVRAS_CHUVA = ("chuva", "chuvoso", "pancada", "trovoada", "garoa", "chuvisco", "tempestade")
@@ -237,6 +256,7 @@ class Clima:
         self.hub, self.buscar = hub, buscar
         self.receptor_url = (receptor_url or "").rstrip("/") or None
         self.enviar_local = enviar_local        # função(lat, lon) -> (ok, detalhe); None = sem receptor
+        self._ibge: dict[tuple[str, str], tuple[str, float]] = {}   # (município, UF) -> (código ou "", quando)
         with hub._trava:
             hub._db.executescript(ESQUEMA)
             hub._db.commit()
@@ -303,42 +323,85 @@ class Clima:
                                  (fonte, erro[:200], agora))
             self._db.commit()
 
+    def _ibge_do_local(self, loc: dict) -> str:
+        """Código IBGE do local; sem ele, procura pelo município e UF (o CEP do Início traz os dois). Guarda a resposta
+        (a que não achou, por IBGE_ESPERA_S) para não perguntar ao IBGE a cada consulta."""
+        if loc.get("ibge"):
+            return str(loc["ibge"])
+        mun, uf = str(loc.get("municipio") or "").strip(), str(loc.get("uf") or "").strip().upper()
+        if not mun or not uf:
+            return ""
+        chave, agora = (_sem_acento(mun), uf), self._agora()
+        guardado = self._ibge.get(chave)
+        if guardado and (guardado[0] or agora - guardado[1] < IBGE_ESPERA_S):
+            return guardado[0]
+        codigo = self.achar_ibge(mun, uf) or ""
+        self._ibge[chave] = (codigo, agora)
+        return codigo
+
     def consultar(self, fonte: str) -> bool:
+        return self.consultar_motivo(fonte) == "ok"
+
+    def consultar_motivo(self, fonte: str) -> str:
+        """Consulta uma fonte e diz como foi: "ok"; "erro_rede" (a fonte não respondeu: o laço espera mais a cada erro);
+        "sem_local" ou "falta_dado" (falta preencher o Início: o erro fica guardado e aparece na tela, em vez de
+        silêncio); "desligado" (receptor não configurado ou fonte desconhecida)."""
         loc = self.local()
         try:
             if fonte == "receptor":
                 if not self.receptor_url:
-                    return False
+                    return "desligado"
                 dados = ler_receptor(self.buscar(self.receptor_url + "/api/estado"))
+            elif fonte not in FONTES_DO_LOCAL:
+                return "desligado"
             elif not loc:
-                return False
+                self._guardar(fonte, None, SEM_LOCAL)
+                return "sem_local"
             elif fonte == "openmeteo":
                 dados = ler_openmeteo(self.buscar(_url("openmeteo").format(lat=loc["lat"], lon=loc["lon"])))
             elif fonte == "inmet":
-                if not loc.get("ibge"):
-                    self._guardar(fonte, None, "falta o código IBGE do município (informe município e UF)")
-                    return False
-                dados = ler_inmet(self.buscar(_url("inmet").format(ibge=loc["ibge"])), loc["ibge"])
-            elif fonte == "cemaden":
-                if not loc.get("uf") or not loc.get("ibge"):
-                    self._guardar(fonte, None, "falta o município e a UF do lugar")
-                    return False
-                dados = ler_cemaden(self.buscar(_url("cemaden").format(uf=loc["uf"])), loc, self._agora())
-            else:
-                return False
+                ibge = self._ibge_do_local(loc)
+                if not ibge:
+                    self._guardar(fonte, None, FALTA_MUNICIPIO)
+                    return "falta_dado"
+                dados = ler_inmet(self.buscar(_url("inmet").format(ibge=ibge)), ibge)
+            else:   # cemaden
+                ibge = self._ibge_do_local(loc)
+                if not loc.get("uf") or not ibge:
+                    self._guardar(fonte, None, FALTA_MUNICIPIO)
+                    return "falta_dado"
+                dados = ler_cemaden(self.buscar(_url("cemaden").format(uf=urllib.parse.quote(loc["uf"]))),
+                                    dict(loc, ibge=ibge), self._agora())
         except (urllib.error.URLError, OSError, ValueError, TypeError, AttributeError) as exc:
             self._guardar(fonte, None, f"sem resposta: {exc}")
-            return False
+            return "erro_rede"
         self._guardar(fonte, dados)
         self._apostar(fonte, dados)
         agora = datetime.fromtimestamp(self._agora(), FUSO)
         if fonte == "cemaden" and dados.get("mm_24h") is not None and agora.hour < 3:
             # entre 0 h e 3 h, o acumulado de 24 h é praticamente a chuva do dia que acabou
             self.observar((agora - timedelta(days=1)).strftime("%Y-%m-%d"), "cemaden", dados["mm_24h"])
-        return True
+        return "ok"
 
     def consultar_tudo(self) -> dict:
         return {f: self.consultar(f) for f in ("receptor", "openmeteo", "inmet", "cemaden")}
+
+    def esquecer_previsoes(self) -> None:
+        """O local mudou: a previsão do lugar antigo sai da tela (o placar e as apostas ficam)."""
+        with self.hub._trava:
+            self._db.execute("DELETE FROM clima_fonte WHERE fonte IN ('openmeteo','inmet','cemaden')")
+            self._db.commit()
+
+    def ultimas_chamadas(self) -> dict[str, float]:
+        """Hora da última ida a cada fonte (boa ou com erro), para o piso entre chamadas valer também depois de reiniciar."""
+        with self.hub._trava:
+            linhas = self._db.execute("SELECT fonte, consultado, erro, erro_em FROM clima_fonte").fetchall()
+        out = {}
+        for f, c, erro, e in linhas:
+            e = e if (erro or "").startswith("sem resposta") else None   # "falta município" não foi chamada à fonte
+            if c or e:
+                out[f] = max(c or 0.0, e or 0.0)
+        return out
 
     # ── Aprendizado: o que cada fonte disse sobre amanhã × o que choveu ───────────────────────
     def _apostar(self, fonte: str, dados: dict) -> None:
@@ -429,16 +492,97 @@ def receptor_local(base: str, timeout: float = 5.0):
     return enviar
 
 
-def rodar(clima: Clima, parar: threading.Event, passo: float = 30.0) -> None:
-    """Laço de fundo: cada fonte no seu ritmo. Erros não derrubam o hub."""
-    ultimo = {f: 0.0 for f in INTERVALO_S}
+_NUNCA = object()
+
+
+class Agendador:
+    """Quando consultar cada fonte, sem ninguém clicar em "Consultar agora" (pedido de 15/11/2026).
+
+    - ao ligar o hub, se já há local: consulta logo;
+    - quando o local muda (Início, Planejador ou Monitoramento, pela função única hub.local_da_instalacao): esquece a
+      previsão do lugar antigo e consulta logo;
+    - depois, cada fonte no seu ritmo (INTERVALO_S);
+    - com erro de rede, espera o dobro a cada erro seguido (do PISO_S até o TETO_S);
+    - nunca chama a mesma fonte com menos de PISO_S de intervalo (limites publicados: ver PISO_S).
+    Sem local, município ou UF, o erro fica guardado (aparece na tela) e a fonte volta só no ritmo normal ou quando o
+    local mudar. O relógio vem de fora (`passo(agora)`) para os testes usarem um relógio falso."""
+
+    def __init__(self, clima: Clima, intervalos: dict | None = None, pisos: dict | None = None, tetos: dict | None = None):
+        self.clima = clima
+        self.intervalos = {f: s for f, s in (intervalos or INTERVALO_S).items()
+                           if f != "receptor" or clima.receptor_url}      # sem receptor configurado, nada a consultar
+        self.pisos, self.tetos = dict(pisos or PISO_S), dict(tetos or TETO_S)
+        self.proximo = {f: 0.0 for f in self.intervalos}
+        self.falhas = {f: 0 for f in self.intervalos}
+        try:
+            self.ultima = clima.ultimas_chamadas()
+        except Exception:          # noqa: BLE001 — sem histórico, só não há piso herdado
+            self.ultima = {}
+        self.marca = _NUNCA
+        self.mudou: set[str] = set()     # fontes com local novo ainda não consultado (piso curto, PISO_MUDANCA_S)
+
+    def _marca_do_local(self):
+        loc = self.clima.local()
+        if not loc:
+            return None
+        return tuple(str(loc.get(k) or "") for k in ("lat", "lon", "municipio", "uf", "ibge", "cemaden_estacao"))
+
+    def espera_erro(self, fonte: str) -> float:
+        n = max(1, self.falhas[fonte])
+        return float(min(self.tetos.get(fonte, 6 * 3600), self.pisos.get(fonte, 60) * 2 ** (n - 1)))
+
+    def passo(self, agora: float) -> dict[str, str]:
+        """Faz as consultas que venceram. Devolve {fonte: motivo} do que foi tentado agora."""
+        try:   # "Consultar agora" na tela também conta para o piso
+            for f, t in self.clima.ultimas_chamadas().items():
+                if t > (self.ultima.get(f) or 0.0):
+                    self.ultima[f] = t
+        except Exception:          # noqa: BLE001
+            pass
+        marca = self._marca_do_local()
+        if marca != self.marca:
+            if self.marca is not _NUNCA and self.marca is not None:
+                self.clima.esquecer_previsoes()           # previsão do lugar antigo não fica na tela
+            self.marca = marca
+            for f in FONTES_DO_LOCAL:
+                if f in self.proximo:
+                    self.proximo[f], self.falhas[f] = 0.0, 0
+                    self.mudou.add(f)
+        feitas: dict[str, str] = {}
+        for fonte, intervalo in self.intervalos.items():
+            if agora < self.proximo[fonte]:
+                continue
+            ult, piso = self.ultima.get(fonte), self.pisos.get(fonte, 60)
+            if fonte in self.mudou:
+                piso = min(piso, PISO_MUDANCA_S)            # local novo: consulta já (ainda com um mínimo)
+            if ult is not None and agora - ult < piso:
+                self.proximo[fonte] = ult + piso           # cedo demais para esta fonte: espera o piso
+                continue
+            try:
+                motivo = self.clima.consultar_motivo(fonte)
+            except Exception:          # noqa: BLE001 — uma fonte com defeito não pode parar as outras
+                motivo = "erro_rede"
+            feitas[fonte] = motivo
+            self.mudou.discard(fonte)
+            if motivo in ("ok", "erro_rede"):
+                self.ultima[fonte] = agora
+            if motivo == "erro_rede":
+                self.falhas[fonte] += 1
+                self.proximo[fonte] = agora + self.espera_erro(fonte)
+            else:
+                self.falhas[fonte] = 0
+                self.proximo[fonte] = agora + intervalo
+        return feitas
+
+
+def rodar(clima: Clima, parar: threading.Event, passo: float = 10.0, relogio=None) -> None:
+    """Laço de fundo do hub (servidor.main liga numa thread). Olha o local a cada `passo` segundos (consulta barata ao
+    banco) e deixa o Agendador decidir. Erros não derrubam o hub."""
+    ag = Agendador(clima)
+    relogio = relogio or clima._agora
     while not parar.is_set():
-        agora = time.time()
-        for fonte, intervalo in INTERVALO_S.items():
-            if agora - ultimo[fonte] >= intervalo:
-                ultimo[fonte] = agora
-                try:
-                    clima.consultar(fonte)
-                except Exception:          # noqa: BLE001 — uma fonte com defeito não pode parar as outras
-                    pass
+        try:
+            ag.passo(relogio())
+        except Exception:          # noqa: BLE001
+            pass
         parar.wait(passo)

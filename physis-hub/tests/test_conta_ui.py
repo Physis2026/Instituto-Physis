@@ -144,7 +144,7 @@ class TestGestaoRobos(unittest.TestCase):
 
     def test_um_h1_por_parte_nova(self):
         b = self.g.split('<script id="gp-robos">', 1)[1].split("</script>", 1)[0]
-        self.assertEqual(b.count("<h1"), 4)       # Suporte, Clientes, Chamados e Parceiros (uma tela cada); Direção usa h2
+        self.assertEqual(b.count("<h1"), 5)       # Suporte, Clientes, Chamados, Parceiros e Fornecedores (uma tela cada); Direção usa h2
 
 
 class TestGestaoNovas(unittest.TestCase):

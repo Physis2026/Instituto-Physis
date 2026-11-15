@@ -73,6 +73,9 @@ function irradiacao(L) { const u = U(); if (!L) return null; const k = L.lat.toF
   if (typeof carregarGisSolar === "function") { try { carregarGisSolar(L.lat, L.lon); } catch (e) {} }
   const g = u.gisSolar; if (g && g.ponto && Array.isArray(g.ponto.meses) && u.gisSolarKey === k) return { H: g.ponto.meses, fonte: "NASA POWER, média de longo prazo (mesma base da aba Solar)" };
   const c = u.mp && u.mp.ctx && u.mp.ctx.campos && u.mp.ctx.campos.irradiacao; if (c && c.valor && Array.isArray(c.valor.mensal_kwh_m2_dia)) return { H: c.valor.mensal_kwh_m2_dia, fonte: c.fonte };
+  /* sem servidor (arquivo aberto, sem internet, demonstração): a estimativa da aba Solar pela latitude (índice de claridade) */
+  if (!emHub()) { const S = SOL(); try { const cp = S && S.compat ? S.compat() : null; if (cp && !cp.semLocal && Array.isArray(cp.H) && cp.H.length === 12 && cp.H.some(x => x > 0))
+    return { H: cp.H, fonte: (cp.medido ? "NASA POWER (guardado neste navegador)" : "estimativa pela latitude e o índice de claridade da aba Solar") + " · " + NAV_TXT, navegador: true }; } catch (e) {} }
   return null; }
 function temperaturas(L) { if (!L) return null; if (typeof carregarGis === "function") { try { carregarGis("temperatura", L.lat, L.lon); } catch (e) {} }
   const g = U().gis && U().gis.temperatura; return g && g.ponto && Array.isArray(g.ponto.meses) ? g.ponto.meses : null; }
@@ -204,6 +207,8 @@ function pedidoPara3d(el) { const cx = el.caixa || {}, mats = el.materiais || []
 const cartao = (id, tit, numero, un) => `<section class="cartao" aria-labelledby="h-${id}"><h3 id="h-${id}" class="t3">${E(T(tit))}</h3><span class="numero">${numero}</span><span class="t2">${E(T(un))}</span></section>`;
 const campo = (k, rot, val, ph, ajuda) => `<div><label for="mp-${k}">${E(T(rot))}</label><input id="mp-${k}" type="text" inputmode="decimal" data-mp-k="${k}" value="${E(val == null ? "" : val)}" placeholder="${E(ph || "")}" style="width:100%"${ajuda ? ` aria-describedby="mp-${k}-a"` : ""}>${ajuda ? `<span id="mp-${k}-a" class="t2 pq">${E(T(ajuda))}</span>` : ""}</div>`;
 const lista = (k, rot, ops, atual) => `<div><label for="mp-${k}">${E(T(rot))}</label><select id="mp-${k}" data-mp-k="${k}" style="width:100%">${ops.map(([v, n]) => `<option value="${E(v)}" ${String(v) === String(atual) ? "selected" : ""}>${E(T(n))}</option>`).join("")}</select></div>`;
+const NAV_TXT = "calculado no navegador (sem servidor)";
+const notaNav = () => emHub() ? "" : `<p class="t2 pq"><span class="selo in">${E(T("calculado no navegador (sem servidor)"))}</span> ${E(T("Com o servidor da instalação, o resultado usa as camadas instaladas e pode mudar."))}</p>`;
 const faixa = (tipo, forte, txt) => `<div class="faixa ${tipo}" role="note"><strong>${E(T(forte))}</strong> <span>${E(T(txt))}</span></div>`;
 const cor = (v, a, b) => { const t = b > a ? Math.max(0, Math.min(1, (v - a) / (b - a))) : 0.5; return RAMPA[Math.min(RAMPA.length - 1, Math.floor(t * RAMPA.length))]; };
 const conforto = () => { const c = document.documentElement.classList; return c.contains("physis-conforto") || c.contains("a11y-simples") || c.contains("a11y-calma"); };
@@ -229,13 +234,30 @@ function buscarContexto(force) { const u = U(), st = estado(); if (!emHub() || (
     .catch(() => { st.ctxErro = "O servidor não respondeu."; }).finally(() => { st.ctxCarregando = false; redesenhar(); }); }
 function valorTxt(v) { if (v == null) return "—"; if (typeof v === "number") return f1(v, 1); if (Array.isArray(v)) return v.slice(0, 6).map(x => x && typeof x === "object" ? (x.nome || x.classe) + (x.fracao != null ? " " + f1(100 * x.fracao, 0) + " %" : "") : f1(x, 2)).join("; ");
   if (typeof v === "object") return Object.entries(v).filter(([, x]) => x != null && typeof x !== "object").slice(0, 6).map(([k, x]) => k + ": " + (typeof x === "number" ? f1(x, 1) : x)).join(" · "); return String(v); }
-const ROTULOS = { coordenadas: "Coordenadas", municipio: "Município", area_lote_m2: "Área do lote", declividade: "Declividade", altitude_m: "Altitude", hidrografia: "Rios e nascentes", uso_solo: "Uso do solo",
+const ROTULOS = { cep: "CEP", coordenadas: "Coordenadas", municipio: "Município", area_lote_m2: "Área do lote", declividade: "Declividade", altitude_m: "Altitude", hidrografia: "Rios e nascentes", uso_solo: "Uso do solo",
   solos: "Solo", limites: "Limites", car: "CAR", risco: "Áreas de risco", rede_eletrica: "Rede elétrica", osm: "Edificações e vias", clima: "Clima (EPW)", irradiacao: "Irradiação solar", vento: "Vento" };
+/* contexto do lugar no navegador (sem servidor): o que dá para saber aqui, com a fonte; as camadas do servidor aparecem como
+   "disponível com o servidor" (nunca um valor inventado) */
+const CAMADAS_SERVIDOR = ["declividade", "altitude_m", "hidrografia", "uso_solo", "solos", "limites", "car", "risco", "rede_eletrica", "osm", "clima", "vento"];
+function contextoNavegador(L, S) { const ir = irradiacao(L), area = S && S.terreno && (S.terreno.poly || []).length >= 3 ? Math.abs(S.terreno.poly.reduce((s, p, i, a) => { const q = a[(i + 1) % a.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2 : (L.area_m2 || null);
+  const linha = (k, v, un, fonte) => `<tr><th scope="row">${E(T(ROTULOS[k] || k))}</th><td>${v == null ? `<span class="selo in">${E(T("sem dado"))}</span>` : E(v)} ${v != null && un ? `<span class="t2 pq">${E(un)}</span>` : ""}</td><td class="t2 pq">${E(T(fonte))}</td></tr>`;
+  const anual = ir ? ir.H.reduce((s, h) => s + h, 0) / 12 : null;
+  const linhas = linha("coordenadas", f1(L.lat, 5) + ", " + f1(L.lon, 5), "graus (WGS 84)", "local da instalação (" + (L.fonte || "—") + (L.fonte_coordenadas ? ", " + L.fonte_coordenadas : "") + ")")
+    + linha("municipio", L.municipio ? L.municipio + (L.uf ? " – " + L.uf : "") : null, "", "Início (dados obrigatórios do cliente)")
+    + linha("cep", L.cep || null, "", "Início")
+    + linha("area_lote_m2", area != null ? f1(area, 0) : null, "m²", S ? "Planejador (lote)" : "Início (área)")
+    + linha("irradiacao", anual != null ? f1(anual, 2) : null, "kWh/m² por dia (média do ano)", ir ? ir.fonte : "aba Solar sem o local");
+  const fora = CAMADAS_SERVIDOR.map(k => `<li>${E(T(ROTULOS[k] || k))}: <span class="selo at">${E(T("disponível com o servidor"))}</span></li>`).join("");
+  const doc = { esquema: "physis-contexto-lugar/1", navegador: true, campos: { coordenadas: { valor: { lat: L.lat, lon: L.lon }, fonte: L.fonte }, municipio: { valor: { municipio: L.municipio, uf: L.uf } },
+    area_lote_m2: { valor: area }, irradiacao: ir ? { valor: { mensal_kwh_m2_dia: ir.H }, fonte: ir.fonte } : { valor: null } }, faltam: CAMADAS_SERVIDOR.map(k => ({ camada: k, motivo: "disponível com o servidor" })) };
+  gravarLS("physis-contexto-lugar", doc);
+  return `<section class="cartao" aria-labelledby="h-mp-ctx"><h2 id="h-mp-ctx">${E(T("Contexto do lugar"))}</h2>${notaNav()}<div class="rolagem"><table><caption>${E(T("Cada campo com a fonte"))}</caption><thead><tr><th scope="col">${E(T("Campo"))}</th><th scope="col">${E(T("Valor"))}</th><th scope="col">${E(T("Fonte"))}</th></tr></thead><tbody>${linhas}</tbody></table></div></section>
+    <section class="cartao" aria-labelledby="h-mp-faltam"><h2 id="h-mp-faltam">${E(T("Camadas que dependem do servidor"))}</h2><ul>${fora}</ul><p class="t2 pq">${E(T("Relevo, rios, uso do solo, solos, CAR, risco, rede elétrica, prédios, clima e vento vêm das bases instaladas no servidor da instalação. Nenhum valor é inventado no lugar delas."))}</p></section>`; }
 function parteContexto() { const st = estado(), L = lugar(), S = planejador();
   if (!L) return faixa("in", "Falta a localização.", "O Mapeamento depende do Início: preencha os dados obrigatórios do cliente (localização) no Início ou desenhe o lote no Planejador.") +
     `<p><button type="button" data-mp-acao="inicio">${E(T("Ir para o Início"))}</button></p>`;
   let html = `<p class="t2">${E(T("Lugar"))}: ${f1(L.lat, 5)}, ${f1(L.lon, 5)} · ${E(T("fonte"))}: ${E(L.fonte || "—")}. ${S ? E(T("Lote do Planejador encontrado.")) : E(T("Sem lote no Planejador: a área vem do Início."))}</p>`;
-  if (!emHub()) return html + faixa("in", "Sem servidor.", "O contexto completo é montado pelo servidor da instalação com as camadas instaladas. Aberta sem ele, esta parte mostra só o lugar.");
+  if (!emHub()) return html + contextoNavegador(L, S);
   buscarContexto(false);
   if (st.ctxCarregando && !st.ctx) return html + `<p class="t2" role="status">${E(T("Montando o contexto do lugar…"))}</p>`;
   if (!st.ctx) return html + `<p class="t2" role="status">${E(T(st.ctxErro || "Contexto indisponível agora."))}</p>`;
@@ -247,18 +269,69 @@ function parteContexto() { const st = estado(), L = lugar(), S = planejador();
 /* ════════ Parte: camadas e arquivos do cliente ════════ */
 function buscar(chave, url) { const st = estado(); if (!emHub() || st[chave + "Carregando"] || st[chave]) return; st[chave + "Carregando"] = true;
   fetch(url, { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(j => { st[chave] = j || { ok: false }; }).catch(() => { st[chave] = { ok: false }; }).finally(() => { st[chave + "Carregando"] = false; redesenhar(); }); }
-function parteCamadas() { if (!emHub()) return faixa("in", "Sem servidor.", "O catálogo mostra o que está instalado no servidor da instalação.");
+function parteCamadas() { if (!emHub()) return `<section class="cartao" aria-labelledby="h-mp-cat"><h2 id="h-mp-cat">${E(T("Catálogo de camadas"))}</h2>${notaNav()}<ul>${CAMADAS_SERVIDOR.concat(["irradiacao"]).map(k => `<li>${E(T(ROTULOS[k] || k))}: ${k === "irradiacao" ? `<span class="selo in">${E(T("estimativa no navegador"))}</span>` : `<span class="selo at">${E(T("disponível com o servidor"))}</span>`}</li>`).join("")}</ul></section>`;
   buscar("cat", "api/mapeamento/camadas"); const st = estado(); if (!st.cat) return `<p class="t2" role="status">${E(T("Carregando o catálogo…"))}</p>`;
   const cs = st.cat.camadas || [];
   return `<section class="cartao" aria-labelledby="h-mp-cat"><h2 id="h-mp-cat">${E(T("Catálogo de camadas"))}</h2><div class="rolagem"><table><caption>${E(T("Bases abertas que o Mapeamento usa; fonte e licença a conferir"))}</caption><thead><tr><th scope="col">${E(T("Camada"))}</th><th scope="col">${E(T("Para quê"))}</th><th scope="col">${E(T("Quem usa"))}</th><th scope="col">${E(T("Fonte e licença"))}</th><th scope="col">${E(T("Formato e lugar no servidor"))}</th><th scope="col">${E(T("Situação"))}</th></tr></thead><tbody>
     ${cs.map(c => `<tr><th scope="row">${E(T(c.nome.pt))}</th><td>${E(T(c.finalidade.pt))}</td><td>${E(c.consumidores.join(", "))}</td><td class="t2 pq">${E(c.fonte.produto)} — ${E(c.fonte.nome)}; ${E(c.fonte.licenca)}</td><td class="t2 pq">${E(c.formato)} · ${E(c.chave_config)}</td><td>${c.status === "instalada" ? `<span class="selo ok">${E(T("instalada"))}</span>` : `<span class="selo at">${E(T("camada não instalada"))}</span>`}</td></tr>`).join("")}</tbody></table></div>
     <p class="t2 pq">${E(T("[CONFERIR]: o nome do produto, a versão e a licença de cada base são conferidos na página oficial antes de instalar. Nenhum dado vem copiado no sistema."))}</p></section>`; }
-function parteArquivos() { const st = estado(); if (!emHub()) return faixa("in", "Sem servidor.", "Os arquivos do cliente ficam guardados no servidor da instalação, com o resumo SHA-256.");
+function parteArquivos() { const st = estado(); if (!emHub()) { const ls = lerLS("physis-mapeamento-arquivos") || [];
+    return `<section class="cartao" aria-labelledby="h-mp-up"><h2 id="h-mp-up">${E(T("Abrir arquivo do cliente"))}</h2>${notaNav()}<p class="t2">${E(T("GeoJSON, KML/KMZ ou Shapefile (.zip com .shp, .dbf e .prj), em WGS 84 ou SIRGAS 2000 geográfico. Sem servidor, o arquivo é lido aqui e guardado só neste navegador; vai para o servidor quando ele existir."))}</p>
+      <div><label for="mp-arquivo">${E(T("Arquivo"))}</label><input id="mp-arquivo" type="file" accept=".geojson,.json,.kml,.kmz,.zip" data-mp-arquivo="upload"></div><p class="t2" role="status" id="mp-up-msg">${E(T(st.upMsg || ""))}</p></section>
+      <section class="cartao" aria-labelledby="h-mp-ups"><h2 id="h-mp-ups">${E(T("Arquivos neste navegador"))}</h2>${ls.length ? `<div class="rolagem"><table><caption>${E(T("Lidos no navegador (sem servidor)"))}</caption><thead><tr><th scope="col">${E(T("Nome"))}</th><th scope="col">${E(T("Formato"))}</th><th scope="col">${E(T("Feições"))}</th><th scope="col">${E(T("Tipos"))}</th></tr></thead><tbody>
+      ${ls.map(x => `<tr><th scope="row">${E(x.nome)}</th><td>${E(x.formato)}</td><td>${E(x.feicoes)}</td><td>${E((x.tipos || []).join(", "))}</td></tr>`).join("")}</tbody></table></div>` : `<p class="t2">${E(T("Nenhum arquivo ainda."))}</p>`}</section>`; }
   buscar("ups", "api/mapeamento/uploads"); const ups = (st.ups && st.ups.uploads) || [];
   return `<section class="cartao" aria-labelledby="h-mp-up"><h2 id="h-mp-up">${E(T("Enviar arquivo do cliente"))}</h2><p class="t2">${E(T("GeoJSON, KML/KMZ ou Shapefile (.zip com .shp, .dbf e .prj). Coordenadas em WGS 84 (EPSG:4326) ou SIRGAS 2000 geográfico (EPSG:4674). Até 20 MB."))}</p>
     <div><label for="mp-arquivo">${E(T("Arquivo"))}</label><input id="mp-arquivo" type="file" accept=".geojson,.json,.kml,.kmz,.zip" data-mp-arquivo="upload"></div><p class="t2" role="status" id="mp-up-msg">${E(T(st.upMsg || ""))}</p></section>
     <section class="cartao" aria-labelledby="h-mp-ups"><h2 id="h-mp-ups">${E(T("Arquivos guardados"))}</h2>${ups.length ? `<div class="rolagem"><table><caption>${E(T("Arquivos do cliente com o resumo de integridade"))}</caption><thead><tr><th scope="col">${E(T("Nome"))}</th><th scope="col">${E(T("Formato"))}</th><th scope="col">${E(T("Sistema de coordenadas"))}</th><th scope="col">${E(T("Feições"))}</th><th scope="col">SHA-256</th></tr></thead><tbody>
     ${ups.map(x => `<tr><th scope="row">${E(x.nome)}</th><td>${E(x.formato)}</td><td>${E(x.crs)}${x.nota_crs ? `<br><span class="t2 pq">${E(T(x.nota_crs))}</span>` : ""}</td><td>${E(x.feicoes)}</td><td><code>${E(String(x.sha256).slice(0, 16))}…</code></td></tr>`).join("")}</tbody></table></div>` : `<p class="t2">${E(T("Nenhum arquivo ainda."))}</p>`}</section>`; }
+
+/* ════════ Leitores de arquivo no navegador (sem servidor): os mesmos formatos do mapeamento.ler_arquivo ════════ */
+async function inflarRaw(bytes) { const ds = new DecompressionStream("deflate-raw"), s = new Blob([bytes]).stream().pipeThrough(ds); return new Uint8Array(await new Response(s).arrayBuffer()); }
+async function lerZip(buf) { const u = new Uint8Array(buf), dv = new DataView(buf), out = {};
+  let e = -1; for (let i = u.length - 22; i >= Math.max(0, u.length - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { e = i; break; }
+  if (e < 0) throw new Error("zip sem diretório central");
+  let p = dv.getUint32(e + 16, true); const n = dv.getUint16(e + 10, true);
+  for (let k = 0; k < n; k++) { if (dv.getUint32(p, true) !== 0x02014b50) break;
+    const met = dv.getUint16(p + 10, true), tam = dv.getUint32(p + 20, true), ln = dv.getUint16(p + 28, true), lx = dv.getUint16(p + 30, true), lc = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+    const nome = new TextDecoder().decode(u.subarray(p + 46, p + 46 + ln)), ini = off + 30 + dv.getUint16(off + 26, true) + dv.getUint16(off + 28, true), dados = u.subarray(ini, ini + tam);
+    out[nome] = met === 0 ? dados : met === 8 ? await inflarRaw(dados) : null; p += 46 + ln + lx + lc; }
+  return out; }
+function lerShp(shp, dbf) { const dv = new DataView(shp.buffer, shp.byteOffset, shp.byteLength), feats = []; let p = 100;
+  while (p + 8 <= dv.byteLength) { const len = dv.getInt32(p + 4) * 2, r = p + 8, tipo = dv.getInt32(r, true); let g = null;
+    if (tipo === 1 || tipo === 11 || tipo === 21) g = { type: "Point", coordinates: [dv.getFloat64(r + 4, true), dv.getFloat64(r + 12, true)] };
+    else if ([3, 5, 13, 15, 23, 25].includes(tipo)) { const np = dv.getInt32(r + 36, true), nn = dv.getInt32(r + 40, true), partes = [], pts = [];
+      for (let i = 0; i < np; i++) partes.push(dv.getInt32(r + 44 + 4 * i, true)); const b = r + 44 + 4 * np;
+      for (let i = 0; i < nn; i++) pts.push([dv.getFloat64(b + 16 * i, true), dv.getFloat64(b + 16 * i + 8, true)]);
+      const aneis = partes.map((s, i) => pts.slice(s, i + 1 < np ? partes[i + 1] : nn)); g = tipo % 10 === 5 ? { type: "Polygon", coordinates: aneis } : { type: "MultiLineString", coordinates: aneis }; }
+    else if (tipo !== 0) throw new Error("tipo de geometria do Shapefile não aceito (" + tipo + ")");
+    if (g) feats.push({ type: "Feature", geometry: g, properties: {} }); p = r + len; }
+  if (dbf) { const d = new DataView(dbf.buffer, dbf.byteOffset, dbf.byteLength), nreg = d.getUint32(4, true), hl = d.getUint16(8, true), rl = d.getUint16(10, true), campos = [];
+    for (let o = 32; o < hl - 1 && dbf[o] !== 0x0d; o += 32) campos.push({ nome: new TextDecoder("latin1").decode(dbf.subarray(o, o + 11)).replace(/\0.*$/, "").trim(), tam: dbf[o + 16] });
+    for (let i = 0; i < Math.min(nreg, feats.length); i++) { let o = hl + i * rl + 1; campos.forEach(c => { feats[i].properties[c.nome] = new TextDecoder("latin1").decode(dbf.subarray(o, o + c.tam)).trim(); o += c.tam; }); } }
+  return { type: "FeatureCollection", features: feats }; }
+function lerKml(txt) { const doc = new DOMParser().parseFromString(txt, "application/xml"), feats = [];
+  const coords = el => (el.textContent || "").trim().split(/\s+/).filter(Boolean).map(s => s.split(",").slice(0, 2).map(Number));
+  [...doc.getElementsByTagName("Placemark")].forEach(pm => { const nome = (pm.getElementsByTagName("name")[0] || {}).textContent || "";
+    [...pm.getElementsByTagName("Point")].forEach(p => feats.push({ type: "Feature", properties: { nome }, geometry: { type: "Point", coordinates: coords(p.getElementsByTagName("coordinates")[0])[0] } }));
+    [...pm.getElementsByTagName("LineString")].forEach(p => feats.push({ type: "Feature", properties: { nome }, geometry: { type: "LineString", coordinates: coords(p.getElementsByTagName("coordinates")[0]) } }));
+    [...pm.getElementsByTagName("Polygon")].forEach(p => feats.push({ type: "Feature", properties: { nome }, geometry: { type: "Polygon", coordinates: [...p.getElementsByTagName("coordinates")].map(coords) } })); });
+  return { type: "FeatureCollection", features: feats }; }
+async function lerArquivoNavegador(nome, buf) { const ext = (nome.split(".").pop() || "").toLowerCase(); let fc, formato;
+  if (ext === "geojson" || ext === "json") { fc = JSON.parse(new TextDecoder().decode(buf)); formato = "GeoJSON"; if (fc.type === "Feature") fc = { type: "FeatureCollection", features: [fc] }; }
+  else if (ext === "kml") { fc = lerKml(new TextDecoder().decode(buf)); formato = "KML"; }
+  else if (ext === "kmz" || ext === "zip") { const z = await lerZip(buf), nomes = Object.keys(z), kml = nomes.find(n => /\.kml$/i.test(n)), shp = nomes.find(n => /\.shp$/i.test(n));
+    if (kml) { fc = lerKml(new TextDecoder().decode(z[kml])); formato = "KMZ"; }
+    else if (shp) { const prj = nomes.find(n => /\.prj$/i.test(n)), wkt = prj ? new TextDecoder().decode(z[prj]) : "";
+      if (/PROJCS/i.test(wkt)) throw new Error("Shapefile em coordenadas projetadas (UTM): reprojete para WGS 84 ou SIRGAS 2000 geográfico.");
+      fc = lerShp(z[shp], z[nomes.find(n => /\.dbf$/i.test(n))]); formato = "Shapefile"; }
+    else throw new Error("o .zip não tem .shp nem .kml"); }
+  else throw new Error("formato não aceito: use GeoJSON, KML/KMZ ou Shapefile em .zip");
+  const feats = (fc && fc.features) || [];
+  if (!feats.length) throw new Error("nenhuma feição no arquivo");
+  const fora = feats.some(f => { const c = JSON.stringify(f.geometry && f.geometry.coordinates || []).match(/-?\d+(\.\d+)?/g) || []; for (let i = 0; i + 1 < c.length; i += 2) if (Math.abs(+c[i]) > 180 || Math.abs(+c[i + 1]) > 90) return true; return false; });
+  if (fora) throw new Error("coordenadas fora de graus (projetadas?): reprojete para WGS 84 ou SIRGAS 2000 geográfico");
+  return { nome, formato, feicoes: feats.length, tipos: [...new Set(feats.map(f => f.geometry && f.geometry.type))], geojson: fc }; }
 
 /* ════════ Parte: sol nas superfícies (mapa de calor) ════════ */
 function calcularSuperficies() { const st = estado(), L = lugar(), ir = irradiacao(L), S = planejador(), hp = num(st.cfg.altura_pav);
@@ -307,7 +380,9 @@ function superficiesPlanta() { const r = calcularSuperficies(), S = planejador()
   if (!r.erro) r.telhados.forEach(s => out.push({ id: s.id, nome: s.nome, plano: "telhado", incl: s.incl, azim: s.azim, anual: s.anual_kwh_m2, fator: s.fator_mensal,
     poligono: [[0, 0], [s.largura_m, 0], [s.largura_m, s.comprimento_agua_m], [0, s.comprimento_agua_m]] }));
   if (S && S.terreno && (S.terreno.poly || []).length >= 3) out.push({ id: "lote", nome: "Área no solo: lote inteiro", plano: "solo", poligono: S.terreno.poly });
-  const c = estado().cfg, w = num(c.solo_w), d = num(c.solo_d);
+  const c = estado().cfg, w = num(c.solo_w), d = num(c.solo_d), tw = num(c.tel_w), tc = num(c.tel_c), ti = num(c.tel_incl), ta = num(c.tel_azim);
+  if (tw > 0 && tc > 0 && ti != null && ta != null) out.push({ id: "telhado-digitado", nome: "Telhado digitado", plano: "telhado", incl: ti, azim: ta, anual: null, fator: null,
+    poligono: [[0, 0], [tw, 0], [tw, tc], [0, tc]] });
   if (w > 0 && d > 0) { const x = num(c.solo_x) || 0, y = num(c.solo_y) || 0, rr = (num(c.solo_rot) || 0) * RAD;
     out.push({ id: "retangulo", nome: "Área no solo: retângulo desenhado", plano: "solo", poligono: [[-w / 2, -d / 2], [w / 2, -d / 2], [w / 2, d / 2], [-w / 2, d / 2]].map(([a, b]) => [x + a * Math.cos(rr) - b * Math.sin(rr), y + a * Math.sin(rr) + b * Math.cos(rr)]) }); }
   return out; }
@@ -315,7 +390,7 @@ function calcularPlanta() { const st = estado(), c = st.cfg, L = lugar(), S = SO
   if (!S) return { erro: "A aba Solar não está carregada: a planta usa as contas dela (módulos, inversores, perdas e strings)." };
   if (r.erro) return { erro: r.erro };
   const sups = superficiesPlanta(), sup = sups.find(s => s.id === c.superficie) || sups[0];
-  if (!sup) return { erro: "Nenhuma superfície: desenhe o lote ou as edificações com telhado no Planejador, ou um retângulo no solo abaixo." };
+  if (!sup) return { erro: "Nenhuma superfície: desenhe o lote ou as edificações com telhado no Planejador, ou digite abaixo uma área no solo ou um telhado.", semSuperficie: true };
   const mods = S.MODULOS, m0 = mods.find(m => m.id === c.modulo) || mods[0], dims = dimensoesModulo(m0.id) || {};
   const mod = Object.assign({}, m0, { comprimento_m: num(c.mod_c) || dims.comprimento_m, largura_m: num(c.mod_l) || dims.largura_m, fonte_dim: num(c.mod_c) ? "digitada" : dims.fonte });
   const af = num(c.afastamento) != null ? num(c.afastamento) : premissa(PREM.afastamento), fo = num(c.folga) != null ? num(c.folga) : premissa(PREM.folga);
@@ -327,7 +402,7 @@ function calcularPlanta() { const st = estado(), c = st.cfg, L = lugar(), S = SO
   const A = arranjo(sup.poligono, mod, { orientacao: c.orientacao || "retrato", empilhados: num(c.empilhados) || 1, incl, azim, afastamento_m: af, folga_m: fo, passo_m: num(c.passo), plano: sup.plano, lat: r.lat, horas: [h0, h1],
     obstaculos: sup.plano === "solo" ? r.caixas.map(b => { const rr = (b.rot || 0) * RAD, w = b.w / 2 + af, d = b.d / 2 + af; return [[-w, -d], [w, -d], [w, d], [-w, d]].map(([x, y]) => [b.x + x * Math.cos(rr) - y * Math.sin(rr), b.y + x * Math.sin(rr) + y * Math.cos(rr)]); }) : [] });
   /* sombra do horizonte no centro da superfície e irradiação no plano das placas */
-  const ctr = sup.plano === "telhado" ? (r.telhados.find(t => t.id === sup.id) || {}) : { x: sup.poligono.reduce((s, p) => s + p[0], 0) / sup.poligono.length, y: sup.poligono.reduce((s, p) => s + p[1], 0) / sup.poligono.length };
+  const ctr = sup.plano === "telhado" ? (r.telhados.find(t => t.id === sup.id) || { x: 0, y: 0, z: num(c.tel_altura) != null ? num(c.tel_altura) : 3 }) : { x: sup.poligono.reduce((s, p) => s + p[0], 0) / sup.poligono.length, y: sup.poligono.reduce((s, p) => s + p[1], 0) / sup.poligono.length };
   const z = sup.plano === "telhado" ? ctr.z : (r.grade ? zGrade(r.grade, ctr.x, ctr.y) + 1 : 1), hz = (r.grade || r.caixas.length) ? horizonte(ctr.x || 0, ctr.y || 0, z, r.grade, r.caixas, sup.plano === "telhado" ? ctr.caixa : null) : null;
   const inc = incidenciaSuperficie(r.H, r.lat, incl, azim, hz), Tm = temperaturas(L), invs = S.INVERSORES, inv = invs.find(v => v.id === c.inversor) || invs[0];
   /* energia do mês e do ano: a conta da aba Solar, com o fator do plano daqui (já com a sombra do horizonte) */
@@ -343,14 +418,18 @@ function cartaSVG(lat, hz) { const W = 320, c = W / 2, R = W / 2 - 24, p = (alt,
   const rot = [["N", 0], ["L", 90], ["S", 180], ["O", 270]].map(([t, a]) => { const q = p(-10, a); return `<text x="${q[0].toFixed(1)}" y="${(q[1] + 4).toFixed(1)}" font-size="12" text-anchor="middle" style="fill:var(--tinta2,#4A4F44)">${t}</text>`; }).join("");
   return `<figure style="margin:0"><svg viewBox="0 0 ${W} ${W}" width="100%" style="max-width:${W}px" role="img" aria-label="${E(T("Carta solar do lugar com o horizonte"))}">${hor}${aneis}${dias}${rot}</svg>
     <figcaption class="t2 pq">${E(T("Azul: solstício de junho; verde: equinócios; laranja: solstício de dezembro. Areia: horizonte (terreno e prédios vizinhos). Anéis: 0°, 30° e 60° de altura."))}</figcaption></figure>`; }
+/* área no solo (retângulo) e telhado digitado: a planta funciona sem o Planejador (instalações só com a Solar) */
+function formsSuperficie(c, abrir) {
+  return `<details${abrir ? " open" : ""}><summary>${E(T("Área no solo (retângulo): largura × comprimento"))}</summary><div class="precos">${campo("solo_w", "Largura (m)", c.solo_w)}${campo("solo_d", "Profundidade (m)", c.solo_d)}${campo("solo_x", "Centro x (m)", c.solo_x, "0")}${campo("solo_y", "Centro y (m)", c.solo_y, "0")}${campo("solo_rot", "Giro (°)", c.solo_rot, "0")}${campo("incl", "Inclinação das placas (°)", c.incl)}${campo("azim", "Azimute das placas (°, 0 = norte)", c.azim)}</div></details>
+    <details${abrir ? " open" : ""}><summary>${E(T("Telhado digitado (sem o Planejador)"))}</summary><div class="precos">${campo("tel_w", "Largura do telhado (m)", c.tel_w)}${campo("tel_c", "Comprimento da água (m)", c.tel_c)}${campo("tel_incl", "Inclinação do telhado (°)", c.tel_incl)}${campo("tel_azim", "Para onde a água aponta (°, 0 = norte)", c.tel_azim)}${campo("tel_altura", "Altura do telhado (m)", c.tel_altura, "3")}</div></details>`; }
 function partePlanta() { const st = estado(), c = st.cfg, P = calcularPlanta(), Sx = SOL();
-  if (P.erro) return faixa("in", "Ainda não dá para montar a planta.", P.erro);
+  if (P.erro) return faixa("in", "Ainda não dá para montar a planta.", P.erro) + (P.semSuperficie ? formsSuperficie(c, true) : "");
   const sel = lista("superficie", "Onde vai a planta", P.sups.map(s => [s.id, s.nome + (s.anual != null ? ` · ${f1(s.anual, 0)} kWh/m²·ano` : "")]), P.sup.id);
-  const solo = `<details${P.sup.plano === "solo" ? " open" : ""}><summary>${E(T("Desenhar um retângulo no solo (metros do Planejador: x leste, y norte)"))}</summary><div class="precos">${campo("solo_x", "Centro x (m)", c.solo_x)}${campo("solo_y", "Centro y (m)", c.solo_y)}${campo("solo_w", "Largura (m)", c.solo_w)}${campo("solo_d", "Profundidade (m)", c.solo_d)}${campo("solo_rot", "Giro (°)", c.solo_rot)}</div></details>`;
+  const solo = formsSuperficie(c, false);
   const modSel = lista("modulo", "Módulo (base de equipamentos)", Sx.MODULOS.map(m => [m.id, m.nome]), P.mod.id);
   const arr = `<div class="precos">${modSel}${campo("mod_c", "Comprimento do módulo (m)", c.mod_c, P.mod.comprimento_m != null ? f1(P.mod.comprimento_m, 2) : "da folha de dados", P.mod.fonte_dim ? "Vazio: " + P.mod.fonte_dim : "")}${campo("mod_l", "Largura do módulo (m)", c.mod_l, P.mod.largura_m != null ? f1(P.mod.largura_m, 2) : "da folha de dados")}
     ${lista("orientacao", "Posição do módulo", [["retrato", "Retrato (em pé)"], ["paisagem", "Paisagem (deitado)"]], c.orientacao || "retrato")}${campo("empilhados", "Módulos por mesa (na inclinação)", c.empilhados, "1")}
-    ${P.sup.plano === "solo" ? campo("incl", "Inclinação das placas (°)", c.incl, P.incl != null ? f1(P.incl, 0) : "") + campo("azim", "Azimute das placas (°, 0 = norte)", c.azim, P.azim != null ? f1(P.azim, 0) : "") + campo("passo", "Passo entre fileiras (m)", c.passo, "vazio: o mínimo sem sombra") : ""}
+    ${P.sup.plano === "solo" ? campo("passo", "Passo entre fileiras (m)", c.passo, "vazio: o mínimo sem sombra") : ""}
     ${campo("afastamento", "Afastamento das bordas (m)", c.afastamento, premissa(PREM.afastamento) != null ? f1(premissa(PREM.afastamento), 2) : "premissa a criar [CONFERIR]")}${campo("folga", "Folga entre módulos (m)", c.folga, premissa(PREM.folga) != null ? f1(premissa(PREM.folga), 2) : "premissa a criar [CONFERIR]")}
     ${P.sup.plano === "solo" ? campo("hora_ini", "Hora crítica, início (hora solar)", c.hora_ini, premissa(PREM.hora_ini) != null ? f1(premissa(PREM.hora_ini), 0) : "premissa a criar [CONFERIR]") + campo("hora_fim", "Hora crítica, fim (hora solar)", c.hora_fim, premissa(PREM.hora_fim) != null ? f1(premissa(PREM.hora_fim), 0) : "premissa a criar [CONFERIR]") : ""}</div>`;
   if (P.falta) return sel + solo + arr + faixa("at", "Falta informar:", P.falta.join("; ") + ".");
@@ -401,10 +480,10 @@ function pedirRack() { const P = calcularPlanta(); if (P.erro || P.falta) return
 function parteBim() { const st = estado(), els = elementosBim(), L = lugar(), p3 = lerLS("physis-ponte-3d") || [];
   const tab = els.length ? `<div class="rolagem"><table><caption>${E(T("Sistemas que os módulos mandaram"))}</caption><thead><tr><th scope="col">${E(T("Elemento"))}</th><th scope="col">${E(T("Tipo"))}</th><th scope="col">${E(T("Origem"))}</th></tr></thead><tbody>${els.map(e => `<tr><th scope="row">${E(e.nome || e.id)}</th><td>${E(e.tipo)}</td><td>${E(e.origem || "")}</td></tr>`).join("")}</tbody></table></div>` : `<p class="t2">${E(T("Nenhum sistema enviado ainda: a planta solar, a cisterna, as calhas, o AVAC, o quadro, o biodigestor, as turbinas e o viveiro aparecem aqui quando os módulos mandarem."))}</p>`;
   return `<section class="cartao" aria-labelledby="h-mp-bim"><h2 id="h-mp-bim">${E(T("Modelo BIM aberto (IFC4)"))}</h2>${tab}
-    <p><button type="button" data-mp-acao="ifc"${!emHub() || !L || !els.length ? " disabled" : ""}>${E(T("Baixar o IFC"))}</button> <span class="t2" role="status">${E(T(st.ifcMsg || ""))}</span></p>
+    ${notaNav()}<p><button type="button" data-mp-acao="ifc"${!L || !els.length || (!emHub() && !window.PhysisIFC) ? " disabled" : ""}>${E(T("Baixar o IFC"))}</button> <span class="t2" role="status">${E(T(st.ifcMsg || ""))}</span></p>
     <p class="t2 pq">${E(T("Fator de potência, potência ativa, reativa e aparente vão em todo equipamento elétrico (premissa eletrica.fator_potencia_padrao)."))}</p></section>
     <section class="cartao" aria-labelledby="h-mp-ler"><h2 id="h-mp-ler">${E(T("Abrir um IFC"))}</h2><p class="t2">${E(T("Leitura básica: terreno, edificações, pavimentos, quantos elementos de cada tipo e o tamanho. A geometria completa fica para um visualizador IFC aberto (Fase 2)."))}</p>
-    <div><label for="mp-ifc">${E(T("Arquivo IFC"))}</label><input id="mp-ifc" type="file" accept=".ifc" data-mp-arquivo="ifc"${emHub() ? "" : " disabled"}></div>${st.ifcLido ? resumoIfc(st.ifcLido) : ""}</section>
+    <div><label for="mp-ifc">${E(T("Arquivo IFC"))}</label><input id="mp-ifc" type="file" accept=".ifc" data-mp-arquivo="ifc"${emHub() || window.PhysisIFC ? "" : " disabled"}></div>${st.ifcLido ? resumoIfc(st.ifcLido) : ""}</section>
     <section class="cartao" aria-labelledby="h-mp-3d"><h2 id="h-mp-3d">${E(T("Ponte com o Physis 3D"))}</h2><p class="t2">${E(T("Pedidos de peça (caixa, medidas e material) no esquema physis-ponte-3d/1; a peça impressa volta como elemento do BIM com o link do memorial."))}</p><p>${E(T("Pedidos guardados"))}: ${p3.length}</p></section>`; }
 function resumoIfc(r) { return `<div class="rolagem"><table><caption>${E(T("Resumo do IFC"))}</caption><tbody><tr><th scope="row">${E(T("Esquema"))}</th><td>${E(r.esquema)}</td></tr><tr><th scope="row">${E(T("Projeto"))}</th><td>${E(r.projeto)}</td></tr>
   ${(r.terrenos || []).map(s => `<tr><th scope="row">${E(T("Terreno"))}</th><td>${E(s.nome)} · ${f1(s.lat, 5)}, ${f1(s.lon, 5)}</td></tr>`).join("")}<tr><th scope="row">${E(T("Edificações"))}</th><td>${(r.edificacoes || []).map(e => E(e.nome)).join(", ")}</td></tr>
@@ -413,6 +492,9 @@ function resumoIfc(r) { return `<div class="rolagem"><table><caption>${E(T("Resu
 async function baixarIfc() { const L = lugar(), els = elementosBim(), S = planejador();
   const d = { projeto: { id: (S && S.meta && S.meta.criado) || "projeto", nome: (S && S.meta && S.meta.nome) || "Projeto Physis" }, site: { nome: "Terreno", lat: L.lat, lon: L.lon }, elementos: els };
   const fp = premissa(PREMISSA_FP); if (fp != null) d.premissas = { [PREMISSA_FP]: fp };
+  if (!emHub()) { if (!window.PhysisIFC) return "Sem servidor e sem o escritor de IFC do navegador.";   /* sem servidor: o mesmo escritor do ifc.py, aqui */
+    const txt = window.PhysisIFC.escrever(d), b = new Blob([txt], { type: "application/x-step" }), a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "physis-modelo.ifc";
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); return "IFC gerado no navegador (sem servidor)."; }
   const r = await fetch("api/mapeamento/ifc", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d) });
   if (!r.ok) { const j = await r.json().catch(() => ({})); return j.erro || "Não foi possível gerar o IFC."; }
   const b = await r.blob(), a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "physis-modelo.ifc"; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
@@ -432,7 +514,7 @@ function parteMetodo() { return `<section class="cartao" aria-labelledby="h-mp-m
 function telaPlantaSolar() { let corpo;
   try { corpo = partePlanta(); } catch (e) { corpo = faixa("al", "Erro nesta parte.", String(e && e.message || e)); }
   const dev = window.MAPEAMENTO_PRONTO === true ? "" : `<p><span class="selo at">${E(T("Em desenvolvimento"))}</span> <span class="t2 pq">${E(T("Planta solar em construção: confira com a equipe Physis antes de usar num projeto."))}</span></p>`;
-  return `<section aria-labelledby="h-so-planta"><h2 id="h-so-planta">${E(T("Planta solar (BIM)"))}</h2>${dev}<p class="t2 apoio">${E(T("Arranjo das placas no telhado ou no solo, carta solar, curva do dia, strings e fator de potência, com o sol de cada superfície do Mapeamento. Ao enviar, o dimensionamento desta aba passa a usar a planta: um número só de geração."))}</p><div id="mp-corpo">${corpo}</div></section>`; }
+  return `<section aria-labelledby="h-so-planta"><h2 id="h-so-planta">${E(T("Planta solar (BIM)"))}</h2>${dev}${typeof window.avisoLocalCep === "function" ? window.avisoLocalCep() : ""}<p class="t2 apoio">${E(T("Arranjo das placas no telhado ou no solo, carta solar, curva do dia, strings e fator de potência, com o sol de cada superfície do Mapeamento. Ao enviar, o dimensionamento desta aba passa a usar a planta: um número só de geração."))}</p><div id="mp-corpo">${corpo}</div></section>`; }
 function apontarSolar() { return `<div class="faixa in" role="note"><strong>${E(T("A planta solar fica na aba Energia solar."))}</strong> <span>${E(T("O Sol nas superfícies continua aqui: é o contexto que a Solar e o AVAC leem."))}</span> <button type="button" data-mp-acao="ir-solar">${E(T("Abrir a planta solar"))}</button></div>`; }
 
 /* ════════ Tela ════════ */
@@ -450,6 +532,15 @@ function telaMapeamentoModulo(telaBases) { const st = estado(), SUBS = [["contex
 function refocar(id) { const x = pega(id); if (x) x.focus(); }
 async function enviarArquivo(inp) { const st = estado(), f = inp.files && inp.files[0]; if (!f) return; const tipo = inp.dataset.mpArquivo;
   st[tipo === "ifc" ? "ifcMsg" : "upMsg"] = "Enviando…"; redesenhar();
+  if (!emHub()) {   /* sem servidor: lido aqui; o arquivo do cliente fica neste navegador e vai ao servidor quando ele existir */
+    try { const b = await f.arrayBuffer();
+      if (tipo === "ifc") { if (!window.PhysisIFC) throw new Error("leitor de IFC indisponível"); st.ifcLido = window.PhysisIFC.ler(new TextDecoder().decode(b)); st.ifcMsg = "Lido no navegador (sem servidor)."; }
+      else { const r = await lerArquivoNavegador(f.name, b), ls = (lerLS("physis-mapeamento-arquivos") || []).filter(x => x.nome !== r.nome);
+        const leve = JSON.stringify(r.geojson).length <= 1500000 ? r : Object.assign({}, r, { geojson: null, nota: "grande demais para guardar neste navegador" });
+        ls.push(Object.assign(leve, { lido_em: new Date().toISOString(), navegador: true })); gravarLS("physis-mapeamento-arquivos", ls.slice(-20));
+        st.upMsg = "Arquivo lido no navegador (sem servidor): " + r.feicoes + " feições. Vai para o servidor quando ele existir."; } }
+    catch (e) { st[tipo === "ifc" ? "ifcMsg" : "upMsg"] = String(e && e.message || e); }
+    redesenhar(); refocar(tipo === "ifc" ? "mp-ifc" : "mp-arquivo"); return; }
   try { const b = await f.arrayBuffer(), url = tipo === "ifc" ? "api/mapeamento/ifc/ler" : "api/mapeamento/upload";
     const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/octet-stream", "X-Physis-Nome": encodeURIComponent(f.name) }, body: b }), j = await r.json().catch(() => ({}));
     if (tipo === "ifc") { st.ifcLido = j.ok ? j.resumo : null; st.ifcMsg = j.ok ? "" : (j.erro || "IFC ilegível."); }
@@ -474,6 +565,16 @@ if (typeof document !== "undefined" && !window.__mpEventos) { window.__mpEventos
 
 /* ════════ Inglês (o integrador junta ao I18N da plataforma) ════════ */
 window.MAPEAMENTO_I18N = {
+  "calculado no navegador (sem servidor)": "calculated in the browser (no server)", "Com o servidor da instalação, o resultado usa as camadas instaladas e pode mudar.": "With the installation's server, the result uses the installed layers and may change.",
+  "disponível com o servidor": "available with the server", "estimativa no navegador": "browser estimate", "Camadas que dependem do servidor": "Layers that depend on the server",
+  "Relevo, rios, uso do solo, solos, CAR, risco, rede elétrica, prédios, clima e vento vêm das bases instaladas no servidor da instalação. Nenhum valor é inventado no lugar delas.": "Relief, rivers, land use, soils, CAR, risk, power grid, buildings, climate and wind come from the bases installed on the installation's server. No value is invented in their place.",
+  "Abrir arquivo do cliente": "Open a client file", "Arquivos neste navegador": "Files in this browser", "Lidos no navegador (sem servidor)": "Read in the browser (no server)", "Tipos": "Types",
+  "GeoJSON, KML/KMZ ou Shapefile (.zip com .shp, .dbf e .prj), em WGS 84 ou SIRGAS 2000 geográfico. Sem servidor, o arquivo é lido aqui e guardado só neste navegador; vai para o servidor quando ele existir.": "GeoJSON, KML/KMZ or Shapefile (.zip with .shp, .dbf and .prj), in WGS 84 or geographic SIRGAS 2000. Without a server, the file is read here and kept only in this browser; it goes to the server when there is one.",
+  "Lido no navegador (sem servidor).": "Read in the browser (no server).", "IFC gerado no navegador (sem servidor).": "IFC generated in the browser (no server).", "CEP": "Postal code",
+  "Nenhuma superfície: desenhe o lote ou as edificações com telhado no Planejador, ou digite abaixo uma área no solo ou um telhado.": "No surface: draw the plot or buildings with roofs in the Planner, or type a ground area or a roof below.",
+  "Área no solo (retângulo): largura × comprimento": "Ground area (rectangle): width × length", "Telhado digitado (sem o Planejador)": "Typed roof (without the Planner)",
+  "Telhado digitado": "Typed roof", "Largura do telhado (m)": "Roof width (m)", "Comprimento da água (m)": "Roof slope length (m)", "Inclinação do telhado (°)": "Roof pitch (°)",
+  "Para onde a água aponta (°, 0 = norte)": "Where the roof faces (°, 0 = north)", "Altura do telhado (m)": "Roof height (m)",
   "Planta solar em construção: confira com a equipe Physis antes de usar num projeto.": "Solar layout under construction: check with the Physis team before using it in a project.",
   "Arranjo das placas no telhado ou no solo, carta solar, curva do dia, strings e fator de potência, com o sol de cada superfície do Mapeamento. Ao enviar, o dimensionamento desta aba passa a usar a planta: um número só de geração.": "Panel layout on the roof or on the ground, sun-path chart, daily curve, strings and power factor, with the sun on each surface from Mapping. Once sent, this tab's sizing uses the layout: a single generation figure.",
   "A planta solar fica na aba Energia solar.": "The solar layout is in the Solar energy tab.",
