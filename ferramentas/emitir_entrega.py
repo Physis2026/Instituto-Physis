@@ -100,7 +100,7 @@ def conferir_inventario(saida: Path, rep: Path, mapa: list) -> list[str]:
         faltas.append("memos da Fase 2 (12)")
     if not list((saida / "10_Gestao_tarefas_Fase2").glob("*.json")):
         faltas.append("tarefas da Gestão")
-    for n in ("00_INDICE_DE_ENVIO.md", "00_O_que_e_cada_parte.md", "LEIA-ME.md"):
+    for n in ("00_INDICE_DE_ENVIO.md", "00_O_que_e_cada_parte.md"):   # o LEIA-ME é escrito depois, junto do manifesto
         if not (saida / n).is_file():
             faltas.append(n)
     if not (saida / "00_Envio_por_pessoa").is_dir() or not any((saida / "00_Envio_por_pessoa").iterdir()):
