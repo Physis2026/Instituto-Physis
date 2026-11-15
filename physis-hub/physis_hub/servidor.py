@@ -48,6 +48,37 @@ CORPO_MAX = 64 * 1024
 DRENAR_MAX = 24 * 1024 * 1024
 DRENAR_SEGUNDOS = 5
 WEB = Path(__file__).resolve().parent.parent / "web"
+DWG_MAX = 50 * 1024 * 1024
+
+
+def converter_dwg(dados: bytes, programa: str | None = None, tempo: float = 120.0) -> dict:
+    """DWG -> DXF com o LibreDWG (dwg2dxf, código aberto). Sem o programa no servidor, avisa e pede DXF."""
+    import shutil
+    import subprocess
+    import tempfile
+    exe = programa or os.environ.get("PHYSIS_DWG2DXF") or shutil.which("dwg2dxf")
+    if not exe:
+        return {"ok": False, "codigo": 501, "erro": "o conversor de DWG (LibreDWG, dwg2dxf) ainda não está instalado no servidor; exporte em DXF pelo programa de desenho"}
+    if not dados.startswith(b"AC10"):
+        return {"ok": False, "codigo": 400, "erro": "o arquivo não parece ser um DWG"}
+    with tempfile.TemporaryDirectory() as d:
+        ent, sai = Path(d) / "entrada.dwg", Path(d) / "saida.dxf"
+        ent.write_bytes(dados)
+        try:
+            p = subprocess.run([exe, "-y", "-o", str(sai), str(ent)], capture_output=True, timeout=tempo)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            return {"ok": False, "codigo": 500, "erro": f"a conversão não terminou: {exc}"}
+        if not sai.is_file() or sai.stat().st_size == 0:
+            msg = (p.stderr or b"").decode("utf-8", "replace").strip().splitlines()[-1:] or ["sem detalhe"]
+            return {"ok": False, "codigo": 422, "erro": "o conversor não conseguiu ler este DWG (" + msg[0][:160] + "); exporte em DXF"}
+        return {"ok": True, "dxf": sai.read_bytes()}
+
+
+# mapas de fundo das regiões dos clientes (PMTiles do OpenStreetMap); PHYSIS_MAPAS troca a pasta
+def PASTA_MAPAS() -> Path:
+    return Path(os.environ.get("PHYSIS_MAPAS") or (WEB.parent / "mapas"))
+
+
 # bibliotecas grandes que o servidor entrega em /vendor/ (as pequenas vão embutidas nos programas)
 VENDOR_TIPOS = {"maplibre-gl.js": "text/javascript; charset=utf-8", "maplibre-gl.css": "text/css; charset=utf-8",
                 "pmtiles.js": "text/javascript; charset=utf-8", "web-ifc-api-iife.js": "text/javascript; charset=utf-8",
@@ -363,6 +394,65 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     "cursos": [c for c in (instancia.get("cursos") or []) if isinstance(c, dict)] if q else [],
                     "senha_min": hub.SENHA_MIN}
 
+        def do_HEAD(self):
+            # só o mapa da região responde a HEAD (o Planejador pergunta se o arquivo existe antes de usar)
+            u = urlparse(self.path)
+            if u.path.startswith("/mapas/"):
+                return self._mapa(u.path, so_cabecalho=True)
+            self.send_response(404)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
+        def _mapa(self, caminho: str, so_cabecalho: bool = False) -> None:
+            """Mapa de fundo da região (PMTiles do OpenStreetMap) guardado no servidor, entregue por partes
+            (Range), como o leitor de PMTiles pede. Nome restrito: só [a-z0-9-].pmtiles dentro da pasta de mapas."""
+            if self._barrado():
+                return
+            nome = caminho[len("/mapas/"):]
+            arq = PASTA_MAPAS() / nome
+            if not re.fullmatch(r"[a-z0-9-]{1,40}\.pmtiles", nome) or not arq.is_file():
+                if so_cabecalho:
+                    self.send_response(404)
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                    return
+                return self._json(404, {"ok": False, "erro": "mapa da região não instalado"})
+            total = arq.stat().st_size
+            ini, fim, parcial = 0, total - 1, False
+            m = re.fullmatch(r"bytes=(\d*)-(\d*)", (self.headers.get("Range") or "").strip())
+            if m and (m.group(1) or m.group(2)):
+                if m.group(1):
+                    ini = int(m.group(1)); fim = min(int(m.group(2)) if m.group(2) else total - 1, total - 1)
+                else:
+                    ini = max(0, total - int(m.group(2)))
+                if ini > fim or ini >= total:
+                    self.send_response(416)
+                    self.send_header("Content-Range", f"bytes */{total}")
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                    return
+                parcial = True
+            n = fim - ini + 1
+            self.send_response(206 if parcial else 200)
+            self.send_header("Content-Type", "application/octet-stream")
+            self.send_header("Accept-Ranges", "bytes")
+            self.send_header("Content-Length", str(n))
+            if parcial:
+                self.send_header("Content-Range", f"bytes {ini}-{fim}/{total}")
+            self.send_header("Cache-Control", "private, max-age=86400")
+            self.end_headers()
+            if so_cabecalho:
+                return
+            with open(arq, "rb") as f:
+                f.seek(ini)
+                restam = n
+                while restam > 0:
+                    pedaco = f.read(min(1 << 20, restam))
+                    if not pedaco:
+                        break
+                    self.wfile.write(pedaco)
+                    restam -= len(pedaco)
+
         def _arquivo(self, arq: Path, tipo: str) -> None:
             dados = arq.read_bytes()
             self.send_response(200)
@@ -502,6 +592,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 self.end_headers()
                 self.wfile.write(dados)
                 return
+            if u.path.startswith("/mapas/"):
+                return self._mapa(u.path)
             if u.path in ("/planejador", "/planejador/") and (WEB / "planejador.html").exists():
                 if self._barrado():
                     return
@@ -566,6 +658,26 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def do_POST(self):
             u = urlparse(self.path)
+            # ── DWG para DXF (Planejador): conversor aberto LibreDWG (dwg2dxf) instalado no servidor ──
+            if u.path == "/api/converter/dwg":
+                q = self._quem()
+                if exige_login and not q:
+                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                if not exige_login and not self._autorizado():
+                    return self._json(401, {"ok": False, "erro": "token ausente ou invalido"})
+                dados = self._corpo_grande(DWG_MAX)
+                if dados is None:
+                    return self._recusar_corpo("arquivo DWG vazio ou maior que 50 MB")
+                r = converter_dwg(dados)
+                if not r["ok"]:
+                    return self._json(r["codigo"], {"ok": False, "erro": r["erro"]})
+                self.send_response(200)
+                self.send_header("Content-Type", "application/dxf")
+                self.send_header("Content-Length", str(len(r["dxf"])))
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                self.wfile.write(r["dxf"])
+                return
             # ── Localização do lugar e previsão do tempo ──
             if u.path in ("/api/clima/local", "/api/clima/atualizar"):
                 q = self._quem()

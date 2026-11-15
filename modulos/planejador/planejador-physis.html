@@ -480,11 +480,11 @@ async function abrirMapa(div,aviso){MAPA_ABERTO=true;
     MAPA.addControl(new maplibregl.NavigationControl({showCompass:true}));MAPA.addControl(new maplibregl.ScaleControl({unit:'metric'}));
     const xs=gj.features[0].geometry.coordinates[0];const b=xs.reduce((a,c)=>[[Math.min(a[0][0],c[0]),Math.min(a[0][1],c[1])],[Math.max(a[1][0],c[0]),Math.max(a[1][1],c[1])]],[[180,90],[-180,-90]]);
     MAPA.fitBounds(b,{padding:40,duration:0});
-    aviso.textContent=fundo?'Mapa com o fundo da região guardado no servidor.':'Mapa do terreno georreferenciado. O fundo da região (ruas, rios, quadras do OpenStreetMap) aparece quando o arquivo da região for instalado no servidor.'}
+    await new Promise(ok=>MAPA.loaded()?ok():MAPA.once('load',ok));await imagensNoMapa();aviso.textContent=fundo?'Mapa com o fundo da região guardado no servidor.':'Mapa do terreno georreferenciado. O fundo da região (ruas, rios, quadras do OpenStreetMap) aparece quando o arquivo da região for instalado no servidor.'}
   catch(e){aviso.textContent='Não foi possível abrir o mapa: '+e.message}}
 function cartaoMapa(){const div=h('div',{class:'mapa-gis',style:'height:360px;border:1px solid var(--line);border-radius:10px;margin-top:.6rem',role:'region','aria-label':'Mapa do terreno'});
   const aviso=h('p',{class:'hint',role:'status'},'');const bt=h('button',{class:'btn',type:'button',onclick:()=>abrirMapa(div,aviso)},'Abrir o mapa');
-  const c=card('Mapa do lugar (GIS)','O terreno no mapa, com coordenadas reais. Funciona sem internet: o mapa e o fundo da região ficam no servidor da plataforma.',bt,aviso,div);
+  const imgs=(S.inicio&&S.inicio.docs||[]).filter(x=>x.tipo==='img'),areaImg=h('div',{});const c=card('Mapa do lugar (GIS)','O terreno no mapa, com coordenadas reais. Funciona sem internet: o mapa e o fundo da região ficam no servidor da plataforma.',bt,aviso,div,imgs.length?h('div',{style:'margin-top:.6rem'},h('p',{class:'hint'},'Fotos, croquis e plantas enviados no Início: posicione no mapa marcando 2 pontos.'),...imgs.map(x=>h('button',{class:'btn',type:'button',onclick:()=>posicionarImagem(x,areaImg)},(x.georef?'Reposicionar: ':'Posicionar: ')+x.nome)),areaImg):null);
   if(MAPA_ABERTO)setTimeout(()=>abrirMapa(div,aviso),0);return c}
 /* leitor BIM: conta o que o modelo tem e lista os ambientes; os números vão para o projeto */
 const IFC_TIPOS=[['IFCBUILDINGSTOREY','Pavimentos'],['IFCSPACE','Ambientes'],['IFCWALL','Paredes'],['IFCWALLSTANDARDCASE','Paredes (padrão)'],['IFCSLAB','Lajes e pisos'],['IFCROOF','Coberturas'],['IFCWINDOW','Janelas'],['IFCDOOR','Portas'],['IFCCOLUMN','Pilares'],['IFCBEAM','Vigas']];
@@ -500,6 +500,75 @@ async function lerIFC(d){if(!VENDOR.temServidor()){toast('O leitor BIM precisa d
     mutate(()=>{const x=S.inicio.docs.find(z=>z.id===d.id);if(x){x.bim={schema,cont,amb,quando:new Date().toISOString()};x.situacao='Modelo BIM lido: '+(Object.entries(cont).map(([l,n])=>n+' '+l.toLowerCase()).join(', ')||'sem elementos reconhecidos')}},'modelo BIM lido: '+d.nome);
     toast('Modelo BIM lido')}
   catch(e){toast('Não foi possível ler o modelo: '+e.message)}}
+/* ===== DWG pelo servidor, croqui no mapa, vista 3D do BIM e normas por bloco (14/11/2026) ===== */
+async function converterDWG(d){if(!VENDOR.temServidor()){toast('A conversão de DWG é feita pelo servidor da plataforma: abra o Planejador pela aba Planejador');return}
+  toast('Convertendo o DWG no servidor…');
+  try{const b=await DOCS.ler(d.id);if(!b){toast('O arquivo não está mais neste aparelho');return}
+    const r=await fetch('/api/converter/dwg',{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:b});
+    if(!r.ok){let e='erro '+r.status;try{e=(await r.json()).erro||e}catch(x){}toast(e);mutate(()=>{const x=S.inicio.docs.find(z=>z.id===d.id);if(x)x.situacao='Não convertido: '+e},'DWG não convertido');return}
+    const dxf=await r.blob();const nome=d.nome.replace(/\.dwg$/i,'')+'.dxf';
+    mutate(()=>{const x=S.inicio.docs.find(z=>z.id===d.id);if(x)x.situacao='Convertido para DXF e lido como terreno'},'DWG convertido: '+d.nome);
+    await ler([new File([dxf],nome)])}
+  catch(e){toast('Não foi possível converter: '+e.message)}}
+/* croqui, foto ou planta no mapa: a pessoa marca o mesmo ponto na imagem e no mapa, duas vezes.
+   Com dois pares de pontos a imagem ganha escala, giro e posição (transformação de semelhança). */
+function semelhanca(z1,z2,w1,w2){const sub=(a,b)=>[a[0]-b[0],a[1]-b[1]],mul=(a,b)=>[a[0]*b[0]-a[1]*b[1],a[0]*b[1]+a[1]*b[0]],div=(a,b)=>{const d=b[0]*b[0]+b[1]*b[1];return[(a[0]*b[0]+a[1]*b[1])/d,(a[1]*b[0]-a[0]*b[1])/d]};
+  const a=div(sub(w2,w1),sub(z2,z1)),b=sub(w1,mul(a,z1));return z=>{const r=mul(a,z);return[r[0]+b[0],r[1]+b[1]]}}
+function cantosDaImagem(img,pi,pm){/* pi: 2 pontos na imagem (px); pm: 2 pontos no mapa (lon,lat) */
+  const lat0=pm[0][1],k=111320*Math.cos(lat0*Math.PI/180),loc=p=>[(p[0]-pm[0][0])*k,(p[1]-lat0)*110540],ll=q=>[pm[0][0]+q[0]/k,lat0+q[1]/110540];
+  const z=p=>[p[0],-p[1]];const T=semelhanca(z(pi[0]),z(pi[1]),loc(pm[0]),loc(pm[1]));
+  const W=img.naturalWidth,H=img.naturalHeight;return[[0,0],[W,0],[W,H],[0,H]].map(p=>ll(T(z(p))))}
+async function posicionarImagem(d,area){if(!MAPA){toast('Abra o mapa primeiro (botão “Abrir o mapa”)');return}
+  const b=await DOCS.ler(d.id);if(!b){toast('O arquivo não está mais neste aparelho');return}
+  const url=URL.createObjectURL(b),img=h('img',{src:url,alt:'Imagem a posicionar: '+d.nome,style:'max-width:100%;cursor:crosshair;border:1px solid var(--line);border-radius:8px'});
+  const passo=h('p',{class:'hint',role:'status'},'1 de 4 · Clique num ponto bem visível da imagem (canto do lote, esquina, poste).');
+  const pi=[],pm=[];area.replaceChildren(passo,img,h('button',{class:'btn',type:'button',onclick:()=>{area.replaceChildren();URL.revokeObjectURL(url)}},'Cancelar'));
+  const esperarMapa=()=>MAPA.once('click',e=>{pm.push([e.lngLat.lng,e.lngLat.lat]);if(pm.length<2){passo.textContent='3 de 4 · Agora clique num segundo ponto da imagem, longe do primeiro.';img.onclick=cliqueImg}else concluir()});
+  const cliqueImg=e=>{const r=img.getBoundingClientRect();pi.push([(e.clientX-r.left)*img.naturalWidth/r.width,(e.clientY-r.top)*img.naturalHeight/r.height]);img.onclick=null;passo.textContent=(pi.length===1?'2':'4')+' de 4 · Clique no mapa no mesmo ponto.';esperarMapa()};
+  img.onclick=cliqueImg;
+  const concluir=()=>{const cantos=cantosDaImagem(img,pi,pm);mutate(()=>{const x=S.inicio.docs.find(z=>z.id===d.id);if(x){x.georef={cantos};x.situacao='Posicionada no mapa com 2 pontos'}},'imagem posicionada: '+d.nome);
+    area.replaceChildren(h('p',{class:'hint',role:'status'},'Imagem posicionada. Ela aparece no mapa, semitransparente, para traçar o contorno por cima.'));URL.revokeObjectURL(url);MAPA_ABERTO=true}}
+async function imagensNoMapa(){if(!MAPA)return;for(const d of S.inicio.docs.filter(x=>x.tipo==='img'&&x.georef)){const id='img-'+d.id;if(MAPA.getSource(id))continue;
+  const b=await DOCS.ler(d.id);if(!b)continue;const url=URL.createObjectURL(b);
+  MAPA.addSource(id,{type:'image',url,coordinates:d.georef.cantos});MAPA.addLayer({id,type:'raster',source:id,paint:{'raster-opacity':0.6}},'terreno-area')}}
+/* vista 3D do modelo BIM e áreas dos ambientes (pelo piso de cada IfcSpace) */
+async function ver3D(d,area){if(!VENDOR.temServidor()){toast('A vista 3D precisa da plataforma');return}
+  area.replaceChildren(h('p',{class:'hint',role:'status'},'Montando o modelo em 3D…'));
+  try{await VENDOR.js('three.min.js');await VENDOR.js('web-ifc-api-iife.js');if(!IFC_API){IFC_API=new WebIFC.IfcAPI();IFC_API.SetWasmPath(VENDOR.base,true);await IFC_API.Init()}
+    const b=await DOCS.ler(d.id);const m=IFC_API.OpenModel(new Uint8Array(await b.arrayBuffer()));
+    const espacos=new Set();const ids=IFC_API.GetLineIDsWithType(m,WebIFC.IFCSPACE);for(let i=0;i<ids.size();i++)espacos.add(ids.get(i));
+    const cena=new THREE.Scene();cena.background=new THREE.Color(0xF4F6F1);cena.add(new THREE.HemisphereLight(0xffffff,0x8899aa,1.1));const sol=new THREE.DirectionalLight(0xffffff,0.8);sol.position.set(5,10,7);cena.add(sol);
+    const caixa=new THREE.Box3(),areas={};
+    const receber=malha=>{const pgs=malha.geometries;for(let i=0;i<pgs.size();i++){const pg=pgs.get(i),g=IFC_API.GetGeometry(m,pg.geometryExpressID);
+      const v=IFC_API.GetVertexArray(g.GetVertexData(),g.GetVertexDataSize()),ix=IFC_API.GetIndexArray(g.GetIndexData(),g.GetIndexDataSize());
+      const pos=new Float32Array(v.length/2),nor=new Float32Array(v.length/2);for(let k=0;k<v.length/6;k++){pos.set(v.subarray(k*6,k*6+3),k*3);nor.set(v.subarray(k*6+3,k*6+6),k*3)}
+      const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setAttribute('normal',new THREE.BufferAttribute(nor,3));geo.setIndex(new THREE.BufferAttribute(ix,1));
+      const mat=new THREE.Matrix4().fromArray(pg.flatTransformation);geo.applyMatrix4(mat);
+      const c=pg.color,ehEsp=espacos.has(malha.expressID);const mesh=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:new THREE.Color(c.x,c.y,c.z),transparent:ehEsp||c.w<1,opacity:ehEsp?0.25:c.w,side:THREE.DoubleSide}));
+      cena.add(mesh);geo.computeBoundingBox();caixa.union(geo.boundingBox);
+      if(ehEsp){/* área do piso: triângulos virados para baixo (o web-ifc entrega com Y para cima) */const p=geo.attributes.position.array,id=geo.index.array;let a=0;
+        for(let t=0;t<id.length;t+=3){const A=new THREE.Vector3().fromArray(p,id[t]*3),B=new THREE.Vector3().fromArray(p,id[t+1]*3),C=new THREE.Vector3().fromArray(p,id[t+2]*3);const n=new THREE.Vector3().subVectors(B,A).cross(new THREE.Vector3().subVectors(C,A));const ar=n.length()/2;if(ar>0&&n.y/(2*ar)<-0.9)a+=ar}
+        areas[malha.expressID]=(areas[malha.expressID]||0)+a}
+      g.delete()}};
+    /* o web-ifc deixa os ambientes (IfcSpace) de fora por padrão: pede os dois */
+    IFC_API.StreamAllMeshes(m,receber);if(IFC_API.StreamAllMeshesWithTypes)IFC_API.StreamAllMeshesWithTypes(m,[WebIFC.IFCSPACE],receber);
+    const nomes={};espacos.forEach(eid=>{const e=IFC_API.GetLine(m,eid);nomes[eid]=[e.Name&&e.Name.value,(e.LongName&&e.LongName.value)||(e.Description&&e.Description.value)].filter(Boolean).join(' · ')||'ambiente'});
+    IFC_API.CloseModel(m);
+    const lista=Object.entries(nomes).map(([eid,n])=>[n,areas[eid]?NF(areas[eid],2)+' m²':'sem geometria']);const total=Object.values(areas).reduce((s,x)=>s+x,0);
+    mutate(()=>{const x=S.inicio.docs.find(z=>z.id===d.id);if(x){x.bim=Object.assign({},x.bim||{},{areas:lista,areaTotal:total})}},'áreas do modelo BIM: '+d.nome);area=document.getElementById('area-3d')||area;/* a tela foi redesenhada: usa o quadro novo */
+    const W=Math.max(320,area.clientWidth||640),H=360,cv=h('canvas',{width:W,height:H,style:'width:100%;max-width:'+W+'px;border:1px solid var(--line);border-radius:10px;touch-action:none','aria-label':'Modelo BIM em 3D; arraste para girar e use a roda para aproximar'});
+    const ren=new THREE.WebGLRenderer({canvas:cv,antialias:true});ren.setSize(W,H,false);
+    if(caixa.isEmpty()){area.replaceChildren(h('p',{class:'hint'},'O modelo não tem geometria para mostrar em 3D.'),tbl(['Ambiente','Área'],lista));return}
+    const centro=caixa.getCenter(new THREE.Vector3()),raio=caixa.getSize(new THREE.Vector3()).length()/2||1,cam=new THREE.PerspectiveCamera(45,W/H,raio/100,raio*100);
+    let az=0.8,el=0.6,dist=raio*2.6;const pos3=()=>{cam.position.set(centro.x+dist*Math.cos(el)*Math.sin(az),centro.y+dist*Math.sin(el),centro.z+dist*Math.cos(el)*Math.cos(az));cam.lookAt(centro);ren.render(cena,cam)};
+    let arr=null;cv.onpointerdown=e=>{arr=[e.clientX,e.clientY];cv.setPointerCapture(e.pointerId)};cv.onpointerup=()=>arr=null;
+    cv.onpointermove=e=>{if(!arr)return;az-=(e.clientX-arr[0])*0.01;el=Math.max(-1.4,Math.min(1.4,el+(e.clientY-arr[1])*0.01));arr=[e.clientX,e.clientY];pos3()};
+    cv.onwheel=e=>{e.preventDefault();dist=Math.max(raio*0.3,Math.min(raio*20,dist*(e.deltaY>0?1.1:0.9)));pos3()};
+    area.replaceChildren(cv,h('p',{class:'hint'},'Arraste para girar; roda do mouse para aproximar. Ambientes em transparência.'),tbl(['Ambiente','Área do piso'],lista),h('p',{},h('b',{},'Total dos ambientes: '),NF(total,2)+' m²'));pos3()}
+  catch(e){area.replaceChildren(h('p',{class:'hint'},'Não foi possível montar o 3D: '+e.message))}}
+/* normas que o estudo confere, conforme os blocos escolhidos no Início */
+const TEMAS_BLOCO={implantacao:['Terreno','Terraplenagem','Arquitetura','Acessibilidade','Incêndio','Estrutura','Lazer','Desempenho'],solar:['Energia'],avac:['Energia','Desempenho'],agua:['Água','Esgoto','Biogás'],drenagem:['Drenagem','Terreno'],residuos:['Biogás'],sbn:['Drenagem','Água'],carbono:['Energia','Desempenho'],certificacoes:['Desempenho','Energia','Água','Acessibilidade']};
+function normasDosBlocos(){const temas=new Set(S.inicio.blocos.flatMap(b=>TEMAS_BLOCO[b]||[]));let R;try{R=run()}catch(e){return[]}return[...R.normas.values()].filter(n=>temas.has(n.tema))}
 /* ===== Início do Planejador: o que construir, blocos, localização e documentos (14/11/2026) ===== */
 const OBRAS_INICIO=[['casa','Casa ou residência'],['chales','Chalés, pousada ou hotel'],['galpao','Galpão, oficina ou indústria'],['escritorio','Escritório, escola ou comércio'],['rural','Estrutura rural (curral, estufa, armazém)'],['loteamento','Loteamento ou condomínio'],['reforma','Reforma ou ampliação do que existe'],['mapear','Só mapear o lugar (sem construção)']];
 const BLOCOS_INICIO=[
@@ -523,7 +592,7 @@ async function receberDocs(files){const geo=[];const novos=[];
   for(const f of files){const tipo=tipoDoc(f.name);if(tipo==='geo'||tipo==='dxf'){geo.push(f)}
     const id='doc-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
     try{await DOCS.guardar(id,f)}catch(e){toast('Não foi possível guardar '+f.name+' neste aparelho');continue}
-    const situacao={geo:'Lido como terreno',dxf:'Lido como terreno (polilinhas cotadas)',pdf:'Guardado. Se for levantamento vetorial, use “Ler como topografia”',img:'Guardado. Vai como fundo do mapa: marque 2 pontos conhecidos para posicionar e trace o contorno',doc:'Guardado no projeto',planilha:'Guardado no projeto',dwg:'Guardado. Conversão aberta para DXF em preparação; se precisar agora, exporte em DXF',ifc:'Guardado. Use o botão Ler o modelo BIM para contar pavimentos, ambientes, paredes, lajes, portas e janelas',outro:'Guardado no projeto'}[tipo];
+    const situacao={geo:'Lido como terreno',dxf:'Lido como terreno (polilinhas cotadas)',pdf:'Guardado. Se for levantamento vetorial, use “Ler como topografia”',img:'Guardado. Vai como fundo do mapa: marque 2 pontos conhecidos para posicionar e trace o contorno',doc:'Guardado no projeto',planilha:'Guardado no projeto',dwg:'Guardado. Use Converter para DXF (conversor aberto no servidor) ou exporte em DXF',ifc:'Guardado. Use o botão Ler o modelo BIM para contar pavimentos, ambientes, paredes, lajes, portas e janelas',outro:'Guardado no projeto'}[tipo];
     novos.push({id,nome:f.name,tipo,tamanho:f.size,situacao,quando:new Date().toISOString()})}
   if(novos.length)mutate(()=>{S.inicio.docs.push(...novos)},'documentos: '+novos.map(d=>d.nome).join(', '));
   if(geo.length)await ler(geo)}
@@ -561,8 +630,9 @@ inicio(el){const I=S.inicio;
   /* 4. documentos */
   const fi=h('input',{type:'file',multiple:true,hidden:true,onchange:e=>receberDocs([...e.target.files])});
   const drop=h('div',{class:'drop',ondragover:e=>{e.preventDefault();drop.classList.add('over')},ondragleave:()=>drop.classList.remove('over'),ondrop:e=>{e.preventDefault();drop.classList.remove('over');receberDocs([...e.dataTransfer.files])}},h('p',{},h('b',{},'Arraste aqui qualquer arquivo do projeto')),h('p',{class:'hint'},'Topografia e GIS (GeoJSON, KML, CSV, TXT, ASC, DXF) vão direto para o terreno. PDF, imagens, Word, planilhas, DWG e IFC ficam guardados no projeto, neste aparelho.'),h('label',{class:'btn primary'},'Escolher arquivos',fi));
-  const linhas=I.docs.map((d,k)=>[d.nome,TIPO_DOC[d.tipo]||d.tipo,NF(d.tamanho/1024,0)+' kB',d.situacao,h('span',{},d.tipo==='pdf'?h('button',{class:'btn',type:'button',onclick:()=>lerDocComoTerreno(d)},'Ler como topografia'):d.tipo==='ifc'?h('button',{class:'btn',type:'button',onclick:()=>lerIFC(d)},'Ler o modelo BIM'):null,' ',h('button',{class:'btn',type:'button',onclick:()=>mutate(()=>{I.docs.splice(k,1);DOCS.apagar(d.id)},'documento removido')},'Remover'))]);
-  el.append(card('4 · Documentos do projeto',null,drop,I.docs.length?tbl(['Arquivo','Tipo','Tamanho','O que acontece','Ações'],linhas):h('p',{class:'hint'},'Nenhum documento ainda.')));
+  const linhas=I.docs.map((d,k)=>[d.nome,TIPO_DOC[d.tipo]||d.tipo,NF(d.tamanho/1024,0)+' kB',d.situacao,h('span',{},d.tipo==='pdf'?h('button',{class:'btn',type:'button',onclick:()=>lerDocComoTerreno(d)},'Ler como topografia'):d.tipo==='ifc'?h('span',{},h('button',{class:'btn',type:'button',onclick:()=>lerIFC(d)},'Ler o modelo BIM'),' ',h('button',{class:'btn',type:'button',onclick:()=>ver3D(d,document.getElementById('area-3d'))},'Ver em 3D e áreas')):d.tipo==='dwg'?h('button',{class:'btn',type:'button',onclick:()=>converterDWG(d)},'Converter para DXF'):null,' ',h('button',{class:'btn',type:'button',onclick:()=>mutate(()=>{I.docs.splice(k,1);DOCS.apagar(d.id)},'documento removido')},'Remover'))]);
+  el.append(card('4 · Documentos do projeto',null,drop,I.docs.length?tbl(['Arquivo','Tipo','Tamanho','O que acontece','Ações'],linhas):h('p',{class:'hint'},'Nenhum documento ainda.'),h('div',{id:'area-3d'})));
+  const nb=normasDosBlocos();el.append(card('5 · Normas que o estudo confere para os blocos escolhidos','Validação preliminar, para levar aos projetistas: o estudo confere os parâmetros destas normas; não substitui o projeto com responsável técnico.',nb.length?tbl(['Norma','Assunto','Tema'],nb.map(n=>[n.cod,n.tit,n.tema])):h('p',{class:'hint'},'As normas aparecem quando o terreno e os blocos estiverem definidos.')));
 },
 terreno(el){const t=S.terreno;const g=T.build();
  el.append(h('h2',{},'1 · Seu terreno'),h('p',{class:'lead'},'Envie a topografia ou o arquivo GIS do terreno. Formatos: PDF do levantamento (vetorial, exportado do CAD), GeoJSON, KML, CSV ou TXT com x, y e cota (ou longitude, latitude e altitude), grade ASCII (.asc) de modelos de elevação e DXF com polilinhas cotadas. Com o arquivo, o planejador desenha as curvas de nível e modela declividade, escoamento da chuva e exposição ao sol.'));
