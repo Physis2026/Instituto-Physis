@@ -30,6 +30,13 @@ VENDOR = {
     "jszip.min.js": "acc7e41455a80765b5fd9c7ee1b8078a6d160bbbca455aeae854de65c947d59e",
     "pdf.min.js": "5b5799e6f8c680663207ac5b42ee14eed2a406fa7af48f50c154f0c0b1566946",
     "pdf.worker.min.js": "feabdf309770ed24bba31a5467836cdc8cf639c705af27d52b585b041bb8527b",
+    # mapa e BIM (jsDelivr, 14/11/2026)
+    "maplibre-gl.js": "be9633c4d870e26fb37f1cfe5c5a77181667114003ea16207ac7850d8da8add1",
+    "maplibre-gl.css": "576b085fdd9487a65a19215328c1e086c07ce5bf6da09b666b3806d3d008dae9",
+    "pmtiles.js": "367c19f8936d1d6c1b1820b0dee053f793fc29277655c3e471f5ed4d37b5f045",
+    "web-ifc-api-iife.js": "ce09568916e574e710225737563672b3933bfa7c49ce5544ac877bae13b0709a",
+    "web-ifc.wasm": "3cebe59b646bf79b38c525a4ffe289881f5bb544952a75a89ec0c1d900240b3f",
+    "three.min.js": "170c6789f43217c96b3170f4b42fafe135de7f7cd48497a4218f9757ee1d49fa",
 }
 
 

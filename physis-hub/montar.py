@@ -28,6 +28,8 @@ MODULOS = ("monitoramento", "agua", "zonas", "animais", "coleiras", "comedouros"
            "painel", "planejador", "certificacoes", "solar", "avac", "turbinas", "sbn", "circular", "carbono",
            "resiliencia", "medicamentos", "pulseira")
 LICENCA_PADRAO = "[LICENÇA A DEFINIR PELA PHYSIS]"
+VENDOR_ARQUIVOS = ("maplibre-gl.js", "maplibre-gl.css", "pmtiles.js", "web-ifc-api-iife.js", "web-ifc.wasm", "three.min.js",
+                   "LEIA-ME.md", "LICENSE-maplibre-gl.txt", "LICENSE-three.txt")
 
 GUIA = """# Sua plataforma Physis
 
@@ -97,6 +99,14 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         shutil.copy2(supervisao, pasta / "web" / "supervisao.html")
     if "planejador" in modulos:
         shutil.copy2(planejador, pasta / "web" / "planejador.html")
+    if "planejador" in modulos or (gestao is not None and gestao.is_file()):
+        # mapa e leitor BIM do Planejador: bibliotecas abertas, entregues pelo próprio servidor (sem internet).
+        # O pacote do servidor da Physis também leva, para montar sozinho a plataforma de quem compra.
+        (pasta / "web" / "vendor").mkdir(exist_ok=True)
+        for nome in VENDOR_ARQUIVOS:
+            origem = next((p for p in (AQUI.parent / "vendor" / nome, AQUI / "web" / "vendor" / nome) if p.is_file()), None)
+            if origem:
+                shutil.copy2(origem, pasta / "web" / "vendor" / nome)
     if gestao is not None and gestao.is_file():      # só o pacote interno da Physis leva o programa de gestão interna
         shutil.copy2(gestao, pasta / "web" / "gestao.html")
         if (AQUI / "web" / "consultoria.html").exists():      # página pública de consultoria do site da Physis

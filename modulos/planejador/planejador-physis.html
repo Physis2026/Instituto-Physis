@@ -454,6 +454,52 @@ const STEPS=[['inicio','Início'],['terreno','Terreno'],['clima','Clima, solo e 
 let OPT={crs:'auto',zona:23,hemis:'S',lat:'',lon:''};
 function links(){const la=S.terreno.lat0,lo=S.terreno.lon0;const c=la!=null?`${NF(la,5)}, ${NF(lo,5)}`:'coordenadas do terreno';const L=(t,u,d)=>h('li',{},h('a',{href:u,target:'_blank',rel:'noopener'},t),' · ',d);
  return card('Bases públicas para completar os dados','Esta página não acessa a internet. Abra a base, baixe o arquivo para '+c+' e importe aqui; o planejador registra a origem de cada dado.',h('ul',{class:'links'},L('OpenTopography (SRTM, Copernicus 30 m)','https://portal.opentopography.org/datasets','modelo de elevação em .asc para o passo 1'),L('PVGIS (Comissão Europeia)','https://re.jrc.ec.europa.eu/pvg_tools/pt/','produção solar mensal em kWh/kWp'),L('CRESESB SunData','https://cresesb.cepel.br/index.php?section=sundata','radiação solar mensal no Brasil'),L('INMET · normais climatológicas','https://portal.inmet.gov.br/normais','chuva e temperatura mensais'),L('ANA · HidroWeb','https://www.snirh.gov.br/hidroweb/','séries de chuva por estação'),L('SGB/CPRM · GeoSGB','https://geosgb.sgb.gov.br/','geologia, solos, áreas de risco e equações de chuva'),L('MapBiomas','https://plataforma.brasil.mapbiomas.org/','cobertura e uso do solo'),L('IBGE · geociências','https://www.ibge.gov.br/geociencias/downloads-geociencias.html','limites, hidrografia, altimetria')))}
+/* ===== Mapa (GIS) e leitor BIM (IFC): bibliotecas abertas entregues pelo próprio servidor em /vendor/ =====
+   Sem internet: MapLibre (mapa), PMTiles (mapa de fundo guardado no servidor) e web-ifc (leitor IFC em WebAssembly).
+   Aberto direto do disco (sem servidor), o Planejador avisa que o mapa e o BIM precisam da plataforma. */
+const VENDOR={base:'/vendor/',feitos:{},
+  temServidor(){return /^https?:$/.test(location.protocol)},
+  js(n){return this.feitos[n]||(this.feitos[n]=new Promise((ok,er)=>{const s=document.createElement('script');s.src=this.base+n;s.onload=()=>ok();s.onerror=()=>{delete this.feitos[n];er(new Error('a biblioteca '+n+' não está no servidor'))};document.head.append(s)}))},
+  css(n){if(this.feitos[n])return;this.feitos[n]=1;const l=document.createElement('link');l.rel='stylesheet';l.href=this.base+n;document.head.append(l)}};
+let MAPA=null,MAPA_ABERTO=false;
+function geojsonTerreno(){const t=S.terreno;if(!t.poly.length||t.lat0==null||t.lon0==null)return null;const anel=t.poly.map(p=>GEO.toLL(p[0],p[1]));anel.push(anel[0]);
+  return{type:'FeatureCollection',features:[{type:'Feature',properties:{nome:'Terreno'},geometry:{type:'Polygon',coordinates:[anel]}}]}}
+async function abrirMapa(div,aviso){MAPA_ABERTO=true;
+  if(!VENDOR.temServidor()){aviso.textContent='O mapa usa bibliotecas guardadas no servidor da plataforma. Abra o Planejador pela plataforma (aba Planejador) para ver o mapa.';return}
+  const gj=geojsonTerreno();if(!gj){aviso.textContent='Para o mapa, o terreno precisa estar georreferenciado: informe latitude e longitude no Início ou importe um arquivo com coordenadas.';return}
+  aviso.textContent='Abrindo o mapa…';
+  try{VENDOR.css('maplibre-gl.css');await VENDOR.js('maplibre-gl.js');await VENDOR.js('pmtiles.js');
+    if(!window.__pmtilesOk&&window.pmtiles){const p=new pmtiles.Protocol();maplibregl.addProtocol('pmtiles',p.tile);window.__pmtilesOk=true}
+    /* mapa de fundo da região: arquivo PMTiles (OpenStreetMap) guardado no servidor, se já instalado */
+    let fundo=false;try{const r=await fetch('/mapas/regiao.pmtiles',{method:'HEAD'});fundo=r.ok}catch(e){}
+    const fontes={terreno:{type:'geojson',data:gj}},camadas=[{id:'fundo',type:'background',paint:{'background-color':'#EEF2EA'}}];
+    if(fundo){fontes.osm={type:'vector',url:'pmtiles:///mapas/regiao.pmtiles'};camadas.push({id:'agua',type:'fill',source:'osm','source-layer':'water',paint:{'fill-color':'#BFD9EA'}},{id:'vias',type:'line',source:'osm','source-layer':'roads',paint:{'line-color':'#B9B3A6','line-width':1}})}
+    camadas.push({id:'terreno-area',type:'fill',source:'terreno',paint:{'fill-color':'#33512F','fill-opacity':0.18}},{id:'terreno-borda',type:'line',source:'terreno',paint:{'line-color':'#33512F','line-width':2.5}});
+    if(MAPA){try{MAPA.remove()}catch(e){}}
+    MAPA=new maplibregl.Map({container:div,style:{version:8,sources:fontes,layers:camadas},attributionControl:false});
+    MAPA.addControl(new maplibregl.NavigationControl({showCompass:true}));MAPA.addControl(new maplibregl.ScaleControl({unit:'metric'}));
+    const xs=gj.features[0].geometry.coordinates[0];const b=xs.reduce((a,c)=>[[Math.min(a[0][0],c[0]),Math.min(a[0][1],c[1])],[Math.max(a[1][0],c[0]),Math.max(a[1][1],c[1])]],[[180,90],[-180,-90]]);
+    MAPA.fitBounds(b,{padding:40,duration:0});
+    aviso.textContent=fundo?'Mapa com o fundo da região guardado no servidor.':'Mapa do terreno georreferenciado. O fundo da região (ruas, rios, quadras do OpenStreetMap) aparece quando o arquivo da região for instalado no servidor.'}
+  catch(e){aviso.textContent='Não foi possível abrir o mapa: '+e.message}}
+function cartaoMapa(){const div=h('div',{class:'mapa-gis',style:'height:360px;border:1px solid var(--line);border-radius:10px;margin-top:.6rem',role:'region','aria-label':'Mapa do terreno'});
+  const aviso=h('p',{class:'hint',role:'status'},'');const bt=h('button',{class:'btn',type:'button',onclick:()=>abrirMapa(div,aviso)},'Abrir o mapa');
+  const c=card('Mapa do lugar (GIS)','O terreno no mapa, com coordenadas reais. Funciona sem internet: o mapa e o fundo da região ficam no servidor da plataforma.',bt,aviso,div);
+  if(MAPA_ABERTO)setTimeout(()=>abrirMapa(div,aviso),0);return c}
+/* leitor BIM: conta o que o modelo tem e lista os ambientes; os números vão para o projeto */
+const IFC_TIPOS=[['IFCBUILDINGSTOREY','Pavimentos'],['IFCSPACE','Ambientes'],['IFCWALL','Paredes'],['IFCWALLSTANDARDCASE','Paredes (padrão)'],['IFCSLAB','Lajes e pisos'],['IFCROOF','Coberturas'],['IFCWINDOW','Janelas'],['IFCDOOR','Portas'],['IFCCOLUMN','Pilares'],['IFCBEAM','Vigas']];
+let IFC_API=null;
+async function lerIFC(d){if(!VENDOR.temServidor()){toast('O leitor BIM precisa da plataforma: abra o Planejador pela aba Planejador');return}
+  toast('Lendo o modelo BIM…');
+  try{await VENDOR.js('web-ifc-api-iife.js');if(!IFC_API){IFC_API=new WebIFC.IfcAPI();IFC_API.SetWasmPath(VENDOR.base,true);await IFC_API.Init()}
+    const b=await DOCS.ler(d.id);if(!b){toast('O arquivo não está mais neste aparelho');return}
+    const m=IFC_API.OpenModel(new Uint8Array(await b.arrayBuffer()));
+    const cont={};for(const[t,l]of IFC_TIPOS){const k=WebIFC[t];if(k==null)continue;const n=IFC_API.GetLineIDsWithType(m,k).size();if(n)cont[l]=n}
+    const ids=IFC_API.GetLineIDsWithType(m,WebIFC.IFCSPACE),amb=[];for(let i=0;i<ids.size()&&i<200;i++){const e=IFC_API.GetLine(m,ids.get(i));amb.push([e.Name&&e.Name.value,(e.LongName&&e.LongName.value)||(e.Description&&e.Description.value)].filter(Boolean).join(' · ')||'ambiente sem nome')}
+    const schema=IFC_API.GetModelSchema?IFC_API.GetModelSchema(m):'';IFC_API.CloseModel(m);
+    mutate(()=>{const x=S.inicio.docs.find(z=>z.id===d.id);if(x){x.bim={schema,cont,amb,quando:new Date().toISOString()};x.situacao='Modelo BIM lido: '+(Object.entries(cont).map(([l,n])=>n+' '+l.toLowerCase()).join(', ')||'sem elementos reconhecidos')}},'modelo BIM lido: '+d.nome);
+    toast('Modelo BIM lido')}
+  catch(e){toast('Não foi possível ler o modelo: '+e.message)}}
 /* ===== Início do Planejador: o que construir, blocos, localização e documentos (14/11/2026) ===== */
 const OBRAS_INICIO=[['casa','Casa ou residência'],['chales','Chalés, pousada ou hotel'],['galpao','Galpão, oficina ou indústria'],['escritorio','Escritório, escola ou comércio'],['rural','Estrutura rural (curral, estufa, armazém)'],['loteamento','Loteamento ou condomínio'],['reforma','Reforma ou ampliação do que existe'],['mapear','Só mapear o lugar (sem construção)']];
 const BLOCOS_INICIO=[
@@ -477,7 +523,7 @@ async function receberDocs(files){const geo=[];const novos=[];
   for(const f of files){const tipo=tipoDoc(f.name);if(tipo==='geo'||tipo==='dxf'){geo.push(f)}
     const id='doc-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
     try{await DOCS.guardar(id,f)}catch(e){toast('Não foi possível guardar '+f.name+' neste aparelho');continue}
-    const situacao={geo:'Lido como terreno',dxf:'Lido como terreno (polilinhas cotadas)',pdf:'Guardado. Se for levantamento vetorial, use “Ler como topografia”',img:'Guardado. Vai como fundo do mapa: marque 2 pontos conhecidos para posicionar e trace o contorno',doc:'Guardado no projeto',planilha:'Guardado no projeto',dwg:'Guardado. Conversão aberta para DXF em preparação; se precisar agora, exporte em DXF',ifc:'Guardado. Leitor BIM em instalação: as áreas e os ambientes do modelo vão alimentar os blocos',outro:'Guardado no projeto'}[tipo];
+    const situacao={geo:'Lido como terreno',dxf:'Lido como terreno (polilinhas cotadas)',pdf:'Guardado. Se for levantamento vetorial, use “Ler como topografia”',img:'Guardado. Vai como fundo do mapa: marque 2 pontos conhecidos para posicionar e trace o contorno',doc:'Guardado no projeto',planilha:'Guardado no projeto',dwg:'Guardado. Conversão aberta para DXF em preparação; se precisar agora, exporte em DXF',ifc:'Guardado. Use o botão Ler o modelo BIM para contar pavimentos, ambientes, paredes, lajes, portas e janelas',outro:'Guardado no projeto'}[tipo];
     novos.push({id,nome:f.name,tipo,tamanho:f.size,situacao,quando:new Date().toISOString()})}
   if(novos.length)mutate(()=>{S.inicio.docs.push(...novos)},'documentos: '+novos.map(d=>d.nome).join(', '));
   if(geo.length)await ler(geo)}
@@ -515,14 +561,14 @@ inicio(el){const I=S.inicio;
   /* 4. documentos */
   const fi=h('input',{type:'file',multiple:true,hidden:true,onchange:e=>receberDocs([...e.target.files])});
   const drop=h('div',{class:'drop',ondragover:e=>{e.preventDefault();drop.classList.add('over')},ondragleave:()=>drop.classList.remove('over'),ondrop:e=>{e.preventDefault();drop.classList.remove('over');receberDocs([...e.dataTransfer.files])}},h('p',{},h('b',{},'Arraste aqui qualquer arquivo do projeto')),h('p',{class:'hint'},'Topografia e GIS (GeoJSON, KML, CSV, TXT, ASC, DXF) vão direto para o terreno. PDF, imagens, Word, planilhas, DWG e IFC ficam guardados no projeto, neste aparelho.'),h('label',{class:'btn primary'},'Escolher arquivos',fi));
-  const linhas=I.docs.map((d,k)=>[d.nome,TIPO_DOC[d.tipo]||d.tipo,NF(d.tamanho/1024,0)+' kB',d.situacao,h('span',{},d.tipo==='pdf'?h('button',{class:'btn',type:'button',onclick:()=>lerDocComoTerreno(d)},'Ler como topografia'):null,' ',h('button',{class:'btn',type:'button',onclick:()=>mutate(()=>{I.docs.splice(k,1);DOCS.apagar(d.id)},'documento removido')},'Remover'))]);
+  const linhas=I.docs.map((d,k)=>[d.nome,TIPO_DOC[d.tipo]||d.tipo,NF(d.tamanho/1024,0)+' kB',d.situacao,h('span',{},d.tipo==='pdf'?h('button',{class:'btn',type:'button',onclick:()=>lerDocComoTerreno(d)},'Ler como topografia'):d.tipo==='ifc'?h('button',{class:'btn',type:'button',onclick:()=>lerIFC(d)},'Ler o modelo BIM'):null,' ',h('button',{class:'btn',type:'button',onclick:()=>mutate(()=>{I.docs.splice(k,1);DOCS.apagar(d.id)},'documento removido')},'Remover'))]);
   el.append(card('4 · Documentos do projeto',null,drop,I.docs.length?tbl(['Arquivo','Tipo','Tamanho','O que acontece','Ações'],linhas):h('p',{class:'hint'},'Nenhum documento ainda.')));
 },
 terreno(el){const t=S.terreno;const g=T.build();
  el.append(h('h2',{},'1 · Seu terreno'),h('p',{class:'lead'},'Envie a topografia ou o arquivo GIS do terreno. Formatos: PDF do levantamento (vetorial, exportado do CAD), GeoJSON, KML, CSV ou TXT com x, y e cota (ou longitude, latitude e altitude), grade ASCII (.asc) de modelos de elevação e DXF com polilinhas cotadas. Com o arquivo, o planejador desenha as curvas de nível e modela declividade, escoamento da chuva e exposição ao sol.'));
  const fi=h('input',{type:'file',accept:'.geojson,.json,.kml,.csv,.txt,.xyz,.asc,.dxf,.pdf',multiple:true,hidden:true,onchange:e=>ler([...e.target.files])});
  const drop=h('div',{class:'drop',ondragover:e=>{e.preventDefault();drop.classList.add('over')},ondragleave:()=>drop.classList.remove('over'),ondrop:e=>{e.preventDefault();drop.classList.remove('over');ler([...e.dataTransfer.files])}},h('p',{},h('b',{},'Arraste os arquivos aqui')),h('p',{class:'hint'},'Perímetro e pontos podem vir em arquivos separados: envie os dois juntos.'),h('label',{class:'btn primary'},'Escolher arquivos',fi));
- el.append(card(null,null,drop,h('div',{class:'grid',style:'margin-top:.8rem'},h('div',{class:'field'},h('label',{},'Sistema de coordenadas'),h('select',{onchange:e=>{OPT.crs=e.target.value;refresh()}},...[['auto','detectar automaticamente'],['ll','longitude e latitude (graus)'],['utm','UTM (metros)'],['local','local (metros, sem georreferência)']].map(([v,l])=>h('option',{value:v,selected:OPT.crs===v},l)))),
+ el.append(cartaoMapa());el.append(card(null,null,drop,h('div',{class:'grid',style:'margin-top:.8rem'},h('div',{class:'field'},h('label',{},'Sistema de coordenadas'),h('select',{onchange:e=>{OPT.crs=e.target.value;refresh()}},...[['auto','detectar automaticamente'],['ll','longitude e latitude (graus)'],['utm','UTM (metros)'],['local','local (metros, sem georreferência)']].map(([v,l])=>h('option',{value:v,selected:OPT.crs===v},l)))),
   OPT.crs==='utm'||OPT.crs==='auto'?h('div',{class:'field'},h('label',{},'Fuso UTM (se for o caso)'),h('div',{class:'row'},h('input',{type:'number',value:OPT.zona,min:18,max:25,onchange:e=>OPT.zona=+e.target.value}),h('select',{onchange:e=>OPT.hemis=e.target.value},h('option',{value:'S',selected:OPT.hemis==='S'},'Sul'),h('option',{value:'N',selected:OPT.hemis==='N'},'Norte')))):null,
   OPT.crs==='local'?h('div',{class:'field'},h('label',{},'Latitude e longitude aproximadas'),h('div',{class:'row'},h('input',{type:'text',placeholder:'-22,45',value:OPT.lat,onchange:e=>OPT.lat=e.target.value.replace(',','.')}),h('input',{type:'text',placeholder:'-43,18',value:OPT.lon,onchange:e=>OPT.lon=e.target.value.replace(',','.')}))):null)));
  if(!g){el.append(links());return}

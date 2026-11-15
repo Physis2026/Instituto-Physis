@@ -212,12 +212,14 @@ class PoliticaDeChamadas(unittest.TestCase):
         p = politica(None)
         self.assertIn("frame-src 'self' blob: data:;", p)
         self.assertIn("connect-src 'self';", p)
+        self.assertIn("worker-src 'self' blob:;", p)                 # mapa: worker da própria página
         self.assertNotIn("https://", p)
+        self.assertNotIn("'unsafe-eval'", p)                          # só WebAssembly, nunca eval de texto
 
     def test_servidor_valido_entra_so_onde_precisa(self):
         from physis_hub.servidor import politica
         p = politica("https://chamada.physis.example/")
-        self.assertIn("script-src 'self' 'unsafe-inline' https://chamada.physis.example;", p)
+        self.assertIn("script-src 'self' 'unsafe-inline' https://chamada.physis.example 'wasm-unsafe-eval';", p)
         self.assertIn("frame-src 'self' blob: data: https://chamada.physis.example;", p)
         self.assertIn("wss://chamada.physis.example", p)
         self.assertNotIn("https://chamada.physis.example", p.split("img-src")[1].split(";")[0])

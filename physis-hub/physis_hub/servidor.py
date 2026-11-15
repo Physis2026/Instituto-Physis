@@ -48,6 +48,10 @@ CORPO_MAX = 64 * 1024
 DRENAR_MAX = 24 * 1024 * 1024
 DRENAR_SEGUNDOS = 5
 WEB = Path(__file__).resolve().parent.parent / "web"
+# bibliotecas grandes que o servidor entrega em /vendor/ (as pequenas vão embutidas nos programas)
+VENDOR_TIPOS = {"maplibre-gl.js": "text/javascript; charset=utf-8", "maplibre-gl.css": "text/css; charset=utf-8",
+                "pmtiles.js": "text/javascript; charset=utf-8", "web-ifc-api-iife.js": "text/javascript; charset=utf-8",
+                "web-ifc.wasm": "application/wasm", "three.min.js": "text/javascript; charset=utf-8"}
 INSTANCIA = Path(__file__).resolve().parent.parent / "instancia.json"
 
 
@@ -119,7 +123,10 @@ def politica(chamadas: str | None = None) -> str:
     o = origem_chamadas(chamadas)
     s = f" {o}" if o else ""
     w = f" {o} wss://{o[len('https://'):]}" if o else ""
-    return ("default-src 'self'; script-src 'self' 'unsafe-inline'" + s + "; style-src 'self' 'unsafe-inline'; "
+    # 'wasm-unsafe-eval': deixa rodar o leitor BIM (web-ifc, WebAssembly) servido pelo próprio servidor;
+    # worker-src blob:: o mapa (MapLibre) desenha num worker criado na própria página. Nada de fora entra.
+    return ("default-src 'self'; script-src 'self' 'unsafe-inline'" + s + " 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; "
+            "worker-src 'self' blob:; "
             "img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'" + w + "; frame-src 'self' blob: data:" + s + "; "
             "media-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'")
 
@@ -209,13 +216,17 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
         clima = clima_mod.Clima(hub, receptor_url=rx, enviar_local=clima_mod.receptor_local(rx) if rx else None)
     exige_login = bool(instancia.get("login"))
     csp = politica(os.environ.get("PHYSIS_CHAMADAS") or instancia.get("chamadas"))
+    csp_planejador = csp.replace("'wasm-unsafe-eval'", "'wasm-unsafe-eval' 'unsafe-eval'", 1)
     fabricar = fabricante(instancia)
     url_publica = (os.environ.get("PHYSIS_URL_PUBLICA") or instancia.get("url_publica") or "").rstrip("/")
     class Manipulador(BaseHTTPRequestHandler):
         # Cabecalhos de seguranca em toda resposta. As telas usam script e estilo dentro da pagina,
         # por isso 'unsafe-inline'; de fora do proprio servidor, so o servidor de chamadas da Physis, se configurado.
         def end_headers(self):
-            self.send_header("Content-Security-Policy", csp)
+            # O Planejador (e só ele) precisa de 'unsafe-eval': o leitor BIM web-ifc monta funções ao rodar.
+            # A liberação vale só para essa página; o resto da plataforma continua sem eval.
+            eh_planejador = urlparse(self.path).path in ("/planejador", "/planejador/")
+            self.send_header("Content-Security-Policy", csp_planejador if eh_planejador else csp)
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
             super().end_headers()
@@ -476,6 +487,21 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     self.wfile.write(pagina)
                     return
                 return self._arquivo(WEB / "gestao.html", "text/html; charset=utf-8")
+            if u.path.startswith("/vendor/"):
+                # bibliotecas abertas guardadas no próprio sistema (mapa e BIM); só as da lista, nunca um caminho qualquer
+                nome = u.path[len("/vendor/"):]
+                tipo = VENDOR_TIPOS.get(nome)
+                arq = next((p for p in (WEB / "vendor" / nome, WEB.parent.parent / "vendor" / nome) if tipo and p.is_file()), None)
+                if not arq:
+                    return self._json(404, {"ok": False, "erro": "biblioteca desconhecida"})
+                dados = arq.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", tipo)
+                self.send_header("Content-Length", str(len(dados)))
+                self.send_header("Cache-Control", "public, max-age=604800, immutable")
+                self.end_headers()
+                self.wfile.write(dados)
+                return
             if u.path in ("/planejador", "/planejador/") and (WEB / "planejador.html").exists():
                 if self._barrado():
                     return
