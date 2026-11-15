@@ -29,10 +29,9 @@ PT = re.compile(r"[ãõçáéíóúâêôÃÕÇÁÉÍÓÚÂÊÔ]|\b(de|do|da|dos
 
 # Literais que não aparecem como texto da tela (chaves, nomes de arquivo, mensagens só de console ou de alert do navegador)
 NAO_E_TELA = {
-    # mensagens de alert/confirm do navegador (fora do alcance da tradução da tela) e nomes de partida dos componentes,
+    # sufixo do nome do projeto duplicado (dado da pessoa) e nomes de partida dos componentes,
     # que viram o valor de um campo editável (o valor de um campo não é traduzido)
-    "servidor-verde": {"arquivo inválido", "sem projetos no arquivo", "nenhum projeto válido", "(cópia)",
-                       "”? Não dá para desfazer (exporte antes, se quiser guardar).",
+    "servidor-verde": {"(cópia)",
                        "Raspberry Pi 5 com SSD", "Mini PC (processador, memória, SSD)", "Servidor de IA: placa-mãe, processador e memória",
                        "Placa de vídeo 8 GB", "Placa de vídeo 16 GB", "Servidor x86 (2 processadores, memória)", "Switch de rede"},
     # origem das premissas de cada produto (PRODUTOS[].fonte): documentação do código, não vai para a tela

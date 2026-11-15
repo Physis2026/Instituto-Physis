@@ -1011,7 +1011,8 @@ class Hub:
                     "sk-c": ("sustainkit", "certificacoes"), "sk-pacote": ("sustainkit", "certificacoes", "carbono"),
                     "P5": ("turbinas",), "P9": ("pulseira",), "P10": ("medicamentos",), "P12": ("carbono",),
                     "P13": ("planejador",), "P15": ("resiliencia",), "P14": ("avac",), "P26": ("avac",),
-                    "P17": ("sbn",), "P18": ("sbn",), "P19": ("sbn",), "P11": ("circular",), "P16": ("circular",),
+                    "solar": ("solar",), "cert": ("certificacoes",),   # itens próprios na loja (15/11/2026)
+                    "P17": ("sbn",), "P18": ("agua",),   # reúso e chuva vai com a Qualidade da água (à venda) "P19": ("sbn",), "P11": ("circular",), "P16": ("circular",),
                     "P20": ("circular",), "P22": ("circular",), "P27": ("circular",), "P23": ("secador",)}
     # propostas personalizadas descrevem os itens em texto: palavras que identificam cada módulo
     PALAVRAS_MODULOS = (("solar", "solar"), ("fotovolt", "solar"), ("usina", "solar"), ("sensor", "monitoramento"),

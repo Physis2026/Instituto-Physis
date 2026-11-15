@@ -35,6 +35,10 @@ ALVOS = [
     RAIZ / "sistema" / "SustainKit_Definitivo.html",
     RAIZ / "modulos" / "planejador" / "planejador-physis.html",
     RAIZ / "physis-hub" / "web" / "painel.html",
+    # barra única de preferências também nestas (15/11/2026)
+    RAIZ / "physis-hub" / "web" / "documento.html",
+    RAIZ / "physis-hub" / "web" / "municipio.html",
+    RAIZ / "app-nativo" / "site" / "baixar.html",
 ]
 # A "Tela do cliente" (sistema/physis-tela-cliente.html) saiu em 15/11/2026: tudo o que ela fazia está nas abas da plataforma.
 PLATAFORMA = RAIZ / "physis-hub" / "web" / "painel.html"
@@ -116,6 +120,8 @@ def tratar(texto: str, novo: str) -> str:
 FONTES = {
     "sustainkit": RAIZ / "sistema" / "SustainKit_Definitivo.html",
     "supervisao": RAIZ / "sistema" / "physis-scada-demo.html",
+    # Planejador embutido desde 15/11/2026: abre sem o computador central, como o SustainKit e o SCADA
+    "planejador": RAIZ / "modulos" / "planejador" / "planejador-physis.html",
 }
 
 

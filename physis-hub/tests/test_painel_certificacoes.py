@@ -9,7 +9,6 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[2]
 PAINEL = RAIZ / "physis-hub" / "web" / "painel.html"
-TELA = RAIZ / "sistema" / "physis-tela-cliente.html"
 
 
 def ler(p: Path) -> str:
@@ -23,17 +22,6 @@ class TelaDoClienteSaiu(unittest.TestCase):
         self.assertNotIn("painel:", linha)
         for velho in ("quadroTela", "SECAO_TELA", "telaPainel", "ocultasNoPainel", 'painel:"Tela do cliente"', 'data-prog="painel"'):
             self.assertNotIn(velho, p, velho)
-
-    def test_conformidade_tem_todos_os_itens_da_tela_antiga(self):
-        t, p = ler(TELA), ler(PAINEL)
-        bloco = t[t.index("const CONFORMIDADE=["):t.index("];", t.index("const CONFORMIDADE=["))]
-        antigos = re.findall(r'\{id:"(\w+)",\s*g:"\w+",\s*n:"([^"]*)",.*?pt:"([^"]*)"', bloco)
-        self.assertGreaterEqual(len(antigos), 28)
-        for i, n, pt in antigos:
-            self.assertIn(f'{{ id:"{i}", ', p)
-            self.assertIn(f'n:"{n}"', p)
-            self.assertIn(f'pt:"{pt}"', p)
-        self.assertIn("[MARCADOR: requisito de APP", p)   # o tema novo sem texto legal inventado
 
     def test_mesmas_contas(self):
         p = ler(PAINEL)
@@ -60,6 +48,17 @@ class SemHubEPesquisa(unittest.TestCase):
         self.assertIn('const ARQ_LOCAL = { planejador:"planejador.html" };', p)
         self.assertIn('fetch(a, { method:"HEAD", cache:"no-store" })', p)
         self.assertIn("if (!doServidor && !PROGRAMAS[id]) return", p)
+
+    def test_planejador_embutido_como_o_sustainkit(self):
+        """Desde 15/11/2026 o Planejador vai embutido (base64) em PROGRAMAS, como o SustainKit e o SCADA: abre sem o computador central."""
+        import base64
+        p = ler(PAINEL)
+        linha = next(l for l in p.split("\n") if l.startswith("const PROGRAMAS = {"))
+        m = re.search(r'planejador:"([A-Za-z0-9+/=]+)"', linha)
+        self.assertIsNotNone(m)
+        html = base64.b64decode(m.group(1)).decode("utf-8")
+        self.assertIn("Planejador Physis", html)
+        self.assertIn('<script id="physis-calc-comum">', html)
 
     def test_pesquisa_mostra_todas_as_abas(self):
         p = ler(PAINEL)

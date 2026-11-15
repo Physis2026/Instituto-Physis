@@ -57,7 +57,10 @@ class Parte4(unittest.TestCase):
         abas = re.findall(r'\["([\w-]+)","', re.search(r"const ABAS = \[(.*?)\];", self.h, re.S).group(1))
         self.assertEqual(abas[abas.index("solar"):abas.index("solar") + 4], ["solar", "avac", "servidor-verde", "turbinas"])
         self.assertIn('"servidor-verde"', re.search(r"const COM_INTERFACE = new Set\(\[(.*?)\]\)", self.h).group(1))
-        self.assertIn('const ABAS_DEV = new Set(["secador","servidor-verde"]);', self.h)
+        dev = re.search(r"const ABAS_DEV = new Set\(\[(.*?)\]\);", self.h)
+        self.assertIsNotNone(dev)
+        for a in ("secador", "servidor-verde"):            # desde 15/11/2026 o conjunto tem todos os módulos em desenvolvimento
+            self.assertIn('"%s"' % a, dev.group(1))
         self.assertIn('"servidor-verde": { grupo:', self.h)
         self.assertIn('"servidor-verde": () => { if (typeof telaServidorVerde !== "function") return telaPlanejado("servidor-verde");', self.h)
         self.assertIn('<script id="mod-servidor-verde">', self.h)

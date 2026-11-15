@@ -27,6 +27,9 @@ function num(v){ if (v == null) return null; if (typeof v === "number") return i
 const n = (v, pad) => { const x = num(v); return x == null ? (pad == null ? 0 : pad) : x; };
 const clone = o => JSON.parse(JSON.stringify(o));
 const MARC = "[MARCADOR]";
+/* caixas do navegador (alert, confirm) ficam fora da tradução da tela: passam por tx(), com o mesmo dicionário e as mesmas regras */
+function tx(s){ try { if (!/^en/i.test(document.documentElement.lang || "")) return s; const D = window.SERVIDOR_VERDE_I18N || {}, k = String(s).replace(/\s+/g, " ").trim(); if (Object.prototype.hasOwnProperty.call(D, k)) return D[k];
+  for (const [a, r] of (window.SERVIDOR_VERDE_I18N_RX || [])){ const m = k.match(new RegExp(a)); if (m) return r.replace(/\$(\d)/g, (_, i) => m[+i] == null ? "" : m[+i]); } } catch (e){} return s; }
 const temServidorWeb = () => { try { return /^https?:$/.test(location.protocol); } catch (e){ return false; } };
 
 /* ════════ contas (mesmas de physis_hub/servidor_verde.py) ════════ */
@@ -341,13 +344,13 @@ if (typeof document !== "undefined" && !window.__svEventos){ window.__svEventos 
     if (a === "busca"){ UI().svBusca = t.value; redesenhar(); refocar(t.id); return; }
     if (a === "abrir"){ mudar(e => { e.atual = t.value; }, t.id); return; }
     if (a === "renomear"){ mudar((e, prj) => { prj.nome = t.value.trim().slice(0, 120) || prj.nome; }, t.id); return; }
-    if (a === "importar" && t.files && t.files[0]){ const r = new FileReader(); r.onload = () => { const erro = importar(String(r.result || "")); redesenhar(); if (erro && typeof alert === "function") alert(erro); }; r.readAsText(t.files[0]); } });
+    if (a === "importar" && t.files && t.files[0]){ const r = new FileReader(); r.onload = () => { const erro = importar(String(r.result || "")); redesenhar(); if (erro && typeof alert === "function") alert(tx(erro)); }; r.readAsText(t.files[0]); } });
   document.addEventListener("click", ev => { const b = ev.target && ev.target.closest ? ev.target.closest("button") : null; if (!b || !b.dataset) return;
     if (b.dataset.svAba){ UI().svAba = b.dataset.svAba; redesenhar(); refocar("sv-aba-" + b.dataset.svAba); return; }
     const a = b.dataset.svAcao; if (!a) return;
     if (a === "novo"){ const s = pegar("sv-perfil"), pf = s ? s.value : "personalizado"; mudar(e => { const x = novoProjeto(pf); e.projetos.push(x); e.atual = x.id; }, "sv-nome"); return; }
     if (a === "duplicar"){ mudar((e, prj) => { const x = clone(prj); x.id = "sv" + Date.now().toString(36); x.nome = prj.nome + " (cópia)"; e.projetos.push(x); e.atual = x.id; }, "sv-nome"); return; }
-    if (a === "apagar"){ const e0 = ler(), prj0 = atual(e0); if (typeof confirm === "function" && !confirm("Apagar o projeto “" + prj0.nome + "”? Não dá para desfazer (exporte antes, se quiser guardar).")) return;
+    if (a === "apagar"){ const e0 = ler(), prj0 = atual(e0); if (typeof confirm === "function" && !confirm(tx("Apagar o projeto “" + prj0.nome + "”? Não dá para desfazer (exporte antes, se quiser guardar)."))) return;
       mudar(e => { e.projetos = e.projetos.filter(x => x.id !== prj0.id); if (!e.projetos.length){ const x = novoProjeto("personalizado"); e.projetos.push(x); } e.atual = e.projetos[0].id; }, "sv-projeto"); return; }
     if (a === "sel-perfil"){ mudar((e, prj) => { if (catalogo()) prj.sel = selecaoDoPerfil(catalogo(), prj.perfil); }, b.id); return; }
     if (a === "sel-limpar"){ mudar((e, prj) => { prj.sel = { hardware:{}, software:[], modelo:{} }; }, b.id); return; }
@@ -816,7 +819,10 @@ window.SERVIDOR_VERDE_I18N = {
   "Monitoramento": "Monitoring",
   "Nenhum": "None",
   "LibreOffice (sem tela": "LibreOffice (headless",
-  "para ODT e PDF)": "for ODT and PDF)"
+  "para ODT e PDF)": "for ODT and PDF)",
+  "arquivo inválido": "invalid file",
+  "sem projetos no arquivo": "no projects in the file",
+  "nenhum projeto válido": "no valid project"
 };
 /* regras com números (o painel lê a cópia em sistema/physis-i18n-modulos.json) */
 window.SERVIDOR_VERDE_I18N_RX = [
@@ -868,6 +874,7 @@ window.SERVIDOR_VERDE_I18N_RX = [
   ["^Programas: (.+)\\.$", "Software: $1."],
   ["^Dimensionado ([\\d.,]+) kWh por mês × medido ([\\d.,]+) kWh por mês \\(([−-]?[\\d.,]+)% de diferença\\)\\.$", "Sized $1 kWh per month × measured $2 kWh per month ($3% difference)."],
   ["^componente (\\d+)$", "component $1"],
+  ["^Apagar o projeto “(.+)”\\? Não dá para desfazer \\(exporte antes, se quiser guardar\\)\\.$", "Delete the project “$1”? This cannot be undone (export it first if you want to keep it)."],
   ["^(.+): falta o processador do encaixe '(.+)'\\.$", "$1: missing processor for socket '$2'."],
   ["^(.+) não encaixa em nenhuma plataforma escolhida\\.$", "$1 does not fit any chosen platform."],
   ["^(.+): nenhuma plataforma usa esse formato de memória\\.$", "$1: no chosen platform uses this memory form factor."],

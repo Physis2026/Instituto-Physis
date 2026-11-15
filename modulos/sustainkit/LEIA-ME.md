@@ -3,7 +3,7 @@
 Physis Engineering Ltda. · Responsável: Erick Lopes
 
 ## Qual é a versão mais atual?
-**`01_HTML_versao_atual/SustainKit_Definitivo.html`** é a versão mais completa e a referência.
+**`sistema/SustainKit_Definitivo.html`** (na raiz do repositório) é a versão atual e a única referência. As três cópias antigas desta pasta (`01_HTML_versao_atual`: Definitivo, Apresentacao e Demo) saíram em 15/11/2026; o modo Apresentação está no Definitivo e a demonstração do site é gerada por `demos/gerar_demos.py`.
 Abre com duplo clique no Chrome ou Firefox (não Brave), sem instalar nada, funciona offline.
 Tem 10 abas: Energia+Água, Materiais, Orientação Solar, Certificações, Acabamentos, Checklist,
 Modelos de Negócio, Agro Solar, **Carbono** e **Preços**, mais o botão "Modo Apresentação".
@@ -11,7 +11,6 @@ Modelos de Negócio, Agro Solar, **Carbono** e **Preços**, mais o botão "Modo 
 ## O que tem em cada pasta
 | Pasta | Conteúdo | Situação |
 |---|---|---|
-| 01_HTML_versao_atual | Definitivo (completo), Apresentacao (5 abas pré-preenchidas, para demo), Demo (4 abas, versão simples anterior) | Definitivo e Apresentacao = atuais |
 | 02_Modulos_React_JSX | Energy, Water, Materials, Cert, Agro (módulos separados), Completo_Demo e Demo_Physis | **Defasados em relação ao HTML** (ver abaixo) |
 | 03_Projeto_Vite | Projetos para build (npm install / npm run build / npx serve dist) | **Defasados** (App.jsx de 20/08) |
 | 04_Planilhas_Excel | Physis_Integrado_v9, ChaleVerde_v8, SustainKit_v8 e módulos Energy/Water/Materials/Cert (v1), Agro (v2) | Base técnica LEED v5; sem a aba de Carbono |

@@ -416,7 +416,10 @@ class ContasComuns(unittest.TestCase):
     def test_planejador_sem_botao_proprio_de_ajustes(self):
         self.assertNotIn("id:'btn-ajustes'", self.pl)
         self.assertIn("PhysisPreferencias.iniciar(", self.pl)
-        self.assertIn("aviso: CONF.v.aviso === 15 ? 15 : (e.conforto || e.calma ? 8 : 4)", self.pl)
+        self.assertIn("aviso: [4, 8, 15].indexOf(e.aviso) >= 0 ? e.aviso : 4", self.pl)
+        pref = (RAIZ / "sistema" / "physis-preferencias.js").read_text(encoding="utf-8")
+        for trecho in ("aviso: 4 };", 'name: "pp-aviso"', 'a15: "15 segundos"', "if (av === 4 || av === 8 || av === 15) e.aviso = av;"):
+            self.assertIn(trecho, pref, trecho)
 
 
 if __name__ == "__main__":

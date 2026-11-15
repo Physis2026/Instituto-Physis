@@ -53,7 +53,7 @@
   if (!doc || global.PhysisPreferencias) return;
 
   var PADRAO = { v: 2, idioma: "pt", tema: "auto", conforto: false, verde: false, texto: 0, espaco: false, calma: false, foco: false,
-    dislexia: false, regua: false, simples: false, lembrar: false, contraste: false, libras: false, voz: false };
+    dislexia: false, regua: false, simples: false, lembrar: false, contraste: false, libras: false, voz: false, aviso: 4 };
   var BOOL = ["conforto", "verde", "espaco", "calma", "foco", "dislexia", "regua", "simples", "lembrar", "contraste", "libras", "voz"];
   var CLASSES = ["verde", "espaco", "calma", "foco", "dislexia", "regua", "simples", "contraste"];
   var ATRIBUTOS = ["aria-label", "title", "placeholder", "alt", "label", "aria-description", "aria-roledescription"];
@@ -67,7 +67,7 @@
       conforto: "Modo de conforto", ligado: "ligado", a11y: "Acessibilidade (PcD)", fechar: "Fechar", padrao: "Voltar ao padrão",
       confT: "Modo de conforto", confD: "Para autismo, TDAH, dislexia e para quem se cansa com telas cheias. Vale para todas as telas da Physis e fica guardado neste aparelho.",
       confLiga: "Ligar o modo de conforto", confLigaD: "Fundo verde, menos estímulo e mais espaçamento de uma vez.",
-      verde: "Fundo verde", verdeD: "Cor de fundo suave, que cansa menos a vista.", texto: "Texto maior", t0: "Normal", t1: "Maior", t2: "Muito maior",
+      verde: "Fundo verde", verdeD: "Cor de fundo suave, que cansa menos a vista.", texto: "Texto maior", t0: "Normal", t1: "Maior", t2: "Muito maior", aviso: "Tempo dos avisos que somem sozinhos", a4: "4 segundos", a8: "8 segundos", a15: "15 segundos",
       espaco: "Mais espaçamento", espacoD: "Mais espaço entre linhas, letras e palavras.",
       calma: "Menos estímulo", calmaD: "Sem animação nem transição, nada piscando, cores mais calmas, nada toca sozinho e menos janelas que se abrem.",
       foco: "Foco reforçado", focoD: "Contorno grosso no item em que você está.", dislexia: "Fonte para dislexia", dislexiaD: "Letras mais fáceis de distinguir (Atkinson Hyperlegible ou Lexend, já no aparelho).",
@@ -101,7 +101,7 @@
       conforto: "Comfort mode", ligado: "on", a11y: "Accessibility (disability)", fechar: "Close", padrao: "Back to default",
       confT: "Comfort mode", confD: "For autism, ADHD, dyslexia and anyone tired by busy screens. Applies to every Physis screen and is saved on this device.",
       confLiga: "Turn comfort mode on", confLigaD: "Green background, less stimulation and more spacing at once.",
-      verde: "Green background", verdeD: "A soft background colour that is easier on the eyes.", texto: "Larger text", t0: "Normal", t1: "Larger", t2: "Much larger",
+      verde: "Green background", verdeD: "A soft background colour that is easier on the eyes.", texto: "Larger text", t0: "Normal", t1: "Larger", t2: "Much larger", aviso: "How long notices stay on screen", a4: "4 seconds", a8: "8 seconds", a15: "15 seconds",
       espaco: "More spacing", espacoD: "More space between lines, letters and words.",
       calma: "Less stimulation", calmaD: "No animation or transitions, nothing blinking, calmer colours, nothing plays by itself and fewer pop-ups.",
       foco: "Stronger focus", focoD: "Thick outline on the item you are on.", dislexia: "Dyslexia-friendly font", dislexiaD: "Letters that are easier to tell apart (Atkinson Hyperlegible or Lexend, already on the device).",
@@ -213,6 +213,7 @@
       if (o.idioma === "en" || o.idioma === "pt") e.idioma = o.idioma;
       if (o.tema === "claro" || o.tema === "escuro" || o.tema === "auto") e.tema = o.tema;
       var t = parseInt(o.texto, 10); if (t === 0 || t === 1 || t === 2) e.texto = t; else if (o.texto === true) e.texto = 1;
+      var av = parseInt(o.aviso, 10); if (av === 4 || av === 8 || av === 15) e.aviso = av;   /* tempo dos avisos (s), lido pelas telas que mostram avisos que somem */
       BOOL.forEach(function (k) { if (k in o) e[k] = !!o[k]; });
       if (o.legivel) e.dislexia = true;            /* nome da v1 */
     }
@@ -342,6 +343,7 @@
       p.addEventListener("change", function (ev) {
         var t = ev.target, k = t.getAttribute("data-pp"), patch = {};
         if (t.name === "pp-texto") return mudar({ texto: parseInt(t.value, 10) }, "ok");
+        if (t.name === "pp-aviso") return mudar({ aviso: parseInt(t.value, 10) }, "ok");
         if (!k) return;
         if (k === "conforto") { patch = { conforto: t.checked, verde: t.checked, calma: t.checked, espaco: t.checked }; return mudar(patch, t.checked ? "aConfOn" : "aConfOff"); }
         patch[k] = t.checked; mudar(patch, k === "libras" && t.checked ? "librasOn" : "ok");
@@ -385,6 +387,9 @@
     var fs = criar("fieldset", null, [criar("legend", null, [txt("texto")])]);
     [0, 1, 2].forEach(function (n) { fs.appendChild(criar("label", null, [criar("input", { type: "radio", name: "pp-texto", value: String(n), id: "pp-texto-" + n }), criar("span", null, [txt("t" + n)])])); });
     f.appendChild(fs);
+    var fa = criar("fieldset", null, [criar("legend", null, [txt("aviso")])]);
+    [4, 8, 15].forEach(function (n) { fa.appendChild(criar("label", null, [criar("input", { type: "radio", name: "pp-aviso", value: String(n), id: "pp-aviso-" + n }), criar("span", null, [txt("a" + n)])])); });
+    f.appendChild(fa);
     f.appendChild(caixa("espaco", "espaco", "espacoD"));
     f.appendChild(caixa("calma", "calma", "calmaD"));
     f.appendChild(caixa("foco", "foco", "focoD"));
@@ -439,6 +444,7 @@
     [u.pConf, u.pA11y].forEach(function (p) {
       p.querySelectorAll("input").forEach(function (i) {
         if (i.name === "pp-texto") i.checked = parseInt(i.value, 10) === e.texto;
+        else if (i.name === "pp-aviso") i.checked = parseInt(i.value, 10) === (e.aviso || 4);
         else if (i.getAttribute("data-pp")) i.checked = !!e[i.getAttribute("data-pp")];
       });
     });

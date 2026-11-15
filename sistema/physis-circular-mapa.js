@@ -12,6 +12,8 @@
    RC_ROTAS, RC_POR_ID, RC_DESVIADO, calcLer, calcGravar. Estado: calcLer("rc-mapa"); seleção e filtros em ui.rcm*. */
 (function () {
 "use strict";
+/* rótulo que vai cortado no desenho: em inglês, traduz pela tradução da plataforma (trad) antes de cortar */
+const traduzRotulo = s => { try { if (/^en/i.test(document.documentElement.lang || "") && typeof trad === "function") { const v = trad(s); if (v != null) return String(v).trim(); } } catch (e) {} return String(s == null ? "" : s); };
 
 /* categoria -> [rótulo, cor (PALETA.md), forma] */
 const CAT = {
@@ -82,7 +84,8 @@ function fluxo(I) { const L = I.linhas.filter(l => l.kg > 0); if (!L.length) ret
   return { col, lig, tot:L.reduce((s, l) => s + l.kg, 0), L }; }
 function sankeySvg(F) { const W = 900, H = 300, nw = 12, pad = 10, xs = [8, 200, 392, 584], maxN = Math.max(...F.col.map(c => Object.keys(c).length));
   const k = (H - 20 - pad * (maxN - 1)) / F.tot, pos = F.col.map(c => { let y = 10; const o = {}; Object.entries(c).sort((a, b) => b[1].v - a[1].v).forEach(([n, x]) => { o[n] = { y, h:Math.max(1, x.v * k), sa:0, ea:0, x }; y += x.v * k + pad; }); return o; });
-  const corta = (s, n) => s.length > n ? s.slice(0, n - 1) + "…" : s;
+  /* o rótulo cortado não tem par em inglês: traduz (trad() do painel) antes de cortar */
+  const corta = (s, n) => { s = traduzRotulo(s); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
   let fitas = "";
   F.lig.forEach((ls, i) => Object.values(ls).sort((a, b) => b.v - a.v).forEach(l => { const A = pos[i][l.a], B = pos[i + 1][l.b], t = l.v * k, x0 = xs[i] + nw, x1 = xs[i + 1], y0 = A.y + A.sa, y1 = B.y + B.ea, xm = (x0 + x1) / 2; A.sa += t; B.ea += t;
     fitas += `<path d="M${x0} ${y0.toFixed(1)}C${xm} ${y0.toFixed(1)} ${xm} ${y1.toFixed(1)} ${x1} ${y1.toFixed(1)}L${x1} ${(y1 + t).toFixed(1)}C${xm} ${(y1 + t).toFixed(1)} ${xm} ${(y0 + t).toFixed(1)} ${x0} ${(y0 + t).toFixed(1)}Z" fill="${l.cor}" fill-opacity="0.35"><title>${esc(l.a)} → ${esc(l.b)}: ${f1(l.v, 0)} kg/mês</title></path>`; }));
@@ -145,7 +148,7 @@ function legenda(grupos) { const ks = Object.keys(CAT).filter(k => grupos[k]);
 /* barras horizontais, com a tabela como alternativa */
 function hbarras(titulo, itens, un, casas, meta) { if (!itens.length) return ""; const W = 360, lh = 26, H = itens.length * lh + 10, L = 130, mx = Math.max(1e-9, ...itens.map(x => x.v), meta || 0);
   const b = itens.map((x, i) => { const w = (W - L - 60) * x.v / mx, y = 5 + i * lh;
-    return `<text x="${L - 6}" y="${y + 15}" font-size="11" text-anchor="end" fill="#1C2B21">${esc(x.rot.length > 22 ? x.rot.slice(0, 21) + "…" : x.rot)}</text><rect x="${L}" y="${y + 3}" width="${Math.max(0, w).toFixed(1)}" height="16" fill="${x.cor || "#4B7547"}"><title>${esc(x.rot)}: ${f1(x.v, casas)} ${esc(un)}</title></rect><text x="${(L + w + 4).toFixed(1)}" y="${y + 15}" font-size="11" fill="#4A4F44">${f1(x.v, casas)}</text>`; }).join("");
+    return `<text x="${L - 6}" y="${y + 15}" font-size="11" text-anchor="end" fill="#1C2B21">${esc(traduzRotulo(x.rot).length > 22 ? traduzRotulo(x.rot).slice(0, 21) + "…" : traduzRotulo(x.rot))}</text><rect x="${L}" y="${y + 3}" width="${Math.max(0, w).toFixed(1)}" height="16" fill="${x.cor || "#4B7547"}"><title>${esc(x.rot)}: ${f1(x.v, casas)} ${esc(un)}</title></rect><text x="${(L + w + 4).toFixed(1)}" y="${y + 15}" font-size="11" fill="#4A4F44">${f1(x.v, casas)}</text>`; }).join("");
   const m = meta ? `<line x1="${(L + (W - L - 60) * meta / mx).toFixed(1)}" y1="2" x2="${(L + (W - L - 60) * meta / mx).toFixed(1)}" y2="${H - 2}" stroke="#1C2B21" stroke-dasharray="4 3"/>` : "";
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px" role="img" aria-label="${esc(titulo)}; os números estão na tabela">${b}${m}</svg>`; }
 

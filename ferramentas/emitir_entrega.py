@@ -285,7 +285,8 @@ def montar_envio(saida: Path, docs: Path, mapa: list, commit: str, hoje: str, re
         alvo.mkdir(parents=True, exist_ok=True)
         meus = [k for k in mapa if p in k["responsaveis"]]
         linhas = [f"# Envio para {p} · Sistema Physis · versão {commit} · {hoje}", "",
-                  "Tudo nesta pasta é da mesma versão da entrega. Abra primeiro este arquivo.", ""]
+                  "Tudo nesta pasta é da mesma versão da entrega. Abra primeiro este arquivo.",
+                  "O que é o site, a plataforma, a loja, a consultoria e as outras páginas: `00_O_que_e_cada_parte.md`, na raiz da entrega.", ""]
         if meus:
             linhas += ["## Seus módulos", "", "| Módulo | Situação | Kit para revisar e devolver | Cópia só para leitura |", "|---|---|---|---|"]
             for k in meus:
@@ -311,6 +312,10 @@ def montar_envio(saida: Path, docs: Path, mapa: list, commit: str, hoje: str, re
         (alvo / "LEIA-ME.md").write_text("\n".join(linhas), encoding="utf-8")
         itens.append(("Pasta de envio por pessoa", p, f"00_Envio_por_pessoa/{seguro(p)}/", "Pronta", p, p))
 
+    (saida / "00_O_que_e_cada_parte.md").write_text(PARTES.format(commit=commit, hoje=hoje), encoding="utf-8")
+    itens.append(("Explicação", "O que é cada parte (site, plataforma, loja, consultoria e outras páginas)",
+                  "00_O_que_e_cada_parte.md", "Pronto", "Rafaella", "equipe Physis"))
+
     cab = ["Nº", "Tipo", "Item", "Arquivo", "Situação", "Responsáveis", "Enviar para"]
     linhas = [f"# Índice de envio · Sistema Physis · versão {commit} · {hoje}", "",
               "Cada item da entrega, com a situação e para quem vai. Comece por `00_Envio_por_pessoa/<seu nome>/LEIA-ME.md`.",
@@ -327,6 +332,45 @@ def montar_envio(saida: Path, docs: Path, mapa: list, commit: str, hoje: str, re
         (saida / "00_INDICE_DE_ENVIO.ods").write_bytes(dados)
     except Exception as exc:  # noqa: BLE001 — o .md continua valendo
         print("índice .ods não gerado:", exc)
+
+
+PARTES = """# O que é cada parte do Sistema Physis · versão {commit} · {hoje}
+
+Situação dos módulos (decisão de 15/11/2026): **pronto** = no site e na loja; **em desenvolvimento** = fora do site,
+instalado e usado na Casa Physis; **hardware** = protótipo, teste de campo na Fase 2.
+
+## Site público
+Porta de entrada da Physis. Apresenta a empresa, os serviços e as demonstrações (Planejador, SustainKit, SCADA,
+Monitoramento e Cliente, marcadas "Demonstração · dados simulados") e a página "Baixar o app". Mostra só módulos prontos.
+Responsável: Rafaella (bloco 7: site, loja, marketing, gestão e editais). Arquivos: `03_Demos_site/`, `02_Paginas_completas/baixar-o-app.html`.
+
+## Plataforma
+O sistema que o cliente usa: mapear → modelar → checar → documentar. Abas dos módulos comprados, "Baixar esta tela"
+(Documento .odt, PDF, Planilha .ods) e preferências (acessibilidade, conforto, inglês, claro/escuro). Sem servidor, abre em
+demonstração; na Casa Physis mostra todas as telas, com as em desenvolvimento marcadas. Cada aba fica com o responsável do
+módulo; revisão geral das telas: Rafaella. Arquivo: `02_Paginas_completas/site-loja-e-plataforma.html`.
+
+## Loja
+No mesmo arquivo da plataforma. Módulos, kits de hardware e cursos. Vende só o que está pronto (Planejador, SustainKit,
+Solar, Água, Monitoramento, SCADA, Gestão, Certificação); "Experimente agora" abre a demonstração. Item novo: a equipe grava,
+revisa e publica; item em desenvolvimento nunca vai ao público. Em aberto: preço de Solar e Certificação; pagamento real
+(Pix e boleto) depende do provedor. Responsável: Rafaella.
+
+## Consultoria
+Página própria: serviços, fases, consultoria personalizada com equipe multidisciplinar, diárias, casos e pedido de proposta.
+Revisão: Leonardo Macedo e Rafaella. Arquivo: `02_Paginas_completas/consultoria.html`.
+
+## Outras páginas
+| Página | O que é | Para quem |
+|---|---|---|
+| Gestão interna | Atividades, propostas, contratos, financeiro, editais, eventos, marketing, e-mails, chamados, parceiros | só a equipe Physis |
+| SCADA · supervisório | Bombas, válvulas e energia, histórico e balanço de carbono do cliente | operação |
+| Painel municipal | Chuva medida, alertas por bairro, rio e risco | Defesa Civil e prefeituras |
+| Documento para comentários | Relatórios para revisão com comentários por parágrafo | equipe e revisores convidados |
+| Baixar o app | App Android e iPhone | clientes |
+
+Todas abrem por `02_Paginas_completas/index.html`.
+"""
 
 
 TELAS = [  # arquivo, nome, o que faz, para quem

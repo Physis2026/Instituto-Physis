@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teste das telas principais</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;margin:16px;background:#F4F6F1;color:#1C2B21}
+iframe{width:360px;height:640px;border:1px solid #C9D2C4;background:#fff}
+pre{white-space:pre-wrap;background:#fff;border:1px solid #C9D2C4;padding:8px}
+.ok{color:#1F4A1C}.al{color:#7A2214}
+</style>
+</head>
+<body>
+<h1>Teste das telas principais (navegador)</h1>
+<p>Como usar: sirva a raiz do repositório por http (por exemplo <code>python -m http.server 8798</code> em <code>C:\physis\physis-sistema</code>) e abra
+<code>/ferramentas/testes-navegador/telas.html</code>. Cada tela abre num quadro de 360 px de largura e é conferida: carrega sem erro de JavaScript,
+tem título principal, tem a barra única de preferências (ou a da plataforma), todo botão e campo têm nome e não há rolagem lateral.
+O título da página vira PASSOU ou FALHOU no fim.</p>
+<pre id="saida" aria-live="polite">rodando…</pre>
+<div id="quadros"></div>
+<script>
+/* tela: [caminho a partir da raiz do repositório, seletor da barra de preferências] */
+const TELAS = [
+  ["physis-hub/web/painel.html", "#pxp-lugar, [data-physis-preferencias], .pp-barra"],
+  ["sistema/SustainKit_Definitivo.html", "[data-physis-preferencias], .pp-barra"],
+  ["modulos/planejador/planejador-physis.html", "[data-physis-preferencias], .pp-barra"],
+  ["sistema/gestao-interna-physis.html", "[data-physis-preferencias], .pp-barra, #pxp-lugar"],
+  ["sistema/physis-scada-demo.html", "[data-physis-preferencias], .pp-barra, #pxp-lugar"],
+  ["physis-hub/web/consultoria.html", "[data-physis-preferencias], .pp-barra"],
+  ["physis-hub/web/documento.html", "[data-physis-preferencias], .pp-barra"],
+  ["physis-hub/web/municipio.html", "[data-physis-preferencias], .pp-barra"],
+  ["app-nativo/site/baixar.html", "[data-physis-preferencias], .pp-barra"]
+];
+const linhas = []; let ok = 0, falha = 0;
+const nomeDe = el => (el.getAttribute("aria-label") || el.getAttribute("aria-labelledby") || el.getAttribute("title") || (el.labels && el.labels.length ? "x" : "") || (el.tagName === "BUTTON" ? el.textContent.trim() : "")).trim();
+function conferir(caminho, sel) {
+  return new Promise(resolve => {
+    const f = document.createElement("iframe"), erros = [];
+    f.title = "Tela " + caminho; f.src = "../../" + caminho;
+    const fim = setTimeout(() => terminar("não carregou em 40 s"), 40000);
+    function terminar(motivo) {
+      clearTimeout(fim); const prob = [];
+      if (motivo) prob.push(motivo);
+      try {
+        const d = f.contentDocument, w = f.contentWindow;
+        if (!d || !d.body) prob.push("sem documento");
+        else {
+          erros.forEach(e => prob.push("erro de JavaScript: " + e));
+          if (!d.querySelector("h1")) prob.push("sem título principal (h1)");
+          if (!d.querySelector(sel)) prob.push("sem a barra de preferências");
+          if (!d.documentElement.getAttribute("lang")) prob.push("html sem lang");
+          const semNome = [...d.querySelectorAll("button, input:not([type=hidden]), select, textarea")].filter(x => x.offsetParent !== null && !nomeDe(x) && !x.closest("[hidden]"));
+          if (semNome.length) prob.push(semNome.length + " controle(s) visível(is) sem nome, ex.: " + (semNome[0].id || semNome[0].outerHTML.slice(0, 80)));
+          if (d.documentElement.scrollWidth > w.innerWidth + 2) prob.push("rolagem lateral (" + d.documentElement.scrollWidth + " px em " + w.innerWidth + " px)");
+        }
+      } catch (e) { prob.push("não deu para ler o quadro: " + e.message); }
+      if (prob.length) { falha++; linhas.push("FALHOU " + caminho + "\n  - " + prob.join("\n  - ")); } else { ok++; linhas.push("PASSOU " + caminho); }
+      resolve();
+    }
+    f.addEventListener("load", () => {
+      try { f.contentWindow.addEventListener("error", ev => erros.push(ev.message || String(ev))); } catch (e) {}
+      setTimeout(() => terminar(""), 2500);
+    });
+    document.getElementById("quadros").appendChild(f);
+  });
+}
+(async () => {
+  for (const [c, s] of TELAS) await conferir(c, s);
+  document.getElementById("saida").textContent = linhas.join("\n") + "\n\nTOTAL: " + ok + " telas passaram, " + falha + " falharam";
+  document.title = falha ? "FALHOU" : "PASSOU";
+})();
+</script>
+</body>
+</html>
