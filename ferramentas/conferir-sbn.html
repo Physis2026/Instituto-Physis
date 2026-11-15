@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conferir SbN</title>
+<style>
+  body { font: 15px/1.45 system-ui, sans-serif; margin: 16px; color: #1C2B21; background: #fff; max-width: 1100px; }
+  table { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 13px; }
+  th, td { border: 1px solid #ccd5c6; padding: 3px 6px; text-align: left; vertical-align: top; }
+  caption { text-align: left; font-weight: 600; padding: 4px 0; }
+  .ok { color: #2d6a2d; } .falha { color: #a3241b; font-weight: 600; }
+  .cartao { border: 1px solid #dfe6da; border-radius: 8px; padding: 8px 12px; margin: 10px 0; }
+  .t2 { color: #44514a; } .pq { font-size: 12px; } .selo { padding: 0 6px; border-radius: 8px; background: #eee; }
+  .selo.al { background: #f6d5d1; } .selo.in { background: #f6ecd1; } .so-leitor { position: absolute; left: -9999px; }
+  details { margin: 8px 0; } summary { cursor: pointer; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Conferência da lógica de SbN</h1>
+<p>Carrega <code>sistema/physis-plantas.json</code> e <code>sistema/physis-sbn.js</code>, monta os consórcios de 8 cenários (e mais 2 de apoio) e confere as regras. Abra por um servidor local (<code>python -m http.server</code> na raiz do repositório) ou escolha o arquivo JSON abaixo.</p>
+<p><label>Base de plantas (se a leitura automática falhar): <input type="file" id="arquivo" accept=".json,application/json"></label></p>
+<pre id="resumo" aria-live="polite">Carregando…</pre>
+<div id="saida"></div>
+<script src="../sistema/physis-sbn.js"></script>
+<script>
+"use strict";
+const L = window.SBN_LOGICA;
+const CENARIOS = [
+  { id: "petropolis", titulo: "Petrópolis (RJ), Mata Atlântica, 900 m, solo argiloso", o: { objetivo: "agrofloresta", area_m2: 500, bioma: "Mata Atlântica", uf: "RJ", altitude_m: 900, solo: { textura: "argiloso", acido: true }, clima: { tmin_c: 2, geada: false, chuva_mm_ano: 2100, meses_secos: 2, temp_media_c: 19 }, nativas_pct: 50, vegetacao: "Floresta Ombrófila Densa" } },
+  { id: "caatinga", titulo: "Semiárido (Caatinga), sequeiro, solo arenoso", o: { objetivo: "agrofloresta", area_m2: 1000, bioma: "Caatinga", uf: "PE", altitude_m: 400, solo: { textura: "arenoso", seco: true }, clima: { tmin_c: 15, geada: false, chuva_mm_ano: 600, meses_secos: 8, temp_media_c: 26 }, nativas_pct: 60, vegetacao: "Savana-Estépica" } },
+  { id: "pantanal", titulo: "Pantanal alagável, restauração", o: { objetivo: "restauracao_app", area_m2: 2000, bioma: "Pantanal", uf: "MS", altitude_m: 100, solo: { textura: "argiloso", umido: true }, clima: { tmin_c: 4, geada: false, chuva_mm_ano: 1200, meses_secos: 5, temp_media_c: 25 } } },
+  { id: "pampa", titulo: "Pampa (RS), agrofloresta com geada", o: { objetivo: "agrofloresta", area_m2: 800, bioma: "Pampa", uf: "RS", altitude_m: 150, solo: { textura: "médio" }, clima: { tmin_c: -4, geada: true, chuva_mm_ano: 1500, meses_secos: 0, temp_media_c: 18 }, nativas_pct: 50 } },
+  { id: "amazonia", titulo: "Amazônia (terra firme), agrofloresta", o: { objetivo: "agrofloresta", area_m2: 1000, bioma: "Amazônia", uf: "PA", altitude_m: 80, solo: { textura: "argiloso", acido: true }, clima: { tmin_c: 18, geada: false, chuva_mm_ano: 2300, meses_secos: 2, temp_media_c: 27 }, nativas_pct: 70 } },
+  { id: "cerrado", titulo: "Cerrado (DF), 1.000 m, latossolo", o: { objetivo: "agrofloresta", area_m2: 600, bioma: "Cerrado", uf: "DF", altitude_m: 1000, solo: { textura: "argiloso", acido: true }, clima: { tmin_c: 4, geada: false, chuva_mm_ano: 1500, meses_secos: 5, temp_media_c: 21 }, nativas_pct: 50 } },
+  { id: "app", titulo: "APP de beira de rio (Mata Atlântica, SP)", o: { objetivo: "restauracao_app", area_m2: 3000, bioma: "Mata Atlântica", uf: "SP", altitude_m: 600, solo: { textura: "argiloso", umido: true }, clima: { tmin_c: 0, geada: true, chuva_mm_ano: 1400, meses_secos: 4, temp_media_c: 20 } } },
+  { id: "horta", titulo: "Horta urbana de 20 m² (São Paulo)", o: { objetivo: "horta", area_m2: 20, bioma: "Mata Atlântica", uf: "SP", altitude_m: 760, irrigacao: true, luz: "sol", solo: { textura: "médio" }, clima: { tmin_c: 3, geada: false, chuva_mm_ano: 1400, meses_secos: 4, temp_media_c: 20 } } },
+  { id: "pomar", titulo: "Apoio: pomar de 300 m² (Petrópolis)", apoio: true, o: { objetivo: "pomar", area_m2: 300, bioma: "Mata Atlântica", altitude_m: 900, solo: { textura: "argiloso" }, clima: { tmin_c: 2, geada: false, chuva_mm_ano: 2100, meses_secos: 2, temp_media_c: 19 }, nativas_pct: 50 } },
+  { id: "chuva", titulo: "Apoio: jardim de chuva de 12 m²", apoio: true, o: { objetivo: "jardim_chuva", area_m2: 12, bioma: "Mata Atlântica", solo: { textura: "argiloso" }, clima: { tmin_c: 2, chuva_mm_ano: 1600, meses_secos: 3, temp_media_c: 20 } } },
+];
+const falhas = [], oks = [];
+const conf = (cond, txt) => { (cond ? oks : falhas).push(txt); return cond; };
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function terrenoTeste() {
+  /* 40 × 30 m; a faixa leste (x > 30) sobe 1,5 m por metro (150%: APP) */
+  const pontos = []; for (let x = 0; x <= 40; x += 2) for (let y = 0; y <= 30; y += 2) pontos.push([x, y, x <= 30 ? x * 0.05 : 1.5 + (x - 30) * 1.5]);
+  return { schema: "physis.terreno/1.0", meta: { nome: "Teste", municipio: "Petrópolis", uf: "RJ" }, solo: { classe: "argila" }, clima: { temp: 19 },
+    terreno: { poly: [[0, 0], [40, 0], [40, 30], [0, 30]], pontos, lat0: -22.5, lon0: -43.18 },
+    itens: [{ id: "h1", nome: "Horta", tipo: "horta", x: 8, y: 8, w: 10, d: 6, rot: 0 }, { id: "g1", nome: "Gramado", tipo: "gramado", x: 15, y: 22, w: 14, d: 8, rot: 15 },
+      { id: "m1", nome: "Mata", tipo: "mata", x: 35, y: 15, w: 8, d: 20, rot: 0 }, { id: "v1", nome: "Vala", tipo: "infiltracao", x: 24, y: 6, w: 6, d: 2, rot: 0 },
+      { id: "c1", nome: "Casa", tipo: "casa", x: 22, y: 15, w: 8, d: 6, rot: 0 }, { id: "a1", tipo: "acesso", x: 0, y: 15 }] };
+}
+
+function rodar(base) {
+  L.carregar(base);
+  const P = base.plantas, PN = new Map(P.map(p => [p.n, p])), saida = [];
+  /* cenários */
+  for (const c of CENARIOS) {
+    const r = L.montarConsorcio(c.o);
+    const erros = r.violacoes.filter(v => v.nivel === "erro");
+    conf(r.itens.length >= (c.o.objetivo === "horta" ? 4 : 3), `${c.id}: ${r.itens.length} espécies`);
+    conf(!erros.length, `${c.id}: sem violação de nível erro` + (erros.length ? " → " + erros.map(e => e.texto).join(" | ") : ""));
+    conf(r.itens.every(i => !PN.get(i.n).invasora), `${c.id}: sem invasoras`);
+    conf(r.itens.every(i => i.mudas > 0), `${c.id}: mudas > 0`);
+    const ns = r.itens.map(i => PN.get(i.n)); let ant = 0; ns.forEach((a, i) => ns.slice(i + 1).forEach(b => { if ((a.antagonistas || []).includes(b.n)) ant++; }));
+    conf(!ant, `${c.id}: sem antagonistas juntos`);
+    conf(r.itens.every(i => L.avaliar(PN.get(i.n), r.criterios).length === 0 || c.o.objetivo === "jardim_chuva"), `${c.id}: todas passam nos filtros de bioma, solo, clima e altitude`);
+    if (c.o.objetivo === "restauracao_app") { conf(r.nativas_pct_especies === 100, `${c.id}: 100% nativas`); const pre = r.itens.filter(i => i.grupo === "preenchimento").reduce((t, i) => t + i.mudas, 0) / r.total_mudas; conf(pre >= 0.4 && pre <= 0.6, `${c.id}: preenchimento ${Math.round(pre * 100)}%`); conf(Math.abs(r.total_mudas - Math.ceil(c.o.area_m2 / 6)) <= 1, `${c.id}: ${r.total_mudas} mudas na grade 3 × 2 m`); }
+    if (c.o.objetivo === "agrofloresta") { const ciclos = new Set(ns.map(p => p.ciclo)); conf(["placenta1", "placenta2", "secundaria", "climax"].every(k => ciclos.has(k)) || r.violacoes.some(v => v.regra === "sucessao"), `${c.id}: sucessão completa ou explicada`); }
+    if (c.o.nativas_pct && c.o.objetivo !== "restauracao_app") conf(r.nativas_pct_especies >= c.o.nativas_pct - 15, `${c.id}: nativas ${r.nativas_pct_especies}% (alvo ${c.o.nativas_pct}%)`);
+    saida.push(`<details ${c.apoio ? "" : "open"}><summary>${esc(c.titulo)} — ${r.itens.length} espécies, ${r.total_mudas} mudas, ${r.violacoes.length} avisos/erros</summary>${L.telaSbnConsorcio({ resultado: r, idBase: "c-" + c.id })}</details>`);
+    window.__res = window.__res || {}; window.__res[c.id] = r;
+  }
+  /* combinações antigas */
+  const jc = L.corrigirCombinacao("4 × Biri (cana-índica), 2 × Papiro-brasileiro, 2 × Helicônia-da-mata, 1 × Taboa", P);
+  conf(JSON.stringify(jc.itens) === JSON.stringify([[62, 4], [60, 2], [43, 2], [61, 1]]), "combinação do jardim de chuva: " + JSON.stringify(jc.itens));
+  const hc = L.corrigirCombinacao("3 × Alho-poró + cenoura, 1 × Couve + cebola + alface → 134 cenoura, beterraba, rabanete, 30 alface, rúcula, almeirão, 18 alho-poró, 12 feijão, 2 couve e brócolis, 0 tomate", P);
+  conf(hc.modulos.length === 2 && !hc.itens.some(([n]) => n === 215 && false), "módulos antes da seta não viram plantas");
+  const m = new Map(hc.itens); conf(m.get(86) === 134 && m.get(81) === 30 && m.get(215) === 18 && m.get(95) === 12 && m.get(82) === 2 && !m.has(70) && !m.has(83), "plantas depois da seta: " + JSON.stringify(hc.itens));
+  conf(L.acharPlanta("feijão", P).n === 95, "feijão → Feijão (grão), não guandu");
+  conf(L.acharPlanta("alho", P).n === 213, "alho → Alho, não alho-poró");
+  const todosEsp = base.espacos.flatMap(e => ["A", "B", "C"].map(k => L.corrigirCombinacao((e.combinacoes || {})[k], P)));
+  const naoAchados = [...new Set(todosEsp.flatMap(r => r.nao_achados))];
+  conf(!naoAchados.length, "todas as combinações A/B/C reconhecidas" + (naoAchados.length ? ": faltam " + naoAchados.join(", ") : ""));
+  /* mudas */
+  conf(L.mudas(PN.get(81), 10) === 160, "alface 0,25 × 0,25 m em 10 m² = 160 mudas");
+  conf(L.mudas(PN.get(81), 10, 2) === 20, "densidade informada (2/m²) vence o espaçamento");
+  /* filtros: bioma vazio/"todas", região, UF, zona de amortecimento */
+  conf(L.filtrar(P, { bioma: "todas", incluirViveiro: true }).some(p => p.n === 199), "bandeja sem bioma aparece em \"todas\" (com viveiro)");
+  conf(!L.filtrar(P, { bioma: "Pampa", incluirViveiro: true }).some(p => p.n === 199), "planta sem bioma não passa no filtro de um bioma");
+  conf(!L.filtrar(P, {}).some(p => p.n === 199 || p.n === 13), "bandejas e grupo Citros fora da lista de espécies");
+  const sul = L.filtrar(P, { regiao: "Sul", somenteNativas: true }); conf(sul.some(p => p.cientifico === "Butia odorata") && !sul.some(p => p.cientifico === "Spondias tuberosa"), `região Sul: ${sul.length} nativas (butiá sim, umbuzeiro não)`);
+  const ce = L.filtrar(P, { uf: "CE", somenteNativas: true }); conf(ce.length >= 30 && ce.every(p => p.nativa_de.includes("Caatinga")), `UF CE: ${ce.length} nativas da Caatinga`);
+  const za = L.filtrar(P, { bioma: "Mata Atlântica", zonaAmortecimento: true }); conf(za.length > 50 && za.every(p => !p.invasora && p.nativa_de.includes("Mata Atlântica")), `zona de amortecimento MA: ${za.length} espécies`);
+  const geada = L.filtrar(P, { clima: { geada: true, tmin_c: -3 } }); conf(!geada.some(p => p.n === 135), "mamoeiro fora com geada");
+  const alt = L.filtrar(P, { altitude_m: 1500, bioma: "Mata Atlântica" }); conf(!alt.some(p => p.cientifico === "Euterpe oleracea"), "altitude filtra");
+  conf(L.filtrar(P, { solo: { textura: "médio (franco)" } }).length > 100, "textura do GIS \"médio (franco)\" reconhecida");
+  /* GIS do lugar */
+  const cl = L.criteriosDoLugar({ zonas: { bioma: { nom_bioma: "Mata Atlântica" }, koppen: { chuva_anual_mm: 2100, meses_secos: 1, temp_media: 19.2, temp_min_mensal: 15.4, altitude_m: 880 }, vegetacao: { nm_pretet: "Floresta Ombrófila Densa" } }, solo: { textura: "argiloso", ph: 5.0 }, lugar: { uf: "RJ" } });
+  conf(cl.bioma === "Mata Atlântica" && cl.clima.chuva_mm_ano === 2100 && cl.clima.geada === false && cl.solo.acido && cl.altitude_m === 880, "critérios do GIS: " + JSON.stringify(cl.clima));
+  const cl2 = L.criteriosDoLugar({ zonas: { clima: { distr_umid: "4 a 5 meses secos" } }, biomaAprox: "Cerrado" }); conf(cl2.clima.meses_secos === 5 && cl2.bioma === "Cerrado", "meses secos do clima IBGE e bioma aproximado");
+  /* UCs */
+  const u = L.ucsDoLugar({ uf: "RJ", bioma: "Mata Atlântica" }); conf(u.ucs.length > 0 && u.regras.length === 3, `UCs no RJ: ${u.ucs.length}`);
+  /* terreno do Planejador e mapa */
+  const T = terrenoTeste(), esp = L.lerTerreno(JSON.stringify(T));
+  conf(esp.length === 5, "Planejador: 4 áreas verdes + APP de declividade (" + esp.map(e => e.tipo).join(", ") + ")");
+  const mata = esp.find(e => e.id === "m1"), horta = esp.find(e => e.id === "h1"), app = esp.find(e => e.id === "app-declividade");
+  conf(mata && mata.app && horta && !horta.app && horta.objetivo === "horta", "APP marcada só na faixa íngreme; horta de 60 m² → horta");
+  conf(app && app.area_m2 > 150 && app.area_m2 < 400, "área da APP de declividade ≈ 300 m²: " + (app && app.area_m2));
+  const ctxT = L.contextoTerreno(T); conf(ctxT.solo_textura === "argiloso" && ctxT.area_terreno_m2 === 1200, "contexto do terreno");
+  const est = L.estadoMapa(T), rH = L.montarConsorcio({ objetivo: "horta", area_m2: 60, bioma: "Mata Atlântica", irrigacao: true }), rG = L.montarConsorcio({ objetivo: "agrofloresta", area_m2: 112, bioma: "Mata Atlântica" });
+  const g = L.gradePlantio(est.areas.find(a => a.id === "g1"), rG); conf(g.desenhadas > 0 && g.desenhadas <= g.planejadas * 1.05, `grade de plantio: ${g.desenhadas} de ${g.planejadas}`);
+  const gA = L.gradePlantio({ id: "x", forma: "ret", x: 0, y: 0, w: 30, d: 20, rot: 0 }, window.__res.app); conf(gA.desenhadas >= 84 && gA.desenhadas <= 110, `grade da APP 3 × 2 m em 600 m²: ${gA.desenhadas} covas`);
+  const html = L.telaSbnMapa({ estado: est, consorcios: { h1: rH, g1: rG }, idBase: "mapa-teste" });
+  conf(/<svg/.test(html) && /data-sbn-m-area="g1"/.test(html) && (html.match(/<h2/g) || []).length === 1, "telaSbnMapa com SVG, áreas e um h2");
+  /* conferência (item de planejamento) */
+  const plano = [{ n: 40, qtd: 2, espaco: "14" }, { n: 113, qtd: 1, espaco: "6" }, { n: 235, qtd: 1, espaco: "" }];
+  const itC = L.itensConferencia({ plano, consorcios: [window.__res.caatinga], lugar: {}, plantas: P });
+  conf(itC.some(i => i.id === "esp:40:invasora?") && itC.some(i => i.id === "esp:113:invasora"), "conferência: espécies do plano com dados incertos e invasora");
+  conf(itC.some(i => i.tipo === "regra") && itC.some(i => i.id === "lugar:bioma"), "conferência: avisos do consórcio e lacunas do lugar");
+  const estC = { "lugar:bioma": { situacao: "conferido", responsavel: "Equipe", data: "2026-11-15", obs: "IBGE" } };
+  const csv = L.conferenciaCsv(itC, estC); conf(/^Tipo;Item;O que conferir;Situação/.test(csv) && /"conferido";"Equipe"/.test(csv), "conferência exportável (CSV)");
+  const htmlC = L.telaSbnConferencia({ itens: itC, estado: estC, idBase: "conf-teste" }); conf((htmlC.match(/<h2/g) || []).length === 1 && /<caption>/.test(htmlC), "telaSbnConferencia com um h2 e tabela com legenda");
+  saida.push(`<div id="conf">${htmlC}</div>`);
+  saida.push(`<div id="mapa"></div>`);
+  saida.push(L.telaSbnAreas({ terreno: T, idBase: "areas-teste" }));
+  saida.push(L.telaSbnUcs({ uf: "RJ", bioma: "Mata Atlântica", plantas: P, idBase: "ucs-teste" }));
+  /* base */
+  const sp = P.filter(L.eEspecie), cnt = {}; sp.forEach(p => (p.nativa_de || []).forEach(b => cnt[b] = (cnt[b] || 0) + 1));
+  document.getElementById("saida").innerHTML = saida.join("");
+  L.ligarConferencia(document.getElementById("conf"), { itens: itC, estado: estC, gravar: () => {} });
+  L.ligarMapa(document.getElementById("mapa"), { estado: est, consorcios: { h1: rH, g1: rG }, idBase: "mapa-teste" }, () => {});
+  const res = `${falhas.length ? "FALHOU" : "OK"}: ${oks.length} conferências certas, ${falhas.length} falhas. Espécies: ${sp.length}; nativas por bioma: ${JSON.stringify(cnt)}\n` + falhas.map(f => "✗ " + f).join("\n") + (falhas.length ? "\n" : "") + oks.map(f => "✓ " + f).join("\n");
+  const el = document.getElementById("resumo"); el.textContent = res; el.className = falhas.length ? "falha" : "ok";
+  document.title = (falhas.length ? "SBN FALHOU " + falhas.length : "SBN OK " + oks.length);
+}
+fetch("../sistema/physis-plantas.json", { cache: "no-store" }).then(r => r.json()).then(rodar).catch(e => { document.getElementById("resumo").textContent = "Não li a base automaticamente (" + e.message + "). Escolha o arquivo physis-plantas.json acima."; document.title = "SBN sem base"; });
+document.getElementById("arquivo").addEventListener("change", ev => { const f = ev.target.files[0]; if (!f) return; f.text().then(t => rodar(JSON.parse(t))); });
+window.addEventListener("error", e => { document.title = "SBN ERRO JS"; document.getElementById("resumo").textContent = "Erro de JavaScript: " + e.message + " (linha " + e.lineno + ")"; });
+</script>
+</body>
+</html>

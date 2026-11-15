@@ -42,7 +42,11 @@ def ler_ponto(j: dict, par: str = "ALLSKY_SFC_SW_DWN") -> dict:
     meses = [p.get(m) for m in MESES]
     if any(v is None or v <= -999 for v in meses):
         raise ValueError("série incompleta")
-    return {"meses": meses, "anual": p.get("ANN")}
+    c = (j.get("geometry") or {}).get("coordinates") or []
+    out = {"meses": meses, "anual": p.get("ANN")}
+    if len(c) >= 3 and isinstance(c[2], (int, float)):
+        out["elev"] = c[2]          # altitude média da célula da NASA (para corrigir a temperatura pela altitude real)
+    return out
 
 
 def ler_regiao(j: dict, par: str = "ALLSKY_SFC_SW_DWN") -> list[dict]:
@@ -304,6 +308,31 @@ class GisExtra:
                     decl.append(abs(e[(i + 1) * n + k] - e[i * n + k]) / dy)
         return {"ok": True, **g, "min": min(e), "max": max(e), "decl_media_pct": round(sum(decl) / len(decl) * 100, 1),
                 "decl_max_pct": round(max(decl) * 100, 1), "fonte": "Copernicus DEM 90 m (via Open-Meteo), guardado no servidor"}
+
+    def solo_grade(self, lat: float, lon: float, prop: str = "phh2o", prof: str = "0-5cm", raio: float = 0.02) -> dict:
+        """Mapa de solo da região: grade do SoilGrids (250 m) em volta do ponto, para o mapa de calor."""
+        if prop not in SOLO_PROPS or prof not in SOLO_PROFS:
+            return {"ok": False, "erro": "propriedade ou profundidade desconhecida"}
+        raio = min(max(float(raio), 0.005), 0.05)        # até ~11 km para cada lado
+        la, lo = round(lat, 3), round(lon, 3)
+        chave = f"solo_grade:{prop}:{prof}:{la}:{lo}:{raio}"
+        g = self.b._guardado(chave)
+        if g is None:
+            try:
+                w, h, cel, nd = ler_tiff(self.buscar_bytes(URL_SOLO_WCS.format(prop=prop, prof=prof, lo0=lo - raio, lo1=lo + raio,
+                                                                               la0=la - raio, la1=la + raio)))
+                fator = SOLO_PROPS[prop][0]
+                vals = [None if (x is None or x == nd or x in (0, -32768)) else round(x / fator, 2) for x in cel]
+                g = {"largura": w, "altura": h, "valores": vals, "lat0": la + raio, "lon0": lo - raio,
+                     "passo_lat": 2 * raio / h, "passo_lon": 2 * raio / w}
+                self.b._guardar(chave, g)
+            except (urllib.error.URLError, OSError, ValueError, KeyError, struct.error, zlib.error) as exc:
+                return {"ok": False, "avisos": [f"mapa de solo indisponível agora ({exc})"]}
+        v = [x for x in g["valores"] if x is not None]
+        return {"ok": bool(v), **g, "propriedade": prop, "profundidade": prof, "unidade": SOLO_PROPS[prop][1],
+                "min": min(v) if v else None, "max": max(v) if v else None,
+                "fonte": "SoilGrids 250 m (ISRIC, serviço de mapas), guardado no servidor",
+                "avisos": [] if v else ["sem dado de solo nesta região (área urbana, água ou rocha)"]}
 
     def solo(self, lat: float, lon: float) -> dict:
         """Propriedades (SoilGrids) e classe brasileira (IBGE). Cada parte é guardada à parte: a que vier fica,

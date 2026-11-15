@@ -1,0 +1,208 @@
+{
+  "_leia": "Base de fatores de emissão do módulo Carbono da Physis (inventário pelo GHG Protocol, abordagem do Programa Brasileiro GHG Protocol). Cada fator traz fonte e ano. 'verificar: true' = valor lembrado de tabela pública ou premissa Physis; conferir na fonte antes de emitir relatório ou relato oficial. Os valores são o padrão sugerido: cada projeto pode trocar o fator e registrar o motivo. Nenhum texto de norma é copiado; as normas são citadas pelo nome e pela seção.",
+  "versao": 1,
+  "atualizado": "2026-11-15",
+  "unidades": {
+    "combustivel_energia": "MJ por unidade do combustível (PCI)",
+    "por_tj": "kg do gás por TJ de energia (PCI)",
+    "rede": "tCO2/MWh",
+    "rebanho": "kg do gás por cabeça por ano",
+    "residuos": "t do gás por t de resíduo úmido",
+    "remocoes": "tCO2 por hectare por ano",
+    "transporte": "kgCO2e por t·km",
+    "pessoas": "kgCO2e por passageiro·km",
+    "gasto": "kgCO2e por R$"
+  },
+  "gwp": {
+    "padrao": "AR5",
+    "nota_padrao": "O Programa Brasileiro GHG Protocol e o relato à UNFCCC usam o GWP de 100 anos do AR5 nos ciclos recentes; a troca para o AR6 está em discussão. Verificar a orientação vigente do Programa e da regulamentação do SBCE antes de relatar.",
+    "verificar": true,
+    "AR5": {
+      "fonte": "IPCC AR5 (2013), WG1, cap. 8, tabela 8.A.1, GWP de 100 anos",
+      "CO2": 1, "CH4_fossil": 28, "CH4_bio": 28, "N2O": 265,
+      "HFC-32": 677, "HFC-125": 3170, "HFC-134a": 1300, "HFC-143a": 4800, "HCFC-22": 1760, "SF6": 23500
+    },
+    "AR6": {
+      "fonte": "IPCC AR6 (2021), WG1, cap. 7, tabela 7.15 (metano fóssil e não fóssil separados), GWP de 100 anos",
+      "CO2": 1, "CH4_fossil": 29.8, "CH4_bio": 27.0, "N2O": 273,
+      "HFC-32": 771, "HFC-125": 3740, "HFC-134a": 1530, "HFC-143a": 5810, "HCFC-22": 1960, "SF6": 25200
+    }
+  },
+  "combustiveis": {
+    "_fonte": "Poder calorífico (PCI) e densidade: Balanço Energético Nacional (EPE), valores típicos; fatores por TJ: IPCC 2006, vol. 2 (Energia), cap. 2 (estacionária, tabelas 2.4 e 2.5, setor comercial e residencial) e cap. 3 (rodoviária, tabelas 3.2.1 e 3.2.2). Mesma lógica da ferramenta do Programa Brasileiro GHG Protocol (fóssil no escopo, CO2 biogênico informado à parte).",
+    "verificar": true,
+    "diesel": { "nome": "Óleo diesel A (fóssil)", "unidade": "L", "mj": 35.5, "co2": 74100, "co2_bio": 0,
+      "estacionaria": { "ch4": 10, "n2o": 0.6 }, "movel": { "ch4": 3.9, "n2o": 3.9 } },
+    "biodiesel": { "nome": "Biodiesel (B100)", "unidade": "L", "mj": 32.9, "co2": 0, "co2_bio": 70800,
+      "estacionaria": { "ch4": 10, "n2o": 0.6 }, "movel": { "ch4": 3.9, "n2o": 3.9 } },
+    "gasolina_a": { "nome": "Gasolina A (fóssil)", "unidade": "L", "mj": 32.2, "co2": 69300, "co2_bio": 0,
+      "estacionaria": { "ch4": 10, "n2o": 0.6 }, "movel": { "ch4": 25, "n2o": 8 } },
+    "etanol_anidro": { "nome": "Etanol anidro", "unidade": "L", "mj": 22.3, "co2": 0, "co2_bio": 70800,
+      "estacionaria": { "ch4": 10, "n2o": 0.6 }, "movel": { "ch4": 18, "n2o": 0 } },
+    "etanol_hidratado": { "nome": "Etanol hidratado (bomba)", "unidade": "L", "mj": 21.3, "co2": 0, "co2_bio": 70800,
+      "estacionaria": { "ch4": 10, "n2o": 0.6 }, "movel": { "ch4": 18, "n2o": 0 } },
+    "glp": { "nome": "GLP (gás de cozinha)", "unidade": "kg", "mj": 46.5, "co2": 63100, "co2_bio": 0,
+      "estacionaria": { "ch4": 5, "n2o": 0.1 }, "movel": { "ch4": 62, "n2o": 0.2 } },
+    "gas_natural": { "nome": "Gás natural", "unidade": "m³", "mj": 36.8, "co2": 56100, "co2_bio": 0,
+      "estacionaria": { "ch4": 5, "n2o": 0.1 }, "movel": { "ch4": 92, "n2o": 3 } },
+    "lenha": { "nome": "Lenha", "unidade": "kg", "mj": 13.0, "co2": 0, "co2_bio": 112000,
+      "estacionaria": { "ch4": 300, "n2o": 4 }, "movel": { "ch4": 300, "n2o": 4 },
+      "nota": "CO2 da lenha de manejo sustentável é biogênico (informado à parte). Lenha de desmatamento sem reposição: marcar 'origem não renovável' para contar o CO2 no escopo 1." },
+    "carvao_vegetal": { "nome": "Carvão vegetal", "unidade": "kg", "mj": 27.0, "co2": 0, "co2_bio": 112000,
+      "estacionaria": { "ch4": 200, "n2o": 1 }, "movel": { "ch4": 200, "n2o": 1 } }
+  },
+  "misturas": {
+    "_fonte": "Teor obrigatório de mistura no Brasil: Lei 14.993/2024 (Combustível do Futuro) e resoluções do CNPE. Os teores mudam por resolução: verificar o teor do período do inventário.",
+    "verificar": true,
+    "diesel_b": { "nome": "Diesel B (bomba, com biodiesel)", "unidade": "L", "fossil": "diesel", "bio": "biodiesel", "teor_bio": 0.15, "rotulo_teor": "biodiesel no diesel (B15)" },
+    "gasolina_c": { "nome": "Gasolina C (bomba, com etanol)", "unidade": "L", "fossil": "gasolina_a", "bio": "etanol_anidro", "teor_bio": 0.30, "rotulo_teor": "etanol anidro na gasolina (E30)" },
+    "gnv": { "nome": "GNV (gás natural veicular)", "unidade": "m³", "fossil": "gas_natural", "bio": null, "teor_bio": 0, "rotulo_teor": "" }
+  },
+  "rede": {
+    "unidade": "tCO2/MWh",
+    "padrao": "nucleo",
+    "nota": "Abordagem por localização: fator médio do Sistema Interligado Nacional (SIN) publicado pelo MCTI para inventários corporativos (há fator anual e fatores mensais). Usar o fator do mesmo ano do consumo. Sistemas isolados têm fator próprio.",
+    "anual": {
+      "nucleo": { "valor": 0.0289, "rotulo": "Padrão da plataforma (núcleo physis/1)", "fonte": "fator médio do SIN (MCTI) usado no núcleo physis/1 e em sistema/physis-premissas.json; conferir o ano", "verificar": true },
+      "2019": { "valor": 0.0750, "rotulo": "Média anual 2019", "fonte": "MCTI, fatores de emissão do SIN para inventários (média anual)", "verificar": true },
+      "2020": { "valor": 0.0617, "rotulo": "Média anual 2020", "fonte": "MCTI, fatores de emissão do SIN para inventários (média anual)", "verificar": true },
+      "2021": { "valor": 0.1264, "rotulo": "Média anual 2021 (crise hídrica)", "fonte": "MCTI, fatores de emissão do SIN para inventários (média anual)", "verificar": true },
+      "2022": { "valor": 0.0426, "rotulo": "Média anual 2022", "fonte": "MCTI, fatores de emissão do SIN para inventários (média anual)", "verificar": true },
+      "2023": { "valor": 0.0385, "rotulo": "Média anual 2023", "fonte": "MCTI, fatores de emissão do SIN para inventários (média anual)", "verificar": true }
+    },
+    "mensal": {
+      "nota": "Os fatores mensais do ano escolhido são digitados na tela (12 valores, tCO2/MWh) a partir da tabela do MCTI; com eles, cada mês de consumo do Início usa o fator do próprio mês.",
+      "valores": {}
+    },
+    "mercado": {
+      "nota": "Abordagem por escolha de compra (market-based): energia com certificado (I-REC) ou contrato com atributo de origem conta com o fator do contrato (0 para renovável certificada); o restante usa o fator residual. Sem fator residual publicado no Brasil, usar o fator médio do SIN e declarar.",
+      "fator_irec": 0,
+      "verificar": true
+    }
+  },
+  "refrigerantes": {
+    "_fonte": "Composição em massa das misturas: designação ASHRAE 34 (citada pelo nome). GHG Protocol: HFCs entram no inventário (escopo 1, fugitivas); HCFC-22 é controlado pelo Protocolo de Montreal e fica fora dos gases do Protocolo de Quioto: informado à parte.",
+    "R-410A": { "nome": "R-410A (splits e VRF)", "gases": { "HFC-32": 0.5, "HFC-125": 0.5 }, "quioto": true },
+    "R-32": { "nome": "R-32 (splits novos)", "gases": { "HFC-32": 1.0 }, "quioto": true },
+    "R-134a": { "nome": "R-134a (chillers, geladeiras, ar de veículos)", "gases": { "HFC-134a": 1.0 }, "quioto": true },
+    "R-404A": { "nome": "R-404A (câmaras frias e balcões)", "gases": { "HFC-125": 0.44, "HFC-143a": 0.52, "HFC-134a": 0.04 }, "quioto": true },
+    "R-407C": { "nome": "R-407C (substituto do R-22)", "gases": { "HFC-32": 0.23, "HFC-125": 0.25, "HFC-134a": 0.52 }, "quioto": true },
+    "R-22": { "nome": "R-22 (HCFC, equipamentos antigos)", "gases": { "HCFC-22": 1.0 }, "quioto": false }
+  },
+  "vazamento": {
+    "_fonte": "IPCC 2006, vol. 3, cap. 7, tabela 7.9 (faixas de emissão anual em operação); valor central adotado pela Physis. Preferir sempre a massa recarregada registrada na manutenção (método por recarga).",
+    "verificar": true,
+    "split": { "nome": "Ar-condicionado split, janela ou VRF", "taxa": 0.05, "faixa": "1 a 10% ao ano" },
+    "chiller": { "nome": "Chiller", "taxa": 0.08, "faixa": "2 a 15% ao ano" },
+    "refrig_comercial": { "nome": "Refrigeração comercial (câmara fria, balcão)", "taxa": 0.20, "faixa": "10 a 35% ao ano" },
+    "veicular": { "nome": "Ar-condicionado de veículo", "taxa": 0.15, "faixa": "10 a 20% ao ano" },
+    "domestica": { "nome": "Geladeira e freezer domésticos", "taxa": 0.003, "faixa": "0,1 a 0,5% ao ano" },
+    "carga_kg_por_kw": { "valor": 0.3, "fonte": "premissa Physis para estimar a carga de fluido quando a placa não informa (splits: cerca de 0,25 a 0,4 kg por kW de frio)", "verificar": true }
+  },
+  "agro": {
+    "_fonte": "IPCC 2006, vol. 4 (Agricultura, Floresta e Outros Usos da Terra), Tier 1 para a América Latina: cap. 10 (tabelas 10.10, 10.11, 10.14, 10.19) e cap. 11 (tabelas 11.1 e 11.3). Conferir com o Refinamento IPCC 2019 e com os fatores do Inventário Nacional (MCTI).",
+    "verificar": true,
+    "rebanho": {
+      "gado_corte": { "nome": "Gado de corte (e outros bovinos)", "enterica_ch4": 56, "dejetos_ch4": 1, "nex_kg_n_1000kg_dia": 0.36, "peso_kg": 305 },
+      "gado_leite": { "nome": "Gado de leite", "enterica_ch4": 63, "dejetos_ch4": 1, "nex_kg_n_1000kg_dia": 0.48, "peso_kg": 400 },
+      "bufalo": { "nome": "Búfalo", "enterica_ch4": 55, "dejetos_ch4": 2, "nex_kg_n_1000kg_dia": 0.32, "peso_kg": 380 },
+      "ovino": { "nome": "Ovelha", "enterica_ch4": 5, "dejetos_ch4": 0.15, "nex_kg_n_1000kg_dia": 0.9, "peso_kg": 28 },
+      "caprino": { "nome": "Cabra", "enterica_ch4": 5, "dejetos_ch4": 0.17, "nex_kg_n_1000kg_dia": 1.37, "peso_kg": 30 },
+      "equino": { "nome": "Cavalo", "enterica_ch4": 18, "dejetos_ch4": 1.64, "nex_kg_n_1000kg_dia": 0.46, "peso_kg": 238 },
+      "suino": { "nome": "Porco", "enterica_ch4": 1, "dejetos_ch4": 1, "nex_kg_n_1000kg_dia": 0, "peso_kg": 28, "nota": "Dejetos de suínos em lagoa emitem muito mais metano: usar o fator do sistema real (MCF da lagoa) na fase 2." }
+    },
+    "pastagem": { "ef3_prp_bovinos": 0.02, "ef3_prp_outros": 0.01, "frac_gasm": 0.20, "frac_leach": 0.30, "ef4": 0.01, "ef5": 0.0075,
+      "nota": "Dejetos deixados no pasto: N2O direto (EF3) e indireto (volatilização e lixiviação). Excreção de N = Nex × peso ÷ 1000 × 365." },
+    "fertilizante": { "ef1": 0.01, "frac_gasf": 0.10, "frac_leach": 0.30, "ef4": 0.01, "ef5": 0.0075,
+      "nota": "N2O direto e indireto do nitrogênio aplicado no solo (kg de N, não kg de adubo)." },
+    "ureia_tc_por_t": 0.20,
+    "calcario_tc_por_t": 0.12,
+    "dolomita_tc_por_t": 0.13,
+    "teor_n_ureia": 0.46
+  },
+  "uso_solo": {
+    "_fonte": "Ordem de grandeza do estoque de carbono na vegetação nativa por bioma, conforme o Inventário Nacional (MCTI, Quarta Comunicação Nacional) e a literatura; a emissão da conversão é distribuída em 20 anos (orientação do GHG Protocol para o setor da terra). Valores muito variáveis: usar o mapa do lugar na fase 2.",
+    "verificar": true,
+    "anos_amortizacao": 20,
+    "estoque_tco2_ha": { "amazonia": 500, "mata_atlantica": 400, "cerrado": 150, "caatinga": 80, "pantanal": 150, "pampa": 50 }
+  },
+  "remocoes": {
+    "_fonte": "Taxa média de remoção de CO2 na restauração ou reflorestamento com nativas nos primeiros 20 anos, por bioma: ordem de grandeza a partir do Refinamento IPCC 2019 (vol. 4, cap. 4, tabelas de crescimento de florestas tropicais em regeneração) e da literatura brasileira de restauração. Premissa Physis: 1.667 mudas por hectare (espaçamento 3 m × 2 m); depois de 20 anos a taxa cai para 30%.",
+    "verificar": true,
+    "tco2_ha_ano": { "amazonia": 11, "mata_atlantica": 9, "cerrado": 4, "caatinga": 2, "pantanal": 4, "pampa": 2, "saf": 5 },
+    "mudas_por_ha": 1667,
+    "anos_crescimento_rapido": 20,
+    "fator_depois": 0.3
+  },
+  "residuos": {
+    "_fonte": "IPCC 2006, vol. 5 (Resíduos): cap. 3 (aterro, método de decaimento de primeira ordem levado ao total comprometido: DOC × DOCf × MCF × F × 16/12, com oxidação OX e recuperação R) e cap. 4 (compostagem e digestão anaeróbia, tabela 4.1). Reciclagem: só transporte e triagem (DEFRA 2024, 'closed loop'). Incineração: carbono fóssil dos plásticos (IPCC 2006, vol. 5, cap. 5).",
+    "verificar": true,
+    "aterro": { "docf": 0.5, "mcf": 1.0, "f": 0.5, "ox": 0.1, "r": 0 },
+    "doc": { "alimentos": 0.15, "poda": 0.20, "colheita": 0.20, "papel": 0.40, "madeira": 0.43, "tecidos": 0.24, "longa_vida": 0.30, "esterco_bov": 0.15, "esterco_sui": 0.15, "cama_aviario": 0.20, "rejeito": 0.15, "saude": 0.15, "_padrao": 0 },
+    "compostagem": { "ch4": 0.004, "n2o": 0.00024 },
+    "biodigestor": { "ch4": 0.0008, "n2o": 0 },
+    "reciclagem_tco2e_t": 0.021,
+    "incineracao_tco2_t": { "pet": 2.29, "pp_pead": 3.14, "filme": 3.14, "eps": 3.38, "pneus": 2.0, "_padrao": 0.02 }
+  },
+  "escopo3": {
+    "transporte_tkm": {
+      "_fonte": "DEFRA/DESNZ, fatores de conversão para relato de GEE 2024 (frete); sem equivalente brasileiro publicado com essa abertura.",
+      "verificar": true,
+      "caminhao": { "nome": "Caminhão (média, diesel)", "kg": 0.107 },
+      "ferrovia": { "nome": "Trem de carga", "kg": 0.028 },
+      "cabotagem": { "nome": "Navio de carga (cabotagem)", "kg": 0.016 }
+    },
+    "viagens_pkm": {
+      "_fonte": "DEFRA/DESNZ 2024 (passageiros; avião com efeito radiativo incluído).",
+      "verificar": true,
+      "aviao_nacional": { "nome": "Avião, voo nacional", "kg": 0.246 },
+      "aviao_internacional": { "nome": "Avião, voo internacional (econômica)", "kg": 0.148 },
+      "onibus_rodoviario": { "nome": "Ônibus rodoviário", "kg": 0.027 }
+    },
+    "deslocamento": {
+      "_fonte": "Carro e moto calculados com a gasolina C desta base e o consumo típico (premissa Physis); ônibus urbano e metrô: ordem de grandeza (DEFRA 2024, ajustado à rede brasileira).",
+      "verificar": true,
+      "carro": { "nome": "Carro (gasolina C)", "km_por_l": 11, "combustivel": "gasolina_c" },
+      "moto": { "nome": "Moto (gasolina C)", "km_por_l": 35, "combustivel": "gasolina_c" },
+      "onibus": { "nome": "Ônibus urbano", "kg": 0.05 },
+      "metro": { "nome": "Metrô ou trem", "kg": 0.005 },
+      "ativo": { "nome": "Bicicleta ou a pé", "kg": 0 }
+    },
+    "gasto_kg_por_real": {
+      "_fonte": "Valor provisório Physis, por ordem de grandeza, a partir de fatores de modelos de entrada e saída ampliados (EEIO) convertidos para reais. Serve só para triagem: substituir pelo fator do fornecedor ou por base brasileira na fase 2.",
+      "verificar": true,
+      "servicos": { "nome": "Serviços (consultoria, manutenção, limpeza)", "kg": 0.03 },
+      "manufaturados": { "nome": "Bens manufaturados (equipamentos, peças)", "kg": 0.10 },
+      "alimentos_insumos": { "nome": "Alimentos e insumos agropecuários", "kg": 0.15 },
+      "construcao": { "nome": "Materiais de construção", "kg": 0.20 },
+      "escritorio": { "nome": "Papel e material de escritório", "kg": 0.08 }
+    },
+    "materiais_kg_por_kg": {
+      "_fonte": "Mesmos valores de sistema/physis-materiais.json (ICE v3.0, 2019, berço ao portão).",
+      "verificar": true,
+      "concreto": { "nome": "Concreto", "kg": 0.13 },
+      "cimento": { "nome": "Cimento Portland", "kg": 0.83 },
+      "aco": { "nome": "Aço carbono", "kg": 1.55 },
+      "aluminio": { "nome": "Alumínio", "kg": 13.1 },
+      "vidro": { "nome": "Vidro float", "kg": 1.44 }
+    }
+  },
+  "incerteza": {
+    "_fonte": "Premissa Physis inspirada na ferramenta de incerteza do GHG Protocol: soma quadrática da incerteza do dado de atividade e do fator.",
+    "dado": { "medido": 0.05, "estimado": 0.30 },
+    "fator": { "combustivel": 0.05, "rede": 0.05, "refrigerante": 0.30, "agro": 0.50, "residuos": 0.50, "escopo3": 0.50, "gasto": 1.00, "solo": 0.75, "processo": 0.30 }
+  },
+  "sbce": {
+    "_fonte": "Lei 15.042/2024 (Sistema Brasileiro de Comércio de Emissões de Gases de Efeito Estufa), resumida com palavras próprias. Limites por instalação ou fonte, em emissões diretas por ano. A regulamentação e o calendário de implantação ainda estão sendo publicados: verificar regulamentação.",
+    "verificar": true,
+    "limite_relato_t": 10000,
+    "limite_obrigacao_t": 25000
+  },
+  "metas": {
+    "reducao_ano_pct_referencia": 4.2,
+    "fonte": "Referência de redução absoluta linear compatível com 1,5 °C usada pela iniciativa Science Based Targets (SBTi, critérios para metas de curto prazo): verificar a versão vigente.",
+    "verificar": true,
+    "residual_max": 0.10,
+    "nota_residual": "No net zero, corta-se pelo menos 90% das emissões e o restante é neutralizado com remoções permanentes (SBTi Net-Zero Standard, citado pelo nome)."
+  }
+}

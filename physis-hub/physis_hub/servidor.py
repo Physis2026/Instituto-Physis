@@ -19,14 +19,22 @@ Variaveis de ambiente:
   PHYSIS_MQTT_BROKER/_PORTA/_USUARIO/_SENHA/_TLS/_NOS  ponte MQTT da Caixinha IoT (ver docs/MQTT.md)
   PHYSIS_PORTA (8700)  PHYSIS_BANCO (physis-hub.db)  PHYSIS_ORG  PHYSIS_LUGAR
   PHYSIS_RX_URL        ex.: http://192.168.4.1 — liga o envio de comandos e a consulta ao receptor
-  PHYSIS_TOKEN         se definido, exigido em X-Physis-Token nas rotas das telas que alteram estado
+  PHYSIS_TOKEN         se definido, exigido em X-Physis-Token nas rotas das telas que alteram estado (comparação em
+                       tempo constante); também vale como chave única antiga dos aparelhos. Prefira as chaves por dispositivo.
+  Segurança na internet (docs/SEGURANCA.md, physis_hub/seguranca.py):
+  PHYSIS_ENDERECO (0.0.0.0)  PHYSIS_PROXY_CONFIAVEL  PHYSIS_HTTPS  PHYSIS_EXPOSTO  PHYSIS_ACEITAR_SEM_CHAVE
+  PHYSIS_PRIMEIRA_CONTA_EXTERNA  PHYSIS_LIMITE_{PUBLICO,ARQUIVO,ENTRAR,DISPOSITIVO}  PHYSIS_RETENCAO_DIAS_*
+  PHYSIS_CSRF_ESTRITO  PHYSIS_ORIGENS  PHYSIS_SESSAO_OCIOSA_MIN  PHYSIS_SESSAO_DIAS  PHYSIS_REAUT_MIN
+  PHYSIS_CONFIRMAR_EMAIL  PHYSIS_TERMOS_VERSAO  PHYSIS_CONSENTIMENTO_ESTRITO  PHYSIS_SEGURANCA_CONTATO
   PHYSIS_SIMULAR       ex.: "6,1,3,1" (solo,zona,coleira,comedouro) — gera dados sem hardware
 """
 from __future__ import annotations
 
 import json
 import os
+import sys
 import threading
+import traceback
 import time
 import urllib.error
 import urllib.request
@@ -40,9 +48,16 @@ from . import clima as clima_mod
 from . import saude as saude_mod
 from . import mqtt as mqtt_mod
 from . import gis as gis_mod
+from . import zonas as zonas_mod
+from . import vento as vento_mod
+from . import residuos_gis as residuos_mod
+from . import aprendizado as aprendizado_mod
+from . import robos as robos_mod
+from . import alertas_clima as alertas_mod
 from . import app_pwa
 from . import correio
 from . import editais as editais_mod
+from . import seguranca as seg
 from .hub import Hub
 from .protocolo import para_int, validar_telemetria
 from .simulador import Simulador
@@ -231,18 +246,91 @@ button{font:inherit;font-weight:600;min-height:46px;padding:0 20px;border-radius
 <div class="cartao"><div id="caixa-nome" hidden><label for="nome">Seu nome</label><input id="nome" autocomplete="name"></div>
 <div><label for="usuario">E-mail</label><input id="usuario" type="email" autocomplete="username" inputmode="email"></div>
 <div><label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password"></div>
+<div id="caixa-codigo" hidden><label for="codigo">Código do aplicativo autenticador</label><input id="codigo" autocomplete="one-time-code" inputmode="numeric" aria-describedby="dica-codigo">
+<p class="t2" id="dica-codigo">6 números do aplicativo, ou um dos códigos de recuperação.</p></div>
+<div id="caixa-termos" hidden><label style="font-weight:400;display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="termos" style="width:auto;min-height:0;margin-top:5px"> <span id="termos-txt"></span></label></div>
 <button type="button" id="ok">Entrar</button><p id="msg" role="status" aria-live="polite"></p></div>
-<p class="t2" style="margin-top:12px">Esqueceu a senha? Peça à direção da Physis para criar uma nova.</p></main><script>
-var criar=false,b=document.getElementById("ok"),m=document.getElementById("msg");
+<p class="t2" style="margin-top:12px"><a href="/conta/esqueci">Esqueci a senha</a></p></main><script>
+var criar=false,versao=null,b=document.getElementById("ok"),m=document.getElementById("msg");
 function dizer(t,e){m.textContent=t;m.style.color=e?"#7A2214":"#1F4A1C";}
-fetch("/api/instancia",{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){if(j&&j.tem_conta===false){criar=true;document.getElementById("caixa-nome").hidden=false;
-document.getElementById("sub").textContent="Primeira entrada neste servidor: quem criar esta conta passa a ser da direção (administradora).";document.getElementById("senha").autocomplete="new-password";b.textContent="Criar conta e entrar";}});
-["usuario","senha","nome"].forEach(function(i){document.getElementById(i).addEventListener("keydown",function(e){if(e.key==="Enter")b.click();});});
-b.onclick=function(){var u=document.getElementById("usuario").value.trim(),s=document.getElementById("senha").value,n=document.getElementById("nome").value.trim();
-if(!u||!s){dizer("Informe o e-mail e a senha.",true);return;}b.disabled=true;dizer("Conferindo…",false);
-fetch(criar?"/api/conta/criar":"/api/conta/entrar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({nome:n||u,usuario:u,senha:s})})
-.then(function(r){return r.json();}).then(function(j){if(j.ok){dizer("Entrando…",false);location.reload();}else{dizer(j.erro||"E-mail ou senha não conferem.",true);b.disabled=false;}})
+fetch("/api/instancia",{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){versao=(j&&j.termos_versao)||null;if(j&&j.tem_conta===false){criar=true;document.getElementById("caixa-nome").hidden=false;
+document.getElementById("sub").textContent="Primeira entrada neste servidor: quem criar esta conta passa a ser da direção (administradora). Use uma senha de pelo menos 12 caracteres.";document.getElementById("senha").autocomplete="new-password";b.textContent="Criar conta e entrar";
+if(versao){document.getElementById("termos-txt").textContent="Li e aceito os Termos de uso e a Política de privacidade da Physis (versão "+versao+").";document.getElementById("caixa-termos").hidden=false;}}});
+["usuario","senha","nome","codigo"].forEach(function(i){document.getElementById(i).addEventListener("keydown",function(e){if(e.key==="Enter")b.click();});});
+b.onclick=function(){var u=document.getElementById("usuario").value.trim(),s=document.getElementById("senha").value,n=document.getElementById("nome").value.trim(),cx=document.getElementById("caixa-codigo");
+if(!u||!s){dizer("Informe o e-mail e a senha.",true);return;}var corpo={nome:n||u,usuario:u,senha:s};
+if(!cx.hidden){corpo.codigo=document.getElementById("codigo").value.trim();if(!corpo.codigo){dizer("Digite o código do aplicativo.",true);document.getElementById("codigo").focus();return;}}
+if(criar&&versao){if(!document.getElementById("termos").checked){dizer("Para criar a conta, marque que leu e aceita os termos.",true);document.getElementById("termos").focus();return;}corpo.consentimento={versao:versao,aceito:true};}
+b.disabled=true;dizer("Conferindo…",false);
+fetch(criar?"/api/conta/criar":"/api/conta/entrar",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(corpo)})
+.then(function(r){return r.json();}).then(function(j){if(j.ok){dizer("Entrando…",false);location.reload();}
+else if(j.precisa_2fa&&cx.hidden){cx.hidden=false;document.getElementById("codigo").focus();dizer("Esta conta usa verificação em duas etapas. Digite o código do aplicativo.",false);b.disabled=false;}
+else{dizer(j.erro||"E-mail ou senha não conferem.",true);b.disabled=false;}})
 .catch(function(){dizer("Sem resposta do servidor.",true);b.disabled=false;});};
+</script></body></html>"""
+
+
+# Páginas dos fluxos de conta, servidas pelo próprio servidor (as telas só precisam pôr os links):
+#   /conta/esqueci  /conta/nova-senha#t=…  /conta/confirmar#t=…  /conta/convite#t=…
+# O código vem depois de "#": o navegador não o envia ao servidor nem a proxies; a página o tira da barra de endereço.
+PAGINA_CONTA = """<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conta · Physis</title><style>
+body{margin:0;background:#F4F6F1;color:#1C2B21;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:480px;margin:0 auto;padding:40px 16px}h1{font:500 1.9em Fraunces,Georgia,serif;color:#33512F;margin:0 0 6px}
+.cartao{background:#fff;border:1px solid #C9D2C4;border-radius:12px;padding:18px;margin-top:14px;display:grid;gap:10px}
+label{font-weight:600}input{font:inherit;width:100%;box-sizing:border-box;min-height:46px;padding:6px 12px;border:1px solid #8A9284;border-radius:8px}
+input[type=checkbox]{width:auto;min-height:0;margin-top:5px}.linha{display:flex;gap:8px;align-items:flex-start;font-weight:400}
+button{font:inherit;font-weight:600;min-height:46px;padding:0 20px;border-radius:8px;border:1px solid #33512F;background:#33512F;color:#fff;cursor:pointer}
+:focus-visible{outline:3px solid #33512F;outline-offset:2px}#msg{min-height:1.5em;font-weight:600;margin:0}.t2{color:#4A4F44;margin:0}a{color:#33512F}
+</style></head><body><main><h1 id="tit">Conta Physis</h1><p class="t2" id="sub"></p>
+<form class="cartao" id="f" novalidate>
+<div id="c-email" hidden><label for="email">E-mail</label><input id="email" type="email" autocomplete="username" inputmode="email"></div>
+<div id="c-token" hidden><label for="token">Código que chegou no e-mail</label><input id="token" autocomplete="one-time-code"></div>
+<div id="c-nome" hidden><label for="nome">Seu nome</label><input id="nome" autocomplete="name"></div>
+<div id="c-senha" hidden><label for="senha">Senha nova</label><input id="senha" type="password" autocomplete="new-password" aria-describedby="dica">
+<p class="t2" id="dica">Pelo menos 12 caracteres. Uma frase com palavras suas é o melhor; não precisa de símbolos.</p></div>
+<div id="c-senha2" hidden><label for="senha2">Repita a senha nova</label><input id="senha2" type="password" autocomplete="new-password"></div>
+<div id="c-termos" hidden><label class="linha"><input type="checkbox" id="termos"> <span id="termos-txt"></span></label></div>
+<button type="submit" id="ok">Continuar</button><p id="msg" role="status" aria-live="polite"></p></form>
+<p class="t2" style="margin-top:12px"><a href="/gestao">Ir para a entrada</a></p></main><script>
+var modo=location.pathname.replace(/\/+$/,"").split("/").pop(),versao=null;
+var tk=(location.hash.match(/[#&]t=([A-Za-z0-9_-]+)/)||[])[1]||"";
+if(tk&&history.replaceState)history.replaceState(null,"",location.pathname);
+function $(i){return document.getElementById(i);}
+function mostrar(){for(var i=0;i<arguments.length;i++)$("c-"+arguments[i]).hidden=false;}
+function dizer(t,e){$("msg").textContent=t||"";$("msg").style.color=e?"#7A2214":"#1F4A1C";}
+function falha(){dizer("Sem resposta do servidor. Tente de novo.",true);$("ok").disabled=false;}
+function post(rota,corpo){return fetch(rota,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(corpo)}).then(function(r){return r.json();});}
+function codigo(){return tk||$("token").value.trim();}
+function ver(){if(!codigo()){dizer("Cole o código do e-mail.",true);$("token").focus();return;}
+post("/api/conta/convite/ver",{token:codigo()}).then(function(j){if(!j.ok){dizer(j.erro,true);return;}tk=codigo();$("c-token").hidden=true;
+$("sub").textContent="Convite para "+j.email+" ("+({administrador:"direção",operador:"equipe",cliente:"cliente"}[j.papel]||j.papel)+") em "+j.org+". Escolha o seu nome e a sua senha.";
+$("nome").value=j.nome||"";mostrar("nome","senha","senha2");versao=j.termos_versao||null;
+if(versao){$("termos-txt").textContent="Li e aceito os Termos de uso e a Política de privacidade da Physis (versão "+versao+").";mostrar("termos");}
+$("ok").textContent="Criar a minha conta";modo="convite2";dizer("",false);$("nome").focus();}).catch(falha);}
+function enviar(){var b=$("ok");
+if(modo==="esqueci"){var em=$("email").value.trim();if(!em){dizer("Digite o e-mail.",true);$("email").focus();return;}b.disabled=true;
+post("/api/conta/esqueci",{usuario:em}).then(function(j){dizer(j.mensagem||j.erro,!j.ok);b.disabled=false;}).catch(falha);return;}
+if(modo==="confirmar"){if(!codigo()){dizer("Cole o código do e-mail.",true);$("token").focus();return;}
+post("/api/conta/confirmar",{token:codigo()}).then(function(j){dizer(j.ok?"E-mail confirmado. Já pode entrar na plataforma.":j.erro,!j.ok);}).catch(falha);return;}
+if(modo==="convite"){ver();return;}
+var s=$("senha").value;if(s.length<12){dizer("A senha precisa de pelo menos 12 caracteres.",true);$("senha").focus();return;}
+if(s!==$("senha2").value){dizer("As duas senhas não são iguais.",true);$("senha2").focus();return;}
+if(modo==="nova-senha"){if(!codigo()){dizer("Cole o código do e-mail.",true);$("token").focus();return;}b.disabled=true;
+post("/api/conta/nova-senha",{token:codigo(),senha:s}).then(function(j){if(j.ok){dizer("Senha nova gravada. Indo para a entrada…",false);setTimeout(function(){location.href="/gestao";},1500);}else{dizer(j.erro,true);b.disabled=false;}}).catch(falha);return;}
+if(modo==="convite2"){var n=$("nome").value.trim();if(!n){dizer("Digite o seu nome.",true);$("nome").focus();return;}
+if(versao&&!$("termos").checked){dizer("Para criar a conta, marque que leu e aceita os termos.",true);$("termos").focus();return;}
+var corpo={token:tk,nome:n,senha:s};if(versao)corpo.consentimento={versao:versao,aceito:true};b.disabled=true;
+post("/api/conta/convite/aceitar",corpo).then(function(j){if(j.ok){dizer("Conta criada. Entrando…",false);setTimeout(function(){location.href=j.papel==="cliente"?"/":"/gestao";},800);}else{dizer(j.erro,true);b.disabled=false;}}).catch(falha);}}
+var T={esqueci:["Esqueci a senha","Digite o e-mail da sua conta. Se ele tiver conta, chega um link para criar uma senha nova."],
+"nova-senha":["Senha nova","Escolha a senha nova. Ao gravar, todas as sessões abertas da conta são encerradas."],
+confirmar:["Confirmar o e-mail","Confirme que este e-mail é seu."],convite:["Aceitar o convite","Conferindo o convite…"]};
+var t=T[modo]||T.esqueci;if(!T[modo])modo="esqueci";$("tit").textContent=t[0];$("sub").textContent=t[1];document.title=t[0]+" · Physis";
+$("f").addEventListener("submit",function(e){e.preventDefault();enviar();});
+if(modo==="esqueci")mostrar("email");
+else if(modo==="nova-senha"){if(!tk)mostrar("token");mostrar("senha","senha2");$("ok").textContent="Gravar a senha nova";}
+else if(modo==="confirmar"){if(!tk)mostrar("token");else enviar();}
+else if(modo==="convite"){if(!tk){mostrar("token");$("ok").textContent="Conferir o convite";$("sub").textContent="Cole o código que chegou no e-mail do convite.";}else ver();}
 </script></body></html>"""
 
 
@@ -263,26 +351,177 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
     pasta_editais = Path(os.environ.get("PHYSIS_EDITAIS_PASTA") or (Path(os.environ.get("PHYSIS_BANCO", "physis-hub.db")).resolve().parent / "editais"))
     editais_col = editais_mod.Coletor(pasta_editais, tipo="edital")
     eventos_col = editais_mod.Coletor(pasta_editais, tipo="evento")
+    # Aprendizado local (sem internet), robôs com regras (+ IA local opcional) e alertas de clima por e-mail/WhatsApp
+    aprendizado = aprendizado_mod.Aprendizado(hub)
+    robos = robos_mod.criar_robos({"hub": hub, "editais": editais_col,
+                                   "suporte_email": os.environ.get("PHYSIS_SUPORTE_EMAIL") or instancia.get("suporte_email") or ""})
+    alertas = alertas_mod.AlertasClima(hub, aprendizado=aprendizado)
+    # ── Segurança (seguranca.py; docs/SEGURANCA.md) ──
+    proxies = seg.proxies_confiaveis()                  # PHYSIS_PROXY_CONFIAVEL: só deles vale X-Forwarded-*
+    limites = seg.Limites()                             # PHYSIS_LIMITE_*: balde de fichas por IP
+    chamadas_origem = origem_chamadas(os.environ.get("PHYSIS_CHAMADAS") or instancia.get("chamadas"))
+    sem_chave = os.environ.get("PHYSIS_ACEITAR_SEM_CHAVE", "").strip()   # "1" aceita, "0" recusa, vazio: só rede local
+    SEM_PAPEL = {"ok": False, "erro": "o seu papel não permite esta ação"}
+    termos = seg.termos_versao()                        # versão dos Termos/Política (sistema/physis-juridico.js)
+    # rotas da própria conta que funcionam sem token CSRF (ainda não há sessão) e mesmo com o consentimento pendente
+    SEM_CSRF = ("/api/conta/entrar", "/api/conta/criar", "/api/conta/esqueci", "/api/conta/nova-senha", "/api/conta/confirmar",
+                "/api/conta/convite/ver", "/api/conta/convite/aceitar")
     class Manipulador(BaseHTTPRequestHandler):
         # Cabecalhos de seguranca em toda resposta. As telas usam script e estilo dentro da pagina,
         # por isso 'unsafe-inline'; de fora do proprio servidor, so o servidor de chamadas da Physis, se configurado.
         def end_headers(self):
             # O Planejador (e só ele) precisa de 'unsafe-eval': o leitor BIM web-ifc monta funções ao rodar.
             # A liberação vale só para essa página; o resto da plataforma continua sem eval.
-            eh_planejador = urlparse(self.path).path in ("/planejador", "/planejador/")
+            eh_planejador = urlparse(getattr(self, "path", "") or "").path in ("/planejador", "/planejador/")
             self.send_header("Content-Security-Policy", csp_planejador if eh_planejador else csp)
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
+            # Permissions-Policy, COOP, CORP, X-Frame-Options e, só por HTTPS, HSTS (seguranca.cabecalhos_extra)
+            for k, v in seg.cabecalhos_extra(self._https(), chamadas_origem):
+                self.send_header(k, v)
             super().end_headers()
 
         server_version = "PhysisHub/0.1"
+        sys_version = ""                     # não anuncia a versão do Python no cabeçalho Server
 
         def log_message(self, *a):          # silencioso; a saude fica em /api/saude
             pass
 
         def handle_one_request(self):
             self._corpo_lido = False          # cada pedido começa sem corpo lido
-            super().handle_one_request()
+            self._respondeu = False
+            try:
+                super().handle_one_request()
+            except (ConnectionError, TimeoutError):
+                self.close_connection = True          # quem chamou foi embora
+            except Exception:
+                # o rastro do erro vai só para o console do servidor; quem chamou recebe "erro interno", nunca o rastro
+                traceback.print_exc(file=sys.stderr)
+                self.close_connection = True
+                if not self._respondeu:
+                    try:
+                        self._json(500, {"ok": False, "erro": "erro interno"})
+                    except Exception:
+                        pass
+
+        def send_response(self, *a, **k):
+            self._respondeu = True
+            super().send_response(*a, **k)
+
+        # ── Segurança: IP de verdade, HTTPS, rede local, papéis, limites e chaves dos aparelhos ──
+        def _ip(self) -> str:
+            return seg.ip_do_cliente(self.client_address[0], getattr(self, "headers", None) or {}, proxies)
+
+        def _https(self) -> bool:
+            return seg.eh_https(self.client_address[0], getattr(self, "headers", None) or {}, proxies)
+
+        def _local(self) -> bool:
+            return seg.eh_rede_local(self._ip())
+
+        def _precisa_sessao(self) -> bool:
+            """Com login na instalação, sempre; sem login, só quem chama de fora da rede local."""
+            return exige_login or not self._local()
+
+        def _cookie(self, valor: str, idade: int) -> str:
+            return (f"physis_sessao={valor}; Path=/; Max-Age={idade}; HttpOnly; SameSite=Strict"
+                    + ("; Secure" if self._https() else ""))
+
+        def _exigir(self, minimo: str) -> dict | None:
+            """Conta da sessão com pelo menos o papel pedido; senão responde 401 (sem sessão) ou 403 e devolve None.
+            Com PHYSIS_CONSENTIMENTO_ESTRITO=1, sem o aceite da versão atual dos termos também 403 ({"consentimento": true})."""
+            q = self._quem()
+            if not q:
+                self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                return None
+            if seg.consentimento_estrito() and seg.consentimento_pendente(q):
+                self._json(403, {"ok": False, "consentimento": True, "versao": termos,
+                                 "erro": "Leia e aceite a versão atual dos Termos de uso e da Política de privacidade."})
+                return None
+            if not seg.pode(q, minimo):
+                self._json(403, dict(SEM_PAPEL, confirmar_email=True) if q.get("confirmado") is False else SEM_PAPEL)
+                return None
+            return q
+
+        def _sensivel(self, q: dict) -> bool:
+            """Ações sensíveis pedem a senha de novo se o último login/reautenticação passou de PHYSIS_REAUT_MIN."""
+            if seg.reauth_recente(hub, q):
+                return True
+            self._json(403, {"ok": False, "reautenticar": True, "erro": "Confirme a sua senha para continuar."})
+            return False
+
+        def _csrf_barrado(self) -> bool:
+            """POST/PUT/DELETE: (1) Origin/Referer de outro site com sessão (ou nas rotas de conta) = 403;
+            (2) com sessão, X-Physis-CSRF errado = 403; ausente = 403 só com PHYSIS_CSRF_ESTRITO=1."""
+            caminho = urlparse(self.path).path
+            tk = self._token_sessao()
+            if seg.origem_confere(self.headers, url_publica) is False and (tk or caminho.startswith("/api/conta/")):
+                return self._negar_csrf("origem de outro site")
+            if tk and caminho not in SEM_CSRF:
+                h = self.headers.get("X-Physis-CSRF")
+                if (h is not None or seg.csrf_estrito()) and not seg.iguais(h, seg.csrf_de(hub, tk)):
+                    return self._negar_csrf("token CSRF ausente ou errado")
+            return False
+
+        def _negar_csrf(self, motivo: str) -> bool:
+            seg.acesso_registrar(hub, "", self._ip(), "csrf recusado", cadeia=False)
+            self._json(403, {"ok": False, "csrf": True, "erro": "pedido recusado: " + motivo + "; recarregue a página"})
+            return True
+
+        def _ler(self, corpo, esquema: str, estrito: bool = True) -> dict | None:
+            """JSON do corpo validado (seguranca.carregar_json + ESQUEMAS). None = já respondeu 400."""
+            try:
+                d = seg.carregar_json(corpo or "{}")
+            except ValueError:
+                self._json(400, {"ok": False, "erro": "json invalido"})
+                return None
+            erro = seg.validar(d, seg.ESQUEMAS[esquema], estrito)
+            if erro:
+                self._json(400, {"ok": False, "erro": erro})
+                return None
+            return d
+
+        def _mandar(self, ref: str | None) -> None:
+            if ref:
+                threading.Thread(target=correio.enviar_fila, args=(hub, ref), daemon=True).start()
+
+        def _pagina(self, html: str) -> None:
+            pagina = html.encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(pagina)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(pagina)
+
+        def _limitado(self, categoria: str) -> bool:
+            """True (e já respondeu 429 com Retry-After, depois de ler o corpo) quando este IP passou do limite."""
+            espera = limites.tentar(categoria, self._ip())
+            if espera <= 0:
+                return False
+            n = max(1, int(espera + 0.999))
+            self._recusar(429, {"ok": False, "erro": f"muitos pedidos; tente de novo em {n} s", "espera": n}, {"Retry-After": str(n)})
+            return True
+
+        def _dispositivo(self, saude_linha: bool = False) -> tuple[bool, int | None]:
+            """Quem entrega linhas de aparelho. (True, nó ou None) se pode; (False, None) e já respondeu 401.
+            Aceita: a chave do dispositivo (Authorization: Bearer / X-Physis-Chave); o PHYSIS_TOKEN antigo
+            (X-Physis-Token); sem chave, conforme PHYSIS_ACEITAR_SEM_CHAVE (vazio = só da rede local)."""
+            ch = seg.chave_do_pedido(self.headers)
+            if ch:
+                c = seg.chave_conferir(hub, ch)
+                if c:
+                    return True, c["no"]
+                self._json(401, {"ok": False, "erro": "chave do dispositivo inválida ou revogada"})
+                return False, None
+            if token is not None and seg.iguais(self.headers.get("X-Physis-Token"), token):
+                return True, None
+            if saude_linha and token is not None:          # como antes: com PHYSIS_TOKEN definido, a Saúde exige token ou chave
+                self._json(401, {"ok": False, "erro": "token ausente ou invalido"})
+                return False, None
+            if sem_chave == "1" or (sem_chave != "0" and self._local()):
+                return True, None
+            self._json(401, {"ok": False, "erro": "chave do dispositivo ausente"})
+            return False, None
 
         def _drenar_pendente(self) -> None:
             """Lê o corpo que ninguém leu antes de responder com erro. Sem isso, um 401/403/404 a um POST
@@ -302,6 +541,13 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def _json(self, codigo: int, obj) -> None:
             if codigo >= 400:
+                # corpo grande ainda não lido (ex.: 403 a um anexo de 20 MB): responde e drena com tempo limite
+                try:
+                    grande = not getattr(self, "_corpo_lido", True) and int(self.headers.get("Content-Length") or 0) > CORPO_MAX
+                except ValueError:
+                    grande = False
+                if grande:
+                    return self._recusar(codigo, obj)
                 self._drenar_pendente()
             corpo = json.dumps(obj, ensure_ascii=False).encode("utf-8")
             self.send_response(codigo)
@@ -323,16 +569,26 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def _recusar_corpo(self, erro: str) -> None:
             """Responde 413 e fecha sem cortar a conexao na cara de quem enviou."""
+            self._recusar(413, {"ok": False, "erro": erro})
+
+        def _recusar(self, codigo: int, obj: dict, cabecalhos: dict | None = None) -> None:
+            """Responde um erro (413, 429) a um pedido cujo corpo ainda não foi lido: responde, depois lê e
+            descarta o corpo (até DRENAR_MAX, com tempo limite) e fecha, sem RST no Windows."""
             try:
                 n = int(self.headers.get("Content-Length") or 0)
             except ValueError:
                 n = 0
+            if getattr(self, "_corpo_lido", False):
+                n = 0
             self._corpo_lido = True
             self.close_connection = True
-            corpo = json.dumps({"ok": False, "erro": erro}, ensure_ascii=False).encode("utf-8")
-            self.send_response(413)
+            corpo = json.dumps(obj, ensure_ascii=False).encode("utf-8")
+            self.send_response(codigo)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(corpo)))
+            self.send_header("Cache-Control", "no-store")
+            for k, v in (cabecalhos or {}).items():
+                self.send_header(k, v)
             self.send_header("Connection", "close")
             self.end_headers()
             self.wfile.write(corpo)
@@ -376,7 +632,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             return q
 
         def _autorizado(self) -> bool:
-            return token is None or self.headers.get("X-Physis-Token") == token
+            return token is None or seg.iguais(self.headers.get("X-Physis-Token"), token)
 
         def _token_sessao(self) -> str | None:
             for parte in (self.headers.get("Cookie") or "").split(";"):
@@ -389,8 +645,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             return hub.sessao(self._token_sessao())
 
         def _barrado(self) -> bool:
-            """True (e ja respondeu 401) quando a instalacao exige login e nao ha sessao."""
-            if not exige_login or self._quem():
+            """True (e ja respondeu 401) quando a instalacao exige login (ou quem chama esta fora da rede local) e nao ha sessao."""
+            if not self._precisa_sessao() or self._quem():
                 return False
             self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
             return True
@@ -405,7 +661,98 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     "planejador": (WEB / "planejador.html").exists(), "pesquisa": bool(instancia.get("pesquisa")),
                     "nome_cliente": instancia.get("nome"),
                     "cursos": [c for c in (instancia.get("cursos") or []) if isinstance(c, dict)] if q else [],
-                    "senha_min": hub.SENHA_MIN}
+                    "senha_min": hub.SENHA_MIN,
+                    # segurança: token CSRF da sessão (mandar em X-Physis-CSRF), termos, e-mail, 2FA
+                    "csrf": seg.csrf_de(hub, self._token_sessao()) if q else None,
+                    "termos_versao": termos, "consentimento_pendente": seg.consentimento_pendente(q) if q else False,
+                    "email_confirmado": q.get("confirmado") if q else None, "dois_fatores": q.get("dois_fatores") if q else None,
+                    "recuperar_senha": True, "reautenticar_min": int(seg.reauth_janela_s() // 60)}
+
+        def _rotas_conta(self, caminho: str):
+            """Fluxos de conta. Devolve False se a rota não é daqui (o do_POST segue procurando)."""
+            ip = self._ip()
+            publicas = {"/api/conta/esqueci": "esqueci", "/api/conta/nova-senha": "nova_senha", "/api/conta/confirmar": "token",
+                        "/api/conta/convite/ver": "token", "/api/conta/convite/aceitar": "convite_aceitar"}
+            if caminho in publicas:
+                if self._limitado("entrar"):
+                    return None
+                d = self._ler(self._corpo(), publicas[caminho])
+                if d is None:
+                    return None
+                if caminho == "/api/conta/esqueci":
+                    r, ref = seg.senha_esqueci(hub, d["usuario"], url_publica, ip)
+                    self._mandar(ref)
+                    return self._json(200, r)
+                if caminho == "/api/conta/nova-senha":
+                    r = seg.senha_redefinir(hub, d["token"], d["senha"], ip)
+                    return self._json(200 if r["ok"] else 400, r)
+                if caminho == "/api/conta/confirmar":
+                    r = seg.confirmar(hub, d["token"])
+                    return self._json(200 if r["ok"] else 400, r)
+                if caminho == "/api/conta/convite/ver":
+                    r = seg.convite_ver(hub, d["token"])
+                    return self._json(200 if r["ok"] else 404, r)
+                r = seg.convite_aceitar(hub, d["token"], d.get("nome") or "", d["senha"], d, ip)
+                if not r["ok"]:
+                    return self._json(400, r)
+                e = hub.entrar(r["usuario"], d["senha"], ip, self.headers.get("User-Agent") or "")
+                seg.acesso_registrar(hub, r["usuario"], ip, "entrou")
+                tk = e.pop("token")
+                e["csrf"] = seg.csrf_de(hub, tk)
+                return self._json_cookie(200, e, self._cookie(tk, hub.SESSAO_S))
+            privadas = {"/api/conta/confirmar/reenviar": "vazio", "/api/conta/consentimento": "consentimento",
+                        "/api/conta/reautenticar": "reautenticar", "/api/conta/2fa/iniciar": "vazio",
+                        "/api/conta/2fa/ativar": "codigo", "/api/conta/2fa/desativar": "codigo", "/api/convites": "convite"}
+            revogar = caminho.startswith("/api/convites/") and caminho.endswith("/revogar")
+            if caminho not in privadas and not revogar:
+                return False
+            if caminho == "/api/conta/reautenticar" and self._limitado("entrar"):
+                return None
+            q = self._quem()
+            if not q:
+                return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+            if caminho.startswith("/api/convites"):
+                if not seg.pode(q, seg.DIRECAO):
+                    return self._json(403, SEM_PAPEL)
+                if revogar:
+                    ok = seg.convite_revogar(hub, caminho.split("/")[-2], q["usuario"])
+                    return self._json(200 if ok else 404, {"ok": ok})
+            d = self._ler(self._corpo(), privadas[caminho])
+            if d is None:
+                return None
+            if caminho == "/api/convites":
+                if seg.normalizar_papel(d.get("papel")) == seg.DIRECAO and not self._sensivel(q):
+                    return None
+                r = seg.convite_criar(hub, d["email"], d.get("papel") or seg.EQUIPE, d.get("pessoa") or "", d.get("nome") or "",
+                                      q["usuario"], url_publica)
+                if r["ok"]:
+                    self._mandar(r.pop("ref"))
+                    r["email_enviado"] = correio.configurado()
+                return self._json(200 if r["ok"] else 400, r)
+            if caminho == "/api/conta/confirmar/reenviar":
+                ref = seg.confirmar_enviar(hub, q["id"], url_publica)
+                self._mandar(ref)
+                return self._json(200, {"ok": True, "enviado": bool(ref)})
+            if caminho == "/api/conta/consentimento":
+                if d["aceito"] and not d.get("versao"):
+                    return self._json(400, {"ok": False, "erro": "falta o campo versao"})
+                r = seg.consentimento_registrar(hub, q["id"], q["usuario"], d.get("versao") or q.get("consentimento") or "", d["aceito"], ip)
+                return self._json(200 if r["ok"] else 409, r)
+            if caminho == "/api/conta/reautenticar":
+                r = seg.reautenticar(hub, self._token_sessao(), q, d["senha"], d.get("codigo") or "")
+                return self._json(200 if r["ok"] else r.pop("codigo", 403), r)
+            if caminho == "/api/conta/2fa/iniciar":
+                if not self._sensivel(q):
+                    return None
+                r = seg.totp_iniciar(hub, q["id"], q["usuario"])
+                return self._json(200 if r["ok"] else 400, r)
+            if caminho == "/api/conta/2fa/ativar":
+                r = seg.totp_ativar(hub, q["id"], q["usuario"], d["codigo"])
+                return self._json(200 if r["ok"] else 400, r)
+            if not self._sensivel(q):           # /api/conta/2fa/desativar
+                return None
+            r = seg.totp_desativar(hub, q["id"], q["usuario"], d["codigo"])
+            return self._json(200 if r["ok"] else 400, r)
 
         def do_HEAD(self):
             # só o mapa da região responde a HEAD (o Planejador pergunta se o arquivo existe antes de usar)
@@ -479,9 +826,27 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             q = parse_qs(u.query)
             if u.path == "/api/instancia":
                 return self._json(200, self._estado_instancia())
+            if u.path in ("/conta/esqueci", "/conta/nova-senha", "/conta/confirmar", "/conta/convite"):
+                return self._pagina(PAGINA_CONTA)
+            if u.path in ("/.well-known/security.txt", "/security.txt"):
+                txt = seg.security_txt(os.environ.get("PHYSIS_SEGURANCA_CONTATO") or os.environ.get("PHYSIS_SUPORTE_EMAIL")
+                                       or instancia.get("suporte_email") or "", url_publica, time.time()).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                self.send_header("Content-Length", str(len(txt)))
+                self.end_headers()
+                self.wfile.write(txt)
+                return
+            if u.path == "/api/convites":
+                if not self._exigir(seg.DIRECAO):
+                    return
+                return self._json(200, {"ok": True, "convites": seg.convite_listar(hub)})
             # ── Editais (só quem tem acesso) e eventos (equipe com sessão): editais.rota decide ──
             if u.path.startswith(("/api/editais", "/api/eventos")):
-                r = editais_mod.rota("GET", u.path, self._quem(), None, editais_col, eventos_col, hub, correio)
+                q = self._quem()
+                if q and not seg.pode(q, seg.EQUIPE):          # conta de cliente não vê a área interna
+                    return self._json(403, SEM_PAPEL)
+                r = editais_mod.rota("GET", u.path, q, None, editais_col, eventos_col, hub, correio)
                 if r:
                     return self._json(*r)
             if u.path.startswith("/api/central/compra/"):
@@ -492,8 +857,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 # publico: so o que foi revisado e posto no ar pela equipe
                 return self._json(200, hub.loja_catalogo(interno=False))
             if u.path == "/api/loja/catalogo/interno":
-                if not self._quem():
-                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                if not self._exigir(seg.EQUIPE):
+                    return
                 return self._json(200, hub.loja_catalogo(interno=True))
             # ── Consultoria ── página pública e textos editáveis do site (leitura pública, como a loja)
             if u.path in ("/consultoria", "/consultoria/"):
@@ -515,8 +880,19 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 self.end_headers()
                 self.wfile.write(pagina)
                 return
-            if u.path == "/api/gestao/estado":
+            # ── LGPD art. 18: o que o servidor guarda sobre quem está na sessão (seguranca.meus_dados) ──
+            if u.path == "/api/conta/meus-dados":
                 q = self._sessao_ou_401()
+                if not q:
+                    return
+                return self._json(200, seg.meus_dados(hub, q))
+            # ── Chaves dos dispositivos: só a direção lista (a chave em si nunca volta, só o resumo fica guardado) ──
+            if u.path == "/api/dispositivos/chaves":
+                if not self._exigir(seg.DIRECAO):
+                    return
+                return self._json(200, {"ok": True, "chaves": seg.chave_listar(hub)})
+            if u.path == "/api/gestao/estado":
+                q = self._exigir(seg.EQUIPE)
                 if not q:
                     return
                 try:
@@ -526,7 +902,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return self._json(200, {"ok": True, "agora": time.time(), "conta": {k: q[k] for k in ("nome", "usuario", "papel", "pessoa")},
                                         "itens": hub.gestao_ler(desde)})
             if u.path.startswith("/api/gestao/arquivo/"):
-                if not self._sessao_ou_401():
+                if not self._exigir(seg.EQUIPE):
                     return
                 arq = hub.gestao_arquivo(u.path.rsplit("/", 1)[-1])
                 if not arq:
@@ -553,14 +929,17 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     return
                 return self._json(200, saude.estado(q["usuario"]))
             if u.path in ("/api/central/emails", "/api/central/instalacoes"):
-                if not self._quem():
-                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                if not self._exigir(seg.EQUIPE):
+                    return
                 if u.path.endswith("emails"):
                     # avisos de saúde (dado sensível, LGPD) vão só para os cuidadores: a fila mostra só quantos são
                     todos = hub.emails()
+                    # e-mails de conta (senha nova, confirmação, convite) levam link de uso único: também ficam fora da fila
+                    oculto = lambda e: str(e.get("ref") or "").startswith(("saude-", seg.REF_CONTA))
                     saude_n = sum(1 for e in todos if str(e.get("ref") or "").startswith("saude-"))
                     return self._json(200, {"ok": True, "configurado": correio.configurado(), "saude_ocultos": saude_n,
-                                            "emails": [e for e in todos if not str(e.get("ref") or "").startswith("saude-")]})
+                                            "conta_ocultos": sum(1 for e in todos if str(e.get("ref") or "").startswith(seg.REF_CONTA)),
+                                            "emails": [e for e in todos if not oculto(e)]})
                 return self._json(200, {"ok": True, "instalacoes": hub.instalacoes()})
             if u.path in ("/demo", "/demo/"):
                 # demonstração gratuita: roda inteira no navegador, com dados simulados; não lê nada do servidor
@@ -578,8 +957,13 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 # a loja e publica: quem compra nao tem, nem deve ter, conta na gestao
                 return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
             if u.path == "/api/central/arquivos":
+                # dado pessoal (anexos de quem pediu proposta): sempre com sessão da equipe, com ou sem login na instalação
+                if not self._exigir(seg.EQUIPE):
+                    return
                 return self._json(200, {"ok": True, "arquivos": hub.arquivos_de((parse_qs(u.query).get("pedido") or [""])[0])})
             if u.path.startswith("/api/central/arquivo/"):
+                if not self._exigir(seg.EQUIPE):
+                    return
                 arq = hub.arquivo(u.path.rsplit("/", 1)[-1])
                 if not arq:
                     return self._json(404, {"ok": False})
@@ -592,6 +976,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 self.wfile.write(arq[1])
                 return
             if u.path == "/api/central/caixa":
+                # compras e pedidos trazem nome, e-mail e CPF de quem pagou: sempre com sessão da equipe
+                if not self._exigir(seg.EQUIPE):
+                    return
                 return self._json(200, {"ok": True, "itens": hub.central_listar()})
             if u.path in ("/gestao", "/gestao/") and (WEB / "gestao.html").exists():
                 # sem sessão, a página de entrada; a Gestão (e o que ela traz embutido) só depois do login
@@ -649,9 +1036,14 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 # previsão das fontes guardadas no hub (a tela nunca chama a internet)
                 return self._json(200, clima.estado())
             if u.path == "/api/suporte":
-                return self._json(200, {"ok": True, "chamados": hub.suporte_listar(),
-                                        "whatsapp": re.sub(r"\D", "", os.environ.get("PHYSIS_SUPORTE_WHATSAPP") or instancia.get("suporte_whatsapp") or ""),
-                                        "email": os.environ.get("PHYSIS_SUPORTE_EMAIL") or instancia.get("suporte_email") or ""})
+                # os contatos da Physis são públicos; os chamados (com contato de quem abriu) só com sessão:
+                # a equipe vê todos, o cliente só os que ele abriu
+                q = self._quem()
+                contatos = {"whatsapp": re.sub(r"\D", "", os.environ.get("PHYSIS_SUPORTE_WHATSAPP") or instancia.get("suporte_whatsapp") or ""),
+                            "email": os.environ.get("PHYSIS_SUPORTE_EMAIL") or instancia.get("suporte_email") or ""}
+                if not q:
+                    return self._json(200, {"ok": True, "chamados": [], "login": True, **contatos})
+                return self._json(200, {"ok": True, "chamados": hub.suporte_listar(None if seg.pode(q, seg.EQUIPE) else q["usuario"]), **contatos})
             if u.path in ("/api/gis/relevo", "/api/gis/solo", "/api/gis/rio"):
                 # relevo (curvas de nível e declividade), solo e rio (enchente) do lugar, guardados no hub
                 try:
@@ -670,6 +1062,52 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     return self._json(400, {"ok": False, "erro": "lat e lon são obrigatórios"})
                 r = irradiacao.consultar(lat, lon, q.get("camada", ["irradiacao"])[0] if u.path.endswith("clima") else "irradiacao")
                 return self._json(200 if r["ok"] or not r.get("erro") else 400, r)
+            if u.path in ("/api/gis/zonas", "/api/gis/solo-grade", "/api/gis/vento", "/api/gis/residuos"):
+                # zonas do lugar (IBGE + Köppen), mapa de solo da região, vento em altura e destinos de resíduos:
+                # buscados uma vez e guardados no hub
+                try:
+                    lat, lon = float(q.get("lat", [""])[0]), float(q.get("lon", [""])[0])
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "lat e lon são obrigatórios"})
+                if not (-35.0 <= lat <= 6.0 and -75.0 <= lon <= -28.0):
+                    return self._json(400, {"ok": False, "erro": "coordenadas fora do Brasil"})
+                if u.path.endswith("zonas"):
+                    r = zonas_mod.Zonas(irradiacao).consultar(lat, lon)
+                elif u.path.endswith("solo-grade"):
+                    r = gis_mod.GisExtra(irradiacao).solo_grade(lat, lon, q.get("prop", ["phh2o"])[0], q.get("prof", ["0-5cm"])[0])
+                elif u.path.endswith("vento"):
+                    r = vento_mod.Vento(irradiacao).consultar(lat, lon)
+                else:
+                    try:
+                        raio = float(q.get("raio", [str(residuos_mod.RAIO_PADRAO)])[0])
+                    except ValueError:
+                        return self._json(400, {"ok": False, "erro": "raio precisa ser número"})
+                    r = residuos_mod.ResiduosGis(irradiacao).consultar(lat, lon, raio)
+                return self._json(200 if r.get("ok") or not r.get("erro") else 400, r)
+            # ── Aprendizado (modelos do próprio hub, sem internet) ──
+            if u.path.startswith("/api/aprendizado/"):
+                if self._barrado():
+                    return
+                qual = u.path.rsplit("/", 1)[-1]
+                fn = {"estado": aprendizado.estado, "anomalias": aprendizado.anomalias, "previsao-chuva": aprendizado.previsao_chuva,
+                      "consumo": aprendizado.consumo, "irrigacao": aprendizado.irrigacao}.get(qual)
+                if fn:
+                    return self._json(200, fn())
+            if u.path == "/api/robos":
+                if not self._exigir(seg.CLIENTE):
+                    return
+                return self._json(200, {"ok": True, "robos": robos_mod.listar(robos)})
+            if u.path in ("/api/alertas/assinaturas", "/api/alertas/historico"):
+                qs = self._sessao_ou_401()
+                if not qs:
+                    return
+                quem = None if seg.pode(qs, seg.DIRECAO) else qs["usuario"]          # a direção vê todas
+                if u.path.endswith("/historico"):
+                    return self._json(200, {"ok": True, "historico": alertas.historico(quem=quem)})
+                return self._json(200, {"ok": True, "assinaturas": alertas.assinaturas(quem),
+                                        "regras": {k: v[0] for k, v in alertas_mod.REGRAS.items()},
+                                        "atividades": list(alertas_mod.ATIVIDADES), "finalidade": alertas_mod.FINALIDADE,
+                                        "whatsapp": bool(alertas.whatsapp), "agora": alertas.alertas_agora()})
             if u.path == "/api/saude":
                 integra, n = hub.verificar_cadeia()
                 p = hub.painel()["saude"]
@@ -698,8 +1136,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def do_PUT(self):
             u = urlparse(self.path)
+            if self._csrf_barrado():
+                return
             if u.path.startswith("/api/gestao/arquivo/"):
-                q = self._sessao_ou_401()
+                q = self._exigir(seg.EQUIPE)
                 if not q:
                     return
                 dados = self._corpo_grande(hub.GESTAO_ARQ_MAX)
@@ -712,8 +1152,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def do_DELETE(self):
             u = urlparse(self.path)
+            if self._csrf_barrado():
+                return
             if u.path.startswith("/api/gestao/arquivo/"):
-                q = self._sessao_ou_401()
+                q = self._exigir(seg.EQUIPE)
                 if not q:
                     return
                 return self._json(200, {"ok": hub.gestao_arquivo_apagar(u.path.rsplit("/", 1)[-1], q["usuario"])})
@@ -721,29 +1163,37 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def do_POST(self):
             u = urlparse(self.path)
+            if self._csrf_barrado():
+                return
             # ── Editais, eventos e e-mail escrito na Gestão (vai para a fila email_saida que já existe) ──
             if u.path.startswith(("/api/editais", "/api/eventos")) or u.path == "/api/gestao/correio":
-                r = editais_mod.rota("POST", u.path, self._quem(), self._corpo(), editais_col, eventos_col, hub, correio)
+                q = self._quem()
+                if q and not seg.pode(q, seg.EQUIPE):
+                    return self._json(403, SEM_PAPEL)
+                if q and u.path.endswith("/fontes") and not seg.pode(q, seg.DIRECAO):   # configurar as fontes: só a direção
+                    return self._json(403, SEM_PAPEL)
+                r = editais_mod.rota("POST", u.path, q, self._corpo(), editais_col, eventos_col, hub, correio)
                 if r:
                     return self._json(*r)
             # ── Suporte ao cliente: chamado + e-mail para a Physis (e-mail e WhatsApp vêm da configuração) ──
             if u.path == "/api/suporte":
                 q = self._quem()
-                if exige_login and not q:
+                if self._precisa_sessao() and not q:
                     return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
-                try:
-                    d = json.loads(self._corpo() or "{}")
-                except ValueError:
-                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                if not q and self._limitado("publico"):
+                    return
+                d = self._ler(self._corpo(), "suporte", estrito=False)
+                if d is None:
+                    return
                 para = os.environ.get("PHYSIS_SUPORTE_EMAIL") or instancia.get("suporte_email") or ""
-                r = hub.suporte_abrir(d if isinstance(d, dict) else {}, (q or {}).get("nome", ""), para)
+                r = hub.suporte_abrir(d if isinstance(d, dict) else {}, (q or {}).get("nome", ""), para, (q or {}).get("usuario", ""))
                 if r.get("ok"):
                     threading.Thread(target=correio.enviar_fila, args=(hub, r["numero"]), daemon=True).start()
                 return self._json(200 if r["ok"] else 400, r)
             # ── DWG para DXF (Planejador): conversor aberto LibreDWG (dwg2dxf) instalado no servidor ──
             if u.path == "/api/converter/dwg":
                 q = self._quem()
-                if exige_login and not q:
+                if self._precisa_sessao() and not q:
                     return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
                 if not exige_login and not self._autorizado():
                     return self._json(401, {"ok": False, "erro": "token ausente ou invalido"})
@@ -763,25 +1213,29 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             # ── Localização do lugar e previsão do tempo ──
             if u.path in ("/api/clima/local", "/api/clima/atualizar"):
                 q = self._quem()
-                if exige_login and not q:
+                if self._precisa_sessao() and not q:
                     return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
                 if not exige_login and not self._autorizado():
                     return self._json(401, {"ok": False, "erro": "token ausente ou invalido"})
                 if u.path.endswith("/atualizar"):
                     return self._json(200, {"ok": True, "consultas": clima.consultar_tudo(), "estado": clima.estado()})
                 try:
-                    d = json.loads(self._corpo() or "{}")
+                    d = seg.carregar_json(self._corpo() or "{}")
                 except ValueError:
                     return self._json(400, {"ok": False, "erro": "json invalido"})
                 r = clima.definir_local(d if isinstance(d, dict) else {}, (q or {}).get("usuario", ""))
                 return self._json(200 if r["ok"] else 400, r)
             # ── Saúde: linhas dos aparelhos (MED/PUL, a homologar) e ações da tela ──
             if u.path == "/api/saude/linha":
-                if not self._autorizado():
-                    return self._json(401, {"ok": False, "erro": "token ausente ou invalido"})
                 corpo = self._corpo()
                 if corpo is None:
                     return self._recusar_corpo("corpo invalido ou grande demais")
+                if self._limitado("dispositivo"):
+                    return
+                ok, no = self._dispositivo(saude_linha=True)
+                if not ok:
+                    return
+                corpo, _ = seg.filtrar_do_no(corpo, no)
                 res = [saude.registrar_evento(l, origem="aparelho") for l in corpo.split("\n") if l.strip()]
                 for aid in {a for r in res for a in r.get("alertas", [])}:
                     threading.Thread(target=correio.enviar_fila, args=(hub, f"saude-{aid}"), daemon=True).start()
@@ -792,22 +1246,24 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if not q:
                     return
                 try:
-                    d = json.loads(self._corpo() or "{}")
+                    d = seg.carregar_json(self._corpo() or "{}")
                 except ValueError:
                     return self._json(400, {"ok": False, "erro": "json invalido"})
                 r = saude.executar(u.path[len("/api/saude/"):], d if isinstance(d, dict) else {}, q["usuario"])
                 return self._json(200 if r.get("ok") else r.pop("codigo", 400), r)
             # ── Gestão no servidor: dados, contas e senha (sempre com sessão) ──
             if u.path.startswith("/api/gestao/estado/"):
-                q = self._sessao_ou_401()
+                q = self._exigir(seg.EQUIPE)
                 if not q:
                     return
                 bruto = self._corpo_grande(hub.GESTAO_VALOR_MAX + 4096)
                 if bruto is None:
                     return self._recusar_corpo("dados ausentes ou grandes demais")
                 try:
-                    d = json.loads(bruto.decode("utf-8"))
+                    d = seg.carregar_json(bruto)
                 except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                if not isinstance(d, dict) or not isinstance(d.get("versao") or 0, int) or isinstance(d.get("versao"), bool):
                     return self._json(400, {"ok": False, "erro": "json invalido"})
                 r = hub.gestao_gravar(unquote(u.path[len("/api/gestao/estado/"):]), d.get("valor"), d.get("versao") or 0, q["usuario"])
                 return self._json(409 if r.get("conflito") else (200 if r["ok"] else 400), r)
@@ -815,15 +1271,27 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 q = self._sessao_ou_401()
                 if not q:
                     return
-                try:
-                    d = json.loads(self._corpo() or "{}")
-                except ValueError:
-                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                esq = "senha" if u.path == "/api/conta/senha" else ("contas" if u.path == "/api/contas" else "conta_alterar")
+                d = self._ler(self._corpo(), esq, estrito=False)
+                if d is None:
+                    return
+                if u.path != "/api/conta/senha" and not seg.pode(q, seg.DIRECAO):
+                    return self._json(403, SEM_PAPEL)
+                # dar papel de direção, mudar papel, desativar ou trocar a senha de outra pessoa: pede a senha de novo
+                if u.path != "/api/conta/senha" and (seg.normalizar_papel(d.get("papel")) == seg.DIRECAO or
+                                                     (u.path != "/api/contas" and (d.get("papel") is not None or d.get("ativa") is False
+                                                                                   or d.get("senha") is not None))):
+                    if not self._sensivel(q):
+                        return
                 if u.path == "/api/conta/senha":
                     r = hub.trocar_senha(q["id"], str(d.get("atual", "")), str(d.get("nova", "")))
+                    if r["ok"]:
+                        seg.evento_seguranca(hub, "senha trocada", q["usuario"], ip=self._ip())
                 elif u.path == "/api/contas":
                     r = hub.criar_conta(str(d.get("nome", "")), str(d.get("usuario", "")), str(d.get("senha", "")), q["id"],
-                                        str(d.get("pessoa", "")), str(d.get("papel", "operador")))
+                                        str(d.get("pessoa") or ""), str(d.get("papel") or "operador"))
+                    if r["ok"] and r.get("id"):
+                        self._mandar(seg.confirmar_enviar(hub, r["id"], url_publica))
                 else:
                     alvo = unquote(u.path.rsplit("/", 1)[-1])
                     r = hub.alterar_conta(q["id"], alvo, senha=d.get("senha") if isinstance(d.get("senha"), str) else None,
@@ -831,6 +1299,11 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                           papel=d.get("papel") if isinstance(d.get("papel"), str) else None,
                                           pessoa=d.get("pessoa") if isinstance(d.get("pessoa"), str) else None)
                 return self._json(200 if r["ok"] else 400, r)
+            # ── Fluxos de conta (seguranca.py): esqueci a senha, confirmar e-mail, convite, consentimento, 2FA ──
+            if u.path.startswith("/api/conta/") or u.path.startswith("/api/convites"):
+                r = self._rotas_conta(u.path)
+                if r is not False:
+                    return
             # ── Consultoria ── gravar textos do site: sempre com sessão, mesmo em instalação sem login
             if u.path.startswith("/api/site/textos/"):
                 # lê o corpo antes de responder, mesmo sem sessão: no Windows, fechar com bytes
@@ -838,11 +1311,11 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 bruto = self._corpo_grande(1024 * 1024)
                 if bruto is None:
                     return self._recusar_corpo("textos ausentes ou maiores que 1 MB")
-                q = self._quem()
+                q = self._exigir(seg.DIRECAO)          # textos do site público: só a direção
                 if not q:
-                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                    return
                 try:
-                    d = json.loads(bruto.decode("utf-8"))
+                    d = seg.carregar_json(bruto)
                 except ValueError:
                     return self._json(400, {"ok": False, "erro": "json invalido"})
                 if isinstance(d, dict) and isinstance(d.get("textos"), dict) and len(d) == 1:
@@ -851,7 +1324,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return self._json(200 if r["ok"] else 400, r)
             # ── fim Consultoria ──
             if u.path == "/api/central/arquivo":
-                # arquivo de apoio do pedido: corpo binario, ate 20 MB; publico como o proprio pedido
+                # arquivo de apoio do pedido: corpo binario, ate 20 MB; publico como o proprio pedido (com limite por IP)
+                if self._limitado("arquivo"):
+                    return
                 q = parse_qs(u.query)
                 try:
                     n = int(self.headers.get("Content-Length") or 0)
@@ -865,12 +1340,70 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             corpo = self._corpo()
             if corpo is None:
                 return self._recusar_corpo("corpo invalido ou grande demais")
-            # Entrega do receptor: o firmware atual nao manda token; fica aberta
-            # na rede local ate a F0 (memo, secao 6).
+            # ── Aprendizado, robôs e alertas de clima ──
+            if u.path == "/api/aprendizado/treinar":
+                if not self._exigir(seg.DIRECAO):
+                    return
+                return self._json(200, aprendizado.treinar())
+            if u.path.startswith("/api/robos/"):
+                qs = self._sessao_ou_401()
+                if not qs:
+                    return
+                try:
+                    d = seg.carregar_json(corpo or "{}")
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                d = d if isinstance(d, dict) else {}
+                d["_quem"] = qs["usuario"]                  # quem abre o chamado do suporte (vem da sessão, nunca do corpo)
+                cod, r = robos_mod.atender(u.path.rsplit("/", 1)[-1], d, robos)
+                return self._json(cod, r)
+            if u.path == "/api/alertas/assinaturas":
+                qs = self._sessao_ou_401()
+                if not qs:
+                    return
+                try:
+                    d = seg.carregar_json(corpo or "{}")
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                if not isinstance(d, dict):
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                admin = seg.pode(qs, seg.DIRECAO)
+                if d.get("acao") == "sair":
+                    r = alertas.sair(int(d.get("id") or 0), qs["usuario"], admin=admin)
+                else:
+                    d.pop("_admin", None)
+                    if admin:
+                        d["_admin"] = True
+                    r = alertas.assinar(d, qs["usuario"])
+                return self._json(r.pop("codigo", 200 if r["ok"] else 400), r)
+            if u.path == "/api/gis/residuos/importar":
+                if not self._exigir(seg.EQUIPE):
+                    return
+                try:
+                    pts = (residuos_mod.importar_geojson(seg.carregar_json(corpo)) if corpo.lstrip().startswith("{")
+                           else residuos_mod.importar_csv(corpo))
+                except ValueError as exc:
+                    return self._json(400, {"ok": False, "erro": str(exc)})
+                return self._json(200, residuos_mod.ResiduosGis(irradiacao).importar(pts))
+            # Entrega dos aparelhos: chave por dispositivo (Authorization: Bearer / X-Physis-Chave). Sem chave,
+            # só da rede local (o receptor V6 atual ainda não manda chave) ou com PHYSIS_ACEITAR_SEM_CHAVE=1.
+            recusadas = 0
+            if u.path in ("/api/gateway/webhook", "/api/hardware/gateway", "/api/v6/linha"):
+                if self._limitado("dispositivo"):
+                    return
+                ok, no = self._dispositivo()
+                if not ok:
+                    return
+                corpo, recusadas = seg.filtrar_do_no(corpo, no)
             if u.path in ("/api/gateway/webhook", "/api/hardware/gateway"):
-                return self._json(200, hub.receber_lote(corpo, origem="receptor"))
+                r = hub.receber_lote(corpo, origem="receptor")
+                if recusadas:
+                    r["recusadas_outro_no"] = recusadas
+                return self._json(200, r)
             if u.path == "/api/v6/linha":
                 r = hub.receber_lote(corpo, origem="esp-wifi")
+                if recusadas:
+                    r["recusadas_outro_no"] = recusadas
                 # comandos pendentes do(s) no(s) que acabaram de falar
                 pend: list[str] = []
                 for bruta in corpo.split("\n"):
@@ -880,10 +1413,12 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 r["comandos"] = pend
                 return self._json(200, r)
             if u.path in ("/api/central/compra", "/api/central/pedido"):
-                # a loja entrega aqui; nao exige login porque quem compra nao tem conta na gestao
+                # a loja entrega aqui; nao exige login porque quem compra nao tem conta na gestao (limite por IP)
+                if self._limitado("publico"):
+                    return
                 tipo = u.path.rsplit("/", 1)[-1]
                 try:
-                    d = json.loads(corpo or "{}")
+                    d = seg.carregar_json(corpo or "{}")
                 except ValueError:
                     return self._json(400, {"ok": False, "erro": "json invalido"})
                 if len(corpo or "") > 64_000 or d.get("_formato") != f"physis-{tipo}/1" or not isinstance(d.get("numero"), str):
@@ -892,10 +1427,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return self._json(200 if r["ok"] else 400, r)
             if u.path == "/api/central/alocacao":
                 # interno: a direcao define os consultores e cada consultor aceita a sua parte
-                if self._barrado():
+                if not self._exigir(seg.EQUIPE):
                     return
                 try:
-                    d = json.loads(corpo or "{}")
+                    d = seg.carregar_json(corpo or "{}")
                 except ValueError:
                     return self._json(400, {"ok": False, "erro": "json invalido"})
                 if len(corpo or "") > 64_000 or d.get("_formato") != "physis-alocacao/1" or not isinstance(d.get("id"), str):
@@ -903,15 +1438,15 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 r = hub.central_gravar("alocacao", d["id"], d)
                 return self._json(200 if r["ok"] else 400, r)
             if u.path.startswith("/api/central/compra/") and u.path.endswith("/aprovar"):
-                q = self._quem()          # aprovar dispara a montagem e o código: sempre com sessão
-                if not q:
-                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                q = self._exigir(seg.DIRECAO)          # aprovar dispara a montagem e o código: só a direção
+                if not q or not self._sensivel(q):     # e com a senha confirmada há pouco
+                    return
                 numero = u.path.split("/")[-2]
                 ok = hub.central_marcar("compra", numero, "aprovado", q["usuario"] if q else "")
                 if not ok:
                     return self._json(404, {"ok": False})
                 # montagem automática: número, plataforma, código e e-mail de acesso
-                base = url_publica or (("https" if self.headers.get("X-Forwarded-Proto") == "https" else "http") + "://" + (self.headers.get("Host") or "localhost"))
+                base = url_publica or (("https" if self._https() else "http") + "://" + (self.headers.get("Host") or "localhost"))
                 inst = hub.instalar_compra(numero, base, fabricar, q["usuario"] if q else "")
                 if inst.get("ok") and not inst.get("repetido") and correio.configurado():
                     threading.Thread(target=correio.enviar_fila, args=(hub, inst["numero"]), daemon=True).start()
@@ -919,8 +1454,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return self._json(200, {"ok": True, "instalacao": inst})
             if u.path.startswith("/api/ativar/"):
                 # o cliente digita o código do e-mail; certo -> baixa a plataforma montada para ele
+                if self._limitado("entrar"):
+                    return
                 try:
-                    d = json.loads(corpo or "{}")
+                    d = seg.carregar_json(corpo or "{}")
                 except ValueError:
                     return self._json(400, {"ok": False, "erro": "json invalido"})
                 r = hub.ativar(u.path.rsplit("/", 1)[-1], str(d.get("codigo", "")) if isinstance(d, dict) else "")
@@ -940,9 +1477,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return self._json(200, {"ok": True, "pacote": False, "numero": r["numero"]})
             if u.path.startswith("/api/central/emails/"):
                 # a equipe marca como enviado à mão, ou manda tentar de novo pelo servidor de e-mail
-                q = self._quem()
-                if not q:
-                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                if not self._exigir(seg.EQUIPE):
+                    return
                 partes = u.path.split("/")
                 if len(partes) != 6 or not partes[4].isdigit() or partes[5] not in ("enviado", "enviar"):
                     return self._json(404, {"ok": False, "erro": "rota desconhecida"})
@@ -955,35 +1491,83 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 hub.email_marcar(e[0]["id"], "enviado" if ok else "falhou", erro)
                 return self._json(200 if ok else 502, {"ok": ok, "erro": erro})
             if u.path in ("/api/conta/criar", "/api/conta/entrar", "/api/conta/sair"):
-                try:
-                    d = json.loads(corpo or "{}")
-                except ValueError:
-                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                if u.path != "/api/conta/sair" and self._limitado("entrar"):     # por IP, além do limite por usuário do hub
+                    return
                 if u.path == "/api/conta/sair":
+                    d = {}
+                else:
+                    d = self._ler(corpo, "criar" if u.path.endswith("criar") else "entrar", estrito=False)
+                    if d is None:
+                        return
+                if u.path == "/api/conta/sair":
+                    q = self._quem()
                     hub.sair(self._token_sessao())
-                    return self._json_cookie(200, {"ok": True}, "physis_sessao=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict")
+                    if q:
+                        seg.acesso_registrar(hub, q["usuario"], self._ip(), "saiu")
+                    return self._json_cookie(200, {"ok": True}, self._cookie("", 0))
                 if u.path == "/api/conta/criar":
                     q = self._quem()
+                    # a primeira conta vira a direção: de fora da rede local, só com PHYSIS_PRIMEIRA_CONTA_EXTERNA=1
+                    if not hub.tem_conta() and not self._local() and os.environ.get("PHYSIS_PRIMEIRA_CONTA_EXTERNA") != "1":
+                        return self._json(403, {"ok": False, "erro": "a primeira conta só pode ser criada da rede local do servidor"})
                     r = hub.criar_conta(str(d.get("nome", "")), str(d.get("usuario", "")), str(d.get("senha", "")), q["id"] if q else None)
                     if not r["ok"]:
                         return self._json(400, r)
+                    aceito, versao = seg._consentimento_do_corpo(d)
+                    if aceito and r.get("id"):
+                        seg.consentimento_registrar(hub, r["id"], str(d.get("usuario", "")).strip().lower(), versao, True, self._ip())
                     if not r.get("primeira"):
+                        self._mandar(seg.confirmar_enviar(hub, r["id"], url_publica))
                         return self._json(200, r)
-                r = hub.entrar(str(d.get("usuario", "")), str(d.get("senha", "")))
+                r = hub.entrar(str(d.get("usuario", "")), str(d.get("senha", "")), self._ip(), self.headers.get("User-Agent") or "",
+                               d.get("codigo") if isinstance(d.get("codigo"), str) else None)
+                if not r.get("precisa_2fa"):
+                    seg.acesso_registrar(hub, str(d.get("usuario", "")).strip().lower(), self._ip(),
+                                         "entrou" if r["ok"] else ("bloqueado" if r.get("espera") else "senha errada"))
                 if not r["ok"]:
                     return self._json(429 if r.get("espera") else 401, r)
                 tk = r.pop("token")
-                return self._json_cookie(200, r, f"physis_sessao={tk}; Path=/; Max-Age={hub.SESSAO_S}; HttpOnly; SameSite=Strict")
-            if u.path.startswith("/api/loja/item/"):
-                # catálogo da loja: sempre exige sessão, mesmo em instalação sem login
-                q = self._quem()
+                r["csrf"] = seg.csrf_de(hub, tk)
+                return self._json_cookie(200, r, self._cookie(tk, hub.SESSAO_S))
+            # ── LGPD art. 18, VI: a pessoa apaga a própria conta (confirma com a senha); ver seguranca.apagar_titular ──
+            if u.path == "/api/conta/apagar":
+                if self._limitado("entrar"):
+                    return
+                q = self._sessao_ou_401()
                 if not q:
-                    return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                    return
+                d = self._ler(corpo, "apagar")
+                if d is None:
+                    return
+                if q.get("dois_fatores") and not seg.segundo_fator(hub, q["id"], str(d.get("codigo") or ""), q["usuario"]):
+                    return self._json(403, {"ok": False, "precisa_2fa": True, "erro": "Digite o código do aplicativo autenticador."})
+                r = seg.apagar_titular(hub, q, str(d.get("senha", "")))
+                if not r["ok"]:
+                    return self._json(r.pop("codigo", 400), r)
+                return self._json_cookie(200, r, self._cookie("", 0))
+            # ── Chaves dos dispositivos (só a direção): criar devolve a chave UMA vez; revogar vale na hora ──
+            if u.path == "/api/dispositivos/chaves" or (u.path.startswith("/api/dispositivos/chaves/") and u.path.endswith("/revogar")):
+                q = self._exigir(seg.DIRECAO)
+                if not q:
+                    return
+                if u.path.endswith("/revogar"):
+                    ok = seg.chave_revogar(hub, u.path.split("/")[-2], q["usuario"])
+                    return self._json(200 if ok else 404, {"ok": ok})
+                d = self._ler(corpo, "chave")
+                if d is None or not self._sensivel(q):
+                    return
+                r = seg.chave_criar(hub, d.get("no"), str(d.get("rotulo", "")), q["usuario"])
+                return self._json(200 if r["ok"] else 400, r)
+            if u.path.startswith("/api/loja/item/"):
+                # catálogo da loja: sempre exige sessão da equipe, mesmo em instalação sem login; publicar, só a direção
+                q = self._exigir(seg.EQUIPE)
+                if not q:
+                    return
                 partes = u.path.split("/")          # ['', 'api', 'loja', 'item', <id>, (acao)]
                 if len(partes) not in (5, 6):
                     return self._json(404, {"ok": False, "erro": "rota desconhecida"})
                 try:
-                    d = json.loads(corpo or "{}")
+                    d = seg.carregar_json(corpo or "{}")
                 except ValueError:
                     return self._json(400, {"ok": False, "erro": "json invalido"})
                 if not isinstance(d, dict):
@@ -994,6 +1578,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 elif acao == "revisar":
                     r = hub.loja_revisar(ident, q["usuario"], bool(d.get("revisado", True)))
                 elif acao == "publicar":
+                    if not seg.pode(q, seg.DIRECAO):
+                        return self._json(403, SEM_PAPEL)
                     r = hub.loja_publicar(ident, q["usuario"], bool(d.get("publico", True)))
                 else:
                     return self._json(404, {"ok": False, "erro": "rota desconhecida"})
@@ -1006,7 +1592,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 linha = corpo.strip()
                 if linha.startswith("{"):
                     try:
-                        linha = str(json.loads(linha).get("comando", ""))
+                        c = seg.carregar_json(linha)
+                        linha = str(c.get("comando", "")) if isinstance(c, dict) else ""
+                        if len(linha) > 200:
+                            return self._json(400, {"ok": False, "erro": "comando longo demais"})
                     except ValueError:
                         return self._json(400, {"ok": False, "erro": "json invalido"})
                 r = hub.comandar(linha)
@@ -1045,11 +1634,21 @@ def main() -> None:
     cfg_mqtt = mqtt_mod.config_de(ler_instancia())       # Caixinha Physis IoT (ESPHome) pelo broker MQTT
     if cfg_mqtt:
         threading.Thread(target=mqtt_mod.rodar, args=(hub, cfg_mqtt, parar), daemon=True).start()
+    apr_fundo = aprendizado_mod.Aprendizado(hub)         # treina ao ligar (se o último tem mais de 1 dia) e às 3 h
+    threading.Thread(target=aprendizado_mod.rodar, args=(apr_fundo, parar), daemon=True).start()
+    alertas_fundo = alertas_mod.AlertasClima(hub, aprendizado=apr_fundo)   # alertas de clima a cada 15 min
+    threading.Thread(target=alertas_mod.rodar, args=(alertas_fundo, parar),
+                     kwargs={"enviar": lambda: alertas_mod.enviar_emails(hub, correio.enviar_fila)}, daemon=True).start()
     saude_fundo = saude_mod.Saude(hub)          # doses esquecidas e avisos aos cuidadores, mesmo sem a tela aberta
     threading.Thread(target=saude_mod.rodar, args=(saude_fundo, parar),
                      kwargs={"enviar": lambda: saude_mod.enviar_avisos(hub, correio.enviar_fila)}, daemon=True).start()
-    srv = iniciar(hub, porta, os.environ.get("PHYSIS_TOKEN"), clima=clima)
-    print(f"Physis Hub em http://0.0.0.0:{porta}  receptor={rx or 'nao configurado'}  simulador={sim or 'desligado'}")
+    # retenção (LGPD/Marco Civil): sessões vencidas, acessos com mais de 6 meses, e-mails não enviados... (PHYSIS_RETENCAO_DIAS_*)
+    threading.Thread(target=seg.rodar_retencao, args=(hub, parar), daemon=True).start()
+    endereco = os.environ.get("PHYSIS_ENDERECO") or "0.0.0.0"
+    srv = iniciar(hub, porta, os.environ.get("PHYSIS_TOKEN"), endereco=endereco, clima=clima)
+    print(f"Physis Hub em http://{endereco}:{porta}  receptor={rx or 'nao configurado'}  simulador={sim or 'desligado'}")
+    if not inst.get("login"):
+        print("Aviso: instalação sem login. Telemetria aberta só para a rede local; de fora, tudo pede sessão (docs/SEGURANCA.md).")
     try:
         while True:
             time.sleep(3600)

@@ -19,6 +19,7 @@ import unicodedata
 from collections import Counter, deque
 
 from . import adaptador, protocolo
+from . import seguranca as seg
 
 OFFLINE_S_PADRAO = 160          # 3 ciclos do TDMA com 99 nos (~53 s cada)
 LINHAS_PARA_CONFIRMAR = 3       # leituras do no ate declarar "nao confirmado"
@@ -47,7 +48,8 @@ CREATE TABLE IF NOT EXISTS conta (
   id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, usuario TEXT NOT NULL UNIQUE,
   papel TEXT NOT NULL, sal BLOB NOT NULL, resumo BLOB NOT NULL, criado REAL NOT NULL);
 CREATE TABLE IF NOT EXISTS sessao (
-  token TEXT PRIMARY KEY, conta INTEGER NOT NULL, expira REAL NOT NULL);
+  resumo TEXT PRIMARY KEY, conta INTEGER NOT NULL, expira REAL NOT NULL, criado REAL NOT NULL DEFAULT 0,
+  ip TEXT NOT NULL DEFAULT '', agente TEXT NOT NULL DEFAULT '', visto REAL NOT NULL DEFAULT 0, reauth REAL NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS central (
   tipo TEXT NOT NULL, numero TEXT NOT NULL, dados TEXT NOT NULL, estado TEXT NOT NULL,
   criado REAL NOT NULL, atualizado REAL NOT NULL, PRIMARY KEY (tipo, numero));
@@ -87,6 +89,7 @@ class Hub:
         self.guardar_medicoes = guardar_medicoes
         self.enviar_comando = enviar_comando      # funcao(linha) -> (ok, detalhe) ou None
         self.relogio = relogio
+        self.SESSAO_S = seg.sessao_vida_s(Hub.SESSAO_S)      # PHYSIS_SESSAO_DIAS (vida máxima da sessão)
         self._trava = threading.RLock()
         self._db = sqlite3.connect(caminho, check_same_thread=False)
         self._db.executescript(ESQUEMA)
@@ -96,6 +99,12 @@ class Hub:
             self._db.execute("ALTER TABLE conta ADD COLUMN pessoa TEXT NOT NULL DEFAULT ''")
         if "ativa" not in cols:
             self._db.execute("ALTER TABLE conta ADD COLUMN ativa INTEGER NOT NULL DEFAULT 1")
+        # segurança: a sessão passa a ser guardada só como resumo SHA-256 do token. As sessões antigas
+        # (token em texto) são descartadas: quem estava dentro entra de novo uma vez.
+        if "token" in {r[1] for r in self._db.execute("PRAGMA table_info(sessao)")}:
+            self._db.execute("DROP TABLE sessao")
+            self._db.executescript(ESQUEMA)
+        seg.preparar(self._db)          # chaves dos dispositivos e registro de acessos
         self._db.commit()
         self._db.execute("PRAGMA journal_mode=WAL")
         self._db.execute("PRAGMA synchronous=NORMAL")
@@ -339,7 +348,7 @@ class Hub:
     # ── Contas e sessoes (acesso local da instalacao) ───────────────────────
     # Senha nunca e guardada: so o resumo PBKDF2-SHA256 com sal por conta.
     ITERACOES = 240_000
-    SENHA_MIN = 10
+    SENHA_MIN = seg.SENHA_MIN          # 12; política completa em seguranca.senha_fraca (lista de senhas comuns)
     SESSAO_S = 30 * 24 * 3600
 
     @staticmethod
@@ -362,12 +371,14 @@ class Hub:
         nome, usuario = (nome or "").strip(), (usuario or "").strip().lower()
         if not nome or not usuario:
             return {"ok": False, "erro": "Informe o nome e o usuario."}
-        if len(senha or "") < self.SENHA_MIN:
-            return {"ok": False, "erro": f"A senha precisa de pelo menos {self.SENHA_MIN} caracteres."}
+        erro = seg.senha_fraca(senha, usuario)
+        if erro:
+            return {"ok": False, "erro": erro}
         dominio = (os.environ.get("PHYSIS_DOMINIO_EMAIL") or "").strip().lower().lstrip("@")
         if dominio and not usuario.endswith("@" + dominio):
             return {"ok": False, "erro": f"Use um e-mail @{dominio}."}
-        if papel not in ("operador", "administrador"):
+        papel = seg.normalizar_papel(papel)          # aceita também "direção", "equipe" e "cliente"
+        if not papel:
             return {"ok": False, "erro": "Papel invalido."}
         with self._trava:
             primeira = not self.tem_conta()
@@ -376,19 +387,23 @@ class Hub:
             papel = "administrador" if primeira else papel
             sal = os.urandom(16)
             try:
-                self._db.execute("INSERT INTO conta(nome,usuario,papel,sal,resumo,criado,pessoa) VALUES(?,?,?,?,?,?,?)",
-                                 (nome, usuario, papel, sal, self._resumir(senha, sal), self.relogio(), (pessoa or "")[:40]))
+                # a primeira conta (dona da instalação, criada da rede local) nasce confirmada; as criadas pela
+                # direção confirmam o e-mail pelo link (seguranca.confirmar_enviar), quando a confirmação é exigida
+                cur = self._db.execute("INSERT INTO conta(nome,usuario,papel,sal,resumo,criado,pessoa,confirmado) VALUES(?,?,?,?,?,?,?,?)",
+                                       (nome, usuario, papel, sal, self._resumir(senha, sal), self.relogio(), (pessoa or "")[:40],
+                                        self.relogio() if primeira else None))
             except sqlite3.IntegrityError:
                 return {"ok": False, "erro": "Ja existe uma conta com esse usuario."}
             self._db.commit()
             self.registrar("conta", usuario, {"o_que": "conta criada", "papel": papel, "pessoa": pessoa or ""})
             self._db.commit()
-            return {"ok": True, "primeira": primeira}
+            return {"ok": True, "primeira": primeira, "id": cur.lastrowid}
 
     def contas(self) -> list[dict]:
         with self._trava:
-            linhas = self._db.execute("SELECT nome, usuario, papel, pessoa, ativa, criado FROM conta ORDER BY nome").fetchall()
-        return [{"nome": n, "usuario": u, "papel": p, "pessoa": pe, "ativa": bool(a), "criado": c} for n, u, p, pe, a, c in linhas]
+            linhas = self._db.execute("SELECT nome, usuario, papel, pessoa, ativa, criado, confirmado, totp_ativo FROM conta ORDER BY nome").fetchall()
+        return [{"nome": n, "usuario": u, "papel": p, "pessoa": pe, "ativa": bool(a), "criado": c, "email_confirmado": cf is not None,
+                 "dois_fatores": bool(t)} for n, u, p, pe, a, c, cf, t in linhas]
 
     def alterar_conta(self, autor: int | None, usuario: str, *, senha: str | None = None, ativa: bool | None = None,
                       papel: str | None = None, pessoa: str | None = None) -> dict:
@@ -400,18 +415,20 @@ class Hub:
             alvo = self._db.execute("SELECT id, papel FROM conta WHERE usuario=?", (usuario,)).fetchone()
             if not alvo:
                 return {"ok": False, "erro": "Conta nao encontrada."}
-            if alvo[0] == autor and (ativa is False or papel == "operador"):
+            if papel is not None and not seg.normalizar_papel(papel):
+                return {"ok": False, "erro": "Papel invalido."}
+            papel = seg.normalizar_papel(papel) if papel is not None else None
+            if alvo[0] == autor and (ativa is False or (papel is not None and papel != seg.DIRECAO)):
                 return {"ok": False, "erro": "Voce nao pode desativar nem rebaixar a propria conta."}
             if senha is not None:
-                if len(senha) < self.SENHA_MIN:
-                    return {"ok": False, "erro": f"A senha precisa de pelo menos {self.SENHA_MIN} caracteres."}
+                erro = seg.senha_fraca(senha, usuario)
+                if erro:
+                    return {"ok": False, "erro": erro}
                 sal = os.urandom(16)
                 self._db.execute("UPDATE conta SET sal=?, resumo=? WHERE id=?", (sal, self._resumir(senha, sal), alvo[0]))
             if ativa is not None:
                 self._db.execute("UPDATE conta SET ativa=? WHERE id=?", (1 if ativa else 0, alvo[0]))
             if papel is not None:
-                if papel not in ("operador", "administrador"):
-                    return {"ok": False, "erro": "Papel invalido."}
                 self._db.execute("UPDATE conta SET papel=? WHERE id=?", (papel, alvo[0]))
             if pessoa is not None:
                 self._db.execute("UPDATE conta SET pessoa=? WHERE id=?", (pessoa[:40], alvo[0]))
@@ -426,8 +443,9 @@ class Hub:
             r = self._db.execute("SELECT usuario, sal, resumo FROM conta WHERE id=?", (conta_id,)).fetchone()
             if not r or not hmac.compare_digest(self._resumir(atual or "", r[1]), r[2]):
                 return {"ok": False, "erro": "A senha atual nao confere."}
-            if len(nova or "") < self.SENHA_MIN:
-                return {"ok": False, "erro": f"A senha nova precisa de pelo menos {self.SENHA_MIN} caracteres."}
+            erro = seg.senha_fraca(nova, r[0])
+            if erro:
+                return {"ok": False, "erro": erro}
             sal = os.urandom(16)
             self._db.execute("UPDATE conta SET sal=?, resumo=? WHERE id=?", (sal, self._resumir(nova, sal), conta_id))
             self.registrar("conta", r[0], {"o_que": "senha trocada pela propria pessoa"})
@@ -473,7 +491,9 @@ class Hub:
         if not dados or len(dados) > self.GESTAO_ARQ_MAX:
             return {"ok": False, "erro": "arquivo vazio ou maior que 20 MB"}
         nome = (nome or "arquivo").replace("\\", "/").rsplit("/", 1)[-1][:120]
-        tipo = tipo if re.fullmatch(r"[\w.+-]+/[\w.+-]+", tipo or "") else "application/octet-stream"
+        if seg.eh_executavel(dados):
+            return {"ok": False, "erro": "arquivo executável não é aceito"}
+        tipo = seg.tipo_seguro(tipo, nome)
         with self._trava:
             self._db.execute("INSERT OR REPLACE INTO gestao_arquivo(id,nome,tipo,dados,tamanho,criado,por) VALUES(?,?,?,?,?,?,?)",
                              (ident, nome, tipo, dados, len(dados), self.relogio(), por))
@@ -494,7 +514,7 @@ class Hub:
             self._db.commit()
             return cur.rowcount > 0
 
-    def entrar(self, usuario: str, senha: str) -> dict:
+    def entrar(self, usuario: str, senha: str, ip: str = "", agente: str = "", codigo: str | None = None) -> dict:
         usuario = (usuario or "").strip().lower()
         with self._trava:
             agora = self.relogio()
@@ -505,35 +525,58 @@ class Hub:
                 return {"ok": False, "erro": f"Muitas tentativas. Tente de novo em {int(ate - agora) + 1} s.", "espera": True}
             linha = self._db.execute("SELECT id, nome, papel, sal, resumo FROM conta WHERE usuario=? AND ativa=1", (usuario,)).fetchone()
             certo = bool(linha) and hmac.compare_digest(self._resumir(senha or "", linha[3]), linha[4])
+            if certo and seg.totp_ligado(self, linha[0]):
+                # verificação em duas etapas: sem código, pede o código (a senha certa não abre a sessão sozinha)
+                if not codigo:
+                    return {"ok": False, "precisa_2fa": True, "erro": "Digite o código do aplicativo autenticador."}
+                certo = seg.segundo_fator(self, linha[0], codigo, usuario)
             if not certo:
                 n += 1
                 falhas[usuario] = (n, agora + 30 if n >= 5 else 0.0)
-                return {"ok": False, "erro": "Usuario ou senha nao conferem."}
+                return {"ok": False, "erro": "Usuario ou senha nao conferem." if not codigo else "Usuario, senha ou codigo nao conferem."}
             falhas.pop(usuario, None)
-            token = secrets.token_urlsafe(32)
+            token = secrets.token_urlsafe(32)          # vai só no cookie; o banco guarda o resumo SHA-256
             self._db.execute("DELETE FROM sessao WHERE expira < ?", (agora,))
-            self._db.execute("INSERT INTO sessao(token,conta,expira) VALUES(?,?,?)", (token, linha[0], agora + self.SESSAO_S))
+            # entrar conta como autenticação recente (reauth): ações sensíveis valem por PHYSIS_REAUT_MIN depois do login
+            self._db.execute("INSERT INTO sessao(resumo,conta,expira,criado,ip,agente,visto,reauth) VALUES(?,?,?,?,?,?,?,?)",
+                             (seg.resumo(token), linha[0], agora + self.SESSAO_S, agora, (ip or "")[:64], (agente or "")[:200], agora, agora))
             self._db.commit()
             return {"ok": True, "token": token, "nome": linha[1], "papel": linha[2]}
 
     def sessao(self, token: str | None) -> dict | None:
         if not token:
             return None
+        r_ = seg.resumo(token)
         with self._trava:
-            r = self._db.execute("SELECT c.id, c.nome, c.usuario, c.papel, c.pessoa FROM sessao s JOIN conta c ON c.id = s.conta "
-                                 "WHERE s.token=? AND s.expira > ? AND c.ativa=1", (token, self.relogio())).fetchone()
-        return dict(zip(("id", "nome", "usuario", "papel", "pessoa"), r)) if r else None
+            agora = self.relogio()
+            r = self._db.execute("SELECT c.id, c.nome, c.usuario, c.papel, c.pessoa, s.resumo, s.visto, s.reauth, c.confirmado, "
+                                 "c.consentimento_versao, c.totp_ativo FROM sessao s JOIN conta c ON c.id = s.conta "
+                                 "WHERE s.resumo=? AND s.expira > ? AND c.ativa=1", (r_, agora)).fetchone()
+            if not r or not seg.iguais(r[5], r_):
+                return None
+            ociosa = seg.sessao_ociosa_s()
+            if ociosa and r[6] and agora - r[6] > ociosa:          # parada tempo demais: cai
+                self._db.execute("DELETE FROM sessao WHERE resumo=?", (r_,))
+                self._db.commit()
+                return None
+            if agora - (r[6] or 0) > 60:                           # marca o uso sem gravar a cada pedido
+                self._db.execute("UPDATE sessao SET visto=? WHERE resumo=?", (agora, r_))
+                self._db.commit()
+        q = dict(zip(("id", "nome", "usuario", "papel", "pessoa"), r[:5]))
+        q.update(reauth=r[7] or 0.0, confirmado=(r[8] is not None) or not seg.confirmacao_exigida(),
+                 consentimento=r[9] or "", dois_fatores=bool(r[10]))
+        return q
 
     def sair(self, token: str | None) -> None:
         with self._trava:
-            self._db.execute("DELETE FROM sessao WHERE token=?", (token or "",))
+            self._db.execute("DELETE FROM sessao WHERE resumo=?", (seg.resumo(token or ""),))
             self._db.commit()
 
     # ── Caixa central: o que a loja entrega e a gestao recebe, sem copiar e colar ──
     TIPOS_CENTRAL = ("compra", "pedido", "alocacao", "suporte")
 
     # ── Suporte ao cliente: cada mensagem vira um chamado, com e-mail para a Physis na fila de saída ──
-    def suporte_abrir(self, dados: dict, quem: str, para: str) -> dict:
+    def suporte_abrir(self, dados: dict, quem: str, para: str, usuario: str = "") -> dict:
         assunto = str(dados.get("assunto") or "").strip()[:140]
         mensagem = str(dados.get("mensagem") or "").strip()[:4000]
         if not assunto or not mensagem:
@@ -547,6 +590,8 @@ class Hub:
         numero = "SP-%04d" % seq
         reg = {"assunto": assunto, "mensagem": mensagem, "contato": contato, "canal": canal, "quem": quem,
                "org": self.org, "lugar": self.lugar, "quando": self.relogio()}
+        if usuario:
+            reg["usuario"] = usuario
         r = self.central_por("suporte", numero, reg)
         if not r.get("ok"):
             return r
@@ -558,9 +603,10 @@ class Hub:
             self._db.commit()
         return {"ok": True, "numero": numero}
 
-    def suporte_listar(self) -> list[dict]:
+    def suporte_listar(self, usuario: str | None = None) -> list[dict]:
+        """Todos os chamados; com usuario, só os que essa conta abriu (papel cliente)."""
         return [{"numero": x["numero"], "estado": x["estado"], "criado": x["criado"], **{k: x["dados"].get(k) for k in ("assunto", "mensagem", "canal", "contato")}}
-                for x in self.central_listar() if x["tipo"] == "suporte"]
+                for x in self.central_listar() if x["tipo"] == "suporte" and (usuario is None or x["dados"].get("usuario") == usuario)]
 
     def central_por(self, tipo: str, numero: str, dados: dict) -> dict:
         """Guarda uma compra paga ou um pedido de proposta. Repetir o mesmo numero nao duplica."""
@@ -603,6 +649,9 @@ class Hub:
             return {"ok": False, "erro": "so sao aceitos arquivos Excel, PDF e Word"}
         if not dados or len(dados) > self.ARQUIVO_MAX:
             return {"ok": False, "erro": "arquivo vazio ou maior que 20 MB"}
+        erro = seg.arquivo_confere(nome, dados)          # conteúdo confere com a extensão; nada executável
+        if erro:
+            return {"ok": False, "erro": erro}
         with self._trava:
             if not self._db.execute("SELECT 1 FROM central WHERE tipo='pedido' AND numero=?", (pedido,)).fetchone():
                 return {"ok": False, "erro": "pedido desconhecido"}
@@ -798,7 +847,11 @@ class Hub:
         with self._trava:
             cur = self._db.execute("UPDATE email_saida SET estado=?, erro=?, enviado=? WHERE id=?",
                                    (estado, erro[:300], self.relogio() if estado.startswith("enviado") else None, ident))
-            if cur.rowcount and estado.startswith("enviado"):
+            if cur.rowcount and estado.startswith("enviado") and str(
+                    (self._db.execute("SELECT ref FROM email_saida WHERE id=?", (ident,)).fetchone() or [""])[0]).startswith(seg.REF_CONTA):
+                self._db.execute("UPDATE email_saida SET corpo='[e-mail de conta com link de uso único: texto apagado depois do envio]' WHERE id=?",
+                                 (ident,))
+            elif cur.rowcount and estado.startswith("enviado"):
                 # depois de enviado, o código de ativação não fica guardado em texto no servidor
                 self._db.execute("UPDATE email_saida SET corpo=? WHERE id=?",
                                  (re.sub(r"(Código de ativação: )[A-Z0-9-]+", r"\1(enviado ao cliente)",
