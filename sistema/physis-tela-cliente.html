@@ -1147,14 +1147,22 @@ function montarFatores(){
 function montarMenu(){
   const secs=["perfil","site","recp","equip","medicao","residuos","conformidade","carbono","cert","trilha"];
   const ol=$("#menu");ol.innerHTML="";
+  /* Dentro da plataforma: PHYSIS_OCULTAR esconde seções sem módulo ou já cobertas por outra aba;
+     PHYSIS_SO mostra só as seções pedidas (ex.: a aba Carbono abre só a seção Carbono). */
+  const so=(window.PHYSIS_SO||[]).filter(x=>secs.indexOf(x)>=0), ocultar=window.PHYSIS_OCULTAR||[];
+  let nMenu=0;
   t().menu.forEach((nome,i)=>{
+    if(ocultar.indexOf(secs[i])>=0||(so.length&&so.indexOf(secs[i])<0))return;
+    nMenu++;
     const li=document.createElement("li");
-    li.innerHTML='<button data-sec="'+secs[i]+'"><span class="n">'+(i+1)+'</span><span>'+nome+
+    li.innerHTML='<button data-sec="'+secs[i]+'"><span class="n">'+nMenu+'</span><span>'+nome+
       '</span><span class="cont" id="cont-'+secs[i]+'"></span></button>';
     ol.appendChild(li);
   });
   $$("#menu button").forEach(b=>b.onclick=()=>irPara(b.dataset.sec));
-  irPara(estado.secAtual||"perfil");
+  if(so.length===1){const nav=ol.closest("nav");if(nav)nav.hidden=true;}
+  const inicial=so.length?(so.indexOf(estado.secAtual)>=0?estado.secAtual:so[0]):(estado.secAtual||"perfil");
+  irPara(inicial);
 }
 function irPara(s){
   estado.secAtual=s;

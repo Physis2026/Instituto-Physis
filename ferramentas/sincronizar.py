@@ -77,10 +77,11 @@ def tratar(texto: str, novo: str) -> str:
 
 
 # Programas embutidos que são cópia exata de um arquivo: a cópia é refeita a partir do arquivo.
-# (A "Tela do cliente" embutida tem ajustes próprios; nela só o exportador e os textos são trocados.)
+# (Desde 14/11/2026 a "Tela do cliente" também: os ajustes que só existiam na cópia foram levados ao original.)
 FONTES = {
     "sustainkit": RAIZ / "sistema" / "SustainKit_Definitivo.html",
     "supervisao": RAIZ / "sistema" / "physis-scada-demo.html",
+    "painel": RAIZ / "sistema" / "physis-tela-cliente.html",
 }
 
 
