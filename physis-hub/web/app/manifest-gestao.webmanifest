@@ -1,0 +1,20 @@
+{
+  "id": "/gestao/",
+  "name": "Physis",
+  "short_name": "Physis",
+  "description": "Gestão Physis: aplicativo interno da equipe.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/gestao/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#33512F",
+  "background_color": "#F4F6F1",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {"src": "/app/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/app/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/app/icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

@@ -93,6 +93,8 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
     shutil.copytree(AQUI / "tests", pasta / "tests", ignore=shutil.ignore_patterns("__pycache__"))
     shutil.copytree(AQUI / "docs", pasta / "docs")
     shutil.copy2(AQUI / "web" / "painel.html", pasta / "web" / "painel.html")
+    if (AQUI / "web" / "app").is_dir():      # app instalável no celular (manifesto, ícones, service worker)
+        shutil.copytree(AQUI / "web" / "app", pasta / "web" / "app")
     if "sustainkit" in modulos:
         shutil.copy2(sustainkit, pasta / "web" / "sustainkit.html")
     if "supervisao" in modulos:

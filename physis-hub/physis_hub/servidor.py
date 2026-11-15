@@ -36,7 +36,9 @@ from urllib.parse import parse_qs, quote, unquote, urlparse
 import re
 
 from . import clima as clima_mod
+from . import saude as saude_mod
 from . import gis as gis_mod
+from . import app_pwa
 from . import correio
 from .hub import Hub
 from .protocolo import para_int, validar_telemetria
@@ -245,6 +247,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
     instancia = instancia if instancia is not None else ler_instancia()
     if irradiacao is None:
         irradiacao = gis_mod.Irradiacao(hub)
+    saude = saude_mod.Saude(hub)
     if clima is None:
         rx = os.environ.get("PHYSIS_RX_URL")
         clima = clima_mod.Clima(hub, receptor_url=rx, enviar_local=clima_mod.receptor_local(rx) if rx else None)
@@ -531,11 +534,21 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if q["papel"] != "administrador":
                     return self._json(403, {"ok": False, "erro": "so a direcao ve as contas"})
                 return self._json(200, {"ok": True, "contas": hub.contas()})
+            # ── Saúde (caixinha de remédios e pulseira): dado sensível, sempre com sessão e só de quem foi autorizado ──
+            if u.path == "/api/saude/estado":
+                q = self._sessao_ou_401()
+                if not q:
+                    return
+                return self._json(200, saude.estado(q["usuario"]))
             if u.path in ("/api/central/emails", "/api/central/instalacoes"):
                 if not self._quem():
                     return self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
                 if u.path.endswith("emails"):
-                    return self._json(200, {"ok": True, "configurado": correio.configurado(), "emails": hub.emails()})
+                    # avisos de saúde (dado sensível, LGPD) vão só para os cuidadores: a fila mostra só quantos são
+                    todos = hub.emails()
+                    saude_n = sum(1 for e in todos if str(e.get("ref") or "").startswith("saude-"))
+                    return self._json(200, {"ok": True, "configurado": correio.configurado(), "saude_ocultos": saude_n,
+                                            "emails": [e for e in todos if not str(e.get("ref") or "").startswith("saude-")]})
                 return self._json(200, {"ok": True, "instalacoes": hub.instalacoes()})
             if u.path in ("/demo", "/demo/"):
                 # demonstração gratuita: roda inteira no navegador, com dados simulados; não lê nada do servidor
@@ -580,6 +593,19 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     self.wfile.write(pagina)
                     return
                 return self._arquivo(WEB / "gestao.html", "text/html; charset=utf-8")
+            if u.path.startswith("/app/"):
+                # app instalável (PWA): manifestos, ícones e service worker. Só os da lista e sem login:
+                # o celular precisa deles para instalar antes de qualquer entrada.
+                r = app_pwa.resposta(unquote(u.path[len("/app/"):]), WEB)
+                if not r:
+                    return self._json(404, {"ok": False, "erro": "arquivo desconhecido"})
+                corpo, cabecalhos = r
+                self.send_response(200)
+                for k, v in cabecalhos.items():
+                    self.send_header(k, v)
+                self.end_headers()
+                self.wfile.write(corpo)
+                return
             if u.path.startswith("/vendor/"):
                 # bibliotecas abertas guardadas no próprio sistema (mapa e BIM); só as da lista, nunca um caminho qualquer
                 nome = u.path[len("/vendor/"):]
@@ -732,6 +758,28 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     return self._json(400, {"ok": False, "erro": "json invalido"})
                 r = clima.definir_local(d if isinstance(d, dict) else {}, (q or {}).get("usuario", ""))
                 return self._json(200 if r["ok"] else 400, r)
+            # ── Saúde: linhas dos aparelhos (MED/PUL, a homologar) e ações da tela ──
+            if u.path == "/api/saude/linha":
+                if not self._autorizado():
+                    return self._json(401, {"ok": False, "erro": "token ausente ou invalido"})
+                corpo = self._corpo()
+                if corpo is None:
+                    return self._recusar_corpo("corpo invalido ou grande demais")
+                res = [saude.registrar_evento(l, origem="aparelho") for l in corpo.split("\n") if l.strip()]
+                for aid in {a for r in res for a in r.get("alertas", [])}:
+                    threading.Thread(target=correio.enviar_fila, args=(hub, f"saude-{aid}"), daemon=True).start()
+                return self._json(200, {"ok": True, "aceitas": sum(1 for r in res if r.get("ok") and not r.get("duplicada")),
+                                        "linhas": [{"ok": r.get("ok"), "motivo": r.get("motivo", "")} for r in res]})
+            if u.path.startswith("/api/saude/"):
+                q = self._sessao_ou_401()
+                if not q:
+                    return
+                try:
+                    d = json.loads(self._corpo() or "{}")
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                r = saude.executar(u.path[len("/api/saude/"):], d if isinstance(d, dict) else {}, q["usuario"])
+                return self._json(200 if r.get("ok") else r.pop("codigo", 400), r)
             # ── Gestão no servidor: dados, contas e senha (sempre com sessão) ──
             if u.path.startswith("/api/gestao/estado/"):
                 q = self._sessao_ou_401()
@@ -977,6 +1025,9 @@ def main() -> None:
     clima = clima_mod.Clima(hub, receptor_url=rx, enviar_local=clima_mod.receptor_local(rx) if rx else None)
     if os.environ.get("PHYSIS_CLIMA", "1") != "0":     # PHYSIS_CLIMA=0 desliga as consultas (sem internet de propósito)
         threading.Thread(target=clima_mod.rodar, args=(clima, parar), daemon=True).start()
+    saude_fundo = saude_mod.Saude(hub)          # doses esquecidas e avisos aos cuidadores, mesmo sem a tela aberta
+    threading.Thread(target=saude_mod.rodar, args=(saude_fundo, parar),
+                     kwargs={"enviar": lambda: saude_mod.enviar_avisos(hub, correio.enviar_fila)}, daemon=True).start()
     srv = iniciar(hub, porta, os.environ.get("PHYSIS_TOKEN"), clima=clima)
     print(f"Physis Hub em http://0.0.0.0:{porta}  receptor={rx or 'nao configurado'}  simulador={sim or 'desligado'}")
     try:

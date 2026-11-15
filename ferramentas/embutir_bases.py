@@ -18,7 +18,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 PAINEL = RAIZ / "physis-hub" / "web" / "painel.html"
 BASES = {"base-certificacoes": RAIZ / "sistema" / "physis-certificacoes.json", "base-plantas": RAIZ / "sistema" / "physis-plantas.json"}
 # módulos de cálculo em arquivo próprio (testados à parte), embutidos como <script> no <head>
-MODULOS = {"mod-avac": RAIZ / "sistema" / "physis-avac.js"}
+MODULOS = {"mod-avac": RAIZ / "sistema" / "physis-avac.js", "mod-saude": RAIZ / "sistema" / "physis-saude.js"}
 
 
 def bloco(ident: str, arq: Path) -> str:
