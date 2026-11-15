@@ -21,6 +21,7 @@ from datetime import datetime
 
 from . import adaptador, protocolo
 from . import clima as clima_mod
+from . import integridade
 from . import perfil_cliente
 from . import secador as secador_mod
 from . import seguranca as seg
@@ -111,6 +112,7 @@ class Hub:
             self._db.execute("DROP TABLE sessao")
             self._db.executescript(ESQUEMA)
         self._db.executescript(perfil_cliente.ESQUEMA)     # dados da plataforma do cliente (antes só no navegador)
+        integridade.preparar(self._db)  # lotes de dados conferidos (fonte da verdade; blockchain é só adicional)
         seg.preparar(self._db)          # chaves dos dispositivos e registro de acessos
         self._db.commit()
         self._db.execute("PRAGMA journal_mode=WAL")

@@ -1,12 +1,23 @@
-# Integridade dos dados para registro em blockchain
+# Integridade dos dados e banco de leitura
 
 Princípio do núcleo do sistema, decidido em 15/11/2026 (documento 01, seção 0.1):
 
 - **A Physis entrega** o mapeamento e a integridade dos dados.
 - **O parceiro entrega** a camada de blockchain, os tokens e a custódia.
 - O valor da Physis não está no blockchain, e sim em garantir que os dados que entram nele sejam **corretos, rastreáveis, auditáveis e no formato que o parceiro consome**.
+- **O banco de dados da Physis existe sempre e por si só.** Ele é a fonte da verdade e pode ser lido e auditado sem blockchain. O blockchain é uma **metodologia adicional e opcional**: ele recebe só o resumo de um lote que já está guardado no banco.
 
 A Physis não emite tokens, não guarda chaves de carteira, não faz custódia, não opera nem escolhe a rede. Nenhum nome de parceiro aparece no código ou nos documentos.
+
+## Camadas
+
+| Camada | Obrigatória? | O que é | Quem faz |
+|---|---|---|---|
+| 1. Banco de dados da Physis | **Sim, sempre** | Medições, cálculos e lotes fechados, em SQLite. Só aceita acréscimo: o banco recusa alteração e exclusão | Physis |
+| 2. Banco de leitura | **Sim, sempre** | Arquivo SQLite separado, aberto só para leitura, com lotes, registros, ancoragens, a visão `integridade_leitura` e um `leia_me` | Physis (para auditor, cliente ou parceiro) |
+| 3. Ancoragem adicional (ex.: blockchain) | Não, opcional | O resumo do lote registrado fora, com a referência anotada no banco | Parceiro registra; a Physis anota a referência |
+
+Sem a camada 3, tudo continua auditável: qualquer pessoa abre o banco de leitura, refaz o SHA-256 e confere.
 
 ## Divisão de responsabilidades
 
@@ -16,39 +27,40 @@ A Physis não emite tokens, não guarda chaves de carteira, não faz custódia, 
 | Validar | Faixas de validade, dado suspeito marcado, falhas de envio registradas | — |
 | Calcular | Metodologia, normas e fatores versionados (17_Metodologia_e_Normas) | — |
 | Mapear | Dicionário de dados: cada campo com nome, unidade, origem e definição | Informa o esquema que consome |
-| Fechar o lote | Lote imutável com resumo SHA-256 e a trilha de origem | — |
-| Registrar | Entrega o lote e o resumo | Grava na rede, emite tokens e faz a custódia |
-| Auditar | Guarda o lote original; qualquer um refaz a conta e confere o resumo | Mostra o registro na rede |
+| Fechar e guardar o lote | Lote imutável com resumo SHA-256, gravado no banco da Physis | — |
+| Disponibilizar para leitura | Exporta o banco de leitura | — |
+| Ancorar (opcional) | Entrega o resumo e anota a referência | Grava na rede, emite tokens e faz a custódia |
+| Auditar | O banco de leitura basta para refazer a conta | Mostra o registro na rede, quando houver |
 
-## O que cada registro leva (proposta, Fase 2)
+## O que cada registro leva
 
-- `origem`: aparelho (ID), local (lote, setor ou ponto), firmware, data e hora (UTC e local).
-- `calibracao`: data e responsável da última calibração do sensor.
-- `metodo`: versão da metodologia, das normas e dos fatores de emissão usados.
-- `qualidade`: válido, suspeito ou corrigido; se corrigido, quem, quando, por quê e o valor anterior.
-- `evidencias`: referências aos documentos e fotos guardados na plataforma.
-- `lote`: identificador, período coberto, quantidade de registros e resumo SHA-256 do conteúdo.
+- `origem`: aparelho (ID) ou cálculo, local (lote, setor ou ponto), firmware, data e hora.
+- `metodo`: versão da metodologia, das normas e dos fatores de emissão; data da calibração.
+- `qualidade`: válido, suspeito ou corrigido; se corrigido, `corrige` traz quem, quando, por quê, o valor e o resumo anteriores.
+- `evidencias` (Fase 2): referências aos documentos e fotos guardados na plataforma.
+- `lote`: identificador, período coberto, responsável, dicionário de dados, quantidade e resumo SHA-256.
 
 Nada é apagado: uma correção gera um registro novo que aponta para o anterior. O lote fechado não muda; um erro achado depois entra num lote de correção.
 
-## O que já existe e o que falta
+## No código (feito em 15/11/2026)
 
-**Já existe:**
-- aparelho com chave própria (SEGURANCA.md);
-- metodologia e normas versionadas (METODOLOGIA.md);
-- evidências da certificação (EVIDENCIAS.md);
-- inventário GHG (CARBONO_GHG.md);
-- exportação em formato aberto (EXPORTACAO.md).
+`physis_hub/integridade.py`, testado em `tests/test_integridade.py` (10 testes):
 
-**Feito em 15/11/2026:** `physis_hub/integridade.py`, com testes em `tests/test_integridade.py`.
-- `fechar_lote` recusa registro incompleto, id repetido e dado suspeito, e grava o resumo SHA-256 do lote e de cada registro.
+- `fechar_lote` recusa registro incompleto, id repetido e dado suspeito. Grava o resumo SHA-256 do lote e de cada registro.
 - `conferir_lote` refaz os resumos.
 - `corrigir` cria a correção sem apagar o registro anterior.
+- `preparar` cria as tabelas `integridade_lote`, `integridade_registro` e `integridade_ancoragem`. Gatilhos recusam UPDATE e DELETE. O hub chama `preparar` ao abrir o banco de cada lugar.
+- `guardar_lote` só grava um lote que confere. `ler_lote` e `listar_lotes` leem do banco.
+- `registrar_ancoragem` anota o método e a referência, e só para um lote já guardado.
+- `exportar_banco_leitura` gera o arquivo separado, só com as tabelas de integridade (sem contas nem senhas). `abrir_leitura` abre esse arquivo sem permissão de escrita.
 
-**Falta (Fase 2):**
+Ao lado disso, o hub mantém o registro encadeado de eventos (tabela `registro`). Cada linha guarda o resumo da anterior.
+
+## Falta (Fase 2)
+
 1. Ligar o lote aos dados reais: Monitoramento, Carbono, SbN e Certificações.
-2. Criar a rota no servidor e o botão "Fechar lote" na tela.
+2. Criar as rotas no servidor e os botões "Fechar lote" e "Baixar banco de leitura" na tela.
 3. Fazer o esquema de exportação no formato que o parceiro informar.
 4. Conferir a ida e volta: o resumo calculado pela Physis tem de bater com o que o parceiro registrou.
 
-Depende do parceiro informar o formato e o tipo de dado de cada token (crédito de carbono, área de SbN, água, energia).
+Os itens 3 e 4 dependem de o parceiro informar o formato e o tipo de dado de cada token (crédito de carbono, área de SbN, água, energia).
