@@ -30,15 +30,23 @@ if NO_REPO:
     import validar_devolucao as V  # noqa: E402
 
 RESPONSAVEIS = {
-    "planejador": ["Rafaella"], "sustainkit": ["Erick Lopes"], "solar": ["Erick Lopes"], "avac": ["Ryan"],
-    "turbinas": ["Ryan", "Emerson"], "agua": ["Erick Lopes", "Rafael"], "sbn": ["Rafaella", "Erick Lopes"],
-    "circular": ["Rafaella", "Rafael"], "carbono": ["Marzia"],
-    "resiliencia": ["Rafaella", "Arthur"], "certificacoes": ["Rafaella", "Laura", "Ryan"], "equipamentos": ["Ryan"],
-    "monitoramento": ["Arthur"], "saude": ["Emerson", "Rafael"], "scada": ["Erick Lopes", "Laura", "Rafaella"],
-    "cursos": ["Rafaella", "Laura"], "secador": ["Arthur", "Laura"], "servidor-verde": ["Eric Oliveira"],
-    "acessibilidade": ["Rafaella"], "hw-lora": ["Arthur"],
-    "hw-caixinha": ["Erick Lopes"], "hw-coleira": ["Rafael"], "hw-pluviometro": ["Rafaella", "Arthur"],
-    "hw-remedios": ["Emerson", "Rafael"], "hw-pulseira": ["Emerson"], "servidor": ["Eric Oliveira"],
+    "planejador": ["Rafaella", "Eric Oliveira", "Erick Lopes", "Arthur", "Rafael", "Emerson", "Ryan", "Laura", "Marzia",
+                   "Leonardo Macedo"],
+    "sustainkit": ["Erick Lopes"], "solar": ["Erick Lopes"], "avac": ["Ryan"], "turbinas": ["Emerson", "Ryan"],
+    "agua": ["Erick Lopes", "Rafael"], "sbn": ["Erick Lopes", "Rafaella"], "circular": ["Rafael", "Rafaella"],
+    "carbono": ["Marzia", "Laura"], "resiliencia": ["Arthur", "Rafaella"],
+    "certificacoes": ["Erick Lopes", "Ryan", "Laura", "Rafaella"], "equipamentos": ["Ryan", "Erick Lopes"],
+    "monitoramento": ["Arthur"], "saude": ["Rafael", "Emerson"], "scada": ["Erick Lopes", "Laura", "Rafaella"],
+    "cursos": ["Laura", "Marzia", "Ryan", "Leonardo Macedo", "Rafaella"], "secador": ["Arthur", "Laura", "Rafaella"],
+    "servidor-verde": ["Eric Oliveira"],
+    "acessibilidade": ["Rafaella", "Arthur", "Emerson", "Leonardo Macedo", "Laura", "Marzia"],
+    "impressao3d": ["Rafael", "Arthur", "Ryan", "Laura", "Rafaella", "Eric Oliveira", "Erick Lopes", "Emerson", "Marzia",
+                    "Leonardo Macedo"],
+    "mapeamento": ["Rafaella", "Eric Oliveira", "Erick Lopes", "Arthur", "Rafael", "Emerson", "Ryan", "Laura", "Marzia",
+                   "Leonardo Macedo"],                      # os do Planejador (principal: Rafaella)
+    "hw-lora": ["Arthur"], "hw-caixinha": ["Erick Lopes", "Arthur", "Rafael", "Emerson", "Laura"],
+    "hw-coleira": ["Rafael"], "hw-pluviometro": ["Arthur"], "hw-remedios": ["Rafael", "Emerson"],
+    "hw-pulseira": ["Emerson"], "servidor": ["Eric Oliveira"],
 }
 DATA = "2026-11-15"
 COPIAR = ["sistema/physis-metodologia.json", "sistema/physis-premissas.json", "sistema/physis-plantas.json",

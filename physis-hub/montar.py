@@ -116,6 +116,20 @@ def conferir_marca(marca: dict | None) -> dict | None:
             "cores": {str(k): v.upper() for k, v in cores.items()}}
 
 
+def escrever_manual(pasta: Path, modulos: list[str], cliente: str) -> Path:
+    """Rascunho do manual desta compra (só os módulos do pacote) em manual/: .md para revisar e .odt.
+    Não é o manual emitido: a versão final passa pela fila de emissão (revisão e aprovação) no servidor da Physis."""
+    if str(AQUI) not in sys.path:
+        sys.path.insert(0, str(AQUI))
+    from physis_hub import documentos_auto
+    c = documentos_auto.compor_manual(modulos, {"cliente": {"nome": cliente}, "hoje": time.strftime("%d/%m/%Y")})
+    (pasta / "manual").mkdir(exist_ok=True)
+    md = pasta / "manual" / "MANUAL-RASCUNHO.md"
+    md.write_text(c["texto"], encoding="utf-8", newline="\n")       # UTF-8 com LF também quando montado no Windows
+    (pasta / "manual" / "MANUAL-RASCUNHO.odt").write_bytes(documentos_auto.odt_de_texto(c["texto"], "Manual da plataforma Physis", rascunho=True))
+    return md
+
+
 def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Path | None, licenca: str,
            supervisao: Path | None = None, gestao: Path | None = None, planejador: Path | None = None,
            pesquisa: bool = False, nome: str = "", cursos: list | None = None, suporte: dict | None = None,
@@ -225,6 +239,9 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
           if "sustainkit" in modulos else "")
     (pasta / "LEIA-ME.md").write_text(GUIA.format(org=org, lugar=lugar, modulos=", ".join(modulos),
                                                   quando=time.strftime("%d/%m/%Y"), sk=sk, licenca=licenca), encoding="utf-8")
+    if (AQUI / "modelos").is_dir():          # modelos dos documentos automáticos (docs/DOCUMENTOS_AUTOMATICOS.md)
+        shutil.copytree(AQUI / "modelos", pasta / "modelos")
+    escrever_manual(pasta, modulos, nome or org)
     pacote = saida / f"physis-{org}.zip"
     with zipfile.ZipFile(pacote, "w", zipfile.ZIP_DEFLATED) as z:
         for arq in sorted(pasta.rglob("*")):

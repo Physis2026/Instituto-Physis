@@ -119,7 +119,7 @@ function compat(sel, C, armBrutoGb, ef){ ef = ef || 0.9; const I = itensDe(C), T
 function kgFabricacaoSelecao(sel, C, S){ const I = itensDe(C); let kg = 0, t = 0; Object.keys(sel.hardware || {}).forEach(k => { const x = I[k], q = Math.trunc(n(sel.hardware[k])); if (!x || !q) return;
   if (x.cat === "plataforma"){ const cl = S.classes[x.classe] || S.classes.mini_pc; kg += cl.kgco2e_fabricacao * q; t += cl.kgco2e_fabricacao * q / 1000 / cl.vida_anos; }
   else if (x.cat === "gpu"){ const gp = S.gpu_placa; kg += gp.kgco2e_fabricacao * q; t += gp.kgco2e_fabricacao * q / 1000 / (gp.vida_anos || 4); } }); return [kg, t]; }
-function nobreak(wPico, wMedio, autMin, bateria, tensao, fp, folga, efInv){ fp = fp || 0.9; folga = folga == null ? 0.25 : folga; efInv = efInv || 0.9; const wh = wMedio * autMin / 60 / ((DOD[bateria] || 0.9) * efInv);
+function nobreak(wPico, wMedio, autMin, bateria, tensao, fp, folga, efInv){ fp = fp || (typeof PhysisCalc !== "undefined" ? PhysisCalc.premissa("eletrica.fator_potencia_padrao") : null) || 0.9;   /* 0,9 só sem a base (espelho servidor_verde.py) */ folga = folga == null ? 0.25 : folga; efInv = efInv || 0.9; const wh = wMedio * autMin / 60 / ((DOD[bateria] || 0.9) * efInv);
   return { va: wPico / fp * (1 + folga), w: wPico * (1 + folga), bateria_wh:wh, bateria_ah: tensao ? wh / tensao : 0 }; }
 function solar(kwhDia, hsp, pr, fracao, wMedio, horasNoite, diasNub, bateria, ef){ pr = pr || 0.75; ef = ef || 0.9; const kwp = hsp > 0 && pr > 0 ? kwhDia * fracao / (hsp * pr) : 0;
   return { kwp, bateria_kwh: (wMedio * horasNoite / 1000 + kwhDia * diasNub) * fracao / ((DOD[bateria] || 0.9) * ef), ger_dia_kwh: kwp * hsp * pr }; }
@@ -135,7 +135,7 @@ function dimensionar(p, fatorRede, hsp, S, sel, C){ S = S || baseServidor(); con
   if (T && T.ups_wh) ups.autonomia_min_selecao = en.w_medio ? T.ups_wh * (DOD[T.ups_quimica || "chumbo"] || 0.5) * 0.9 / en.w_medio * 60 : 0;
   const h = n(p.hsp) || hsp || 0, modo = p.solar_modo || "dedicado", fr = modo === "nenhum" ? 0 : n(p.solar_fracao, 100) / 100;
   const sol = solar(en.kwh_dia, h, n(p.pr, 0.75), fr, en.w_medio, n(p.horas_noite, 14), n(p.dias_nublados, 0), p.ups_bateria || "lifepo4");
-  const f = n(p.fator_rede) || fatorRede || 0.0289, kwhAnoInst = en.kwh_dia * 365 * ter.pue, redeKwh = kwhAnoInst * (h > 0 ? 1 - fr : 1);
+  const f = n(p.fator_rede) || fatorRede || premRede() || 0, kwhAnoInst = en.kwh_dia * 365 * ter.pue, redeKwh = kwhAnoInst * (h > 0 ? 1 - fr : 1);
   const cl = S.classes[comp.classe] || S.classes.mini_pc; let kgFab = cl.kgco2e_fabricacao + (p.ia_ativa ? Math.max(comp.gpus_precisa, Math.trunc(n(p.gpu_qtd))) * S.gpu_placa.kgco2e_fabricacao : 0), tFab = kgFab / 1000 / cl.vida_anos;
   if (usaSel){ const kt = kgFabricacaoSelecao(sel, C, S); kgFab = kt[0]; tFab = kt[1]; }
   const fDc = n(p.fator_dc, f), pueDc = n(p.pue_dc, 1.5), tarifa = n(p.tarifa), capex = n(p.custo_kwp) ? sol.kwp * n(p.custo_kwp) + sol.bateria_kwh * n(p.custo_bat_kwh) : null, econ = tarifa ? (kwhAnoInst - redeKwh) * tarifa : null;
@@ -186,7 +186,9 @@ const atual = e => e.projetos.find(x => x.id === e.atual) || e.projetos[0];
 /* ════════ dados do lugar e do servidor ════════ */
 const EXT = { sol:{}, pegada:null, pegadaQuando:0, pedindo:{} };
 function fatorDoProjeto(p){ const m = num(p.fator_rede); if (m != null && m >= 0) return [m, "digitado no projeto"]; const F = baseFatores();
-  if (F && F.rede){ const A = F.rede.anual, k = A[p.fator_ano] ? p.fator_ano : F.rede.padrao; return [A[k].valor, A[k].rotulo]; } return [0.0289, "padrão da plataforma"]; }
+  if (F && F.rede){ const A = F.rede.anual, k = A[p.fator_ano] ? p.fator_ano : F.rede.padrao; return [A[k].valor, A[k].rotulo]; } return [premRede(), "premissa rede.fator_emissao (a conferir)"]; }
+/* fator da rede sem a base de fatores: a premissa da base (nunca um número próprio aqui, R9) */
+function premRede(){ try { const v = typeof PhysisCalc !== "undefined" ? +PhysisCalc.premissa("rede.fator_emissao") : NaN; return isFinite(v) && v > 0 ? v : null; } catch (e){ return null; } }
 function solDoProjeto(p){ const h = num(p.hsp); if (h) return [h, "digitado no projeto"]; const la = num(p.lat), lo = num(p.lon); if (la == null || lo == null) return [0, "falta o lugar (latitude e longitude) ou as horas de sol"];
   const k = la.toFixed(2) + "," + lo.toFixed(2), r = EXT.sol[k];
   if (!r && temServidorWeb() && !EXT.pedindo[k]){ EXT.pedindo[k] = true; fetch(`api/gis/irradiacao?lat=${la}&lon=${lo}`, { cache:"no-store", credentials:"same-origin" }).then(x => x.json()).then(j => { EXT.sol[k] = j; redesenhar(); }).catch(() => { EXT.sol[k] = { ok:false }; }); }
@@ -276,7 +278,7 @@ function abaTermico(p, R){ const T = R.termico;
 function abaCarbono(p, R){ const C = R.carbono, f = fatorDoProjeto(p), F = baseFatores(), anos = F && F.rede ? Object.keys(F.rede.anual) : [];
   const inv = C.capex_solar && C.economia_ano && typeof analiseInvest === "function" ? analiseInvest(C.capex_solar, C.economia_ano / 12, n(p.anos_analise, 10), 10, 4) : null;
   return `<p class="t2 apoio">Carbono da operação (energia), da fabricação das máquinas e os custos. Fator da rede do lugar do projeto.</p>
-  ${secao("sv-lg", "Lugar do projeto", `<div class="precos">${texto(p, "nome_local", "Lugar")}${campo(p, "lat", "Latitude")}${campo(p, "lon", "Longitude")}${escolha(p, "fator_ano", "Fator da rede (SIN)", [["", "Padrão da plataforma"]].concat(anos.map(k => [k, F.rede.anual[k].rotulo + " · " + N(F.rede.anual[k].valor, 4)])))}${campo(p, "fator_rede", "Ou fator digitado (tCO₂/MWh)")}${campo(p, "tarifa", "Tarifa de energia (R$/kWh)")}</div>${typeof ui !== "undefined" && ui && ui.clima && ui.clima.local ? `<button type="button" id="sv-usar-lugar" data-sv-acao="lugar">Usar o lugar da plataforma</button>` : ""}`)}
+  ${secao("sv-lg", "Lugar do projeto", `<div class="precos">${texto(p, "nome_local", "Lugar")}${campo(p, "lat", "Latitude")}${campo(p, "lon", "Longitude")}${escolha(p, "fator_ano", "Fator da rede (SIN)", [["", "Padrão da plataforma"]].concat(anos.map(k => [k, F.rede.anual[k].rotulo + " · " + N(F.rede.anual[k].valor, 4)])))}${campo(p, "fator_rede", "Ou fator digitado (tCO₂/MWh)")}${campo(p, "tarifa", "Tarifa de energia (R$/kWh)")}</div>${typeof localDaInstalacao === "function" && localDaInstalacao().lat != null ? `<button type="button" id="sv-usar-lugar" data-sv-acao="lugar">Usar o lugar da plataforma</button>` : ""}`)}
   ${secao("sv-cmp", "Comparar com datacenter ou nuvem", `<div class="precos">${campo(p, "fator_dc", "Fator da rede da região do datacenter (tCO₂/MWh)")}${campo(p, "pue_dc", "PUE do datacenter")}${campo(p, "custo_kwp", "Custo do solar (R$/kWp)", "vazio = " + MARC)}${campo(p, "custo_bat_kwh", "Custo da bateria (R$/kWh)", "vazio = " + MARC)}${campo(p, "anos_analise", "Anos da análise")}</div>`)}
   ${tabela("Carbono e custos", ["Item", "Valor"], [["Fator da rede", N(C.fator, 4) + " tCO₂/MWh (" + E(f[1]) + ")"], ["Energia por ano (com PUE)", N(C.kwh_ano, 0) + " kWh"], ["Energia da rede por ano (depois do solar)", N(C.kwh_rede_ano, 0) + " kWh"], ["Operação no lugar", N(C.t_operacao, 3) + " tCO₂e por ano"], ["Operação sem solar", N(C.t_sem_solar, 3) + " tCO₂e por ano"], ["No datacenter", N(C.t_datacenter, 3) + " tCO₂e por ano"], ["Fabricação (escopo 3, cat. 2)", N(C.kg_fabricacao, 0) + " kgCO₂e, " + N(C.t_fabricacao_ano, 3) + " tCO₂e por ano"], ["Energia da rede por mês", R$(C.custo_mes)], ["Investimento no solar e bateria", R$(C.capex_solar)], ["Economia por ano", R$(C.economia_ano)], ["Retorno simples", C.payback_anos != null ? N(C.payback_anos, 1) + " anos" : MARC]].concat(inv && inv.descontado != null ? [["Retorno descontado", N(inv.descontado / 12, 1) + " anos"]] : []).map(([a, b]) => `<tr><th scope="row">${a}</th><td>${b}</td></tr>`))}
   <p class="t2 pq">Mesmas regras da aba Carbono: energia no escopo 2 (máquina própria) e fabricação no escopo 3, categoria 2, dividida pelos anos de uso. ${verificar("carbono de fabricação por classe de máquina, ordem de grandeza")}</p>`; }
@@ -356,7 +358,7 @@ if (typeof document !== "undefined" && !window.__svEventos){ window.__svEventos 
     if (a === "sel-limpar"){ mudar((e, prj) => { prj.sel = { hardware:{}, software:[], modelo:{} }; }, b.id); return; }
     if (a === "comp-add"){ mudar((e, prj) => { (prj.p.componentes = prj.p.componentes || []).push({ nome:"", tipo:"outro", qtd:1, w_ocioso:"", w_carga:"", ciclo:"", fonte:true }); }, idDe("c" + ((atual(ler()).p.componentes || []).length) + "nome")); return; }
     if (a === "comp-del"){ const i = +b.dataset.svI; mudar((e, prj) => { prj.p.componentes.splice(i, 1); }, "sv-comp-add"); return; }
-    if (a === "lugar"){ mudar((e, prj) => { const L = ui.clima.local; prj.p.lat = String(L.lat); prj.p.lon = String(L.lon); if (L.nome) prj.p.nome_local = L.nome; }, "sv-usar-lugar"); return; }
+    if (a === "lugar"){ mudar((e, prj) => { const L = localDaInstalacao(); prj.p.lat = String(L.lat); prj.p.lon = String(L.lon); if (L.municipio) prj.p.nome_local = L.municipio + (L.uf ? " – " + L.uf : ""); }, "sv-usar-lugar"); return; }
     if (a === "imprimir"){ if (typeof print === "function") print(); return; }
     if (a === "exportar"){ const e = ler(); baixar("servidor-verde-projetos.json", JSON.stringify({ v:1, exportado:new Date().toISOString(), projetos:e.projetos }, null, 2)); } }); }
 

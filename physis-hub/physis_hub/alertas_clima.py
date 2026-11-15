@@ -35,6 +35,7 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta
 
+from . import carbono as carbono_mod
 from . import clima as clima_mod
 
 FUSO = clima_mod.FUSO
@@ -75,6 +76,12 @@ REGRAS = {
 
 
 # ══ Regras (funções puras) ═══════════════════════════════════════════════════════════════════════
+def limiares() -> tuple[dict, dict]:
+    """(atividades, encosta): os limiares das premissas res.alertas_limiares e resiliencia.encosta_limiares (as mesmas
+    que o painel lê em alertasAprendidos e telaResiliencia). Nada fixo aqui (R7, 15/11/2026)."""
+    return (carbono_mod.premissa("res.alertas_limiares") or {}), (carbono_mod.premissa("resiliencia.encosta_limiares") or {})
+
+
 def _dm(dia: str) -> str:
     return f"{dia[8:10]}/{dia[5:7]}"
 
@@ -88,30 +95,36 @@ def avaliar(dias: list[dict], cemaden: dict | None, prob_chuva: dict | None, hoj
     prob_chuva = {dia, prob} do modelo local. Cada alerta: {regra, chave, nivel, titulo, texto, dia}."""
     out = []
     futuros = [d for d in dias or [] if str(d.get("dia") or "") >= hoje]
+    L, E = limiares()
+    if not L:                                   # sem a base de premissas: nenhum alerta de atividade (nada inventado)
+        futuros = []
+    g = lambda k: L.get(k)
 
     def add(regra, dia, nivel, texto):
         out.append({"regra": regra, "chave": f"{regra}|{dia}", "nivel": nivel, "titulo": REGRAS[regra][0], "texto": texto, "dia": dia})
 
     for d in futuros:
         dia, mm, tmin, tmax = d["dia"], d.get("mm") or 0.0, d.get("tmin"), d.get("tmax")
-        if tmin is not None and tmin < 3:
-            add("geada_cafe", dia, "alerta" if tmin < 1 else "atencao",
+        if tmin is not None and tmin < g("geada_tmin_c"):
+            add("geada_cafe", dia, "alerta" if tmin < g("geada_alerta_tmin_c") else "atencao",
                 f"Café: risco de geada em {_dm(dia)} (mínima de {_n(tmin, ' °C')}). Proteja as mudas e as plantas novas.")
-        if 5 <= int(dia[5:7]) <= 9 and mm >= 10:
-            add("chuva_colheita", dia, "alerta" if mm >= 30 else "atencao",
+        if 5 <= int(dia[5:7]) <= 9 and mm >= g("colheita_chuva_mm"):
+            add("chuva_colheita", dia, "alerta" if mm >= g("colheita_alerta_chuva_mm") else "atencao",
                 f"Colheita: chuva de {_n(mm, ' mm')} prevista em {_dm(dia)}. Planeje a colheita e a secagem.")
-        if tmax is not None and tmax >= 30:
-            add("calor_rebanho", dia, "alerta" if tmax >= 35 else "atencao",
+        if tmax is not None and tmax >= g("rebanho_tmax_c"):
+            add("calor_rebanho", dia, "alerta" if tmax >= g("rebanho_alerta_tmax_c") else "atencao",
                 f"Rebanho: calor de {_n(tmax, ' °C')} em {_dm(dia)}; confira sombra e água.")
-        if mm >= 30 or (tmin is not None and tmin < 4) or (tmax is not None and tmax >= 34):
-            forte = mm >= 50 or (tmin is not None and tmin < 2) or (tmax is not None and tmax >= 37)
-            o_que = f"chuva forte ({_n(mm, ' mm')})" if mm >= 30 else f"frio de {_n(tmin, ' °C')}" if tmin is not None and tmin < 4 else f"calor de {_n(tmax, ' °C')}"
+        if mm >= g("horta_chuva_mm") or (tmin is not None and tmin < g("horta_tmin_c")) or (tmax is not None and tmax >= g("horta_tmax_c")):
+            forte = (mm >= g("horta_alerta_chuva_mm") or (tmin is not None and tmin < g("horta_alerta_tmin_c"))
+                     or (tmax is not None and tmax >= g("horta_alerta_tmax_c")))
+            o_que = (f"chuva forte ({_n(mm, ' mm')})" if mm >= g("horta_chuva_mm") else f"frio de {_n(tmin, ' °C')}"
+                     if tmin is not None and tmin < g("horta_tmin_c") else f"calor de {_n(tmax, ' °C')}")
             add("horta", dia, "alerta" if forte else "atencao", f"Horta e viveiro: {o_que} em {_dm(dia)}; proteja canteiros e mudas.")
-        if mm >= 30:
-            add("hospedagem_chuva", dia, "alerta" if mm >= 50 else "atencao",
+        if mm >= g("hospedagem_chuva_mm"):
+            add("hospedagem_chuva", dia, "alerta" if mm >= g("hospedagem_alerta_chuva_mm") else "atencao",
                 f"Hospedagem: chuva forte ({_n(mm, ' mm')}) em {_dm(dia)}; avise os hóspedes sobre estradas e trilhas.")
     for d in futuros[:2]:
-        if (d.get("mm") or 0) >= 5:
+        if (d.get("mm") or 0) >= g("irrigacao_chuva_mm"):
             add("chuva_irrigacao", d["dia"], "atencao",
                 f"Irrigação: {_n(d['mm'], ' mm')} de chuva prevista em {_dm(d['dia'])}; avalie adiar a rega.")
     if prob_chuva and prob_chuva.get("prob") is not None and prob_chuva["prob"] >= 0.7 and prob_chuva.get("dia"):
@@ -119,7 +132,8 @@ def avaliar(dias: list[dict], cemaden: dict | None, prob_chuva: dict | None, hoj
             f"O modelo do lugar dá {round(100 * prob_chuva['prob'])}% de chance de chover em {_dm(prob_chuva['dia'])}; avalie adiar a rega.")
     if cemaden and (cemaden.get("mm_24h") is not None or cemaden.get("mm_72h") is not None):
         a24, a72 = cemaden.get("mm_24h") or 0.0, cemaden.get("mm_72h") or 0.0
-        nivel = "alerta" if a24 >= 80 or a72 >= 120 else "atencao" if a24 >= 40 or a72 >= 60 else None
+        nivel = (None if not E else "alerta" if a24 >= E["alerta_24h"] or a72 >= E["alerta_72h"]
+                 else "atencao" if a24 >= E["atencao_24h"] or a72 >= E["atencao_72h"] else None)
         if nivel:
             est = (cemaden.get("estacao") or {}).get("nome") or "CEMADEN"
             txt = ("Chuva acumulada alta: risco de deslizamento em encostas." if nivel == "alerta" else

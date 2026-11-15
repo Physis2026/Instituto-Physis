@@ -729,6 +729,12 @@ const wBulbos = (tbs, tbu, p) => ((2501 - 2.326 * tbu) * wsat(tbu, p) - 1.006 * 
 const wUR = (t, ur, p) => { const pv = ur / 100 * pws(t); return 0.621945 * pv / (p - pv); };
 
 /* ════════ Clima de projeto ════════ */
+/* cidade de projeto a partir do local único da plataforma (localDaInstalacao: Planejador > Início > Monitoramento):
+   o município, se estiver na tabela; senão a cidade da tabela na mesma UF. Sem local: "" (nada de cidade padrão). */
+function localPlataforma() { try { return typeof localDaInstalacao === "function" ? localDaInstalacao() : null; } catch (e) { return null; } }
+function cidadeDoLocal() { const L = localPlataforma(); if (!L) return "";
+  const m = cidadePorNome(L.municipio); if (m) return m.nome;
+  const u = String(L.uf || "").toUpperCase(), x = u ? DADOS.cidades.find(c => String(c.uf).toUpperCase() === u) : null; return x ? x.nome : ""; }
 function cidadePorNome(nome) { const s = String(nome || "").trim().toLowerCase(); return DADOS.cidades.find(c => c.nome.toLowerCase() === s) || null; }
 function resolverClima(clima, opcoes) {
   const c = clima || {}, op = opcoes || {}, cid = cidadePorNome(c.cidade), avisos = [];
@@ -883,7 +889,7 @@ function agrupar(c) { c = c || {}; const g = k => N(c[k]);
 
 /* ════════ Exemplo ════════ */
 function padrao() {
-  return { clima:{ cidade:"São Paulo" }, opcoes:{ mes:1, fs:1.1, horas_ano:2600, fator_carga:0.5, tarifa:null },
+  return { clima:{ cidade:cidadeDoLocal() }, opcoes:{ mes:1, fs:1.1, horas_ano:2600, fator_carga:0.5, tarifa:null },
     ambientes:[
       { nome:"Escritório", area:30, pe_direito:2.8, pessoas:4, atividade:"escritorio", uso:"escritorio", iluminacao_wm2:10, equipamentos_wm2:15, infiltracao_ach:0.5,
         superficies:[{ tipo:"parede", orient:"N", area:12, material:"tijolo_6f_14", cor:"clara" }, { tipo:"vidro", orient:"N", area:4, material:"vidro_simples", sombra:0.7 },
@@ -925,8 +931,13 @@ function ler(estado) { if (estado && typeof estado === "object" && Array.isArray
   return padrao(); }
 function gravar(e) { if (typeof calcGravar === "function") { const o = (typeof calcLer === "function" && calcLer("cargatermica")) || {}; o.e = e; calcGravar("cargatermica", o); } }
 
-function telaCargaTermica(estado) { const e = ler(estado), c = e.clima || {}, o = e.opcoes || {};
-  const R = calcular(e.ambientes, c, o), cl = R.clima, cid = cidadePorNome(c.cidade) || {};
+const TITULO_CT = `<h2 id="h-ct">Carga térmica</h2>`;   /* um só título (com ou sem o clima) */
+function telaCargaTermica(estado) { const e = ler(estado), c0 = e.clima || {}, o = e.opcoes || {};
+  /* cidade vazia e TBS vazia: vem do local da plataforma; sem local, a carga (que depende do clima) não é calculada */
+  const Lp = localPlataforma(), auto = !cidadePorNome(c0.cidade) && !tem(c0.tbs) ? cidadeDoLocal() : "";
+  const c = auto ? Object.assign({}, c0, { cidade:auto }, !tem(c0.lat) && Lp && Lp.lat != null ? { lat:Lp.lat } : {}) : c0;
+  const semClima = !cidadePorNome(c.cidade) && !tem(c.tbs);
+  const R = semClima ? null : calcular(e.ambientes, c, o), cl = R ? R.clima : null, cid = cidadePorNome(c.cidade) || {};
   const ph = k => tem(cid[k]) ? cid[k] : null;
   const clima = secao("clima", "Clima de projeto e premissas", `<div class="precos">`
     + campo("clima.cidade", c.cidade || "", "Cidade (condições de verão)", "s", { ops:[["", "Outra — informar abaixo"]].concat(DADOS.cidades.map(x => [x.nome, x.nome + " / " + x.uf])) })
@@ -942,7 +953,7 @@ function telaCargaTermica(estado) { const e = ler(estado), c = e.clima || {}, o 
     + campo("opcoes.horas_ano", o.horas_ano, "Horas de uso por ano", "nn", { ph:P.horas_ano })
     + campo("opcoes.fator_carga", o.fator_carga, "Fator de carga médio (0 a 1)", "nn", { ph:P.fator_carga }, "Fração média do pico ao longo do ano — premissa Physis.")
     + campo("opcoes.tarifa", o.tarifa, "Tarifa de energia (R$/kWh)", "nn", {}, "Sem tarifa, o custo fica em branco.")
-    + `</div><p class="t2 pq">Campos vazios usam o valor da cidade (mostrado em cinza). Valores de cidade, materiais e ar externo vêm de tabelas públicas lembradas e estão marcados para conferência na base.</p>`);
+    + `</div>${auto ? `<p class="t2" role="status">Cidade de projeto tirada do local da plataforma: <strong>${esc(auto)}</strong>. Escolha outra acima para trocar.</p>` : ""}<p class="t2 pq">Campos vazios usam o valor da cidade (mostrado em cinza). Valores de cidade, materiais e ar externo vêm de tabelas públicas lembradas e estão marcados para conferência na base.</p>`);
   const ambs = (e.ambientes || []).map((a, i) => { const pre = "ambientes." + i + ".";
     const sups = (a.superficies || []).map((s, j) => { const sp = pre + "superficies." + j + ".", t = s.tipo || "parede";
       const mats = t === "vidro" ? MATS("vidro") : t === "cobertura" ? MATS("cobertura") : t === "parede" ? MATS("parede") : MATS("parede").concat(MATS("piso"));
@@ -964,6 +975,10 @@ function telaCargaTermica(estado) { const e = ler(estado), c = e.clima || {}, o 
       + campo(pre + "ini", a.ini, "Ocupação: início (h)", "nn", { ph:P.ini }) + campo(pre + "fim", a.fim, "Ocupação: fim (h)", "nn", { ph:P.fim })
       + `</div>` + tabela("Superfícies de " + (a.nome || "ambiente " + (i + 1)), ["Nº", "Tipo", "Orientação", "Área (m²)", "Material", "U (W/m²K)", "Cor", "Sombra", "Ação"], sups)
       + `<p>${botao("add-sup:" + i, "Acrescentar superfície")} ${botao("del-amb:" + i, "Remover ambiente", "Remover o ambiente " + (a.nome || i + 1))}</p>`); }).join("");
+  if (semClima) return `<section aria-labelledby="h-ct">${TITULO_CT}`
+    + (typeof avisoSemLocal === "function" ? avisoSemLocal() : `<p class="faixa at" role="status">Local não informado — preencha na página Início.</p>`)
+    + `<p class="t2">Sem o local, a carga térmica não usa clima de exemplo: escolha a cidade de projeto ou digite a TBS externa abaixo.</p>` + clima + ambs
+    + `<p>${botao("add-amb", "Acrescentar ambiente")} ${botao("reset", "Voltar ao exemplo")}</p></section>`;
   const T = R.total;
   const linhas = R.ambientes.map(a => `<tr><th scope="row">${esc(a.nome || "—")}</th><td>${fmt(a.pico.h, 0)} h</td><td>${fmt(a.pico.sens)}</td><td>${fmt(a.pico.lat)}</td><td>${fmt(a.pico.total)}</td>`
     + `<td>${fmt(a.projeto.W)}</td><td>${fmt(a.projeto.btuh)}</td><td>${fmt(a.projeto.tr, 2)}</td><td>${fmt(a.projeto.wm2)}</td></tr>`)
@@ -984,7 +999,7 @@ function telaCargaTermica(estado) { const e = ler(estado), c = e.clima || {}, o 
     + (S.base ? "" : `<p class="t2 pq">Base de equipamentos não carregada: eficiências-padrão usadas.</p>`)
     + `<p class="t2 pq">Equipamentos por classe genérica (sem marca). Confira a eficiência na tabela do Inmetro vigente e cote com três fornecedores.</p>`);
   const av = R.avisos.length ? `<ul class="t2">${R.avisos.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : "";
-  return `<section aria-labelledby="h-ct"><h2 id="h-ct">Carga térmica</h2>`
+  return `<section aria-labelledby="h-ct">${TITULO_CT}`
     + `<p class="t2 apoio">Carga de resfriamento por ambiente (sensível e latente), hora a hora das 8 às 18 h, no caminho da NBR 16401-1: envoltória com sol e massa térmica, vidros, pessoas, iluminação, equipamentos, infiltração e ar externo. Resultado em W, BTU/h e TR, com sugestão de sistema.</p>`
     + av + clima + ambs + `<p>${botao("add-amb", "Acrescentar ambiente")} ${botao("reset", "Voltar ao exemplo")}</p>` + res + comp + perfil + sis
     + `<p class="t2 pq">Estudo preliminar: não substitui o projeto de AVAC assinado. Método simplificado (sem fator de armazenamento de carga radiante); revisar com software de simulação no projeto executivo.</p></section>`; }

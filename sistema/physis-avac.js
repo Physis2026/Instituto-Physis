@@ -559,6 +559,9 @@ function telaDutos(e, R) { const d = e.dutos, x = R.dutos;
     + `<p class="t2 pq">Em shaft residencial quem manda é o ruído: 6 a 8 m/s em prumada, até 12 m/s em garagem e pressurização.</p>`);
   return avisoStatus(R, "dutos") + sis + vel + ent; }
 
+function potenciasQuadro(al) { const PCq = typeof PhysisCalc !== "undefined" ? PhysisCalc : null, fp = al.kva > 0 ? al.kw / al.kva : null, lim = PCq ? PCq.premissa("eletrica.fator_potencia_minimo") : null;
+  const o = { p:al.kw, s:al.kva, q:Math.sqrt(Math.max(0, al.kva * al.kva - al.kw * al.kw)), fp, fonte:"circuitos", baixo:lim != null && fp != null && fp < lim, limite:lim };
+  return PCq ? PCq.potenciasHtml([["Alimentador (soma dos circuitos)", o]], /^en/i.test(document.documentElement.lang), "Potências do quadro (FP de cada circuito, com o rendimento)") : ""; }
 function telaQuadro(e, R) { const sec = secH3, q = e.quadro, x = R.quadro, al = x.alim;
   const P = (k, rot, t, aj, opt) => campo("quadro." + k, q[k], rot, t, aj, opt);
   const ent = sec("qe", "Parâmetros elétricos", `<div class="precos">${P("vff", "Tensão fase-fase (V)", "n", "380/220 V ou 220/127 V: confirme com a concessionária.")}${P("vfn", "Tensão fase-neutro U0 (V)")}
@@ -598,7 +601,7 @@ function telaQuadro(e, R) { const sec = secH3, q = e.quadro, x = R.quadro, al = 
         ${cel(p + ".iplaca", s.p.iplaca, "Corrente de placa do split de " + n, "nn", { w:"4.5em" })}${cel(p + ".comp", s.p.comp, "Comprimento do circuito do split de " + n, "n", { w:"4.5em" })}${cel(p + ".curva", s.p.curva, "Curva do split de " + n, "sel", CURVA_OPS)}
         ${cel(p + ".dr", s.p.dr, "DR do split de " + n, "sel", SIMNAO)}<td>${f(s.ib, 2)}</td><td>${f(s.in, 0)}</td><td>${f(s.s, 1)}</td><td>${f(s.sPE, 1)}</td><td>${f(s.iz, 1)}</td><td>${s.dv == null ? "—" : n2(s.dv * 100, 2) + "%"}</td><td>${f(s.lmax, 1)}</td><td>${selo(s.situacao)}</td></tr>`; }))
     + kv("Splits no edifício", [["Circuitos de split no edifício", f(x.splitsQtd, 0)], ["Carga instalada de splits (kW)", f(x.splitsKw, 2)], ["Conferência com o ar-condicionado (splits + áreas comuns)", selo(x.conf)]]));
-  return avisoStatus(R, "quadro") + ali + circ + spl + ent; }
+  return avisoStatus(R, "quadro") + ali + potenciasQuadro(al) + circ + spl + ent; }
 
 function telaResumo(e, R) {
   const res = sec("rr", "Resumo de instalações — anteprojeto", tabela("Resumo por sistema", ["Sistema", "Grandeza", "Valor", "Base do cálculo"],

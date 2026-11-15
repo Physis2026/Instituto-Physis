@@ -27,6 +27,7 @@ cada treino grava uma versão nova e a tela mostra a última.
 """
 from __future__ import annotations
 
+import calendar
 import json
 import math
 import re
@@ -502,26 +503,64 @@ GRANDEZAS_CONSUMO = {"energia": ("kWh/dia", "energia"), "vazao": ("m³/dia", "á
 MIN_DIAS_CONSUMO = 14
 
 
-def _producao_gestao(db) -> dict[str, float]:
-    """Produção ou ocupação por dia, se a Gestão guardar (melhor esforço: listas com data e quantidade)."""
+def _producao_gestao(db, org: str | None = None) -> dict[str, float]:
+    """Produção ou ocupação por dia, tirada da Gestão DO CLIENTE (cliente_estado, chave "physis-gestao-cliente",
+    lista `producao`), não da Gestão Physis interna.
+
+    Regra de mês para dia (documentada em docs/APRENDIZADO.md): a Gestão do cliente guarda um total por mês
+    ({mes: "AAAA-MM", prod}); cada dia do mês recebe prod ÷ número de dias do mês (distribuição uniforme, sem
+    inventar sazonalidade dentro do mês). Item com dia ({dia ou data: "AAAA-MM-DD", prod/quantidade}) vale para
+    aquele dia. Dois itens no mesmo dia somam. org None = todas as organizações deste banco (um hub = um cliente)."""
     out: dict[str, float] = {}
     try:
-        linhas = db.execute("SELECT chave, valor FROM gestao_estado WHERE chave LIKE '%produc%' OR chave LIKE '%ocupac%'").fetchall()
-    except Exception:       # noqa: BLE001 — tabela da gestão pode não existir neste banco
+        sql = "SELECT valor FROM cliente_estado WHERE chave='physis-gestao-cliente'" + (" AND org=?" if org else "")
+        linhas = db.execute(sql, (org,) if org else ()).fetchall()
+    except Exception:       # noqa: BLE001 — banco sem a tabela dos dados do cliente
         return out
-    for _, valor in linhas:
+    for (valor,) in linhas:
         try:
-            lista = json.loads(valor)
+            g = json.loads(valor)
         except ValueError:
             continue
+        lista = g.get("producao") if isinstance(g, dict) else None
         for it in lista if isinstance(lista, list) else []:
             if not isinstance(it, dict):
                 continue
+            q = next((_numero(it.get(k)) for k in ("prod", "quantidade", "qtd", "valor", "ocupacao", "hospedes")
+                      if _numero(it.get(k)) is not None), None)
+            if q is None:
+                continue
             dia = str(it.get("dia") or it.get("data") or "")[:10]
-            q = next((it[k] for k in ("quantidade", "qtd", "valor", "ocupacao", "hospedes") if isinstance(it.get(k), (int, float))), None)
-            if re.fullmatch(r"\d{4}-\d{2}-\d{2}", dia) and q is not None:
-                out[dia] = out.get(dia, 0.0) + float(q)
+            mes = str(it.get("mes") or "")[:7]
+            if re.fullmatch(r"\d{4}-\d{2}-\d{2}", dia):
+                out[dia] = out.get(dia, 0.0) + q
+            elif re.fullmatch(r"\d{4}-\d{2}", mes):
+                a, m = int(mes[:4]), int(mes[5:7])
+                if not 1 <= m <= 12:
+                    continue
+                n = calendar.monthrange(a, m)[1]
+                for d in range(1, n + 1):
+                    k = f"{mes}-{d:02d}"
+                    out[k] = out.get(k, 0.0) + q / n
     return out
+
+
+def _numero(v) -> float | None:
+    """Número digitado na Gestão: 1234,5 / "1.234,5" / "0.5"."""
+    if isinstance(v, bool) or v is None:
+        return None
+    if isinstance(v, (int, float)):
+        return float(v) if math.isfinite(v) else None
+    s = str(v).strip().replace(" ", "")
+    if not s:
+        return None
+    if "," in s:
+        s = s.replace(".", "").replace(",", ".")
+    try:
+        x = float(s)
+    except ValueError:
+        return None
+    return x if math.isfinite(x) else None
 
 
 def dados_consumo(db) -> dict[str, list[dict]]:
@@ -608,6 +647,88 @@ def explicar_consumo(modelo: dict) -> str:
     return (f"Aprendeu com {modelo['n_amostras']} dias o consumo normal levando em conta o mês, o fim de semana"
             f"{(' e ' + ' e '.join(extra)) if extra else ''}. Explica {round(100 * max(0, m['r2']))}% da variação; "
             f"o erro típico é {m['sigma']:.2f}. Um dia acima do esperado + 2 erros típicos é marcado como possível desperdício.")
+
+
+# ══ (c2) Potências do dia: P, Q, S e fator de potência (regra do usuário: FP sempre nos módulos de energia) ══
+FP_PREMISSA = "eletrica.fator_potencia_padrao"   # sistema/physis-premissas.json (status conferir)
+
+
+def fp_padrao() -> float | None:
+    """Fator de potência de referência quando nada é medido: a premissa da base (None se ainda não existir)."""
+    from . import carbono            # tardio: só a leitura da base de premissas
+    v = carbono.premissa(FP_PREMISSA)
+    return float(v) if isinstance(v, (int, float)) and 0 < v <= 1 else None
+
+
+def potencias_dia(db, fp_ref: float | None = None) -> dict[str, dict[str, dict]]:
+    """{ativo: {dia: {p_kwh, q_kvarh, s_kvah, fp, fp_fonte}}} de cada medidor de energia (TIPO:ENE).
+
+    Cada potência do dia = média das leituras × 24 h (a mesma regra do consumo). Ordem para o fator de potência:
+    1. P e S medidos: FP = P ÷ S; Q = √(S² − P²) (sinal desconhecido sem Q medido);
+    2. P e Q medidos: S = √(P² + Q²); FP = P ÷ S;
+    3. só FP medido (fp): média do dia; S = P ÷ FP; Q = √(S² − P²);
+    4. nada medido além de P: FP = premissa eletrica.fator_potencia_padrao (fp_fonte diz); sem premissa, FP, Q e S None.
+    P negativa (geração injetando) usa o valor absoluto nas contas de S e FP."""
+    fp_ref = fp_padrao() if fp_ref is None else fp_ref
+    por: dict = {}
+    for ativo, g, ts, v in db.execute("SELECT ativo, grandeza, ts, valor FROM medicao WHERE ts > 0 AND grandeza IN "
+                                      "('energia','potencia_reativa','potencia_aparente','fp')"):
+        por.setdefault(ativo, {}).setdefault(_dia(ts), {}).setdefault(g, []).append(v)
+    out: dict[str, dict[str, dict]] = {}
+    for ativo, dias in por.items():
+        for dia, g in dias.items():
+            if "energia" not in g:
+                continue
+            p = media(g["energia"]) * 24.0
+            q = media(g["potencia_reativa"]) * 24.0 if "potencia_reativa" in g else None
+            s = media(g["potencia_aparente"]) * 24.0 if "potencia_aparente" in g else None
+            ap = abs(p)
+            if s is not None and s > 0:
+                fp, fonte = min(1.0, ap / s), "medido (P e S)"
+                if q is None:
+                    q = math.sqrt(max(0.0, s * s - ap * ap))
+            elif q is not None:
+                s = math.hypot(ap, q)
+                fp, fonte = (ap / s if s > 0 else None), "medido (P e Q)"
+            elif "fp" in g and media([abs(x) for x in g["fp"]]) > 0:
+                fp, fonte = media([abs(x) for x in g["fp"]]), "medido (FP)"
+                s = ap / fp
+                q = math.sqrt(max(0.0, s * s - ap * ap))
+            elif fp_ref:
+                fp, fonte = fp_ref, f"premissa {FP_PREMISSA}"
+                s = ap / fp_ref
+                q = math.sqrt(max(0.0, s * s - ap * ap))
+            else:
+                fp, fonte = None, f"sem medição de Q, S ou FP e sem a premissa {FP_PREMISSA}"
+            out.setdefault(ativo, {})[dia] = {"p_kwh": _r(p), "q_kvarh": _r(q), "s_kvah": _r(s), "fp": _r(fp, 4), "fp_fonte": fonte}
+    return out
+
+
+def resumo_potencias(nome: str, dias: dict[str, dict], agora: float) -> dict:
+    """Modelo guardado (tabela modelo, nome "potencias:<ativo>"): médias do período e de onde veio o FP."""
+    lst = [d for _, d in sorted(dias.items())]
+    com_fp = [d for d in lst if d["fp"] is not None]
+    p = sum(d["p_kwh"] for d in lst)
+    s = sum(d["s_kvah"] for d in com_fp)
+    fontes = sorted({d["fp_fonte"] for d in lst})
+    return _modelo(nome, agora, len(lst), {"dias": len(lst), "p_kwh_dia": _r(p / len(lst)) if lst else None,
+                                           "q_kvarh_dia": _r(sum(d["q_kvarh"] or 0 for d in com_fp) / len(com_fp)) if com_fp else None,
+                                           "s_kvah_dia": _r(s / len(com_fp)) if com_fp else None,
+                                           "fp_periodo": _r(sum(abs(d["p_kwh"]) for d in com_fp) / s, 4) if s else None,
+                                           "fp_fontes": fontes},
+                   {"ultimos": [dict(d, dia=k) for k, d in sorted(dias.items())[-31:]]})
+
+
+def explicar_potencias(modelo: dict) -> str:
+    m = modelo["metricas"]
+    if m.get("fp_periodo") is None:
+        return f"{m['dias']} dias de potência ativa; sem medição nem premissa para o fator de potência."
+    from . import carbono
+    ref = carbono.premissa("eletrica.fator_potencia_minimo")
+    aviso = (f" Abaixo de {ref:g} (premissa eletrica.fator_potencia_minimo) a distribuidora costuma cobrar o reativo."
+             if isinstance(ref, (int, float)) else "")
+    return (f"{m['dias']} dias: {m['p_kwh_dia']} kWh, {m['q_kvarh_dia']} kvarh e {m['s_kvah_dia']} kVAh por dia em média; "
+            f"fator de potência do período {m['fp_periodo']} ({'; '.join(m['fp_fontes'])}).{aviso}")
 
 
 # ══ (d) Irrigação ═══════════════════════════════════════════════════════════════════════════════
@@ -716,6 +837,8 @@ def explicar(modelo: dict) -> str:
         return explicar_consumo(modelo)
     if nome.startswith("irrigacao"):
         return explicar_irrigacao(modelo)
+    if nome.startswith("potencias"):
+        return explicar_potencias(modelo)
     return EXPLICAR[nome](modelo) if nome in EXPLICAR else ""
 
 
@@ -742,6 +865,8 @@ class Aprendizado:
             feitos.append(salvar(self._db, treinar_anomalias(dados_anomalias(self._db), agora)))
             for chave, amostras in dados_consumo(self._db).items():
                 feitos.append(salvar(self._db, treinar_consumo(amostras, agora, nome=f"consumo:{chave}")))
+            for ativo, dias in potencias_dia(self._db).items():
+                feitos.append(salvar(self._db, resumo_potencias(f"potencias:{ativo}", dias, agora)))
             for ativo, pontos in dados_irrigacao(self._db, agora).items():
                 feitos.append(salvar(self._db, treinar_irrigacao(pontos, agora, nome=f"irrigacao:{ativo}")))
             self._db.commit()
@@ -789,11 +914,15 @@ class Aprendizado:
         with self.hub._trava:
             dados = dados_consumo(self._db)
             modelos = {k: carregar(self._db, f"consumo:{k}") for k in dados}
+            pot = potencias_dia(self._db)
         out = []
         for chave, amostras in sorted(dados.items()):
             m = modelos.get(chave) or treinar_consumo(amostras, agora, nome=f"consumo:{chave}")
             ativo, grandeza = chave.split("|", 1)
             dias_prev = [prever_consumo(m, dict(a, real=a["valor"])) for a in sorted(amostras, key=lambda a: a["dia"])[-dias:]]
+            if grandeza == "energia":         # P, Q, S e FP de cada dia ao lado do consumo (regra: FP sempre na energia)
+                for d in dias_prev:
+                    d["potencias"] = pot.get(ativo, {}).get(d["dia"])
             out.append({"ativo": ativo, "grandeza": grandeza, "unidade": GRANDEZAS_CONSUMO[grandeza][0], "dias": dias_prev,
                         "desperdicio": [d["dia"] for d in dias_prev if d.get("desperdicio")], "explicacao": explicar_consumo(m)})
         return {"ok": True, "medidores": out}
@@ -814,14 +943,29 @@ class Aprendizado:
         return {"ok": True, "prob_chuva": prev.get("prob"), "recomendacoes": out}
 
 
-def rodar(apr: Aprendizado, parar: threading.Event, hora: int = 3, passo: float = 600.0) -> None:
-    """Treina ao ligar (se o último treino tem mais de 1 dia) e depois todo dia a partir de `hora` (3 h da manhã)."""
-    while not parar.is_set():
+def passo_diario(apr: Aprendizado, hora: int = 3) -> dict:
+    """Um passo do laço diário do hub: treina os modelos (quando é hora) e fecha o lote de integridade do dia
+    anterior (Hub.fechar_lote_diario, uma vez por dia; PHYSIS_LOTE_DIARIO=0 desliga). Cada parte falha sozinha."""
+    out: dict = {}
+    try:
+        if precisa_treinar(apr, hora):
+            out["treino"] = apr.treinar()
+    except Exception as exc:    # noqa: BLE001 — treino com defeito não derruba o hub nem impede o lote
+        out["treino_erro"] = str(exc)[:200]
+    fechar = getattr(apr.hub, "fechar_lote_diario", None)
+    if fechar:
         try:
-            if precisa_treinar(apr, hora):
-                apr.treinar()
-        except Exception:       # noqa: BLE001 — treino com defeito não derruba o hub
-            pass
+            out["lote"] = fechar(hora)
+        except Exception as exc:    # noqa: BLE001
+            out["lote_erro"] = str(exc)[:200]
+    return out
+
+
+def rodar(apr: Aprendizado, parar: threading.Event, hora: int = 3, passo: float = 600.0) -> None:
+    """Laço diário do hub (o servidor liga em uma thread): treina ao ligar (se o último treino tem mais de 1 dia) e
+    todo dia a partir de `hora` (3 h); no mesmo passo, fecha o lote de integridade do dia anterior."""
+    while not parar.is_set():
+        passo_diario(apr, hora)
         parar.wait(passo)
 
 

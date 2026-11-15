@@ -163,33 +163,82 @@ class TestIAClaude(Base):
         self.assertNotIn("exportar", json.dumps(nota))
 
 
+class TestTetosEAvisos(Base):
+    def test_teto_por_robo_so_aquele_robo_volta_as_regras(self):
+        ia = self.claude(max_tokens=100, tetos_robo={"suporte": 0.01, "editais": 5})
+        self.assertIsNotNone(ia.gerar("s", "p", robo="suporte"))          # 0,014 gasto pelo suporte
+        self.assertIsNone(ia.gerar("s", "p", robo="suporte"))              # passou do teto do suporte
+        self.assertIn("teto do robô suporte", ia.erro)
+        self.assertIsNotNone(ia.gerar("s", "p", robo="editais"))           # os outros seguem
+        est = ia.estado()
+        pr = {x["robo"]: x for x in est["por_robo"]}
+        self.assertEqual((pr["suporte"]["chamadas"], pr["suporte"]["bloqueadas_teto"], pr["suporte"]["no_teto"]), (1, 1, True))
+        self.assertEqual(pr["editais"]["chamadas"], 1)
+        self.assertFalse(pr["editais"]["no_teto"])
+        self.assertEqual(len(Falso.recebidos), 2)
+
+    def test_aviso_por_email_80_e_100_uma_vez_por_mes(self):
+        from physis_hub import correio
+        from physis_hub.hub import Hub
+        h = Hub(":memory:", relogio=lambda: self.agora)
+        enviados = []
+        with mock.patch.dict(os.environ, {"PHYSIS_SMTP_HOST": "smtp.teste"}), \
+                mock.patch.object(correio, "enviar", lambda para, assunto, corpo: (enviados.append((para, assunto, corpo)), (True, ""))[1]):
+            ia = self.claude(max_tokens=100, teto_usd=0.02, tetos_robo={"suporte": 1},
+                             avisar=ia_claude.aviso_por_email(h, "direcao@physis.example"))
+            ia.gerar("s", "p", robo="suporte")            # 0,014 = 70%: sem aviso
+            self.assertEqual(enviados, [])
+            ia.gerar("s", "p", robo="suporte")            # 0,028: passa de 80% e de 100%
+            self.assertEqual([a for _, a, _ in enviados], ["Physis · IA Claude: 80% do teto do mês (2026-11)",
+                                                           "Physis · IA Claude: 100% do teto do mês (2026-11)"])
+            self.assertIsNone(ia.gerar("s", "p", robo="suporte"))     # teto total: robô por regras
+            self.assertEqual(len(enviados), 2)                         # uma vez por mês por limite
+        self.assertEqual(enviados[0][0], "direcao@physis.example")
+        self.assertNotIn(CHAVE, json.dumps(enviados))
+        self.assertEqual({e["estado"] for e in h.emails()}, {"enviado"})
+        self.assertEqual(ia.estado()["avisos_enviados"], ["80", "100"])
+
+    def test_historico_por_mes(self):
+        ia = self.claude()
+        ia.gerar("s", "p", robo="suporte")
+        self.agora = datetime(2026, 12, 2, 9, 0).timestamp()
+        ia.gerar("s", "p", robo="precos")
+        est = ia.estado()
+        self.assertEqual(est["mes"], "2026-12")
+        self.assertEqual(est["historico"][0]["mes"], "2026-11")
+        self.assertAlmostEqual(est["historico"][0]["gasto_usd"], 0.014, places=6)
+        self.assertEqual(list(est["historico"][0]["por_robo"]), ["suporte"])
+        self.assertEqual(est["avisos_enviados"], [])
+
+
 class TestOrdemNosRobos(Base):
-    def test_claude_primeiro_e_marcado(self):
+    def test_claude_primeiro_sem_aviso_no_texto(self):
         cadeia = robos.CadeiaIA([self.claude(), robos.IALocal("")])
-        r = robos.Suporte({"base_suporte": BASE}, cadeia).responder({"pergunta": "exportar tela para PDF"})
+        r = robos.Suporte({"base_suporte": BASE}, cadeia).responder({"pergunta": "exportar tela para PDF", "_publico": "equipe"})
         self.assertTrue(r["ia"]["usada"])
-        self.assertEqual(r["ia"]["tipo"], "claude")
-        self.assertTrue(r["gerado_por_ia"])
+        self.assertEqual((r["ia"]["tipo"], r["ia"]["modelo"]), ("claude", "claude-opus-5-5"))
+        self.assertTrue(r["ia"]["quando"])
         self.assertTrue(r["revisao_humana"])
-        self.assertIn(robos.AVISO_IA, r["resposta"])
+        self.assertEqual(r["resposta"], "Use o botão Baixar esta tela [1].")
+        self.assertNotIn("gerado_por_ia", r)
 
     def test_claude_falha_vai_para_local_depois_regras(self):
         Falso.respostas = [(500, {}), (500, {})]
         local = robos.IALocal("http://localhost:8000", enviar=lambda u, c, t: {"choices": [{"message": {"content": "da IA local"}}]})
-        r = robos.Suporte({"base_suporte": BASE}, robos.CadeiaIA([self.claude(), local])).responder({"pergunta": "exportar tela para PDF"})
+        r = robos.Suporte({"base_suporte": BASE}, robos.CadeiaIA([self.claude(), local])).responder(
+            {"pergunta": "exportar tela para PDF", "_publico": "equipe"})
         self.assertEqual(r["ia"]["tipo"], "openai")
         self.assertTrue(r["resposta"].startswith("da IA local"))
         self.assertTrue(any("claude" in t for t in r["ia"]["tentativas"]))
         r = robos.Suporte({"base_suporte": BASE}, robos.CadeiaIA([self.claude(), robos.IALocal("")])).responder(
-            {"pergunta": "exportar tela para PDF"})
+            {"pergunta": "exportar tela para PDF", "_publico": "equipe"})
         self.assertFalse(r["ia"]["usada"])
         self.assertIn("Baixar esta tela", r["resposta"])          # resposta pronta
-        self.assertNotIn(robos.AVISO_IA, r["resposta"])
 
     def test_teto_robo_responde_por_regras(self):
         self.consumo.write_text(json.dumps({"mes": "2026-11", "gasto_usd": 30.0}), encoding="utf-8")
         r = robos.Suporte({"base_suporte": BASE}, robos.CadeiaIA([self.claude(), robos.IALocal("")])).responder(
-            {"pergunta": "exportar tela para PDF"})
+            {"pergunta": "exportar tela para PDF", "_publico": "equipe"})
         self.assertTrue(r["ok"])
         self.assertFalse(r["ia"]["usada"])
         self.assertIn("teto", r["ia"]["erro"])
@@ -201,11 +250,11 @@ class TestOrdemNosRobos(Base):
                                                 "historico": [{"descricao": "Módulo fotovoltaico 550 W", "preco": p} for p in (900, 1000)]})
         self.assertTrue(r["revisao_humana"])
         self.assertTrue(r["dados"]["sugestao"])
-        self.assertTrue(r["gerado_por_ia"])
+        self.assertTrue(r["ia"]["usada"])
         r = robos.Editais({}, cadeia).responder({"editais": [{"id": "b", "titulo": "Chamada energia solar no campo",
                                                              "resumo": "fotovoltaica", "prazo": "2026-12-20"}], "hoje": "2026-11-15"})
         self.assertTrue(r["dados"]["sugestao"])
-        self.assertTrue(r["gerado_por_ia"])
+        self.assertTrue(r["revisao_humana"] and r["ia"]["usada"])
         self.assertIn("Perfil:", Falso.recebidos[-1]["corpo"]["messages"][0]["content"])
 
     def test_ordem_padrao_do_ambiente(self):

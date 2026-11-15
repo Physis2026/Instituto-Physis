@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conferir modelos do Mapeamento</title>
+<!-- Abre o pacote de EXEMPLO (dados fictícios) de modulos/mapeamento/exemplos/ nos visualizadores do módulo Mapeamento
+     e mostra uma lista de conferência (passou / falhou). Precisa de um servidor local na raiz do repositório, por exemplo:
+       python -m http.server 8850 --bind 127.0.0.1      (na pasta raiz)  →  /ferramentas/testes-navegador/conferir-modelos.html
+     Para gerar os exemplos de novo: python modulos/mapeamento/exemplos/gerar_exemplos.py
+     A página guarda e devolve as chaves do navegador que ela usa (physis.terreno.v1 e as physis-calc-* do Mapeamento). -->
+<style>
+  :root { --fundo:#F4F6F1; --sup:#FFFFFF; --tinta:#1C2B21; --tinta2:#4A4F44; --linha:#C9D2C4; --verde:#33512F; }
+  html[data-tema="escuro"] { --fundo:#14180F; --sup:#1C2B21; --tinta:#EEF2EA; --tinta2:#C9D3C4; --linha:#3A4A38; --verde:#8FB183; }
+  @media (prefers-color-scheme: dark) { html:not([data-tema="claro"]) { --fundo:#14180F; --sup:#1C2B21; --tinta:#EEF2EA; --tinta2:#C9D3C4; --linha:#3A4A38; --verde:#8FB183; } }
+  body { margin:0; padding:16px; background:var(--fundo); color:var(--tinta); font:16px/1.5 system-ui, sans-serif; }
+  h1 { font-family:Fraunces, Georgia, serif; color:var(--verde); }
+  .cartao { background:var(--sup); border:1px solid var(--linha); border-radius:10px; padding:12px 16px; margin:12px 0; }
+  .faixa { border-radius:8px; padding:8px 12px; margin:8px 0; }
+  .faixa.at { background:#F6EAD0; color:#5C3F00; } .faixa.al { background:#F5E2D7; color:#7A2214; } .faixa.ok { background:#DCEBD8; color:#1F4A1C; } .faixa.in { background:#DBE7F1; color:#1C3550; }
+  .selo { display:inline-block; padding:2px 8px; border-radius:99px; font-size:.85em; } .selo.ok { background:#DCEBD8; color:#1F4A1C; } .selo.at { background:#F6EAD0; color:#5C3F00; } .selo.in { background:#DBE7F1; color:#1C3550; }
+  .t2 { color:var(--tinta2); } .pq { font-size:.9em; display:block; } .so-leitor { position:absolute; left:-9999px; }
+  .grade { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:8px; } .numero { font-size:1.6em; font-weight:700; display:block; }
+  .precos { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:8px; } .rolagem { overflow-x:auto; }
+  table { border-collapse:collapse; width:100%; } th, td { border-bottom:1px solid var(--linha); padding:4px 6px; text-align:left; vertical-align:top; }
+  button, input, select { min-height:44px; font:inherit; } button { cursor:pointer; } :focus-visible { outline:3px solid #3D6E8F; outline-offset:2px; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; } .passou { color:#1F4A1C; font-weight:700; } .falhou { color:#7A2214; font-weight:700; }
+  html[data-tema="escuro"] .passou, html:not([data-tema="claro"]) .passou { }
+</style>
+</head>
+<body>
+<h1>Conferir modelos do Mapeamento</h1>
+<div class="faixa at" role="note"><strong>Exemplo / dados fictícios.</strong> Lote, relevo, rio, poços e irradiação são inventados, só para conferir os visualizadores.</div>
+<section class="cartao" aria-labelledby="h-lista"><h2 id="h-lista">Lista de conferência</h2><p id="resumo" role="status">Conferindo…</p><div class="rolagem"><table><caption class="so-leitor">Resultado de cada conferência</caption><thead><tr><th scope="col">Conferência</th><th scope="col">Resultado</th><th scope="col">Detalhe</th></tr></thead><tbody id="lista"></tbody></table></div></section>
+<section class="cartao" aria-labelledby="h-mapa"><h2 id="h-mapa">Mapa do lote (GeoJSON, KML e Shapefile)</h2><div id="mapa"></div></section>
+<section class="cartao" aria-labelledby="h-ifc"><h2 id="h-ifc">Resumo do IFC</h2><div id="ifc"></div></section>
+<section class="cartao" aria-labelledby="h-sol"><h2 id="h-sol">Sol nas superfícies (mapa de calor)</h2><div id="sol"></div></section>
+<section class="cartao" aria-labelledby="h-planta"><h2 id="h-planta">Planta solar: arranjo, carta solar e curva do dia</h2><div id="planta"></div></section>
+<script src="../../sistema/physis-calc-comum.js"></script>
+<script src="../../sistema/physis-solar.js"></script>
+<script src="../../sistema/physis-mapeamento.js"></script>
+<script>
+"use strict";
+const EX = "../../modulos/mapeamento/exemplos/";
+const CHAVES = ["physis.terreno.v1", "physis-mapeamento", "physis-calc-incidencia", "physis-calc-planta-solar", "physis-bim-elementos", "physis-geometria-lugar", "physis-ponte-3d"];
+const guardado = {}; CHAVES.forEach(k => { try { guardado[k] = localStorage.getItem(k); } catch (e) {} });
+window.addEventListener("pagehide", () => CHAVES.forEach(k => { try { guardado[k] == null ? localStorage.removeItem(k) : localStorage.setItem(k, guardado[k]); } catch (e) {} }));
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+var ui = { modo: "local" };
+let LUGAR = null; function localDaInstalacao() { return LUGAR; }
+let alvo = null; function desenhar() { if (alvo) document.getElementById(alvo.id).innerHTML = (alvo.id === "planta" ? telaSolar() : telaMapeamentoModulo()).replace(/<h1\b[\s\S]*?<\/h1>/, ""); }   /* um h1 só na página; a planta vem pela aba Solar */
+const linhas = []; function confere(nome, ok, det) { linhas.push([nome, !!ok, det || ""]); }
+function mostrarLista() { document.getElementById("lista").innerHTML = linhas.map(([n, ok, d]) => `<tr><th scope="row">${esc(n)}</th><td class="${ok ? "passou" : "falhou"}">${ok ? "passou" : "falhou"}</td><td class="t2">${esc(d)}</td></tr>`).join("");
+  const f = linhas.filter(l => !l[1]).length; document.getElementById("resumo").textContent = f ? `${f} de ${linhas.length} conferências falharam.` : `As ${linhas.length} conferências passaram.`; }
+const quase = (a, b, tol) => Math.abs(a - b) <= tol * Math.max(1, Math.abs(b));
+
+async function principal() {
+  const pega = async (n, tipo) => { const r = await fetch(EX + n, { cache: "no-store" }); if (!r.ok) throw new Error(n + ": " + r.status); return tipo === "bin" ? r.arrayBuffer() : tipo === "txt" ? r.text() : r.json(); };
+  const [lote, plan, planta, ctx, kml, shp, ifcTxt, ifcRes] = await Promise.all([pega("lote.geojson"), pega("planejador-exemplo.json"), pega("planta-solar.json"), pega("contexto-lugar.json"), pega("pocos.kml", "txt"), pega("nascentes-shp.zip", "bin"), pega("modelo.ifc", "txt"), pega("ifc-resumo.json")]);
+  const M = window.MAPEAMENTO;
+  /* ── 1. arquivos de exemplo ── */
+  confere("Todos os arquivos marcados como exemplo", [lote.aviso, plan.aviso, planta.aviso, ctx.aviso, ifcRes.aviso].every(a => /FICTÍCIOS/.test(a || "")) && /FICTÍCIOS/.test(kml), "aviso em cada arquivo");
+  confere("Lote em GeoJSON é um polígono", lote.features[0].geometry.type === "Polygon", lote.features[0].geometry.coordinates[0].length + " vértices");
+  const doc = new DOMParser().parseFromString(kml, "application/xml"), pms = [...doc.getElementsByTagName("Placemark")];
+  confere("KML com 2 poços e o lote", pms.length === 3 && doc.getElementsByTagName("Point").length === 2, pms.length + " marcadores");
+  const b = new Uint8Array(shp); confere("Shapefile em .zip", b[0] === 0x50 && b[1] === 0x4B && b.length > 200, b.length + " bytes");
+  /* mapa simples: lote, casa e poços do KML */
+  const anel = lote.features[0].geometry.coordinates[0], xs = anel.map(p => p[0]), ys = anel.map(p => p[1]), W = 360, k = W / (Math.max(...xs) - Math.min(...xs)), Hh = Math.round((Math.max(...ys) - Math.min(...ys)) * k * 1.1);
+  const px = p => [((p[0] - Math.min(...xs)) * k).toFixed(1), (Hh - (p[1] - Math.min(...ys)) * k * 1.1).toFixed(1)];
+  const pocos = [...doc.getElementsByTagName("Point")].map(p => p.textContent.trim().split(",").map(Number));
+  const t = plan.terreno, kk = 111320 * Math.cos(t.lat0 * Math.PI / 180), casa = plan.itens[0], cantos = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, c]) => [t.lon0 + (casa.x + a * casa.w / 2) / kk, t.lat0 + (casa.y + c * casa.d / 2) / 110540]);
+  document.getElementById("mapa").innerHTML = `<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="max-width:${W}px" role="img" aria-label="Lote de exemplo com a casa e dois poços"><polygon points="${anel.map(p => px(p).join(",")).join(" ")}" fill="#EFE8D6" stroke="#4A4F44"/><polygon points="${cantos.map(p => px(p).join(",")).join(" ")}" fill="#C9D2C4" stroke="#1C2B21"/>${pocos.map(p => `<circle cx="${px(p)[0]}" cy="${px(p)[1]}" r="5" fill="#3D6E8F"/>`).join("")}<text x="${W - 6}" y="14" text-anchor="end" font-size="12" fill="#1C2B21">N ↑</text></svg><p class="t2">Bege: lote (GeoJSON). Cinza: casa (Planejador). Azul: poços (KML).</p>`;
+  /* ── 2. IFC ── */
+  const tipos = {}; (ifcTxt.match(/^#\d+=(IFC\w+)\(/gm) || []).forEach(l => { const x = l.replace(/^#\d+=/, "").replace("(", ""); tipos[x] = (tipos[x] || 0) + 1; });
+  confere("IFC: cabeçalho STEP e esquema IFC4", ifcTxt.startsWith("ISO-10303-21;") && /FILE_SCHEMA\(\('IFC4'\)\);/.test(ifcTxt) && /END-ISO-10303-21;\s*$/.test(ifcTxt), "");
+  const obrig = ["IFCPROJECT", "IFCSITE", "IFCBUILDING", "IFCBUILDINGSTOREY", "IFCSOLARDEVICE", "IFCTRANSFORMER", "IFCTANK", "IFCRELCONTAINEDINSPATIALSTRUCTURE", "IFCPROPERTYSET"];
+  confere("IFC: entidades obrigatórias presentes", obrig.every(x => tipos[x]), obrig.filter(x => !tipos[x]).join(", ") || obrig.length + " tipos");
+  const guids = (ifcTxt.match(/^#\d+=IFC\w+\('([^']{22})'/gm) || []).map(l => l.match(/'([^']{22})'/)[1]);
+  confere("IFC: GlobalId com 22 caracteres e sem repetição", guids.length > 20 && guids.every(g => /^[0-3][0-9A-Za-z_$]{21}$/.test(g)) && new Set(guids).size === guids.length, guids.length + " GlobalId");
+  confere("IFC: fator de potência com P, Q e S", /'Physis_Eletrica'/.test(ifcTxt) && /'FatorPotencia'/.test(ifcTxt) && /'PotenciaReativa'/.test(ifcTxt) && /'PotenciaAparente'/.test(ifcTxt), "");
+  confere("IFC: módulos do arranjo = planta", tipos.IFCSOLARDEVICE === planta.total.modulos + planta.aguas.length, `${tipos.IFCSOLARDEVICE} IfcSolarDevice`);
+  document.getElementById("ifc").innerHTML = `<div class="rolagem"><table><caption>Lido pelo leitor do servidor (ifc-resumo.json)</caption><tbody><tr><th scope="row">Esquema</th><td>${esc(ifcRes.esquema)}</td></tr><tr><th scope="row">Projeto</th><td>${esc(ifcRes.projeto)}</td></tr><tr><th scope="row">Terreno</th><td>${ifcRes.terrenos.map(s => `${esc(s.nome)} · ${s.lat.toFixed(5)}, ${s.lon.toFixed(5)}`).join("")}</td></tr><tr><th scope="row">Pavimentos</th><td>${ifcRes.pavimentos.map(p => esc(p.nome)).join(", ")}</td></tr>${Object.entries(ifcRes.elementos_por_tipo).map(([a, c]) => `<tr><th scope="row">${esc(a)}</th><td>${c}</td></tr>`).join("")}</tbody></table></div>`;
+  /* ── 3. contas: o espelho do navegador bate com o do servidor ── */
+  LUGAR = { lat: planta.lat, lon: t.lon0, fonte: "exemplo" };
+  ui.gisSolar = { ponto: { meses: planta.H } }; ui.gisSolarKey = planta.lat.toFixed(2) + "," + t.lon0.toFixed(2);
+  localStorage.setItem("physis.terreno.v1", JSON.stringify(plan));
+  planta.aguas.forEach(a => {
+    const larg = casa.w, comp = casa.d / 2 / Math.cos(a.incl * Math.PI / 180);
+    const r = M.arranjo([[0, 0], [larg, 0], [larg, comp], [0, comp]], planta.modulo, { orientacao: "retrato", plano: "telhado", afastamento_m: planta.regras_teste.afastamento_m, folga_m: planta.regras_teste.folga_m });
+    confere(`Arranjo ${a.id}: módulos e kWp iguais aos do servidor`, r.modulos === a.modulos && quase(r.kwp, a.kwp, 1e-9), `${r.modulos} módulos, ${r.kwp.toFixed(2)} kWp`);
+    const inc = M.incidenciaSuperficie(planta.H, planta.lat, a.incl, a.azim, null, 0.2);
+    confere(`Sol na ${a.id}: navegador = servidor`, quase(inc.anual_kwh_m2, a.anual_kwh_m2, 1e-6), `${inc.anual_kwh_m2.toFixed(1)} kWh/m²·ano`);
+  });
+  confere("Face norte recebe mais sol que a face sul (hemisfério sul)", planta.aguas[0].anual_kwh_m2 > planta.aguas[1].anual_kwh_m2, planta.aguas.map(a => a.anual_kwh_m2.toFixed(0)).join(" × "));
+  const cv = M.curvaDiaria(planta.H[2], planta.lat, 80, 20, 0), g = cv.pontos.map(p => p[1]), assim = Math.max(...g.map((v, i) => Math.abs(v - g[g.length - 1 - i])));
+  confere("Curva do dia simétrica ao meio-dia solar", assim < 1e-6 && Math.abs(cv.nascer_h + cv.por_h - 24) < 1e-9, `assimetria ${assim.toExponential(1)} W/m²; nascer ${cv.nascer_h.toFixed(2)} h`);
+  const sb = M.sombraEntreFileiras(planta.lat, 25, 0, 2.0, 0.95, 2.5, 172, [9, 15]);
+  confere("Sombra entre fileiras no solstício de inverno com passo curto", sb.sombreia, `sombra ${sb.sombra_max_m.toFixed(2)} m; vão ${sb.vao_m.toFixed(2)} m`);
+  /* ── 4. contexto do lugar ── */
+  const faltam = new Set((ctx.faltam || []).map(f => f.camada));
+  confere("Contexto: esquema e integridade", ctx.esquema === "physis-contexto-lugar/1" && /^[0-9a-f]{64}$/.test(ctx.integridade.sha256), ctx.integridade.sha256.slice(0, 12) + "…");
+  confere("Contexto: camadas instaladas usadas, as outras como não instaladas", !faltam.has("relevo") && !faltam.has("hidrografia") && faltam.has("uso_solo") && ctx.campos.uso_solo.situacao === "camada_nao_instalada" && ctx.campos.uso_solo.valor === null, [...faltam].join(", "));
+  confere("Contexto: rio e nascente fictícios achados", ctx.campos.hidrografia.valor.rios === 1 && ctx.campos.hidrografia.valor.nascentes === 1, "");
+  /* ── 5. visualizadores do módulo ── */
+  localStorage.setItem("physis-mapeamento", JSON.stringify({ superficie: "casa-agua1", mod_c: String(planta.modulo.comprimento_m), mod_l: String(planta.modulo.largura_m), afastamento: String(planta.regras_teste.afastamento_m), folga: String(planta.regras_teste.folga_m), dia: "172" }));
+  ui.mp = { sub: "sol" }; alvo = { id: "sol" }; desenhar();
+  const sol = document.getElementById("sol").innerHTML;
+  confere("Mapa de calor desenhado", /<rect /.test(sol) && !/Erro nesta parte/.test(sol), "");
+  /* a planta solar fica na aba Energia solar (15/11/2026): abre pelo caminho da Solar, sub-aba "Planta solar (BIM)" */
+  ui.solSub = "planta"; alvo = { id: "planta" }; document.getElementById("planta").innerHTML = telaSolar().replace(/<h1\b[\s\S]*?<\/h1>/, "");
+  const pl = document.getElementById("planta").innerHTML;
+  confere("Planta: carta solar, curva do dia, potência CA e arranjo desenhados", /Carta solar do lugar/.test(pl) && /mp-g-curva/.test(pl) && /mp-g-ca/.test(pl) && /Arranjo das placas na superf/.test(pl) && !/Erro nesta parte/.test(pl), "");
+  confere("Planta: o arranjo na tela tem os módulos do servidor", new RegExp(`>${planta.aguas[0].modulos}<`).test(pl), planta.aguas[0].modulos + " módulos na água norte");
+  confere("Planta: fator de potência com P, Q e S", /Q \(kvar\)/.test(pl) && /S \(kVA\)/.test(pl), "");
+  mostrarLista();
+}
+principal().catch(e => { confere("Carregar o pacote de exemplo", false, String(e && e.message || e)); mostrarLista(); });
+</script>
+</body>
+</html>

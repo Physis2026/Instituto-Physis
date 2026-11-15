@@ -20,9 +20,14 @@ from __future__ import annotations
 import json
 import re
 
+# Qualidade da água (15/11/2026): leituras, calibrações, laboratório, limites, laudos e configuração. O lote diário de
+# integridade leva as leituras; a ponte do navegador (sistema/physis-ponte-cliente.js, embutida no painel) envia as
+# mesmas chaves (test_cliente_estado confere as duas listas).
+CHAVES_AGUA = ("physis-ph-leituras", "physis-ph-calibracoes", "physis-ph-laboratorio", "physis-agua-limites",
+               "physis-agua-laudos", "physis-agua-config")
 # chaves que a plataforma do cliente guarda (iguais às do localStorage)
 CHAVES = ("physis-perfil", "physis-gestao-cliente", "physis-carbono", "physis-residuos-plano", "physis-cert-gap",
-          "physis-sbn", "physis.terreno.v1", "physis-servidor-verde")
+          "physis-sbn", "physis.terreno.v1", "physis-servidor-verde") + CHAVES_AGUA
 PREFIXOS = ("physis-calc-", "physis-curso-")
 _SUFIXO = re.compile(r"^[A-Za-z0-9_.:-]{1,60}$")
 VALOR_MAX = 2 * 1024 * 1024          # por chave (texto UTF-8)
@@ -38,7 +43,7 @@ CREATE TABLE IF NOT EXISTS cliente_estado (
 
 def chave_valida(chave: str) -> bool:
     c = str(chave or "")
-    if c in CHAVES:
+    if c in CHAVES or c in CHAVES_AGUA:
         return True
     return any(c.startswith(p) and _SUFIXO.match(c[len(p):]) for p in PREFIXOS)
 

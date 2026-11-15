@@ -35,6 +35,21 @@ ROTA_DESTINO = {
     "biomassa": ("queima", True),
 }
 RC_UN = {"kg_mes": 1, "kg_sem": 52 / 12, "kg_dia": 30, "t_mes": 1000, "l_mes": 0.92}
+PREMISSAS = RAIZ / "sistema" / "physis-premissas.json"
+# fora do repositório (sem a base de premissas): os mesmos padrões que physis-carbono.js usa sem o bloco PhysisCalc
+BIOG_PAD = {"alimentos": 0.10, "esterco_bov": 0.04, "esterco_sui": 0.06, "cama_aviario": 0.07, "colheita": 0.05}
+PCI_PAD = {"biogas.pci": 6.0, "glp.pci": 12.8}
+
+
+def premissa(pid: str, padrao=None):
+    """Valor padrão de uma premissa de sistema/physis-premissas.json (ou `padrao` sem a base)."""
+    try:
+        for p in json.loads(PREMISSAS.read_text(encoding="utf-8"))["premissas"]:
+            if p.get("id") == pid:
+                return p.get("valor_padrao")
+    except (OSError, ValueError, KeyError):
+        pass
+    return padrao
 
 
 def carregar(caminho: Path | str | None = None) -> dict:
@@ -464,8 +479,31 @@ def calcular(estado: dict, ctx: dict | None = None, F: dict | None = None) -> di
     rm = c.get("remo") or {}
     ha = n0(rm.get("ha")) + (n0(ctx.get("mudas_sbn")) / F["remocoes"]["mudas_por_ha"] if rm.get("usar_sbn", True) else 0)
     rem_t = remocoes(F, ha, rm.get("bioma", "mata_atlantica"), n0(rm.get("idade"))) if ha else 0.0
-    solar = n0(c.get("solar_kwh"))
-    evit = {"solar": rede_localizacao(solar, f_loc)}
+    # Solar, Secador e Turbinas entram sozinhos (R4, mesma regra de physis-carbono.js): o digitado vale; vazio, o do módulo
+    solar = n0(c.get("solar_kwh")) if num(c.get("solar_kwh")) is not None else (n0(ctx.get("solar_kwh")) if c.get("solar_auto", True) is not False else 0.0)
+    evit = {"solar": rede_localizacao(solar, f_loc), "secador": n0(ctx.get("secador_co2_kg")) / 1000,
+            "turbinas": rede_localizacao(n0(ctx.get("turbinas_kwh")), f_loc)}
+    # biogás no lugar do GLP (mesma regra de physis-carbono.js): o registro de Esgoto e biogás substitui a soma do plano
+    rc = ctx.get("rc") or []
+    bio_r = ctx.get("biogas") if isinstance(ctx.get("biogas"), dict) and num(ctx["biogas"].get("biogas_m3_dia")) is not None else None
+    por_kg = premissa("residuos.biogas_por_kg") or BIOG_PAD
+    if bio_r:
+        biog_m3 = num(bio_r["biogas_m3_dia"]) * 365
+    else:
+        biog_m3 = sum(n0(r.get("qtd")) * RC_UN.get(r.get("un"), 1) * 12 * (por_kg.get(r.get("tipo")) or 0.05)
+                      for r in rc if r.get("rota") == "biodigestor")
+    pci_bio = premissa("biogas.pci", PCI_PAD["biogas.pci"])
+    pci_glp = premissa("glp.pci", PCI_PAD["glp.pci"])
+    glp_t_kg = tco2e(combustao(F, "glp", 1, "estacionaria")[0], gw)
+    evit["biogas"] = biog_m3 * pci_bio / pci_glp * glp_t_kg
+    # reciclagem: o que o aterro emitiria menos o que a reciclagem emite (nunca negativo), por item do plano
+    recic = 0.0
+    for r in rc:
+        if ROTA_DESTINO.get(r.get("rota"), ("",))[0] != "reciclagem":
+            continue
+        t = n0(r.get("qtd")) * RC_UN.get(r.get("un"), 1) * 12 / 1000
+        recic += max(0.0, tco2e(residuo(F, r.get("tipo", ""), t, "aterro"), gw) - tco2e(residuo(F, r.get("tipo", ""), t, "reciclagem"), gw))
+    evit["reciclagem"] = recic
     reuso_m3 = n0((ctx.get("esgoto") or {}).get("reuso_m3_dia")) * 365
     f_agua = num((F.get("agua_fornecida") or {}).get("kg_m3"))
     evit["reuso"] = reuso_m3 * f_agua / 1000 if f_agua is not None else 0.0
@@ -473,6 +511,7 @@ def calcular(estado: dict, ctx: dict | None = None, F: dict | None = None) -> di
     return {"linhas": linhas, "e1": e1, "e2_loc": e2_loc, "e2_mkt": e2_mkt, "e3": e3t, "total": total,
             "por_gas": por_gas, "bio_t": sum(l["bio_t"] for l in linhas),
             "fora_quioto_t": sum(l["t"] for l in linhas if l["fora"]), "remocoes_t": rem_t, "evitadas": evit,
+            "evitadas_t": evit["solar"] + evit["secador"] + evit["turbinas"] + evit["biogas"] + evit["reciclagem"] + evit["reuso"], "biogas_m3": biog_m3,
             "incerteza": incerteza([(l["t"], l["u"]) for l in linhas if not l["fora"]]),
             "sbce": sbce(F, e1), "kwh": kwh, "fator_rede": f_loc, "servidor": sv, "esgoto": esgoto, "mat_falta": mat_falta,
             "reuso_m3": reuso_m3, "reuso_marcador": reuso_m3 > 0 and f_agua is None}

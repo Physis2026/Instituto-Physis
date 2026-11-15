@@ -53,9 +53,20 @@ CP_AR_KJ_KG_K = 1.006              # kJ/(kg·K), ar seco
 RHO_AR = 1.15                      # kg/m³ perto de 30 °C ao nível do mar
 MJ_POR_KWH = 3.6
 PCI_LENHA_MJ_KG = 13.0             # o mesmo da base de fatores de emissão (lenha, PCI)
-FATOR_REDE_PADRAO = 0.0289         # tCO2/MWh, o mesmo do núcleo physis/1 (verificar o ano)
 GWP_CH4, GWP_N2O = 28, 265         # AR5, como a base de fatores
 LENHA_CH4_KG_TJ, LENHA_N2O_KG_TJ, LENHA_CO2_KG_TJ = 300.0, 4.0, 112000.0
+
+
+def fator_rede_padrao() -> float | None:
+    """tCO2/MWh: o padrão da base de fatores de emissão (o mesmo do Carbono); sem ela, a premissa rede.fator_emissao;
+    sem nenhuma das duas, None (o CO2 evitado elétrico não é calculado). Nada de número fixo aqui (R9, 15/11/2026)."""
+    from . import carbono            # tardio: o secador é importado pela ponte MQTT
+    try:
+        rede = carbono.carregar()["rede"]
+        return float(rede["anual"][rede["padrao"]]["valor"])
+    except (OSError, ValueError, KeyError, TypeError):
+        v = carbono.premissa("rede.fator_emissao")
+        return float(v) if isinstance(v, (int, float)) else None
 
 
 def produto(chave: str | None) -> dict:
@@ -203,14 +214,18 @@ def dimensionar(p: dict) -> dict:
     lenha_nao_renovavel (bool).
     """
     g = lambda k, d: d if p.get(k) in (None, "") else float(p[k])
+    avisos = []
     massa, u0, alvo = g("massa", 0), g("u0", 60), g("alvo", 12)
-    H, eta, aprov = g("irradiacao", 5.0), g("eta_coletor", 0.40), g("aproveitamento", 0.5)
+    # irradiação: a do lugar (NASA POWER pelo local da instalação) ou a digitada; sem ela, "local não informado"
+    H, eta, aprov = g("irradiacao", None), g("eta_coletor", 0.40), g("aproveitamento", 0.5)
+    if H is None:
+        avisos.append("local não informado: sem a irradiação do lugar, a área do coletor não é calculada")
     dias, horas, dT = g("dias", 5), g("horas_sol", 8), g("delta_t", 15)
     agua = agua_a_remover(massa, u0, alvo)
     q_evap = agua * CALOR_LATENTE_MJ_KG                       # MJ que a água leva
     q_ar = q_evap / aprov if aprov > 0 else 0.0                # MJ que o coletor tem de pôr no ar
-    por_m2 = H * MJ_POR_KWH * eta * dias                       # MJ por m² de coletor no lote
-    area = q_ar / por_m2 if por_m2 > 0 else None
+    por_m2 = H * MJ_POR_KWH * eta * dias if H is not None else None   # MJ por m² de coletor no lote
+    area = q_ar / por_m2 if por_m2 else None
     dw = CP_AR_KJ_KG_K * dT * aprov / (CALOR_LATENTE_MJ_KG * 1000.0)   # kg de água por kg de ar
     m_ar = agua / dw if dw > 0 else None
     vazao = m_ar / RHO_AR / (dias * horas) if m_ar and dias * horas > 0 else None   # m³/h
@@ -218,8 +233,12 @@ def dimensionar(p: dict) -> dict:
     lotes = g("lotes_ano", 10)
     kwh_el = q_evap / eta_el / MJ_POR_KWH if eta_el > 0 else None
     kg_lenha = q_evap / (PCI_LENHA_MJ_KG * eta_le) if eta_le > 0 else None
-    f_rede = g("fator_rede", FATOR_REDE_PADRAO)
-    co2_el = kwh_el * f_rede if kwh_el is not None else None             # kg CO2 (tCO2/MWh = kg/kWh)
+    f_rede = g("fator_rede", None)
+    if f_rede is None:
+        f_rede = fator_rede_padrao()
+    if f_rede is None:
+        avisos.append("fator da rede não informado: CO2 evitado elétrico não calculado")
+    co2_el = kwh_el * f_rede if kwh_el is not None and f_rede is not None else None   # kg CO2 (tCO2/MWh = kg/kWh)
     co2_lenha = None
     if kg_lenha is not None:
         tj = kg_lenha * PCI_LENHA_MJ_KG / 1e6
@@ -232,7 +251,8 @@ def dimensionar(p: dict) -> dict:
             "kwh_eletrico_ano": kwh_el * lotes if kwh_el is not None else None,
             "kg_lenha_ano": kg_lenha * lotes if kg_lenha is not None else None,
             "co2_eletrico_kg_ano": co2_el * lotes if co2_el is not None else None,
-            "co2_lenha_kg_ano": co2_lenha * lotes if co2_lenha is not None else None}
+            "co2_lenha_kg_ano": co2_lenha * lotes if co2_lenha is not None else None,
+            "fator_rede": f_rede, "avisos": avisos}
 
 
 # ── Alertas do hub ────────────────────────────────────────────────────────────────────────────────

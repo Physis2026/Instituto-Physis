@@ -17,6 +17,9 @@ A ponte:
    TIPO:SEC e o comando VENT liga e desliga o ventilador. Segurança: com a temperatura interna no
    limite ("tmax", padrão 60 °C) a ponte força o ventilador ligado e recusa VENT:0 até esfriar 5 °C;
    o YAML do nó faz o mesmo sozinho (firmware/secador/secador-solar.yaml), sem depender da ponte.
+5. medidores ("tipo": "energia" ou "agua" no nó, desde 15/11/2026): os sensores viram a linha TIPO:ENE
+   (PW kW, V, I, FP) ou TIPO:HID (Q m³/h, PR bar). Só leitura. É o caminho de energia, tensão, corrente,
+   fator de potência, vazão e pressão até a tabela medicao (e daí ao modelo de consumo do aprendizado).
 
 Só a biblioteca padrão (socket/ssl): MQTT 3.1.1, QoS 0, usuário e senha, TLS opcional (porta 8883).
 A senha vem de PHYSIS_MQTT_SENHA (nunca do código nem do instancia.json).
@@ -173,6 +176,50 @@ class NoSecador:
                 f"VENT:{v('vent')},{abt}PESO:{v('peso')},IRR:{v('irr')},BAT:{v('bat')},TS:{self.ultimo_ts}")
 
 
+class NoMedidor:
+    """Medidor (só leitura, sem comando). "tipo": "energia" → linha TIPO:ENE {"pw": potência ativa kW, "qr": potência
+    reativa kvar, "s": potência aparente kVA, "v": tensão V, "i": corrente A, "fp": fator de potência}; "tipo": "agua" → linha TIPO:HID {"q": vazão m³/h, "pr": pressão bar}.
+    Ex.: {"no": "medidor-geral", "id": 61, "tipo": "energia", "pw": "potencia_ativa", "v": "tensao", "i": "corrente",
+    "fp": "fator_de_potencia"}. Pelo menos uma grandeza; "bat" opcional. As unidades são as do contrato physis/1:
+    o objeto do ESPHome tem de publicar nelas (kW, V, A, -, m³/h, bar)."""
+    BOOL: tuple = ()
+    TIPOS = {"energia": ("ENE", ("pw", "qr", "s", "v", "i", "fp")), "agua": ("HID", ("q", "pr"))}
+    CASAS = {"pw": 3, "qr": 3, "s": 3, "v": 1, "i": 2, "fp": 3, "q": 3, "pr": 2, "bat": 2}
+
+    def __init__(self, cfg: dict):
+        self.nome = str(cfg["no"])
+        self.id = int(cfg["id"])
+        if not 1 <= self.id <= 99:
+            raise ValueError("id do nó entre 1 e 99")
+        self.tipo_v6, chaves = self.TIPOS[str(cfg.get("tipo")).lower()]
+        self.chaves = chaves
+        self.obj = {k: str(cfg[k]) for k in chaves + ("bat",) if cfg.get(k)}
+        if not any(k in self.obj for k in chaves):
+            raise ValueError("medidor sem nenhuma grandeza configurada")
+        self.val: dict[str, float | int | None] = {}
+        self.online = None
+
+    chave_de = No.chave_de
+
+    def linha(self, agora: float) -> str:
+        self.ultimo_ts = max(int(agora), getattr(self, "ultimo_ts", 0) + 1)
+        partes = [f"ID:{self.id}", f"TIPO:{self.tipo_v6}"]
+        for k in self.chaves + ("bat",):
+            if k in self.obj:
+                x = self.val.get(k)
+                partes.append(f"{'BAT' if k == 'bat' else k.upper()}:{'-' if x is None else f'{x:.{self.CASAS[k]}f}'}")
+        return ",".join(partes + [f"TS:{self.ultimo_ts}"])
+
+
+def _no_de(cfg: dict):
+    t = str(cfg.get("tipo", "")).lower()
+    if t == "secador":
+        return NoSecador(cfg)
+    if t in NoMedidor.TIPOS:
+        return NoMedidor(cfg)
+    return No(cfg)
+
+
 def _num(carga: str) -> float | None:
     try:
         f = float(carga)
@@ -190,7 +237,7 @@ class Ponte:
     """Sem rede: recebe (tópico, carga), devolve linhas V6 para o hub e (tópico, carga) para publicar."""
 
     def __init__(self, nos: list[dict], relogio=time.time):
-        self.nos = {n.nome: n for n in ((NoSecador(c) if str(c.get("tipo", "")).lower() == "secador" else No(c)) for c in nos)}
+        self.nos = {n.nome: n for n in (_no_de(c) for c in nos)}
         self.por_id = {n.id: n for n in self.nos.values()}
         self.relogio = relogio
 
@@ -248,6 +295,8 @@ class Ponte:
     def _automatico(self, no, agora: float) -> list[tuple[str, str]]:
         if isinstance(no, NoSecador):
             return self._seguranca(no)
+        if isinstance(no, NoMedidor):
+            return []                                   # medidor: só leitura
         pub: list[tuple[str, str]] = []
         for i in (1, 2):
             aberta = bool(no.val.get(f"ir{i}"))
@@ -281,7 +330,7 @@ class Ponte:
                     if arg == "1" or not quente:          # desligar com o secador no limite: recusado (segurança)
                         pub += self._ventilador(no, arg == "1")
                 continue
-            if acao == "VENT":
+            if acao == "VENT" or isinstance(no, NoMedidor):
                 continue
             if acao in ("IRR1", "IRR2"):
                 pub += self._valvula(no, int(acao[-1]), arg == "1")

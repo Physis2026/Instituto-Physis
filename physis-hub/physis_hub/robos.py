@@ -15,8 +15,9 @@ Mesmo ligada:
   * o registro guarda só metadados (robô, tamanho, tempo, ok) — nunca o texto.
 
 Ordem de quem melhora o texto (ia_do_ambiente): Claude com a conta da Physis, se configurado (ia_claude.py) →
-IA local acima (Fase 2) → respostas prontas por regras. Resposta que passou por IA vem com "gerado_por_ia",
-o aviso AVISO_IA no fim do texto e revisao_humana=True. Ver docs/IA_CLAUDE.md.
+IA local acima (Fase 2) → respostas prontas por regras. O texto da resposta não leva aviso visível (decisão de
+15/11/2026); o protocolo fica: "ia" na resposta (provedor, modelo, quando) e uma entrada "ia" no registro encadeado
+do hub (ia.protocolo = id do registro), e revisao_humana=True. Ver docs/IA_CLAUDE.md.
 
 Robôs: suporte, precos, editais, marketing, instituto, pluviometro. Ver docs/ROBOS.md.
 """
@@ -248,9 +249,35 @@ class CadeiaIA:
         return None
 
 
-def ia_do_ambiente() -> CadeiaIA:
-    """Claude (se houver chave) → IA local (PHYSIS_IA_URL, Fase 2) → regras."""
-    return CadeiaIA([claude_mod.IAClaude(), IALocal()])
+def ia_do_ambiente(avisar=None) -> CadeiaIA:
+    """Claude (se houver chave) → IA local (PHYSIS_IA_URL, Fase 2) → regras. avisar(assunto, corpo): aviso de teto."""
+    return CadeiaIA([claude_mod.IAClaude(avisar=avisar), IALocal()])
+
+
+def claude_da_cadeia(ia) -> "claude_mod.IAClaude | None":
+    for p in getattr(ia, "provedores", None) or ([ia] if ia is not None else []):
+        if isinstance(p, claude_mod.IAClaude):
+            return p
+    return None
+
+
+def registrar_uso_ia(hub, robo: str, info: dict, extra: dict | None = None) -> str | None:
+    """Protocolo interno: quem gerou (robô/documento), provedor, modelo e quando, no registro encadeado. Sem texto."""
+    if hub is None or not hasattr(hub, "registrar"):
+        return None
+    try:
+        conteudo = {"o_que": "texto gerado por IA", "robo": robo, "provedor": info.get("tipo"), "modelo": info.get("modelo"),
+                    "quando": info.get("quando"), "revisao_humana": True}
+        if info.get("dados_pessoais_removidos"):
+            conteudo["dados_pessoais_removidos"] = info["dados_pessoais_removidos"]
+        conteudo.update(extra or {})
+        with hub._trava:
+            ident = hub.registrar("ia", f"robo:{robo}", conteudo)
+            hub._db.commit()
+        return ident
+    except Exception as exc:                      # o protocolo não derruba a resposta; fica no log
+        log.warning("protocolo de IA não gravado (%s)", type(exc).__name__)
+        return None
 
 
 # ══ Base dos robôs ══════════════════════════════════════════════════════════════════════════════
@@ -289,10 +316,9 @@ class Robo:
             r = {"ok": False, "robo": self.nome, "erro": f"pedido inválido: {exc}", "revisao_humana": True}
         if r.get("intencao") is None:
             r["intencao"] = self.intencao(str(pedido.get("pergunta") or ""))
-        if (r.get("ia") or {}).get("usada"):         # tudo que passou por IA: marcado e com revisão humana
+        if (r.get("ia") or {}).get("usada"):         # passou por IA: protocolo no registro e revisão humana
             r["revisao_humana"] = True
-            r["gerado_por_ia"] = True
-            r["aviso_ia"] = AVISO_IA
+            r["ia"]["protocolo"] = registrar_uso_ia(self.ctx.get("hub"), self.nome, r["ia"])
         log.info("robo=%s intencao=%s tamanho=%d ok=%s ms=%d", self.nome, r.get("intencao"), len(json.dumps(pedido, ensure_ascii=False)),
                  r.get("ok"), int((time.monotonic() - inicio) * 1000))
         return r
@@ -309,10 +335,11 @@ class Robo:
         if not texto:
             return rascunho, {"usada": False, "erro": self.ia.erro or "sem resposta"}
         info = dict(getattr(self.ia, "ultimo", None) or {"tipo": self.ia.tipo})
-        info.update(usada=True, gerado_por_ia=True, revisao_humana=True)
+        info.update(usada=True, revisao_humana=True)
+        info.setdefault("quando", datetime.fromtimestamp(self.agora()).isoformat(timespec="seconds"))
         if getattr(self.ia, "tentativas", None):
             info["tentativas"] = list(self.ia.tentativas)     # ex.: Claude no teto, quem respondeu foi a IA local
-        return f"{texto}\n\n— {AVISO_IA}", info
+        return texto, info
 
 
 # ── 1. Suporte ──────────────────────────────────────────────────────────────────────────────────
@@ -362,15 +389,54 @@ def _curso_do_painel(caminho: Path) -> list[dict]:
 DOCS_INTERNOS = ("MEMO-CLAUDE-CODE.md", "LISTA-DE-MODIFICACOES.md", "CHECKLIST.md", "IA_CLAUDE.md")
 
 
-def carregar_base(pasta_docs: Path | None = None, painel: Path | None = None, internos: bool = False) -> list[dict]:
-    pasta = Path(pasta_docs or RAIZ / "docs")
+PUBLICOS = ("cliente", "equipe")
+# Texto de desenvolvedor: nome de arquivo, pasta do código, rota, identificador de código. Nunca vai para o cliente.
+_DEV = re.compile(r"`|\b[\w-]+\.(?:md|js|py|html|json|yaml|yml|db|odt|ods|sh|ps1|ino|h)\b|\bdocs/|physis_hub|/api/|\b[a-z]+_[a-z0-9_]+\b"
+                  r"|\b[a-z]+[A-Z][A-Za-z]+\b|\bPHYSIS_[A-Z_]+|\[MARCADOR|\{\{")
+
+
+def eh_texto_de_cliente(texto: str) -> bool:
+    """True quando o trecho pode ir a um cliente: sem nome de arquivo, pasta, rota, variável ou identificador de código,
+    sem [MARCADOR] e sem {{campo}} (trecho de modelo ainda incompleto)."""
+    return not _DEV.search(str(texto or ""))
+
+
+def _manual_cliente(pasta_modelos: Path | None = None) -> list[dict]:
+    """As seções do manual (comum e de cada módulo): a base do suporte para o cliente, junto com o curso de introdução."""
+    from . import documentos_auto
+    pastas = [Path(pasta_modelos)] if pasta_modelos else documentos_auto.pastas_modelos()
+    nomes = documentos_auto.nomes_modulos()
+    out, vistos = [], set()
+    for pasta in pastas:
+        arqs = [(pasta / "manual" / "comum.md", "Manual da plataforma")] + [
+            (a, "Manual · " + nomes.get(a.stem, a.stem.capitalize())) for a in sorted((pasta / "manual" / "modulos").glob("*.md"))]
+        for arq, rotulo in arqs:
+            if arq.is_file() and arq.name + rotulo not in vistos:
+                vistos.add(arq.name + rotulo)
+                out += _paragrafos_md(arq, rotulo)
+    return out
+
+
+def carregar_base(pasta_docs: Path | None = None, painel: Path | None = None, internos: bool = False,
+                  publico: str = "equipe", pasta_modelos: Path | None = None) -> list[dict]:
+    """Base do suporte por público (15/11/2026). Cliente: só o manual por módulo e o curso de introdução, e só trechos
+    sem nome de arquivo ou código. Equipe: isso mais a documentação técnica (docs/*.md) e as explicações do código."""
     base = []
-    for arq in sorted(pasta.glob("*.md")):
-        if internos or arq.name not in DOCS_INTERNOS:
-            base += _paragrafos_md(arq, f"docs/{arq.name}")
-    base += _docstrings(RAIZ / "physis_hub")
-    base += _curso_do_painel(Path(painel or RAIZ / "web" / "painel.html"))
+    if publico == "equipe":
+        pasta = Path(pasta_docs or RAIZ / "docs")
+        for arq in sorted(pasta.glob("*.md")):
+            if internos or arq.name not in DOCS_INTERNOS:
+                base += _paragrafos_md(arq, f"docs/{arq.name}")
+        base += _docstrings(RAIZ / "physis_hub")
+    cliente = _manual_cliente(pasta_modelos) + _curso_do_painel(Path(painel or RAIZ / "web" / "painel.html"))
+    base += [b for b in cliente if publico == "equipe" or eh_texto_de_cliente(b["texto"] + " " + b["secao"])]
     return base
+
+
+def so_para_cliente(base: list[dict]) -> list[dict]:
+    """Filtro de segurança da base injetada: fora o que é de desenvolvedor (fonte ou texto)."""
+    return [b for b in base if not str(b.get("fonte", "")).startswith(("docs/", "physis_hub/")) and eh_texto_de_cliente(
+        f"{b.get('fonte', '')} {b.get('secao', '')} {b.get('texto', '')}")]
 
 
 def _docstrings(pasta: Path) -> list[dict]:
@@ -400,22 +466,29 @@ class Suporte(Robo):
 
     def __init__(self, contexto=None, ia=None):
         super().__init__(contexto, ia)
-        self._base = self.ctx.get("base_suporte")
-        self._indice = None
+        self._indices: dict = {}
 
-    def indice(self) -> tuple[list[dict], IndiceTFIDF]:
-        if self._indice is None:
-            if self._base is None:
-                self._base = carregar_base(self.ctx.get("pasta_docs"), self.ctx.get("painel_html"), bool(self.ctx.get("docs_internos")))
-            self._indice = IndiceTFIDF([f"{d['secao']} {d['texto']}" for d in self._base])
-        return self._base, self._indice
+    def indice(self, publico: str = "equipe") -> tuple[list[dict], IndiceTFIDF]:
+        """Um índice por público. Cliente: manual por módulo + curso de introdução (nunca docs de desenvolvedor)."""
+        publico = publico if publico in PUBLICOS else "cliente"
+        if publico not in self._indices:
+            dada = self.ctx.get("base_suporte")
+            if dada is not None:
+                base = list(dada) if publico == "equipe" else so_para_cliente(dada)
+            else:
+                base = carregar_base(self.ctx.get("pasta_docs"), self.ctx.get("painel_html"), bool(self.ctx.get("docs_internos")),
+                                     publico=publico, pasta_modelos=self.ctx.get("pasta_modelos"))
+            self._indices[publico] = (base, IndiceTFIDF([f"{d['secao']} {d['texto']}" for d in base]))
+        return self._indices[publico]
 
     def _responder(self, pedido: dict) -> dict:
         pergunta = str(pedido.get("pergunta") or "").strip()[:1000]
         if not pergunta:
             raise ValueError("falta a pergunta")
-        base, idx = self.indice()
-        achados = idx.buscar(pergunta, k=3)
+        # quem pergunta: o servidor põe _publico pela sessão (equipe ou cliente); sem isso, vale o mais restrito
+        publico = "equipe" if pedido.get("_publico") == "equipe" else "cliente"
+        base, idx = self.indice(publico)
+        achados = idx.buscar(pergunta, k=3) if base else []
         fontes = [{"n": k + 1, "fonte": base[i]["fonte"], "secao": base[i]["secao"], "trecho": base[i]["texto"][:300],
                    "semelhanca": s, "termos": idx.termos_comuns(pergunta, i)} for k, (s, i) in enumerate(achados)]
         # uma palavra só em comum (ex.: "receita") não basta: a confiança cai pela metade
@@ -439,9 +512,14 @@ class Suporte(Robo):
         if len(fontes) > 1:
             rascunho += "\n\nVeja também: " + "; ".join(f"[{f['n']}] {f['fonte']} § {f['secao']}" for f in fontes[1:])
         material = "\n".join(f"[{f['n']}] ({f['fonte']} § {f['secao']}) {base[i]['texto'][:900]}" for f, (_, i) in zip(fontes, achados))
-        texto, ia = self.melhorar(rascunho, material, f"Pergunta: {pergunta}\nResponda só com o material, citando [n].")
+        instr = f"Pergunta: {pergunta}\nResponda só com o material, citando [n]."
+        if publico == "cliente":
+            instr += " Quem pergunta é cliente: não cite nome de arquivo, pasta, rota nem nome de código."
+        texto, ia = self.melhorar(rascunho, material, instr)
+        if publico == "cliente" and not eh_texto_de_cliente(texto):          # a IA escorregou: fica o texto do manual
+            texto, ia = rascunho, dict(ia, usada=False, erro="resposta da IA citava arquivo ou código; ficou o texto do manual")
         return resposta(self.nome, texto, fontes=fontes, confianca=conf, revisao_humana=conf < self.SEGURO, ia=ia,
-                        dados={"melhor": {"fonte": top["fonte"], "secao": top["secao"]}})
+                        dados={"melhor": {"fonte": top["fonte"], "secao": top["secao"]}, "publico": publico})
 
 
 # ── 2. Preços de propostas ──────────────────────────────────────────────────────────────────────
@@ -758,7 +836,7 @@ class Instituto(Robo):
                       "Valores reais do orçamento"] + ([] if prazo else ["Prazo de envio (não encontrado no texto)"])
         rascunho = "\n".join(f"{s['titulo']}\n" + "\n".join(f"  - {i}" for i in s["itens"]) for s in secoes)
         texto, ia = self.melhorar(rascunho, texto_ed[:3000], "Melhore a redação do roteiro mantendo a estrutura e os [A PREENCHER].")
-        return resposta(self.nome, texto, fontes=[{"fonte": "edital informado"}, {"fonte": "modelos de área do Instituto (robos.MODELOS_AREA)"}],
+        return resposta(self.nome, texto, fontes=[{"fonte": "edital informado"}, {"fonte": "modelos de área do Instituto Physis"}],
                         confianca=0.5, revisao_humana=True, ia=ia,
                         dados={"secoes": secoes, "areas": areas, "prazo": prazo, "pendencias": pendencias})
 
@@ -922,7 +1000,10 @@ CLASSES = {c.nome: c for c in (Suporte, Precos, Editais, Marketing, Instituto, P
 
 
 def criar_robos(contexto: dict | None = None, ia=None) -> dict[str, Robo]:
-    ia = ia if ia is not None else ia_do_ambiente()
+    if ia is None:
+        ctx = contexto or {}
+        para = os.environ.get("PHYSIS_CLAUDE_AVISO_EMAIL") or ctx.get("suporte_email") or ""
+        ia = ia_do_ambiente(avisar=claude_mod.aviso_por_email(ctx["hub"], para) if ctx.get("hub") is not None else None)
     return {n: c(contexto, ia) for n, c in CLASSES.items()}
 
 

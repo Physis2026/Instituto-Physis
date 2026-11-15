@@ -545,13 +545,20 @@
         "horta_chuva_mm": 30,
         "horta_tmin_c": 4,
         "horta_tmax_c": 34,
-        "hospedagem_chuva_mm": 30
+        "hospedagem_chuva_mm": 30,
+        "geada_alerta_tmin_c": 1,
+        "colheita_alerta_chuva_mm": 30,
+        "rebanho_alerta_tmax_c": 35,
+        "horta_alerta_chuva_mm": 50,
+        "horta_alerta_tmin_c": 2,
+        "horta_alerta_tmax_c": 37,
+        "hospedagem_alerta_chuva_mm": 50
       },
       "unidade": "°C ou mm por dia",
       "opcoes": [],
       "fonte": "premissa Physis (valores que os alertas da plataforma já usavam); conferir com o técnico da atividade",
       "status": "conferir",
-      "nota": "Alertas de planejamento; não substituem a Defesa Civil nem o agrônomo."
+      "nota": "Alertas de planejamento; não substituem a Defesa Civil nem o agrônomo. Os campos *_alerta_* são o nível mais forte (ALERTA) [CONFERIR]."
     },
     {
       "id": "residuos.rendimentos",
@@ -678,6 +685,231 @@
       "fonte": "Lei 12.651/2012 (Código Florestal), art. 4º, IX [CONFERIR NA LEI]",
       "status": "conferir",
       "nota": "Triagem pelo relevo que o Planejador tem: a base do morro pode estar fora do terreno importado; o engenheiro confirma com o modelo de elevação da região."
+    },
+    {
+      "id": "eletrica.fator_potencia_padrao",
+      "grandeza": "Fator de potência adotado quando não há medição",
+      "valor_padrao": 0.92,
+      "unidade": "adimensional (0 a 1)",
+      "opcoes": [],
+      "fonte": "premissa Physis para estimativa, igual à referência regulatória abaixo [CONFERIR]; vale a medição (V6, medidor) quando houver",
+      "status": "conferir",
+      "nota": "Usado para dar Q (kvar) e S (kVA) a partir de P (kW) em todos os módulos de energia."
+    },
+    {
+      "id": "eletrica.fator_potencia_minimo",
+      "grandeza": "Fator de potência de referência (abaixo dele, aviso de FP baixo)",
+      "valor_padrao": 0.92,
+      "unidade": "adimensional (0 a 1)",
+      "opcoes": [],
+      "fonte": "REN ANEEL 1.000/2021 (fator de potência de referência para cobrança de reativo) [CONFERIR NA NORMA]",
+      "status": "conferir",
+      "nota": "Só aviso: FP abaixo do valor de referência costuma gerar cobrança de energia reativa."
+    },
+    {
+      "id": "gestao.taxa_desconto",
+      "grandeza": "Taxa de desconto do ranking de investimentos (quando a pessoa não digita)",
+      "valor_padrao": 10,
+      "unidade": "% ao ano",
+      "opcoes": [],
+      "fonte": "premissa Physis (valor que o ranking da Gestão já usava)",
+      "status": "conferir",
+      "nota": "Usada no VPL e no retorno descontado; a pessoa pode digitar a taxa de cada investimento."
+    },
+    {
+      "id": "gestao.inflacao",
+      "grandeza": "Inflação usada para corrigir o ganho mensal (quando a pessoa não digita)",
+      "valor_padrao": 4,
+      "unidade": "% ao ano",
+      "opcoes": [],
+      "fonte": "premissa Physis (valor que o ranking da Gestão já usava)",
+      "status": "conferir",
+      "nota": "Correção do ganho mensal no fluxo do investimento."
+    },
+    {
+      "id": "impressao3d.material.rpetg",
+      "grandeza": "Perfil de impressão do rPET/PETG reciclado (densidade, temperaturas e contração)",
+      "valor_padrao": {
+        "nome": "rPET / PETG reciclado",
+        "densidade_g_cm3": 1.27,
+        "bico_c": 240,
+        "bico_faixa_c": [
+          230,
+          250
+        ],
+        "mesa_c": 75,
+        "mesa_faixa_c": [
+          70,
+          85
+        ],
+        "contracao_pct": 0.4,
+        "contracao_faixa_pct": [
+          0.2,
+          0.6
+        ],
+        "diametro_mm": 1.75
+      },
+      "unidade": "g/cm³; °C; % de contração linear; mm",
+      "opcoes": [],
+      "fonte": "[CONFERIR] valores típicos de literatura e de fabricantes para PETG virgem; PET de garrafa tem densidade maior (cerca de 1,33 a 1,38 g/cm³). Trocar pela folha de dados do filamento reciclado usado.",
+      "status": "conferir",
+      "nota": "Reciclado de garrafa (PET) seca mal e cristaliza; secar antes de imprimir. Contração é de ordem de grandeza: medir no cubo de calibração."
+    },
+    {
+      "id": "impressao3d.material.rpp",
+      "grandeza": "Perfil de impressão do rPP (polipropileno reciclado)",
+      "valor_padrao": {
+        "nome": "rPP (polipropileno reciclado)",
+        "densidade_g_cm3": 0.9,
+        "bico_c": 230,
+        "bico_faixa_c": [
+          210,
+          250
+        ],
+        "mesa_c": 90,
+        "mesa_faixa_c": [
+          80,
+          100
+        ],
+        "contracao_pct": 1.8,
+        "contracao_faixa_pct": [
+          1.0,
+          2.5
+        ],
+        "diametro_mm": 1.75
+      },
+      "unidade": "g/cm³; °C; % de contração linear; mm",
+      "opcoes": [],
+      "fonte": "[CONFERIR] valores típicos de literatura para PP virgem (densidade 0,89 a 0,91 g/cm³; contração de moldagem de 1 a 2,5 %). Trocar pela folha de dados do filamento reciclado usado.",
+      "status": "conferir",
+      "nota": "PP adere mal à maioria das mesas e empena muito: mesa com fita de PP ou adesivo próprio; câmara fechada ajuda."
+    },
+    {
+      "id": "impressao3d.material.rhdpe",
+      "grandeza": "Perfil de impressão do rHDPE (polietileno de alta densidade reciclado)",
+      "valor_padrao": {
+        "nome": "rHDPE (PEAD reciclado)",
+        "densidade_g_cm3": 0.95,
+        "bico_c": 240,
+        "bico_faixa_c": [
+          220,
+          260
+        ],
+        "mesa_c": 100,
+        "mesa_faixa_c": [
+          90,
+          110
+        ],
+        "contracao_pct": 2.5,
+        "contracao_faixa_pct": [
+          1.5,
+          4.0
+        ],
+        "diametro_mm": 1.75
+      },
+      "unidade": "g/cm³; °C; % de contração linear; mm",
+      "opcoes": [],
+      "fonte": "[CONFERIR] valores típicos de literatura para PEAD virgem (densidade 0,94 a 0,97 g/cm³; contração de moldagem de 1,5 a 4 %). Poucos dados publicados para impressão FDM. Trocar pelo ensaio da oficina.",
+      "status": "conferir",
+      "nota": "O mais difícil dos cinco: empenamento forte. Peças pequenas, borda (brim) larga e mesa de PP/PE."
+    },
+    {
+      "id": "impressao3d.material.rabs",
+      "grandeza": "Perfil de impressão do rABS (ABS reciclado)",
+      "valor_padrao": {
+        "nome": "rABS (ABS reciclado)",
+        "densidade_g_cm3": 1.04,
+        "bico_c": 240,
+        "bico_faixa_c": [
+          230,
+          255
+        ],
+        "mesa_c": 100,
+        "mesa_faixa_c": [
+          95,
+          110
+        ],
+        "contracao_pct": 0.6,
+        "contracao_faixa_pct": [
+          0.4,
+          0.8
+        ],
+        "diametro_mm": 1.75
+      },
+      "unidade": "g/cm³; °C; % de contração linear; mm",
+      "opcoes": [],
+      "fonte": "[CONFERIR] valores típicos de literatura e de fabricantes para ABS virgem (densidade 1,03 a 1,06 g/cm³). Trocar pela folha de dados do filamento reciclado usado.",
+      "status": "conferir",
+      "nota": "Solta vapores (estireno): imprimir com ventilação ou exaustão. Câmara fechada reduz a separação de camadas."
+    },
+    {
+      "id": "impressao3d.material.rpla",
+      "grandeza": "Perfil de impressão do PLA reciclado",
+      "valor_padrao": {
+        "nome": "PLA reciclado",
+        "densidade_g_cm3": 1.24,
+        "bico_c": 205,
+        "bico_faixa_c": [
+          190,
+          220
+        ],
+        "mesa_c": 60,
+        "mesa_faixa_c": [
+          50,
+          65
+        ],
+        "contracao_pct": 0.3,
+        "contracao_faixa_pct": [
+          0.2,
+          0.5
+        ],
+        "diametro_mm": 1.75
+      },
+      "unidade": "g/cm³; °C; % de contração linear; mm",
+      "opcoes": [],
+      "fonte": "[CONFERIR] valores típicos de literatura e de fabricantes para PLA virgem (densidade 1,21 a 1,25 g/cm³). PLA reciclado perde massa molar a cada ciclo: a faixa de bico costuma cair. Trocar pela folha de dados do filamento reciclado usado.",
+      "status": "conferir",
+      "nota": "Mais fácil de imprimir; PLA não é reciclável junto com PET na coleta comum."
+    },
+    {
+      "id": "solar.arranjo_afastamento_borda",
+      "grandeza": "Afastamento dos módulos até a borda do telhado ou do terreno",
+      "valor_padrao": null,
+      "unidade": "m",
+      "opcoes": [],
+      "fonte": "[CONFERIR] sem fonte na base: a tela do Mapeamento pede o valor (regra do Corpo de Bombeiros do estado e do fabricante da estrutura)",
+      "status": "conferir",
+      "nota": "Sem valor na base: o campo fica para digitar na Planta solar."
+    },
+    {
+      "id": "solar.arranjo_folga_modulos",
+      "grandeza": "Folga entre módulos vizinhos no arranjo",
+      "valor_padrao": null,
+      "unidade": "m",
+      "opcoes": [],
+      "fonte": "[CONFERIR] sem fonte na base: a tela do Mapeamento pede o valor (manual de instalação do módulo e da estrutura)",
+      "status": "conferir",
+      "nota": "Sem valor na base: o campo fica para digitar na Planta solar."
+    },
+    {
+      "id": "solar.arranjo_hora_critica_inicio",
+      "grandeza": "Início da janela sem sombra entre fileiras (hora solar, no solstício de inverno)",
+      "valor_padrao": null,
+      "unidade": "h (hora solar)",
+      "opcoes": [],
+      "fonte": "[CONFERIR] sem fonte na base: a tela do Mapeamento pede o valor",
+      "status": "conferir",
+      "nota": "Sem valor na base: o campo fica para digitar na Planta solar (arranjo no solo)."
+    },
+    {
+      "id": "solar.arranjo_hora_critica_fim",
+      "grandeza": "Fim da janela sem sombra entre fileiras (hora solar, no solstício de inverno)",
+      "valor_padrao": null,
+      "unidade": "h (hora solar)",
+      "opcoes": [],
+      "fonte": "[CONFERIR] sem fonte na base: a tela do Mapeamento pede o valor",
+      "status": "conferir",
+      "nota": "Sem valor na base: o campo fica para digitar na Planta solar (arranjo no solo)."
     }
   ],
   "normas": {

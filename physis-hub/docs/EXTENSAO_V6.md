@@ -28,6 +28,8 @@ Sem `TIPO`, a linha e do no de solo e irrigacao (compatibilidade com o que esta 
 | `COM` | Comedouro | `NIV PORC TAG BLOQ BAT TS` | `ID:71,TIPO:COM,NIV:62.0,PORC:3,TAG:A1B2,BLOQ:0,BAT:-,TS:1794600000` |
 | `PLUV` | Pluviômetro de báscula | `CHI PUL BAT TS` | `ID:31,TIPO:PLUV,CHI:0.20,PUL:44,BAT:-,TS:1794600000` |
 | `SEC` | Secador solar (monitoramento, **em desenvolvimento**) | `TI UI TE UE TC VENT ABT PESO IRR BAT TS` (`ABT`, `PESO` e `IRR` opcionais) | `ID:41,TIPO:SEC,TI:38.5,UI:42.0,TE:27.1,UE:70.0,TC:52.3,VENT:1,PESO:84.20,IRR:820,BAT:3.95,TS:1794600000` |
+| `ENE` | Medidor de energia (ESP com Modbus ou pulso, ou ponte MQTT) | `PW QR S V I FP BAT TS` (pelo menos uma grandeza) | `ID:61,TIPO:ENE,PW:12.430,QR:4.910,S:13.370,V:221.5,I:19.80,FP:0.930,TS:1794600000` |
+| `HID` | Medidor de água (vazão e pressão) | `Q PR BAT TS` (pelo menos uma grandeza) | `ID:62,TIPO:HID,Q:3.250,PR:2.40,TS:1794600000` |
 | `MED` | Caixinha de remédios (Saúde, **a homologar**) | `CMP EVT BAT TS` | `ID:31,TIPO:MED,CMP:1,EVT:TOMADO,BAT:3.91,TS:1794650400` |
 | `PUL` | Pulseira (Saúde, **a homologar**) | `LAT LON GPS CRISE BPM MOV BAT TS` | `ID:51,TIPO:PUL,LAT:-22.51003,LON:-43.18012,GPS:1,CRISE:1,BPM:128,MOV:2,BAT:3.80,TS:1794650400` |
 
@@ -38,6 +40,17 @@ Significados novos:
   linhas perdidas. O hub gera as grandezas `chuva` (mm) e `chuva_intensidade` (mm/h, pelo intervalo entre duas linhas
   do mesmo nó, até 3 h), soma o `CHI` do dia (fuso de Brasília) e grava como chuva observada de origem `physis`
   (`clima_observado`): o placar das fontes, o modelo de chuva e o alerta de deslizamento passam a usar a chuva do lugar.
+- `ENE` (desde 15/11/2026): `PW` potência ativa em kW (negativa = injetando na rede), `QR` potência reativa em kvar
+  (indutiva +, capacitiva -), `S` potência aparente em kVA, `V` tensão em V, `I` corrente em A, `FP` fator de potência
+  (-1 a 1). Limites só físicos: V, I e S ≥ 0 e FP entre -1 e 1 (`protocolo.FAIXAS_ENE`); o teto de cada medidor é a
+  definir [CONFERIR]. Grandezas: `energia` (kW, como no contrato physis/1), `potencia_reativa`, `potencia_aparente`,
+  `tensao`, `corrente`, `fp`. Regra do usuário: o fator de potência entra sempre na energia. O hub calcula P, Q, S e FP de
+  cada dia (`aprendizado.potencias_dia`): P e S medidos, ou P e Q, ou só FP; sem nada, a premissa
+  `eletrica.fator_potencia_padrao` (marcada em `fp_fonte`). Guardado como modelo `potencias:<ativo>`.
+- `HID` (desde 15/11/2026): `Q` vazão em m³/h (≥ 0), `PR` pressão em bar. Grandezas: `vazao`, `pressao`.
+  Com `ENE` e `HID` em `medicao`, o modelo de consumo do aprendizado (média do dia × 24 h = kWh/dia e m³/dia) passa a
+  ter dado. Pela ponte MQTT: nó com `"tipo": "energia"` ou `"tipo": "agua"` (`physis_hub/mqtt.py`, `NoMedidor`).
+  Sem comando: `CMD` para esses nós é ignorado. Firmware do medidor (ESP): a definir.
 - `MED`/`PUL`: o hub entrega à Saúde (`saude.py`) **antes** do adaptador; nada vai para `medicao` nem para o painel.
   `PHYSIS_SAUDE_V6=0` volta a recusar os dois (`tipo_desconhecido`). Ver `SAUDE.md`.
 
@@ -89,3 +102,5 @@ Feito em `physis_hub/adaptador.py`. Ativo = `<lugar>-no<ID>` com sufixo quando h
 | `LAT`, `LON` (com `GPS:1`) | `latitude`, `longitude` | sem sufixo |
 | `ATV`, `IMP` | `atividade`, `impacto` | sem sufixo |
 | `NIV`, `PORC` | `nivel`, `porcoes` | sem sufixo |
+| `PW`, `QR`, `S`, `V`, `I`, `FP` (só ENE) | `energia` (kW), `potencia_reativa` (kvar), `potencia_aparente` (kVA), `tensao`, `corrente`, `fp` | sem sufixo |
+| `Q`, `PR` (só HID) | `vazao`, `pressao` | sem sufixo |

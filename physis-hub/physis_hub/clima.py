@@ -250,6 +250,12 @@ class Clima:
 
     # ── Localização ──────────────────────────────────────────────────────────────────────────
     def local(self) -> dict | None:
+        """O local do cliente pela função única do hub (hub.local_da_instalacao: Planejador > Início > Monitoramento >
+        instancia.json). Sem coordenadas, None ("local não informado"): nenhuma fonte é consultada com ponto padrão."""
+        achar = getattr(self.hub, "local_da_instalacao", None)
+        if achar:
+            loc = achar()
+            return loc if loc.get("lat") is not None else None
         r = self._db.execute("SELECT dados FROM clima_local WHERE id=1").fetchone()
         return json.loads(r[0]) if r else None
 
@@ -402,7 +408,9 @@ class Clima:
         prev = {k: v for k, v in fontes.items() if k in ("openmeteo", "inmet") and v["atual"]}
         with self.hub._trava:
             local = chuva_medida_local(self._db, agora)       # pluviômetro Physis (TIPO:PLUV), se houver
-        return {"ok": True, "local": self.local(), "fontes": fontes, "placar": placar,
+        achar = getattr(self.hub, "local_da_instalacao", None)
+        lugar = achar() if achar else None     # o local único do cliente, com fonte (ou "nao_informado") e polígono
+        return {"ok": True, "local": self.local(), "lugar": lugar, "fontes": fontes, "placar": placar,
                 "combinada": self.combinada(prev, placar), "agora": agora, "chuva_local": local}
 
 

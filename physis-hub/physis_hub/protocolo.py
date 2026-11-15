@@ -19,7 +19,8 @@ EPOCH_MAX_VALIDO = 4_102_444_800   # 2100-01-01
 # (docs/SAUDE.md, "a homologar"); o hub as entrega a saude.py antes do adaptador generico e nunca
 # as grava em `medicao`. PHYSIS_SAUDE_V6=0 volta a recusar MED/PUL (tipo_desconhecido) no receptor e no /api/v6/linha.
 TIPOS_SAUDE = ("MED", "PUL")
-TIPOS_CONHECIDOS = ("SOLO", "ZONA", "COL", "COM", "PLUV", "SEC") + TIPOS_SAUDE
+# ENE: medidor de energia (PW kW, QR kvar, S kVA, V, I, FP); HID: medidor de água (Q m3/h, PR bar). Desde 15/11/2026, docs/EXTENSAO_V6.md.
+TIPOS_CONHECIDOS = ("SOLO", "ZONA", "COL", "COM", "PLUV", "SEC", "ENE", "HID") + TIPOS_SAUDE
 # Limites de plausibilidade fisica, largos de proposito. NAO sao faixas de operacao:
 # as faixas de operacao de cada equipamento devem ser confirmadas pela equipe tecnica da Physis.
 # CHI: mm de chuva no intervalo (0 a 200); PUL so e contador de pulsos quando TIPO:PLUV (na pulseira, PUL e o TIPO).
@@ -29,6 +30,14 @@ FAIXAS_PLAUSIVEIS = {"BAT": (0.0, 60.0), "RSSI": (-200.0, 20.0), "SNR": (-60.0, 
 FAIXAS_SEC = {"TI": (-20.0, 120.0), "TE": (-20.0, 70.0), "TC": (-20.0, 150.0), "UI": (0.0, 100.0),
               "UE": (0.0, 100.0), "PESO": (0.0, 5000.0), "IRR": (0.0, 1500.0)}
 BINARIOS_SEC = ("VENT", "ABT")
+# ENE e HID: só limites que vêm da física (sem teto inventado; teto de cada medidor: a definir [CONFERIR]).
+# Tensão, corrente e vazão não são negativas; o fator de potência fica entre -1 e 1 (medidor com sinal na injeção).
+# PW (potência ativa) pode ser negativa: geração própria injetando na rede.
+_INF = float("inf")
+# QR (potência reativa, kvar) tem sinal (indutiva +, capacitiva -); S (potência aparente, kVA) não é negativa.
+FAIXAS_ENE = {"V": (0.0, _INF), "I": (0.0, _INF), "FP": (-1.0, 1.0), "S": (0.0, _INF)}
+FAIXAS_HID = {"Q": (0.0, _INF)}
+FAIXAS_POR_TIPO = {"SEC": FAIXAS_SEC, "ENE": FAIXAS_ENE, "HID": FAIXAS_HID}
 
 
 def saude_v6_ligada() -> bool:
@@ -134,7 +143,7 @@ def validar_telemetria(bruta: str) -> tuple[bool, str, dict[str, str]]:
         for k in BINARIOS_SEC:
             if k in campos and campos[k].strip().lower() not in SENTINELAS and campos[k].strip() not in ("0", "1"):
                 fora.append(k)
-    faixas = dict(FAIXAS_PLAUSIVEIS, **FAIXAS_SEC) if tipo == "SEC" else FAIXAS_PLAUSIVEIS
+    faixas = dict(FAIXAS_PLAUSIVEIS, **FAIXAS_POR_TIPO.get(tipo, {}))
     for k, (lo, hi) in faixas.items():
         if k in campos:
             f = para_float(campos[k], None)

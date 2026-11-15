@@ -1,8 +1,8 @@
 """Recorte em Python do contrato physis/1 (`physis-nucleo.js`).
 
 Cobre o que o hub precisa: organizacao, topico, faixa e alarme de medicao.
-As grandezas marcadas NOVA ainda nao existem no nucleo em JavaScript e tem de
-entrar la e no `physis-ponte.py` no mesmo passo (memo, secao 4.2).
+As grandezas marcadas NOVAS (GRANDEZAS_NOVAS) ja estao tambem no nucleo em JavaScript (physis-nucleo.js,
+FAIXAS, 15/11/2026); toda grandeza nova entra nos dois e no `physis-ponte.py` no mesmo passo (memo, secao 4.2).
 """
 from __future__ import annotations
 
@@ -40,10 +40,14 @@ FAIXAS: dict[str, tuple[float | None, float | None, str]] = {
     "temperatura_coletor": (None, None, "C"),
     "peso_produto": (None, None, "kg"),
     "irradiancia": (0, 1500, "W/m2"),
+    # medidor de energia (TIPO:ENE, 15/11/2026): potência reativa e aparente; o fator de potência já é "fp"
+    "potencia_reativa": (None, None, "kvar"),
+    "potencia_aparente": (None, None, "kVA"),
 }
 GRANDEZAS_NOVAS = ("umidade_solo", "estado", "previsao_min", "bateria", "rssi", "snr",
                    "latitude", "longitude", "atividade", "impacto", "porcoes", "chuva", "chuva_intensidade",
-                   "temperatura_interna", "umidade_interna", "temperatura_coletor", "peso_produto", "irradiancia")
+                   "temperatura_interna", "umidade_interna", "temperatura_coletor", "peso_produto", "irradiancia",
+                   "potencia_reativa", "potencia_aparente")
 
 
 def org_valido(org: str) -> bool:

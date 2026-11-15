@@ -71,12 +71,17 @@ from . import alertas_clima as alertas_mod
 from . import app_pwa
 from . import correio
 from . import documentos as documentos_mod
+from . import documentos_auto as documentos_auto_mod
+from . import indicadores as indicadores_mod
 from . import editais as editais_mod
 from . import evidencias as evidencias_mod
 from . import municipio as municipio_mod
 from . import parceiros as parceiros_mod
+from . import impressao3d as impressao3d_mod
+from . import mapeamento as mapeamento_mod
 from . import pegada_servidor as pegada_mod
 from . import seguranca as seg
+from . import suporte_remoto as suporte_mod
 from . import perfil_cliente
 from .hub import Hub
 from .protocolo import para_int, validar_telemetria
@@ -139,6 +144,9 @@ def ler_instancia() -> dict:
         return json.loads(arquivo_instancia().read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
+
+
+MAPEAMENTO_CORPO_MAX = 20 * 1024 * 1024        # arquivo do cliente ou IFC da aba Mapeamento
 
 
 def banco_da_instancia(inst: dict) -> str:
@@ -527,6 +535,14 @@ ESQUEMAS_ROTAS = {
     "parc_doc_remover": {"id": (int, 10**12, True)},
     "parc_curadoria": {"status": (_S, 20, True), "motivo": (_S, 600, False)},
     "parc_avaliacao": {"nota": (int, 5, True), "pedido": (_S, 40, True), "comentario": (_S, 1000, False)},
+    # Mapeamento (mapeamento.py, ifc.py; docs/MAPEAMENTO.md): corpos JSON; arquivos (upload, IFC para ler) vão em bytes
+    "map_contexto": {"lote": (dict, 5000, False), "irradiacao_solar": (dict, 10, False), "local": (dict, 20, False)},
+    "map_incidencia": {"H": (list, 12, False), "lat": ((int, float), 90, True), "superficies": (list, 2000, True),
+                       "grade": ((dict, list), 1_000_000, False), "caixas": (list, 5000, False), "albedo": ((int, float), 1, False),
+                       "fonte_irradiacao": (_S, 300, False)},
+    "map_planta_solar": {"poligono": (list, 5000, True), "modulo": (dict, 60, True), "arranjo": (dict, 60, True),
+                         "lat": ((int, float), 90, False), "obstaculos": (list, 5000, False)},
+    "map_ifc": {"projeto": (dict, 20, False), "site": (dict, 20, True), "elementos": (list, 5000, False), "premissas": (dict, 60, False)},
 }
 ESQUEMAS_ROTAS["parc_editar"] = {k: v for k, v in ESQUEMAS_ROTAS["parc_cadastro"].items() if k != "consentimento"}
 for _k, _v in ESQUEMAS_ROTAS.items():
@@ -759,11 +775,19 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
     # Editais e eventos (editais.py): listas públicas buscadas pelo servidor, com cache em arquivo
     pasta_editais = Path(os.environ.get("PHYSIS_EDITAIS_PASTA") or (Path(banco_da_instancia(instancia)).resolve().parent / "editais"))
     editais_col = editais_mod.Coletor(pasta_editais, tipo="edital")
+    # "Permitir suporte": acesso da equipe Physis com prazo, só pela VPN (PHYSIS_SUPORTE_REDES); docs/SUPORTE_REMOTO.md
+    suporte = suporte_mod.SuporteRemoto(hub)
+    uploads_map = mapeamento_mod.Uploads(hub._db)          # arquivos do cliente da aba Mapeamento (GeoJSON, KML, SHP em zip…)
     eventos_col = editais_mod.Coletor(pasta_editais, tipo="evento")
     # Aprendizado local (sem internet), robôs com regras (+ IA local opcional) e alertas de clima por e-mail/WhatsApp
     aprendizado = aprendizado_mod.Aprendizado(hub)
     robos = robos_mod.criar_robos({"hub": hub, "editais": editais_col,
                                    "suporte_email": os.environ.get("PHYSIS_SUPORTE_EMAIL") or instancia.get("suporte_email") or ""})
+    # emissão de documentos (modelos → rascunho → revisão → aprovação → emissão) e biblioteca; a IA é a mesma dos robôs
+    docauto = documentos_auto_mod.DocumentosAuto(hub, ia=robos["suporte"].ia)
+    # indicadores da plataforma (D18): só metadados; coleta de 5 em 5 min no laço do hub (ver o fim de iniciar)
+    indicadores = indicadores_mod.Indicadores(hub, robos=robos)
+    hub.indicadores = indicadores                 # o laço de coleta (main) usa a mesma instância
     alertas = alertas_mod.AlertasClima(hub, aprendizado=aprendizado)
     # Documento para comentários, painel municipal e parceiros: criados no primeiro uso (cada um cria as suas tabelas)
     modulos_vivos: dict = {}
@@ -774,7 +798,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             if nome not in modulos_vivos:
                 modulos_vivos[nome] = {"docs": lambda: documentos_mod.Documentos(hub),
                                        "municipio": lambda: municipio_mod.Municipio(hub, clima=clima, aprendizado=aprendizado),
-                                       "parceiros": lambda: parceiros_mod.Parceiros(hub)}[nome]()
+                                       "parceiros": lambda: parceiros_mod.Parceiros(hub),
+                                       "impressao3d": lambda: impressao3d_mod.Impressao3D(
+                                           hub, impressao3d_mod.pasta_padrao(banco_da_instancia(instancia)))}[nome]()
             return modulos_vivos[nome]
     cfg_pegada = pegada_mod.config_de(instancia)          # None = desligada (PHYSIS_PEGADA=0)
     # ── Segurança (seguranca.py; docs/SEGURANCA.md) ──
@@ -812,8 +838,12 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
         def handle_one_request(self):
             self._corpo_lido = False          # cada pedido começa sem corpo lido
             self._respondeu = False
+            self._status, inicio = 0, time.monotonic()
             try:
                 super().handle_one_request()
+                if self._status:              # indicadores da plataforma: só método, rota normalizada, código e tempo
+                    indicadores.requisicao(getattr(self, "command", ""), getattr(self, "path", ""), self._status,
+                                           (time.monotonic() - inicio) * 1000)
             except (ConnectionError, TimeoutError):
                 self.close_connection = True          # quem chamou foi embora
             except Exception:
@@ -828,6 +858,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def send_response(self, *a, **k):
             self._respondeu = True
+            self._status = a[0] if a and isinstance(a[0], int) else int(k.get("code", 0) or 0)
             super().send_response(*a, **k)
 
         # ── Segurança: IP de verdade, HTTPS, rede local, papéis, limites e chaves dos aparelhos ──
@@ -931,6 +962,29 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 else:
                     self._arquivo(WEB / "documento.html", "text/html; charset=utf-8")
                 return True
+            if p.startswith("/api/indicadores"):          # indicadores da plataforma (D18): só equipe e direção
+                qi = self._exigir(seg.EQUIPE)
+                if qi:
+                    self._json(*indicadores.rota("GET", p, qi, None, consulta=q))
+                return True
+            if p.startswith("/api/emissao") or p == "/api/ia/consumo":
+                qe = self._exigir(seg.EQUIPE)
+                if not qe:
+                    return True
+                if p == "/api/ia/consumo":           # tela de consumo da IA: nunca leva a chave nem texto enviado
+                    cl = robos_mod.claude_da_cadeia(robos["suporte"].ia)
+                    self._json(200, {"ok": True, "consumo": cl.estado() if cl else None})
+                    return True
+                r = docauto.rota("GET", p, qe, None, consulta=q)
+                if r and "_bytes" in r[1]:
+                    nome = r[1]["_nome"]
+                    self._enviar_bytes(r[1]["_bytes"], r[1]["_tipo"], {"Content-Disposition": f'attachment; filename="{nome}"',
+                                                                      "Cache-Control": "no-store"})
+                    return True
+                if r:
+                    self._json(*r)
+                    return True
+                return False
             if p.startswith("/api/documentos"):
                 r = modulo("docs").rota("GET", p, self._conta_doc(), None, convite=self.headers.get("X-Physis-Convite"),
                                         ip=self._ip(), base=url_publica, consulta=q)
@@ -967,6 +1021,24 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 qe = self._exigir(seg.CLIENTE)
                 if qe:
                     self._json(200, {"ok": True, "dados": evidencias_mod.dados_servidor(hub, incluir_arquivos=seg.pode(qe, seg.EQUIPE))})
+                return True
+            # Mapeamento: catálogo e camadas abertas sem login; contexto e arquivos do cliente com sessão
+            if p.startswith("/api/mapeamento/"):
+                aberto = p.rstrip("/") in ("/api/mapeamento/camadas", "/api/mapeamento/camada")
+                qm = None if aberto else self._exigir(seg.CLIENTE)
+                if aberto or qm:
+                    self._rota_mapeamento("GET", u, q, None, qm)
+                return True
+            # Physis 3D (impressao3d.py; docs/PHYSIS_3D.md): só com sessão de participante (cliente ou acima)
+            if p.startswith("/api/3d/"):
+                q3 = self._exigir(seg.CLIENTE)
+                if q3:
+                    cod, r = modulo("impressao3d").rota("GET", p, q3, None, q)
+                    if isinstance(r, tuple):                       # ("bytes", nome, tipo, dados)
+                        self._enviar_bytes(r[3], r[2], {"Content-Disposition": "attachment; filename*=UTF-8''" + quote(r[1]),
+                                                        "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
+                    else:
+                        self._json(cod, r)
                 return True
             # parceiros: vitrine pública (sem dado pessoal); lista interna para a equipe; CPF/CNPJ completo só a direção
             if p == "/api/parceiros":
@@ -1013,9 +1085,67 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return True
             return False
 
+        def _rota_mapeamento(self, metodo: str, u, q: dict, corpo: bytes | None, quem: dict | None) -> None:
+            r = mapeamento_mod.rota(metodo, u.path, q, corpo, hub=hub, uploads=uploads_map,
+                                    nome_arquivo=unquote(self.headers.get("X-Physis-Nome", ""))[:200],
+                                    quem=(quem or {}).get("usuario", ""))
+            if r is None:
+                self._json(404, {"ok": False, "erro": "rota desconhecida"})
+            elif len(r) == 3:                               # (código, bytes, tipo): o arquivo IFC
+                self._enviar_bytes(r[1], r[2], {"Content-Disposition": 'attachment; filename="physis-modelo.ifc"',
+                                                "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
+            else:
+                self._json(*r)
+
         def _rotas_novas_post_grandes(self, u) -> bool:
             """POST com corpo que pode passar de 64 KB (PDF/A, documento publicado, importação de bairros). True = respondeu."""
             p = u.path
+            # emissão de documentos (documentos_auto.py): equipe gera/edita/envia/emite; a direção aprova e devolve
+            if p.startswith("/api/emissao"):
+                q = self._exigir(seg.EQUIPE)
+                if not q:
+                    return True
+                corpo = self._corpo_grande(documentos_auto_mod.TEXTO_MAX + 64 * 1024)
+                if corpo is None and (self.headers.get("Content-Length") or "0").strip() == "0":
+                    corpo = b"{}"                   # ação sem corpo (enviar, aprovar, emitir)
+                if corpo is None:
+                    self._recusar_corpo("documento grande demais")
+                    return True
+                r = docauto.rota("POST", p, q, corpo)
+                if r:
+                    self._json(*r)
+                    return True
+                return False
+            # Mapeamento: arquivo do cliente e IFC até 20 MB; corpos JSON conferidos pelos ESQUEMAS map_*
+            if p.startswith("/api/mapeamento/"):
+                qm = self._exigir(seg.CLIENTE)
+                if not qm or (re.search(r"/(upload|ifc/ler)$", p) and self._limitado("arquivo")):
+                    return True
+                corpo = self._corpo_grande(MAPEAMENTO_CORPO_MAX)
+                if corpo is None and (self.headers.get("Content-Length") or "0").strip() == "0":
+                    corpo = b"{}"
+                if corpo is None:
+                    self._recusar_corpo("arquivo grande demais (máximo 20 MB)")
+                    return True
+                esq = {"/api/mapeamento/contexto": "map_contexto", "/api/mapeamento/incidencia": "map_incidencia",
+                       "/api/mapeamento/planta-solar": "map_planta_solar", "/api/mapeamento/ifc": "map_ifc"}.get(p.rstrip("/"))
+                if esq and self._ler(corpo, esq) is None:
+                    return True
+                self._rota_mapeamento("POST", u, parse_qs(u.query), corpo, qm)
+                return True
+            # Physis 3D: malha e foto vão em base64 dentro do JSON (até impressao3d.CORPO_MAX)
+            if p.startswith("/api/3d/"):
+                q3 = self._exigir(seg.CLIENTE)
+                if not q3 or (re.search(r"/(revisao|foto|fatiar)$", p) and self._limitado("arquivo")):
+                    return True
+                corpo = self._corpo_grande(impressao3d_mod.CORPO_MAX)
+                if corpo is None and (self.headers.get("Content-Length") or "0").strip() == "0":
+                    corpo = b"{}"
+                if corpo is None:
+                    self._recusar_corpo("arquivo grande demais")
+                    return True
+                self._json(*modulo("impressao3d").rota("POST", p, q3, corpo))
+                return True
             if p == "/api/documentos/pdfa":
                 if not self._exigir(seg.CLIENTE) or self._limitado("arquivo"):      # LibreOffice é pesado: 10 por 10 min por IP
                     return True
@@ -1073,6 +1203,11 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
         def _rotas_novas_post(self, u, corpo: str) -> bool:
             """POST JSON (até 64 KB) das rotas novas. Todo corpo passa por seg.ESQUEMAS (estrito). True = respondeu."""
             p = u.path
+            if p.startswith("/api/indicadores"):          # retorno real/falso, incidentes, melhoria → tarefa, coletar
+                qi = self._exigir(seg.EQUIPE)
+                if qi:
+                    self._json(*indicadores.rota("POST", p, qi, corpo))
+                return True
             if p in ("/api/municipio/config", "/api/municipio/bairro", "/api/municipio/atualizar"):
                 qm = self._exigir(seg.EQUIPE)
                 if not qm:
@@ -1142,7 +1277,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             """POST/PUT/DELETE: (1) Origin/Referer de outro site com sessão (ou nas rotas de conta) = 403;
             (2) com sessão, X-Physis-CSRF errado = 403; ausente = 403 só com PHYSIS_CSRF_ESTRITO=1."""
             caminho = urlparse(self.path).path
-            tk = self._token_sessao()
+            tk = self._token_sessao() or self._token_suporte()
             if seg.origem_confere(self.headers, url_publica) is False and (tk or caminho.startswith("/api/conta/")):
                 return self._negar_csrf("origem de outro site")
             if tk and caminho not in SEM_CSRF:
@@ -1332,8 +1467,33 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     return v
             return None
 
+        def _token_suporte(self) -> str | None:
+            for parte in (self.headers.get("Cookie") or "").split(";"):
+                k, _, v = parte.strip().partition("=")
+                if k == "physis_suporte":
+                    return v
+            return None
+
         def _quem(self) -> dict | None:
-            return hub.sessao(self._token_sessao())
+            q = hub.sessao(self._token_sessao())
+            if not q and self._token_suporte():
+                q = suporte.sessao(self._token_suporte(), self._ip())    # sessão de suporte (papel equipe, só pela VPN)
+            return q
+
+        def _suporte_barrado(self, u, metodo: str) -> bool:
+            """Sessão de suporte: registra cada rota da API (sem conteúdo) e, no modo "só ver", recusa escrita."""
+            if hub.sessao(self._token_sessao()) or not self._token_suporte():
+                return False
+            q = suporte.sessao(self._token_suporte(), self._ip())
+            if not q or u.path == "/api/suporte-remoto/sair":
+                return False
+            if not suporte.pode_metodo(q, metodo):
+                suporte.uso(q, metodo, u.path, self._ip(), recusado=True)
+                self._json(403, {"ok": False, "so_ver": True, "erro": "Acesso de suporte só para ver: nada pode ser mudado."})
+                return True
+            if u.path.startswith("/api/"):
+                suporte.uso(q, metodo, u.path, self._ip())
+            return False
 
         def _barrado(self) -> bool:
             """True (e ja respondeu 401) quando a instalacao exige login (ou quem chama esta fora da rede local) e nao ha sessao."""
@@ -1356,7 +1516,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     "cursos": [c for c in (instancia.get("cursos") or []) if isinstance(c, dict)] if q else [],
                     "senha_min": hub.SENHA_MIN,
                     # segurança: token CSRF da sessão (mandar em X-Physis-CSRF), termos, e-mail, 2FA
-                    "csrf": seg.csrf_de(hub, self._token_sessao()) if q else None,
+                    "csrf": seg.csrf_de(hub, self._token_sessao() or self._token_suporte()) if q else None,
+                    "suporte_remoto": {"so_ver": q.get("so_ver")} if q and q.get("suporte") else None,
                     "termos_versao": termos, "consentimento_pendente": seg.consentimento_pendente(q) if q else False,
                     "email_confirmado": q.get("confirmado") if q else None, "dois_fatores": q.get("dois_fatores") if q else None,
                     "recuperar_senha": True, "reautenticar_min": int(seg.reauth_janela_s() // 60)}
@@ -1517,6 +1678,11 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
         def do_GET(self):
             u = urlparse(self.path)
             q = parse_qs(u.query)
+            if self._suporte_barrado(u, "GET"):
+                return
+            if u.path == "/api/suporte-remoto":
+                r = suporte.listar(self._quem())
+                return self._json(r.pop("codigo", 200), r)
             if u.path == "/api/instancia":
                 return self._json(200, self._estado_instancia())
             if u.path in ("/conta/esqueci", "/conta/nova-senha", "/conta/confirmar", "/conta/convite"):
@@ -1882,7 +2048,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def do_PUT(self):
             u = urlparse(self.path)
-            if self._csrf_barrado():
+            if self._csrf_barrado() or self._suporte_barrado(u, "PUT"):
                 return
             if u.path.startswith("/api/gestao/arquivo/"):
                 q = self._exigir(seg.EQUIPE)
@@ -1930,19 +2096,53 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
 
         def do_DELETE(self):
             u = urlparse(self.path)
-            if self._csrf_barrado():
+            if self._csrf_barrado() or self._suporte_barrado(u, "DELETE"):
                 return
             if u.path.startswith("/api/gestao/arquivo/"):
                 q = self._exigir(seg.EQUIPE)
                 if not q:
                     return
                 return self._json(200, {"ok": hub.gestao_arquivo_apagar(u.path.rsplit("/", 1)[-1], q["usuario"])})
+            if u.path.startswith("/api/mapeamento/"):           # apagar um arquivo do cliente (Mapeamento)
+                qm = self._exigir(seg.CLIENTE)
+                if qm:
+                    self._rota_mapeamento("DELETE", u, parse_qs(u.query), None, qm)
+                return
             self._json(404, {"ok": False, "erro": "rota desconhecida"})
 
         def do_POST(self):
             u = urlparse(self.path)
-            if self._csrf_barrado():
+            if self._csrf_barrado() or self._suporte_barrado(u, "POST"):
                 return
+            # ── "Permitir suporte" (suporte_remoto.py): a direção libera e revoga; a equipe Physis entra pela VPN ──
+            if u.path in ("/api/suporte-remoto/conceder", "/api/suporte-remoto/revogar"):
+                qd = self._exigir(seg.DIRECAO)
+                if not qd:
+                    return
+                if u.path.endswith("conceder"):
+                    d = self._ler(self._corpo(), "suporte_conceder")
+                    if d is None:
+                        return
+                    r = suporte.conceder(qd, d.get("duracao", ""), d.get("nota") or "", bool(d.get("so_ver")), self._ip())
+                else:
+                    d = self._ler(self._corpo(), "suporte_revogar")
+                    if d is None:
+                        return
+                    r = suporte.revogar(qd, d.get("id", ""), self._ip())
+                return self._json(r.pop("codigo", 200), r)
+            if u.path == "/api/suporte-remoto/entrar":
+                d = self._ler(self._corpo(), "suporte_entrar")
+                if d is None:
+                    return
+                r = suporte.entrar(d.get("codigo", ""), d.get("equipe", ""), self._ip(), self.headers.get("User-Agent", ""))
+                if not r.get("ok"):
+                    return self._json(r.pop("codigo", 403), r)
+                idade = max(1, int(r["expira"] - hub.relogio()))
+                cookie = (f"physis_suporte={r.pop('token')}; Path=/; Max-Age={idade}; HttpOnly; SameSite=Strict" + ("; Secure" if self._https() else ""))
+                return self._json_cookie(200, r, cookie)
+            if u.path == "/api/suporte-remoto/sair":
+                suporte.sair(self._token_suporte(), self._quem(), self._ip())
+                return self._json_cookie(200, {"ok": True}, "physis_suporte=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict")
             # PDF/A, documento para comentários e importação de bairros: corpo maior que o normal
             if self._rotas_novas_post_grandes(u):
                 return
@@ -2152,6 +2352,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     return self._json(400, {"ok": False, "erro": "json invalido"})
                 d = d if isinstance(d, dict) else {}
                 d["_quem"] = qs["usuario"]                  # quem abre o chamado do suporte (vem da sessão, nunca do corpo)
+                # público da resposta (vem da sessão, nunca do corpo): cliente só vê manual e curso; equipe vê também a doc técnica
+                d["_publico"] = "equipe" if seg.pode(qs, seg.EQUIPE) else "cliente"
                 cod, r = robos_mod.atender(u.path.rsplit("/", 1)[-1], d, robos)
                 return self._json(cod, r)
             if u.path == "/api/alertas/assinaturas":
@@ -2245,6 +2447,13 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 # montagem automática: número, plataforma, código e e-mail de acesso
                 base = url_publica or (("https" if self._https() else "http") + "://" + (self.headers.get("Host") or "localhost"))
                 inst = hub.instalar_compra(numero, base, fabricar, q["usuario"] if q else "")
+                if inst.get("ok") and not inst.get("repetido"):
+                    # manual (só os módulos comprados), contrato e dados da NF: rascunhos na fila de emissão (revisão e aprovação)
+                    try:
+                        docs = docauto.documentos_da_compra(numero, inst.get("modulos") or [], q["usuario"] if q else "sistema")
+                        inst["manual"], inst["documentos"] = docs.get("manual"), docs
+                    except Exception as e:          # o manual não derruba a aprovação; a equipe vê no registro
+                        hub.registrar("documento_auto", numero, {"o_que": "manual não gerado", "erro": type(e).__name__})
                 if inst.get("ok") and not inst.get("repetido") and correio.configurado():
                     threading.Thread(target=correio.enviar_fila, args=(hub, inst["numero"]), daemon=True).start()
                     inst["email"] = "enviando"
@@ -2453,6 +2662,9 @@ def main() -> None:
         threading.Thread(target=pegada_mod.rodar, args=(pegada_mod.para(hub, cfg_pegada), parar), daemon=True).start()
     endereco = os.environ.get("PHYSIS_ENDERECO") or "0.0.0.0"
     srv = iniciar(hub, porta, os.environ.get("PHYSIS_TOKEN"), endereco=endereco, clima=clima)
+    # indicadores da plataforma (D18): coleta a cada 5 min no próprio laço do hub (sem cron, sem Agendador do Windows)
+    if getattr(hub, "indicadores", None) is not None:
+        threading.Thread(target=rodar_diario, args=(hub.indicadores.tarefa_periodica, parar, 300.0, 60.0), daemon=True).start()
     print(f"Physis Hub em http://{endereco}:{porta}  receptor={rx or 'nao configurado'}  simulador={sim or 'desligado'}")
     if not inst.get("login"):
         print("Aviso: instalação sem login. Telemetria aberta só para a rede local; de fora, tudo pede sessão (docs/SEGURANCA.md).")

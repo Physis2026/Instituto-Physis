@@ -23,10 +23,12 @@ BASES = {"base-certificacoes": S / "physis-certificacoes.json", "base-plantas": 
          "base-evidencias": S / "physis-evidencias.json",            # certificação assistida
          "base-materiais": S / "physis-materiais.json",              # materiais e composições (SustainKit na plataforma, Certificações)
          "base-servidor-catalogo": S / "physis-servidor-catalogo.json",  # catálogo de módulos do Servidor verde
-         "base-i18n-modulos": S / "physis-i18n-modulos.json"}        # inglês das telas dos módulos
+         "base-i18n-modulos": S / "physis-i18n-modulos.json",        # inglês das telas dos módulos
+         "base-3d-premissas": S / "physis-3d-premissas.json"}        # perfis de material do Physis 3D (conferir)
 # módulos de cálculo em arquivo próprio (testados à parte), embutidos como <script> no <head>
 MODULOS = {"mod-avac": S / "physis-avac.js", "mod-saude": S / "physis-saude.js", "mod-juridico": S / "physis-juridico.js",
            "mod-turbinas": S / "physis-turbinas.js", "mod-solar": S / "physis-solar.js",
+           "mod-mapeamento": S / "physis-mapeamento.js",          # Mapeamento (camadas, BIM, planta solar); depois da solar
            "mod-circular-mapa": S / "physis-circular-mapa.js", "mod-cargatermica": S / "physis-cargatermica.js",
            "mod-metodologia": S / "physis-metodologia.js", "mod-sbn": S / "physis-sbn.js",
            "mod-carbono": S / "physis-carbono.js", "mod-relatorio-esg": S / "physis-relatorio-esg.js",
@@ -36,7 +38,9 @@ MODULOS = {"mod-avac": S / "physis-avac.js", "mod-saude": S / "physis-saude.js",
            "mod-aprendizado-ui": S / "physis-aprendizado-ui.js",  # o que o hub aprendeu + avisos de clima
            "mod-odf": S / "physis-odf.js",                        # ODT, ODS e PDF/A ao lado do "Baixar esta tela"
            "mod-secador": S / "physis-secador.js",                # aba Secador solar (em desenvolvimento)
-           "mod-servidor-verde": S / "physis-servidor-verde.js"}  # aba Servidor verde (em desenvolvimento)
+           "mod-servidor-verde": S / "physis-servidor-verde.js",  # aba Servidor verde (em desenvolvimento)
+           "mod-suporte-remoto": S / "physis-suporte-remoto.js",  # "Permitir suporte" (Minha conta da direção)
+           "mod-physis-3d": S / "physis-3d.js"}                   # aba Physis 3D (em desenvolvimento)
 
 
 def bloco(ident: str, arq: Path) -> str:

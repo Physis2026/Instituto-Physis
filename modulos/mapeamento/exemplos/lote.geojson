@@ -1,0 +1,40 @@
+{
+ "type": "FeatureCollection",
+ "aviso": "EXEMPLO / DADOS FICTÍCIOS — só para conferir os visualizadores; não usar em projeto",
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "nome": "Lote exemplo",
+    "aviso": "EXEMPLO / DADOS FICTÍCIOS — só para conferir os visualizadores; não usar em projeto"
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -43.2003889,
+       -22.5002714
+      ],
+      [
+       -43.1996111,
+       -22.5002714
+      ],
+      [
+       -43.1996111,
+       -22.4997286
+      ],
+      [
+       -43.2003889,
+       -22.4997286
+      ],
+      [
+       -43.2003889,
+       -22.5002714
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}

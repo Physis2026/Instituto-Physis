@@ -105,7 +105,7 @@ class TestSuporte(unittest.TestCase):
         return robos.Suporte({"base_suporte": BASE, **ctx}, ia)
 
     def test_responde_com_citacao(self):
-        r = self.robo().responder({"pergunta": "Como baixo a tela em PDF ou Word?"})
+        r = self.robo().responder({"pergunta": "Como baixo a tela em PDF ou Word?", "_publico": "equipe"})
         self.assertTrue(r["ok"])
         self.assertEqual(r["fontes"][0]["fonte"], "docs/APPS.md")
         self.assertIn("[1]", r["resposta"])
@@ -125,11 +125,26 @@ class TestSuporte(unittest.TestCase):
     def test_ia_melhora_o_texto(self):
         falsa = FalsaIA({"choices": [{"message": {"content": "Use Baixar esta tela [1]."}}]})
         r = robos.Suporte({"base_suporte": BASE}, robos.IALocal("http://localhost:8000", enviar=falsa)).responder(
-            {"pergunta": "exportar tela para PDF"})
+            {"pergunta": "exportar tela para PDF", "_publico": "equipe"})
         self.assertTrue(r["ia"]["usada"])
-        self.assertTrue(r["resposta"].startswith("Use Baixar esta tela [1]."))
-        self.assertIn(robos.AVISO_IA, r["resposta"])        # marcado como gerado por IA
-        self.assertTrue(r["revisao_humana"] and r["gerado_por_ia"])
+        self.assertEqual(r["resposta"], "Use Baixar esta tela [1].")      # sem aviso visível no texto (15/11/2026)
+        self.assertNotIn(robos.AVISO_IA, r["resposta"])
+        self.assertTrue(r["revisao_humana"])                               # a revisão humana continua
+        self.assertEqual(r["ia"]["tipo"], "openai")
+
+    def test_protocolo_de_ia_no_registro(self):
+        h = Hub(":memory:", relogio=lambda: AGORA)
+        falsa = FalsaIA({"choices": [{"message": {"content": "Use Baixar esta tela [1]."}}]})
+        r = robos.Suporte({"base_suporte": BASE, "hub": h}, robos.IALocal("http://localhost:8000", enviar=falsa)).responder(
+            {"pergunta": "exportar tela para PDF", "_publico": "equipe"})
+        reg = h._db.execute("SELECT id, origem, conteudo FROM registro WHERE tipo='ia'").fetchall()
+        self.assertEqual(len(reg), 1)
+        self.assertEqual(r["ia"]["protocolo"], reg[0][0])
+        c = json.loads(reg[0][2])
+        self.assertEqual((reg[0][1], c["robo"], c["provedor"], c["modelo"]), ("robo:suporte", "suporte", "openai", "physis"))
+        self.assertTrue(c["quando"])
+        self.assertNotIn("Baixar", reg[0][2])                              # o texto não vai para o registro
+        self.assertTrue(h.verificar_cadeia()[0])
 
     def test_base_real_tem_docs_e_curso(self):
         base = robos.carregar_base()
@@ -137,8 +152,57 @@ class TestSuporte(unittest.TestCase):
         self.assertTrue(any(f.startswith("docs/") for f in fontes))
         self.assertIn("Curso PHY-INTRO", fontes)
         r = robos.Suporte({"base_suporte": base}, robos.IALocal("")).responder(
-            {"pergunta": "Como abrir um chamado no Suporte Physis pelo WhatsApp?"})
+            {"pergunta": "Como abrir um chamado no Suporte Physis pelo WhatsApp?", "_publico": "equipe"})
         self.assertTrue(r["fontes"])
+
+
+class TestPublicoDoSuporte(unittest.TestCase):
+    """Pergunta de cliente nunca cita documento de desenvolvedor nem mostra nome de arquivo ou de código."""
+    PERGUNTAS = ("Como baixo a tela em PDF ou Word?", "O que é o physis-odf.js e como exportar?", "Como funciona a exportação ODT?",
+                 "Como calcular a carga térmica do ar-condicionado AVAC?", "O nó do sensor está sem sinal, o que faço?",
+                 "Como calibrar o pH da água?", "Qual é a senha do primeiro acesso?", "Como o SCADA manda comandos?",
+                 "Onde vejo a revisão do AVAC e a exportação?", "Como abrir um chamado no Suporte Physis pelo WhatsApp?")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.cliente = robos.carregar_base(publico="cliente")
+        cls.equipe = robos.carregar_base(publico="equipe")
+
+    def test_base_do_cliente_so_manual_e_curso(self):
+        fontes = {b["fonte"] for b in self.cliente}
+        self.assertTrue(fontes)
+        self.assertTrue(all(f == "Curso PHY-INTRO" or f.startswith("Manual") for f in fontes), fontes)
+        self.assertTrue(any(f.startswith("Manual · ") for f in fontes))
+        for b in self.cliente:
+            self.assertTrue(robos.eh_texto_de_cliente(b["texto"]), b)
+        self.assertTrue(any(b["fonte"].startswith("docs/") for b in self.equipe))     # a equipe continua vendo a doc técnica
+
+    def test_pergunta_de_cliente_nunca_cita_doc_de_desenvolvedor(self):
+        s = robos.Suporte({}, robos.IALocal(""))
+        for p in self.PERGUNTAS:
+            r = s.responder({"pergunta": p})                                   # sem _publico: vale cliente
+            tudo = json.dumps({k: r.get(k) for k in ("resposta", "fontes", "dados")}, ensure_ascii=False)
+            self.assertNotIn("docs/", tudo, p)
+            self.assertNotIn("physis_hub", tudo, p)
+            for f in r.get("fontes") or []:
+                self.assertTrue(f["fonte"] == "Curso PHY-INTRO" or f["fonte"].startswith("Manual"), (p, f["fonte"]))
+            self.assertTrue(robos.eh_texto_de_cliente(r["resposta"]), (p, r["resposta"]))
+            self.assertNotRegex(r["resposta"], r"\.(md|js|py|html|json)\b")
+
+    def test_base_injetada_tambem_e_filtrada_para_cliente(self):
+        base = BASE + [{"texto": "Use o physis-odf.js para gerar o ODT; ver docs/EXPORTACAO.md e a função odt().",
+                        "fonte": "Manual · Teste", "secao": "Exportar"}]
+        r = robos.Suporte({"base_suporte": base}, robos.IALocal("")).responder({"pergunta": "Como exportar o ODT em PDF?"})
+        self.assertNotIn("docs/", json.dumps(r, ensure_ascii=False))
+        self.assertNotIn("physis-odf.js", json.dumps(r, ensure_ascii=False))
+
+    def test_ia_que_cita_arquivo_e_descartada_para_cliente(self):
+        falsa = FalsaIA({"choices": [{"message": {"content": "Veja docs/EXPORTACAO.md e o physis-odf.js [1]."}}]})
+        r = robos.Suporte({}, robos.IALocal("http://localhost:8000", enviar=falsa)).responder({"pergunta": "Como calibrar o pH da água?"})
+        if r["fontes"]:
+            self.assertFalse(r["ia"]["usada"])
+            self.assertNotIn("physis-odf", r["resposta"])
+            self.assertTrue(robos.eh_texto_de_cliente(r["resposta"]))
 
 
 class TestPrecos(unittest.TestCase):

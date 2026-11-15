@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import math
 import os
 import re
 import secrets
@@ -17,7 +18,8 @@ import threading
 import time
 import unicodedata
 from collections import Counter, deque
-from datetime import datetime
+from datetime import datetime, timedelta
+from pathlib import Path
 
 from . import adaptador, protocolo
 from . import clima as clima_mod
@@ -30,6 +32,45 @@ OFFLINE_S_PADRAO = 160          # 3 ciclos do TDMA com 99 nos (~53 s cada)
 LINHAS_PARA_CONFIRMAR = 3       # leituras do no ate declarar "nao confirmado"
 BAT_BAIXA_V = 3.5
 NIVEL_RACAO_BAIXO = 15.0
+INSTANCIA_PADRAO = Path(__file__).resolve().parent.parent / "instancia.json"
+LOCAL_NAO_INFORMADO = "local não informado"
+
+
+def terreno_do_planejador(texto: str | None) -> dict:
+    """Lote mapeado no Planejador (cliente_estado "physis.terreno.v1", schema physis.terreno/1.0) → {lat, lon, municipio,
+    uf, poligono [[lon, lat], …], area_m2}. O Planejador guarda o polígono em metros locais (x leste, y norte) a partir de
+    terreno.lat0/lon0; a conversão para graus é a mesma de sistema/physis-sbn.js (mapa GIS): 110.540 m por grau de
+    latitude e 111.320 × cos(lat0) m por grau de longitude. lat/lon = lat0/lon0 (o ponto de referência do lote)."""
+    try:
+        s = json.loads(texto) if texto else None
+    except ValueError:
+        s = None
+    if not isinstance(s, dict):
+        return {}
+    t, m, i = (s.get(k) if isinstance(s.get(k), dict) else {} for k in ("terreno", "meta", "inicio"))
+    lat0 = t.get("lat0") if t.get("lat0") is not None else i.get("lat")
+    lon0 = t.get("lon0") if t.get("lon0") is not None else i.get("lon")
+    out = {"lat": lat0, "lon": lon0, "municipio": m.get("municipio") or "", "uf": m.get("uf") or ""}
+    poly = t.get("poly")
+    try:
+        la0, lo0 = float(lat0), float(lon0)
+        pts = [(float(p[0]), float(p[1])) for p in poly] if isinstance(poly, list) else []
+    except (TypeError, ValueError, IndexError):
+        pts = []
+    if len(pts) > 2:
+        a = sum(p[0] * q[1] - q[0] * p[1] for p, q in zip(pts, pts[1:] + pts[:1])) / 2
+        kx = 111320 * math.cos(math.radians(la0))
+        out["poligono"] = [[round(lo0 + x / kx, 7), round(la0 + y / 110540, 7)] for x, y in pts]
+        out["area_m2"] = round(abs(a), 1)
+    return out
+
+
+def ler_instancia() -> dict:
+    """instancia.json desta instalação (PHYSIS_INSTANCIA troca o arquivo), com as mesmas regras de servidor.ler_instancia."""
+    try:
+        return json.loads(Path(os.environ.get("PHYSIS_INSTANCIA") or INSTANCIA_PADRAO).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
 
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS leitura (
@@ -96,6 +137,7 @@ class Hub:
         self.saude_receptor = None                # funcao(linha, origem) -> dict de saude.registrar_evento (o servidor liga)
         self.secador_produtos: dict[int, str] = {}  # no SEC -> produto do lote (secador.PRODUTOS); vazio = limite generico
         self.relogio = relogio
+        self.instancia: dict | None = None        # instancia.json (lido na primeira vez que for preciso; testes podem pôr o dict)
         self.SESSAO_S = seg.sessao_vida_s(Hub.SESSAO_S)      # PHYSIS_SESSAO_DIAS (vida máxima da sessão)
         self._trava = threading.RLock()
         self._db = sqlite3.connect(caminho, check_same_thread=False)
@@ -619,6 +661,107 @@ class Hub:
         r["atualizado"] = v["atualizado"] if v else None
         return r
 
+    # ── Local da instalação (lacuna 2 do mapa de variáveis, 15/11/2026) ─────────────────────────
+    def _inst(self) -> dict:
+        if self.instancia is None:
+            self.instancia = ler_instancia()
+        return self.instancia
+
+    def local_da_instalacao(self) -> dict:
+        """O local do cliente, numa função só, para previsão/CEMADEN, Resiliência, Solar, Secador, AVAC (clima e cidade),
+        SbN (bioma e região), Economia circular e Carbono. Fonte da verdade (pedido de 15/11/2026):
+
+        geometria (lat, lon, polígono, área): 1. o lote mapeado no Planejador (physis.terreno.v1: lat0/lon0 + polígono, mais
+           rico); 2. o cadastro obrigatório do Início (physis-perfil.c.lat/lon); 3. o local gravado no Monitoramento
+           (/api/clima/local, tabela clima_local, por compatibilidade); 4. o instancia.json ("local", só padrão do instalador).
+        município e UF: Início > Planejador > Monitoramento > instancia.json. Estação do CEMADEN e IBGE: Monitoramento >
+           instancia.json > Início.
+        Sem coordenadas: fonte "nao_informado", lat e lon None, e quem usa diz "local não informado" (nunca um ponto padrão).
+        Devolve {lat, lon, municipio, uf, ibge, cemaden_estacao, poligono, area_m2, fonte, fontes}."""
+        with self._trava:
+            try:
+                r = self._db.execute("SELECT dados FROM clima_local WHERE id=1").fetchone()
+            except sqlite3.Error:
+                r = None
+            est = dict(self._db.execute("SELECT chave, valor FROM cliente_estado WHERE org=? AND chave IN "
+                                        "('physis-perfil','physis.terreno.v1')", (self.org,)).fetchall())
+
+        def ler(txt):
+            try:
+                v = json.loads(txt) if txt else None
+                return v if isinstance(v, dict) else {}
+            except ValueError:
+                return {}
+        mon = ler(r[0]) if r else {}
+        c = ler(est.get("physis-perfil")).get("c") or {}
+        c = c if isinstance(c, dict) else {}
+        ter = terreno_do_planejador(est.get("physis.terreno.v1"))
+        inst = self._inst().get("local")
+        inst = inst if isinstance(inst, dict) else {}
+        perfil = {"lat": c.get("lat", c.get("latitude")), "lon": c.get("lon", c.get("longitude")),
+                  "municipio": c.get("municipio"), "uf": c.get("uf"), "ibge": c.get("ibge")}
+        geo = [("planejador", ter), ("inicio", perfil), ("monitoramento", mon), ("instalacao", inst)]
+        out = {"lat": None, "lon": None, "municipio": "", "uf": "", "ibge": "", "cemaden_estacao": "", "poligono": None,
+               "area_m2": None, "fonte": "nao_informado", "fontes": {}}
+        for fonte, d in geo:
+            if d.get("lat") in (None, "") or d.get("lon") in (None, ""):
+                continue
+            loc, _ = clima_mod.validar_local({"lat": d.get("lat"), "lon": d.get("lon")})
+            if loc:
+                out.update(lat=loc["lat"], lon=loc["lon"], fonte=fonte)
+                break
+        if ter.get("poligono"):
+            out["poligono"], out["area_m2"], out["fontes"]["area"] = ter["poligono"], ter["area_m2"], "planejador"
+        elif isinstance(c.get("area_total_ha"), (int, float, str)) and str(c.get("area_total_ha")).strip():
+            try:
+                out["area_m2"], out["fontes"]["area"] = float(str(c["area_total_ha"]).replace(",", ".")) * 10000, "inicio"
+            except ValueError:
+                pass
+        for campo, ordem in (("municipio", [("inicio", perfil), ("planejador", ter), ("monitoramento", mon), ("instalacao", inst)]),
+                             ("uf", [("inicio", perfil), ("planejador", ter), ("monitoramento", mon), ("instalacao", inst)]),
+                             ("ibge", [("monitoramento", mon), ("instalacao", inst), ("inicio", perfil)]),
+                             ("cemaden_estacao", [("monitoramento", mon), ("instalacao", inst)])):
+            for fonte, d in ordem:
+                v = str(d.get(campo) or "").strip()
+                if v:
+                    out[campo] = v.upper()[:2] if campo == "uf" else v[:80]
+                    out["fontes"][campo] = fonte
+                    break
+        if out["fonte"] != "nao_informado":
+            out["fontes"]["coordenadas"] = out["fonte"]
+        return out
+
+    # ── Lote diário de integridade (ruptura R6; docs/INTEGRIDADE_DADOS.md) ─────────────────────────
+    LOTE_HORA = 3          # fecha o dia anterior a partir das 3 h (mesma janela do treino diário)
+
+    def lote_diario_ligado(self) -> bool:
+        """PHYSIS_LOTE_DIARIO=0 desliga; instancia.json {"integridade": {"lote_diario": false}} também."""
+        if os.environ.get("PHYSIS_LOTE_DIARIO", "1").strip() == "0":
+            return False
+        cfg = self._inst().get("integridade")
+        return not (isinstance(cfg, dict) and cfg.get("lote_diario") is False)
+
+    def fechar_lote_diario(self, hora: int | None = None) -> dict:
+        """Fecha (uma vez) o lote do dia anterior com os registros validados. Chamado pelo laço diário do hub
+        (aprendizado.rodar → passo_diario); repetir não duplica. Fuso de Brasília, como o resto do hub."""
+        if not self.lote_diario_ligado():
+            return {"ok": True, "desligado": True}
+        agora = self.relogio()
+        d = datetime.fromtimestamp(agora, clima_mod.FUSO)
+        if d.hour < (self.LOTE_HORA if hora is None else hora):
+            return {"ok": True, "cedo": True}
+        ontem = (d - timedelta(days=1)).date()
+        if getattr(self, "_lote_dia", None) == ontem:
+            return {"ok": True, "repetido": True, "dia": ontem.isoformat()}
+        self._lote_dia = ontem
+        with self._trava:
+            r = integridade.lote_diario(self._db, ontem.isoformat(), org=self.org, lugar=self.lugar, fuso=clima_mod.FUSO,
+                                        fechado_em=datetime.fromtimestamp(agora, clima_mod.FUSO).isoformat(timespec="seconds"))
+            if not r.get("repetido"):
+                self.registrar("integridade", "hub", {k: v for k, v in r.items() if k != "ok"})
+                self._db.commit()
+        return r
+
     def entrar(self, usuario: str, senha: str, ip: str = "", agente: str = "", codigo: str | None = None) -> dict:
         usuario = (usuario or "").strip().lower()
         with self._trava:
@@ -1008,7 +1151,11 @@ class Hub:
                           "aqua_hqe", "casa_azul", "greenkey", "pbe", "pbqph", "obra", "rainforest", "organico", "cafe_4c")
     # Do contrato à plataforma: cada item vendido (da loja ou de uma proposta personalizada) liga os módulos
     # que ele traz. Assim a plataforma nasce já com as abas certas, sem ninguém escolher à mão.
-    ITEM_MODULOS = {"mon-sw": ("monitoramento",), "campo": ("monitoramento",), "zonas": ("zonas",), "col": ("coleiras",),
+    # "base" (computador central e receptor LoRa, parte do Kit Monitoramento) liga o Monitoramento; "consultoria-pers"
+    # é serviço da equipe e não liga módulo (entrada vazia de propósito: o mapa de variáveis confere que todo item da loja
+    # está aqui). Ids conferidos em web/painel.html, LOJA_VENDA (15/11/2026).
+    ITEM_MODULOS = {"base": ("monitoramento",), "consultoria-pers": (),
+                    "mon-sw": ("monitoramento",), "campo": ("monitoramento",), "zonas": ("zonas",), "col": ("coleiras",),
                     "com": ("comedouros",), "P6": ("agua",), "scada": ("supervisao",), "gestao": ("gestao",),
                     "sk-e": ("sustainkit", "solar"), "sk-w": ("sustainkit",), "sk-m": ("sustainkit",),
                     "sk-c": ("sustainkit", "certificacoes"), "sk-pacote": ("sustainkit", "certificacoes", "carbono"),
@@ -1018,7 +1165,66 @@ class Hub:
                     **dict.fromkeys(("cert-iso9001", "cert-iso14001", "cert-iso45001", "cert-iso22000", "cert-iso50001", "cert-netzero", "cert-leed", "cert-leed_zero", "cert-edge", "cert-true_zw", "cert-aqua_hqe", "cert-casa_azul", "cert-greenkey", "cert-pbe", "cert-pbqph", "cert-obra", "cert-rainforest", "cert-organico", "cert-cafe_4c"), ("certificacoes",)),   # um módulo por certificação (mesmos ids de CERTIFICACOES_LOJA)
                     "P17": ("sbn",), "P18": ("agua",),   # reúso e chuva vai com a Qualidade da água (à venda)
                     "P19": ("sbn",), "P11": ("circular",), "P16": ("circular",),
-                    "P20": ("circular",), "P22": ("circular",), "P27": ("circular",), "P23": ("secador",)}
+                    "P20": ("circular",), "P22": ("circular",), "P27": ("circular",), "P23": ("secador",),
+                    # D17 (15/11/2026): níveis 2 a 4 de cada certificação (regra em sistema/physis-certificacoes.json,
+                    # niveis_loja; conferida por tests/test_cert_niveis.py). N3 = N2 (consultoria é serviço); N4 = N3 + M&V + SustainKit (D20).
+                    'cert-iso9001-n2': ('certificacoes', 'gestao', 'monitoramento'),
+                    'cert-iso9001-n3': ('certificacoes', 'gestao', 'monitoramento'),
+                    'cert-iso9001-n4': ('certificacoes', 'gestao', 'monitoramento', 'sustainkit'),
+                    'cert-iso14001-n2': ('certificacoes', 'circular', 'gestao', 'monitoramento'),
+                    'cert-iso14001-n3': ('certificacoes', 'circular', 'gestao', 'monitoramento'),
+                    'cert-iso14001-n4': ('certificacoes', 'circular', 'gestao', 'monitoramento', 'sustainkit'),
+                    'cert-iso45001-n2': ('certificacoes', 'gestao', 'monitoramento'),
+                    'cert-iso45001-n3': ('certificacoes', 'gestao', 'monitoramento'),
+                    'cert-iso45001-n4': ('certificacoes', 'gestao', 'monitoramento', 'sustainkit'),
+                    'cert-iso22000-n2': ('certificacoes', 'gestao', 'monitoramento'),
+                    'cert-iso22000-n3': ('certificacoes', 'gestao', 'monitoramento'),
+                    'cert-iso22000-n4': ('certificacoes', 'gestao', 'monitoramento', 'sustainkit'),
+                    'cert-iso50001-n2': ('certificacoes', 'solar', 'gestao', 'monitoramento'),
+                    'cert-iso50001-n3': ('certificacoes', 'solar', 'gestao', 'monitoramento'),
+                    'cert-iso50001-n4': ('certificacoes', 'solar', 'gestao', 'monitoramento', 'sustainkit'),
+                    'cert-netzero-n2': ('certificacoes', 'solar', 'circular', 'carbono', 'gestao'),
+                    'cert-netzero-n3': ('certificacoes', 'solar', 'circular', 'carbono', 'gestao'),
+                    'cert-netzero-n4': ('certificacoes', 'solar', 'circular', 'carbono', 'gestao', 'monitoramento', 'sustainkit'),
+                    'cert-leed-n2': ('certificacoes', 'solar', 'avac', 'agua', 'circular', 'carbono', 'gestao', 'monitoramento'),
+                    'cert-leed-n3': ('certificacoes', 'solar', 'avac', 'agua', 'circular', 'carbono', 'gestao', 'monitoramento'),
+                    'cert-leed-n4': ('certificacoes', 'solar', 'avac', 'agua', 'circular', 'carbono', 'gestao', 'monitoramento', 'sustainkit'),
+                    'cert-leed_zero-n2': ('certificacoes', 'solar', 'avac', 'agua', 'circular', 'carbono', 'monitoramento'),
+                    'cert-leed_zero-n3': ('certificacoes', 'solar', 'avac', 'agua', 'circular', 'carbono', 'monitoramento'),
+                    'cert-leed_zero-n4': ('certificacoes', 'solar', 'avac', 'agua', 'circular', 'carbono', 'monitoramento', 'sustainkit'),
+                    'cert-edge-n2': ('certificacoes', 'solar', 'avac', 'agua', 'carbono', 'monitoramento'),
+                    'cert-edge-n3': ('certificacoes', 'solar', 'avac', 'agua', 'carbono', 'monitoramento'),
+                    'cert-edge-n4': ('certificacoes', 'solar', 'avac', 'agua', 'carbono', 'monitoramento', 'sustainkit'),
+                    'cert-true_zw-n2': ('certificacoes', 'circular'),
+                    'cert-true_zw-n3': ('certificacoes', 'circular'),
+                    'cert-true_zw-n4': ('certificacoes', 'circular', 'monitoramento', 'sustainkit'),
+                    'cert-aqua_hqe-n2': ('certificacoes', 'solar', 'avac', 'agua', 'circular'),
+                    'cert-aqua_hqe-n3': ('certificacoes', 'solar', 'avac', 'agua', 'circular'),
+                    'cert-aqua_hqe-n4': ('certificacoes', 'solar', 'avac', 'agua', 'circular', 'monitoramento', 'sustainkit'),
+                    'cert-casa_azul-n2': ('certificacoes', 'solar', 'agua', 'circular', 'gestao'),
+                    'cert-casa_azul-n3': ('certificacoes', 'solar', 'agua', 'circular', 'gestao'),
+                    'cert-casa_azul-n4': ('certificacoes', 'solar', 'agua', 'circular', 'gestao', 'monitoramento', 'sustainkit'),
+                    'cert-greenkey-n2': ('certificacoes', 'solar', 'agua', 'circular', 'monitoramento'),
+                    'cert-greenkey-n3': ('certificacoes', 'solar', 'agua', 'circular', 'monitoramento'),
+                    'cert-greenkey-n4': ('certificacoes', 'solar', 'agua', 'circular', 'monitoramento', 'sustainkit'),
+                    'cert-pbe-n2': ('certificacoes', 'solar', 'avac', 'agua'),
+                    'cert-pbe-n3': ('certificacoes', 'solar', 'avac', 'agua'),
+                    'cert-pbe-n4': ('certificacoes', 'solar', 'avac', 'agua', 'monitoramento', 'sustainkit'),
+                    'cert-pbqph-n2': ('certificacoes',),
+                    'cert-pbqph-n3': ('certificacoes',),
+                    'cert-pbqph-n4': ('certificacoes', 'monitoramento', 'sustainkit'),
+                    'cert-obra-n2': ('certificacoes', 'solar', 'agua', 'circular', 'gestao', 'monitoramento'),
+                    'cert-obra-n3': ('certificacoes', 'solar', 'agua', 'circular', 'gestao', 'monitoramento'),
+                    'cert-obra-n4': ('certificacoes', 'solar', 'agua', 'circular', 'gestao', 'monitoramento', 'sustainkit'),
+                    'cert-rainforest-n2': ('certificacoes', 'agua', 'circular', 'carbono'),
+                    'cert-rainforest-n3': ('certificacoes', 'agua', 'circular', 'carbono'),
+                    'cert-rainforest-n4': ('certificacoes', 'agua', 'circular', 'carbono', 'monitoramento', 'sustainkit'),
+                    'cert-organico-n2': ('certificacoes', 'agua', 'circular'),
+                    'cert-organico-n3': ('certificacoes', 'agua', 'circular'),
+                    'cert-organico-n4': ('certificacoes', 'agua', 'circular', 'monitoramento', 'sustainkit'),
+                    'cert-cafe_4c-n2': ('certificacoes', 'agua', 'circular', 'carbono', 'gestao'),
+                    'cert-cafe_4c-n3': ('certificacoes', 'agua', 'circular', 'carbono', 'gestao'),
+                    'cert-cafe_4c-n4': ('certificacoes', 'agua', 'circular', 'carbono', 'gestao', 'monitoramento', 'sustainkit')}
     # propostas personalizadas descrevem os itens em texto: palavras que identificam cada módulo
     PALAVRAS_MODULOS = (("solar", "solar"), ("fotovolt", "solar"), ("usina", "solar"), ("sensor", "monitoramento"),
                         ("umidade do solo", "monitoramento"), ("estação meteorol", "resiliencia"), ("ph", "agua"),

@@ -158,7 +158,7 @@ function telaCircularMapa(dados) { const o = cfgLer(), raio = RAIOS.includes(+o.
   ui.rcmDados = d;
   const ok = d && d.ok && Array.isArray(d.pontos), filtro = ui.rcmCat || "", todos = ok ? d.pontos : [], pontos = filtro ? todos.filter(p => p.categoria === filtro) : todos;
   const grupos = ok ? d.grupos || {} : {}, selId = ui.rcmSel && todos.some(p => p.id === ui.rcmSel) ? ui.rcmSel : null, sel = selId ? todos.find(p => p.id === selId) : null;
-  const estado = !d ? "" : d.semLugar ? "Informe a localização do lugar (Monitoramento verde → Configuração) para ver os destinos em volta."
+  const estado = !d ? "" : d.semLugar ? "Local não informado — preencha na página Início (endereço, município, UF e coordenadas) para ver os destinos em volta."
     : d.semServidor ? "O mapa dos destinos usa a base guardada no servidor da plataforma. Sem servidor, só os indicadores do plano aparecem."
     : d.carregando ? "Procurando aterros, cooperativas, ecopontos e outros destinos em volta…" : !ok ? "Base de destinos indisponível agora; o servidor tenta de novo mais tarde." : "";
   const ctrl = `<div class="precos"><div><label for="rcm-raio">Raio da busca</label><select id="rcm-raio" data-rcm-k="raio" style="width:100%">${RAIOS.map(r => `<option value="${r}" ${r === raio ? "selected" : ""}>${r} km</option>`).join("")}</select></div>

@@ -3,6 +3,9 @@
 
     python montar_clientes.py --saida <pasta>
 
+Cada pacote leva o rascunho do manual do cliente (manual/MANUAL-RASCUNHO.md e .odt), montado só com os módulos
+da ficha (montar.escrever_manual). A versão final do manual passa pela revisão e aprovação na fila de emissão.
+
 O código é um só (este repositório). Cada cliente é só uma ficha: organização, módulos e,
 para a Casa Physis, o modo de pesquisa. Os programas da Physis (SustainKit, SCADA e
 Planejador) vêm das pastas do repositório.
@@ -53,7 +56,7 @@ def main() -> None:
                         bool(f.get("pesquisa")), f.get("nome", ""), f.get("cursos"), f.get("suporte") or suporte,
                         f.get("instalacao", "physis"), f.get("marca"), f.get("banco", ""),
                         pegada=f.get("pegada_servidor") or PEGADA_PADRAO.get(f["org"]))
-        print(f"{f['nome']}: {pacote.name} ({pacote.stat().st_size // 1024} kB) · módulos: {', '.join(f['modulos'])}"
+        print(f"{f['nome']}: {pacote.name} ({pacote.stat().st_size // 1024} kB) · módulos: {', '.join(f['modulos'])} · manual (rascunho)"
               + (" · pesquisa" if f.get("pesquisa") else "") + (f" · instalação {f['instalacao']}" if f.get("instalacao") else ""))
 
 

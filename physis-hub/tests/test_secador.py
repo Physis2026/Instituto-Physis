@@ -293,7 +293,7 @@ class ModuloDaTela(unittest.TestCase):
 
     def test_mesmas_constantes_e_premissas(self):
         s = self.s
-        for x in ("2.45", "1.006", "1.15", "3.6", "13.0", "0.0289", "112000", "0.999", "100", "40"):
+        for x in ("2.45", "1.006", "1.15", "3.6", "13.0", "112000", "0.999", "100", "40"):
             self.assertIn(x, s)
         for k, p in S.PRODUTOS.items():
             m = re.search(k + r':\s*\{[^}]*?t_max:\s*([0-9.]+)[^}]*?u0:\s*([0-9.]+)[^}]*?alvo:\s*([0-9.]+)[^}]*?ue:\s*([0-9.]+)[^}]*?k:\s*([0-9.]+)', s)

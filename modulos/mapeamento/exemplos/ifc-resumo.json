@@ -1,0 +1,49 @@
+{
+ "aviso": "EXEMPLO / DADOS FICTÍCIOS — só para conferir os visualizadores; não usar em projeto",
+ "esquema": "IFC4",
+ "projeto": "Projeto exemplo (dados ficticios)",
+ "entidades": 196,
+ "terrenos": [
+  {
+   "nome": "Lote exemplo",
+   "lat": -22.5,
+   "lon": -43.2,
+   "altitude_m": 2.0
+  }
+ ],
+ "edificacoes": [
+  {
+   "nome": "Casa exemplo"
+  }
+ ],
+ "pavimentos": [
+  {
+   "nome": "Térreo",
+   "elevacao_m": 0.0
+  },
+  {
+   "nome": "Cobertura",
+   "elevacao_m": 3.0
+  }
+ ],
+ "elementos": 4,
+ "elementos_por_tipo": {
+  "IFCSOLARDEVICE": 2,
+  "IFCTANK": 1,
+  "IFCTRANSFORMER": 1
+ },
+ "caixa": {
+  "min": [
+   -6.0,
+   -4.0,
+   0.0
+  ],
+  "max": [
+   6.0,
+   4.0,
+   3.15
+  ],
+  "unidade": "m",
+  "nota": "origens das peças mais IfcBoundingBox, sem rotações"
+ }
+}

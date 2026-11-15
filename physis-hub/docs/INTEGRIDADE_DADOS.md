@@ -56,9 +56,22 @@ Nada é apagado: uma correção gera um registro novo que aponta para o anterior
 
 Ao lado disso, o hub mantém o registro encadeado de eventos (tabela `registro`). Cada linha guarda o resumo da anterior.
 
+## Lote diário automático (feito em 15/11/2026)
+
+- Todo dia, a partir das 3 h (fuso de Brasília), o hub fecha o lote do **dia anterior**: `integridade.lote_diario`, chamado por
+  `Hub.fechar_lote_diario` dentro do laço diário que o servidor já roda (`aprendizado.rodar` → `passo_diario`, o mesmo do
+  treino dos modelos). Não precisa de cron nem de timer do sistema; no Linux de produção basta o serviço do hub estar no ar.
+- Entram só registros validados: as medições de `medicao` (já passaram nas faixas físicas do protocolo; o campo absurdo é
+  descartado antes) e as leituras de água digitadas (pH, turbidez, cloro) que já chegaram ao servidor. O alarme de operação
+  (`ok`, `baixo`, `alto`, `sem_faixa`; ex.: fator de potência abaixo de 0,92) vai junto no registro e não tira o dado do lote.
+  Grandeza sem unidade no contrato fica fora (`sem_unidade_fora`).
+- Lote `dia-<org>-<lugar>-<AAAA-MM-DD>`, dicionário `physis-variaveis/1` (`sistema/physis-variaveis.json`). Uma vez só por dia;
+  dia sem registro não gera lote. `PHYSIS_LOTE_DIARIO=0` ou `instancia.json` `{"integridade": {"lote_diario": false}}` desligam.
+- Testado com relógio falso em `tests/test_fluxo_dados.py`.
+
 ## Falta (Fase 2)
 
-1. Ligar o lote aos dados reais: Monitoramento, Carbono, SbN e Certificações.
+1. Ligar o lote aos outros dados: Carbono, SbN e Certificações (o Monitoramento e a água já entram no lote diário).
 2. Criar as rotas no servidor e os botões "Fechar lote" e "Baixar banco de leitura" na tela.
 3. Fazer o esquema de exportação no formato que o parceiro informar.
 4. Conferir a ida e volta: o resumo calculado pela Physis tem de bater com o que o parceiro registrou.

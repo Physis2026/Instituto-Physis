@@ -101,7 +101,11 @@ mostrar "aprendendo (poucos dados)"; nunca esconder a previsão das fontes — o
 ## 4. Limites conhecidos
 - O histórico de temperatura vem dos sensores do ar (`temperatura`, ativo `-ar`); sem sensor, o consumo usa só
   mês e fim de semana.
-- Produção/ocupação é lida da Gestão por melhor esforço (chaves com `produc` ou `ocupac` contendo listas com
-  data e quantidade).
+- Produção/ocupação vem da Gestão **do cliente** (`cliente_estado`, chave `physis-gestao-cliente`, lista `producao`),
+  não da Gestão Physis interna (desde 15/11/2026). Regra de mês para dia: o total do mês (`mes` AAAA-MM, `prod`) é
+  dividido igualmente pelos dias daquele mês (31, 30, 29 ou 28); item com dia (`dia` ou `data` AAAA-MM-DD) vale para o
+  próprio dia. A produção só entra no modelo se cobrir 80 % dos dias com consumo.
+- Energia e água medidas chegam pelos tipos V6 `ENE` e `HID` (ou pela ponte MQTT, nó `"tipo": "energia"`/`"agua"`);
+  `energia` é potência em kW e a conta do dia é média × 24 h.
 - Leituras sem relógio (`TS:0`) não entram em consumo, bateria e irrigação.
 - Treino da chuva com 1 ano de dados leva ~3 s num PC; num Raspberry Pi 4, estimado em 15–30 s (1 vez por dia).

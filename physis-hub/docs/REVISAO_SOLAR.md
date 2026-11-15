@@ -45,3 +45,10 @@ aviso de corrente (2 strings de 14 A num MPPT de 16 A). JavaScript e Python igua
 2. Em `painel.html`: apagar a função `telaSolar()` antiga (uma declaração `function telaSolar` no script principal sobrescreve a do módulo) e trocar o corpo de `solarCalc()` por `return window.SOLAR ? SOLAR.compat() : { … conta antiga … }` — Carbono, Custos e o ranking de investimentos leem os mesmos campos.
 3. `TELAS.solar` continua `telaSolar`.
 4. Rodar `embutir_bases.py` e os testes.
+
+## Planta solar dentro da aba (15/11/2026)
+
+A aba Energia solar tem duas partes: **Dimensionamento** (a de sempre) e **Planta solar (BIM)** (em desenvolvimento,
+com selo): arranjo das placas, carta solar, curva do dia, strings e fator de potência, vindos do Mapeamento
+(`sistema/physis-mapeamento.js`, docs/MAPEAMENTO.md). Quando a planta é enviada, o Dimensionamento usa o sistema da planta
+e mostra uma geração só, com a fonte; a opção "Dimensionar pelo consumo" volta ao cálculo pelo consumo.

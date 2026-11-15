@@ -1,0 +1,292 @@
+{
+ "esquema": "physis-contexto-lugar/1",
+ "instalacao": "exemplo",
+ "gerado_em": "2026-11-14T23:46:40Z",
+ "depende_de": [
+  "inicio",
+  "planejador"
+ ],
+ "campos": {
+  "coordenadas": {
+   "valor": {
+    "lat": -22.5,
+    "lon": -43.2
+   },
+   "unidade": "grau (WGS 84)",
+   "fonte": "local da instalação (exemplo)",
+   "camada": null,
+   "situacao": "ok"
+  },
+  "municipio": {
+   "valor": {
+    "municipio": "[exemplo]",
+    "uf": "RJ"
+   },
+   "unidade": "texto",
+   "fonte": "Início (dados obrigatórios do cliente)",
+   "camada": null,
+   "situacao": "ok"
+  },
+  "area_lote_m2": {
+   "valor": 4800.0,
+   "unidade": "m²",
+   "fonte": "polígono do lote do Planejador",
+   "camada": null,
+   "situacao": "ok"
+  },
+  "declividade": {
+   "valor": {
+    "n": 8,
+    "media_pct": 5.000452324950244,
+    "p50_pct": 5.000452324950245,
+    "p90_pct": 5.000452324950245,
+    "max_pct": 5.000452324950245,
+    "fracao_acima_30pct": 0.0,
+    "fracao_acima_100pct": 0.0
+   },
+   "unidade": "%",
+   "fonte": "Copernicus DEM GLO-30 / SRTM 1 arc-second / TOPODATA [CONFERIR] — Copernicus DEM (ESA) ou SRTM (NASA/USGS) ou TOPODATA (INPE) [CONFERIR]; licença: Copernicus DEM: licença própria, uso livre com atribuição; SRTM: domínio público; TOPODATA: uso livre com citação [CONFERIR]",
+   "camada": "relevo",
+   "situacao": "ok",
+   "nota": "APP de encosta acima de 45° (100 %) pela premissa app.declividade; conferir na lei [CONFERIR NA LEI]"
+  },
+  "altitude_m": {
+   "valor": {
+    "n": 8,
+    "min": 2.947,
+    "max": 4.053,
+    "media": 3.5,
+    "p50": 4.053
+   },
+   "unidade": "m",
+   "fonte": "Copernicus DEM GLO-30 / SRTM 1 arc-second / TOPODATA [CONFERIR] — Copernicus DEM (ESA) ou SRTM (NASA/USGS) ou TOPODATA (INPE) [CONFERIR]; licença: Copernicus DEM: licença própria, uso livre com atribuição; SRTM: domínio público; TOPODATA: uso livre com citação [CONFERIR]",
+   "camada": "relevo",
+   "situacao": "ok"
+  },
+  "hidrografia": {
+   "valor": {
+    "rios": 1,
+    "nascentes": 1,
+    "rio_mais_proximo_m": 42.46583680926537,
+    "nascente_mais_proxima_m": 65.30555565069338,
+    "nomes": [
+     "Córrego exemplo"
+    ]
+   },
+   "unidade": "contagem; m",
+   "fonte": "Base Hidrográfica Ottocodificada (BHO) [CONFERIR] — ANA [CONFERIR]; licença: dados abertos da ANA [CONFERIR]",
+   "camada": "hidrografia",
+   "situacao": "ok",
+   "nota": "A faixa de APP é desenhada no Planejador (premissas app.faixa_rio e app.raio_nascente) [CONFERIR NA LEI]."
+  },
+  "uso_solo": {
+   "valor": null,
+   "unidade": "",
+   "fonte": "Coleção anual de cobertura e uso (versão e ano [CONFERIR]) — MapBiomas [CONFERIR]; licença: CC BY 4.0 [CONFERIR]",
+   "camada": "uso_solo",
+   "situacao": "camada_nao_instalada"
+  },
+  "solos": {
+   "valor": null,
+   "unidade": "",
+   "fonte": "Mapa de Solos do Brasil (escala [CONFERIR]) — Embrapa Solos / IBGE [CONFERIR]; licença: uso livre com citação [CONFERIR]",
+   "camada": "solos",
+   "situacao": "camada_nao_instalada"
+  },
+  "limites": {
+   "valor": null,
+   "unidade": "",
+   "fonte": "Malhas territoriais / malha municipal [CONFERIR] — IBGE [CONFERIR]; licença: dados públicos do IBGE, uso livre com citação da fonte [CONFERIR]",
+   "camada": "limites",
+   "situacao": "camada_nao_instalada"
+  },
+  "car": {
+   "valor": null,
+   "unidade": "",
+   "fonte": "Base pública do CAR por município [CONFERIR] — SICAR / Serviço Florestal Brasileiro [CONFERIR]; licença: dados públicos [CONFERIR]; tratar como dado sensível pela LGPD se vier nome ou CPF",
+   "camada": "car",
+   "situacao": "camada_nao_instalada"
+  },
+  "risco": {
+   "valor": null,
+   "unidade": "",
+   "fonte": "Setorização de riscos geológicos (SGB) e municípios monitorados (CEMADEN) [CONFERIR] — SGB/CPRM e CEMADEN [CONFERIR]; licença: dados públicos [CONFERIR]",
+   "camada": "risco",
+   "situacao": "camada_nao_instalada"
+  },
+  "rede_eletrica": {
+   "valor": null,
+   "unidade": "",
+   "fonte": "SIGEL (Sistema de Informações Georreferenciadas do Setor Elétrico) [CONFERIR] — ANEEL [CONFERIR]; licença: dados abertos da ANEEL [CONFERIR]",
+   "camada": "rede_eletrica",
+   "situacao": "camada_nao_instalada"
+  },
+  "osm": {
+   "valor": null,
+   "unidade": "",
+   "fonte": "Extrato regional (edificações e vias) [CONFERIR] — OpenStreetMap (© colaboradores do OpenStreetMap) [CONFERIR]; licença: ODbL 1.0: atribuição e compartilhamento pela mesma licença do banco derivado [CONFERIR]",
+   "camada": "osm",
+   "situacao": "camada_nao_instalada"
+  },
+  "clima": {
+   "valor": null,
+   "unidade": "",
+   "fonte": "Arquivos climáticos EPW das estações do INMET [CONFERIR] — INMET (estações) convertido em EPW [CONFERIR]; licença: dados públicos do INMET; licença do arquivo EPW conforme quem converteu [CONFERIR]",
+   "camada": "clima",
+   "situacao": "camada_nao_instalada"
+  },
+  "irradiacao": {
+   "valor": {
+    "anual_kwh_m2_dia": 4.7250000000000005,
+    "mensal_kwh_m2_dia": [
+     5.8,
+     5.9,
+     5.0,
+     4.4,
+     3.7,
+     3.4,
+     3.6,
+     4.2,
+     4.5,
+     5.0,
+     5.4,
+     5.8
+    ]
+   },
+   "unidade": "kWh/m²·dia",
+   "fonte": "EXEMPLO / DADOS FICTÍCIOS — só para conferir os visualizadores; não usar em projeto",
+   "camada": null,
+   "situacao": "ok",
+   "nota": "atlas LABREN não instalado: usada a base da aba Solar"
+  },
+  "vento": {
+   "valor": null,
+   "unidade": "",
+   "fonte": "Atlas do Potencial Eólico Brasileiro (altura [CONFERIR]) — CEPEL / CRESESB [CONFERIR]; licença: uso livre com citação [CONFERIR]",
+   "camada": "vento",
+   "situacao": "camada_nao_instalada"
+  }
+ },
+ "faltam": [
+  {
+   "campo": "uso_solo",
+   "camada": "uso_solo",
+   "nome": {
+    "pt": "Uso e cobertura do solo",
+    "en": "Land use and land cover"
+   },
+   "motivo": "camada não instalada",
+   "como_instalar": "PHYSIS_CAMADAS/uso_solo.asc (+ uso_solo.legenda.json)"
+  },
+  {
+   "campo": "solos",
+   "camada": "solos",
+   "nome": {
+    "pt": "Solos",
+    "en": "Soils"
+   },
+   "motivo": "camada não instalada",
+   "como_instalar": "PHYSIS_CAMADAS/solos.geojson"
+  },
+  {
+   "campo": "limites",
+   "camada": "limites",
+   "nome": {
+    "pt": "Limites municipais e estaduais",
+    "en": "Municipal and state boundaries"
+   },
+   "motivo": "camada não instalada",
+   "como_instalar": "PHYSIS_CAMADAS/limites.geojson"
+  },
+  {
+   "campo": "car",
+   "camada": "car",
+   "nome": {
+    "pt": "Cadastro Ambiental Rural (CAR)",
+    "en": "Rural Environmental Registry (CAR)"
+   },
+   "motivo": "camada não instalada",
+   "como_instalar": "PHYSIS_CAMADAS/car.geojson"
+  },
+  {
+   "campo": "risco",
+   "camada": "risco",
+   "nome": {
+    "pt": "Áreas de risco (deslizamento e inundação)",
+    "en": "Risk areas (landslide and flood)"
+   },
+   "motivo": "camada não instalada",
+   "como_instalar": "PHYSIS_CAMADAS/risco.geojson"
+  },
+  {
+   "campo": "rede_eletrica",
+   "camada": "rede_eletrica",
+   "nome": {
+    "pt": "Rede elétrica (linhas e subestações)",
+    "en": "Power grid (lines and substations)"
+   },
+   "motivo": "camada não instalada",
+   "como_instalar": "PHYSIS_CAMADAS/rede_eletrica.geojson"
+  },
+  {
+   "campo": "osm",
+   "camada": "osm",
+   "nome": {
+    "pt": "Edificações e vias (OpenStreetMap)",
+    "en": "Buildings and roads (OpenStreetMap)"
+   },
+   "motivo": "camada não instalada",
+   "como_instalar": "PHYSIS_CAMADAS/osm.geojson"
+  },
+  {
+   "campo": "clima",
+   "camada": "clima",
+   "nome": {
+    "pt": "Clima (arquivos EPW)",
+    "en": "Climate (EPW files)"
+   },
+   "motivo": "camada não instalada",
+   "como_instalar": "PHYSIS_CAMADAS/clima/*.epw (o mais perto do lote)"
+  },
+  {
+   "campo": "vento",
+   "camada": "vento",
+   "nome": {
+    "pt": "Vento (atlas eólico)",
+    "en": "Wind (wind atlas)"
+   },
+   "motivo": "camada não instalada",
+   "como_instalar": "PHYSIS_CAMADAS/vento.asc"
+  }
+ ],
+ "uploads": [],
+ "avisos": [],
+ "janela": [
+  -43.20330590503144,
+  -22.50298534467161,
+  -43.196694094968564,
+  -22.49701465532839
+ ],
+ "poligono_lote": [
+  [
+   -43.200388930003705,
+   -22.500271394970145
+  ],
+  [
+   -43.1996110699963,
+   -22.500271394970145
+  ],
+  [
+   -43.1996110699963,
+   -22.499728605029855
+  ],
+  [
+   -43.200388930003705,
+   -22.499728605029855
+  ]
+ ],
+ "integridade": {
+  "sha256": "92da0efcde7760dd36b2ff8443bbf5e873b6bd90961ae23f795d5d00bf653ee9"
+ },
+ "aviso": "EXEMPLO / DADOS FICTÍCIOS — só para conferir os visualizadores; não usar em projeto"
+}

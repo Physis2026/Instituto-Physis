@@ -163,17 +163,25 @@ function blocoInvest(r, kwhAno, tarifa) { if (!r) return `<p class="t2 pq">Infor
   return `<div class="rolagem"><table><caption>Retorno do investimento (economia de ${brl(Math.round(kwhAno * tarifa))} no primeiro ano)</caption><thead><tr><th scope="col">Retorno simples</th><th scope="col">Retorno descontado</th><th scope="col">VPL</th><th scope="col">TIR ao ano</th></tr></thead><tbody><tr>
     <td>${r.simples != null ? f1(r.simples / 12, 1) + " anos" : "não se paga"}</td><td>${r.descontado != null ? f1(r.descontado / 12, 1) + " anos" : "—"}</td><td>${r.vpl != null ? brl(Math.round(r.vpl)) : "—"}</td><td>${r.tir != null ? f1(r.tir, 1) + "%" : "—"}</td></tr></tbody></table></div>`; }
 
-function parteHidraulica() { const o = ler("h"), mat = o.mat || "pvc";
-  const P = { vazao:num(o.vazao) || 0, vazao_ecologica:num(o.eco) || 0, queda:num(o.queda) || 0, un:o.un === "bar" ? "bar" : "m", eta:ou(num(o.eta), 0.6), horas:ou(num(o.horas), 12), n:ou(num(o.n), 1),
+function paramsHid(o) { const mat = o.mat || "pvc";
+  return { vazao:num(o.vazao) || 0, vazao_ecologica:num(o.eco) || 0, queda:num(o.queda) || 0, un:o.un === "bar" ? "bar" : "m", eta:ou(num(o.eta), 0.6), horas:ou(num(o.horas), 12), n:ou(num(o.n), 1),
     vazoes_mes:lista12(o.meses), pressao_dinamica:!!o.din, tubo:{ material:mat, diametro_mm:num(o.diam), comprimento_m:num(o.comp), metodo:o.metodo === "hazen" ? "hazen" : "darcy", k_local:num(o.kloc) || 0 },
-    custo:num(o.custo), tarifa:num(o.tarifa), vida:num(o.vida), taxa:num(o.taxa), infl:num(o.infl) };
+    custo:num(o.custo), tarifa:num(o.tarifa), vida:num(o.vida), taxa:num(o.taxa), infl:num(o.infl) }; }
+/* energia por ano do que foi planejado nas duas partes (para o Carbono, emissões evitadas): só conta a parte que tem
+   dados salvos (vazão e queda; diâmetro ou modelo da eólica); sem nada, null */
+function kwhAnoPlanejado() { let t = 0, tem = false;
+  try { const h = ler("h"); if (num(h.vazao) > 0 && num(h.queda) > 0) { const r = hidraulica(paramsHid(h)); if (r && r.kwh_ano > 0) { t += r.kwh_ano; tem = true; } } } catch (e) {}
+  try { const e = ler("e"); if (num(e.diametro) > 0 || e.preset) { const r = eolica(paramsEol(e)); if (r && r.aep_kwh > 0) { t += r.aep_kwh; tem = true; } } } catch (e) {}
+  return tem ? t : null; }
+function parteHidraulica() { const o = ler("h"), mat = o.mat || "pvc";
+  const P = paramsHid(o);
   const R = hidraulica(P);
   let parte = null; try { if (typeof carbCalc === "function" && typeof carbLer === "function") { const ca = carbCalc(carbLer()); if (ca && ca.kwh) parte = R.kwh_ano / ca.kwh; } } catch (e) {}
   const ent = `<section class="cartao" aria-labelledby="h-tu-ent"><h2 id="h-tu-ent">Cada turbina</h2><div class="precos">
       ${campo("h", o, "vazao", "Vazão de projeto (m³ por hora)", "ex.: 12")}${campo("h", o, "queda", "Queda bruta ou pressão", "ex.: 25")}
       ${lista("h", o, "un", "Unidade da queda", [["m", "metros de coluna d'água"], ["bar", "bar"]], "m")}
       ${campo("h", o, "eta", "Eficiência do conjunto (0 a 1)", "0,6")}${campo("h", o, "horas", "Horas com água por dia", "12")}${campo("h", o, "n", "Quantidade de turbinas", "1")}
-      ${campo("h", o, "eco", "Vazão ecológica que fica no rio (m³ por hora)", "da outorga", "O órgão gestor define na outorga; ela sai da vazão disponível.")}</div>
+      ${campo("h", o, "fp", "Fator de potência do gerador (0 a 1)", "da placa", "Vazio = premissa da base (a conferir).")}${campo("h", o, "eco", "Vazão ecológica que fica no rio (m³ por hora)", "da outorga", "O órgão gestor define na outorga; ela sai da vazão disponível.")}</div>
       ${campo("h", o, "meses", "Vazão de cada mês (m³/h, 12 valores separados por ;)", "ex.: 20;22;18;15;12;10;8;8;9;12;15;18", "Opcional. Acima da vazão de projeto, o excesso passa pelo vertedouro; vazio = vazão de projeto o ano todo.")}</section>
     <section class="cartao" aria-labelledby="h-tu-tubo"><h2 id="h-tu-tubo">Tubulação forçada (perdas)</h2><div class="precos">
       ${lista("h", o, "mat", "Material", Object.entries(TUBOS).map(([k, v]) => [k, v[2]]), "pvc")}${campo("h", o, "diam", "Diâmetro interno (mm)", "ex.: 100")}${campo("h", o, "comp", "Comprimento (m)", "ex.: 120")}
@@ -182,7 +190,8 @@ function parteHidraulica() { const o = ler("h"), mat = o.mat || "pvc";
   const res = `<div class="grade">${cartao("tu-kw", "Potência de cada turbina", f1(R.kw, 2), "kW" + (P.n > 1 ? " · " + f1(R.kw_total, 2) + " kW no total" : ""))}
       ${cartao("tu-kwh", "Energia por ano", f1(R.kwh_ano, 0), "kWh" + (parte != null ? " · " + f1(parte * 100, 1) + "% do consumo" : ""))}
       ${cartao("tu-hl", "Queda líquida", f1(R.queda_liquida, 1), "m · perda de " + f1(R.perda_m, 2) + " m" + (R.velocidade ? " · " + f1(R.velocidade, 2) + " m/s no tubo" : ""))}</div>
-    ${R.avisos.length ? `<div class="faixa at" role="status">${lstAvisos(R.avisos)}</div>` : ""}<p class="faixa in" role="note">${esc(R.aviso_outorga)}</p>`;
+    ${R.avisos.length ? `<div class="faixa at" role="status">${lstAvisos(R.avisos)}</div>` : ""}<p class="faixa in" role="note">${esc(R.aviso_outorga)}</p>
+    ${typeof PhysisCalc !== "undefined" && PhysisCalc.potencias ? PhysisCalc.potenciasHtml([["Cada turbina", PhysisCalc.potencias(R.kw, num(o.fp))], ["Todas as turbinas", PhysisCalc.potencias(R.kw_total, num(o.fp))]], /^en/i.test(document.documentElement.lang), "Potências do gerador") : ""}`;
   const tipos = R.tipos.length ? `<section class="cartao" aria-labelledby="h-tu-tipo"><h2 id="h-tu-tipo">Tipo de turbina indicado</h2><div class="rolagem"><table><caption>Tipos de turbina pela queda líquida (${f1(R.queda_liquida, 1)} m) e vazão (${f1(P.vazao / 3600, 4)} m³/s), do mais indicado ao menos</caption>
       <thead><tr><th scope="col">Tipo</th><th scope="col">Queda típica</th><th scope="col">Vazão típica</th><th scope="col">Eficiência típica</th><th scope="col">Serve aqui?</th></tr></thead><tbody>
       ${R.tipos.map(t => `<tr><th scope="row">${esc(t.nome)}</th><td>${f1(t.queda[0], 0)} a ${f1(t.queda[1], 0)} m</td><td>${f1(t.vazao_m3s[0] * 1000, 0)} a ${f1(t.vazao_m3s[1] * 1000, 0)} L/s</td><td>${f1(t.eta[0] * 100, 0)} a ${f1(t.eta[1] * 100, 0)}%</td><td>${t.dentro ? `<span class="selo ok">Sim</span>` : `<span class="selo in">Fora da faixa</span>`}</td></tr>`).join("")}</tbody></table></div>
@@ -193,14 +202,17 @@ function parteHidraulica() { const o = ler("h"), mat = o.mat || "pvc";
   const inv = `<section class="cartao" aria-labelledby="h-tu-inv"><h2 id="h-tu-inv">Custo e retorno</h2><div class="precos">${campo("h", o, "custo", "Custo instalado (R$)", "ex.: 25000")}${campo("h", o, "tarifa", "Tarifa de energia (R$/kWh)", "ex.: 0,95")}${campo("h", o, "vida", "Vida útil (anos)", "20")}${campo("h", o, "taxa", "Taxa de desconto (% ao ano)", "10")}${campo("h", o, "infl", "Reajuste da tarifa (% ao ano)", "4")}</div>${blocoInvest(R.invest, R.kwh_ano, P.tarifa || 0)}</section>`;
   return ent + res + tipos + tabMes + inv + `<p class="t2 pq">Potência = 1.000 kg/m³ × 9,81 m/s² × vazão (m³/s) × queda líquida (m) × eficiência. 1 bar ≈ 10,2 m. Perdas: Darcy-Weisbach hf = f·(L/D)·v²/2g (f de Swamee-Jain) ou Hazen-Williams hf = 10,67·L·Q^1,852/(C^1,852·D^4,87), mais ΣK·v²/2g. Com sensores (ESP32 de vazão e pressão), a geração medida entra aqui pelo protocolo V6 (tipo TURB, a homologar).</p>` + metodoHidro(); }
 
-function parteEolica() { const o = ler("e"), V = ventoDoLugar(), temV = V && V.ok, hRef = o.href === "50" ? 50 : 10, serie = temV ? (hRef === 50 ? V.ws50 : V.ws10) : null;
+function paramsEol(o) { const V = ventoDoLugar(), temV = V && V.ok, hRef = o.href === "50" ? 50 : 10, serie = temV ? (hRef === 50 ? V.ws50 : V.ws10) : null;
   const pre = PRESETS_EOL.find(x => x.id === o.preset) || null, d = (k, base) => num(o[k]) != null ? num(o[k]) : (pre && pre[k] != null ? pre[k] : base);
-  const P = { diametro:d("diametro", 0), cp:d("cp", 0.30), v_in:d("v_in", 3), v_nom:d("v_nom", null), v_out:d("v_out", 25), p_nom:d("p_nom", null), altura_cubo:ou(num(o.altura), 12), h_ref:hRef,
+  return { diametro:d("diametro", 0), cp:d("cp", 0.30), v_in:d("v_in", 3), v_nom:d("v_nom", null), v_out:d("v_out", 25), p_nom:d("p_nom", null), altura_cubo:ou(num(o.altura), 12), h_ref:hRef,
     terreno:o.terreno || "aberto", alfa:num(o.alfa), altitude:ou(num(o.altitude), (temV && V.elevacao_m != null ? V.elevacao_m : 0)), temperatura:ou(num(o.temp), (temV && V.t2m ? V.t2m.anual : 25)),
     v_ref:ou(num(o.v_ref), (serie ? serie.anual : 0)), meses_ref:num(o.v_ref) == null && serie ? serie.meses : null, k:ou(num(o.k), 2), perdas:ou(num(o.perdas), 0),
-    custo:num(o.custo), tarifa:num(o.tarifa), vida:num(o.vida), taxa:num(o.taxa), infl:num(o.infl), curva:pares(o.curva) };
+    custo:num(o.custo), tarifa:num(o.tarifa), vida:num(o.vida), taxa:num(o.taxa), infl:num(o.infl), curva:pares(o.curva) }; }
+function parteEolica() { const o = ler("e"), V = ventoDoLugar(), temV = V && V.ok, hRef = o.href === "50" ? 50 : 10, serie = temV ? (hRef === 50 ? V.ws50 : V.ws10) : null;
+  const pre = PRESETS_EOL.find(x => x.id === o.preset) || null;
+  const P = paramsEol(o);
   const R = eolica(P), classe = { viavel:"ok", marginal:"at", pouco_viavel:"al" }[R.viabilidade];
-  const origem = !V ? "Informe a localização do lugar (Monitoramento verde → Configuração) para trazer o vento da base aberta, ou digite a velocidade medida."
+  const origem = !V ? "Local não informado — preencha na página Início para trazer o vento da base aberta, ou digite a velocidade medida."
     : V.semServidor ? "Sem o servidor da plataforma não há base de vento: digite a velocidade média medida."
     : V.carregando ? "Carregando o vento do lugar…" : !temV ? "Vento do lugar indisponível agora: digite a velocidade média medida."
     : `Base aberta no lugar: ${f1(V.ws10 && V.ws10.anual, 2)} m/s a 10 m e ${f1(V.ws50 && V.ws50.anual, 2)} m/s a 50 m${V.alfa_medido != null ? " (α entre as duas alturas: " + f1(V.alfa_medido, 2) + ")" : ""}; ${esc(V.fonte || "")}. Campos vazios usam esses valores.`;
@@ -220,6 +232,7 @@ function parteEolica() { const o = ler("e"), V = ventoDoLugar(), temV = V && V.o
       ${R.curva_fabricante ? `<p class="t2 pq"><span class="selo ok">Curva do fabricante</span> A energia sai da curva digitada; o Cp e o diâmetro não entram na conta.</p>` : ""}
       ${pre ? `<p class="t2 pq"><span class="selo at">Verificar</span> Classe genérica, não é um modelo comercial: troque pelos dados e pela curva do fabricante.</p>` : ""}</section>`;
   const res = `<div class="faixa ${classe}" role="status"><strong>${esc(R.mensagem)}</strong></div>
+    ${typeof PhysisCalc !== "undefined" && PhysisCalc.potencias && R.p_nom ? PhysisCalc.potenciasHtml([["Turbina na potência nominal", PhysisCalc.potencias(R.p_nom, num(o.fp))]], /^en/i.test(document.documentElement.lang), "Potências do gerador") : ""}
     <div class="grade">${cartao("te-v", "Vento no cubo", f1(R.v_cubo, 2), "m/s de média · α " + f1(R.alfa, 2) + " · c " + f1(R.c, 2) + " m/s")}
       ${cartao("te-e", "Energia por ano", f1(R.aep_kwh, 0), "kWh" + (R.meses ? " (soma dos 12 meses)" : ""))}
       ${cartao("te-fc", "Fator de capacidade", R.fc == null ? "—" : f1(R.fc * 100, 1) + "%", R.p_nom ? "de " + f1(R.p_nom, 1) + " kW nominais" : "informe a potência nominal")}
@@ -293,7 +306,7 @@ if (typeof document !== "undefined" && !window.__turbEventos) { window.__turbEve
   document.addEventListener("click", ev => { const b = ev.target.closest ? ev.target.closest("button") : null; if (!b || !b.dataset || !b.dataset.turbSub) return;
     ui.turbSub = b.dataset.turbSub; desenhar(false); refocar("turb-sub-" + b.dataset.turbSub); }); }
 
-window.TURBINAS = { hidraulica, eolica, densidadeAr, cisalhamento, alfaMedido, weibullC, weibullPdf, turbinaEolica, potenciaVento, energiaWeibull,
+window.TURBINAS = { hidraulica, eolica, kwhAnoPlanejado, densidadeAr, cisalhamento, alfaMedido, weibullC, weibullPdf, turbinaEolica, potenciaVento, energiaWeibull,
   potenciaHidraulica, perdaDarcy, perdaHazen, sugerirTipos, gama, ALFA_TERRENO, TIPOS_HIDRO, TUBOS, PRESETS_EOL, BETZ };
 window.telaTurbinas = telaTurbinas;   /* global: a plataforma chama telaTurbinas() na hora de desenhar */
 })();

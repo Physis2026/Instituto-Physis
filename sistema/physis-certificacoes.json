@@ -4002,5 +4002,76 @@
         }
       ]
     }
-  ]
+  ],
+  "niveis_loja": {
+    "_leia": "D17 (15/11/2026): quatro níveis por item cert-<id> da loja. Tabela ÚNICA de preços e do que cada nível liga. N1 = item cert-<id>; N2 a N4 = cert-<id>-n2 … -n4 (hub.ITEM_MODULOS). Abas do N2 tiradas dos campos 'auto' dos critérios da certificação (modulo_por_criterio); AVAC só nas certificações de edificação da lista avac_em. Preços da D19 (15/11/2026): N1 a partir de R$ 750,00; N2 R$ 5.000,00; N3 a partir de R$ 30.000,00; N4 a partir de R$ 50.000,00. D20: o SustainKit entra no N4.",
+    "niveis": [
+      {
+        "n": 1,
+        "sufixo": "",
+        "nome": "Gap analysis",
+        "inclui": "A aba Certificações: requisitos, nota de atendimento e maturidade.",
+        "preco": 750,
+        "apartir": true
+      },
+      {
+        "n": 2,
+        "sufixo": "-n2",
+        "nome": "Sistema detalhado",
+        "inclui": "O nível 1, mais a página de evidências com os links e as abas ligadas aos critérios desta certificação.",
+        "preco": 5000,
+        "apartir": false
+      },
+      {
+        "n": 3,
+        "sufixo": "-n3",
+        "nome": "Sistema com consultoria",
+        "inclui": "O nível 2, mais a consultoria personalizada da equipe Physis.",
+        "preco": 30000,
+        "apartir": true
+      },
+      {
+        "n": 4,
+        "sufixo": "-n4",
+        "nome": "Sistema com medição e verificação",
+        "inclui": "O nível 3, mais a medição e verificação da economia (IPMVP).",
+        "preco": 50000,
+        "apartir": true
+      }
+    ],
+    "modulo_por_criterio": {
+      "solar": "solar",
+      "energia_hist": "solar",
+      "agua": "agua",
+      "residuos": "circular",
+      "residuos50": "circular",
+      "carbono": "carbono",
+      "riscos": "gestao",
+      "custos": "gestao",
+      "medicao": "monitoramento"
+    },
+    "ordem_modulos": [
+      "certificacoes",
+      "solar",
+      "avac",
+      "agua",
+      "circular",
+      "carbono",
+      "gestao",
+      "monitoramento",
+      "sustainkit"
+    ],
+    "avac_em": [
+      "leed",
+      "leed_zero",
+      "edge",
+      "aqua_hqe",
+      "pbe"
+    ],
+    "mv_modulos": [
+      "monitoramento"
+    ],
+    "sustainkit_d20": "n4",
+    "_sustainkit_d20": "D20 (15/11/2026, decidido): o SustainKit entra no N4 (\"n4\"). Outras opções, se mudar: null = nenhum; \"n2\" = do N2 em diante; \"separado\" = item próprio da loja."
+  }
 }

@@ -131,7 +131,13 @@
     chuva: [0, 200, "mm"], chuva_intensidade: [null, null, "mm/h"],
     // secador solar (TIPO:SEC, a homologar): o limite de temperatura é do produto (physis-secador.js), não daqui
     temperatura_interna: [null, null, "C"], umidade_interna: [0, 100, "%"], temperatura_coletor: [null, null, "C"],
-    peso_produto: [null, null, "kg"], irradiancia: [0, 1500, "W/m2"]
+    peso_produto: [null, null, "kg"], irradiancia: [0, 1500, "W/m2"],
+    // rede V6 e dispositivos via ESP (as mesmas de physis_hub/nucleo.py)
+    umidade_solo: [0, 100, "%"], estado: [null, null, "0/1"], previsao_min: [null, null, "min"],
+    bateria: [3.3, 4.3, "V"], rssi: [-120, 0, "dBm"], snr: [null, null, "dB"], latitude: [-90, 90, "grau"],
+    longitude: [-180, 180, "grau"], atividade: [null, null, "0-2"], impacto: [null, null, "0/1"], porcoes: [null, null, "un"],
+    // medidor de energia (TIPO:ENE): potência reativa e aparente; o fator de potência já é "fp"
+    potencia_reativa: [null, null, "kvar"], potencia_aparente: [null, null, "kVA"]
   };
   function avaliarAlarme(grandeza, valor, faixas) {
     var f = (faixas || FAIXAS)[grandeza];

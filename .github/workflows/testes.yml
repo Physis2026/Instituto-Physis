@@ -1,0 +1,36 @@
+# Testes em Linux a cada envio (decisão D22, 15/11/2026): o servidor final da Physis é Linux.
+# Roda a mesma suíte do computador de desenvolvimento, sem chaves nem segredos.
+name: testes-linux
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONWARNINGS: ignore
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Node só para os testes que comparam o JavaScript com o Python (ex.: espelho do carbono)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Cópias embutidas iguais aos originais
+        run: |
+          python ferramentas/sincronizar.py --conferir
+          python demos/gerar_demos.py --conferir
+      - name: Suíte completa
+        working-directory: physis-hub
+        run: python -W ignore -m unittest discover -s tests

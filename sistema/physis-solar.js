@@ -66,7 +66,7 @@ function calcular(p) { p = p || {}; const H = p.H || [], T = Array.isArray(p.T) 
   const meses = H.map((h, i) => { const tc = tCelula(T[i], m.noct, g), ft = fTemp(tc, m.gamma_pmax); return { H:h, T:T[i], tc, f_temp:ft, pr:fixo * ft, fp:fpM[i], kwh_kwp:h * fpM[i] * DIAS[i] * fixo * ft }; });
   const rend = meses.reduce((s, x) => s + x.kwh_kwp, 0), hPlano = H.reduce((s, h, i) => s + h * fpM[i] * DIAS[i], 0), pr = hPlano ? rend / hPlano : null;
   const alvo = p.consumo > 0 ? p.consumo * (p.cobertura == null ? 1 : p.cobertura) : null;
-  const kwpNec = alvo != null && rend > 0 ? alvo / rend : (p.kwp || 0), placas = Math.ceil(kwpNec * 1000 / m.pmax - 1e-9), kwp = placas * m.pmax / 1000;
+  const kwpNec = p.kwp_fixo > 0 ? p.kwp_fixo : alvo != null && rend > 0 ? alvo / rend : (p.kwp || 0), placas = Math.ceil(kwpNec * 1000 / m.pmax - 1e-9), kwp = placas * m.pmax / 1000;
   const ger = kwp * rend, deg = (p.deg != null ? p.deg : m.deg) / 100, vida = p.vida || 25;
   let somaVida = 0; for (let a = 0; a < vida; a++) somaVida += ger * Math.pow(1 - deg, a);
   /* cascata de perdas (kWh por ano, na ordem aplicada) */
@@ -98,35 +98,41 @@ function ler() { if (typeof calcLer === "function") return calcLer("solar") || {
 function gravar(o) { if (typeof calcGravar === "function") return calcGravar("solar", o); try { localStorage.setItem("physis-calc-solar", JSON.stringify(o)); } catch (e) {} }
 const num = s => { if (s == null || String(s).trim() === "") return null; const v = typeof numBr === "function" ? numBr(s) : parseFloat(String(s).replace(",", ".")); return v == null || !isFinite(v) ? null : v; };
 const ou = (a, b) => a == null ? b : a;
-function lugar(o) { const L = ui.clima && ui.clima.local, lat = ou(num(o.lat), L && L.lat != null ? +L.lat : -22.5), lon = ou(num(o.lon), L && L.lon != null ? +L.lon : -43.18); return { lat, lon }; }
-function sol(o, P) { const k = P.lat.toFixed(2) + "," + P.lon.toFixed(2);
+/* o local único da plataforma (localDaInstalacao: Planejador > Início > Monitoramento); sem ele, nada de ponto padrão */
+function lugar(o) { const L = typeof localDaInstalacao === "function" ? localDaInstalacao() : { lat:null, lon:null }, lat = ou(num(o.lat), L.lat), lon = ou(num(o.lon), L.lon); return { lat, lon, fonte:num(o.lat) != null ? "digitado" : L.fonte }; }
+function sol(o, P) { if (P.lat == null || P.lon == null) return { H:null, medido:false }; const k = P.lat.toFixed(2) + "," + P.lon.toFixed(2);
   if (typeof carregarGisSolar === "function") carregarGisSolar(P.lat, P.lon);
   const g = ui.gisSolar, medido = g && g.ponto && ui.gisSolarKey === k ? g.ponto.meses : null;
   if (medido) return { H:medido, medido:true };
   if (typeof solMensal === "function") return { H:solMensal(P.lat, ou(num(o.kt), 0.5)), medido:false };
   return { H:null, medido:false }; }
-function temperatura(P) { if (typeof carregarGis === "function") { try { carregarGis("temperatura", P.lat, P.lon); } catch (e) {} }
+function temperatura(P) { if (P.lat == null) return null; if (typeof carregarGis === "function") { try { carregarGis("temperatura", P.lat, P.lon); } catch (e) {} }
   const g = ui.gis && ui.gis.temperatura; return g && g.ponto && Array.isArray(g.ponto.meses) ? g.ponto.meses : null; }
 
 /* telhado gravado pelo Planejador (mesmo navegador): inclinação e orientação da água escolhida para as placas */
 function telhadoPlanejador() { try { const t = JSON.parse(localStorage.getItem("physis-calc-telhado") || "null"); return t && t.incl != null ? t : null; } catch (e) { return null; } }
 const PCx = () => (typeof PhysisCalc !== "undefined" ? PhysisCalc : null);
+/* planta solar enviada (physis-calc-planta-solar, da sub-aba Planta solar): quando existe e não foi desligada, o
+   dimensionamento usa o kWp, o módulo e o plano da planta, e a geração desta aba é a única mostrada */
+function plantaSalva() { try { const p = JSON.parse(localStorage.getItem("physis-calc-planta-solar") || "null"); return p && p.kwp > 0 ? p : null; } catch (e) { return null; } }
 function entradas(o) { const P = lugar(o), S = sol(o, P), Tm = temperatura(P), mods = modulos(), invs = inversores();
-  const m0 = mods.find(x => x.id === o.mod) || mods[0], v0 = invs.find(x => x.id === o.inv) || invs[0];
+  const PL = o.usar_planta === "0" ? null : plantaSalva();
+  const m0 = mods.find(x => x.id === o.mod) || (PL && PL.modulo && mods.find(x => x.id === PL.modulo.id)) || mods[0], v0 = invs.find(x => x.id === o.inv) || invs[0];
   const m = Object.assign({}, m0, { pmax:ou(num(o.placa), m0.pmax), area:ou(num(o.m2placa), m0.area), voc:ou(num(o.voc), m0.voc), vmp:ou(num(o.vmp), m0.vmp), isc:ou(num(o.isc), m0.isc),
     beta_voc:ou(num(o.beta), m0.beta_voc), gamma_pmax:ou(num(o.gamma), m0.gamma_pmax), noct:ou(num(o.noct), m0.noct) });
   const v = Object.assign({}, v0, { vdc_max:ou(num(o.vdc_max), v0.vdc_max), mppt_min:ou(num(o.mppt_min), v0.mppt_min), mppt_max:ou(num(o.mppt_max), v0.mppt_max), n_mppt:ou(num(o.n_mppt), v0.n_mppt), imax_mppt:ou(num(o.imax_mppt), v0.imax_mppt) });
   let consumo = num(o.consumo); if (consumo == null) { try { if (typeof carbCalc === "function" && typeof carbLer === "function") { const ca = carbCalc(carbLer()); if (ca && ca.kwh != null) consumo = ca.kwh; } } catch (e) {} }
   const tAmb = num(o.tamb), T = tAmb != null ? DIAS.map(() => tAmb) : Tm;
   /* plano das placas: inclinação e orientação digitadas, senão as do telhado do Planejador, senão o fator digitado (1 = horizontal) */
-  const tp = telhadoPlanejador(), incl = ou(num(o.incl), tp ? +tp.incl : null), azim = ou(num(o.azim), tp ? +tp.azim : 0), Hh = S.H || DIAS.map(() => 0);
-  const pl = incl != null && PCx() ? PCx().fatorPlano(Hh, P.lat, incl, azim) : null;
+  const tp = telhadoPlanejador(), incl = ou(num(o.incl), PL && PL.incl != null ? +PL.incl : tp ? +tp.incl : null), azim = ou(num(o.azim), PL && PL.azim != null ? +PL.azim : tp ? +tp.azim : 0), Hh = S.H || DIAS.map(() => 0);
+  const pl = PL && num(o.incl) == null && Array.isArray(PL.fator_plano_mensal) && PL.fator_plano_mensal.length === 12 ? { fator:PL.fator_plano_mensal, anual:PL.fator_plano_mensal.reduce((s, f, i) => s + f * Hh[i] * DIAS[i], 0) / Math.max(1e-9, Hh.reduce((s, h, i) => s + h * DIAS[i], 0)), planta:true }
+    : incl != null && PCx() ? PCx().fatorPlano(Hh, P.lat, incl, azim) : null;
   const disp = PCx() ? PCx().premissa("tarifa.custo_disponibilidade") : null, lig = o.ligacao || "bifasico";
-  return { P, S, m, v, mods, invs, temBase:base().length > 0, Tfonte:tAmb != null ? "digitada" : Tm ? "base" : "padrão",
-    plano:{ incl, azim, fonte:num(o.incl) != null ? "digitada" : tp ? "Planejador" : null, fator:pl, telhado:tp },
+  return { P, S, m, v, mods, invs, temBase:base().length > 0, planta:PL, temPlanta:!!plantaSalva(), Tfonte:tAmb != null ? "digitada" : Tm ? "base" : "padrão",
+    plano:{ incl, azim, fonte:num(o.incl) != null ? "digitada" : PL ? "Planta solar" : tp ? "Planejador" : null, fator:pl, telhado:tp },
     p:{ H:Hh, T, fator_plano:pl ? pl.fator : ou(num(o.fp), 1),
       autoconsumo:ou(num(o.autoconsumo), 100) / 100, fio_b:num(o.fio_b), ano:ou(num(o.ano), new Date().getFullYear()), regra:o.regra || "lei14300",
-      disponibilidade:disp && disp[lig] != null ? disp[lig] : null, consumo:consumo || 0, cobertura:ou(num(o.cobertura), 100) / 100, kwp:num(o.kwp) || 0, modulo:m, inversor:v,
+      disponibilidade:disp && disp[lig] != null ? disp[lig] : null, consumo:consumo || 0, cobertura:ou(num(o.cobertura), 100) / 100, kwp:num(o.kwp) || 0, kwp_fixo:PL ? +PL.kwp : 0, modulo:m, inversor:v,
       perdas:{ sombra:ou(num(o.sombra), PERDAS_PADRAO.sombra), sujeira:ou(num(o.sujeira), PERDAS_PADRAO.sujeira), mismatch:ou(num(o.mismatch), PERDAS_PADRAO.mismatch), cabos_cc:ou(num(o.cabos_cc), PERDAS_PADRAO.cabos_cc), cabos_ca:ou(num(o.cabos_ca), PERDAS_PADRAO.cabos_ca) },
       eta_inv:num(o.eta_inv) != null ? num(o.eta_inv) / 100 : v.eta, g_op:ou(num(o.g_op), 800), deg:ou(num(o.deg), m.deg), vida:ou(num(o.vida), 25), razao:ou(num(o.razao), 1.2), pca:num(o.pca),
       tmin:ou(num(o.tmin), 0), tmax:ou(num(o.tmax), 40), tarifa:num(o.tarifa), custo_kwp:num(o.custo_kwp), taxa:num(o.taxa), infl:num(o.infl) } }; }
@@ -134,7 +140,9 @@ function entradas(o) { const P = lugar(o), S = sol(o, P), Tm = temperatura(P), m
 /* campos do solarCalc() antigo, para o resto da plataforma */
 /* banco de baterias: regra única (PhysisCalc.bateria = consumo diário × horas ÷ 24 ÷ DoD ÷ rendimento, premissas bateria.*) */
 const bateriaKwh = (consumoAno, autH, dod) => { const pc = PCx(); return autH > 0 && consumoAno > 0 ? (pc ? pc.bateria(consumoAno / 365, autH, dod) : consumoAno / 365 / 24 * autH / dod / 0.95) : 0; };
-function compat() { const o = ler(), E = entradas(o), R = calcular(E.p), autH = ou(num(o.autonomia), 0), dod = { litio:0.9, agm:0.5 }[o.bateria || "litio"] || 0.9, consumo = E.p.consumo;
+function compat() { const o = ler(), E = entradas(o);
+  if (E.P.lat == null) return { semLocal:true, lat:null, kt:0.5, pr:null, consumo:E.p.consumo, kwp:0, placas:0, area:0, ger:0, rend:0, H:[], hpsMin:0, tarifa:E.p.tarifa, invest:null, econ:null, bat:0, autH:0, dod:0.9, medido:false };
+  const R0 = null, R = calcular(E.p), autH = ou(num(o.autonomia), 0), dod = { litio:0.9, agm:0.5 }[o.bateria || "litio"] || 0.9, consumo = E.p.consumo;
   return { lat:E.P.lat, kt:ou(num(o.kt), 0.5), pr:R.pr, consumo, kwp:R.kwp, placas:R.placas, area:R.area, ger:R.ger, rend:R.rend, H:E.p.H, hpsMin:Math.min.apply(null, E.p.H),
     tarifa:E.p.tarifa, invest:R.invest, econ:R.econ, bat:bateriaKwh(consumo, autH, dod), autH, dod, medido:E.S.medido }; }
 
@@ -166,7 +174,15 @@ function metodologia() { return `<details class="cartao"><summary><h2 style="dis
   <li>Lei 14.300/2022 — marco da micro e minigeração distribuída e do sistema de compensação de energia (inclusive a transição da cobrança pelo uso da rede); ANEEL REN 1.059/2023 — regras de acesso, prazos e faturamento que regulamentam a lei; PRODIST Módulo 3 — procedimentos de acesso da distribuidora.</li>
   <li>Inmetro — registro de módulos e inversores (conferir a portaria vigente).</li></ul></details>`; }
 
-function telaSolar() { const o = ler(), E = entradas(o), R = calcular(E.p), M = E.m, V = E.v;
+const TITULO_SOLAR = "<h1>Energia solar</h1>";   /* um só título (com ou sem o local) */
+const SUBS_SOLAR = [["calculo", "Dimensionamento"], ["planta", "Planta solar (BIM)"]];
+function subSolar() { const s = typeof ui !== "undefined" && ui && ui.solSub; return SUBS_SOLAR.some(x => x[0] === s) ? s : "calculo"; }
+function chipsSolar() { const at = subSolar();
+  return `<div class="chips" role="group" aria-label="Partes da Energia solar">${SUBS_SOLAR.map(([k, n]) => `<button type="button" id="so-sub-${k}" data-sol-sub="${k}" aria-pressed="${k === at}">${n}${k === "planta" ? ' <span class="selo at">Em desenvolvimento</span>' : ""}</button>`).join("")}</div>`; }
+function telaSolar() { if (subSolar() === "planta") return TITULO_SOLAR + chipsSolar() + (window.PhysisMapeamento && PhysisMapeamento.telaPlantaSolar ? PhysisMapeamento.telaPlantaSolar() : `<p class="faixa in" role="status">A planta solar vem do módulo Mapeamento, que não está nesta instalação.</p>`);
+  const o = ler(), E = entradas(o);
+  if (E.P.lat == null) return `${TITULO_SOLAR}${chipsSolar()}${typeof avisoSemLocal === "function" ? avisoSemLocal() : '<p class="faixa at" role="status">Local não informado — preencha na página Início.</p>'}<p class="t2">Sem o local, a solar não calcula o sol do lugar nem a geração. Também dá para digitar latitude e longitude só para esta tela:</p><div class="precos">${campo(o, "lat", "Latitude", "ex.: -22,505")}${campo(o, "lon", "Longitude", "ex.: -43,183")}</div>${metodologia()}`;
+  const R = calcular(E.p), M = E.m, V = E.v;
   const fontS = E.S.medido ? "Irradiação medida por satélite (NASA POWER, média de longo prazo), guardada no servidor." : E.S.H ? "Estimativa pela latitude (a base ainda não respondeu para este ponto)." : "Sem dado de sol: informe a localização.";
   const fontT = { base:"temperatura média mensal da base aberta (NASA POWER)", digitada:"temperatura digitada", "padrão":"25 °C (sem a base; digite a média do lugar)" }[E.Tfonte];
   const ent = `<section class="cartao" aria-labelledby="h-so-ent"><h2 id="h-so-ent">Dados do lugar e do consumo</h2><div class="precos">
@@ -191,10 +207,13 @@ function telaSolar() { const o = ler(), E = entradas(o), R = calcular(E.p), M = 
     ${campo(o, "sombra", "Sombreamento (%)", "0", "Do estudo de sombra do Planejador ou medição.")}${campo(o, "sujeira", "Sujeira (%)", "2")}${campo(o, "mismatch", "Descasamento entre módulos (%)", "1,5")}
     ${campo(o, "cabos_cc", "Cabos CC (%)", "1,5")}${campo(o, "cabos_ca", "Cabos CA (%)", "1")}${campo(o, "g_op", "Irradiância de operação para a temperatura (W/m²)", "800")}
     ${campo(o, "deg", "Degradação anual (%)", n2(M.deg, 2))}${campo(o, "vida", "Vida útil (anos)", "25")}</div><p class="t2 pq">Padrões típicos de partida; ajuste ao projeto.</p></section>`;
-  const res = `<div class="grade">${cartao("so-kwp", "Potência", f1(R.kwp, 2), "kWp · " + R.placas + " módulos · " + f1(R.area, 0) + " m²")}
-    ${cartao("so-ger", "Geração no 1º ano", f1(R.ger, 0), "kWh · " + f1(R.rend, 0) + " kWh por kWp · média na vida útil " + f1(R.ger_media_vida, 0) + " kWh/ano")}
+  const fonteSis = E.planta ? `Fonte: planta solar (${esc(E.planta.superficie && E.planta.superficie.nome || "")}), com as contas desta aba` : "Fonte: dimensionado pelo consumo (ou pela potência digitada)";
+  const usar = E.temPlanta ? `<div class="precos">${lista(o, "usar_planta", "Sistema usado nas contas", [["1", "O da planta solar"], ["0", "Dimensionar pelo consumo"]], "1")}</div>` : "";
+  const res = `${usar}<div class="grade">${cartao("so-kwp", "Potência", f1(R.kwp, 2), "kWp · " + R.placas + " módulos · " + f1(R.area, 0) + " m²", `<span class="t2 pq">${fonteSis}</span>`)}
+    ${cartao("so-ger", "Geração no 1º ano", f1(R.ger, 0), "kWh · " + f1(R.rend, 0) + " kWh por kWp · média na vida útil " + f1(R.ger_media_vida, 0) + " kWh/ano", `<span class="t2 pq">${fonteSis}</span>`)}
     ${cartao("so-pr", "Rendimento global (PR)", R.pr == null ? "—" : f1(R.pr * 100, 1) + "%", "calculado pelas perdas abaixo")}
-    ${cartao("so-inv", "Inversor", f1(R.pca, 2), "kW CA · relação CC/CA " + f1(R.razao, 2))}</div>${R.avisos.length ? `<div class="faixa at" role="status"><ul>${R.avisos.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}`;
+    ${cartao("so-inv", "Inversor", f1(R.pca, 2), "kW CA · relação CC/CA " + f1(R.razao, 2))}</div>
+    ${typeof PhysisCalc !== "undefined" && PhysisCalc.potencias ? PhysisCalc.potenciasHtml([["Inversor na potência nominal", PhysisCalc.potencias(R.pca, num(o.fp_inv))]], /^en/i.test(document.documentElement.lang), "Potências na saída do inversor (FP: o da folha do inversor, se digitado)") + campo(o, "fp_inv", "Fator de potência do inversor (0 a 1)", "da folha de dados", "Vazio = premissa da base (a conferir).") : ""}${R.avisos.length ? `<div class="faixa at" role="status"><ul>${R.avisos.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}`;
   const casc = `<section class="cartao" aria-labelledby="h-so-casc"><h2 id="h-so-casc">Para onde vai a energia</h2>${hbar("Perdas por etapa, kWh por ano", R.cascata.map(x => ({ rot:x.nome, v:x.kwh })), "kWh/ano")}
     <div class="rolagem"><table><caption>Perdas em cascata: de ${f1(R.bruta, 0)} kWh (potência nominal × sol no plano) a ${f1(R.ger, 0)} kWh entregues</caption><thead><tr><th scope="col">Etapa</th><th scope="col">Perda (%)</th><th scope="col">Perda (kWh/ano)</th></tr></thead><tbody>
     ${R.cascata.map(x => `<tr><th scope="row">${esc(x.nome)}</th><td>${f1(x.pct, 1)}</td><td>${f1(x.kwh, 0)}</td></tr>`).join("")}</tbody></table></div></section>`;
@@ -220,15 +239,17 @@ function telaSolar() { const o = ler(), E = entradas(o), R = calcular(E.p), M = 
     ${lista(o, "ligacao", "Tipo de ligação", [["monofasico", "Monofásica"], ["bifasico", "Bifásica"], ["trifasico", "Trifásica"]], "bifasico")}
     ${lista(o, "regra", "Pedido de acesso à rede", [["lei14300", "Depois de 07/01/2023 (regra de transição)"], ["antiga", "Até 07/01/2023 (regra antiga até 2045)"]], "lei14300")}</div>${leiTab}${finTab}${bat ? `<p class="t2">Bateria: <strong>${f1(bat, 1)} kWh</strong> para ${f1(autH, 0)} h de autonomia.</p>` : ""}</section>`;
   const mapa = typeof mapaCalorSolar === "function" ? mapaCalorSolar(E.P.lat, E.P.lon) : "";
-  return `<h1>Energia solar</h1><p class="t2 apoio">Potencial do lugar, perdas uma a uma, tamanho do sistema, inversor e strings, e o retorno. A geração calculada aqui vai para o Carbono e para a Gestão (compras e investimentos).</p>${ent}${eq}${per}${mapa}${res}${casc}${mes}${st}${fin}${metodologia()}`; }
+  return `${TITULO_SOLAR}${chipsSolar()}<p class="t2 apoio">Potencial do lugar, perdas uma a uma, tamanho do sistema, inversor e strings, e o retorno. A geração calculada aqui vai para o Carbono e para a Gestão (compras e investimentos).</p>${ent}${eq}${per}${mapa}${res}${casc}${mes}${st}${fin}${metodologia()}`; }
 
 /* ════════ Eventos (atributos data-sol-…) ════════ */
 if (typeof document !== "undefined" && !window.__solEventos) { window.__solEventos = true;
   document.addEventListener("change", ev => { const t = ev.target; if (!t || !t.dataset || !t.dataset.solK) return; const o = Object.assign({}, ler()), k = t.dataset.solK; o[k] = t.value.trim();
     if (k === "mod") ["placa", "m2placa", "voc", "vmp", "isc", "beta", "gamma", "noct", "deg"].forEach(x => { o[x] = ""; });
     if (k === "inv") ["eta_inv", "vdc_max", "mppt_min", "mppt_max", "n_mppt", "imax_mppt"].forEach(x => { o[x] = ""; });
-    gravar(o); const id = t.id; desenhar(false); const x = el(id); if (x) x.focus(); }); }
+    gravar(o); const id = t.id; desenhar(false); const x = el(id); if (x) x.focus(); });
+  document.addEventListener("click", ev => { const b = ev.target && ev.target.closest ? ev.target.closest("button[data-sol-sub]") : null; if (!b) return;
+    if (typeof ui !== "undefined" && ui) ui.solSub = b.dataset.solSub; desenhar(false); const x = el(b.id); if (x) x.focus(); }); }
 
-window.SOLAR = { calcular, strings, tCelula, fTemp, compat, MODULOS, INVERSORES, PERDAS_PADRAO };
+window.SOLAR = { calcular, strings, tCelula, fTemp, compat, plantaSalva, MODULOS, INVERSORES, PERDAS_PADRAO };
 window.telaSolar = telaSolar;   /* global: a plataforma chama telaSolar() na hora de desenhar */
 })();

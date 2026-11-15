@@ -13,6 +13,8 @@ Este módulo não fala com nenhuma rede.
   ler_lote(con, lote_id) / listar_lotes(con)
   registrar_ancoragem(con, lote_id, metodo, referencia)  -> anota onde o resumo foi registrado (ex.: blockchain)
   exportar_banco_leitura(con, destino) -> arquivo SQLite separado, só para leitura, para auditor ou parceiro
+  lote_diario(con, dia, ...)           -> lote do dia anterior com os registros validados (Hub.fechar_lote_diario,
+                                          chamado pelo laço diário do hub; PHYSIS_LOTE_DIARIO=0 desliga)
 """
 from __future__ import annotations
 
@@ -20,6 +22,7 @@ import datetime as _dt
 import hashlib
 import json
 import sqlite3
+from collections import Counter
 from pathlib import Path
 
 ESQUEMA = "physis-lote/1"
@@ -56,11 +59,12 @@ def problemas_do_registro(r) -> list[str]:
 
 
 def fechar_lote(registros: list[dict], *, lote_id: str, periodo: tuple[str, str], responsavel: str,
-                dicionario: str, aceitar_suspeitos: bool = False) -> dict:
+                dicionario: str, aceitar_suspeitos: bool = False, fechado_em: str | None = None) -> dict:
     """Fecha o lote. Recusa registro incompleto, id repetido e (por padrão) dado suspeito."""
     erros = [e for r in registros for e in problemas_do_registro(r)]
     ids = [r.get("id") for r in registros if isinstance(r, dict)]
-    erros += [f"{i}: id repetido" for i in sorted({i for i in ids if ids.count(i) > 1})]
+    contagem = Counter(ids)                       # Counter: lote diário pode ter muitos registros (ids.count seria n²)
+    erros += [f"{i}: id repetido" for i in sorted((i for i, n in contagem.items() if n > 1), key=str)]
     if not aceitar_suspeitos:
         erros += [f"{r['id']}: dado suspeito (revisar antes de fechar)" for r in registros
                   if isinstance(r, dict) and r.get("qualidade") == "suspeito"]
@@ -72,7 +76,7 @@ def fechar_lote(registros: list[dict], *, lote_id: str, periodo: tuple[str, str]
     corpo = {"esquema": ESQUEMA, "lote": lote_id, "periodo": list(periodo), "responsavel": responsavel,
              "dicionario": dicionario, "quantidade": len(ordenados),
              "registros": [dict(r, resumo=resumo({k: v for k, v in r.items() if k != "resumo"})) for r in ordenados]}
-    return dict(corpo, fechado_em=_dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"),
+    return dict(corpo, fechado_em=fechado_em or _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="seconds"),
                 resumo_lote=resumo(corpo))
 
 
@@ -209,6 +213,89 @@ def exportar_banco_leitura(con: sqlite3.Connection, destino: str | Path) -> Path
     finally:
         saida.close()
     return destino
+
+
+# ── Lote diário automático (ruptura R6 do mapa de variáveis, 15/11/2026) ─────────────────────────
+DICIONARIO = "physis-variaveis/1"        # sistema/physis-variaveis.json: nome, unidade e origem de cada grandeza
+# leituras de água digitadas na plataforma (chave physis-ph-leituras do cliente): campo -> (grandeza, unidade)
+AGUA_CAMPOS = {"ph": ("ph", "pH"), "turb": ("turbidez", "uT"), "cloro": ("cloro", "mg/L")}
+# O que está em medicao já passou na validação do protocolo (campo fora da faixa física é descartado antes). O alarme
+# (ok, baixo, alto, sem_faixa) é de OPERAÇÃO (ex.: fator de potência abaixo de 0,92, bateria baixa): vai no registro e
+# não tira o dado do lote. Fica fora só o que não tem unidade no contrato (não dá para registrar sem unidade).
+
+
+def _iso(t: float) -> str:
+    return _dt.datetime.fromtimestamp(t, _dt.timezone.utc).isoformat(timespec="seconds")
+
+
+def registros_do_dia(con: sqlite3.Connection, ini: float, fim: float, *, org: str, lugar: str) -> tuple[list[dict], int]:
+    """(registros validados entre ini e fim, quantos ficaram fora por não ter unidade). Medições da rede V6 (tabela medicao;
+    hora do aparelho, ou a de chegada quando o nó não tem relógio) e leituras de água digitadas (cliente_estado)."""
+    from . import nucleo                  # tardio: integridade não depende do núcleo para o resto
+    regs, fora = [], 0
+    t_sql = "CASE WHEN m.ts > 0 THEN m.ts ELSE l.recebido END"
+    try:
+        linhas = con.execute(f"SELECT m.seq, m.grandeza, m.ativo, m.valor, m.alarme, m.ts, {t_sql}, l.seq, l.origem "
+                             f"FROM medicao m JOIN leitura l ON l.seq = m.leitura WHERE {t_sql} >= ? AND {t_sql} < ? "
+                             "ORDER BY m.seq", (ini, fim)).fetchall()
+    except sqlite3.Error:
+        linhas = []
+    for seq, grandeza, ativo, valor, alarme, ts, t, leitura, origem in linhas:
+        unidade = nucleo.unidade(grandeza)
+        if not unidade:
+            fora += 1
+            continue
+        regs.append({"id": f"m{seq}", "grandeza": grandeza, "valor": valor, "unidade": unidade, "quando": _iso(t), "alarme": alarme,
+                     "origem": {"aparelho": ativo, "local": lugar, "leitura": leitura, "via": origem,
+                                "relogio": "aparelho" if ts and ts > 0 else "chegada"},
+                     "metodo": {"contrato": nucleo.VERSAO_CONTRATO, "dicionario": DICIONARIO}, "qualidade": "valido"})
+    try:
+        r = con.execute("SELECT valor FROM cliente_estado WHERE org=? AND chave='physis-ph-leituras'", (org,)).fetchone()
+        lista = json.loads(r[0]) if r else []
+    except (sqlite3.Error, ValueError):
+        lista = []
+    vistos: set[str] = set()
+    for it in lista if isinstance(lista, list) else []:
+        if not isinstance(it, dict) or it.get("exemplo"):
+            continue
+        try:
+            q = _dt.datetime.fromisoformat(str(it.get("q") or "").replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        if q.tzinfo is None or not ini <= q.timestamp() < fim:
+            continue
+        for campo, (grandeza, unidade) in AGUA_CAMPOS.items():
+            v = it.get(campo)
+            if isinstance(v, bool) or not isinstance(v, (int, float)) or v != v:
+                continue
+            ponto = str(it.get("ponto") or "")
+            ident = f"agua:{q.isoformat()}:{ponto}:{grandeza}"
+            if ident in vistos:
+                continue                      # a mesma leitura lançada duas vezes entra uma vez
+            vistos.add(ident)
+            regs.append({"id": f"agua:{q.isoformat()}:{ponto}:{grandeza}", "grandeza": grandeza, "valor": v, "unidade": unidade,
+                         "quando": _iso(q.timestamp()), "origem": {"aparelho": "manual:" + (ponto or "agua"), "local": lugar,
+                                                                    "via": str(it.get("origem") or "manual")},
+                         "metodo": {"contrato": "physis/1", "dicionario": DICIONARIO}, "qualidade": "valido"})
+    return regs, fora
+
+
+def lote_diario(con: sqlite3.Connection, dia: str, *, org: str, lugar: str, fuso, fechado_em: str | None = None) -> dict:
+    """Fecha e guarda o lote de um dia (AAAA-MM-DD no fuso dado). Uma vez só: lote já guardado = repetido.
+    Dia sem registro validado: nenhum lote (fechar_lote recusa lote vazio)."""
+    lote_id = f"dia-{org}-{lugar}-{dia}"
+    if con.execute("SELECT 1 FROM integridade_lote WHERE lote=?", (lote_id,)).fetchone():
+        return {"ok": True, "repetido": True, "lote": lote_id, "dia": dia}
+    d = _dt.datetime.strptime(dia, "%Y-%m-%d").replace(tzinfo=fuso)
+    ini, fim = d.timestamp(), (d + _dt.timedelta(days=1)).timestamp()
+    regs, fora = registros_do_dia(con, ini, fim, org=org, lugar=lugar)
+    if not regs:
+        return {"ok": True, "vazio": True, "dia": dia, "sem_unidade_fora": fora}
+    lote = fechar_lote(regs, lote_id=lote_id, periodo=(_iso(ini), _iso(fim)), responsavel="hub (lote diário automático)",
+                       dicionario=DICIONARIO, fechado_em=fechado_em)
+    guardar_lote(con, lote)
+    return {"ok": True, "lote": lote_id, "dia": dia, "quantidade": lote["quantidade"], "sem_unidade_fora": fora,
+            "resumo_lote": lote["resumo_lote"]}
 
 
 def abrir_leitura(caminho: str | Path) -> sqlite3.Connection:

@@ -16,6 +16,8 @@ TIPOS = {
     "COM": "Comedouro (AutoFeeder)",
     "PLUV": "Pluviometro de bascula",
     "SEC": "Secador solar (a homologar)",
+    "ENE": "Medidor de energia (potencia ativa, tensao, corrente, fator de potencia)",
+    "HID": "Medidor de agua (vazao e pressao)",
 }
 # MED e PUL (Saude) nunca passam por aqui: o hub as entrega a saude.py antes (dado sensivel fora de `medicao`).
 INTENSIDADE_INTERVALO_MAX_S = 3 * 3600     # intervalo maior que isso: a intensidade nao e calculada
@@ -92,6 +94,10 @@ def interpretar(campos: dict[str, str]) -> dict:
         b = lambda k: None if para_float(campos.get(k)) is None else para_bool(campos.get(k))
         est.update({"ti": f("TI"), "ui": f("UI"), "te": f("TE"), "ue": f("UE"), "tc": f("TC"),
                     "vent": b("VENT"), "abt": b("ABT"), "peso": f("PESO"), "irr": f("IRR")})
+    elif tipo == "ENE":
+        est.update({"pw": f("PW"), "qr": f("QR"), "s": f("S"), "v": f("V"), "i": f("I"), "fp": f("FP")})
+    elif tipo == "HID":
+        est.update({"q": f("Q"), "pr": f("PR")})
     return est
 
 
@@ -144,4 +150,15 @@ def adaptar(campos: dict[str, str], org: str, lugar: str, intervalo_s: float | N
             _m(out, org, "estado", base + "-ventilador", 1.0 if e["vent"] else 0.0, ts)
         if e["abt"] is not None:
             _m(out, org, "estado", base + "-tampa", 1.0 if e["abt"] else 0.0, ts)
+    elif e["tipo"] == "ENE":
+        # "energia" no contrato physis/1 é potência ativa em kW (nucleo.FAIXAS); o modelo de consumo faz média do dia × 24 h
+        _m(out, org, "energia", base, e["pw"], ts)
+        _m(out, org, "potencia_reativa", base, e["qr"], ts)      # só o medido; P, Q, S e FP do dia: aprendizado.potencias_dia
+        _m(out, org, "potencia_aparente", base, e["s"], ts)
+        _m(out, org, "tensao", base, e["v"], ts)
+        _m(out, org, "corrente", base, e["i"], ts)
+        _m(out, org, "fp", base, e["fp"], ts)
+    elif e["tipo"] == "HID":
+        _m(out, org, "vazao", base, e["q"], ts)
+        _m(out, org, "pressao", base, e["pr"], ts)
     return out

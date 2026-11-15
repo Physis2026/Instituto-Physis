@@ -42,7 +42,16 @@
    "nome": "Planejador",
    "tipo": "modulo",
    "responsaveis": [
-    "Rafaella"
+    "Rafaella",
+    "Eric Oliveira",
+    "Erick Lopes",
+    "Arthur",
+    "Rafael",
+    "Emerson",
+    "Ryan",
+    "Laura",
+    "Marzia",
+    "Leonardo Macedo"
    ],
    "metodologia": "planejador",
    "doc17_secao": "Planejador",
@@ -264,8 +273,8 @@
    "nome": "Turbinas",
    "tipo": "modulo",
    "responsaveis": [
-    "Ryan",
-    "Emerson"
+    "Emerson",
+    "Ryan"
    ],
    "metodologia": "turbinas",
    "doc17_secao": "Turbinas",
@@ -356,8 +365,8 @@
    "nome": "SbN e viveiro",
    "tipo": "modulo",
    "responsaveis": [
-    "Rafaella",
-    "Erick Lopes"
+    "Erick Lopes",
+    "Rafaella"
    ],
    "metodologia": "sbn",
    "doc17_secao": "SbN e viveiro",
@@ -409,8 +418,8 @@
    "nome": "Economia circular",
    "tipo": "modulo",
    "responsaveis": [
-    "Rafaella",
-    "Rafael"
+    "Rafael",
+    "Rafaella"
    ],
    "metodologia": "circular",
    "doc17_secao": "Economia circular",
@@ -459,7 +468,8 @@
    "nome": "Carbono e ESG",
    "tipo": "modulo",
    "responsaveis": [
-    "Marzia"
+    "Marzia",
+    "Laura"
    ],
    "metodologia": "carbono",
    "doc17_secao": "Carbono",
@@ -520,8 +530,8 @@
    "nome": "Resiliência climática",
    "tipo": "modulo",
    "responsaveis": [
-    "Rafaella",
-    "Arthur"
+    "Arthur",
+    "Rafaella"
    ],
    "metodologia": "resiliencia",
    "doc17_secao": "Resiliência climática",
@@ -572,9 +582,10 @@
    "nome": "Certificações",
    "tipo": "modulo",
    "responsaveis": [
-    "Rafaella",
+    "Erick Lopes",
+    "Ryan",
     "Laura",
-    "Ryan"
+    "Rafaella"
    ],
    "metodologia": "certificacoes",
    "doc17_secao": "Certificações",
@@ -628,7 +639,8 @@
    "nome": "Equipamentos e materiais",
    "tipo": "modulo",
    "responsaveis": [
-    "Ryan"
+    "Ryan",
+    "Erick Lopes"
    ],
    "metodologia": null,
    "doc17_secao": null,
@@ -732,8 +744,8 @@
    "nome": "Saúde (telas e consentimento)",
    "tipo": "modulo",
    "responsaveis": [
-    "Emerson",
-    "Rafael"
+    "Rafael",
+    "Emerson"
    ],
    "metodologia": "saude",
    "doc17_secao": "Saúde",
@@ -826,8 +838,11 @@
    "nome": "Cursos",
    "tipo": "modulo",
    "responsaveis": [
-    "Rafaella",
-    "Laura"
+    "Laura",
+    "Marzia",
+    "Ryan",
+    "Leonardo Macedo",
+    "Rafaella"
    ],
    "metodologia": "cursos",
    "doc17_secao": null,
@@ -868,7 +883,8 @@
    "tipo": "modulo",
    "responsaveis": [
     "Arthur",
-    "Laura"
+    "Laura",
+    "Rafaella"
    ],
    "metodologia": "secador",
    "doc17_secao": null,
@@ -960,7 +976,12 @@
    "nome": "Acessibilidade, inglês e textos jurídicos",
    "tipo": "modulo",
    "responsaveis": [
-    "Rafaella"
+    "Rafaella",
+    "Arthur",
+    "Emerson",
+    "Leonardo Macedo",
+    "Laura",
+    "Marzia"
    ],
    "metodologia": "geral",
    "doc17_secao": "Toda a plataforma",
@@ -1004,6 +1025,61 @@
    "aba": "resumo"
   },
   {
+   "id": "impressao3d",
+   "nome": "Physis 3D (peças impressas com plástico reciclado)",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Rafael",
+    "Arthur",
+    "Ryan",
+    "Laura",
+    "Rafaella",
+    "Eric Oliveira",
+    "Erick Lopes",
+    "Emerson",
+    "Marzia",
+    "Leonardo Macedo"
+   ],
+   "metodologia": null,
+   "doc17_secao": null,
+   "o_que_revisar": "Em desenvolvimento. Perfis dos cinco plásticos reciclados (todos conferir), contas de medida e de estimativa de filamento, massa e tempo, regras da biblioteca (LGPD, licenças abertas, curadoria e moderação), avisos aprendidos e textos da aba. Valor sem fonte fica [CONFERIR].",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-3d-premissas.json",
+     "partes": [
+      [
+       "premissas"
+      ]
+     ]
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "physis-hub/docs/PHYSIS_3D.md",
+    "physis-hub/physis_hub/impressao3d.py",
+    "sistema/physis-3d.js",
+    "servicos/fatiador/physis_fatiador/servidor.py",
+    "physis-hub/tests/test_impressao3d.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "physis-hub/web/painel.html",
+     "como": "Abra a plataforma da Casa Physis (pesquisa) e vá à aba Physis 3D."
+    },
+    {
+     "arquivo": "ferramentas/testes-navegador/teste-physis-3d.html",
+     "como": "Abra no navegador (servido por http): tem de mostrar TUDO OK."
+    }
+   ],
+   "testes": [
+    "test_impressao3d"
+   ],
+   "aba": "impressao3d"
+  },
+  {
    "id": "hw-lora",
    "nome": "Transmissor LoRa e Receptor V6",
    "tipo": "hardware",
@@ -1045,7 +1121,11 @@
    "nome": "Caixinha Physis IoT (firmware)",
    "tipo": "hardware",
    "responsaveis": [
-    "Erick Lopes"
+    "Erick Lopes",
+    "Arthur",
+    "Rafael",
+    "Emerson",
+    "Laura"
    ],
    "metodologia": "zonas",
    "doc17_secao": "Caixinha Physis IoT",
@@ -1114,7 +1194,6 @@
    "nome": "Pluviômetro Physis",
    "tipo": "hardware",
    "responsaveis": [
-    "Rafaella",
     "Arthur"
    ],
    "metodologia": null,
@@ -1150,8 +1229,8 @@
    "nome": "Caixinha de remédios",
    "tipo": "hardware",
    "responsaveis": [
-    "Emerson",
-    "Rafael"
+    "Rafael",
+    "Emerson"
    ],
    "metodologia": null,
    "doc17_secao": "Saúde",
@@ -1261,6 +1340,72 @@
     "test_seguranca"
    ],
    "aba": "resumo"
+  },
+  {
+   "id": "mapeamento",
+   "nome": "Mapeamento (contexto do lugar, BIM e planta solar)",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Rafaella",
+    "Eric Oliveira",
+    "Erick Lopes",
+    "Arthur",
+    "Rafael",
+    "Emerson",
+    "Ryan",
+    "Laura",
+    "Marzia",
+    "Leonardo Macedo"
+   ],
+   "metodologia": null,
+   "doc17_secao": null,
+   "o_que_revisar": "Em desenvolvimento. Incidência por superfície, carta solar, sombra entre fileiras e arranjo da planta solar; as quatro premissas do arranjo (sem valor na base: [CONFERIR]); exportação IFC (BIM); textos da aba.",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-premissas.json",
+     "partes": [
+      [
+       "premissas",
+       "id=solar.arranjo_afastamento_borda"
+      ],
+      [
+       "premissas",
+       "id=solar.arranjo_folga_modulos"
+      ],
+      [
+       "premissas",
+       "id=solar.arranjo_hora_critica_inicio"
+      ],
+      [
+       "premissas",
+       "id=solar.arranjo_hora_critica_fim"
+      ]
+     ]
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "sistema/physis-mapeamento.js",
+    "physis-hub/physis_hub/mapeamento.py",
+    "physis-hub/physis_hub/ifc.py",
+    "physis-hub/docs/MAPEAMENTO.md",
+    "physis-hub/tests/test_mapeamento.py",
+    "physis-hub/tests/test_ifc.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "physis-hub/web/painel.html",
+     "como": "Abra a plataforma e vá à aba Mapeamento (Planta solar e BIM)."
+    }
+   ],
+   "testes": [
+    "test_mapeamento",
+    "test_ifc"
+   ],
+   "aba": "mapeamento"
   }
  ]
 }

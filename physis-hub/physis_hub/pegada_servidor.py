@@ -68,7 +68,9 @@ PADRAO = {
     "uso_padrao": 0.3,
     "amostra_min": 5,
 }
-FATOR_REDE_RESERVA = 0.0289    # mesmo valor do nucleo physis/1, so se a base de fatores nao estiver no pacote
+# Reserva quando a base de fatores nao esta no pacote: a premissa rede.fator_emissao (sistema/physis-premissas.json),
+# lida da base, sem numero fixo no codigo (R9, 15/11/2026). Sem as duas bases, None.
+FATOR_REDE_RESERVA = carbono.premissa("rede.fator_emissao")
 
 DICAS = (
     "Desligue ou suspenda a placa de vídeo quando nenhum modelo de IA estiver rodando: parada, ela ainda gasta de 20 a 50 W.",
@@ -373,7 +375,9 @@ class PegadaServidor:
         if m is not None and m >= 0:
             return m, "configuração do servidor"
         if not self.F.get("rede"):
-            return FATOR_REDE_RESERVA, "padrão da plataforma (base de fatores ausente)"
+            if FATOR_REDE_RESERVA is None:
+                return None, "fator da rede não informado (bases de fatores e de premissas ausentes)"
+            return float(FATOR_REDE_RESERVA), "premissa rede.fator_emissao (base de fatores ausente)"
         try:
             it = self.hub.cliente_ler(chave="physis-carbono").get("physis-carbono")
             est = json.loads(it["valor"]) if it else {}
@@ -403,7 +407,8 @@ class PegadaServidor:
                 contas = self.hub._db.execute("SELECT COUNT(*) FROM conta WHERE ativa=1").fetchone()[0]
             except Exception:      # noqa: BLE001
                 contas = 0
-        f, f_fonte = self.fator()
+        f_lido, f_fonte = self.fator()
+        f = f_lido if f_lido is not None else 0.0      # sem fator: as contas em tCO2e saem None no fim (sem chute)
         escolha = self.cfg.get("contagem") if self.cfg.get("contagem") in ("ja_contado", "somar") else "auto"
         meses: dict = {}
         por_eq: dict = {}
@@ -449,6 +454,12 @@ class PegadaServidor:
              "dicas": self.dicas(), "verificar": True}
         if detalhado:
             r["clientes"] = por_cliente(kwh_mes, f, self.cfg.get("clientes"))
+        if f_lido is None:
+            r["fator_rede"] = None
+            for d in [r["total"]] + eqs + r.get("clientes", []):
+                for k in ("t_ano", "e2_somar_t", "e3_cat1_t", "ja_contado_t"):
+                    if k in d:
+                        d[k] = None
         return r
 
     def dicas(self) -> list:

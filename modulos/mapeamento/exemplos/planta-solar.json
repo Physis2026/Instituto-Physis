@@ -1,0 +1,54 @@
+{
+ "aviso": "EXEMPLO / DADOS FICTÍCIOS — só para conferir os visualizadores; não usar em projeto",
+ "lat": -22.5,
+ "H": [
+  5.8,
+  5.9,
+  5.0,
+  4.4,
+  3.7,
+  3.4,
+  3.6,
+  4.2,
+  4.5,
+  5.0,
+  5.4,
+  5.8
+ ],
+ "modulo": {
+  "id": "fv-perc-144",
+  "comprimento_m": 2.28,
+  "largura_m": 1.13,
+  "pmax": 550
+ },
+ "regras_teste": {
+  "afastamento_m": 0.3,
+  "folga_m": 0.02
+ },
+ "aguas": [
+  {
+   "id": "casa-agua1",
+   "incl": 20.0,
+   "azim": 0.0,
+   "modulos": 9,
+   "kwp": 4.95,
+   "area_modulos_m2": 23.187599999999996,
+   "anual_kwh_m2": 1792.626357751648,
+   "curva_junho_total_kwh_m2": 4.180708287638069
+  },
+  {
+   "id": "casa-agua2",
+   "incl": 20.0,
+   "azim": 180.0,
+   "modulos": 9,
+   "kwp": 4.95,
+   "area_modulos_m2": 23.187599999999996,
+   "anual_kwh_m2": 1516.629072506448,
+   "curva_junho_total_kwh_m2": 2.300102878446985
+  }
+ ],
+ "total": {
+  "modulos": 18,
+  "kwp": 9.9
+ }
+}

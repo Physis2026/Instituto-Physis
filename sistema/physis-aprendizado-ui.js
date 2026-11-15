@@ -182,13 +182,15 @@
       + '<ul class="pau-leg" aria-hidden="true"><li><i class="pau-real"></i><span>Real</span></li><li><i class="pau-fx"></i><span>Faixa esperada</span></li><li><i class="pau-esp"></i><span>Esperado</span></li><li><i class="pau-desp"></i><span>! Possível desperdício</span></li></ul>';
   }
   function tabela(m, idc) {
-    var un = m.unidade || "";
+    var un = m.unidade || "", ene = m.grandeza === "energia";   /* energia: P, Q, S e FP do dia (regra: FP sempre na energia) */
     var linhas = (m.dias || []).map(function (d) {
       var fx = d.faixa || [], sit = d.desperdicio ? '<span class="selo al">! Possível desperdício</span>' : d.real != null && fx.length && d.real < fx[0] ? '<span class="selo in">Abaixo do normal</span>' : '<span class="selo ok">Dentro do normal</span>';
-      return "<tr" + (d.desperdicio ? ' class="pau-linha-desp"' : "") + '><th scope="row">' + esc(diaMes(d.dia)) + "</th><td>" + nf(d.real, 1) + "</td><td>" + nf(d.esperado, 1) + "</td><td>" + nf(fx[0], 1) + " – " + nf(fx[1], 1) + "</td><td>" + sit + "</td></tr>";
+      return "<tr" + (d.desperdicio ? ' class="pau-linha-desp"' : "") + '><th scope="row">' + esc(diaMes(d.dia)) + "</th><td>" + nf(d.real, 1) + "</td><td>" + nf(d.esperado, 1) + "</td><td>" + nf(fx[0], 1) + " – " + nf(fx[1], 1) + "</td>"
+        + (ene ? (function (p) { p = p || {}; return "<td>" + nf(p.q_kvarh, 1) + "</td><td>" + nf(p.s_kvah, 1) + "</td><td>" + nf(p.fp, 2) + "</td><td>" + esc(p.fp_fonte || "—") + "</td>"; })(d.potencias) : "")
+        + "<td>" + sit + "</td></tr>";
     }).join("");
     return '<div class="rolagem"><table class="pau-tab"><caption id="' + idc + '">Consumo de cada dia, real e esperado <span>(' + esc(un) + ")</span></caption><thead><tr>"
-      + '<th scope="col">Dia</th><th scope="col">Real</th><th scope="col">Esperado</th><th scope="col">Faixa normal</th><th scope="col">Situação</th></tr></thead><tbody>' + linhas + "</tbody></table></div>";
+      + '<th scope="col">Dia</th><th scope="col">Real</th><th scope="col">Esperado</th><th scope="col">Faixa normal</th>' + (ene ? '<th scope="col">Q (kvarh)</th><th scope="col">S (kVAh)</th><th scope="col">FP</th><th scope="col">De onde vem o FP</th>' : "") + '<th scope="col">Situação</th></tr></thead><tbody>' + linhas + "</tbody></table></div>";
   }
   function cartaoConsumo(n) {
     var id = "pau-h-cons", tit = "Consumo esperado × real";

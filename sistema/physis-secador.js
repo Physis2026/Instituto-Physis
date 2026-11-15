@@ -26,7 +26,7 @@ const PRODUTOS = {
 const UMIDADE_INTERNA_ALTA = 80;      /* % UR dentro do secador sem ventilação: atenção (verificar) */
 const CHUVA_PREVISTA_MM = 1.0, CHUVA_PREVISTA_PROB = 60;
 const CALOR_LATENTE_MJ_KG = 2.45, CP_AR_KJ_KG_K = 1.006, RHO_AR = 1.15, MJ_POR_KWH = 3.6, PCI_LENHA_MJ_KG = 13.0;
-const FATOR_REDE_PADRAO = 0.0289, GWP_CH4 = 28, GWP_N2O = 265, LENHA_CH4_KG_TJ = 300, LENHA_N2O_KG_TJ = 4, LENHA_CO2_KG_TJ = 112000;
+const GWP_CH4 = 28, GWP_N2O = 265, LENHA_CH4_KG_TJ = 300, LENHA_N2O_KG_TJ = 4, LENHA_CO2_KG_TJ = 112000;
 const MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 const produto = k => PRODUTOS[String(k || "").toLowerCase()] || PRODUTOS.outro;
 
@@ -68,19 +68,26 @@ function previsaoLote(l, serie) { const peso0 = +l.peso0, u0 = +l.u0, alvo = l.a
   return { peso_alvo: pa, agua_kg: aguaARemover(peso0, u0, alvo), modelo: m, horas_fim: horasAte(m, pa), medido: !m.estimado }; }
 
 /* ════════ Dimensionamento (secador de ar forçado com coletor solar) ════════ */
-function dimensionar(p) { p = p || {}; const g = (k, d) => (p[k] == null || p[k] === "" || !isFinite(+p[k])) ? d : +p[k];
-  const massa = g("massa", 0), u0 = g("u0", 60), alvo = g("alvo", 12), H = g("irradiacao", 5.0), eta = g("eta_coletor", 0.40), aprov = g("aproveitamento", 0.5);
+/* fator da rede (tCO2/MWh): o padrão da base de fatores de emissão (o mesmo do Carbono); sem ela, a premissa
+   rede.fator_emissao; sem nenhuma, null (CO2 evitado elétrico não calculado). Espelho de secador.fator_rede_padrao (R9). */
+function fatorRedePadrao() { const b = fatorRedeBase(); if (b != null) return b;
+  try { const v = typeof PhysisCalc !== "undefined" ? +PhysisCalc.premissa("rede.fator_emissao") : NaN; return isFinite(v) && v > 0 ? v : null; } catch (e) { return null; } }
+function dimensionar(p) { p = p || {}; const g = (k, d) => (p[k] == null || p[k] === "" || !isFinite(+p[k])) ? d : +p[k], avisos = [];
+  /* irradiação: a do lugar ou a digitada; sem ela, "local não informado" (como secador.py) */
+  const massa = g("massa", 0), u0 = g("u0", 60), alvo = g("alvo", 12), H = g("irradiacao", null), eta = g("eta_coletor", 0.40), aprov = g("aproveitamento", 0.5);
   const dias = g("dias", 5), horas = g("horas_sol", 8), dT = g("delta_t", 15);
-  const agua = aguaARemover(massa, u0, alvo), qEvap = agua * CALOR_LATENTE_MJ_KG, qAr = aprov > 0 ? qEvap / aprov : 0, porM2 = H * MJ_POR_KWH * eta * dias;
+  if (H == null) avisos.push("local não informado: sem a irradiação do lugar, a área do coletor não é calculada");
+  const agua = aguaARemover(massa, u0, alvo), qEvap = agua * CALOR_LATENTE_MJ_KG, qAr = aprov > 0 ? qEvap / aprov : 0, porM2 = H != null ? H * MJ_POR_KWH * eta * dias : null;
   const area = porM2 > 0 ? qAr / porM2 : null, dw = CP_AR_KJ_KG_K * dT * aprov / (CALOR_LATENTE_MJ_KG * 1000), mAr = dw > 0 ? agua / dw : null;
   const vazao = mAr && dias * horas > 0 ? mAr / RHO_AR / (dias * horas) : null;
-  const etaEl = g("eta_eletrico", 0.5), etaLe = g("eta_lenha", 0.35), lotes = g("lotes_ano", 10), fRede = g("fator_rede", FATOR_REDE_PADRAO);
+  const etaEl = g("eta_eletrico", 0.5), etaLe = g("eta_lenha", 0.35), lotes = g("lotes_ano", 10), fRede = g("fator_rede", fatorRedePadrao());
+  if (fRede == null) avisos.push("fator da rede não informado: CO2 evitado elétrico não calculado");
   const kwhEl = etaEl > 0 ? qEvap / etaEl / MJ_POR_KWH : null, kgLenha = etaLe > 0 ? qEvap / (PCI_LENHA_MJ_KG * etaLe) : null;
-  const co2El = kwhEl != null ? kwhEl * fRede : null;
+  const co2El = kwhEl != null && fRede != null ? kwhEl * fRede : null;
   let co2Le = null; if (kgLenha != null) { const tj = kgLenha * PCI_LENHA_MJ_KG / 1e6; co2Le = tj * (LENHA_CH4_KG_TJ * GWP_CH4 + LENHA_N2O_KG_TJ * GWP_N2O); if (p.lenha_nao_renovavel) co2Le += tj * LENHA_CO2_KG_TJ; }
   return { agua_kg: agua, q_evap_mj: qEvap, q_ar_mj: qAr, mj_m2_lote: porM2, area_m2: area, dw_kg_kg: dw, ar_kg: mAr, vazao_m3h: vazao,
     kwh_eletrico_lote: kwhEl, kg_lenha_lote: kgLenha, kwh_eletrico_ano: kwhEl != null ? kwhEl * lotes : null, kg_lenha_ano: kgLenha != null ? kgLenha * lotes : null,
-    co2_eletrico_kg_ano: co2El != null ? co2El * lotes : null, co2_lenha_kg_ano: co2Le != null ? co2Le * lotes : null }; }
+    co2_eletrico_kg_ano: co2El != null ? co2El * lotes : null, co2_lenha_kg_ano: co2Le != null ? co2Le * lotes : null, fator_rede: fRede, avisos }; }
 
 /* ════════ Alertas (os mesmos do hub, mais a chuva da previsão da tela) ════════ */
 function alertas(est, prod, chuva) { const out = [], p = produto(prod), ti = est.ti;
@@ -252,31 +259,33 @@ function fatorRedeBase() { try { const s = document.getElementById("base-fatores
   if (b && b.rede && b.rede.anual) { const a = b.rede.anual[b.rede.padrao]; if (a && a.valor > 0) return a.valor; } } catch (e) {} return null; }
 
 function parteDimensionamento(o) { const d = o.dim, prod = d.produto || "cafe", p = produto(prod), ir = irradiacaoDoLugar(), mes = d.mes == null || d.mes === "" ? "" : String(d.mes);
-  const irBase = ir ? (mes === "" ? Math.min(...ir.meses) : ir.meses[+mes]) : null, fr = fatorRedeBase();
+  const irBase = ir ? (mes === "" ? Math.min(...ir.meses) : ir.meses[+mes]) : null, fr = fatorRedePadrao();
   const P = { massa: num(d.massa) || 0, u0: num(d.u0) != null ? num(d.u0) : p.u0, alvo: num(d.alvo) != null ? num(d.alvo) : p.alvo,
-    irradiacao: num(d.irradiacao) != null ? num(d.irradiacao) : (irBase != null ? irBase : 5), eta_coletor: num(d.eta_coletor) != null ? num(d.eta_coletor) : 0.4,
+    irradiacao: num(d.irradiacao) != null ? num(d.irradiacao) : irBase, eta_coletor: num(d.eta_coletor) != null ? num(d.eta_coletor) : 0.4,
     aproveitamento: num(d.aproveitamento) != null ? num(d.aproveitamento) : 0.5, dias: num(d.dias) || 5, horas_sol: num(d.horas_sol) || 8, delta_t: num(d.delta_t) || 15,
     lotes_ano: num(d.lotes_ano) != null ? num(d.lotes_ano) : 10, eta_eletrico: num(d.eta_eletrico) || 0.5, eta_lenha: num(d.eta_lenha) || 0.35,
-    fator_rede: num(d.fator_rede) != null ? num(d.fator_rede) : (fr != null ? fr : FATOR_REDE_PADRAO), lenha_nao_renovavel: !!d.lenha_nr };
+    fator_rede: num(d.fator_rede) != null ? num(d.fator_rede) : fr, lenha_nao_renovavel: !!d.lenha_nr };
+  /* sem o local (página Início) e sem irradiação digitada: a área de coletor, que depende do sol do lugar, não é calculada */
+  const semLocal = !ir && num(d.irradiacao) == null;   /* sem a irradiação do lugar e sem a digitada: a área não é calculada */
   const R = dimensionar(P);
-  const origemIr = ir ? `Irradiação do lugar (NASA POWER, média de longo prazo): de ${f1(Math.min(...ir.meses), 2)} a ${f1(Math.max(...ir.meses), 2)} kWh/m² por dia. Campo vazio usa ${mes === "" ? "o mês mais fraco" : "o mês escolhido"}.`
-    : "Sem a localização do lugar (Monitoramento verde → Configuração) ou sem o servidor, digite a irradiação; vazio usa 5 kWh/m² por dia.";
+  const origemIr = semLocal ? (typeof avisoSemLocal === "function" ? avisoSemLocal() : "Local não informado — preencha na página Início.") + " Ou digite a irradiação no coletor abaixo." : ir ? `Irradiação do lugar (NASA POWER, média de longo prazo): de ${f1(Math.min(...ir.meses), 2)} a ${f1(Math.max(...ir.meses), 2)} kWh/m² por dia. Campo vazio usa ${mes === "" ? "o mês mais fraco" : "o mês escolhido"}.`
+    : "";
   const ent = `<section class="cartao" aria-labelledby="h-sec-dent"><h2 id="h-sec-dent">O que vai secar</h2><div class="precos">
     ${selProduto("sec-produto-d", prod, "dim")}${campo("massa", "Produto por lote (kg)", d.massa, "ex.: 200", null, "dim")}
     ${campo("u0", "Umidade no começo (%)", d.u0, f1(p.u0, 0), null, "dim")}${campo("alvo", "Umidade final (%)", d.alvo, f1(p.alvo, 1), null, "dim")}
     ${campo("dias", "Dias de sol por lote", d.dias, "5", null, "dim")}${campo("horas_sol", "Horas de ventilador por dia", d.horas_sol, "8", null, "dim")}
     ${campo("lotes_ano", "Lotes por ano", d.lotes_ano, "10", null, "dim")}</div></section>
-    <section class="cartao" aria-labelledby="h-sec-dsol"><h2 id="h-sec-dsol">Sol e coletor</h2><p class="t2" role="status">${origemIr}</p><div class="precos">
+    <section class="cartao" aria-labelledby="h-sec-dsol"><h2 id="h-sec-dsol">Sol e coletor</h2><div class="t2" role="status">${origemIr}</div><div class="precos">
     ${ir ? `<div><label for="sec-mes">Mês de projeto</label><select id="sec-mes" data-sec-k="mes" data-sec-m="dim" style="width:100%"><option value="" ${mes === "" ? "selected" : ""}>Mês mais fraco</option>${MESES.map((x, i) => `<option value="${i}" ${mes === String(i) ? "selected" : ""}>${x} · ${f1(ir.meses[i], 2)}</option>`).join("")}</select></div>` : ""}
-    ${campo("irradiacao", "Irradiação no coletor (kWh/m² por dia)", d.irradiacao, irBase != null ? f1(irBase, 2) : "5", null, "dim")}
+    ${campo("irradiacao", "Irradiação no coletor (kWh/m² por dia)", d.irradiacao, irBase != null ? f1(irBase, 2) : "", null, "dim")}
     ${campo("eta_coletor", "Eficiência do coletor (0 a 1)", d.eta_coletor, "0,4", "Coletor de ar com cobertura: tipicamente 0,3 a 0,6 (verificar com o ensaio do coletor).", "dim")}
     ${campo("aproveitamento", "Aproveitamento do ar quente (0 a 1)", d.aproveitamento, "0,5", "Parte do calor do ar que vira evaporação; o resto sai com o ar.", "dim")}
     ${campo("delta_t", "Aquecimento do ar no coletor (°C)", d.delta_t, "15", null, "dim")}</div></section>`;
-  const res = `<div class="grade">${cartao("sec-d-agua", "Água para tirar", f1(R.agua_kg, 1), "kg por lote")}${cartao("sec-d-area", "Área de coletor", f1(R.area_m2, 1), "m²")}
+  const res = `<div class="grade">${cartao("sec-d-agua", "Água para tirar", f1(R.agua_kg, 1), "kg por lote")}${cartao("sec-d-area", "Área de coletor", semLocal ? "—" : f1(R.area_m2, 1), semLocal ? "falta o local" : "m²")}
     ${cartao("sec-d-ar", "Vazão de ar", f1(R.vazao_m3h, 0), "m³/h no ventilador")}${cartao("sec-d-en", "Calor no ar", f1(R.q_ar_mj, 0), "MJ por lote (" + f1(R.q_ar_mj / MJ_POR_KWH, 0) + " kWh)")}</div>`;
   const comp = `<section class="cartao" aria-labelledby="h-sec-dcomp"><h2 id="h-sec-dcomp">Comparado com secador elétrico ou a lenha</h2><div class="precos">
     ${campo("eta_eletrico", "Eficiência do secador elétrico (0 a 1)", d.eta_eletrico, "0,5", null, "dim")}${campo("eta_lenha", "Eficiência da fornalha a lenha (0 a 1)", d.eta_lenha, "0,35", null, "dim")}
-    ${campo("fator_rede", "Fator da rede elétrica (tCO₂/MWh)", d.fator_rede, f1(fr != null ? fr : FATOR_REDE_PADRAO, 4), fr != null ? "Da base de fatores do Carbono." : "Padrão do núcleo physis/1 (verificar o ano).", "dim")}
+    ${campo("fator_rede", "Fator da rede elétrica (tCO₂/MWh)", d.fator_rede, fr != null ? f1(fr, 4) : "", fr != null ? "Da base de fatores do Carbono (ou da premissa rede.fator_emissao)." : "Sem a base de fatores: digite o fator do ano.", "dim")}
     <div><label><input type="checkbox" id="sec-lenha_nr" data-sec-k="lenha_nr" data-sec-m="dim" ${d.lenha_nr ? "checked" : ""}> Lenha sem reposição (conta o CO₂ da queima)</label></div></div>
     <div class="rolagem"><table><caption>Energia e CO₂ que o sol evita por ano (${f1(P.lotes_ano, 0)} lotes)</caption><thead><tr><th scope="col">Secador trocado</th><th scope="col">Energia por lote</th><th scope="col">Energia por ano</th><th scope="col">CO₂ evitado por ano</th></tr></thead><tbody>
     <tr><th scope="row">Elétrico</th><td>${f1(R.kwh_eletrico_lote, 0)} kWh</td><td>${f1(R.kwh_eletrico_ano, 0)} kWh</td><td>${f1(R.co2_eletrico_kg_ano, 0)} kg</td></tr>
@@ -467,7 +476,12 @@ window.SECADOR_I18N = {
   "Peso inicial": "Initial weight",
   "Peso final": "Final weight",
   "Umidade final calculada pela matéria seca: confira com o medidor de umidade antes de ensacar.": "Final moisture calculated from the dry matter: check it with the moisture meter before bagging.",
-  "Sem a localização do lugar (Monitoramento verde → Configuração) ou sem o servidor, digite a irradiação; vazio usa 5 kWh/m² por dia.": "Without the site location (Green monitoring → Setup) or without the server, type the irradiation; blank uses 5 kWh/m² per day.",
+  "Sem a irradiação do lugar no servidor: digite a irradiação; vazio usa 5 kWh/m² por dia.": "Without the site irradiation on the server: type the irradiation; blank uses 5 kWh/m² per day.",
+  "Ou digite a irradiação no coletor abaixo.": "Or type the collector irradiation below.",
+  "Da base de fatores do Carbono (ou da premissa rede.fator_emissao).": "From the Carbon emission-factor base (or the rede.fator_emissao assumption).",
+  "Sem a base de fatores: digite o fator do ano.": "Without the factor base: type the factor for the year.",
+  "fator da rede não informado: CO2 evitado elétrico não calculado": "grid factor not provided: avoided electric CO2 not calculated",
+  "local não informado: sem a irradiação do lugar, a área do coletor não é calculada": "site not provided: without the site irradiation, the collector area is not calculated", "falta o local": "site missing",
   "Umidade no começo (%)": "Starting moisture (%)",
   "Umidade final (%)": "Final moisture (%)",
   "Coletor de ar com cobertura: tipicamente 0,3 a 0,6 (verificar com o ensaio do coletor).": "Glazed air collector: typically 0.3 to 0.6 (verify with the collector test report).",
@@ -548,6 +562,6 @@ window.SECADOR_I18N_RX = [
 ];
 
 window.SECADOR = { PRODUTOS, UMIDADE_INTERNA_ALTA, materiaSeca, pesoNaUmidade, aguaARemover, umidadeDoPeso, rendimento, ajustar, pesoPrevisto, horasAte,
-  modeloEstimado, previsaoLote, dimensionar, alertas, demoSerie, CALOR_LATENTE_MJ_KG, CP_AR_KJ_KG_K, RHO_AR, FATOR_REDE_PADRAO, linhaExemplo: "ID:41,TIPO:SEC,TI:38.5,UI:42.0,TE:27.1,UE:70.0,TC:52.3,VENT:1,PESO:84.20,IRR:820,BAT:3.95,TS:1794600000" };
+  modeloEstimado, previsaoLote, dimensionar, alertas, demoSerie, CALOR_LATENTE_MJ_KG, CP_AR_KJ_KG_K, RHO_AR, fatorRedePadrao, linhaExemplo: "ID:41,TIPO:SEC,TI:38.5,UI:42.0,TE:27.1,UE:70.0,TC:52.3,VENT:1,PESO:84.20,IRR:820,BAT:3.95,TS:1794600000" };
 window.telaSecador = telaSecador;   /* global: a plataforma chama telaSecador() na hora de desenhar */
 })();
