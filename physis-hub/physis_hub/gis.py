@@ -394,3 +394,92 @@ class GisExtra:
                 nivel = "alerta" if pico >= hist["p99"] else "atencao" if pico >= hist["p90"] else "normal"
         return {"ok": bool(hist or prev), "historico": hist, "previsao": prev, "nivel": nivel, "avisos": avisos,
                 "fonte": "GloFAS (Copernicus), rio mais próximo em grade de ~5 km, via Open-Meteo; histórico 2000–2024 guardado no servidor"}
+
+
+# ═══════════════ Hidrografia (rios e nascentes) instalada no servidor (15/11/2026) ═══════════════
+# O arquivo GeoJSON fica no servidor (caminho em PHYSIS_HIDROGRAFIA), gerado por ferramentas/hidrografia_servidor.py a
+# partir da base oficial que o engenheiro baixa (Base Hidrográfica Ottocodificada da ANA [CONFERIR o produto e o link]).
+# Nada é buscado na internet: sem o arquivo, a resposta diz sem_camada e o Planejador segue com o rio digitado.
+MAX_BBOX_GRAUS = 0.25        # janela máxima pedida (≈ 27 km): o Planejador pede o lote com folga
+MAX_FEICOES = 400            # teto de feições por resposta
+MAX_PONTOS = 20000           # teto de vértices por resposta
+_HIDRO_CACHE: dict = {}
+
+
+def _hidro_ler(caminho: str) -> dict | None:
+    try:
+        st = os.stat(caminho)
+    except OSError:
+        return None
+    c = _HIDRO_CACHE.get(caminho)
+    if c and c[0] == st.st_mtime:
+        return c[1]
+    with open(caminho, encoding="utf-8") as f:
+        dados = json.load(f)
+    _HIDRO_CACHE[caminho] = (st.st_mtime, dados)
+    return dados
+
+
+def _dentro(p, b) -> bool:
+    return b[0] <= p[0] <= b[2] and b[1] <= p[1] <= b[3]
+
+
+def _recortar_linha(coords: list, b) -> list[list]:
+    """Recorta a linha na janela: guarda os trechos com vértice dentro (mais o vértice vizinho, para a linha cruzar a borda)."""
+    partes, atual = [], []
+    for i, p in enumerate(coords):
+        dentro = _dentro(p, b)
+        viz = (i > 0 and _dentro(coords[i - 1], b)) or (i + 1 < len(coords) and _dentro(coords[i + 1], b))
+        if dentro or viz:
+            atual.append([round(float(p[0]), 6), round(float(p[1]), 6)])
+        elif atual:
+            if len(atual) >= 2:
+                partes.append(atual)
+            atual = []
+    if len(atual) >= 2:
+        partes.append(atual)
+    return partes
+
+
+def hidrografia(bbox, caminho: str | None = None) -> dict:
+    """Rios (linhas) e nascentes (pontos) dentro de bbox = (lon_min, lat_min, lon_max, lat_max).
+    Propriedades lidas: nome (ou name), largura_m (se a base trouxer; o Planejador pede a largura quando falta)."""
+    caminho = caminho or os.environ.get("PHYSIS_HIDROGRAFIA", "")
+    try:
+        b = [float(x) for x in bbox]
+    except (TypeError, ValueError):
+        return {"ok": False, "erro": "bbox = lon_min,lat_min,lon_max,lat_max"}
+    if len(b) != 4 or b[0] >= b[2] or b[1] >= b[3]:
+        return {"ok": False, "erro": "bbox = lon_min,lat_min,lon_max,lat_max"}
+    if b[2] - b[0] > MAX_BBOX_GRAUS or b[3] - b[1] > MAX_BBOX_GRAUS:
+        return {"ok": False, "erro": f"janela grande demais (máximo {MAX_BBOX_GRAUS}° de lado)"}
+    if not caminho or not os.path.isfile(caminho):
+        return {"ok": False, "sem_camada": True, "erro": "camada de hidrografia não instalada neste servidor"}
+    try:
+        dados = _hidro_ler(caminho) or {}
+    except (OSError, ValueError):
+        return {"ok": False, "erro": "arquivo de hidrografia ilegível"}
+    feats = dados.get("features") or []
+    rios, nascentes, pontos, cortado = [], [], 0, False
+    for f in feats:
+        g = (f or {}).get("geometry") or {}
+        pr = (f or {}).get("properties") or {}
+        nome = str(pr.get("nome") or pr.get("name") or "")[:120]
+        larg = pr.get("largura_m")
+        larg = float(larg) if isinstance(larg, (int, float)) and larg > 0 else None
+        if g.get("type") == "Point":
+            c = g.get("coordinates") or []
+            if len(c) >= 2 and _dentro(c, b):
+                nascentes.append({"nome": nome, "lon": round(float(c[0]), 6), "lat": round(float(c[1]), 6)})
+        elif g.get("type") in ("LineString", "MultiLineString"):
+            linhas = [g.get("coordinates") or []] if g["type"] == "LineString" else (g.get("coordinates") or [])
+            for l in linhas:
+                for parte in _recortar_linha(l, b):
+                    rios.append({"nome": nome, "largura_m": larg, "coords": parte})
+                    pontos += len(parte)
+        if len(rios) + len(nascentes) >= MAX_FEICOES or pontos >= MAX_PONTOS:
+            cortado = True
+            break
+    return {"ok": True, "rios": rios, "nascentes": nascentes, "cortado": cortado,
+            "fonte": str(dados.get("fonte") or "hidrografia instalada no servidor"), "bbox": b}
+

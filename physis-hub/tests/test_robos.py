@@ -127,7 +127,9 @@ class TestSuporte(unittest.TestCase):
         r = robos.Suporte({"base_suporte": BASE}, robos.IALocal("http://localhost:8000", enviar=falsa)).responder(
             {"pergunta": "exportar tela para PDF"})
         self.assertTrue(r["ia"]["usada"])
-        self.assertEqual(r["resposta"], "Use Baixar esta tela [1].")
+        self.assertTrue(r["resposta"].startswith("Use Baixar esta tela [1]."))
+        self.assertIn(robos.AVISO_IA, r["resposta"])        # marcado como gerado por IA
+        self.assertTrue(r["revisao_humana"] and r["gerado_por_ia"])
 
     def test_base_real_tem_docs_e_curso(self):
         base = robos.carregar_base()

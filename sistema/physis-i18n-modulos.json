@@ -5157,7 +5157,22 @@
 "Potencial do lugar, perdas, tamanho do sistema, inversor e retorno pela Lei 14.300. Abre a aba Energia solar; o diagnóstico rápido fica no SustainKit Energy.": "Site potential, losses, system size, inverter and payback under Lei 14.300. Opens the Solar energy tab; the quick diagnosis is in SustainKit Energy.",
 "Nota de atendimento e maturidade para ISO 14001, 50001 e 45001, LEED, EDGE, PBE Edifica e Selo Casa Azul. Abre a aba Certificações; o checklist rápido fica no SustainKit Cert.": "Compliance score and maturity for ISO 14001, 50001 and 45001, LEED, EDGE, PBE Edifica and Selo Casa Azul. Opens the Certifications tab; the quick checklist is in SustainKit Cert.",
 "Água para obra, viveiro e descargas; vai junto com a Qualidade da água": "Water for building work, the nursery and flushing; goes together with Water quality",
-"Reúso e coleta de chuva": "Reuse and rainwater harvesting"
+"Reúso e coleta de chuva": "Reuse and rainwater harvesting",
+"Modo de teste: usar as referências como limites": "Test mode: use the references as limits",
+"teste — valores a conferir": "test — values to be checked",
+"Desligado por padrão. Ligado (e com um uso escolhido), os limites em branco de turbidez e cloro recebem a referência do uso e os alertas funcionam, para testar. Não serve para operar: confira os valores na norma e digite os seus.": "Off by default. When on (and with a use chosen), blank turbidity and chlorine limits take the reference of that use and the alerts work, for testing. Not for operation: check the values in the standard and type your own.",
+"Modo de teste ligado.": "Test mode on.",
+"Escolha um uso acima para o modo de teste valer.": "Choose a use above for test mode to apply.",
+"A referência aparece ao lado de cada limite, como informação. Ela não preenche o limite nem gera alerta, a não ser no modo de teste abaixo.": "The reference appears next to each limit, as information. It does not fill in the limit or raise an alert, except in the test mode below.",
+"Solar · módulo à parte": "Solar · stand-alone module",
+"Certificação · módulo": "Certification · module",
+"Planejador · módulo à parte": "Planner · stand-alone module",
+"Água · módulo à parte": "Water · stand-alone module",
+"Consultoria personalizada": "Personalized consulting",
+"Projeto e acompanhamento sob medida com a equipe Physis. Veja como funciona na página de consultoria (/consultoria/).": "Tailor-made design and follow-up with the Physis team. See how it works on the consulting page (/consultoria/).",
+"Módulo à parte do SustainKit: potencial do lugar, perdas, tamanho do sistema, inversor, strings e retorno pela Lei 14.300. Abre a aba Energia solar. O SustainKit Energy é outro produto: o diagnóstico rápido dentro do SustainKit.": "Stand-alone module, separate from SustainKit: site potential, losses, system size, inverter, strings and payback under Lei 14.300. Opens the Solar energy tab. SustainKit Energy is a different product: the quick diagnosis inside SustainKit.",
+"Módulo à parte do SustainKit: implantação, normas, sol e fases; medido × projetado.": "Stand-alone module, separate from SustainKit: layout, standards, sun and phases; measured × designed.",
+"Módulo à parte do SustainKit: água para obra, viveiro e descargas; vai junto com a Qualidade da água.": "Stand-alone module, separate from SustainKit: water for building works, nursery and toilets; goes together with Water quality."
 },
 "I18N_RX": [
 [
@@ -7787,6 +7802,14 @@
 [
 "^(.+) \\(([\\d.,]+) Pa · motor ([\\d.,]+) kW / ([\\d.,]+) cv\\)$",
 "$1 ($2 Pa · motor $3 kW / $4 cv)"
+],
+[
+"^a partir de R\\$ ([\\d.,]+)$",
+"from R$ $1"
+],
+[
+"^Módulo de certificação: requisitos, evidências, nota de atendimento e maturidade para (.+), na aba Certificações\\. Diferente do SustainKit Cert \\(checklist rápido dentro do diagnóstico\\)\\.$",
+"Certification module: requirements, evidence, compliance score and maturity for $1, in the Certifications tab. Different from SustainKit Cert (quick checklist inside the diagnosis)."
 ],
 [
 "^· (.+)$",

@@ -14,6 +14,10 @@ Mesmo ligada:
   * tem tempo máximo (PHYSIS_IA_TEMPO, 30 s) e, se falhar, a resposta por regras continua valendo;
   * o registro guarda só metadados (robô, tamanho, tempo, ok) — nunca o texto.
 
+Ordem de quem melhora o texto (ia_do_ambiente): Claude com a conta da Physis, se configurado (ia_claude.py) →
+IA local acima (Fase 2) → respostas prontas por regras. Resposta que passou por IA vem com "gerado_por_ia",
+o aviso AVISO_IA no fim do texto e revisao_humana=True. Ver docs/IA_CLAUDE.md.
+
 Robôs: suporte, precos, editais, marketing, instituto, pluviometro. Ver docs/ROBOS.md.
 """
 from __future__ import annotations
@@ -36,6 +40,7 @@ from pathlib import Path
 
 from . import clima as clima_mod
 from . import editais as editais_mod
+from . import ia_claude as claude_mod
 
 log = logging.getLogger("physis.robos")
 RAIZ = Path(__file__).resolve().parent.parent
@@ -113,13 +118,22 @@ _PADROES_PESSOAIS = [
 ]
 
 
-def anonimizar(texto: str, nomes: tuple[str, ...] | list[str] = ()) -> str:
-    t = str(texto or "")
+def anonimizar_relatorio(texto: str, nomes: tuple[str, ...] | list[str] = ()) -> tuple[str, dict]:
+    """Texto sem dados pessoais e quantos de cada tipo saíram (ex.: {"e-mail": 1}) — a nota do que foi enviado."""
+    t, cont = str(texto or ""), {}
     for rx, troca in _PADROES_PESSOAIS:
-        t = rx.sub(troca, t)
+        t, n = rx.subn(troca, t)
+        if n:
+            cont[troca.strip("[]")] = cont.get(troca.strip("[]"), 0) + n
     for nome in sorted((n for n in nomes if n and len(n) >= 3), key=len, reverse=True):
-        t = re.sub(re.escape(nome), "[pessoa]", t, flags=re.I)
-    return t
+        t, n = re.subn(re.escape(nome), "[pessoa]", t, flags=re.I)
+        if n:
+            cont["pessoa"] = cont.get("pessoa", 0) + n
+    return t, cont
+
+
+def anonimizar(texto: str, nomes: tuple[str, ...] | list[str] = ()) -> str:
+    return anonimizar_relatorio(texto, nomes)[0]
 
 
 # ══ Gancho para a IA local ═══════════════════════════════════════════════════════════════════════
@@ -156,6 +170,7 @@ class IALocal:
         self.tempo = float(tempo or os.environ.get("PHYSIS_IA_TEMPO") or 30)
         self.enviar = enviar or _post_json
         self.erro = ""
+        self.ultimo: dict = {}
         if self.url and not destino_local(self.url) and os.environ.get("PHYSIS_IA_EXTERNO") != "1":
             self.erro = "PHYSIS_IA_URL fora da rede local: desligada (use PHYSIS_IA_EXTERNO=1 só se for mesmo o servidor da Physis)"
             self.url = ""
@@ -195,7 +210,47 @@ class IALocal:
         REGISTRO_IA.append(meta)
         del REGISTRO_IA[:-100]
         log.info("ia robo=%s tipo=%s bytes=%d ms=%d ok=%s", robo, self.tipo, meta["bytes_enviados"], ms, ok)
+        self.ultimo = {"tipo": self.tipo, "modelo": self.modelo} if ok else {}
         return texto.strip() if ok else None
+
+
+AVISO_IA = claude_mod.AVISO_IA
+
+
+class CadeiaIA:
+    """Tenta cada IA na ordem (Claude → local); se nenhuma responder, o robô usa a resposta por regras."""
+
+    def __init__(self, provedores: list):
+        self.provedores = [p for p in provedores if p is not None]
+        self.erro = ""
+        self.ultimo: dict = {}
+        self.tentativas: list[str] = []
+
+    @property
+    def ativa(self) -> bool:
+        return any(p.ativa for p in self.provedores)
+
+    @property
+    def tipo(self) -> str:
+        return " → ".join([p.tipo for p in self.provedores if p.ativa] + ["regras"])
+
+    def gerar(self, sistema: str, pedido: str, robo: str = "", nomes=()) -> str | None:
+        self.ultimo, self.tentativas, self.erro = {}, [], ""
+        for p in self.provedores:
+            if not p.ativa:
+                continue
+            texto = p.gerar(sistema, pedido, robo=robo, nomes=nomes)
+            if texto:
+                self.ultimo = dict(getattr(p, "ultimo", None) or {"tipo": p.tipo})
+                return texto
+            self.tentativas.append(f"{p.tipo}: {p.erro or 'sem resposta'}")
+        self.erro = "; ".join(self.tentativas)
+        return None
+
+
+def ia_do_ambiente() -> CadeiaIA:
+    """Claude (se houver chave) → IA local (PHYSIS_IA_URL, Fase 2) → regras."""
+    return CadeiaIA([claude_mod.IAClaude(), IALocal()])
 
 
 # ══ Base dos robôs ══════════════════════════════════════════════════════════════════════════════
@@ -213,9 +268,9 @@ class Robo:
     intencoes: tuple[tuple[str, str], ...] = ()       # (nome, expressão regular sobre o texto sem acento)
     sistema_ia = "Você é um assistente da Physis. Responda em português do Brasil, curto e claro, só com base no material dado."
 
-    def __init__(self, contexto: dict | None = None, ia: IALocal | None = None):
+    def __init__(self, contexto: dict | None = None, ia=None):
         self.ctx = contexto or {}
-        self.ia = ia if ia is not None else IALocal()
+        self.ia = ia if ia is not None else ia_do_ambiente()
 
     def agora(self) -> float:
         h = self.ctx.get("hub")
@@ -234,6 +289,10 @@ class Robo:
             r = {"ok": False, "robo": self.nome, "erro": f"pedido inválido: {exc}", "revisao_humana": True}
         if r.get("intencao") is None:
             r["intencao"] = self.intencao(str(pedido.get("pergunta") or ""))
+        if (r.get("ia") or {}).get("usada"):         # tudo que passou por IA: marcado e com revisão humana
+            r["revisao_humana"] = True
+            r["gerado_por_ia"] = True
+            r["aviso_ia"] = AVISO_IA
         log.info("robo=%s intencao=%s tamanho=%d ok=%s ms=%d", self.nome, r.get("intencao"), len(json.dumps(pedido, ensure_ascii=False)),
                  r.get("ok"), int((time.monotonic() - inicio) * 1000))
         return r
@@ -249,7 +308,11 @@ class Robo:
                               nomes=self.ctx.get("nomes_pessoais") or ())
         if not texto:
             return rascunho, {"usada": False, "erro": self.ia.erro or "sem resposta"}
-        return texto, {"usada": True, "tipo": self.ia.tipo}
+        info = dict(getattr(self.ia, "ultimo", None) or {"tipo": self.ia.tipo})
+        info.update(usada=True, gerado_por_ia=True, revisao_humana=True)
+        if getattr(self.ia, "tentativas", None):
+            info["tentativas"] = list(self.ia.tentativas)     # ex.: Claude no teto, quem respondeu foi a IA local
+        return f"{texto}\n\n— {AVISO_IA}", info
 
 
 # ── 1. Suporte ──────────────────────────────────────────────────────────────────────────────────
@@ -296,7 +359,7 @@ def _curso_do_painel(caminho: Path) -> list[dict]:
 
 
 # notas internas de desenvolvimento: não entram nas respostas a clientes (podem citar pessoas e decisões internas)
-DOCS_INTERNOS = ("MEMO-CLAUDE-CODE.md", "LISTA-DE-MODIFICACOES.md", "CHECKLIST.md")
+DOCS_INTERNOS = ("MEMO-CLAUDE-CODE.md", "LISTA-DE-MODIFICACOES.md", "CHECKLIST.md", "IA_CLAUDE.md")
 
 
 def carregar_base(pasta_docs: Path | None = None, painel: Path | None = None, internos: bool = False) -> list[dict]:
@@ -465,8 +528,15 @@ class Precos(Robo):
                               f"da faixa R$ {r['faixa'][0]:.2f}–{r['faixa'][1]:.2f} ({r['desvio_pct']:+.0f}% da mediana).")
         fontes = sorted({ref["origem"] for r in out for ref in r["referencias"]})
         conf = 1 - sem / len(out)
-        return resposta(self.nome, "\n".join(linhas), fontes=[{"fonte": f} for f in fontes], confianca=conf,
-                        revisao_humana=fora > 0 or sem > 0, dados={"itens": out})
+        material = "\n".join(f"- {r['descricao']}: preço {r['preco']}, situação {r['situacao']}, faixa {r['faixa']}, "
+                             f"mediana {r.get('mediana')}, referências: " + "; ".join(f"{x['descricao']} ({x['origem']}, {x['preco']})"
+                                                                                   for x in r["referencias"][:3])
+                             for r in out)[:6000]
+        texto, ia = self.melhorar("\n".join(linhas), material,
+                                  "Explique em português simples, item por item, o que está fora da faixa e o que conferir. "
+                                  "Use só os números do material; não proponha preço novo. É uma sugestão para a equipe.")
+        return resposta(self.nome, texto, fontes=[{"fonte": f} for f in fontes], confianca=conf,
+                        revisao_humana=fora > 0 or sem > 0, ia=ia, dados={"itens": out, "sugestao": True})
 
 
 # ── 3. Editais ──────────────────────────────────────────────────────────────────────────────────
@@ -527,9 +597,15 @@ class Editais(Robo):
         out.sort(key=lambda x: (-x["nota"], x["prazo"] or "9999"))
         top = [f"{i + 1}. {x['titulo']} — nota {x['nota']} ({'; '.join(x['motivos']) or 'pouca relação com a Physis'})" for i, x in enumerate(out[:5])]
         texto = "Editais mais alinhados à Physis:\n" + "\n".join(top)
+        resumos = {(e.get("id"), e.get("titulo")): str(e.get("resumo") or "") for e in lista}
+        material = "\n".join(f"[{i + 1}] {x['titulo']} — nota {x['nota']}; prazo {x['prazo'] or '?'}; "
+                             f"resumo: {resumos.get((x['id'], x['titulo']), '')[:800]}" for i, x in enumerate(out[:5]))
+        texto, ia = self.melhorar(texto, f"Perfil: {PERFIL_PHYSIS}\n\n{material}",
+                                  "Para cada edital, faça um resumo de 2 linhas e diga o encaixe com o perfil da Physis "
+                                  "(forte, médio ou fraco, e por quê). Mantenha a ordem e as notas. É sugestão, não decisão.")
         return resposta(self.nome, texto, fontes=[{"fonte": "perfil Physis (áreas de editais.py)"}] +
                         ([{"fonte": f"{len(aceitos)} editais aprovados antes"}] if aceitos else []),
-                        confianca=0.8 if aceitos else 0.6, revisao_humana=True, dados={"ranking": out})
+                        confianca=0.8 if aceitos else 0.6, revisao_humana=True, ia=ia, dados={"ranking": out, "sugestao": True})
 
 
 def _r3(v):
@@ -845,13 +921,14 @@ interval:
 CLASSES = {c.nome: c for c in (Suporte, Precos, Editais, Marketing, Instituto, Pluviometro)}
 
 
-def criar_robos(contexto: dict | None = None, ia: IALocal | None = None) -> dict[str, Robo]:
-    ia = ia if ia is not None else IALocal()
+def criar_robos(contexto: dict | None = None, ia=None) -> dict[str, Robo]:
+    ia = ia if ia is not None else ia_do_ambiente()
     return {n: c(contexto, ia) for n, c in CLASSES.items()}
 
 
 def listar(robos: dict[str, Robo]) -> list[dict]:
-    return [{"nome": r.nome, "titulo": r.titulo, "descricao": r.descricao, "ia_local": r.ia.ativa} for r in robos.values()]
+    return [{"nome": r.nome, "titulo": r.titulo, "descricao": r.descricao, "ia_local": r.ia.ativa, "ia": r.ia.tipo}
+            for r in robos.values()]
 
 
 def rotear(texto: str, robos: dict[str, Robo]) -> str:

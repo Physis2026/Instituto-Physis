@@ -50,7 +50,8 @@ def embutir(html: str) -> str:
         if not arq.is_file():
             continue
         novo = bloco(ident, arq)
-        padrao = re.compile(rf'<script type="application/json" id="{ident}">.*?</script>\n?', re.S)
+        # só o bloco que começa a linha: o texto do bloco citado num comentário de outro módulo não pode casar (15/11/2026)
+        padrao = re.compile(rf'^<script type="application/json" id="{ident}">.*?</script>\n?', re.S | re.M)
         # sempre no <head>: o código da página lê a base assim que carrega, então ela tem de vir antes
         html = padrao.sub("", html)
         html = html.replace("</head>", novo + "\n</head>", 1)
@@ -61,7 +62,7 @@ def embutir(html: str) -> str:
         if re.search(r"(?i)</script", codigo):
             raise SystemExit(f"{arq.name} contém '</script' e não pode ir embutido")
         novo = f'<script id="{ident}">{codigo}</script>'
-        padrao = re.compile(rf'<script id="{ident}">.*?</script>\n?', re.S)
+        padrao = re.compile(rf'^<script id="{ident}">.*?</script>\n?', re.S | re.M)
         html = padrao.sub("", html)
         html = html.replace("</head>", novo + "\n</head>", 1)
     return html

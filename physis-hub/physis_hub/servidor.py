@@ -1794,6 +1794,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     return self._json(400, {"ok": False, "erro": "coordenadas fora do Brasil"})
                 extra = gis_mod.GisExtra(irradiacao)
                 return self._json(200, getattr(extra, u.path.rsplit("/", 1)[-1])(lat, lon))
+            if u.path == "/api/gis/hidrografia":
+                # rios e nascentes da camada instalada no servidor (PHYSIS_HIDROGRAFIA), recortados na janela pedida
+                r = gis_mod.hidrografia(q.get("bbox", [""])[0].split(","))
+                return self._json(200 if r.get("ok") or r.get("sem_camada") else 400, r)
             if u.path in ("/api/gis/irradiacao", "/api/gis/clima"):
                 # base GIS de clima do lugar (ponto + grade da região), buscada uma vez e guardada no hub
                 try:

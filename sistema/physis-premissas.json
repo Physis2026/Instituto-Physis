@@ -664,6 +664,20 @@
       "fonte": "planilha PHYSIS_AVAC-5 (premissa Physis); conferir os limites de velocidade e ruído na ABNT NBR 16401-1 [CONFERIR NA NORMA]",
       "status": "conferir",
       "nota": "Usado para conferir a velocidade adotada em cada sistema de dutos."
+    },
+    {
+      "id": "app.topo_morro",
+      "grandeza": "APP de topo de morro: altura mínima, inclinação média e cota de início (terço superior)",
+      "valor_padrao": {
+        "altura_min_m": 100,
+        "inclinacao_media_graus": 25,
+        "fracao_base": 0.666667
+      },
+      "unidade": "m, graus e fração da altura medida da base (0,666667 = 2/3)",
+      "opcoes": [],
+      "fonte": "Lei 12.651/2012 (Código Florestal), art. 4º, IX [CONFERIR NA LEI]",
+      "status": "conferir",
+      "nota": "Triagem pelo relevo que o Planejador tem: a base do morro pode estar fora do terreno importado; o engenheiro confirma com o modelo de elevação da região."
     }
   ],
   "normas": {

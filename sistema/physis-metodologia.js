@@ -176,7 +176,7 @@ const DADOS = {
      "nome": "Declividade e APP de encosta",
      "o_que_calcula": "Mede a inclinação do terreno em cada célula e marca a área acima de 45° como APP e acima de 30% como área que pede estudo.",
      "formula": {
-      "texto": "i = Δz ÷ Δx (m/m); APP se i ≥ 1 (45° = 100%); atenção se i ≥ 0,30",
+      "texto": "i = Δz ÷ Δx (m/m); APP se i ≥ 1 (45° = 100%); atenção se i ≥ 0,30; topo de morro: se altura ≥ mínima e inclinação média > a da base, APP acima de base + 2/3 da altura",
       "variaveis": [
        {
         "simbolo": "i",
@@ -198,14 +198,15 @@ const DADOS = {
      "premissas": [
       "app.declividade",
       "app.faixa_rio",
-      "app.raio_nascente"
+      "app.raio_nascente",
+      "app.topo_morro"
      ],
      "normas": [
       {
        "codigo": "Lei 12.651/2012",
        "edicao": "2012",
-       "item": "art. 4º, I, IV e V",
-       "como_e_usada": "Encosta acima de 45° (= 100%) é APP; faixa ao longo de rios pela largura (inciso I) e raio em volta de nascentes (inciso IV), com larguras da base a conferir."
+       "item": "art. 4º, I, IV, V e IX",
+       "como_e_usada": "Encosta acima de 45° (= 100%), faixa de rios pela largura (I), raio de nascentes (IV) e topo de morro (IX, triagem pelo relevo); larguras e parâmetros da base a conferir."
       },
       {
        "codigo": "Lei 6.766/1979",
@@ -221,9 +222,9 @@ const DADOS = {
       }
      ],
      "limites_de_validade": "A resolução é a do levantamento ou do modelo de elevação (30 m no SRTM). Modelo de 30 m não vê taludes pequenos.",
-     "fonte_de_dados": "Topografia enviada pela pessoa; sem ela, modelo de elevação aberto (servidor, gis.py relevo).",
+     "fonte_de_dados": "Topografia enviada pela pessoa ou modelo de elevação aberto; hidrografia instalada no servidor (base da ANA convertida por ferramentas/hidrografia_servidor.py) ou rio digitado.",
      "status": "conforme",
-     "o_que_falta": "Feito em 15/11/2026: APP de rios (art. 4º, I) e nascentes (IV) desenhadas quando há rio (digitado ou GeoJSON, com largura) ou nascente no mapa; Lei 6.766 citada no alerta de 30%. Falta: topo de morro (inciso IX) e a camada de hidrografia no servidor (gis.py), que ainda não existe.",
+     "o_que_falta": "Feito em 15/11/2026: APP de rios (I) e nascentes (IV) com a camada de hidrografia do servidor (GET /api/gis/hidrografia, quando instalada) ou rio digitado ou importado, sempre com a largura digitada; topo de morro (IX) em triagem pelo relevo do terreno. Falta: o engenheiro conferir as larguras e os parâmetros (premissas 'conferir') e confirmar a base do morro com o modelo de elevação da região.",
      "onde": "planejador-physis.html (declividade, aptidão) · physis_hub/gis.py relevo()"
     },
     {
@@ -1812,7 +1813,7 @@ const DADOS = {
      "limites_de_validade": "Limite provisório não gera alerta (regra do sistema).",
      "fonte_de_dados": "Limites informados pela pessoa.",
      "status": "simplificado",
-     "o_que_falta": "Feito em 15/11/2026: ao lado de cada limite aparece a faixa de referência do uso escolhido (beber, rio, efluente, reúso), só como informação; nada é preenchido nem alerta sozinho. Falta: o engenheiro conferir as faixas (premissa 'conferir') e acrescentar outros parâmetros (coliformes, DBO).",
+     "o_que_falta": "Feito em 15/11/2026: faixa de referência por uso ao lado de cada limite; modo de teste (desligado por padrão, marcado 'teste — valores a conferir') que preenche os limites vazios pela referência e libera os alertas. Desligado, vale a regra 3. Falta: o engenheiro conferir as faixas e outros parâmetros (coliformes, DBO).",
      "onde": "painel.html · telaAgua(); physis_hub/agua.py"
     },
     {
@@ -3525,7 +3526,7 @@ const DADOS = {
    "titulo": "Qualidade da água: referência por uso, sem alerta automático",
    "o_que_fazer": "Mostrar ao lado de cada limite a faixa de referência do uso escolhido (beber, rio, efluente, reúso) como informação; nada é preenchido nem alerta sozinho.",
    "criterio_de_aceite": "Sem limite informado pela pessoa, nenhum alerta aparece (regra 3).",
-   "situacao": "feito (15/11/2026)"
+   "situacao": "feito (15/11/2026), com modo de teste opcional"
   },
   {
    "prioridade": 11,
@@ -3550,7 +3551,7 @@ const DADOS = {
    "titulo": "Planejador: outras APP e Lei 6.766",
    "o_que_fazer": "Marcar faixas de APP de rios e nascentes (art. 4º, I e IV) quando houver hidrografia no servidor; citar a Lei 6.766 no alerta de 30%.",
    "criterio_de_aceite": "Com um rio no mapa aparece a faixa de APP na largura que o engenheiro aprovou.",
-   "situacao": "feito (falta a hidrografia no servidor) (15/11/2026)"
+   "situacao": "feito (15/11/2026): rios e nascentes com a hidrografia do servidor ou digitada; topo de morro em triagem"
   },
   {
    "prioridade": 13,

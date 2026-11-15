@@ -1003,6 +1003,9 @@ class Hub:
         limpo = re.sub(r"[^A-Z0-9]", "", (codigo or "").upper())
         return hashlib.pbkdf2_hmac("sha256", limpo.encode(), sal, 100_000)
 
+    # ids das certificações da loja (um item "cert-<id>" por certificação): os mesmos de sistema/physis-certificacoes.json
+    CERTIFICACOES_LOJA = ("iso9001", "iso14001", "iso45001", "iso22000", "iso50001", "netzero", "leed", "leed_zero", "edge", "true_zw",
+                          "aqua_hqe", "casa_azul", "greenkey", "pbe", "pbqph", "obra", "rainforest", "organico", "cafe_4c")
     # Do contrato à plataforma: cada item vendido (da loja ou de uma proposta personalizada) liga os módulos
     # que ele traz. Assim a plataforma nasce já com as abas certas, sem ninguém escolher à mão.
     ITEM_MODULOS = {"mon-sw": ("monitoramento",), "campo": ("monitoramento",), "zonas": ("zonas",), "col": ("coleiras",),
@@ -1011,8 +1014,10 @@ class Hub:
                     "sk-c": ("sustainkit", "certificacoes"), "sk-pacote": ("sustainkit", "certificacoes", "carbono"),
                     "P5": ("turbinas",), "P9": ("pulseira",), "P10": ("medicamentos",), "P12": ("carbono",),
                     "P13": ("planejador",), "P15": ("resiliencia",), "P14": ("avac",), "P26": ("avac",),
-                    "solar": ("solar",), "cert": ("certificacoes",),   # itens próprios na loja (15/11/2026)
-                    "P17": ("sbn",), "P18": ("agua",),   # reúso e chuva vai com a Qualidade da água (à venda) "P19": ("sbn",), "P11": ("circular",), "P16": ("circular",),
+                    "solar": ("solar",),   # módulo à parte do SustainKit (15/11/2026)
+                    **dict.fromkeys(("cert-iso9001", "cert-iso14001", "cert-iso45001", "cert-iso22000", "cert-iso50001", "cert-netzero", "cert-leed", "cert-leed_zero", "cert-edge", "cert-true_zw", "cert-aqua_hqe", "cert-casa_azul", "cert-greenkey", "cert-pbe", "cert-pbqph", "cert-obra", "cert-rainforest", "cert-organico", "cert-cafe_4c"), ("certificacoes",)),   # um módulo por certificação (mesmos ids de CERTIFICACOES_LOJA)
+                    "P17": ("sbn",), "P18": ("agua",),   # reúso e chuva vai com a Qualidade da água (à venda)
+                    "P19": ("sbn",), "P11": ("circular",), "P16": ("circular",),
                     "P20": ("circular",), "P22": ("circular",), "P27": ("circular",), "P23": ("secador",)}
     # propostas personalizadas descrevem os itens em texto: palavras que identificam cada módulo
     PALAVRAS_MODULOS = (("solar", "solar"), ("fotovolt", "solar"), ("usina", "solar"), ("sensor", "monitoramento"),

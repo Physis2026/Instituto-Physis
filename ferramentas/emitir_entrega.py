@@ -41,6 +41,28 @@ def rodar(cmd, cwd=None, check=True):
     return r
 
 
+def apagar_pasta(pasta: Path, tentativas: int = 6):
+    """Apaga a entrega anterior. Na pasta do OneDrive um arquivo pode ficar preso por instantes (sincronização):
+    tira o "somente leitura", espera e tenta de novo; se continuar preso, para com uma mensagem clara."""
+    import os
+    import stat
+    import time
+
+    def destravar(func, caminho, _erro):
+        try:
+            os.chmod(caminho, stat.S_IWRITE)
+            func(caminho)
+        except OSError:
+            pass
+    for n in range(tentativas):
+        shutil.rmtree(pasta, onexc=destravar) if sys.version_info >= (3, 12) else shutil.rmtree(pasta, onerror=destravar)
+        if not pasta.exists():
+            return
+        time.sleep(2 + 2 * n)
+    raise SystemExit(f"não consegui apagar {pasta}: o OneDrive (ou outro programa) está usando um arquivo dela. "
+                     "Pause a sincronização do OneDrive por alguns minutos ou feche o que estiver aberto e rode de novo.")
+
+
 def zipar(pasta: Path, destino: Path, raiz_nome: str | None = None):
     with zipfile.ZipFile(destino, "w", zipfile.ZIP_DEFLATED) as z:
         for arq in sorted(pasta.rglob("*")):
@@ -68,7 +90,7 @@ def main():
     if saida.exists():
         if not a.intermediaria and not (saida / "MANIFESTO.json").is_file():
             raise SystemExit(f"{saida} existe e não é uma entrega; escolha outra --saida")
-        shutil.rmtree(saida)          # mesma pasta, versão nova (a anterior é substituída)
+        apagar_pasta(saida)           # mesma pasta, versão nova (a anterior é substituída)
 
     tmp = Path(tempfile.mkdtemp(prefix="physis-entrega-"))
     resultado_testes = "não rodados"
@@ -359,6 +381,48 @@ revisa e publica; item em desenvolvimento nunca vai ao público. Em aberto: pre�
 ## Consultoria
 Página própria: serviços, fases, consultoria personalizada com equipe multidisciplinar, diárias, casos e pedido de proposta.
 Revisão: Leonardo Macedo e Rafaella. Arquivo: `02_Paginas_completas/consultoria.html`.
+
+## Gestão interna (só equipe Physis)
+| Área | O que tem | Quem cuida (Fase 2) |
+|---|---|---|
+| Propostas e contratos | Modelos de proposta e contrato, pedido de proposta da consultoria | Rafaella, Laura, Arthur |
+| Financeiro | Contas, entradas e saídas, investimentos | Rafaella |
+| Fornecedores e compras | Cadastro e compras de equipamentos e materiais | Ryan, Arthur, Erick Lopes, Rafael, Emerson |
+| Central de clientes e chamados | Clientes, chamados de suporte, resposta por e-mail e WhatsApp | Arthur, Rafaella, Erick Lopes, Rafael |
+| Cursos e turmas | Cursos, carga horária, turmas, inscritos e concluintes | Rafaella, Laura |
+| Equipe e contas | Contas da equipe (vindas do servidor), convites e 2 etapas | Rafaella |
+| Parceiros | Profissionais parceiros, curadoria e pedidos de orçamento | Rafaella (curadoria), Eric Oliveira (servidor) |
+| Plano de ação | Tarefas da Fase 2 por bloco e por pessoa (importadas de `10_Gestao_tarefas_Fase2/`) | Rafaella |
+
+## Editais
+Aba da Gestão: fontes de editais, triagem, resumo e encaixe com a Physis, montagem e envio das propostas.
+| Etapa | Quem |
+|---|---|
+| Acesso aos editais | Rafaella, Erick Lopes, Marzia |
+| Conferir cada fonte marcada "a conferir" e fazer a triagem | toda a equipe |
+| Montar as propostas | Rafaella, Marzia, Erick Lopes |
+| Aprovação final e envio | Rafaella, Laura, Arthur, Erick Lopes, Marzia |
+Robô de editais (resumo e encaixe): com a IA (Claude, conta da Physis) desde a Fase 1; sempre sugestão para revisão humana.
+
+## Marketing
+Aba da Gestão: posts, artigos, roteiros de vídeo, enquete de segunda e métricas.
+| Etapa | Quem |
+|---|---|
+| Produzir posts, artigos e roteiros de vídeo | Rafaella, Marzia |
+| Aprovar antes de publicar | Rafaella, Marzia |
+| Enquete de segunda | automática pelo sistema, com coleta de dados pela IA |
+| Acompanhar as métricas | Rafaella, Marzia |
+| Cadastrar os links dos modelos do Canva na Gestão | Rafaella, Marzia, Laura |
+
+## Loja (tarefas)
+| Etapa | Quem |
+|---|---|
+| Revisar e publicar os módulos prontos, com preço e situação | Rafaella, Marzia, Laura, Arthur |
+| Trocar os marcadores da consultoria (diárias, prazo de resposta, resultados dos casos) | Rafaella |
+| Revisar as páginas da consultoria (textos, serviços, casos, inglês, modo escuro, acessibilidade) | Leonardo Macedo, Rafaella |
+| Provedor de pagamento (Pix e boleto) e nota fiscal: recomendação em `01_Documentos/21_Pagamento_Provedor_e_Integracao.md`; ligar na Fase 2 | Rafaella (decisão), Eric Oliveira (integração) |
+Preços decididos em 15/11/2026: Solar a partir de R$ 300,00; cada certificação é um módulo, a partir de R$ 750,00;
+consultoria personalizada a partir de R$ 5.000,00. Os demais itens ficam "sob consulta" até a direção definir.
 
 ## Outras páginas
 | Página | O que é | Para quem |

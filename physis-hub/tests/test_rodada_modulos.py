@@ -34,21 +34,42 @@ class RodadaModulos(unittest.TestCase):
 
     def test_1_loja_modulos_a_venda(self):
         for cod in ("P13", "P18"):
-            self.assertRegex(self.cat, r'Object\.assign\(P\("%s",[^)]*\), \{ g:"func", st:"func" \}\)' % cod, cod)
-        self.assertIn('Object.assign(P("P6","Qualidade da água e reúso","pH, turbidez e cloro, com o cuidado de cada eletrodo e histórico para baixar."), { g:"func", st:"func", preco:11400,', self.cat)
-        for ident in ("solar", "cert"):
-            m = re.search(r'\{ id:"%s",[^\n]*\}' % ident, self.cat)
-            self.assertIsNotNone(m, ident)
-            self.assertNotIn("preco:", m.group(0), "sem preço inventado: o item entra como sob consulta")
-            self.assertIn('st:"func"', m.group(0))
-        venda = re.search(r"const LOJA_VENDA = new Set\(\[(.*?)\]\);", self.p).group(1)
-        for ident in ("base", "campo", "mon-sw", "P13", "solar", "P6", "P18", "sk-e", "sk-w", "sk-m", "sk-c", "scada", "gestao", "cert"):
+            self.assertRegex(self.cat, r'Object\.assign\(P\("%s",[^)]*\), \{ g:"func", st:"func", cod:"[^"]*módulo à parte" \}\)' % cod, cod)
+            self.assertNotRegex(self.cat, r'P\("%s"[^\n]*preco:' % cod, "sem preço dado: sob consulta")
+        self.assertIn('{ g:"func", st:"func", cod:"Água · módulo à parte", preco:11400,', self.cat)
+        m = re.search(r'\{ id:"solar",[^\n]*\}', self.cat)
+        self.assertIn("preco:300, apartir:true", m.group(0))
+        venda = re.search(r"const LOJA_VENDA = new Set\(\[(.*?)\]\)", self.p).group(1)
+        for ident in ("base", "campo", "mon-sw", "P13", "solar", "P6", "P18", "sk-e", "sk-w", "sk-m", "sk-c", "scada", "gestao", "consultoria-pers"):
             self.assertIn('"%s"' % ident, venda, ident)
         for fora in ("P5", "P9", "P10", "P12", "P15", "col", "com", "zonas", "servidor-verde"):
             self.assertNotIn('"%s"' % fora, venda, fora)
-        self.assertIn('publico() ? !!srvItem(id) && (LOJA_VENDA.has(id)', self.p)
+        self.assertIn('publico() ? !!srvItem(id) && (LOJA_VENDA.has(id) || ehCert(id)', self.p)
         for trecho in ('r.push("planejador")', 'r.push("solar")', 'r.push("certificacoes")', '(ligado(m,"P18") && visivel(m,"P18"))'):
             self.assertIn(trecho, self.p, trecho)
+
+    def test_d01_d02_precos_dados_e_certificacoes(self):
+        """D01: solar a partir de R$ 300,00. D02: cada certificação da aba é um módulo a partir de R$ 750,00, com objetivo
+        diferente do SustainKit Cert; consultoria personalizada a partir de R$ 5.000,00 (loja e página de consultoria)."""
+        import json
+        base = json.loads((RAIZ / "sistema" / "physis-certificacoes.json").read_text(encoding="utf-8"))["certificacoes"]
+        self.assertIn('const CERT_ITENS = () =>', self.p)
+        self.assertIn('id:"cert-" + c.id', self.p)
+        self.assertIn('preco:750, apartir:true', self.p)
+        self.assertIn("Diferente do SustainKit Cert (checklist rápido dentro do diagnóstico)", self.p)
+        self.assertIn('{ id:"consultoria-pers", g:"func", cod:"Consultoria", nome:"Consultoria personalizada"', self.p)
+        self.assertIn('preco:5000, apartir:true', self.p)
+        self.assertIn('"a partir de " + brl2(pr)', self.p)
+        self.assertIn("A partir de R$ 5.000,00", ler("physis-hub", "web", "consultoria.html"))
+        import sys
+        sys.path.insert(0, str(RAIZ / "physis-hub"))
+        from physis_hub.hub import Hub
+        self.assertEqual(set(Hub.CERTIFICACOES_LOJA), {c["id"] for c in base}, "hub.py e a base de certificações com os mesmos ids")
+        for c in base:
+            self.assertEqual(Hub.ITEM_MODULOS["cert-" + c["id"]], ("certificacoes",))
+        for k, m in (("solar", ("solar",)), ("P13", ("planejador",)), ("P18", ("agua",)), ("P19", ("sbn",)), ("P11", ("circular",)), ("P16", ("circular",))):
+            self.assertEqual(Hub.ITEM_MODULOS[k], m, k)
+        self.assertNotIn("cert", Hub.ITEM_MODULOS)
 
     def test_2_abas_em_desenvolvimento(self):
         abas = re.findall(r'\["([\w-]+)",', re.search(r"const ABAS = \[(.*?)\];", self.p, re.S).group(1))

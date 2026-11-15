@@ -41,12 +41,12 @@
     },
     {
       "org": "fazenda-santa-clara-v2",
-      "nome": "Fazenda Santa Clara · versão 2 (com SCADA e gestão)",
+      "nome": "Fazenda Santa Clara · versão 2 (com SCADA, gestão, SustainKit e certificações)",
       "lugar": "itirapua-sp",
-      "projeto": "Versão 2: a versão 1 mais SCADA (supervisão e controle) e a gestão da fazenda",
-      "modulos": ["monitoramento", "agua", "solar", "resiliencia", "supervisao", "gestao"],
+      "projeto": "Versão 2: a versão 1 mais SCADA (supervisão e controle), a gestão da fazenda, o SustainKit e as certificações (decisão de 15/11/2026)",
+      "modulos": ["monitoramento", "agua", "solar", "resiliencia", "supervisao", "gestao", "sustainkit", "certificacoes"],
       "pesquisa": false,
-      "confirmar": "Ampliação proposta depois da versão 1."
+      "confirmar": "Ampliação proposta depois da versão 1. Quais certificações entram (cada uma é um módulo) fica para a proposta."
     },
     {
       "org": "casa-physis",

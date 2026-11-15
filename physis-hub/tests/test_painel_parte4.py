@@ -49,7 +49,7 @@ class Parte4(unittest.TestCase):
     def test_itens_em_desenvolvimento_fora_da_venda(self):
         self.assertIn('P("P23","Secador solar"', self.h)                            # P() nasce com st:"dev"
         self.assertRegex(self.h, r'\{ id:"servidor-verde", g:"pdi",[^}]*st:"dev" \}')
-        vend = re.search(r"const VENDAVEIS = new Set\(\[(.*?)\]\)", self.h).group(1)
+        vend = re.search(r"const LOJA_VENDA = new Set\(\[(.*?)\]\)", self.h).group(1)   # VENDAVEIS usa LOJA_VENDA desde 15/11/2026
         self.assertNotIn("P23", vend)
         self.assertNotIn("servidor-verde", vend)
 
