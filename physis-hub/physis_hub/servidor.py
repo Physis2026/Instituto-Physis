@@ -610,13 +610,23 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             if u.path == "/api/clima":
                 # previsão das fontes guardadas no hub (a tela nunca chama a internet)
                 return self._json(200, clima.estado())
-            if u.path == "/api/gis/irradiacao":
-                # base GIS de irradiação (ponto + grade da região), buscada uma vez e guardada no hub
+            if u.path in ("/api/gis/relevo", "/api/gis/solo", "/api/gis/rio"):
+                # relevo (curvas de nível e declividade), solo e rio (enchente) do lugar, guardados no hub
                 try:
                     lat, lon = float(q.get("lat", [""])[0]), float(q.get("lon", [""])[0])
                 except ValueError:
                     return self._json(400, {"ok": False, "erro": "lat e lon são obrigatórios"})
-                r = irradiacao.consultar(lat, lon)
+                if not (-35.0 <= lat <= 6.0 and -75.0 <= lon <= -28.0):
+                    return self._json(400, {"ok": False, "erro": "coordenadas fora do Brasil"})
+                extra = gis_mod.GisExtra(irradiacao)
+                return self._json(200, getattr(extra, u.path.rsplit("/", 1)[-1])(lat, lon))
+            if u.path in ("/api/gis/irradiacao", "/api/gis/clima"):
+                # base GIS de clima do lugar (ponto + grade da região), buscada uma vez e guardada no hub
+                try:
+                    lat, lon = float(q.get("lat", [""])[0]), float(q.get("lon", [""])[0])
+                except ValueError:
+                    return self._json(400, {"ok": False, "erro": "lat e lon são obrigatórios"})
+                r = irradiacao.consultar(lat, lon, q.get("camada", ["irradiacao"])[0] if u.path.endswith("clima") else "irradiacao")
                 return self._json(200 if r["ok"] or not r.get("erro") else 400, r)
             if u.path == "/api/saude":
                 integra, n = hub.verificar_cadeia()

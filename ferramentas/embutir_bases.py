@@ -17,6 +17,8 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 PAINEL = RAIZ / "physis-hub" / "web" / "painel.html"
 BASES = {"base-certificacoes": RAIZ / "sistema" / "physis-certificacoes.json", "base-plantas": RAIZ / "sistema" / "physis-plantas.json"}
+# módulos de cálculo em arquivo próprio (testados à parte), embutidos como <script> no <head>
+MODULOS = {"mod-avac": RAIZ / "sistema" / "physis-avac.js"}
 
 
 def bloco(ident: str, arq: Path) -> str:
@@ -32,6 +34,16 @@ def embutir(html: str) -> str:
         novo = bloco(ident, arq)
         padrao = re.compile(rf'<script type="application/json" id="{ident}">.*?</script>\n?', re.S)
         # sempre no <head>: o código da página lê a base assim que carrega, então ela tem de vir antes
+        html = padrao.sub("", html)
+        html = html.replace("</head>", novo + "\n</head>", 1)
+    for ident, arq in MODULOS.items():
+        if not arq.is_file():
+            continue
+        codigo = arq.read_text(encoding="utf-8")
+        if re.search(r"(?i)</script", codigo):
+            raise SystemExit(f"{arq.name} contém '</script' e não pode ir embutido")
+        novo = f'<script id="{ident}">{codigo}</script>'
+        padrao = re.compile(rf'<script id="{ident}">.*?</script>\n?', re.S)
         html = padrao.sub("", html)
         html = html.replace("</head>", novo + "\n</head>", 1)
     return html
