@@ -34,6 +34,10 @@ traz coordenadas).
 
 ## Rotas para o `servidor.py` (colar)
 
+> **Aplicado em 15/11/2026** (`servidor.py`). Diferenças: os corpos JSON passam por `seg.ESQUEMAS` (`mun_config`, `mun_bairro`,
+> estrito); o `Municipio` da rota nasce no primeiro uso; o laço de fundo está no `main()`. `montar.py` leva `municipio.html` com o
+> módulo `resiliencia` ou na instalação de pesquisa. Testes: `tests/test_rotas_novas.py` (classe `Municipio`).
+
 No `criar_manipulador`, depois de `alertas = ...`:
 
 ```python

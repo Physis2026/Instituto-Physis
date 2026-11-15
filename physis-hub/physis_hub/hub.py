@@ -1007,7 +1007,7 @@ class Hub:
     # que ele traz. Assim a plataforma nasce já com as abas certas, sem ninguém escolher à mão.
     ITEM_MODULOS = {"mon-sw": ("monitoramento",), "campo": ("monitoramento",), "zonas": ("zonas",), "col": ("coleiras",),
                     "com": ("comedouros",), "P6": ("agua",), "scada": ("supervisao",), "gestao": ("gestao",),
-                    "cliente": ("painel",), "sk-e": ("sustainkit", "solar"), "sk-w": ("sustainkit",), "sk-m": ("sustainkit",),
+                    "sk-e": ("sustainkit", "solar"), "sk-w": ("sustainkit",), "sk-m": ("sustainkit",),
                     "sk-c": ("sustainkit", "certificacoes"), "sk-pacote": ("sustainkit", "certificacoes", "carbono"),
                     "P5": ("turbinas",), "P9": ("pulseira",), "P10": ("medicamentos",), "P12": ("carbono",),
                     "P13": ("planejador",), "P15": ("resiliencia",), "P14": ("avac",), "P26": ("avac",),

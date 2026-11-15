@@ -73,6 +73,11 @@ Pi pelo `/proc/device-tree/model`; com placa NVIDIA, `servidor_gpu`; senão `min
 
 ## Rota
 
+> **Aplicado em 15/11/2026** (`servidor.py`): rota e linha de fundo no `main()` (`pegada_servidor.rodar`, a mesma instância
+> que a rota lê; `PHYSIS_PEGADA=0` desliga as duas e a rota responde `{"ok": false, "desligada": true}`). O pacote da Casa
+> Physis leva `"pegada_servidor"` no `instancia.json` (`montar_clientes.py`, `PEGADA_PADRAO`: a configuração acima sem medidor,
+> servidor de IA e clientes de exemplo). Testes: `tests/test_rotas_novas.py` (classes `Pegada` e `PegadaDesligada`).
+
 `GET /api/servidor/pegada` — exige sessão (cliente ou acima). Equipe e direção recebem o detalhe (fonte de cada
 medida e a parte de cada cliente hospedado); o cliente recebe só os totais e a lista de máquinas.
 Sem servidor (arquivo aberto direto), a tela mostra um **exemplo marcado** que nunca entra no inventário.

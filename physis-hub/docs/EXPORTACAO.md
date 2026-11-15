@@ -178,6 +178,12 @@ Conferir a conformidade com o **veraPDF** (aberto): `verapdf --flavour 2b saida.
 
 ### Ligação no `servidor.py` (exata; o resto está no módulo)
 
+> **Aplicado em 15/11/2026** (`servidor.py`: `_rotas_novas_get` e `_rotas_novas_post_grandes`). Diferenças do trecho abaixo:
+> `/documento` sem id também abre a página; o corpo de cada POST passa por `seg.ESQUEMAS` (`doc_*`, estrito) antes do módulo;
+> sem sessão nem convite, 401 sem ler o corpo grande; `/api/documentos/pdfa` aceita ODS (`Content-Type` de planilha) e usa o
+> serviço de documentos (`documentos_cliente`) quando não há `soffice`; a retenção roda uma vez por dia (`rodar_diario`).
+> Testes: `tests/test_rotas_novas.py` (classe `Documento`).
+
 Import, junto dos outros:
 
 ```python
@@ -271,7 +277,6 @@ Observação: `seguranca.py` não precisa mudar. Se quiserem os limites do convi
 - Abrir os arquivos no LibreOffice e no Word (aparência da marca d'água, logo no cabeçalho, quebra de página da tabela). A
   estrutura foi conferida por Python (`zipfile` + XML) e no navegador (`ferramentas/conferir-odf.html`, 31 conferências OK no Chromium).
 - PDF/A: sem LibreOffice nesta máquina; o comando e a rota estão prontos e testados com o programa simulado; falta o veraPDF num servidor real.
-- Teste de ponta a ponta pela rota HTTP do `servidor.py` (depende de a ligação acima ser feita); a página foi testada com um servidor
-  de teste que usa o mesmo `Documentos.rota`.
+- ~~Teste de ponta a ponta pela rota HTTP do `servidor.py`~~: feito em 15/11/2026 (`tests/test_rotas_novas.py`).
 - `physis-odf.js` ainda não entra no `sincronizar.py` nem nas telas (ganchos acima).
 - Aviso por e-mail ao revisor (o link é copiado e enviado pela equipe); dá para usar `correio` depois.

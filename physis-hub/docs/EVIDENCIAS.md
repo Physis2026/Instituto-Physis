@@ -50,6 +50,9 @@ com `auto`); as outras certificações usam `por_auto` e a regra de documentos.
 
 ## Rotas para o `servidor.py` (colar)
 
+> **Aplicado em 15/11/2026** (`servidor.py`), com os corpos validados por `seg.ESQUEMAS` (`evid_anexo`, `evid_remover`: `id`
+> número inteiro). Testes: `tests/test_rotas_novas.py` (classe `Evidencias`).
+
 ```python
 from . import evidencias as evidencias_mod          # topo
 # do_GET

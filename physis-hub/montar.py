@@ -33,6 +33,11 @@ INSTALACOES = ("physis", "instituto")
 LICENCA_PADRAO = "Licença Physis de Uso e Adaptação (minuta em revisão jurídica)"
 VENDOR_ARQUIVOS = ("maplibre-gl.js", "maplibre-gl.css", "pmtiles.js", "web-ifc-api-iife.js", "web-ifc.wasm", "three.min.js",
                    "LEIA-ME.md", "LICENSE-maplibre-gl.txt", "LICENSE-three.txt")
+# demonstrações públicas (demos/, servidas em /demo/<nome>/): só no pacote do servidor da Physis (o site)
+DEMOS_ARQUIVOS = ("physis-demo-sustainkit.html", "physis-demo-scada.html", "physis-demo-monitoramento.html",
+                  "physis-demo-planejador.html", "physis-demo-cliente.html")
+# download do app (/app/baixar, /app/android.apk): só estes nomes saem de app-nativo/site; chave de assinatura nunca
+APP_DOWNLOAD_ARQUIVOS = ("baixar.html", "android.apk", "android.apk.sha256")
 
 GUIA = """# Sua plataforma Physis
 
@@ -114,7 +119,7 @@ def conferir_marca(marca: dict | None) -> dict | None:
 def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Path | None, licenca: str,
            supervisao: Path | None = None, gestao: Path | None = None, planejador: Path | None = None,
            pesquisa: bool = False, nome: str = "", cursos: list | None = None, suporte: dict | None = None,
-           instalacao: str = "physis", marca: dict | None = None, banco: str = "") -> Path:
+           instalacao: str = "physis", marca: dict | None = None, banco: str = "", pegada: dict | None = None) -> Path:
     if not re.fullmatch(r"[a-z0-9][a-z0-9._-]{1,63}", org):
         raise SystemExit("org: use de 2 a 64 letras minúsculas, números, ponto, hífen ou sublinhado")
     if instalacao not in INSTALACOES:
@@ -141,6 +146,26 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
     shutil.copy2(AQUI / "web" / "painel.html", pasta / "web" / "painel.html")
     if (AQUI / "web" / "app").is_dir():      # app instalável no celular (manifesto, ícones, service worker)
         shutil.copytree(AQUI / "web" / "app", pasta / "web" / "app")
+    # documento para comentários (/documento/<id>): toda plataforma tem equipe que publica e revisor que comenta
+    if (AQUI / "web" / "documento.html").is_file():
+        shutil.copy2(AQUI / "web" / "documento.html", pasta / "web" / "documento.html")
+    # painel municipal de resiliência (/municipio): com o módulo resiliência ou na instalação de pesquisa
+    if ("resiliencia" in modulos or pesquisa) and (AQUI / "web" / "municipio.html").is_file():
+        shutil.copy2(AQUI / "web" / "municipio.html", pasta / "web" / "municipio.html")
+    # termos, privacidade e acessibilidade (/termos, /privacidade, /acessibilidade) e a versão dos termos do consentimento
+    juridico = AQUI.parent / "sistema" / "physis-juridico.js"
+    if juridico.is_file():
+        shutil.copy2(juridico, pasta / "web" / "physis-juridico.js")
+    # página de download do app (/app/baixar): o publicado (com APK e SHA-256) ou, sem ele, a página modelo
+    if (gestao is not None and gestao.is_file()) or pesquisa:
+        site =AQUI.parent / "app-nativo" / "site"
+        origens = [site / "publicar" / n for n in APP_DOWNLOAD_ARQUIVOS if (site / "publicar" / n).is_file()]
+        if not origens and (site / "baixar.html").is_file():
+            origens = [site / "baixar.html"]
+        if origens:
+            (pasta / "app-download").mkdir()
+            for o in origens:
+                shutil.copy2(o, pasta / "app-download" / o.name)
     if (AQUI.parent / "implantacao").is_dir():   # instalador do Raspberry/mini PC, backup, atualização e verificação
         shutil.copytree(AQUI.parent / "implantacao", pasta / "implantacao", ignore=shutil.ignore_patterns("*.env"))
     if "sustainkit" in modulos:
@@ -161,6 +186,11 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         shutil.copy2(gestao, pasta / "web" / "gestao.html")
         if (AQUI / "web" / "consultoria.html").exists():      # página pública de consultoria do site da Physis
             shutil.copy2(AQUI / "web" / "consultoria.html", pasta / "web" / "consultoria.html")
+        demos = [AQUI.parent / "demos" / n for n in DEMOS_ARQUIVOS if (AQUI.parent / "demos" / n).is_file()]
+        if demos:                                           # demonstrações do site (/demo/<nome>/)
+            (pasta / "web" / "demos").mkdir(exist_ok=True)
+            for d in demos:
+                shutil.copy2(d, pasta / "web" / "demos" / d.name)
         # o servidor da Physis monta sozinho a plataforma de quem compra: leva o montador e os programas
         shutil.copy2(AQUI / "montar.py", pasta / "montar.py")
         (pasta / "programas").mkdir(exist_ok=True)
@@ -187,6 +217,8 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         inst["banco"] = banco
     if marca:
         inst["marca"] = marca
+    if pegada:          # pegada do servidor (docs/PEGADA_SERVIDOR.md): classe da máquina, lugar e forma de contar
+        inst["pegada_servidor"] = pegada
     (pasta / "instancia.json").write_text(json.dumps(inst, ensure_ascii=False, indent=2), encoding="utf-8")
     (pasta / "LICENSE").write_text(texto_licenca(licenca), encoding="utf-8")
     sk = ("- **SustainKit:** já funciona, sem equipamento. Abra pela aba SustainKit.\n"

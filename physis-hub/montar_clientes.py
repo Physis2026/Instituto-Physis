@@ -22,6 +22,13 @@ PROGRAMAS = {
     "supervisao": RAIZ / "sistema" / "physis-scada-demo.html",
     "planejador": RAIZ / "modulos" / "planejador" / "planejador-physis.html",
 }
+# Pegada do servidor (docs/PEGADA_SERVIDOR.md): obrigatória na Casa Physis. É a configuração do documento, sem as
+# partes de exemplo (medidor "lugar01/no7", servidor de IA e clientes hospedados): essas entram quando existirem de fato.
+# Uma ficha de clientes.json com "pegada_servidor" vale no lugar desta.
+PEGADA_PADRAO = {
+    "casa-physis": {"classe": "rpi5", "nome": "Hub da Casa Physis", "local": "no_lugar", "controle": "proprio",
+                    "intervalo_min": 5, "contagem": "auto", "fator_rede": None},
+}
 
 
 def main() -> None:
@@ -44,7 +51,8 @@ def main() -> None:
         pacote = montar(f["org"], f.get("lugar", "lugar01"), f["modulos"], a.saida, PROGRAMAS["sustainkit"],
                         LICENCA_PADRAO, PROGRAMAS["supervisao"], gestao, PROGRAMAS["planejador"],
                         bool(f.get("pesquisa")), f.get("nome", ""), f.get("cursos"), f.get("suporte") or suporte,
-                        f.get("instalacao", "physis"), f.get("marca"), f.get("banco", ""))
+                        f.get("instalacao", "physis"), f.get("marca"), f.get("banco", ""),
+                        pegada=f.get("pegada_servidor") or PEGADA_PADRAO.get(f["org"]))
         print(f"{f['nome']}: {pacote.name} ({pacote.stat().st_size // 1024} kB) · módulos: {', '.join(f['modulos'])}"
               + (" · pesquisa" if f.get("pesquisa") else "") + (f" · instalação {f['instalacao']}" if f.get("instalacao") else ""))
 

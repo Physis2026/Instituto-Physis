@@ -53,15 +53,38 @@ def criar_manipulador(chave: str | None, vagas: threading.Semaphore):
         def log_message(self, fmt, *args):
             log.info("%s %s", self.address_string(), fmt % args)
 
-        def _json(self, codigo: int, dados: dict):
+        def _json(self, codigo: int, dados: dict, fechar: bool = False):
             b = json.dumps(dados, ensure_ascii=False, allow_nan=False).encode("utf-8")
             self.send_response(codigo)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(b)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
+            if fechar:
+                self.send_header("Connection", "close")
             self.end_headers()
             self.wfile.write(b)
+
+        def _recusar(self, codigo: int, dados: dict):
+            """Erro antes de ler o corpo: responde, fecha e só então lê e descarta o corpo (até MAX_CORPO, 5 s).
+            Fechar com bytes não lidos faz o Windows cortar a conexão (RST) e quem enviou às vezes não vê a resposta."""
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                n = 0
+            self.close_connection = True
+            self._json(codigo, dados, fechar=True)
+            try:
+                self.wfile.flush()
+                self.connection.settimeout(5)
+                restam = min(max(n, 0), MAX_CORPO)
+                while restam > 0:
+                    pedaco = self.rfile.read(min(65536, restam))
+                    if not pedaco:
+                        break
+                    restam -= len(pedaco)
+            except OSError:
+                pass
 
         def _autorizado(self) -> bool:
             if not chave:
@@ -77,13 +100,13 @@ def criar_manipulador(chave: str | None, vagas: threading.Semaphore):
         def do_POST(self):
             u = urlparse(self.path)
             if not self._autorizado():
-                return self._json(401, {"ok": False, "erro": "chave inválida"})
+                return self._recusar(401, {"ok": False, "erro": "chave inválida"})
             try:
                 n = int(self.headers.get("Content-Length") or 0)
             except ValueError:
                 n = -1
             if n <= 0 or n > MAX_CORPO:
-                return self._json(413 if n > MAX_CORPO else 400, {"ok": False, "erro": "corpo ausente ou grande demais"})
+                return self._recusar(413 if n > MAX_CORPO else 400, {"ok": False, "erro": "corpo ausente ou grande demais"})
             try:
                 corpo = json.loads(self.rfile.read(n), parse_constant=lambda c: (_ for _ in ()).throw(ValueError(c)))
                 if not isinstance(corpo, dict):

@@ -31,6 +31,10 @@ elétrica, automação e AVAC; NR-35 para solar.
 
 ## Rotas para o `servidor.py` (colar)
 
+> **Aplicado em 15/11/2026** (`servidor.py`). Diferenças: cada corpo passa por `seg.ESQUEMAS` (`parc_*`, estrito); a avaliação
+> pede sessão de cliente para cima (`_exigir(CLIENTE)`, que também respeita o consentimento estrito). Testes:
+> `tests/test_rotas_novas.py` (classes `Parceiros` e `LimitePublico`).
+
 ```python
 from . import parceiros as parceiros_mod          # topo
 parceiros = parceiros_mod.Parceiros(hub)          # em criar_manipulador

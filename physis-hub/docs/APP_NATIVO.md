@@ -194,7 +194,13 @@ Depois de mudar a plataforma: `python scripts/preparar_www.py && npx cap sync`.
 
 ## 12. Rota proposta no hub: `/app/baixar` e `/app/android.apk` (para quem mexe no servidor)
 
-Não mexi no `servidor.py`. Trecho sugerido (junto da rota `/app/`, sem login, pois o celular precisa antes de entrar):
+> **Aplicado em 15/11/2026** no `servidor.py` (`arquivo_app`, `_app_download`). Pasta: `PHYSIS_APP_DOWNLOAD` (só ela, se
+> definida); senão `<pacote>/app-download` e, no repositório, `app-nativo/site/publicar` (sem ela, a página modelo
+> `site/baixar.html`). O SHA-256 (cabeçalho `Digest` e `/app/android.apk.sha256`) é calculado do próprio APK servido; o APK sai
+> em blocos. `montar.py` copia para `app-download/` só `baixar.html`, `android.apk` e `android.apk.sha256` (nenhuma chave).
+> Testes: `tests/test_rotas_novas.py` (classe `App`).
+
+Trecho original (junto da rota `/app/`, sem login, pois o celular precisa antes de entrar):
 
 ```python
 # physis_hub/app_pwa.py (ou servidor.py): download do app nativo. Pasta em PHYSIS_APP_DOWNLOAD

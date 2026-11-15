@@ -14,6 +14,15 @@ Rotas das telas:
   POST /api/clima/local          {"lat","lon","municipio","uf","ibge"} — também grava no receptor (PHYSIS_RX_URL)
   POST /api/clima/atualizar      consulta todas as fontes agora
   GET  /                         web/painel.html
+Páginas e rotas ligadas em 15/11/2026 (cada uma com o seu documento em docs/):
+  /documento[/<id>], /api/documentos…, POST /api/documentos/pdfa   documento para comentários e PDF/A (EXPORTACAO.md)
+  /municipio, /api/municipio…                                       painel municipal de resiliência (MUNICIPIO.md)
+  /api/evidencias/dados, POST /api/evidencias/anexo[/remover]       certificação assistida (EVIDENCIAS.md)
+  /api/parceiros…                                                   profissionais parceiros (PARCEIROS.md)
+  /app/baixar, /app/android.apk[.sha256]                            download do app (APP_NATIVO.md)
+  GET  /api/servidor/pegada                                         pegada do servidor (PEGADA_SERVIDOR.md)
+  /demo/{sustainkit,scada,monitoramento,planejador,plataforma}/     demonstrações públicas (demos/)
+  /termos, /privacidade, /acessibilidade                            textos de sistema/physis-juridico.js (minuta)
 
 Variaveis de ambiente:
   PHYSIS_MQTT_BROKER/_PORTA/_USUARIO/_SENHA/_TLS/_NOS  ponte MQTT da Caixinha IoT (ver docs/MQTT.md)
@@ -27,9 +36,14 @@ Variaveis de ambiente:
   PHYSIS_CSRF_ESTRITO  PHYSIS_ORIGENS  PHYSIS_SESSAO_OCIOSA_MIN  PHYSIS_SESSAO_DIAS  PHYSIS_REAUT_MIN
   PHYSIS_CONFIRMAR_EMAIL  PHYSIS_TERMOS_VERSAO  PHYSIS_CONSENTIMENTO_ESTRITO  PHYSIS_SEGURANCA_CONTATO
   PHYSIS_SIMULAR       ex.: "6,1,3,1" (solo,zona,coleira,comedouro) — gera dados sem hardware
+  PHYSIS_APP_DOWNLOAD  pasta com baixar.html, android.apk (padrão: <pacote>/app-download)
+  PHYSIS_PEGADA        configuração da pegada do servidor (JSON); "0" desliga
 """
 from __future__ import annotations
 
+import base64
+import hashlib
+import html as html_mod
 import json
 import os
 import sys
@@ -56,7 +70,12 @@ from . import robos as robos_mod
 from . import alertas_clima as alertas_mod
 from . import app_pwa
 from . import correio
+from . import documentos as documentos_mod
 from . import editais as editais_mod
+from . import evidencias as evidencias_mod
+from . import municipio as municipio_mod
+from . import parceiros as parceiros_mod
+from . import pegada_servidor as pegada_mod
 from . import seguranca as seg
 from . import perfil_cliente
 from .hub import Hub
@@ -298,7 +317,8 @@ _PX_FAIXA = r"""<a class="pular" href="#conteudo" data-pt="">Ir para o conteúdo
 _PX_RODAPE = r"""<footer><div class="px-in">
 <nav aria-label="Site da Physis" data-pt-aria="Site da Physis"><ul>
 <li><a href="/loja/" data-pt="">Loja</a></li><li><a href="/consultoria/" data-pt="">Consultoria</a></li><li><a href="/demo/" data-pt="">Demonstração</a></li></ul></nav>
-<p><span data-pt="">Termos de uso, política de privacidade e declaração de acessibilidade:</span> <a href="/loja/" data-pt="">na loja, no rodapé</a></p>
+<nav aria-label="Documentos da Physis" data-pt-aria="Documentos da Physis"><ul>
+<li><a href="/termos" data-pt="">Termos de uso</a></li><li><a href="/privacidade" data-pt="">Política de privacidade</a></li><li><a href="/acessibilidade" data-pt="">Acessibilidade</a></li></ul></nav>
 <p>Physis Engineering · Petrópolis/RJ</p>
 </div></footer>
 """
@@ -307,7 +327,7 @@ _PX_JS = r"""<script>
 var PX=(function(){var r=document.documentElement,est={titulo:null,suf:" · Physis"},tem=Object.prototype.hasOwnProperty;
 var COMUM={"Ir para o conteúdo":"Skip to content","Preferências de leitura":"Reading preferences","Idioma":"Language","Tema":"Theme","Claro":"Light","Escuro":"Dark","Automático":"Automatic",
 "Site da Physis":"Physis website","Loja":"Store","Consultoria":"Consulting","Demonstração":"Demo",
-"Termos de uso, política de privacidade e declaração de acessibilidade:":"Terms of use, privacy policy and accessibility statement:","na loja, no rodapé":"in the store, at the bottom of the page",
+"Documentos da Physis":"Physis documents","Termos de uso":"Terms of use","Política de privacidade":"Privacy policy","Acessibilidade":"Accessibility",
 "Conferindo…":"Checking…","Sem resposta do servidor.":"No response from the server.","Sem resposta do servidor. Tente de novo.":"No response from the server. Try again.",
 "Seu nome":"Your name","E-mail":"E-mail","Esqueci a senha":"I forgot my password",
 "Li e aceito os Termos de uso e a Política de privacidade da Physis (versão {0}).":"I have read and accept the Physis Terms of use and Privacy policy (version {0}).",
@@ -469,6 +489,251 @@ else if(modo==="convite"){if(!tk){mostrar("token");PX.por($("ok"),"Conferir o co
 </script></body></html>""").replace("__LOGO__", _PX_LOGO)
 
 
+# ── Esquemas dos corpos JSON das rotas ligadas em 15/11/2026 (entram em seg.ESQUEMAS; validação estrita) ──
+_S, _NUM = str, (int, float)
+ESQUEMAS_ROTAS = {
+    # documento para comentários (documentos.py; docs/EXPORTACAO.md)
+    "doc_publicar": {"titulo": (_S, 300, True), "html": (_S, documentos_mod.HTML_MAX, True), "origem": (_S, 2000, False),
+                     "nota": (_S, 1000, False)},
+    "doc_versao": {"html": (_S, documentos_mod.HTML_MAX, True), "nota": (_S, 1000, False)},
+    "doc_comentar": {"texto": (_S, documentos_mod.TEXTO_MAX, False), "sugestao": (_S, documentos_mod.TEXTO_MAX, False),
+                     "paragrafo": (_S, 40, False), "versao": (int, 10**6, False), "pai": (int, 10**12, False)},
+    "doc_texto": {"texto": (_S, documentos_mod.TEXTO_MAX, True)},
+    "doc_resolver": {"resolvido": (bool, None, False)},
+    "doc_sugestao": {"aceitar": (bool, None, True)},
+    "doc_convite": {"nome": (_S, 80, True), "email": (_S, 160, False), "dias": (_NUM, documentos_mod.DIAS_MAX, False),
+                    "pode_comentar": (bool, None, False)},
+    "doc_arquivar": {"arquivado": (bool, None, False)},
+    # painel municipal (municipio.py; docs/MUNICIPIO.md)
+    "mun_config": {"ibge": (_S, 7, True), "uf": (_S, 2, True), "municipio": (_S, 80, False), "lat": (_NUM, 90, False),
+                   "lon": (_NUM, 180, False), "orgao": (_S, 120, False), "telefone_emergencia": (_S, 20, False),
+                   "limiares": (dict, 8, False), "rios": (list, municipio_mod.MAX_RIOS, False),
+                   "pluviometros": (list, municipio_mod.MAX_PLUV, False)},
+    "mun_bairro": {"id": (_S, 80, True), "nome": (_S, 80, False), "risco": ((_S, int), 20, False), "estacoes": (list, 20, False),
+                   "rio": (_S, 40, False), "apagar": (bool, None, False)},
+    # certificação assistida (evidencias.py; docs/EVIDENCIAS.md)
+    "evid_anexo": {"cert": (_S, 60, True), "criterio": (_S, 80, True), "nome": (_S, 160, True), "data": (_S, 10, True),
+                   "validade": (_S, 10, False), "responsavel": (_S, 200, False), "obs": (_S, 2000, False), "arquivo": (_S, 40, False)},
+    "evid_remover": {"id": (int, 10**12, True)},
+    # profissionais parceiros (parceiros.py; docs/PARCEIROS.md). Conteúdo (CPF, UF, especialidade...) o módulo confere.
+    "parc_cadastro": {"tipo": (_S, 2, False), "documento": (_S, 20, False), "nome": (_S, 160, False), "nome_publico": (_S, 120, False),
+                      "conselho": (_S, 10, False), "registro": (_S, 40, False), "registro_uf": (_S, 2, False),
+                      "email": (_S, 160, False), "telefone": (_S, 20, False), "especialidades": (list, 10, False),
+                      "regioes": (list, 60, False), "descricao": (_S, 1000, False), "consentimento": (bool, None, False)},
+    "parc_orcamento": {"parceiro": ((int, _S), 10**9, True), "servico": (_S, 40, False), "municipio": (_S, 80, False), "uf": (_S, 2, False),
+                       "ibge": (_S, 7, False), "nome": (_S, 120, False), "email": (_S, 160, False), "telefone": (_S, 20, False),
+                       "descricao": (_S, 2000, False), "consentimento": (bool, None, False)},
+    "parc_documento": {"tipo": (_S, 20, True), "validade": (_S, 10, False), "descricao": (_S, 400, False), "arquivo": (_S, 40, False)},
+    "parc_doc_remover": {"id": (int, 10**12, True)},
+    "parc_curadoria": {"status": (_S, 20, True), "motivo": (_S, 600, False)},
+    "parc_avaliacao": {"nota": (int, 5, True), "pedido": (_S, 40, True), "comentario": (_S, 1000, False)},
+}
+ESQUEMAS_ROTAS["parc_editar"] = {k: v for k, v in ESQUEMAS_ROTAS["parc_cadastro"].items() if k != "consentimento"}
+for _k, _v in ESQUEMAS_ROTAS.items():
+    seg.ESQUEMAS.setdefault(_k, _v)
+
+
+def esquema_documento(caminho: str) -> str | None:
+    """Esquema do corpo de um POST /api/documentos…; None = rota que o módulo não conhece (ele responde 404)."""
+    p = [x for x in caminho.split("/") if x][2:]
+    if not p:
+        return "doc_publicar"
+    r = p[1:]
+    if r == ["versoes"]:
+        return "doc_versao"
+    if r == ["comentarios"]:
+        return "doc_comentar"
+    if len(r) == 3 and r[0] == "comentarios":
+        return {"editar": "doc_texto", "apagar": "vazio", "resolver": "doc_resolver", "sugestao": "doc_sugestao"}.get(r[2])
+    if r == ["convites"]:
+        return "doc_convite"
+    if len(r) == 3 and r[0] == "convites" and r[2] == "revogar":
+        return "vazio"
+    return {"arquivar": "doc_arquivar", "apagar": "vazio"}.get(r[0]) if len(r) == 1 else None
+
+
+# ── Demonstrações públicas (demos/, geradas por demos/gerar_demos.py): só leitura, lista fechada ──
+DEMOS = {"sustainkit": "physis-demo-sustainkit.html", "scada": "physis-demo-scada.html",
+         "monitoramento": "physis-demo-monitoramento.html", "planejador": "physis-demo-planejador.html",
+         "plataforma": "physis-demo-cliente.html"}
+
+
+def arquivo_demo(caminho: str) -> Path | None:
+    """/demo/<nome>[/] -> arquivo da demo: no pacote, web/demos/; no repositório, demos/ na raiz."""
+    m = re.fullmatch(r"/demo/([a-z]+)/?", caminho)
+    nome = DEMOS.get(m.group(1)) if m else None
+    if not nome:
+        return None
+    return next((p for p in (WEB / "demos" / nome, WEB.parent.parent / "demos" / nome) if p.is_file()), None)
+
+
+# ── Download do app nativo (docs/APP_NATIVO.md, seção 12). Lista fechada: nada do pedido vira caminho ──
+APK_MIME = "application/vnd.android.package-archive"
+APP_DOWNLOAD = {"/app/baixar": "baixar.html", "/app/baixar/": "baixar.html", "/app/android.apk": "android.apk",
+                "/app/android.apk.sha256": "android.apk"}
+_SHA_CACHE: dict = {}
+
+
+def arquivo_app(nome: str) -> Path | None:
+    """PHYSIS_APP_DOWNLOAD (só ela, se definida); senão <pacote>/app-download e, no repositório, o que o
+    app-nativo/scripts/publicar_baixar.py deixou em app-nativo/site/publicar (a página modelo, sem APK, também vale)."""
+    env = (os.environ.get("PHYSIS_APP_DOWNLOAD") or "").strip()
+    pastas = [Path(env)] if env else [WEB.parent / "app-download", WEB.parent.parent / "app-nativo" / "site" / "publicar"]
+    for p in pastas:
+        if (p / nome).is_file():
+            return p / nome
+    if nome == "baixar.html" and not env:
+        modelo = WEB.parent.parent / "app-nativo" / "site" / "baixar.html"
+        if modelo.is_file():
+            return modelo
+    return None
+
+
+def sha256_arquivo(p: Path) -> str:
+    """SHA-256 calculado do próprio arquivo servido (guardado enquanto tamanho e data não mudam)."""
+    st = p.stat()
+    chave = (str(p), st.st_size, st.st_mtime_ns)
+    if chave not in _SHA_CACHE:
+        h = hashlib.sha256()
+        with open(p, "rb") as f:
+            for bloco in iter(lambda: f.read(1 << 20), b""):
+                h.update(bloco)
+        _SHA_CACHE.clear()
+        _SHA_CACHE[chave] = h.hexdigest()
+    return _SHA_CACHE[chave]
+
+
+# ── Termos de uso, política de privacidade e acessibilidade: texto de sistema/physis-juridico.js (minuta) ──
+JURIDICO_ROTAS = {"/termos": "termos", "/privacidade": "privacidade", "/acessibilidade": "acessibilidade"}
+_JURIDICO_CACHE: dict = {}
+
+
+def ler_juridico() -> dict | None:
+    """Os textos gerados por ferramentas/gerar_juridico.py. No pacote: web/physis-juridico.js (montar.py copia)."""
+    arq = next((p for p in (WEB / "physis-juridico.js", WEB.parent / "programas" / "physis-juridico.js",
+                            WEB.parent.parent / "sistema" / "physis-juridico.js") if p.is_file()), None)
+    if not arq:
+        return None
+    chave = (str(arq), arq.stat().st_mtime_ns)
+    if _JURIDICO_CACHE.get("chave") == chave:
+        return _JURIDICO_CACHE["dados"]
+    try:
+        dados = json.loads(arq.read_text(encoding="utf-8").split("window.PHYSIS_JURIDICO = ", 1)[1].rstrip().rstrip(";"))
+    except (OSError, IndexError, ValueError):
+        return None
+    if not isinstance(dados, dict):
+        return None
+    _JURIDICO_CACHE.update(chave=chave, dados=dados)
+    return dados
+
+
+def _md_linha(s: str) -> str:
+    """Escapa tudo e só depois devolve o negrito do markdown (nada do arquivo vira etiqueta HTML)."""
+    return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", html_mod.escape(str(s), quote=False))
+
+
+def md_para_html(paragrafos: list) -> str:
+    """Markdown simples das minutas: parágrafo, lista (- ou 1.), tabela (| a | b |) e **negrito**."""
+    out, atual, buf = [], None, []
+
+    def despejar():
+        if atual in ("ul", "ol") and buf:
+            out.append(f"<{atual}>" + "".join(f"<li>{i}</li>" for i in buf) + f"</{atual}>")
+        elif atual == "tabela" and buf:
+            cab, corpo = buf[0], buf[1:]
+            out.append('<div class="rolar" role="region" tabindex="0" aria-label="Tabela" data-pt-aria="Tabela"><table><thead><tr>'
+                       + "".join(f'<th scope="col">{_md_linha(c)}</th>' for c in cab) + "</tr></thead><tbody>"
+                       + "".join("<tr>" + "".join(f"<td>{_md_linha(c)}</td>" for c in r) + "</tr>" for r in corpo)
+                       + "</tbody></table></div>")
+        buf.clear()
+
+    for p in paragrafos or []:
+        s = str(p).strip()
+        if not s:
+            continue
+        if s.startswith("|") and s.endswith("|"):
+            novo = "tabela"
+        elif re.match(r"^[-*] ", s):
+            novo = "ul"
+        elif re.match(r"^\d+[.)] ", s):
+            novo = "ol"
+        else:
+            novo = "p"
+        if novo != atual:
+            despejar()
+            atual = novo
+        if novo == "tabela":
+            celulas = [c.strip() for c in s.strip("|").split("|")]
+            if all(re.fullmatch(r":?-{2,}:?", c) for c in celulas if c):
+                continue                                   # linha |---|---| do markdown
+            buf.append(celulas)
+        elif novo in ("ul", "ol"):
+            buf.append(_md_linha(re.sub(r"^([-*]|\d+[.)]) ", "", s, count=1)))
+        else:
+            out.append(f"<p>{_md_linha(s)}</p>")
+    despejar()
+    return "\n".join(out)
+
+
+_PX_CSS_JURIDICO = r"""main{max-width:860px}.juridico{overflow-wrap:anywhere}
+.juridico h2{font:500 1.3rem/1.3 var(--titulo);color:var(--acao);margin:28px 0 8px}.juridico p,.juridico li{margin:6px 0}
+.juridico ol,.juridico ul{padding-left:1.4em}
+.rolar{overflow-x:auto;max-width:100%;border:1px solid var(--linha);border-radius:8px;margin:10px 0;background:var(--sup)}
+.rolar table{border-collapse:collapse;width:100%;min-width:480px}.rolar th,.rolar td{border-bottom:1px solid var(--linha);padding:8px 10px;text-align:left;vertical-align:top}
+.rolar th{background:var(--fundo)}
+.aviso{background:var(--sup);border:1px solid var(--linha);border-left:4px solid var(--acao);border-radius:8px;padding:10px 14px;margin:0 0 12px}
+.so-en{display:none}html[lang=en] .so-en{display:block}
+.px-docs{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-wrap:wrap;gap:0 20px}.px-docs a{display:inline-flex;align-items:center;min-height:44px;font-weight:600}
+.px-docs a[aria-current]{color:var(--tinta);text-decoration:none}
+"""
+
+
+def pagina_juridico(chave: str) -> str | None:
+    """Página Physis (PT/EN, claro/escuro) com um dos textos jurídicos. O texto é a minuta em português;
+    em inglês, a página avisa que a tradução sai depois da revisão jurídica (não inventamos texto legal)."""
+    dados = ler_juridico()
+    bloco = (dados or {}).get(chave)
+    if not isinstance(bloco, dict) or not bloco.get("blocos"):
+        return None
+    titulo = html_mod.escape(str(bloco.get("titulo") or ""))
+    corpo = []
+    for b in bloco["blocos"]:
+        if b.get("t"):
+            corpo.append(f"<h2>{_md_linha(b['t'])}</h2>")
+        corpo.append(md_para_html(b.get("p") or []))
+    atual = ' aria-current="page"'
+    docs = "".join(f'<li><a href="{r}"{atual if k == chave else ""} data-pt="">{n}</a></li>'
+                   for r, k, n in (("/termos", "termos", "Termos de uso"), ("/privacidade", "privacidade", "Política de privacidade"),
+                                   ("/acessibilidade", "acessibilidade", "Acessibilidade")))
+    situacao = html_mod.escape(str(dados.get("situacao") or ""))
+    versao = html_mod.escape(str(dados.get("versao") or ""))
+    return ((r"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__TITULO__ · Physis</title>""" + _PX_CEDO + _PX_CSS + _PX_CSS_JURIDICO + r"""</style></head><body>"""
+             + _PX_FAIXA.replace("__TITULO__", '<span data-pt="">__TITULO__</span>') + r"""<main id="conteudo" tabindex="-1">
+<p class="aviso"><strong data-pt="">__SITUACAO__</strong> · <span data-pt="">versão de</span> __VERSAO__. <span data-pt="">Dados entre colchetes ainda serão definidos.</span></p>
+<p class="aviso so-en" lang="en">This text is a draft available in Portuguese only. The English version will be published after the legal review.</p>
+<nav aria-label="Documentos" data-pt-aria="Documentos"><ul class="px-docs">__DOCS__</ul></nav>
+<article class="juridico" lang="pt-BR">__CORPO__</article>
+</main>""" + _PX_RODAPE + r"""<script>window.PX_EN={"Termos de uso":"Terms of use","Política de privacidade (LGPD)":"Privacy policy (LGPD)",
+"Política de privacidade":"Privacy policy","Encontrou alguma barreira? Conte para nós":"Found a barrier? Tell us","Documentos":"Documents",
+"Minuta em revisão jurídica":"Draft under legal review","versão de":"version of","Tabela":"Table",
+"Dados entre colchetes ainda serão definidos.":"Data in square brackets is still to be defined."};</script>""" + _PX_JS
+             + r"""<script>PX.titulo(document.querySelector("#tit [data-pt]").getAttribute("data-pt"));</script></body></html>""")
+            .replace("__LOGO__", _PX_LOGO).replace("__TITULO__", titulo).replace("__SITUACAO__", situacao)
+            .replace("__VERSAO__", versao).replace("__DOCS__", docs).replace("__CORPO__", "\n".join(corpo)))
+
+
+def rodar_diario(fn, parar: threading.Event, passo: float = 86400.0, inicio: float = 300.0) -> None:
+    """Roda fn() 5 min depois de ligar e depois uma vez por dia (retenção LGPD dos documentos)."""
+    espera = inicio
+    while not parar.wait(espera):
+        try:
+            fn()
+        except Exception as exc:      # noqa: BLE001 — um erro não derruba o servidor
+            print("tarefa diária:", type(exc).__name__, exc)
+        espera = passo
+
+
 def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None, clima=None, irradiacao=None):
     instancia = instancia if instancia is not None else ler_instancia()
     if irradiacao is None:
@@ -500,6 +765,18 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
     robos = robos_mod.criar_robos({"hub": hub, "editais": editais_col,
                                    "suporte_email": os.environ.get("PHYSIS_SUPORTE_EMAIL") or instancia.get("suporte_email") or ""})
     alertas = alertas_mod.AlertasClima(hub, aprendizado=aprendizado)
+    # Documento para comentários, painel municipal e parceiros: criados no primeiro uso (cada um cria as suas tabelas)
+    modulos_vivos: dict = {}
+    modulos_trava = threading.Lock()
+
+    def modulo(nome: str):
+        with modulos_trava:
+            if nome not in modulos_vivos:
+                modulos_vivos[nome] = {"docs": lambda: documentos_mod.Documentos(hub),
+                                       "municipio": lambda: municipio_mod.Municipio(hub, clima=clima, aprendizado=aprendizado),
+                                       "parceiros": lambda: parceiros_mod.Parceiros(hub)}[nome]()
+            return modulos_vivos[nome]
+    cfg_pegada = pegada_mod.config_de(instancia)          # None = desligada (PHYSIS_PEGADA=0)
     # ── Segurança (seguranca.py; docs/SEGURANCA.md) ──
     proxies = seg.proxies_confiaveis()                  # PHYSIS_PROXY_CONFIAVEL: só deles vale X-Forwarded-*
     limites = seg.Limites()                             # PHYSIS_LIMITE_*: balde de fichas por IP
@@ -516,7 +793,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
         def end_headers(self):
             # O Planejador (e só ele) precisa de 'unsafe-eval': o leitor BIM web-ifc monta funções ao rodar.
             # A liberação vale só para essa página; o resto da plataforma continua sem eval.
-            eh_planejador = urlparse(getattr(self, "path", "") or "").path in ("/planejador", "/planejador/")
+            eh_planejador = urlparse(getattr(self, "path", "") or "").path in ("/planejador", "/planejador/",
+                                                                              "/demo/planejador", "/demo/planejador/")
             self.send_header("Content-Security-Policy", csp_planejador if eh_planejador else csp)
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
@@ -592,6 +870,273 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return True
             self._json(403, {"ok": False, "reautenticar": True, "erro": "Confirme a sua senha para continuar."})
             return False
+
+        # ── Rotas ligadas em 15/11/2026 (docs: EXPORTACAO, MUNICIPIO, EVIDENCIAS, PARCEIROS, APP_NATIVO, PEGADA_SERVIDOR) ──
+        def _conta_doc(self) -> dict | None:
+            """Conta da sessão para as rotas de documento; sem o aceite dos termos atuais (modo estrito), não vale (o convite vale)."""
+            q = self._quem()
+            if q and seg.consentimento_estrito() and seg.consentimento_pendente(q):
+                return None
+            return q
+
+        def _doc_resposta(self, r) -> None:
+            codigo, obj = r
+            if codigo == 429:
+                return self._recusar(429, obj, {"Retry-After": str(obj.get("espera", 60))})
+            return self._json(codigo, obj)
+
+        def _enviar_bytes(self, dados: bytes, tipo: str, cabecalhos: dict | None = None) -> None:
+            self.send_response(200)
+            self.send_header("Content-Type", tipo)
+            self.send_header("Content-Length", str(len(dados)))
+            for k, v in (cabecalhos or {}).items():
+                self.send_header(k, v)
+            self.end_headers()
+            self.wfile.write(dados)
+
+        def _app_download(self, caminho: str) -> None:
+            """/app/baixar (página), /app/android.apk (com Digest SHA-256) e /app/android.apk.sha256 (calculado do APK)."""
+            arq = arquivo_app(APP_DOWNLOAD[caminho])
+            if not arq:
+                return self._json(404, {"ok": False, "erro": "app ainda não publicado neste servidor" if "apk" in caminho
+                                        else "página de download ausente"})
+            if caminho.startswith("/app/baixar"):
+                return self._enviar_bytes(arq.read_bytes(), "text/html; charset=utf-8", {"Cache-Control": "no-cache"})
+            soma = sha256_arquivo(arq)
+            if caminho.endswith(".sha256"):
+                return self._enviar_bytes(f"{soma}  android.apk\n".encode("ascii"), "text/plain; charset=utf-8", {"Cache-Control": "no-cache"})
+            total = arq.stat().st_size
+            self.send_response(200)
+            self.send_header("Content-Type", APK_MIME)
+            self.send_header("Content-Length", str(total))
+            self.send_header("Content-Disposition", 'attachment; filename="physis.apk"')
+            self.send_header("Digest", "sha-256=" + base64.b64encode(bytes.fromhex(soma)).decode("ascii"))
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            with open(arq, "rb") as f:                      # em blocos: o APK tem dezenas de MB
+                for bloco in iter(lambda: f.read(1 << 20), b""):
+                    self.wfile.write(bloco)
+
+        def _rotas_novas_get(self, u, q: dict) -> bool:
+            """GET das rotas novas. True = respondeu. Fica antes de qualquer _barrado: há páginas públicas e o revisor
+            externo do documento não tem sessão; cada rota decide o seu acesso."""
+            p = u.path
+            # documento para comentários: a página não tem dado; a API decide (equipe com sessão ou convite)
+            if p == "/documento/fontes.css":
+                self._enviar_bytes(documentos_mod.fontes_css().encode("utf-8"), "text/css; charset=utf-8", {"Cache-Control": "max-age=86400"})
+                return True
+            if p in ("/documento", "/documento/") or re.fullmatch(r"/documento/[A-Za-z0-9_-]{16,64}/?", p):
+                if not (WEB / "documento.html").is_file():
+                    self._json(404, {"ok": False, "erro": "documento.html ausente"})
+                else:
+                    self._arquivo(WEB / "documento.html", "text/html; charset=utf-8")
+                return True
+            if p.startswith("/api/documentos"):
+                r = modulo("docs").rota("GET", p, self._conta_doc(), None, convite=self.headers.get("X-Physis-Convite"),
+                                        ip=self._ip(), base=url_publica, consulta=q)
+                if r:
+                    self._doc_resposta(r)
+                    return True
+                return False
+            # painel municipal: página e modo público sem conta; operador = equipe
+            if p in ("/municipio", "/municipio/"):
+                if not (WEB / "municipio.html").is_file():
+                    self._json(404, {"ok": False, "erro": "municipio.html ausente"})
+                else:
+                    self._arquivo(WEB / "municipio.html", "text/html; charset=utf-8")
+                return True
+            if p == "/api/municipio/publico":
+                self._json(200, modulo("municipio").estado(operador=False))
+                return True
+            if p == "/api/municipio":
+                if self._exigir(seg.EQUIPE):
+                    self._json(200, modulo("municipio").estado(operador=True))
+                return True
+            if p == "/api/municipio/exportar":
+                qm = self._quem()
+                oper = bool(qm and seg.pode(qm, seg.EQUIPE))
+                tipo = q.get("tipo", ["alertas"])[0]
+                if tipo not in ("alertas", "chuva", "bairros"):
+                    self._json(400, {"ok": False, "erro": "tipo: alertas, chuva ou bairros"})
+                    return True
+                self._enviar_bytes(modulo("municipio").exportar_csv(tipo, operador=oper).encode("utf-8"), "text/csv; charset=utf-8",
+                                   {"Content-Disposition": f'attachment; filename="municipio-{tipo}.csv"', "Cache-Control": "no-store"})
+                return True
+            # certificação assistida: nomes de arquivos da Gestão só para a equipe
+            if p == "/api/evidencias/dados":
+                qe = self._exigir(seg.CLIENTE)
+                if qe:
+                    self._json(200, {"ok": True, "dados": evidencias_mod.dados_servidor(hub, incluir_arquivos=seg.pode(qe, seg.EQUIPE))})
+                return True
+            # parceiros: vitrine pública (sem dado pessoal); lista interna para a equipe; CPF/CNPJ completo só a direção
+            if p == "/api/parceiros":
+                g = lambda k: q.get(k, [""])[0][:80]
+                self._json(200, modulo("parceiros").vitrine(g("servico"), g("uf"), g("municipio"), g("ibge")))
+                return True
+            if p == "/api/parceiros/interno":
+                qp = self._exigir(seg.EQUIPE)
+                if not qp:
+                    return True
+                completo = q.get("completo", [""])[0] == "1" and seg.pode(qp, seg.DIRECAO)
+                if completo and not self._sensivel(qp):
+                    return True
+                self._json(200, modulo("parceiros").interno(completo=completo))
+                return True
+            # app nativo: sem login (o celular baixa antes de entrar)
+            if p in APP_DOWNLOAD:
+                self._app_download(p)
+                return True
+            # pegada do servidor: cliente vê os totais; equipe e direção, o detalhe (fontes e clientes hospedados)
+            if p == "/api/servidor/pegada":
+                qg = self._exigir(seg.CLIENTE)
+                if not qg:
+                    return True
+                if cfg_pegada is None:
+                    self._json(200, {"ok": False, "desligada": True, "erro": "pegada do servidor desligada nesta instalação (PHYSIS_PEGADA=0)"})
+                    return True
+                self._json(200, pegada_mod.para(hub, cfg_pegada).relatorio(detalhado=seg.pode(qg, seg.EQUIPE)))
+                return True
+            # demonstrações públicas: só leitura; os mesmos cabeçalhos de segurança das outras páginas (end_headers)
+            if p.startswith("/demo/") and p != "/demo/":          # /demo/ continua sendo a demonstração do painel
+                arq = arquivo_demo(p)
+                if not arq:
+                    self._json(404, {"ok": False, "erro": "demonstração desconhecida"})
+                else:
+                    self._enviar_bytes(arq.read_bytes(), "text/html; charset=utf-8", {"Cache-Control": "public, max-age=3600"})
+                return True
+            if p.rstrip("/") in JURIDICO_ROTAS:
+                pagina = pagina_juridico(JURIDICO_ROTAS[p.rstrip("/")])
+                if pagina is None:
+                    self._json(404, {"ok": False, "erro": "texto jurídico ausente nesta instalação"})
+                else:
+                    self._pagina(pagina)
+                return True
+            return False
+
+        def _rotas_novas_post_grandes(self, u) -> bool:
+            """POST com corpo que pode passar de 64 KB (PDF/A, documento publicado, importação de bairros). True = respondeu."""
+            p = u.path
+            if p == "/api/documentos/pdfa":
+                if not self._exigir(seg.CLIENTE) or self._limitado("arquivo"):      # LibreOffice é pesado: 10 por 10 min por IP
+                    return True
+                odf = self._corpo_grande(documentos_mod.CORPO_MAX)
+                if odf is None:
+                    self._recusar_corpo("documento vazio ou grande demais")
+                    return True
+                ext = "ods" if "spreadsheet" in (self.headers.get("Content-Type") or "") else "odt"
+                r = documentos_mod.converter_pdfa(odf, extensao=ext)       # sem soffice: serviço de documentos ou 501
+                if not r["ok"]:
+                    self._json(r.pop("codigo", 500), r)
+                    return True
+                self._enviar_bytes(r["pdf"], "application/pdf", {"Content-Disposition": 'attachment; filename="physis-documento.pdf"',
+                                                                 "Cache-Control": "no-store", "X-Physis-PDFA": str(r.get("pdfa"))})
+                return True
+            if p.startswith("/api/documentos"):
+                conta, convite = self._conta_doc(), self.headers.get("X-Physis-Convite")
+                if not conta and not convite:          # sem sessão nem convite: nem lê o corpo grande
+                    self._json(401, {"ok": False, "erro": "entre com usuario e senha", "login": True})
+                    return True
+                try:
+                    n = int(self.headers.get("Content-Length") or 0)
+                except ValueError:
+                    n = -1
+                corpo = self._corpo_grande(documentos_mod.CORPO_MAX) if n > 0 else b"{}"
+                if corpo is None:
+                    self._recusar_corpo("documento grande demais (máx. 16 MB)")
+                    return True
+                esq = esquema_documento(p)
+                if esq and self._ler(corpo, esq) is None:
+                    return True
+                r = modulo("docs").rota("POST", p, conta, corpo, convite=convite, ip=self._ip(), base=url_publica)
+                if r:
+                    self._doc_resposta(r)
+                    return True
+                return False
+            if p == "/api/municipio/bairros/importar":
+                qm = self._exigir(seg.EQUIPE)
+                if not qm:
+                    return True
+                dados = self._corpo_grande(municipio_mod.IMPORTAR_MAX_BYTES)
+                if dados is None:
+                    self._recusar_corpo("arquivo vazio ou maior que 5 MB")
+                    return True
+                try:
+                    lista = municipio_mod.ler_importacao(dados, self.headers.get("Content-Type") or "")
+                except ValueError as exc:
+                    self._json(400, {"ok": False, "erro": str(exc)})
+                    return True
+                r = modulo("municipio").importar(lista, qm["usuario"], substituir=parse_qs(u.query).get("substituir", [""])[0] == "1")
+                self._json(200 if r["ok"] else 400, r)
+                return True
+            return False
+
+        def _rotas_novas_post(self, u, corpo: str) -> bool:
+            """POST JSON (até 64 KB) das rotas novas. Todo corpo passa por seg.ESQUEMAS (estrito). True = respondeu."""
+            p = u.path
+            if p in ("/api/municipio/config", "/api/municipio/bairro", "/api/municipio/atualizar"):
+                qm = self._exigir(seg.EQUIPE)
+                if not qm:
+                    return True
+                d = self._ler(corpo, {"/api/municipio/config": "mun_config", "/api/municipio/bairro": "mun_bairro"}.get(p, "vazio"))
+                if d is None:
+                    return True
+                mun = modulo("municipio")
+                if p.endswith("/atualizar"):
+                    if not self._limitado("publico"):          # cada clique chama CEMADEN, INMET e GloFAS
+                        self._json(200, mun.consultar())
+                    return True
+                r = mun.definir_config(d, qm["usuario"]) if p.endswith("/config") else mun.editar_bairro(d, qm["usuario"])
+                self._json(200 if r["ok"] else 400, r)
+                return True
+            if p in ("/api/evidencias/anexo", "/api/evidencias/anexo/remover"):
+                qe = self._exigir(seg.CLIENTE)
+                if not qe:
+                    return True
+                d = self._ler(corpo, "evid_remover" if p.endswith("/remover") else "evid_anexo")
+                if d is None:
+                    return True
+                r = (evidencias_mod.remover(hub, d["id"], qe["usuario"]) if p.endswith("/remover")
+                     else evidencias_mod.anexar(hub, d, qe["usuario"]))
+                self._json(200 if r["ok"] else 400, r)
+                return True
+            if not p.startswith("/api/parceiros"):
+                return False
+            par = modulo("parceiros")
+            if p in ("/api/parceiros/cadastro", "/api/parceiros/orcamento"):
+                # públicas (loja), com limite por IP; dado pessoal só com o consentimento marcado (o módulo confere)
+                if self._limitado("publico"):
+                    return True
+                d = self._ler(corpo, "parc_cadastro" if p.endswith("cadastro") else "parc_orcamento")
+                if d is None:
+                    return True
+                qp = self._quem()
+                r = par.cadastrar(d, "site") if p.endswith("cadastro") else par.pedir_orcamento(d, usuario=qp["usuario"] if qp else "")
+                self._json(200 if r["ok"] else 400, r)
+                return True
+            m = re.fullmatch(r"/api/parceiros/(\d{1,12})/(editar|documento|documento/remover|conferir|curadoria|avaliacao|apagar)", p)
+            if not m:
+                self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                return True
+            pid, acao = int(m.group(1)), m.group(2)
+            qp = self._exigir(seg.CLIENTE if acao == "avaliacao" else seg.DIRECAO if acao in ("curadoria", "apagar") else seg.EQUIPE)
+            if not qp:
+                return True
+            d = self._ler(corpo, {"editar": "parc_editar", "documento": "parc_documento", "documento/remover": "parc_doc_remover",
+                                  "curadoria": "parc_curadoria", "avaliacao": "parc_avaliacao"}.get(acao, "vazio"))
+            if d is None:
+                return True
+            if acao == "apagar" and not self._sensivel(qp):          # LGPD: apaga cadastro, documentos e avaliações
+                return True
+            us = qp["usuario"]
+            r = {"editar": lambda: par.editar(pid, d, us),
+                 "documento": lambda: par.documento(pid, d, us),
+                 "documento/remover": lambda: par.remover_documento(pid, d["id"], us),
+                 "conferir": lambda: par.conferir_registro(pid, us),
+                 "curadoria": lambda: par.curar(pid, d.get("status"), d.get("motivo"), us, seg.pode(qp, seg.DIRECAO)),
+                 "avaliacao": lambda: par.avaliar(pid, d, us, eh_equipe=seg.pode(qp, seg.EQUIPE)),
+                 "apagar": lambda: par.apagar(pid, us)}[acao]()
+            self._json(r.pop("codigo", 200 if r["ok"] else 400), r)
+            return True
 
         def _csrf_barrado(self) -> bool:
             """POST/PUT/DELETE: (1) Origin/Referer de outro site com sessão (ou nas rotas de conta) = 403;
@@ -976,6 +1521,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return self._json(200, self._estado_instancia())
             if u.path in ("/conta/esqueci", "/conta/nova-senha", "/conta/confirmar", "/conta/convite"):
                 return self._pagina(PAGINA_CONTA)
+            # documento, município, evidências, parceiros, app, pegada, demos e textos jurídicos (antes de qualquer _barrado)
+            if self._rotas_novas_get(u, q):
+                return
             if u.path in ("/.well-known/security.txt", "/security.txt"):
                 txt = seg.security_txt(os.environ.get("PHYSIS_SEGURANCA_CONTATO") or os.environ.get("PHYSIS_SUPORTE_EMAIL")
                                        or instancia.get("suporte_email") or "", url_publica, time.time()).encode("utf-8")
@@ -1391,6 +1939,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             u = urlparse(self.path)
             if self._csrf_barrado():
                 return
+            # PDF/A, documento para comentários e importação de bairros: corpo maior que o normal
+            if self._rotas_novas_post_grandes(u):
+                return
             # ── Editais, eventos e e-mail escrito na Gestão (vai para a fila email_saida que já existe) ──
             if u.path.startswith(("/api/editais", "/api/eventos")) or u.path == "/api/gestao/correio":
                 q = self._quem()
@@ -1579,6 +2130,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             corpo = self._corpo()
             if corpo is None:
                 return self._recusar_corpo("corpo invalido ou grande demais")
+            # ── Município (operador), evidências e parceiros ──
+            if self._rotas_novas_post(u, corpo):
+                return
             # ── Aprendizado, robôs e alertas de clima ──
             if u.path == "/api/aprendizado/treinar":
                 if not self._exigir(seg.DIRECAO):
@@ -1883,6 +2437,16 @@ def main() -> None:
                      kwargs={"enviar": lambda: saude_mod.enviar_avisos(hub, correio.enviar_fila)}, daemon=True).start()
     # retenção (LGPD/Marco Civil): sessões vencidas, acessos com mais de 6 meses, e-mails não enviados... (PHYSIS_RETENCAO_DIAS_*)
     threading.Thread(target=seg.rodar_retencao, args=(hub, parar), daemon=True).start()
+    # LGPD dos documentos para comentários: nome e e-mail do revisor externo saem depois do prazo (docs/EXPORTACAO.md)
+    threading.Thread(target=rodar_diario, args=(documentos_mod.Documentos(hub).retencao, parar), daemon=True).start()
+    # painel municipal: CEMADEN, INMET e rios a cada 15 min, como o clima (PHYSIS_CLIMA=0 desliga; docs/MUNICIPIO.md)
+    if os.environ.get("PHYSIS_CLIMA", "1") != "0":
+        mun_fundo = municipio_mod.Municipio(hub, clima=clima, aprendizado=apr_fundo)
+        threading.Thread(target=municipio_mod.rodar, args=(mun_fundo, parar), daemon=True).start()
+    # pegada do servidor: uma amostra a cada 5 min (PHYSIS_PEGADA=0 desliga; docs/PEGADA_SERVIDOR.md). A rota usa a mesma.
+    cfg_pegada = pegada_mod.config_de(inst)
+    if cfg_pegada is not None:
+        threading.Thread(target=pegada_mod.rodar, args=(pegada_mod.para(hub, cfg_pegada), parar), daemon=True).start()
     endereco = os.environ.get("PHYSIS_ENDERECO") or "0.0.0.0"
     srv = iniciar(hub, porta, os.environ.get("PHYSIS_TOKEN"), endereco=endereco, clima=clima)
     print(f"Physis Hub em http://{endereco}:{porta}  receptor={rx or 'nao configurado'}  simulador={sim or 'desligado'}")

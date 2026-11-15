@@ -143,6 +143,29 @@ def criar_manipulador(chave: str | None, vagas: threading.Semaphore):
         def _json(self, codigo: int, dados: dict):
             self._enviar(codigo, json.dumps(dados, ensure_ascii=False).encode("utf-8"), "application/json; charset=utf-8")
 
+        def _recusar(self, codigo: int, dados: dict):
+            """Erro antes de ler o corpo (chave errada, rota desconhecida, corpo grande): responde, fecha e só então
+            lê e descarta o corpo (até MAX_CORPO, com tempo limite). Sem isso, fechar com bytes não lidos faz o
+            Windows cortar a conexão com RST e quem enviou às vezes não vê a resposta (ConnectionAbortedError)."""
+            try:
+                n = int(self.headers.get("Content-Length") or 0)
+            except ValueError:
+                n = 0
+            self.close_connection = True
+            self._enviar(codigo, json.dumps(dados, ensure_ascii=False).encode("utf-8"), "application/json; charset=utf-8",
+                         {"Connection": "close"})
+            try:
+                self.wfile.flush()
+                self.connection.settimeout(5)
+                restam = min(max(n, 0), MAX_CORPO)
+                while restam > 0:
+                    pedaco = self.rfile.read(min(65536, restam))
+                    if not pedaco:
+                        break
+                    restam -= len(pedaco)
+            except OSError:
+                pass
+
         def do_GET(self):
             if urlparse(self.path).path == "/saude":
                 return self._json(200, {"ok": True, "versao": __version__, "soffice": soffice() is not None,
@@ -155,15 +178,15 @@ def criar_manipulador(chave: str | None, vagas: threading.Semaphore):
             if chave:
                 dado = self.headers.get("Authorization", "")
                 if not (dado.startswith("Bearer ") and hmac.compare_digest(dado[7:].encode(), chave.encode())):
-                    return self._json(401, {"ok": False, "erro": "chave inválida"})
+                    return self._recusar(401, {"ok": False, "erro": "chave inválida"})
             if u.path not in ("/pdfa/converter", "/pdfa/validar"):
-                return self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                return self._recusar(404, {"ok": False, "erro": "rota desconhecida"})
             try:
                 n = int(self.headers.get("Content-Length") or 0)
             except ValueError:
                 n = -1
             if n <= 0 or n > MAX_CORPO:
-                return self._json(413 if n > MAX_CORPO else 400, {"ok": False, "erro": "corpo ausente ou grande demais"})
+                return self._recusar(413 if n > MAX_CORPO else 400, {"ok": False, "erro": "corpo ausente ou grande demais"})
             corpo = self.rfile.read(n)
             if not vagas.acquire(timeout=2):
                 return self._json(429, {"ok": False, "erro": "ocupado; tente de novo"})
