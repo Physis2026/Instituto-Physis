@@ -1,0 +1,21 @@
+# Caddy com domínio público (instalar.sh --caddy dominio). Certificado Let's Encrypt automático.
+# Precisa: DNS de __DOMINIO__ apontando para este aparelho e as portas 80/443 chegando até ele.
+{
+	email __EMAIL__
+	admin localhost:2019
+}
+
+__DOMINIO__ {
+	encode gzip
+	request_body {
+		max_size 60MB
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+	reverse_proxy 127.0.0.1:__PORTA__ {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto https
+	}
+}

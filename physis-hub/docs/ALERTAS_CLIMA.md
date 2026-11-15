@@ -17,7 +17,7 @@ o que já tem guardado (não chama a internet para avaliar).
 | `hospedagem_chuva` | hospedagem | ≥ 30 mm | ≥ 50 mm |
 | `deslizamento` | todos | CEMADEN 24 h ≥ 40 mm ou 72 h ≥ 60 mm | 24 h ≥ 80 mm ou 72 h ≥ 120 mm |
 
-Os níveis "alerta" acima dos limites do painel são premissa Physis (a confirmar pela equipe técnica). Encostas:
+Os níveis "alerta" acima dos limites do painel são premissa Physis, **confirmada pela direção em 15/11/2026**. Encostas:
 referência de planejamento; a pessoa sempre é lembrada de seguir a Defesa Civil.
 
 ## 2. Assinatura (LGPD)

@@ -39,10 +39,19 @@ Rotas sempre com sessão (`_sessao_ou_401`), mesmo em instalação sem login: se
 - `BAT` em volts; abaixo de 3,45 V gera aviso uma vez por dia (**limite a confirmar**).
 - Sem `TS` válido, vale a hora de chegada. Linha repetida (mesmo `ID`, `TS`, evento) é ignorada.
 
-Até a homologação, as linhas entram por `POST /api/saude/linha` (texto, uma por linha; exige `X-Physis-Token`
-quando o hub tem token). O receptor e o `/api/v6/linha` continuam descartando esses TIPOs (`tipo_desconhecido`).
+As linhas entram por `POST /api/saude/linha` (texto, uma por linha; chave do dispositivo ou `X-Physis-Token`
+quando o hub tem token) e, desde 15/11/2026, também pelo receptor (`/api/gateway/webhook`), pelo `/api/v6/linha` e
+pela ponte MQTT: `MED` e `PUL` estão em `protocolo.TIPOS_CONHECIDOS` e o `Hub._receber_linha` as entrega à Saúde
+(`hub.saude_receptor`, ligado pelo servidor) **antes** do adaptador genérico, sem gravar em `leitura`/`medicao` e sem
+mostrar a linha no painel (o descarte aparece só como `saude_<motivo>`). Continuam **a homologar**.
 
-### Como registrar depois (homologação)
+Bandeira: `PHYSIS_SAUDE_V6` (padrão `1`). Com `PHYSIS_SAUDE_V6=0`, o receptor e o `/api/v6/linha` voltam a recusar
+`MED`/`PUL` (`tipo_desconhecido`); `/api/saude/linha` continua aceitando.
+
+### Homologação: o que foi feito e o que falta
+
+Feito no servidor (passos 1 a 3 abaixo, só a parte Python; testes em `tests/test_pluviometro_saude.py` e `tests/test_fluxos.py`).
+Falta: os dois `protocolo.cpp`, o passo 4 (mover os casos para `test_protocolo.py`) e o passo 5 (firmware).
 
 1. Acrescentar `"MED", "PUL"` a `TIPOS_CONHECIDOS` em `physis_hub/protocolo.py`, nos dois `protocolo.cpp` e no `PROTOCOLO.md`.
 2. Em `Hub._receber_linha`, **antes** do adaptador genérico: se `TIPO` for MED/PUL, chamar `saude.registrar_evento(linha)`

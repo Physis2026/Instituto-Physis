@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resiliência municipal · Physis</title>
+<meta name="description" content="Painel municipal de resiliência: chuva medida, avisos, rios e risco por bairro.">
+<!-- Painel municipal de resiliência (Defesa Civil e prefeituras). Servido pelo hub em /municipio.
+     Não chama a internet: lê só as rotas do hub (/api/municipio/publico; com sessão da equipe, /api/municipio).
+     Ver physis-hub/docs/MUNICIPIO.md. -->
+<script>(function(){var r=document.documentElement,t=null,p=null;try{p=JSON.parse(localStorage.getItem("physis-pref")||"null");t=p&&p.tema||localStorage.getItem("physis-pref-tema");}catch(e){}if(t!=="claro"&&t!=="escuro"){try{t=matchMedia("(prefers-color-scheme: dark)").matches?"escuro":"claro";}catch(e){t="claro";}}r.setAttribute("data-tema",t);})();</script>
+<style>
+:root{
+  color-scheme:light;
+  --verde:#33512F;--escuro:#1C2B21;--fundo:#F4F6F1;--sup:#FFFFFF;--linha:#C9D2C4;--tinta2:#4A4F44;--marca:#4B7547;
+  --ok-f:#DCEBD8;--ok-t:#1F4A1C;--al-f:#F5E2D7;--al-t:#7A2214;--at-f:#F6EAD0;--at-t:#8A6410;--in-f:#DBE7F1;--in-t:#1C3550;
+  --titulo:Fraunces,Georgia,"Times New Roman",serif;
+  --fonte:Lexend,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --sobre-verde:#FFFFFF;--suave:#EEF2EA;--campo:#FFFFFF;--borda-campo:#8A9284;
+  --r1:#DCEBD8;--r2:#F6EAD0;--r3:#F5E2D7;--r4:#E3C4BD;--mapa:#F7F9F4;--rio:#3D6E8F;
+}
+html[data-tema="escuro"]{
+  color-scheme:dark;
+  --verde:#B9CDB3;--escuro:#EEF2EA;--fundo:#1C2B21;--sup:#2A3829;--linha:#4A5A47;--tinta2:#D9D3C2;--marca:#A8BFA0;
+  --ok-f:#1F4A1C;--ok-t:#DCEBD8;--al-f:#5C2B2E;--al-t:#FF8A80;--at-f:#33372E;--at-t:#E5D5AE;--in-f:#1C3550;--in-t:#DBE7F1;
+  --sobre-verde:#1C2B21;--suave:#33372E;--campo:#1C2B21;--borda-campo:#8A9182;
+  --r1:#1F4A1C;--r2:#5C3F00;--r3:#5C2B2E;--r4:#2A1215;--mapa:#14180F;--rio:#7FA9C4;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--escuro);font:1rem/1.55 var(--fonte)}
+a{color:var(--verde)}
+:focus-visible{outline:3px solid var(--verde);outline-offset:2px}
+.pular{position:absolute;left:-9999px;top:8px;background:var(--verde);color:var(--sobre-verde);padding:8px 14px;border-radius:8px;z-index:10}
+.pular:focus{left:8px}
+.in{max-width:1180px;margin:0 auto;padding:0 16px}
+header{border-bottom:1px solid var(--linha);padding:14px 0 18px}
+.ferramentas{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.titulo{display:flex;align-items:center;gap:12px;margin-top:6px}
+.titulo svg{flex:none}
+h1{font:500 clamp(1.7rem,4.4vw,2.5rem)/1.15 var(--titulo);color:var(--verde);margin:0}
+.sub{color:var(--tinta2);margin:6px 0 0}
+h2{font:500 1.45rem/1.25 var(--titulo);color:var(--verde);margin:0 0 10px}
+h3{font:700 1.05rem/1.3 var(--fonte);margin:0 0 6px}
+main section{margin:20px 0}
+.cartao{background:var(--sup);border:1px solid var(--linha);border-radius:12px;padding:16px}
+.grade{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.botao{display:inline-flex;align-items:center;justify-content:center;font:inherit;font-weight:600;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--verde);background:var(--verde);color:var(--sobre-verde);cursor:pointer;text-decoration:none}
+.botao.sec{background:transparent;color:var(--verde)}
+.botao.peq{min-height:36px;padding:0 12px;font-size:.92rem}
+.botao[disabled]{opacity:.6;cursor:wait}
+.acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.selo{display:inline-block;border-radius:999px;padding:1px 10px;font-size:.85rem;font-weight:700;border:1px solid var(--linha);white-space:nowrap}
+.selo.alerta{background:var(--al-f);color:var(--al-t)}
+.selo.atencao{background:var(--at-f);color:var(--at-t)}
+.selo.normal{background:var(--ok-f);color:var(--ok-t)}
+.selo.info{background:var(--in-f);color:var(--in-t)}
+.faixa{border-radius:12px;padding:12px 16px;font-weight:600;border:1px solid var(--linha)}
+.faixa.alerta{background:var(--al-f);color:var(--al-t)}
+.faixa.atencao{background:var(--at-f);color:var(--at-t)}
+.faixa.normal{background:var(--ok-f);color:var(--ok-t)}
+.t2{color:var(--tinta2)}
+.pq{font-size:.9rem}
+.numero{font:600 1.8rem/1.1 var(--fonte)}
+.rolagem{overflow-x:auto;border:1px solid var(--linha);border-radius:12px;background:var(--sup)}
+table{border-collapse:collapse;width:100%}
+caption{text-align:left;padding:10px 12px 0;color:var(--tinta2);font-size:.92rem}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--linha);vertical-align:top}
+thead th{background:var(--suave)}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mapa{width:100%;height:auto;background:var(--mapa);border:1px solid var(--linha);border-radius:12px;display:block}
+.mapa .b{stroke:var(--escuro);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.mapa .b.nv-atencao{stroke:var(--at-t);stroke-width:3;stroke-dasharray:6 3}
+.mapa .b.nv-alerta{stroke:var(--al-t);stroke-width:4}
+.mapa .r-baixo{fill:var(--r1)}.mapa .r-medio{fill:var(--r2)}.mapa .r-alto{fill:var(--r3)}.mapa .r-muito_alto{fill:var(--r4)}
+.mapa text{fill:var(--escuro);font:600 12px var(--fonte);paint-order:stroke;stroke:var(--mapa);stroke-width:3px}
+.mapa .rio{fill:var(--rio)}
+.legenda{display:flex;flex-wrap:wrap;gap:8px 16px;margin:8px 0 0;padding:0;list-style:none;font-size:.92rem}
+.legenda i{display:inline-block;width:18px;height:14px;border:1px solid var(--escuro);vertical-align:-2px;margin-right:6px}
+label{font-weight:600}
+input[type=text],input[type=number],select,textarea{font:inherit;min-height:44px;padding:6px 10px;border:1px solid var(--borda-campo);border-radius:8px;background:var(--campo);color:var(--escuro);width:100%}
+textarea{min-height:90px}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--verde)}
+.campos{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.msg{min-height:1.4em;font-weight:600;margin:8px 0 0}
+.msg.erro{color:var(--al-t)}
+.so-leitor{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+footer{border-top:1px solid var(--linha);margin-top:28px;padding:16px 0 28px;color:var(--tinta2);font-size:.92rem}
+@media (max-width:520px){th,td{padding:6px 8px}.numero{font-size:1.4rem}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="pular" href="#conteudo" data-t="pular">Pular para o conteúdo</a>
+<header>
+  <div class="in">
+    <div class="ferramentas">
+      <button type="button" class="botao sec peq" id="b-idioma" aria-label="English">EN</button>
+      <button type="button" class="botao sec peq" id="b-tema"></button>
+    </div>
+    <div class="titulo">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true" focusable="false"><path d="M20 3c-7 0-12 5-12 11 0 4 2 7 5 9-2 1-3 3-3 5 0 3 3 5 6 5h2v4h4v-4h2c3 0 6-2 6-5 0-2-1-4-3-5 3-2 5-5 5-9 0-6-5-11-12-11z" fill="#4B7547"/></svg>
+      <h1 id="titulo" data-t="titulo">Resiliência municipal</h1>
+    </div>
+    <p class="sub" id="sub"></p>
+  </div>
+</header>
+<main id="conteudo" class="in" tabindex="-1">
+  <div id="estado" role="status" aria-live="polite"></div>
+  <div id="corpo"></div>
+  <div id="operador"></div>
+</main>
+<footer><div class="in" id="rodape"></div></footer>
+<script>
+"use strict";
+const T = {
+  pt: { pular:"Pular para o conteúdo", titulo:"Resiliência municipal", carregando:"Carregando…", sem_hub:"Não foi possível falar com o servidor. Tente de novo em instantes.",
+    nao_config:"Município ainda não configurado pela equipe da Defesa Civil.", resumo:"Situação agora", tudo_normal:"Nenhum alerta aberto no município.",
+    n_alertas:(a, b) => `${a} alerta(s) e ${b} atenção(ões) abertos.`, mapa:"Mapa de risco por bairro", mapa_desc:"Bairros coloridos pela classe de risco; borda tracejada = atenção, borda grossa = alerta. A mesma informação está na tabela de bairros.",
+    sem_bairros:"Nenhum bairro cadastrado ainda.", risco:"Risco", bairro:"Bairro", situacao:"Situação", normal:"Normal", atencao:"Atenção", alerta:"Alerta",
+    alertas:"Alertas por bairro", tipo:"Tipo", nivel:"Nível", inicio:"Início", atualizado:"Atualizado", fim:"Fim", aberto:"aberto", sem_alertas:"Nenhum alerta nas últimas 72 horas.",
+    chuva:"Chuva medida (CEMADEN)", estacao:"Estação", ultimo:"Último dado", h1:"1 h", h24:"24 h", h72:"72 h", inativa:"sem dado recente", sem_estacoes:"Sem dados do CEMADEN para este município.",
+    limiares:(l) => `Limiares de deslizamento: atenção a partir de ${l.atencao_24h} mm em 24 h ou ${l.atencao_72h} mm em 72 h; alerta a partir de ${l.alerta_24h} mm em 24 h ou ${l.alerta_72h} mm em 72 h.`,
+    pluv:"Pluviômetros Physis", inmet:"Avisos do INMET", sem_avisos:"Nenhum aviso do INMET para o município.", previsao:"Previsão (apoio)",
+    combinada:"Chance de chuva amanhã (fontes combinadas no hub)", aprendida:"Chance aprendida no lugar", sem_prev:"Sem previsão guardada no hub.",
+    rios:"Rios e enchente (GloFAS)", pico:"Vazão máxima prevista", sem_rios:"Nenhum ponto de rio configurado.", exportar:"Exportar CSV", exp_alertas:"Alertas", exp_chuva:"Chuva", exp_bairros:"Bairros",
+    consultado:"consultado em", desatualizado:"desatualizado", fontes:"Fontes", tema_claro:"Tema: claro", tema_escuro:"Tema: escuro", idioma:"English",
+    op:"Operação (equipe)", op_aviso:"Só a equipe vê esta parte. Mudanças ficam no registro do lugar.", atualizar:"Atualizar agora", config:"Município e limiares",
+    ibge:"Código IBGE (7 dígitos)", municipio:"Município", uf:"UF", lat:"Latitude do centro", lon:"Longitude do centro", orgao:"Órgão responsável", tel:"Telefone de emergência",
+    a24:"Atenção 24 h (mm)", l24:"Alerta 24 h (mm)", a72:"Atenção 72 h (mm)", l72:"Alerta 72 h (mm)", rios_txt:"Pontos de rio, um por linha: nome;latitude;longitude",
+    pluv_txt:"Pluviômetros Physis, um por linha: nó;nome;latitude;longitude;id do bairro;publico (sim/não)", gravar:"Gravar", importar:"Importar bairros",
+    arquivo:"Arquivo GeoJSON (polígonos ou pontos) ou CSV (nome;risco;lat;lon)", substituir:"Substituir todos os bairros", editar:"Bairros: risco, estações e rio",
+    estacoes:"Estações do CEMADEN no bairro (separe por vírgula)", rio:"Ponto de rio", nenhum:"nenhum", apagar:"Apagar", gravado:"Gravado.", erro:"Erro",
+    confirmar_apagar:"Apagar este bairro?", revisar:"Bairros importados sem classe de risco (entraram como R1, revise):", emergencia:t => `Em emergência, ligue ${t}. Siga sempre as orientações da Defesa Civil.`,
+    mm:"mm", municipio_todo:"Município inteiro", publico:"Visão pública (cidadão): sem dados pessoais." },
+  en: { pular:"Skip to content", titulo:"Municipal resilience", carregando:"Loading…", sem_hub:"Could not reach the server. Please try again shortly.",
+    nao_config:"The municipality has not been set up by the Civil Defense team yet.", resumo:"Current situation", tudo_normal:"No open alerts in the municipality.",
+    n_alertas:(a, b) => `${a} warning(s) and ${b} watch(es) open.`, mapa:"Risk map by neighbourhood", mapa_desc:"Neighbourhoods coloured by risk class; dashed border = watch, thick border = warning. The same information is in the neighbourhood table.",
+    sem_bairros:"No neighbourhoods registered yet.", risco:"Risk", bairro:"Neighbourhood", situacao:"Status", normal:"Normal", atencao:"Watch", alerta:"Warning",
+    alertas:"Alerts by neighbourhood", tipo:"Type", nivel:"Level", inicio:"Start", atualizado:"Updated", fim:"End", aberto:"open", sem_alertas:"No alerts in the last 72 hours.",
+    chuva:"Measured rain (CEMADEN)", estacao:"Station", ultimo:"Last reading", h1:"1 h", h24:"24 h", h72:"72 h", inativa:"no recent data", sem_estacoes:"No CEMADEN data for this municipality.",
+    limiares:(l) => `Landslide thresholds: watch from ${l.atencao_24h} mm in 24 h or ${l.atencao_72h} mm in 72 h; warning from ${l.alerta_24h} mm in 24 h or ${l.alerta_72h} mm in 72 h.`,
+    pluv:"Physis rain gauges", inmet:"INMET warnings", sem_avisos:"No INMET warnings for the municipality.", previsao:"Forecast (support)",
+    combinada:"Chance of rain tomorrow (sources combined by the hub)", aprendida:"Chance learned on site", sem_prev:"No forecast stored in the hub.",
+    rios:"Rivers and floods (GloFAS)", pico:"Highest forecast discharge", sem_rios:"No river points configured.", exportar:"Export CSV", exp_alertas:"Alerts", exp_chuva:"Rain", exp_bairros:"Neighbourhoods",
+    consultado:"checked at", desatualizado:"out of date", fontes:"Sources", tema_claro:"Theme: light", tema_escuro:"Theme: dark", idioma:"Português",
+    op:"Operations (team)", op_aviso:"Only the team sees this part. Changes are kept in the site log.", atualizar:"Update now", config:"Municipality and thresholds",
+    ibge:"IBGE code (7 digits)", municipio:"Municipality", uf:"State", lat:"Centre latitude", lon:"Centre longitude", orgao:"Responsible body", tel:"Emergency phone",
+    a24:"Watch 24 h (mm)", l24:"Warning 24 h (mm)", a72:"Watch 72 h (mm)", l72:"Warning 72 h (mm)", rios_txt:"River points, one per line: name;latitude;longitude",
+    pluv_txt:"Physis rain gauges, one per line: node;name;latitude;longitude;neighbourhood id;public (yes/no)", gravar:"Save", importar:"Import neighbourhoods",
+    arquivo:"GeoJSON file (polygons or points) or CSV (name;risk;lat;lon)", substituir:"Replace all neighbourhoods", editar:"Neighbourhoods: risk, stations and river",
+    estacoes:"CEMADEN stations in the neighbourhood (comma separated)", rio:"River point", nenhum:"none", apagar:"Delete", gravado:"Saved.", erro:"Error",
+    confirmar_apagar:"Delete this neighbourhood?", revisar:"Neighbourhoods imported without a risk class (set to R1, please review):", emergencia:t => `In an emergency, call ${t}. Always follow Civil Defense guidance.`,
+    mm:"mm", municipio_todo:"Whole municipality", publico:"Public view (citizens): no personal data." }
+};
+const RISCO_NOME = { pt:{ baixo:"Baixo (R1)", medio:"Médio (R2)", alto:"Alto (R3)", muito_alto:"Muito alto (R4)" }, en:{ baixo:"Low (R1)", medio:"Medium (R2)", alto:"High (R3)", muito_alto:"Very high (R4)" } };
+const RISCO_COD = { baixo:"R1", medio:"R2", alto:"R3", muito_alto:"R4" };
+const TIPO_NOME = { pt:{ chuva:"Chuva acumulada (encostas)", rio:"Rio acima do normal", inmet:"Aviso do INMET" }, en:{ chuva:"Accumulated rain (slopes)", rio:"River above normal", inmet:"INMET warning" } };
+let lang = (() => { try { const p = JSON.parse(localStorage.getItem("physis-pref") || "null"); return (p && p.idioma) || localStorage.getItem("physis-idioma") || "pt"; } catch (e){ return "pt"; } })() === "en" ? "en" : "pt";
+const t = (k, ...a) => { const v = T[lang][k] ?? T.pt[k] ?? k; return typeof v === "function" ? v(...a) : v; };
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const num = (v, c = 1) => v == null ? "—" : Number(v).toLocaleString(lang === "en" ? "en-GB" : "pt-BR", { minimumFractionDigits:c, maximumFractionDigits:c });
+const hora = s => s ? new Date(s * 1000).toLocaleString(lang === "en" ? "en-GB" : "pt-BR", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" }) : "—";
+const selo = nv => `<span class="selo ${nv || "normal"}">${esc(t(nv || "normal"))}</span>`;
+let dados = null, sessao = { csrf:null, papel:null }, msg = { texto:"", erro:false };
+
+function aplicarIdioma(){
+  document.documentElement.lang = lang === "en" ? "en" : "pt-BR";
+  document.querySelectorAll("[data-t]").forEach(n => { n.textContent = t(n.dataset.t); });
+  const b = document.getElementById("b-idioma"); b.textContent = lang === "en" ? "PT" : "EN"; b.setAttribute("aria-label", t("idioma"));
+  document.title = t("titulo") + " · Physis";
+  temaBotao();
+}
+function temaBotao(){ const e = document.documentElement.getAttribute("data-tema") === "escuro", b = document.getElementById("b-tema");
+  b.textContent = e ? t("tema_escuro") : t("tema_claro"); b.setAttribute("aria-pressed", String(e)); }
+document.getElementById("b-tema").addEventListener("click", () => { const novo = document.documentElement.getAttribute("data-tema") === "escuro" ? "claro" : "escuro";
+  document.documentElement.setAttribute("data-tema", novo); try { localStorage.setItem("physis-pref-tema", novo); const p = JSON.parse(localStorage.getItem("physis-pref") || "null"); if (p){ p.tema = novo; localStorage.setItem("physis-pref", JSON.stringify(p)); } } catch (e){} temaBotao(); });
+document.getElementById("b-idioma").addEventListener("click", () => { lang = lang === "en" ? "pt" : "en"; try { localStorage.setItem("physis-idioma", lang); } catch (e){} aplicarIdioma(); desenhar(); });
+
+/* ── Mapa SVG sem internet: projeção equiretangular com correção da latitude ── */
+function mapa(bairros, rios){
+  const pts = [];
+  bairros.forEach(b => { const g = b.geometria; if (g.tipo === "ponto") pts.push(g.coords); else g.coords.forEach(a => a.forEach(p => pts.push(p))); });
+  (rios || []).forEach(r => pts.push([r.lon, r.lat]));
+  if (!pts.length) return `<p class="t2">${esc(t("sem_bairros"))}</p>`;
+  let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
+  pts.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
+  const k = Math.cos((y0 + y1) / 2 * Math.PI / 180), larg = Math.max((x1 - x0) * k, 0.005), alt = Math.max(y1 - y0, 0.005), W = 1000, H = Math.round(Math.min(900, Math.max(320, W * alt / larg))), m = 30;
+  const s = Math.min((W - 2 * m) / larg, (H - 2 * m) / alt), P = ([x, y]) => [m + (x - x0) * k * s, m + (y1 - y) * s];
+  const rotulos = [];
+  const formas = bairros.map(b => { const g = b.geometria, cls = `b r-${esc(b.risco)}${b.nivel ? " nv-" + b.nivel : ""}`, tit = `<title>${esc(b.nome)} · ${esc(RISCO_NOME[lang][b.risco])} · ${esc(t(b.nivel || "normal"))}</title>`;
+    let c;
+    if (g.tipo === "ponto"){ c = P(g.coords); rotulos.push([c[0] + 10, c[1] + 4, b]); return `<g>${tit}<circle class="${cls}" cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" r="9"/></g>`; }
+    let sx = 0, sy = 0, n = 0;
+    const d = g.coords.map(a => a.map((p, i) => { const q = P(p); sx += q[0]; sy += q[1]; n++; return (i ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }).join("") + "Z").join("");
+    rotulos.push([sx / n, sy / n, b]); return `<g>${tit}<path class="${cls}" d="${d}" fill-rule="evenodd"/></g>`; }).join("");
+  const rr = (rios || []).map(r => { const c = P([r.lon, r.lat]); return `<g><title>${esc(r.nome)}</title><rect class="rio" x="${(c[0] - 6).toFixed(1)}" y="${(c[1] - 6).toFixed(1)}" width="12" height="12" transform="rotate(45 ${c[0].toFixed(1)} ${c[1].toFixed(1)})"/><text x="${(c[0] + 10).toFixed(1)}" y="${(c[1] - 8).toFixed(1)}">${esc(r.nome)}</text></g>`; }).join("");
+  const tx = rotulos.map(([x, y, b]) => `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${b.geometria.tipo === "ponto" ? "start" : "middle"}">${esc(b.nome)} · ${RISCO_COD[b.risco] || ""}${b.nivel ? " · " + esc(t(b.nivel)) : ""}</text>`).join("");
+  return `<svg class="mapa" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="mapa-t mapa-d"><title id="mapa-t">${esc(t("mapa"))}</title><desc id="mapa-d">${esc(t("mapa_desc"))}</desc>${formas}${rr}${tx}</svg>
+    <ul class="legenda">${Object.keys(RISCO_COD).map(r => `<li><i style="background:var(--r${RISCO_COD[r][1]})"></i>${esc(RISCO_NOME[lang][r])}</li>`).join("")}<li><i style="border:2px dashed var(--at-t)"></i>${esc(t("atencao"))}</li><li><i style="border:3px solid var(--al-t)"></i>${esc(t("alerta"))}</li></ul>`;
+}
+
+function tabela(cap, cab, linhas, vazio){
+  if (!linhas.length) return `<p class="t2">${esc(vazio)}</p>`;
+  return `<div class="rolagem"><table><caption>${esc(cap)}</caption><thead><tr>${cab.map(c => `<th scope="col">${esc(c)}</th>`).join("")}</tr></thead><tbody>${linhas.join("")}</tbody></table></div>`;
+}
+
+function desenhar(){
+  const corpo = document.getElementById("corpo"), est = document.getElementById("estado");
+  est.innerHTML = msg.texto ? `<p class="msg ${msg.erro ? "erro" : ""}">${esc(msg.texto)}</p>` : "";
+  if (!dados){ corpo.innerHTML = `<p class="t2">${esc(t("carregando"))}</p>`; return; }
+  if (!dados.configurado){ corpo.innerHTML = `<p class="faixa atencao">${esc(t("nao_config"))}</p>`; operador(); return; }
+  const d = dados, m = d.municipio, abertos = d.alertas.filter(a => a.aberto), nA = abertos.filter(a => a.nivel === "alerta").length, nT = abertos.length - nA;
+  document.getElementById("sub").textContent = `${m.municipio || ""}${m.uf ? " · " + m.uf : ""} · IBGE ${m.ibge}${m.orgao ? " · " + m.orgao : ""}`;
+  const resumo = `<section aria-labelledby="h-resumo"><h2 id="h-resumo">${esc(t("resumo"))}</h2><p class="faixa ${nA ? "alerta" : nT ? "atencao" : "normal"}">${esc(abertos.length ? t("n_alertas", nA, nT) : t("tudo_normal"))} ${esc(t("emergencia", m.telefone_emergencia || "199"))}</p>${d.operador ? "" : `<p class="t2 pq">${esc(t("publico"))}</p>`}</section>`;
+  const secMapa = `<section aria-labelledby="h-mapa"><h2 id="h-mapa">${esc(t("mapa"))}</h2>${mapa(d.bairros, d.rios)}
+    ${d.bairros.length ? tabela(t("mapa"), [t("bairro"), t("risco"), t("situacao")], d.bairros.map(b => `<tr><th scope="row">${esc(b.nome)}</th><td>${esc(RISCO_NOME[lang][b.risco])}</td><td>${selo(b.nivel)}</td></tr>`), "") : ""}</section>`;
+  const secAlertas = `<section aria-labelledby="h-alertas"><h2 id="h-alertas">${esc(t("alertas"))}</h2>${tabela(t("alertas"), [t("bairro"), t("tipo"), t("nivel"), t("inicio"), t("atualizado"), t("fim"), ""],
+    d.alertas.map(a => `<tr><th scope="row">${esc(a.bairro ? a.bairro_nome : t("municipio_todo"))}</th><td>${esc(TIPO_NOME[lang][a.tipo] || a.tipo)}</td><td>${selo(a.nivel)}</td><td>${hora(a.inicio)}</td><td>${hora(a.atualizado)}</td><td>${a.aberto ? `<span class="selo info">${esc(t("aberto"))}</span>` : hora(a.fim)}</td><td class="pq">${esc(a.texto)}</td></tr>`), t("sem_alertas"))}</section>`;
+  const cons = f => f.consultado ? `<p class="t2 pq">${esc(t("consultado"))} ${hora(f.consultado)}${f.atual ? "" : ` · <span class="selo atencao">${esc(t("desatualizado"))}</span>`}</p>` : "";
+  const secChuva = `<section aria-labelledby="h-chuva"><h2 id="h-chuva">${esc(t("chuva"))}</h2><p class="t2">${esc(t("limiares", d.limiares))}</p>${cons(d.cemaden)}
+    ${tabela(t("chuva") + " (" + t("mm") + ")", [t("estacao"), t("h1"), t("h24"), t("h72"), t("nivel"), t("ultimo")], d.cemaden.estacoes.map(e => `<tr><th scope="row">${esc(e.nome)}</th>${e.ativa ? `<td class="n">${num(e.mm_1h)}</td><td class="n">${num(e.mm_24h)}</td><td class="n">${num(e.mm_72h)}</td><td>${selo(e.nivel)}</td>` : `<td colspan="4" class="t2">${esc(t("inativa"))}</td>`}<td>${hora(e.ultimo)}</td></tr>`), t("sem_estacoes"))}
+    ${d.pluviometros.length ? `<h3 style="margin-top:14px">${esc(t("pluv"))}</h3>` + tabela(t("pluv") + " (" + t("mm") + ")", [t("estacao"), t("h1"), t("h24"), t("h72"), t("nivel"), t("ultimo")], d.pluviometros.map(p => `<tr><th scope="row">${esc(p.nome)}</th><td class="n">${num(p.mm_1h)}</td><td class="n">${num(p.mm_24h)}</td><td class="n">${num(p.mm_72h)}</td><td>${p.ultimo ? selo(p.nivel) : "—"}</td><td>${hora(p.ultimo)}</td></tr>`), "") : ""}</section>`;
+  const pv = d.previsao || {}, pct = v => v == null ? "—" : Math.round(v * 100) + "%";
+  const secPrev = `<section aria-labelledby="h-prev"><h2 id="h-prev">${esc(t("previsao"))}</h2><div class="grade">
+    <div class="cartao"><h3>${esc(t("inmet"))}</h3>${cons(d.inmet)}${d.inmet.avisos.length ? `<ul>${d.inmet.avisos.map(a => `<li>${selo(a.nivel)} <strong>${esc(a.evento)}</strong> ${esc(a.severidade || "")}<br><span class="t2 pq">${hora(a.inicio)} – ${hora(a.fim)}</span>${a.instrucoes ? `<br><span class="pq">${esc(a.instrucoes)}</span>` : ""}</li>`).join("")}</ul>` : `<p class="t2">${esc(t("sem_avisos"))}</p>`}</div>
+    <div class="cartao"><h3>${esc(t("combinada"))}</h3>${pv.combinada ? `<p class="numero">${pct(pv.combinada.chance_chuva)}</p>` : `<p class="t2">${esc(t("sem_prev"))}</p>`}
+      <h3>${esc(t("aprendida"))}</h3>${pv.aprendida && pv.aprendida.prob != null ? `<p class="numero">${pct(pv.aprendida.prob)}</p>` : `<p class="t2">${esc(t("sem_prev"))}</p>`}
+      ${pv.dias && pv.dias.length ? `<p class="pq">${pv.dias.map(x => `${esc(x.dia.slice(8, 10) + "/" + x.dia.slice(5, 7))}: ${num(x.mm)} mm`).join(" · ")}</p>` : ""}${pv.aviso ? `<p class="t2 pq">${esc(pv.aviso)}</p>` : ""}</div>
+    <div class="cartao"><h3>${esc(t("rios"))}</h3>${d.rios.length ? `<ul>${d.rios.map(r => `<li><strong>${esc(r.nome)}</strong> ${selo(r.nivel === "normal" ? null : r.nivel)}<br><span class="pq">${esc(t("pico"))}: ${num(r.pico, 0)} m³/s (p90 ${num(r.p90, 0)} · p99 ${num(r.p99, 0)})</span></li>`).join("")}</ul>` : `<p class="t2">${esc(t("sem_rios"))}</p>`}</div></div></section>`;
+  const secExp = `<section aria-labelledby="h-exp"><h2 id="h-exp">${esc(t("exportar"))}</h2><div class="acoes">${["alertas", "chuva", "bairros"].map(k => `<a class="botao sec" href="/api/municipio/exportar?tipo=${k}" download="municipio-${k}.csv">${esc(t("exp_" + k))} (CSV)</a>`).join("")}</div></section>`;
+  corpo.innerHTML = resumo + secMapa + secAlertas + secChuva + secPrev + secExp;
+  document.getElementById("rodape").textContent = t("fontes") + ": " + (d.fontes || "");
+  operador();
+}
+
+/* ── Operação (equipe): configuração, bairros, limiares ── */
+async function enviar(url, corpo, tipo){
+  const h = { "Content-Type": tipo || "application/json" }; if (sessao.csrf) h["X-Physis-CSRF"] = sessao.csrf;
+  const r = await fetch(url, { method:"POST", headers:h, body: tipo ? corpo : JSON.stringify(corpo), credentials:"same-origin" });
+  let j = {}; try { j = await r.json(); } catch (e){}
+  if (!r.ok || j.ok === false) throw new Error(j.erro || ("HTTP " + r.status));
+  return j;
+}
+function avisar(texto, erro){ msg = { texto, erro: !!erro }; desenhar(); document.getElementById("estado").scrollIntoView({ block:"nearest" }); }
+function operador(){
+  const o = document.getElementById("operador");
+  if (!dados || !dados.operador){ o.innerHTML = ""; return; }
+  const c = dados.config || { limiares:{}, rios:[], pluviometros:[] }, l = c.limiares || {}, m = dados.municipio || {};
+  const campo = (id, rot, v, tipo) => `<div><label for="${id}">${esc(rot)}</label><input id="${id}" type="${tipo || "text"}" value="${esc(v ?? "")}"${tipo === "number" ? ' step="any" inputmode="decimal"' : ""}></div>`;
+  const riosTxt = (c.rios || []).map(r => `${r.nome};${r.lat};${r.lon}`).join("\n"), plTxt = (c.pluviometros || []).map(p => `${p.no};${p.nome};${p.lat ?? ""};${p.lon ?? ""};${p.bairro};${p.publico ? "sim" : "não"}`).join("\n");
+  const opRio = sel => `<option value="">${esc(t("nenhum"))}</option>` + (c.rios || []).map(r => `<option value="${esc(r.id)}"${r.id === sel ? " selected" : ""}>${esc(r.nome)}</option>`).join("");
+  const opRisco = sel => Object.keys(RISCO_COD).map(r => `<option value="${r}"${r === sel ? " selected" : ""}>${esc(RISCO_NOME[lang][r])}</option>`).join("");
+  o.innerHTML = `<section aria-labelledby="h-op"><h2 id="h-op">${esc(t("op"))}</h2><p class="t2">${esc(t("op_aviso"))}</p>
+    ${dados.erros && Object.keys(dados.erros).length ? `<p class="faixa atencao">${Object.entries(dados.erros).map(([k, v]) => esc(k + ": " + v)).join("<br>")}</p>` : ""}
+    <div class="acoes"><button type="button" class="botao" id="op-atualizar">${esc(t("atualizar"))}</button></div>
+    <form class="cartao" id="op-config" style="margin-top:14px"><h3>${esc(t("config"))}</h3><div class="campos">
+      ${campo("c-ibge", t("ibge"), m.ibge)}${campo("c-mun", t("municipio"), m.municipio)}${campo("c-uf", t("uf"), m.uf)}${campo("c-lat", t("lat"), m.lat, "number")}${campo("c-lon", t("lon"), m.lon, "number")}
+      ${campo("c-orgao", t("orgao"), m.orgao)}${campo("c-tel", t("tel"), m.telefone_emergencia)}
+      ${campo("c-a24", t("a24"), l.atencao_24h, "number")}${campo("c-l24", t("l24"), l.alerta_24h, "number")}${campo("c-a72", t("a72"), l.atencao_72h, "number")}${campo("c-l72", t("l72"), l.alerta_72h, "number")}</div>
+      <div style="margin-top:10px"><label for="c-rios">${esc(t("rios_txt"))}</label><textarea id="c-rios">${esc(riosTxt)}</textarea></div>
+      <div style="margin-top:10px"><label for="c-pluv">${esc(t("pluv_txt"))}</label><textarea id="c-pluv">${esc(plTxt)}</textarea></div>
+      <div class="acoes"><button type="submit" class="botao">${esc(t("gravar"))}</button></div></form>
+    <form class="cartao" id="op-importar" style="margin-top:14px"><h3>${esc(t("importar"))}</h3><label for="i-arq">${esc(t("arquivo"))}</label>
+      <input id="i-arq" type="file" accept=".geojson,.json,.csv,application/geo+json,application/json,text/csv" required>
+      <p><label style="font-weight:400;display:flex;gap:8px;align-items:center"><input id="i-subst" type="checkbox"> ${esc(t("substituir"))}</label></p>
+      <div class="acoes"><button type="submit" class="botao">${esc(t("importar"))}</button></div></form>
+    ${dados.bairros.length ? `<div class="cartao" style="margin-top:14px"><h3>${esc(t("editar"))}</h3>${tabela(t("editar"), [t("bairro"), t("risco"), t("estacoes"), t("rio"), ""], dados.bairros.map((b, i) =>
+      `<tr><th scope="row">${esc(b.nome)}<br><span class="t2 pq">${esc(b.id)}</span></th><td><label class="so-leitor" for="e-r-${i}">${esc(t("risco"))}</label><select id="e-r-${i}" data-ed="risco" data-id="${esc(b.id)}">${opRisco(b.risco)}</select></td>
+       <td><label class="so-leitor" for="e-e-${i}">${esc(t("estacoes"))}</label><input id="e-e-${i}" type="text" data-ed="estacoes" data-id="${esc(b.id)}" value="${esc((b.estacoes || []).join(", "))}"></td>
+       <td><label class="so-leitor" for="e-rio-${i}">${esc(t("rio"))}</label><select id="e-rio-${i}" data-ed="rio" data-id="${esc(b.id)}">${opRio(b.rio)}</select></td>
+       <td><button type="button" class="botao sec peq" data-apagar="${esc(b.id)}" aria-label="${esc(t("apagar") + " " + b.nome)}">${esc(t("apagar"))}</button></td></tr>`), "")}</div>` : ""}</section>`;
+}
+const linhasDe = id => document.getElementById(id).value.split("\n").map(x => x.trim()).filter(Boolean).map(x => x.split(";").map(y => y.trim()));
+const nOuNada = v => v === "" || v == null ? null : Number(String(v).replace(",", "."));
+document.addEventListener("submit", async ev => {
+  const f = ev.target; if (!f.id || !f.id.startsWith("op-")) return; ev.preventDefault();
+  const b = f.querySelector("button[type=submit]"); b.disabled = true;
+  try {
+    if (f.id === "op-config"){
+      const v = id => document.getElementById(id).value.trim();
+      const corpo = { ibge:v("c-ibge"), municipio:v("c-mun"), uf:v("c-uf"), lat:nOuNada(v("c-lat")), lon:nOuNada(v("c-lon")), orgao:v("c-orgao"), telefone_emergencia:v("c-tel"),
+        limiares:{ atencao_24h:nOuNada(v("c-a24")), alerta_24h:nOuNada(v("c-l24")), atencao_72h:nOuNada(v("c-a72")), alerta_72h:nOuNada(v("c-l72")) },
+        rios: linhasDe("c-rios").map(([nome, lat, lon]) => ({ nome, lat:nOuNada(lat), lon:nOuNada(lon) })),
+        pluviometros: linhasDe("c-pluv").map(([no, nome, lat, lon, bairro, pub]) => ({ no:Number(no), nome, lat:nOuNada(lat), lon:nOuNada(lon), bairro:bairro || "", publico:/^(sim|s|yes|y|1)$/i.test(pub || "") })) };
+      await enviar("/api/municipio/config", corpo); await carregar(); avisar(t("gravado"));
+    } else {
+      const arq = document.getElementById("i-arq").files[0]; if (!arq) return;
+      const txt = await arq.text(), ehCsv = /\.csv$/i.test(arq.name);
+      const r = await enviar("/api/municipio/bairros/importar" + (document.getElementById("i-subst").checked ? "?substituir=1" : ""), txt, ehCsv ? "text/csv" : "application/json");
+      await carregar(); avisar(t("gravado") + (r.revisar && r.revisar.length ? " " + t("revisar") + " " + r.revisar.join(", ") : ""));
+    }
+  } catch (e){ avisar(t("erro") + ": " + e.message, true); } finally { b.disabled = false; }
+});
+document.addEventListener("change", async ev => {
+  const n = ev.target; if (!n.dataset || !n.dataset.ed) return;
+  const corpo = { id:n.dataset.id }; corpo[n.dataset.ed] = n.dataset.ed === "estacoes" ? n.value.split(",").map(x => x.trim()).filter(Boolean) : n.value;
+  try { await enviar("/api/municipio/bairro", corpo); await carregar(); avisar(t("gravado")); } catch (e){ avisar(t("erro") + ": " + e.message, true); }
+});
+document.addEventListener("click", async ev => {
+  const b = ev.target.closest("button"); if (!b) return;
+  try {
+    if (b.id === "op-atualizar"){ b.disabled = true; await enviar("/api/municipio/atualizar", {}); await carregar(); avisar(t("gravado")); }
+    else if (b.dataset.apagar && confirm(t("confirmar_apagar"))){ await enviar("/api/municipio/bairro", { id:b.dataset.apagar, apagar:true }); await carregar(); avisar(t("gravado")); }
+  } catch (e){ avisar(t("erro") + ": " + e.message, true); } finally { b.disabled = false; }
+});
+
+async function carregar(){
+  try {
+    const i = await fetch("/api/instancia", { credentials:"same-origin" }).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+    sessao = { csrf:i.csrf || null, papel:i.papel || null };
+    let r = null;
+    if (i.papel === "operador" || i.papel === "administrador") r = await fetch("/api/municipio", { credentials:"same-origin" });
+    if (!r || !r.ok) r = await fetch("/api/municipio/publico", { credentials:"same-origin" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    dados = await r.json(); if (msg.erro && msg.texto === t("sem_hub")) msg = { texto:"", erro:false };
+  } catch (e){ msg = { texto:t("sem_hub"), erro:true }; }
+  desenhar();
+}
+aplicarIdioma(); desenhar(); carregar();
+setInterval(() => { if (!document.hidden && !document.querySelector("#operador :focus")) carregar(); }, 5 * 60 * 1000);
+</script>
+</body>
+</html>

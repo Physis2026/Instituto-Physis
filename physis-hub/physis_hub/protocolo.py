@@ -7,6 +7,7 @@ Qualquer mudanca aqui tem de entrar tambem nos dois `protocolo.cpp` e no
 from __future__ import annotations
 
 import math
+import os
 import re
 
 TOTAL_NOS = 99
@@ -14,10 +15,20 @@ PREFIXO_COMANDO = "CMD:"
 PREFIXO_BEACON = "BCN:"
 EPOCH_MIN_VALIDO = 1_700_000_000   # 2023-11-14
 EPOCH_MAX_VALIDO = 4_102_444_800   # 2100-01-01
-TIPOS_CONHECIDOS = ("SOLO", "ZONA", "COL", "COM")
+# PLUV: pluviometro de bascula (docs/ROBOS.md secao 6). MED/PUL: caixinha de remedios e pulseira
+# (docs/SAUDE.md, "a homologar"); o hub as entrega a saude.py antes do adaptador generico e nunca
+# as grava em `medicao`. PHYSIS_SAUDE_V6=0 volta a recusar MED/PUL (tipo_desconhecido) no receptor e no /api/v6/linha.
+TIPOS_SAUDE = ("MED", "PUL")
+TIPOS_CONHECIDOS = ("SOLO", "ZONA", "COL", "COM", "PLUV") + TIPOS_SAUDE
 # Limites de plausibilidade fisica, largos de proposito. NAO sao faixas de operacao:
 # as faixas de operacao de cada equipamento devem ser confirmadas pela equipe tecnica da Physis.
-FAIXAS_PLAUSIVEIS = {"BAT": (0.0, 60.0), "RSSI": (-200.0, 20.0), "SNR": (-60.0, 60.0)}
+# CHI: mm de chuva no intervalo (0 a 200); PUL so e contador de pulsos quando TIPO:PLUV (na pulseira, PUL e o TIPO).
+FAIXAS_PLAUSIVEIS = {"BAT": (0.0, 60.0), "RSSI": (-200.0, 20.0), "SNR": (-60.0, 60.0), "CHI": (0.0, 200.0)}
+
+
+def saude_v6_ligada() -> bool:
+    """PHYSIS_SAUDE_V6 (padrao 1): MED e PUL entram pelo receptor e pelo /api/v6/linha e vao para a Saude."""
+    return os.environ.get("PHYSIS_SAUDE_V6", "1").strip() != "0"
 LINHA_MAX = 240                    # folga sobre o maior payload (~132 B) + RSSI/SNR
 
 SENTINELAS = {"-", "--", "---", "n/d", "nd", "null", "none", "nan"}
@@ -105,8 +116,14 @@ def validar_telemetria(bruta: str) -> tuple[bool, str, dict[str, str]]:
     no = para_int(campos["ID"], -1)
     if no < 1 or no > TOTAL_NOS:
         return False, "id_fora", campos
-    if "TIPO" in campos and campos["TIPO"].strip().upper() not in TIPOS_CONHECIDOS:
+    tipo = campos["TIPO"].strip().upper() if "TIPO" in campos else ""
+    if tipo and (tipo not in TIPOS_CONHECIDOS or (tipo in TIPOS_SAUDE and not saude_v6_ligada())):
         return False, "tipo_desconhecido", campos      # um tipo novo nao pode virar "solo" em silencio
+    if tipo == "PLUV" and "PUL" in campos:
+        p = para_float(campos["PUL"], None)
+        if p is not None and (p < 0 or p != int(p)):
+            del campos["PUL"]                           # contador de pulsos: inteiro >= 0
+            campos["_FORA"] = "PUL"
     fora = []
     for k, (lo, hi) in FAIXAS_PLAUSIVEIS.items():
         if k in campos:
@@ -116,7 +133,7 @@ def validar_telemetria(bruta: str) -> tuple[bool, str, dict[str, str]]:
     for k in fora:
         del campos[k]                                   # a leitura segue; o campo absurdo, nao
     if fora:
-        campos["_FORA"] = ",".join(fora)
+        campos["_FORA"] = ",".join(([campos["_FORA"]] if "_FORA" in campos else []) + fora)
     return True, "", campos
 
 

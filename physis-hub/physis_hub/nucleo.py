@@ -31,9 +31,12 @@ FAIXAS: dict[str, tuple[float | None, float | None, str]] = {
     "atividade": (None, None, "0-2"),
     "impacto": (None, None, "0/1"),
     "porcoes": (None, None, "un"),
+    # pluviometro de bascula (TIPO:PLUV): chuva no intervalo e intensidade (mm/h, calculada pelo hub)
+    "chuva": (0, 200, "mm"),
+    "chuva_intensidade": (None, None, "mm/h"),
 }
 GRANDEZAS_NOVAS = ("umidade_solo", "estado", "previsao_min", "bateria", "rssi", "snr",
-                   "latitude", "longitude", "atividade", "impacto", "porcoes")
+                   "latitude", "longitude", "atividade", "impacto", "porcoes", "chuva", "chuva_intensidade")
 
 
 def org_valido(org: str) -> bool:

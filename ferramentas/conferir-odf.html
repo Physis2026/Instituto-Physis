@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conferir ODF</title>
+<style>
+  body { font: 15px/1.45 system-ui, sans-serif; margin: 16px; color: #1C2B21; background: #fff; max-width: 1100px; }
+  table { border-collapse: collapse; margin: 6px 0 12px; font-size: 13px; }
+  th, td { border: 1px solid #C9D2C4; padding: 3px 6px; text-align: left; vertical-align: top; }
+  thead th { background: #4B7547; color: #fff; }
+  .ok { color: #1F4A1C; } .falha { color: #7A2214; font-weight: 600; }
+  .cartao { border: 1px solid #D6DBCF; border-radius: 8px; padding: 8px 12px; margin: 10px 0; }
+  button { font: inherit; font-weight: 600; min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #33512F; background: #fff; color: #33512F; cursor: pointer; margin: 0 6px 6px 0; }
+  .px-faixa { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #C9D2C4; padding: 6px 0; }
+  .px-tit { font-family: Fraunces, Georgia, serif; font-size: 22px; color: #33512F; }
+  :focus-visible { outline: 3px solid #33512F; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="px-faixa"><span class="px-tit">Sistema Physis</span></div>
+<h1>Conferência dos arquivos ODF (ODT e ODS)</h1>
+<p>Gera um texto (.odt) e uma planilha (.ods) com <code>sistema/physis-odf.js</code> a partir da tela de exemplo abaixo, confere a
+  estrutura aqui mesmo (mimetype primeiro e sem compressão, manifesto, XML bem formado, estilos e números tipados) e deixa baixar
+  para abrir no LibreOffice. Abra por um servidor local (<code>python -m http.server</code> na raiz do repositório) ou direto do disco.</p>
+<p>No LibreOffice, confira: cabeçalho com o nome do sistema; marca d'água "PHYSIS" na diagonal em todas as páginas; rodapé
+  "Documento gerado pelo Sistema Physis" com página X de Y; títulos verdes no Navegador (F5); lista com marcadores e numerada; tabela
+  com cabeçalho verde que repete na página seguinte; o gráfico como imagem com texto alternativo; na planilha, números à direita e
+  somáveis, R$, %, datas, CEP como texto, uma folha por tabela. Depois: Arquivo &gt; Exportar como PDF &gt; "PDF/A-2b" e conferir no veraPDF.</p>
+<div>
+  <button type="button" id="b-odt">Baixar ODT</button>
+  <button type="button" id="b-ods">Baixar ODS</button>
+  <button type="button" id="b-conferir">Conferir de novo</button>
+  <label><input type="checkbox" id="svg-embutido"> SVG embutido (com PNG de reserva)</label>
+</div>
+<pre id="resumo" aria-live="polite">Carregando…</pre>
+<div id="saida"></div>
+
+<h2>Tela de exemplo</h2>
+<div id="tela" class="cartao">
+  <h2>Consumo de água · Unidade Petrópolis</h2>
+  <p>Leituras do hidrômetro principal. Valores em m³; custo pela tarifa  vigente (dois espaços de propósito) e “aspas” &amp; símbolos &lt;&gt;.</p>
+  <h3>Pontos de atenção</h3>
+  <ul><li>Vazamento provável no bloco B</li><li>Leitura de março estimada</li></ul>
+  <ol><li>Trocar a boia da caixa</li><li>Refazer a leitura</li></ol>
+  <table>
+    <caption>Leituras mensais</caption>
+    <thead><tr><th>Mês</th><th>Volume (m³)</th><th>Custo</th><th>Variação</th><th>Data da leitura</th><th>CEP</th></tr></thead>
+    <tbody>
+      <tr><td>Janeiro</td><td>1.234,5</td><td>R$ 9.876,54</td><td>-3,2%</td><td>31/01/2026</td><td>25620-000</td></tr>
+      <tr><td>Fevereiro</td><td>1.180</td><td>R$ 9.440,00</td><td>4%</td><td>28/02/2026</td><td>01234-567</td></tr>
+      <tr><td>Março</td><td>1.5</td><td>R$ 10</td><td>12,5%</td><td>31/03/2026</td><td>0800</td></tr>
+    </tbody>
+  </table>
+  <svg width="320" height="120" viewBox="0 0 320 120" role="img" aria-label="Gráfico de barras do volume por mês">
+    <title>Volume por mês</title>
+    <rect x="20" y="20" width="60" height="90" fill="#4B7547"></rect>
+    <rect x="120" y="30" width="60" height="80" fill="#33512F"></rect>
+    <rect x="220" y="10" width="60" height="100" fill="#B9A97F"></rect>
+    <text x="50" y="16" text-anchor="middle" font-size="11" fill="#1C2B21">Jan</text>
+  </svg>
+  <label>Responsável <input value="Equipe técnica"></label>
+  <p hidden>Isto está escondido e não deve sair.</p>
+</div>
+
+<script src="../sistema/physis-odf.js"></script>
+<script>
+"use strict";
+var saida = document.getElementById("saida"), resumo = document.getElementById("resumo");
+var ultimo = {};
+function linha(ok, txt) { return '<li class="' + (ok ? "ok" : "falha") + '">' + (ok ? "OK · " : "FALHOU · ") + txt.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</li>"; }
+// leitor de ZIP mínimo (só para conferir): diretório central -> arquivos; inflate com DecompressionStream
+function lerZip(u8) {
+  var dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength), fim = -1;
+  for (var i = u8.length - 22; i >= 0; i--) if (dv.getUint32(i, true) === 0x06054b50) { fim = i; break; }
+  if (fim < 0) throw new Error("sem fim de diretório central");
+  var n = dv.getUint16(fim + 10, true), p = dv.getUint32(fim + 16, true), lista = [];
+  for (var k = 0; k < n; k++) {
+    var metodo = dv.getUint16(p + 10, true), crc = dv.getUint32(p + 16, true), comp = dv.getUint32(p + 20, true), tam = dv.getUint32(p + 24, true);
+    var ln = dv.getUint16(p + 28, true), le = dv.getUint16(p + 30, true), lc = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+    var nome = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + ln));
+    var lnL = dv.getUint16(off + 26, true), leL = dv.getUint16(off + 28, true), ini = off + 30 + lnL + leL;
+    lista.push({ nome: nome, metodo: metodo, crc: crc, tam: tam, extraLocal: leL, off: off, dados: u8.subarray(ini, ini + comp) });
+    p += 46 + ln + le + lc;
+  }
+  return lista;
+}
+function inflar(a) {
+  if (a.metodo === 0) return Promise.resolve(a.dados);
+  var s = new Blob([a.dados]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+  return new Response(s).arrayBuffer().then(function (b) { return new Uint8Array(b); });
+}
+function conferir(nomeArq, u8, mime, extra) {
+  var itens = [], arqs;
+  try { arqs = lerZip(u8); } catch (e) { return Promise.resolve(linha(false, nomeArq + ": " + e.message)); }
+  itens.push(linha(arqs[0].nome === "mimetype" && arqs[0].off === 0, "mimetype é o primeiro arquivo"));
+  itens.push(linha(arqs[0].metodo === 0 && arqs[0].extraLocal === 0, "mimetype sem compressão e sem campo extra"));
+  itens.push(linha(new TextDecoder().decode(u8.subarray(30, 38 + mime.length)) === "mimetype" + mime, "bytes 30.. = mimetype" + mime));
+  return Promise.all(arqs.map(function (a) { return inflar(a).then(function (d) { a.texto = /\.xml$/.test(a.nome) || a.nome === "mimetype" ? new TextDecoder().decode(d) : null; a.crcOk = PhysisODF.crc32(d) === a.crc && d.length === a.tam; }); })).then(function () {
+    itens.push(linha(arqs.every(function (a) { return a.crcOk; }), "CRC e tamanho de todos os arquivos (" + arqs.length + "); deflate: " + arqs.filter(function (a) { return a.metodo === 8; }).length));
+    var xmls = {}; arqs.forEach(function (a) { if (a.texto != null && /\.xml$/.test(a.nome)) { var doc = new DOMParser().parseFromString(a.texto, "application/xml"); xmls[a.nome] = doc; itens.push(linha(!doc.querySelector("parsererror"), a.nome + " bem formado")); } });
+    var man = xmls["META-INF/manifest.xml"], NSM = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0";
+    var listados = Array.prototype.map.call(man.getElementsByTagNameNS(NSM, "file-entry"), function (e) { return e.getAttributeNS(NSM, "full-path"); });
+    var faltam = arqs.map(function (a) { return a.nome; }).filter(function (n) { return n !== "mimetype" && n !== "META-INF/manifest.xml" && listados.indexOf(n) < 0; });
+    itens.push(linha(!faltam.length && listados.indexOf("/") >= 0, "manifesto lista todos os arquivos" + (faltam.length ? " (faltam: " + faltam.join(", ") + ")" : "")));
+    var meta = arqs.filter(function (a) { return a.nome === "meta.xml"; })[0].texto;
+    itens.push(linha(/<meta:initial-creator>Physis Engineering</.test(meta) && /<dc:title>/.test(meta) && /<meta:generator>Sistema Physis/.test(meta), "meta.xml: título, autor Physis Engineering, gerador"));
+    (extra || []).forEach(function (f) { var r = f(arqs); itens.push(linha(r[0], r[1])); });
+    return "<h3>" + nomeArq + "</h3><ul>" + itens.join("") + "</ul>";
+  });
+}
+function texto(arqs, n) { return arqs.filter(function (a) { return a.nome === n; })[0].texto; }
+function gerar() {
+  var tela = document.getElementById("tela"), op = { titulo: "Consumo de água", svgEmbutido: document.getElementById("svg-embutido").checked };
+  resumo.textContent = "Gerando…";
+  return Promise.all([PhysisODF.odt(tela, op), PhysisODF.ods(tela, { titulo: "Consumo de água" })]).then(function (r) {
+    ultimo = { odt: r[0], ods: r[1] };
+    return Promise.all([
+      conferir("ODT", r[0], PhysisODF.MIME.odt, [
+        function (a) { var c = texto(a, "content.xml"); return [/text:outline-level="1"/.test(c) && /Lista_20_Physis/.test(c) && /Lista_20_Numerada/.test(c), "títulos com nível, lista com marcadores e numerada"]; },
+        function (a) { var c = texto(a, "content.xml"); return [/<table:table-header-rows>/.test(c) && /TabCab/.test(c), "tabela com linha de cabeçalho verde"]; },
+        function (a) { var c = texto(a, "content.xml"); return [/Pictures\/imagem1\.png/.test(c) && a.some(function (x) { return x.nome === "Pictures/imagem1.png"; }) && /<svg:title>Gráfico de barras/.test(c), "gráfico SVG virou PNG com texto alternativo"]; },
+        function (a) { var c = texto(a, "content.xml"); return [!/escondido/.test(c) && /Responsável: Equipe técnica/.test(c), "o escondido não sai; campo sai como \"rótulo: valor\""]; },
+        function (a) { var s = texto(a, "styles.xml"); return [/MarcaDaguaPhysis/.test(s) && /Documento gerado pelo Sistema Physis/.test(s) && /<text:page-number/.test(s) && /<text:page-count/.test(s), "marca d'água, rodapé e página X de Y"]; }]),
+      conferir("ODS", r[1], PhysisODF.MIME.ods, [
+        function (a) { var c = texto(a, "content.xml"); return [(c.match(/<table:table /g) || []).length === 1 && /table:name="Leituras mensais"/.test(c), "uma folha por tabela, com o nome da legenda"]; },
+        function (a) { var c = texto(a, "content.xml"); return [/office:value-type="float" office:value="1234.5"/.test(c) && /office:value-type="float" office:value="1180"/.test(c), "números pt-BR viram número (1.234,5 → 1234.5)"]; },
+        function (a) { var c = texto(a, "content.xml"); return [/office:value-type="currency" office:currency="BRL" office:value="9876.54"/.test(c) && /office:value-type="percentage" office:value="-0.032"/.test(c), "R$ e % tipados"]; },
+        function (a) { var c = texto(a, "content.xml"); return [/office:date-value="2026-01-31"/.test(c), "datas dd/mm/aaaa viram data"]; },
+        function (a) { var c = texto(a, "content.xml"); return [/office:value-type="string"><text:p>01234-567/.test(c) && /office:value-type="string"><text:p>1\.5</.test(c) && /office:value-type="string"><text:p>0800/.test(c), "CEP, \"1.5\" e 0800 ficam texto"]; },
+        function (a) { var c = texto(a, "content.xml"); return [/ceCab/.test(c) && /<table:table-header-rows>/.test(c), "cabeçalho com estilo e repetido na impressão"]; }])
+    ]);
+  }).then(function (html) {
+    saida.innerHTML = html.join("");
+    var falhas = saida.querySelectorAll(".falha").length;
+    resumo.textContent = falhas ? falhas + " conferência(s) falharam." : "Tudo certo: " + saida.querySelectorAll(".ok").length + " conferências. Baixe e abra no LibreOffice.";
+    document.title = (falhas ? "FALHOU · " : "OK · ") + "Conferir ODF";
+  }).catch(function (e) { resumo.textContent = "Erro: " + (e && e.stack || e); });
+}
+// para conferência automática: base64 dos últimos arquivos
+window.conferirODF = { gerar: gerar, base64: function (q) { var u = ultimo[q], s = ""; for (var i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); } };
+document.getElementById("b-odt").addEventListener("click", function () { PhysisODF.baixar("physis-conferir.odt", ultimo.odt, PhysisODF.MIME.odt); });
+document.getElementById("b-ods").addEventListener("click", function () { PhysisODF.baixar("physis-conferir.ods", ultimo.ods, PhysisODF.MIME.ods); });
+document.getElementById("b-conferir").addEventListener("click", gerar);
+document.getElementById("svg-embutido").addEventListener("change", gerar);
+gerar();
+</script>
+</body>
+</html>

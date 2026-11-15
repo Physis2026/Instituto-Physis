@@ -41,6 +41,14 @@ o pedido veio por HTTPS.
 | `PHYSIS_TERMOS_VERSAO` | vazio | Força a versão dos termos; sem ela, vale o `"versao"` de `sistema/physis-juridico.js` (lido ao subir). |
 | `PHYSIS_CONSENTIMENTO_ESTRITO` | vazio | `1` = sem o aceite da versão atual dos termos, só as rotas da própria conta funcionam (403 `{"consentimento": true}`). **Ligue depois que as telas tiverem o aviso de aceite.** |
 | `PHYSIS_SEGURANCA_CONTATO` | vazio | Contato do `/.well-known/security.txt` (e-mail ou https; padrão: e-mail de suporte). |
+| `PHYSIS_SAUDE_V6` | `1` | Linhas `MED`/`PUL` (Saúde) pelo receptor, `/api/v6/linha` e MQTT vão para a Saúde (nunca para `medicao`). `0` = recusadas (`tipo_desconhecido`); `/api/saude/linha` segue aceitando. |
+| `PHYSIS_INSTANCIA` | `instancia.json` ao lado de `physis_hub/` | Outro arquivo de configuração. Serve para rodar o servidor do Instituto Physis do mesmo código (`docs/INSTITUTO.md`); o `"banco"` dele fica na pasta dele. |
+
+Rotas novas de 15/11/2026 (mesmas regras): `GET /api/cliente/estado`, `GET|PUT /api/cliente/estado/<chave>` e
+`GET /api/cliente/perfil` exigem sessão (cliente ou acima) **sempre**, mesmo em instalação sem login; o PUT passa pelo
+CSRF; só as chaves da lista (`perfil_cliente.py`), até 2 MB por chave e 32 MB por organização. `GET /api/central/clientes`
+e `GET|POST /api/suporte/chamados/<numero>` (contatos e notas internas = dado pessoal) exigem a **equipe**; o cliente
+só vê a situação e as respostas dos próprios chamados em `GET /api/suporte`.
 
 Os limites e `PHYSIS_PROXY_CONFIAVEL`/`PHYSIS_ACEITAR_SEM_CHAVE` são lidos quando o servidor sobe; os demais, a cada pedido.
 

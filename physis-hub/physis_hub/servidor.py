@@ -58,6 +58,7 @@ from . import app_pwa
 from . import correio
 from . import editais as editais_mod
 from . import seguranca as seg
+from . import perfil_cliente
 from .hub import Hub
 from .protocolo import para_int, validar_telemetria
 from .simulador import Simulador
@@ -107,12 +108,36 @@ VENDOR_TIPOS = {"maplibre-gl.js": "text/javascript; charset=utf-8", "maplibre-gl
 INSTANCIA = Path(__file__).resolve().parent.parent / "instancia.json"
 
 
+def arquivo_instancia() -> Path:
+    """instancia.json desta instalação. PHYSIS_INSTANCIA troca o arquivo: assim o servidor da Physis e o do
+    Instituto Physis rodam do mesmo código na mesma máquina, cada um com a sua configuração (docs/INSTITUTO.md)."""
+    return Path(os.environ.get("PHYSIS_INSTANCIA") or INSTANCIA)
+
+
 def ler_instancia() -> dict:
     """Configuracao da instalacao montada na compra: modulos, se exige login, licenca."""
     try:
-        return json.loads(INSTANCIA.read_text(encoding="utf-8"))
+        return json.loads(arquivo_instancia().read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
+
+
+def banco_da_instancia(inst: dict) -> str:
+    """Arquivo do banco: PHYSIS_BANCO; senão o "banco" do instancia.json (relativo à pasta dele); senão physis-hub.db."""
+    if os.environ.get("PHYSIS_BANCO"):
+        return os.environ["PHYSIS_BANCO"]
+    nome = str(inst.get("banco") or "").strip()
+    if nome and re.fullmatch(r"[A-Za-z0-9._-]{1,80}\.db", nome):
+        return str(arquivo_instancia().resolve().parent / nome)
+    return "physis-hub.db"
+
+
+def marca_da_instancia(inst: dict) -> dict:
+    """Marca da instalação para as telas: nome, texto do logo e cores (só as da docs/PALETA.md, conferidas na montagem)."""
+    m = inst.get("marca") if isinstance(inst.get("marca"), dict) else {}
+    cores = m.get("cores") if isinstance(m.get("cores"), dict) else {}
+    return {"nome": str(m.get("nome") or inst.get("nome") or "")[:120], "logo_texto": str(m.get("logo_texto") or "")[:60],
+            "cores": {str(k)[:30]: str(v)[:9] for k, v in cores.items() if re.fullmatch(r"#[0-9A-Fa-f]{6}", str(v))}}
 
 
 def cliente_receptor(base: str, timeout: float = 4.0):
@@ -339,6 +364,15 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
     if irradiacao is None:
         irradiacao = gis_mod.Irradiacao(hub)
     saude = saude_mod.Saude(hub)
+    # MED/PUL pelo receptor, pelo /api/v6/linha e pelo MQTT: o hub entrega à Saúde antes do adaptador genérico
+    # (protocolo.TIPOS_SAUDE; PHYSIS_SAUDE_V6=0 desliga). Avisos novos (dose esquecida, crise) saem pela fila de e-mail.
+    def receptor_saude(linha: str, origem: str) -> dict:
+        r = saude.registrar_evento(linha, origem=origem)
+        for aid in r.get("alertas", []):
+            threading.Thread(target=correio.enviar_fila, args=(hub, f"saude-{aid}"), daemon=True).start()
+        return r
+    if getattr(hub, "saude_receptor", None) is None:
+        hub.saude_receptor = receptor_saude
     if clima is None:
         rx = os.environ.get("PHYSIS_RX_URL")
         clima = clima_mod.Clima(hub, receptor_url=rx, enviar_local=clima_mod.receptor_local(rx) if rx else None)
@@ -348,7 +382,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
     fabricar = fabricante(instancia)
     url_publica = (os.environ.get("PHYSIS_URL_PUBLICA") or instancia.get("url_publica") or "").rstrip("/")
     # Editais e eventos (editais.py): listas públicas buscadas pelo servidor, com cache em arquivo
-    pasta_editais = Path(os.environ.get("PHYSIS_EDITAIS_PASTA") or (Path(os.environ.get("PHYSIS_BANCO", "physis-hub.db")).resolve().parent / "editais"))
+    pasta_editais = Path(os.environ.get("PHYSIS_EDITAIS_PASTA") or (Path(banco_da_instancia(instancia)).resolve().parent / "editais"))
     editais_col = editais_mod.Coletor(pasta_editais, tipo="edital")
     eventos_col = editais_mod.Coletor(pasta_editais, tipo="evento")
     # Aprendizado local (sem internet), robôs com regras (+ IA local opcional) e alertas de clima por e-mail/WhatsApp
@@ -539,7 +573,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 except OSError:
                     pass
 
-        def _json(self, codigo: int, obj) -> None:
+        def _json(self, codigo: int, obj, cabecalhos: dict | None = None) -> None:
             if codigo >= 400:
                 # corpo grande ainda não lido (ex.: 403 a um anexo de 20 MB): responde e drena com tempo limite
                 try:
@@ -547,13 +581,15 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 except ValueError:
                     grande = False
                 if grande:
-                    return self._recusar(codigo, obj)
+                    return self._recusar(codigo, obj, cabecalhos)
                 self._drenar_pendente()
             corpo = json.dumps(obj, ensure_ascii=False).encode("utf-8")
             self.send_response(codigo)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(corpo)))
             self.send_header("Cache-Control", "no-store")
+            for k, v in (cabecalhos or {}).items():
+                self.send_header(k, v)
             self.end_headers()
             self.wfile.write(corpo)
 
@@ -660,6 +696,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     "supervisao": (WEB / "supervisao.html").exists(), "gestao": (WEB / "gestao.html").exists(),
                     "planejador": (WEB / "planejador.html").exists(), "pesquisa": bool(instancia.get("pesquisa")),
                     "nome_cliente": instancia.get("nome"),
+                    # instalação "physis" (padrão) ou "instituto" (Instituto Physis: outra marca, outro banco, outro catálogo)
+                    "instalacao": instancia.get("instalacao") or "physis", "marca": marca_da_instancia(instancia),
                     "cursos": [c for c in (instancia.get("cursos") or []) if isinstance(c, dict)] if q else [],
                     "senha_min": hub.SENHA_MIN,
                     # segurança: token CSRF da sessão (mandar em X-Physis-CSRF), termos, e-mail, 2FA
@@ -901,6 +939,50 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     desde = 0.0
                 return self._json(200, {"ok": True, "agora": time.time(), "conta": {k: q[k] for k in ("nome", "usuario", "papel", "pessoa")},
                                         "itens": hub.gestao_ler(desde)})
+            # ── Plataforma do cliente: dados que antes ficavam só no navegador (perfil_cliente.py) ──
+            if u.path == "/api/cliente/estado" or u.path.startswith("/api/cliente/estado/") or u.path == "/api/cliente/perfil":
+                qc = self._exigir(seg.CLIENTE)          # sempre com sessão, mesmo em instalação sem login
+                if not qc:
+                    return
+                if u.path == "/api/cliente/perfil":
+                    return self._json(200, {"ok": True, "org": hub.org, "aprendido": hub.cliente_aprendido()})
+                if u.path == "/api/cliente/estado":
+                    try:
+                        desde = float(q.get("desde", ["0"])[0])
+                    except ValueError:
+                        desde = 0.0
+                    return self._json(200, {"ok": True, "agora": time.time(), "org": hub.org,
+                                            "conta": {k: qc[k] for k in ("nome", "usuario", "papel")},
+                                            "chaves": list(perfil_cliente.CHAVES), "prefixos": list(perfil_cliente.PREFIXOS),
+                                            "itens": hub.cliente_ler(desde=desde)})
+                chave = unquote(u.path[len("/api/cliente/estado/"):])
+                if not perfil_cliente.chave_valida(chave):
+                    return self._json(400, {"ok": False, "erro": "chave nao permitida"})
+                it = hub.cliente_ler(chave=chave).get(chave)
+                if not it:
+                    return self._json(404, {"ok": False, "chave": chave, "versao": 0, "valor": None}, {"ETag": '"v0"'})
+                etag = f'"v{it["versao"]}"'
+                if (self.headers.get("If-None-Match") or "").strip() == etag:
+                    self.send_response(304)
+                    self.send_header("ETag", etag)
+                    self.send_header("Cache-Control", "no-store")
+                    self.end_headers()
+                    return
+                return self._json(200, {"ok": True, "chave": chave, **it}, {"ETag": etag})
+            # ── Central de clientes e caixa de chamados (Gestão interna; dado pessoal: só equipe) ──
+            if u.path == "/api/central/clientes":
+                if not self._exigir(seg.EQUIPE):
+                    return
+                return self._json(200, {"ok": True, "clientes": hub.central_clientes()})
+            if u.path.startswith("/api/suporte/chamados/"):
+                if not self._exigir(seg.EQUIPE):
+                    return
+                ch = hub.suporte_detalhe(unquote(u.path[len("/api/suporte/chamados/"):]))
+                return self._json(200 if ch else 404, {"ok": bool(ch), "chamado": ch})
+            if u.path == "/api/suporte/chamados":
+                if not self._exigir(seg.EQUIPE):
+                    return
+                return self._json(200, {"ok": True, "chamados": hub.suporte_listar(None)})
             if u.path.startswith("/api/gestao/arquivo/"):
                 if not self._exigir(seg.EQUIPE):
                     return
@@ -1107,6 +1189,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return self._json(200, {"ok": True, "assinaturas": alertas.assinaturas(quem),
                                         "regras": {k: v[0] for k, v in alertas_mod.REGRAS.items()},
                                         "atividades": list(alertas_mod.ATIVIDADES), "finalidade": alertas_mod.FINALIDADE,
+                                        # aprendidas da descrição do negócio: valem quando a assinatura não escolhe nenhuma
+                                        "atividades_perfil": alertas.atividades_do_perfil(),
                                         "whatsapp": bool(alertas.whatsapp), "agora": alertas.alertas_agora()})
             if u.path == "/api/saude":
                 integra, n = hub.verificar_cadeia()
@@ -1148,7 +1232,39 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 nome = unquote(self.headers.get("X-Nome") or "arquivo")
                 r = hub.gestao_arquivo_por(u.path.rsplit("/", 1)[-1], nome, self.headers.get("Content-Type") or "", dados, q["usuario"])
                 return self._json(200 if r["ok"] else 400, r)
+            if u.path.startswith("/api/cliente/estado/"):
+                return self._gravar_cliente(unquote(u.path[len("/api/cliente/estado/"):]))
             self._json(404, {"ok": False, "erro": "rota desconhecida"})
+
+        def _gravar_cliente(self, chave: str) -> None:
+            """PUT /api/cliente/estado/<chave> {"valor": texto, "versao": n} (ou cabeçalho If-Match: "v<n>").
+            200 + ETag; 409 (conflito) com o valor, a versão e quem gravou; 413 grande demais; 400 chave fora da lista."""
+            bruto = self._corpo_grande(perfil_cliente.VALOR_MAX + 4096)
+            if bruto is None:
+                return self._recusar_corpo("dados ausentes ou maiores que 2 MB")
+            q = self._exigir(seg.CLIENTE)
+            if not q:
+                return
+            if not perfil_cliente.chave_valida(chave):
+                return self._json(400, {"ok": False, "erro": "chave nao permitida"})
+            try:
+                d = seg.carregar_json(bruto)
+            except (ValueError, UnicodeDecodeError):
+                return self._json(400, {"ok": False, "erro": "json invalido"})
+            if not isinstance(d, dict) or not isinstance(d.get("valor"), str) or set(d) - {"valor", "versao"}:
+                return self._json(400, {"ok": False, "erro": "envie {valor: texto, versao: número}"})
+            versao = d.get("versao")
+            if versao is None:
+                m = re.fullmatch(r'(?:W/)?"?v(\d{1,12})"?', (self.headers.get("If-Match") or "").strip())
+                versao = int(m.group(1)) if m else 0
+            if not isinstance(versao, int) or isinstance(versao, bool) or versao < 0:
+                return self._json(400, {"ok": False, "erro": "versao invalida"})
+            r = hub.cliente_gravar(chave, d["valor"], versao, q["usuario"])
+            if r.get("conflito"):
+                return self._json(409, r, {"ETag": f'"v{r["versao"]}"'})
+            if not r["ok"]:
+                return self._json(413 if r.get("grande") else 400, r)
+            return self._json(200, r, {"ETag": f'"v{r["versao"]}"'})
 
         def do_DELETE(self):
             u = urlparse(self.path)
@@ -1190,6 +1306,19 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if r.get("ok"):
                     threading.Thread(target=correio.enviar_fila, args=(hub, r["numero"]), daemon=True).start()
                 return self._json(200 if r["ok"] else 400, r)
+            # ── Caixa de chamados (equipe): situação, responsável, nota interna e resposta por e-mail ao cliente ──
+            if u.path.startswith("/api/suporte/chamados/"):
+                q = self._exigir(seg.EQUIPE)
+                if not q:
+                    return
+                d = self._ler(self._corpo(), "chamado")
+                if d is None:
+                    return
+                r = hub.suporte_atualizar(unquote(u.path[len("/api/suporte/chamados/"):]), d, q["usuario"])
+                if r.get("ref"):
+                    self._mandar(r["ref"])
+                    r["email"] = "enviando" if correio.configurado() else "pendente"
+                return self._json(200 if r["ok"] else r.pop("codigo", 400), r)
             # ── DWG para DXF (Planejador): conversor aberto LibreDWG (dwg2dxf) instalado no servidor ──
             if u.path == "/api/converter/dwg":
                 q = self._quem()
@@ -1617,7 +1746,7 @@ def main() -> None:
     porta = int(os.environ.get("PHYSIS_PORTA", "8700"))
     rx = os.environ.get("PHYSIS_RX_URL")
     inst = ler_instancia()
-    hub = Hub(os.environ.get("PHYSIS_BANCO", "physis-hub.db"),
+    hub = Hub(banco_da_instancia(inst),
               org=os.environ.get("PHYSIS_ORG", inst.get("org", "org-teste")),
               lugar=os.environ.get("PHYSIS_LUGAR", inst.get("lugar", "lugar01")),
               enviar_comando=cliente_receptor(rx) if rx else None)

@@ -63,6 +63,45 @@ CREATE TABLE IF NOT EXISTS clima_observado (
 """
 
 
+def observar_no_banco(db, dia: str, origem: str, mm: float, agora: float) -> None:
+    """Grava a chuva medida no dia (sem commit). Usada por Clima.observar e pelo hub, quando chega a linha
+    TIPO:PLUV (o pluviômetro do lugar, origem "physis", vale mais que o CEMADEN no placar e no modelo de chuva)."""
+    db.execute("CREATE TABLE IF NOT EXISTS clima_observado (dia TEXT NOT NULL, origem TEXT NOT NULL, mm REAL NOT NULL, "
+               "atualizado REAL NOT NULL, PRIMARY KEY (dia, origem))")
+    db.execute("INSERT INTO clima_observado(dia,origem,mm,atualizado) VALUES(?,?,?,?) "
+               "ON CONFLICT(dia,origem) DO UPDATE SET mm=excluded.mm, atualizado=excluded.atualizado",
+               (dia, origem, float(mm), agora))
+
+
+# quando conta a leitura: o TS do aparelho; sem relógio (ts=0), a hora de chegada
+_T_CHUVA = "CASE WHEN m.ts > 0 THEN m.ts ELSE l.recebido END"
+
+
+def chuva_do_periodo(db, ini: float, fim: float) -> tuple[float | None, int]:
+    """(mm, pluviômetros) entre ini e fim: soma de cada pluviômetro e média entre eles. None = nenhuma leitura."""
+    linhas = db.execute(f"SELECT m.ativo, SUM(m.valor) FROM medicao m JOIN leitura l ON l.seq = m.leitura "
+                        f"WHERE m.grandeza='chuva' AND {_T_CHUVA} >= ? AND {_T_CHUVA} < ? GROUP BY m.ativo", (ini, fim)).fetchall()
+    if not linhas:
+        return None, 0
+    return round(sum(s for _, s in linhas) / len(linhas), 2), len(linhas)
+
+
+def chuva_medida_local(db, agora: float, validade_s: float = 3 * 3600) -> dict | None:
+    """Chuva medida no lugar (pluviômetro Physis) no mesmo formato do CEMADEN ({mm_24h, mm_72h, estacao}).
+    None quando não há pluviômetro ou ele não fala há mais de validade_s (aí vale o CEMADEN)."""
+    try:
+        ultima = db.execute(f"SELECT MAX({_T_CHUVA}) FROM medicao m JOIN leitura l ON l.seq = m.leitura "
+                            "WHERE m.grandeza='chuva'").fetchone()[0]
+    except Exception:          # noqa: BLE001 — banco sem as tabelas de leitura (ex.: só o clima)
+        return None
+    if not ultima or agora - ultima > validade_s:
+        return None
+    mm24, n = chuva_do_periodo(db, agora - 86400, agora + 1)
+    mm72, _ = chuva_do_periodo(db, agora - 3 * 86400, agora + 1)
+    return {"mm_24h": mm24 or 0.0, "mm_72h": mm72 or 0.0, "pluviometros": n, "ultima": ultima,
+            "estacao": {"nome": NOMES["physis"], "codigo": "physis"}}
+
+
 def _url(fonte: str) -> str:
     return os.environ.get(f"PHYSIS_CLIMA_{fonte.upper()}_URL") or URL[fonte]
 
@@ -309,9 +348,7 @@ class Clima:
     def observar(self, dia: str, origem: str, mm: float) -> None:
         """Chuva medida no dia (CEMADEN ou pluviômetro Physis). O pluviômetro do lugar vale mais."""
         with self.hub._trava:
-            self._db.execute("INSERT INTO clima_observado(dia,origem,mm,atualizado) VALUES(?,?,?,?) "
-                             "ON CONFLICT(dia,origem) DO UPDATE SET mm=excluded.mm, atualizado=excluded.atualizado",
-                             (dia, origem, float(mm), self._agora()))
+            observar_no_banco(self._db, dia, origem, mm, self._agora())
             self._db.commit()
 
     def placar(self) -> dict:
@@ -363,8 +400,10 @@ class Clima:
                                   "erro": None if (f != "receptor" or self.receptor_url) else "receptor não configurado"})
         placar = self.placar()
         prev = {k: v for k, v in fontes.items() if k in ("openmeteo", "inmet") and v["atual"]}
+        with self.hub._trava:
+            local = chuva_medida_local(self._db, agora)       # pluviômetro Physis (TIPO:PLUV), se houver
         return {"ok": True, "local": self.local(), "fontes": fontes, "placar": placar,
-                "combinada": self.combinada(prev, placar), "agora": agora}
+                "combinada": self.combinada(prev, placar), "agora": agora, "chuva_local": local}
 
 
 def receptor_local(base: str, timeout: float = 5.0):

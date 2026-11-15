@@ -11,8 +11,9 @@ Dados de saúde são sensíveis (LGPD, art. 11). Por isso:
   - "apagar" remove tudo da pessoa (direito de eliminação);
   - o registro encadeado do hub guarda só o que foi feito e por quem (nunca remédio, horário ou local).
 
-Linhas novas do protocolo V6 ("a homologar", ver docs/SAUDE.md). O receptor/hub ainda descartam esses TIPOs
-(protocolo.TIPOS_CONHECIDOS); até a homologação, elas entram pela rota própria POST /api/saude/linha:
+Linhas novas do protocolo V6 ("a homologar", ver docs/SAUDE.md). Entram pela rota própria POST /api/saude/linha e,
+com PHYSIS_SAUDE_V6=1 (padrão), também pelo receptor, /api/v6/linha e MQTT: o hub as entrega aqui (hub.saude_receptor)
+antes do adaptador genérico, sem gravar em `medicao`:
   ID:31,TIPO:MED,CMP:1,EVT:TOMADO,BAT:3.91,TS:1794650400
   ID:51,TIPO:PUL,LAT:-22.51003,LON:-43.18012,GPS:1,CRISE:1,BPM:128,MOV:2,BAT:3.80,TS:1794650400
 """

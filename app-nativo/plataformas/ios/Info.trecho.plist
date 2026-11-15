@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Chaves que scripts/aplicar_plataformas.py põe no ios/App/App/Info.plist (gerado por "npx cap add ios").
+     Textos em português: são o que o iPhone mostra quando pede a permissão. -->
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>pt-BR</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>pt-BR</string>
+		<string>en</string>
+	</array>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>O Physis usa o Bluetooth para receber os registros da caixinha de remédios e os alertas da pulseira e enviá-los só para o servidor do seu lugar. O Bluetooth não é usado para saber onde você está.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>O Physis usa o Bluetooth para falar com a caixinha de remédios e a pulseira.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>

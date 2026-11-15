@@ -17,8 +17,11 @@ import threading
 import time
 import unicodedata
 from collections import Counter, deque
+from datetime import datetime
 
 from . import adaptador, protocolo
+from . import clima as clima_mod
+from . import perfil_cliente
 from . import seguranca as seg
 
 OFFLINE_S_PADRAO = 160          # 3 ciclos do TDMA com 99 nos (~53 s cada)
@@ -88,6 +91,7 @@ class Hub:
         self.offline_s = offline_s
         self.guardar_medicoes = guardar_medicoes
         self.enviar_comando = enviar_comando      # funcao(linha) -> (ok, detalhe) ou None
+        self.saude_receptor = None                # funcao(linha, origem) -> dict de saude.registrar_evento (o servidor liga)
         self.relogio = relogio
         self.SESSAO_S = seg.sessao_vida_s(Hub.SESSAO_S)      # PHYSIS_SESSAO_DIAS (vida máxima da sessão)
         self._trava = threading.RLock()
@@ -104,6 +108,7 @@ class Hub:
         if "token" in {r[1] for r in self._db.execute("PRAGMA table_info(sessao)")}:
             self._db.execute("DROP TABLE sessao")
             self._db.executescript(ESQUEMA)
+        self._db.executescript(perfil_cliente.ESQUEMA)     # dados da plataforma do cliente (antes só no navegador)
         seg.preparar(self._db)          # chaves dos dispositivos e registro de acessos
         self._db.commit()
         self._db.execute("PRAGMA journal_mode=WAL")
@@ -165,6 +170,8 @@ class Hub:
             self.descartes[motivo] += 1
             self.ultimas_descartadas.append({"motivo": motivo, "linha": bruta[:160]})
             return "descartada"
+        if campos.get("TIPO", "").strip().upper() in protocolo.TIPOS_SAUDE:
+            return self._receber_saude(bruta, origem)     # dado de saúde: antes do adaptador, nunca em `medicao`
         if campos.pop("_FORA", None):
             self.descartes["campo_fora_da_faixa"] += 1   # so o campo foi descartado; a leitura segue
         linha = protocolo.limpar_linha(bruta)
@@ -172,6 +179,14 @@ class Hub:
         no, ts, agora = est["id"], est["ts"], self.relogio()
         if not (protocolo.EPOCH_MIN_VALIDO <= ts <= protocolo.EPOCH_MAX_VALIDO):
             ts = 0                      # no sem relogio: nao ha como deduplicar
+        intervalo = None                # pluviometro: segundos desde a linha anterior do mesmo no (intensidade em mm/h)
+        antes = self.nos.get(no)
+        if est["tipo"] == "PLUV" and antes and antes.get("tipo") == "PLUV":
+            ts_antes = antes.get("ts") or 0
+            if ts and protocolo.EPOCH_MIN_VALIDO <= ts_antes <= protocolo.EPOCH_MAX_VALIDO:
+                intervalo = ts - ts_antes
+            elif not ts:
+                intervalo = agora - antes["visto"]
         try:
             cur = self._db.execute(
                 "INSERT INTO leitura(no,ts,recebido,origem,linha) VALUES(?,?,?,?,?)",
@@ -186,9 +201,37 @@ class Hub:
             self._db.executemany(
                 "INSERT INTO medicao(leitura,topico,grandeza,ativo,valor,ts,alarme) VALUES(?,?,?,?,?,?,?)",
                 [(cur.lastrowid, m["topico"], m["grandeza"], m["ativo"], m["valor"], m["ts"], m["alarme"])
-                 for m in adaptador.adaptar(campos_ts, self.org, self.lugar)])
+                 for m in adaptador.adaptar(campos_ts, self.org, self.lugar, intervalo)])
+            if est["tipo"] == "PLUV" and est.get("chi") is not None:
+                self._chuva_do_dia(ts or agora)
         self._atualizar_no(est, agora, linha)
         return "aceita"
+
+    def _chuva_do_dia(self, quando: float) -> None:
+        """Soma do CHI do dia (fuso de Brasília) -> clima_observado origem "physis": o placar das fontes de
+        previsão e o modelo de chuva (aprendizado.py) passam a usar a chuva medida no próprio lugar."""
+        d = datetime.fromtimestamp(quando, clima_mod.FUSO)
+        ini = datetime(d.year, d.month, d.day, tzinfo=clima_mod.FUSO).timestamp()
+        mm, _ = clima_mod.chuva_do_periodo(self._db, ini, ini + 86400)
+        if mm is not None:
+            clima_mod.observar_no_banco(self._db, d.strftime("%Y-%m-%d"), "physis", mm, self.relogio())
+
+    def _receber_saude(self, bruta: str, origem: str) -> str:
+        """MED/PUL (docs/SAUDE.md): vão para a Saúde (consentimento, autorização, avisos). Sem o módulo ligado
+        neste servidor (saude_receptor), a linha é descartada. A linha crua não vai para o painel (dado sensível)."""
+        motivo = "saude_sem_modulo"
+        if self.saude_receptor is not None:
+            try:
+                r = self.saude_receptor(protocolo.limpar_linha(bruta), origem) or {}
+            except Exception:          # noqa: BLE001 — um defeito na Saúde não derruba a telemetria
+                r = {"ok": False, "motivo": "erro"}
+            if r.get("ok"):
+                self.contagem["saude"] += 1
+                return "duplicada" if r.get("duplicada") else "aceita"
+            motivo = "saude_" + str(r.get("motivo") or "recusada")
+        self.descartes[motivo] += 1
+        self.ultimas_descartadas.append({"motivo": motivo, "linha": "[linha de saúde: não mostrada]"})
+        return "descartada"
 
     def _atualizar_no(self, est: dict, agora: float, linha: str) -> None:
         no = est["id"]
@@ -514,6 +557,57 @@ class Hub:
             self._db.commit()
             return cur.rowcount > 0
 
+    # ── Dados da plataforma do cliente no servidor (perfil_cliente.py; ponte sistema/physis-ponte-cliente.js) ──
+    def cliente_ler(self, org: str | None = None, desde: float = 0.0, chave: str | None = None) -> dict:
+        """{chave: {valor, versao, atualizado, por}} da organização (padrão: a desta instalação)."""
+        org = org or self.org
+        with self._trava:
+            if chave is not None:
+                linhas = self._db.execute("SELECT chave, valor, versao, atualizado, por FROM cliente_estado WHERE org=? AND chave=?",
+                                          (org, chave)).fetchall()
+            else:
+                linhas = self._db.execute("SELECT chave, valor, versao, atualizado, por FROM cliente_estado WHERE org=? AND atualizado > ?",
+                                          (org, desde)).fetchall()
+        return {c: {"valor": v, "versao": n, "atualizado": a, "por": p} for c, v, n, a, p in linhas}
+
+    def cliente_gravar(self, chave: str, valor, versao_base: int, por: str, org: str | None = None) -> dict:
+        """Grava com controle de versão. Versão base diferente da atual = conflito (devolve a atual)."""
+        org = org or self.org
+        if not perfil_cliente.chave_valida(chave):
+            return {"ok": False, "erro": "chave nao permitida"}
+        if not isinstance(valor, str):
+            return {"ok": False, "erro": "valor precisa ser texto"}
+        tam = len(valor.encode("utf-8"))
+        if tam > perfil_cliente.VALOR_MAX:
+            return {"ok": False, "erro": "valor grande demais", "grande": True}
+        with self._trava:
+            r = self._db.execute("SELECT valor, versao, por, atualizado FROM cliente_estado WHERE org=? AND chave=?", (org, chave)).fetchone()
+            atual = r[1] if r else 0
+            if int(versao_base or 0) != atual:
+                return {"ok": False, "conflito": True, "valor": r[0] if r else None, "versao": atual, "por": r[2] if r else "",
+                        "atualizado": r[3] if r else None}
+            if r and r[0] == valor:
+                return {"ok": True, "versao": atual, "igual": True, "atualizado": r[3]}
+            soma, n = self._db.execute("SELECT COALESCE(SUM(LENGTH(CAST(valor AS BLOB))),0), COUNT(*) FROM cliente_estado "
+                                       "WHERE org=? AND chave<>?", (org, chave)).fetchone()
+            if soma + tam > perfil_cliente.TOTAL_MAX or (not r and n >= perfil_cliente.CHAVES_MAX):
+                return {"ok": False, "erro": "espaço da organização no servidor esgotado", "grande": True}
+            agora = max(self.relogio(), (r[3] if r else 0) + 1e-6)
+            self._db.execute("INSERT INTO cliente_estado(org,chave,valor,versao,atualizado,por) VALUES(?,?,?,?,?,?) "
+                             "ON CONFLICT(org,chave) DO UPDATE SET valor=excluded.valor, versao=excluded.versao, "
+                             "atualizado=excluded.atualizado, por=excluded.por", (org, chave, valor, atual + 1, agora, por))
+            # o registro guarda só metadados (o conteúdo é da organização)
+            self.registrar("cliente", por, {"o_que": "gravou", "chave": chave, "versao": atual + 1, "bytes": tam})
+            self._db.commit()
+            return {"ok": True, "versao": atual + 1, "atualizado": agora}
+
+    def cliente_aprendido(self, org: str | None = None) -> dict:
+        """Atividades do negócio aprendidas da descrição (physis-perfil guardado no servidor)."""
+        v = self.cliente_ler(org, chave="physis-perfil").get("physis-perfil")
+        r = perfil_cliente.aprendido_do_perfil(v["valor"] if v else None)
+        r["atualizado"] = v["atualizado"] if v else None
+        return r
+
     def entrar(self, usuario: str, senha: str, ip: str = "", agente: str = "", codigo: str | None = None) -> dict:
         usuario = (usuario or "").strip().lower()
         with self._trava:
@@ -604,9 +698,194 @@ class Hub:
         return {"ok": True, "numero": numero}
 
     def suporte_listar(self, usuario: str | None = None) -> list[dict]:
-        """Todos os chamados; com usuario, só os que essa conta abriu (papel cliente)."""
-        return [{"numero": x["numero"], "estado": x["estado"], "criado": x["criado"], **{k: x["dados"].get(k) for k in ("assunto", "mensagem", "canal", "contato")}}
-                for x in self.central_listar() if x["tipo"] == "suporte" and (usuario is None or x["dados"].get("usuario") == usuario)]
+        """Todos os chamados; com usuario, só os que essa conta abriu (papel cliente).
+        O cliente vê a situação e as respostas que a Physis mandou; as notas internas e o responsável, nunca."""
+        out = []
+        for x in self.central_listar():
+            if x["tipo"] != "suporte" or not (usuario is None or x["dados"].get("usuario") == usuario):
+                continue
+            d = x["dados"]
+            c = {"numero": x["numero"], "estado": x["estado"], "criado": x["criado"], "atualizado": x["atualizado"],
+                 **{k: d.get(k) for k in ("assunto", "mensagem", "canal", "contato")},
+                 "respostas": [{"quando": r.get("quando"), "texto": r.get("texto")} for r in d.get("respostas") or []]}
+            if usuario is None:          # equipe
+                c.update(responsavel=d.get("responsavel") or "", notas=len(d.get("notas") or []), usuario=d.get("usuario") or "",
+                         quem=d.get("quem") or "", org=d.get("org") or "")
+            out.append(c)
+        return out
+
+    # ── Caixa de chamados (equipe): situação, responsável, notas internas e resposta por e-mail ──
+    SUPORTE_ESTADOS = {"novo": "novo", "em atendimento": "em_atendimento", "em_atendimento": "em_atendimento",
+                       "atendimento": "em_atendimento", "resolvido": "resolvido"}
+    SUPORTE_ESTADO_TEXTO = {"novo": "novo", "em_atendimento": "em atendimento", "resolvido": "resolvido"}
+    _EMAIL_RE = re.compile(r"[^@\s,;<>()]+@[^@\s,;<>()]+\.[^@\s,;<>()]+")
+
+    def suporte_detalhe(self, numero: str) -> dict | None:
+        with self._trava:
+            r = self._db.execute("SELECT dados, estado, criado, atualizado FROM central WHERE tipo='suporte' AND numero=?",
+                                 (numero,)).fetchone()
+        if not r:
+            return None
+        d = json.loads(r[0])
+        return {"numero": numero, "estado": r[1], "estado_texto": self.SUPORTE_ESTADO_TEXTO.get(r[1], r[1]), "criado": r[2],
+                "atualizado": r[3], **{k: d.get(k) for k in ("assunto", "mensagem", "contato", "canal", "quem", "usuario", "org", "lugar")},
+                "responsavel": d.get("responsavel") or "", "notas": d.get("notas") or [], "respostas": d.get("respostas") or [],
+                "historico": d.get("historico") or [], "email_cliente": self._email_do_chamado(d)}
+
+    def _email_do_chamado(self, d: dict) -> str:
+        for v in (d.get("usuario"), d.get("contato")):
+            m = self._EMAIL_RE.search(str(v or ""))
+            if m:
+                return m.group(0)
+        return ""
+
+    def suporte_atualizar(self, numero: str, d: dict, quem: str) -> dict:
+        """d: {estado?, responsavel?, nota?, resposta?: {texto, assunto?}}. A resposta vai para a fila email_saida
+        (ref "<numero>-R<n>"); o servidor manda pelo correio.py. Devolve {ok, chamado, ref}."""
+        if not isinstance(d, dict):
+            return {"ok": False, "erro": "json invalido"}
+        estado = d.get("estado")
+        if estado is not None:
+            estado = self.SUPORTE_ESTADOS.get(str(estado).strip().lower())
+            if not estado:
+                return {"ok": False, "erro": "situação: novo, em atendimento ou resolvido"}
+        resp = d.get("resposta")
+        if resp is not None and (not isinstance(resp, dict) or not str(resp.get("texto") or "").strip()):
+            return {"ok": False, "erro": "a resposta precisa de texto"}
+        with self._trava:
+            r = self._db.execute("SELECT dados, estado FROM central WHERE tipo='suporte' AND numero=?", (numero,)).fetchone()
+            if not r:
+                return {"ok": False, "erro": "chamado desconhecido", "codigo": 404}
+            dados, atual = json.loads(r[0]), r[1]
+            agora, mudou, ref = self.relogio(), [], None
+            if estado and estado != atual:
+                dados.setdefault("historico", []).append({"quando": agora, "por": quem, "de": atual, "para": estado})
+                atual = estado
+                mudou.append("estado")
+            if isinstance(d.get("responsavel"), str) and d["responsavel"].strip()[:120] != (dados.get("responsavel") or ""):
+                dados["responsavel"] = d["responsavel"].strip()[:120]
+                mudou.append("responsavel")
+            if isinstance(d.get("nota"), str) and d["nota"].strip():
+                dados.setdefault("notas", []).append({"quando": agora, "por": quem, "texto": d["nota"].strip()[:4000]})
+                mudou.append("nota")
+            if resp is not None:
+                para = self._email_do_chamado(dados)
+                if not para:
+                    return {"ok": False, "erro": "o chamado não tem e-mail do cliente; responda pelo canal indicado (WhatsApp)"}
+                texto = str(resp["texto"]).strip()[:8000]
+                assunto = (str(resp.get("assunto") or "").strip()[:140] or f"Re: {dados.get('assunto') or 'seu chamado'}")
+                n = len(dados.get("respostas") or []) + 1
+                ref = f"{numero}-R{n}"
+                corpo = "\n".join([f"Olá{', ' + dados['quem'] if dados.get('quem') else ''}.", "", texto, "",
+                                   f"Chamado {numero} · situação: {self.SUPORTE_ESTADO_TEXTO.get(atual, atual)}.",
+                                   "Você acompanha este chamado na sua plataforma Physis, em Suporte.", "", "Physis Engineering"])
+                eid = self._db.execute("INSERT INTO email_saida(para,assunto,corpo,estado,ref,criado) VALUES(?,?,?,?,?,?)",
+                                       (para, f"Suporte {numero} · {assunto}", corpo, "pendente", ref, agora)).lastrowid
+                dados.setdefault("respostas", []).append({"quando": agora, "por": quem, "texto": texto, "email": eid})
+                mudou.append("resposta")
+            if not mudou:
+                return {"ok": True, "igual": True, "chamado": self.suporte_detalhe(numero), "ref": None}
+            self._db.execute("UPDATE central SET dados=?, estado=?, atualizado=? WHERE tipo='suporte' AND numero=?",
+                             (json.dumps(dados, ensure_ascii=False), atual, agora, numero))
+            self.registrar("central", numero, {"o_que": "chamado atualizado", "campos": mudou, "estado": atual, "quem": quem})
+            self._db.commit()
+        return {"ok": True, "chamado": self.suporte_detalhe(numero), "ref": ref}
+
+    # ── Central de clientes (equipe): organizações a partir de compras, instalações e pedidos ──
+    def central_clientes(self) -> list[dict]:
+        """Uma ficha por organização: contato (dado pessoal: só equipe), módulos, instalação, compras, pedidos
+        e chamados de suporte (quantos e em que situação). Junta pelo e-mail de contato."""
+        itens = self.central_listar()
+        fichas: dict[str, dict] = {}
+
+        def ficha(chave: str, nome: str = "") -> dict:
+            f = fichas.get(chave)
+            if f is None:
+                f = fichas[chave] = {"chave": chave, "org": "", "nome": nome, "contato": {"nome": "", "email": "", "telefone": "", "doc": ""},
+                                     "modulos": [], "instalacoes": [], "compras": [], "pedidos": [],
+                                     "chamados": {"total": 0, "abertos": 0, "novo": 0, "em_atendimento": 0, "resolvido": 0, "lista": []},
+                                     "criado": None, "atualizado": None}
+            return f
+
+        def tocar(f: dict, criado, atualizado) -> None:
+            if criado is not None:
+                f["criado"] = criado if f["criado"] is None else min(f["criado"], criado)
+            if atualizado is not None:
+                f["atualizado"] = atualizado if f["atualizado"] is None else max(f["atualizado"], atualizado)
+
+        def contato(f: dict, nome="", email="", telefone="", doc="") -> None:
+            email = str(email or "").strip().lower()
+            for k, v in (("nome", nome), ("email", email), ("telefone", telefone), ("doc", doc)):
+                if v and not f["contato"][k]:
+                    f["contato"][k] = str(v)[:160]
+
+        def mods(f: dict, lista) -> None:
+            for m in lista or []:
+                if isinstance(m, str) and m not in f["modulos"]:
+                    f["modulos"].append(m)
+
+        por_email: dict[str, str] = {}
+        por_compra: dict[str, str] = {}
+        for i in self.instalacoes():
+            chave = "org:" + i["org"]
+            f = ficha(chave, i["nome"])
+            f["org"] = i["org"]
+            contato(f, i["nome"], i["email"])
+            mods(f, i["modulos"])
+            f["instalacoes"].append({"numero": i["numero"], "compra": i["compra"], "ativada": bool(i["ativado"]), "criado": i["criado"]})
+            tocar(f, i["criado"], i["ativado"] or i["criado"])
+            por_compra[i["compra"]] = chave
+            if i["email"]:
+                por_email.setdefault(i["email"].lower(), chave)
+        for x in itens:
+            if x["tipo"] != "compra":
+                continue
+            d, pag = x["dados"], (x["dados"].get("pagador") or {})
+            email = str(pag.get("email") or "").strip().lower()
+            chave = por_compra.get(x["numero"]) or por_email.get(email) or ("email:" + email if email else "compra:" + x["numero"])
+            f = ficha(chave, str(pag.get("nome") or ""))
+            contato(f, pag.get("nome"), email, pag.get("telefone"), pag.get("doc"))
+            mods(f, self.modulos_do_contrato(d))
+            f["compras"].append({"numero": x["numero"], "estado": x["estado"], "fatura": d.get("fatura"), "total": d.get("total"),
+                                 "criado": x["criado"]})
+            tocar(f, x["criado"], x["atualizado"])
+            if email:
+                por_email.setdefault(email, chave)
+        for x in itens:
+            if x["tipo"] != "pedido":
+                continue
+            d = x["dados"]
+            email = str(d.get("email") or "").strip().lower()
+            chave = por_email.get(email) or ("email:" + email if email else "pedido:" + x["numero"])
+            f = ficha(chave, str(d.get("org") or d.get("nome") or ""))
+            contato(f, d.get("nome"), email, d.get("telefone"), d.get("doc"))
+            f["pedidos"].append({"numero": x["numero"], "estado": x["estado"], "origem": d.get("origem") or "loja", "criado": x["criado"]})
+            tocar(f, x["criado"], x["atualizado"])
+            if email:
+                por_email.setdefault(email, chave)
+        orgs = {f["org"]: k for k, f in fichas.items() if f["org"]}
+        for x in itens:
+            if x["tipo"] != "suporte":
+                continue
+            d = x["dados"]
+            email = self._email_do_chamado(d).lower()
+            chave = por_email.get(email) or (orgs.get(d.get("org")) if d.get("org") != self.org else None) \
+                or ("email:" + email if email else "suporte:" + x["numero"])
+            f = ficha(chave, str(d.get("quem") or ""))
+            contato(f, d.get("quem"), email)
+            ch = f["chamados"]
+            ch["total"] += 1
+            ch[x["estado"]] = ch.get(x["estado"], 0) + 1
+            ch["abertos"] += x["estado"] != "resolvido"
+            ch["lista"].append({"numero": x["numero"], "estado": x["estado"], "assunto": d.get("assunto"), "criado": x["criado"],
+                                "atualizado": x["atualizado"], "responsavel": d.get("responsavel") or ""})
+            tocar(f, x["criado"], x["atualizado"])
+        out = list(fichas.values())
+        for f in out:
+            if not f["nome"]:
+                f["nome"] = f["contato"]["nome"] or f["contato"]["email"] or f["chave"]
+        out.sort(key=lambda f: (-(f["chamados"]["abertos"]), -(f["atualizado"] or 0)))
+        return out
 
     def central_por(self, tipo: str, numero: str, dados: dict) -> dict:
         """Guarda uma compra paga ou um pedido de proposta. Repetir o mesmo numero nao duplica."""

@@ -1,0 +1,23 @@
+# Gerados (refeitos com npm install, scripts/preparar_www.py e npx cap add/sync)
+node_modules/
+www/
+recursos/
+site/publicar/
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+ios/App/Pods/
+ios/App/build/
+ios/DerivedData/
+*.apk
+*.aab
+*.ipa
+
+# Segredos da assinatura: NUNCA no Git (guardar em cofre, ver docs/APP_NATIVO.md)
+*.jks
+*.keystore
+keystore.properties
+*.p8
+*.mobileprovision
+*.cer

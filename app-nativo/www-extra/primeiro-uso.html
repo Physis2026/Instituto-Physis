@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Physis · primeiro uso</title>
+<script src="physis-nativo.js"></script>
+<style>
+:root { --fundo:#F4F6F1; --sup:#FFFFFF; --texto:#1C2B21; --texto2:#4A4F44; --acao:#33512F; --linha:#C9D2C4;
+  --al-t:#7A2214; --al-f:#F5E2D7; --ok-t:#1F4A1C; --ok-f:#DCEBD8; --in-t:#1C3550; --in-f:#DBE7F1; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--fundo); color: var(--texto); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 34rem; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+h1 { font-family: Fraunces, Georgia, serif; color: var(--acao); font-weight: 600; font-size: 1.75rem; margin: .5rem 0 1rem; }
+h2 { font-size: 1.1rem; margin: 0 0 .5rem; }
+section { background: var(--sup); border: 1px solid var(--linha); border-radius: 12px; padding: 16px; margin: 0 0 16px; }
+label { display: block; font-weight: 600; margin: 0 0 4px; }
+.dica { color: var(--texto2); font-size: .95rem; margin: 0 0 8px; }
+input[type=url] { width: 100%; min-height: 44px; padding: 8px 12px; font: inherit; color: var(--texto); background: var(--sup);
+  border: 1px solid var(--texto2); border-radius: 8px; }
+.marcar { display: flex; gap: 12px; align-items: flex-start; font-weight: 400; margin: 12px 0; min-height: 44px; }
+.marcar input { width: 24px; height: 24px; margin: 2px 0 0; flex: none; accent-color: var(--acao); }
+button { min-height: 44px; min-width: 44px; padding: 8px 20px; font: inherit; font-weight: 600; border-radius: 8px; cursor: pointer;
+  background: var(--acao); color: #FFFFFF; border: 1px solid var(--acao); }
+button[disabled] { opacity: .55; cursor: not-allowed; }
+:focus-visible { outline: 3px solid var(--in-t); outline-offset: 2px; }
+.msg { margin: 8px 0 0; padding: 8px 12px; border-radius: 8px; }
+.msg:empty { display: none; }
+.msg.erro { color: var(--al-t); background: var(--al-f); }
+.msg.ok { color: var(--ok-t); background: var(--ok-f); }
+ul { padding-left: 1.2rem; margin: .5rem 0; }
+a { color: var(--acao); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Bem-vindo ao Physis</h1>
+
+  <section aria-labelledby="h-servidor">
+    <h2 id="h-servidor">1. Endereço do servidor</h2>
+    <p class="dica" id="dica-servidor">É o endereço que a Physis ou o responsável do seu lugar passou. Começa com https://. Os seus dados ficam nesse servidor, não com a Physis nem com outra empresa.</p>
+    <label for="servidor">Endereço</label>
+    <input type="url" id="servidor" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false"
+      aria-describedby="dica-servidor msg-servidor" placeholder="https://">
+    <p style="margin:12px 0 0"><button type="button" id="conferir">Conferir o endereço</button></p>
+    <p class="msg" id="msg-servidor" role="status" aria-live="polite"></p>
+  </section>
+
+  <section aria-labelledby="h-consentimento" id="parte-consentimento" hidden>
+    <h2 id="h-consentimento">2. Como o app usa os seus dados</h2>
+    <ul>
+      <li>O app mostra a mesma plataforma do site. Entrar, sair e as permissões de cada pessoa são as do servidor acima.</li>
+      <li>Saúde (se o seu lugar usa a caixinha de remédios ou a pulseira): o app recebe os registros por Bluetooth e manda só para o servidor acima. Sem internet, guarda os registros neste celular, cifrados, e apaga depois de enviar.</li>
+      <li>O Bluetooth não é usado para descobrir onde você está. Nada vai para publicidade, análise de uso ou empresas de fora.</li>
+      <li>Você pode retirar o consentimento e apagar os dados deste celular a qualquer momento (menu da conta → "Sair e apagar deste celular").</li>
+    </ul>
+    <p class="dica">Termos de uso e política de privacidade: <a id="link-privacidade" href="#">[MARCADOR: endereço da política no servidor]</a>. Versão do termo: <span id="versao-termo"></span> (provisória, a revisar pelo jurídico).</p>
+    <label class="marcar"><input type="checkbox" id="aceito" aria-describedby="h-consentimento"> <span>Li e concordo com o uso dos meus dados descrito acima (obrigatório para usar o app).</span></label>
+    <label class="marcar"><input type="checkbox" id="usar-ble"> <span>Usar o Bluetooth para a caixinha de remédios e a pulseira (pode ligar depois).</span></label>
+    <label class="marcar"><input type="checkbox" id="usar-avisos"> <span>Receber avisos neste celular (pode ligar depois).</span></label>
+    <p style="margin:12px 0 0"><button type="button" id="comecar" disabled>Começar</button></p>
+    <p class="msg" id="msg-consentimento" role="status" aria-live="polite"></p>
+  </section>
+</main>
+<script src="primeiro-uso.js"></script>
+</body>
+</html>

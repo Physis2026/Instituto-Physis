@@ -1,0 +1,9 @@
+# ACL do Mosquitto do servidor (usuários criados por preparar.sh; senhas só em env/*.env)
+user physis-hub
+topic read +/#
+topic write +/switch/+/command
+
+user nodered
+topic read +/#
+topic readwrite physis/#
+topic write +/switch/+/command

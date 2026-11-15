@@ -1,0 +1,10 @@
+# ACL do Mosquitto para o Physis (instalada em /etc/mosquitto/physis/acl)
+#
+# O hub (usuário physis-hub) assina <nó>/# de cada nó (physis_hub/mqtt.py) e manda comandos às válvulas.
+user physis-hub
+topic read +/#
+topic write +/switch/+/command
+
+# Cada nó ESPHome entra com usuário = nome do nó (ex.: irrigacao-zona1) e só mexe no próprio prefixo.
+# Assim uma Caixinha roubada não abre a válvula de outra. (No ESPHome, deixe "discovery: false".)
+pattern readwrite %u/#

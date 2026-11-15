@@ -4,6 +4,7 @@
 <meta name="physis-demo-gerado" content="demos/gerar_demos.py">
 <meta charset="utf-8">
 <script id="pxp-cedo">(function(){var r=document.documentElement,t=null,p=null;try{p=JSON.parse(localStorage.getItem("physis-pref")||"null");t=p&&p.tema||localStorage.getItem("physis-pref-tema");}catch(e){}var v=!!(p&&p.verde);if(t!=="claro"&&t!=="escuro"){try{t=matchMedia("(prefers-color-scheme: dark)").matches?"escuro":"claro";}catch(e){t="claro";}}r.setAttribute("data-tema",v?"escuro":t);if(v)r.classList.add("a11y-verde");})();</script>
+<script id="px-em-quadro">(function(){var q=false;try{q=window.self!==window.top;}catch(e){q=true;}if(q||/em-quadro/.test(location.hash||""))document.documentElement.setAttribute("data-em-quadro","");})();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Physis · SCADA — demonstração</title>
 <!--
@@ -184,6 +185,38 @@ html.ph-texto .env{zoom:1!important}
 html.a11y-simples :is(.nota,#tSub,#tAviso,footer){display:none!important}
 html.a11y-simples :is(.grade,.kpi){grid-template-columns:minmax(0,1fr)!important}
 html.a11y-calma .barra i{transition:none!important}
+</style>
+<style id="px-modelo">
+/* ===== Modelo Physis (igual ao painel da plataforma): faixa com a árvore e o título serifado ===== */
+.px-faixa{background:#F4F6F1;border-bottom:1px solid #C9D2C4;color:#1C2B21}
+.px-faixa .px-in{max-width:1240px;margin:0 auto;padding:10px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.px-faixa .px-id{display:flex;align-items:center;gap:14px;min-width:0;flex-wrap:wrap}
+.px-faixa .px-id img{height:42px!important;width:42px!important;object-fit:cover;object-position:0 50%;display:block;flex:none;background:#F4F6F1;border-radius:6px}
+.px-faixa .px-tit{font-family:Fraunces,Georgia,"Times New Roman",serif!important;font-weight:500;font-size:24px;line-height:1.15;letter-spacing:-.012em;color:#33512F;padding-left:0;border-left:0;margin:0}
+html[data-tema="escuro"] .px-faixa{background:#14180F;border-bottom-color:#4A5A47;color:#EEF2EA}
+html[data-tema="escuro"] .px-faixa .px-id img{background:transparent;filter:brightness(0) invert(1)}
+html[data-tema="escuro"] .px-faixa .px-tit{color:#B9CDB3}
+@media (max-width:480px){.px-faixa .px-in{padding:10px 16px}.px-faixa .px-tit{font-size:21px}}
+/* SCADA no modelo Physis (igual ao painel): título serifado verde, botões e abas de 44 px, cantos de 8 a 14 px. Só aparência. */
+.env{max-width:1240px;padding:16px 20px 56px}
+h1{font-family:Fraunces,Georgia,"Times New Roman",serif;font-size:2.1em;font-weight:400;line-height:1.15;color:var(--px-acao)}
+h2{font-family:Fraunces,Georgia,"Times New Roman",serif;font-size:1.4em;font-weight:500;color:var(--px-acao)}
+.topo{border-bottom-color:var(--px-linha)}
+button{min-height:44px;border-radius:8px;padding:0 16px;font-weight:600;border-color:var(--px-acao);color:var(--px-acao);background:var(--px-sup)}
+button.p{background:var(--px-acao);border-color:var(--px-acao);color:var(--px-sup)}
+.abas{gap:6px}
+.abas button{border-color:var(--px-linha);color:var(--px-tinta);font-weight:500}
+.abas button.on{background:var(--px-tinta);border-color:var(--px-tinta);color:var(--px-fundo);font-weight:700}
+.cartao{border-radius:12px;border-color:var(--px-linha);padding:14px 16px 16px}
+.kpi div{border-radius:12px;border-color:var(--px-linha)}
+.aviso{border-radius:0 8px 8px 0}
+:focus-visible{outline:3px solid var(--px-acao)!important;outline-offset:2px!important}
+/* Dentro da plataforma (quadro): o título, a faixa e a barra de preferências ficam na plataforma. */
+html[data-em-quadro] .px-faixa,html[data-em-quadro] .topo .marca{display:none!important}
+html[data-em-quadro] .topo{justify-content:flex-end;border-bottom:0;padding-bottom:0}
+html[data-em-quadro] h1{display:none!important}
+html[data-em-quadro] .env{padding-top:8px}
+@media (max-width:480px){.env{padding-left:16px;padding-right:16px}h1{font-size:1.7em}}
 </style>
 </head>
 <body>
@@ -1135,6 +1168,35 @@ function pintarSin(){
   }).join("");
 }
 
+/* Inglês das tabelas de travas e regras: só o texto exibido muda; condições e números são os mesmos. */
+var AUT_EN = {
+  "Bomba seca":"Dry pump", "Vedação e rotor da bomba de irrigação":"Irrigation pump seal and impeller",
+  "reservatório acima de 30% para partir, desliga em 24%":"reservoir above 30% to start, stops at 24%",
+  "Transbordo":"Overflow", "Reservatório e área ao redor":"Reservoir and surrounding area",
+  "captação para em 90% de nível":"abstraction stops at 90% level",
+  "Dosagem em linha parada":"Dosing on a stopped line", "Raiz da cultura":"Crop roots",
+  "fertirrigação só com bomba ligada e vazão real":"fertigation only with the pump running and real flow",
+  "Dosagem durante retrolavagem":"Dosing during backwash", "Perda de insumo no dreno":"Input lost to the drain",
+  "sem dosar enquanto o filtro retrolava":"no dosing while the filter backwashes",
+  "Irrigação em ponta":"Irrigation at peak hours", "Custo de energia":"Energy cost",
+  "não irriga entre 18h e 21h, salvo solo abaixo de 22%":"no irrigation between 18:00 and 21:00, unless soil is below 22%",
+  "Cisterna antes do poço":"Cistern before the well", "Outorga e energia de bombeamento":"Water permit and pumping energy",
+  "só capta no poço com a cisterna abaixo de 12%":"draws from the well only with the cistern below 12%",
+  "Irrigação":"Irrigation", "liga abaixo de 26% de umidade do solo, desliga em 38%":"starts below 26% soil moisture, stops at 38%",
+  "A decisão é do solo, não do relógio. Irrigar por horário rega quem não precisa.":"The soil decides, not the clock. Irrigating on a timer waters what does not need it.",
+  "Captação do poço":"Well abstraction", "de 01h às 05h, ou a qualquer hora se o reservatório cair de 25%":"from 01:00 to 05:00, or at any time if the reservoir drops below 25%",
+  "Bombear na janela barata é a maior alavanca de custo da fazenda.":"Pumping in the cheap window is the farm's biggest cost lever.",
+  "Cisterna de chuva":"Rainwater cistern", "consumida antes do poço, sempre":"used before the well, always",
+  "Água de chuva não custa bombeamento e não entra na outorga.":"Rainwater costs no pumping and does not count against the permit.",
+  "Retrolavagem do filtro":"Filter backwash", "acima de 0,9 bar de pressão diferencial":"above 0.9 bar differential pressure",
+  "Filtro entupido faz a bomba gastar energia sem entregar água.":"A clogged filter makes the pump spend energy without delivering water.",
+  "Fertirrigação":"Fertigation", "mantém a condutividade em 2,0 mS/cm durante a irrigação":"keeps conductivity at 2.0 mS/cm during irrigation",
+  "Dosar por tempo erra quando a vazão muda; por condutividade, não.":"Dosing by time fails when the flow changes; by conductivity, it does not.",
+  "Reúso da ETE":"Treated wastewater reuse", "entra na irrigação quando há efluente tratado disponível":"goes into irrigation when treated effluent is available",
+  "Fecha o ciclo — e só vai para cultura que não se come crua.":"Closes the loop — and only goes to crops that are not eaten raw."
+};
+function tAut(s){ return EN && AUT_EN[s] ? AUT_EN[s] : s; }
+
 function pintarAut(){
   var d = t();
   var res = A["reservatorio-01"], solo = A["umidade-solo-t1"], filtro = A["filtro-dp"];
@@ -1166,7 +1228,7 @@ function pintarAut(){
   ];
   $("#tabTravas").querySelector("tbody").innerHTML = travas.map(function(x){
     var cor = x[3] === d.livre ? "color:var(--tx-4A4F44,#4A4F44)" : "color:var(--atencao);font-weight:600";
-    return "<tr><td><strong>"+esc(x[0])+"</strong></td><td>"+esc(x[1])+"</td><td>"+esc(x[2])+
+    return "<tr><td><strong>"+esc(tAut(x[0]))+"</strong></td><td>"+esc(tAut(x[1]))+"</td><td>"+esc(tAut(x[2]))+
       '</td><td style="'+cor+';white-space:nowrap">'+esc(x[3])+"</td></tr>";
   }).join("");
 
@@ -1192,7 +1254,7 @@ function pintarAut(){
   ];
   $("#tabRegras").querySelector("tbody").innerHTML = regras.map(function(x){
     var cor = x[3] === d.atuando ? "color:var(--marca);font-weight:600" : "color:var(--tx-4A4F44,#4A4F44)";
-    return "<tr><td><strong>"+esc(x[0])+"</strong></td><td>"+esc(x[1])+"</td><td>"+esc(x[2])+
+    return "<tr><td><strong>"+esc(tAut(x[0]))+"</strong></td><td>"+esc(tAut(x[1]))+"</td><td>"+esc(tAut(x[2]))+
       '</td><td style="'+cor+';white-space:nowrap">'+esc(x[3])+"</td></tr>";
   }).join("");
 
@@ -1303,6 +1365,7 @@ function idioma(){
   var d = t();
   document.documentElement.lang = EN ? "en" : "pt";
   $("#tTitulo").textContent = d.titulo;
+  var pxTit = document.querySelector(".px-faixa .px-tit"); if (pxTit) pxTit.textContent = EN ? "Physis PDI - Integrated System" : "Physis PDI - Sistema Integrado";
   $("#tSub").textContent = d.sub;
   $("#tAviso").textContent = d.aviso;
   $("#tAbaSin").textContent = d.abaSin;

@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<title>Documento para revisão · Physis</title>
+<!-- Fontes da plataforma (Fraunces, Inter...) servidas pelo próprio hub a partir do painel.html: nada vem da internet. -->
+<link rel="stylesheet" href="/documento/fontes.css">
+<style>
+:root{
+  color-scheme:light;
+  --fundo:#F4F6F1;--sup:#FFFFFF;--tinta:#1C2B21;--tinta2:#4A4F44;--acao:#33512F;--marca:#4B7547;--linha:#C9D2C4;--trilho:#E3E8DE;
+  --ok-f:#DCEBD8;--ok-t:#1F4A1C;--at-f:#F6EAD0;--at-t:#8A6410;--al-f:#F5E2D7;--al-t:#7A2214;--in-f:#DBE7F1;--in-t:#1C3550;--areia-f:#EFE8D6;--tinte:#EEF4EA;
+  --fonte:Lexend,Inter,system-ui,-apple-system,"Segoe UI",sans-serif;--titulo:Fraunces,Georgia,serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-padding-top:16px}
+body{margin:0;background:var(--fundo);color:var(--tinta);font-family:var(--fonte);font-size:16px;line-height:1.55}
+a{color:var(--acao)}
+:focus-visible{outline:3px solid var(--acao);outline-offset:2px}
+.so-leitor{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.pular{position:absolute;left:12px;top:-60px;background:var(--acao);color:var(--sup);padding:10px 14px;border-radius:8px;z-index:20}
+.pular:focus{top:12px}
+/* faixa verde da Physis + cabeçalho do sistema (árvore e nome em serifada verde) */
+.faixa-verde{height:6px;background:var(--acao)}
+.px-faixa{background:var(--fundo);border-bottom:1px solid var(--linha)}
+.px-faixa .dentro{max-width:1240px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.px-faixa img{width:36px;height:36px;border-radius:8px}
+.px-tit{font-family:var(--titulo);font-weight:500;font-size:22px;color:var(--acao)}
+.px-faixa .direita{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+main{max-width:1240px;margin:0 auto;padding:18px 16px 40px}
+h1,h2,h3{font-family:var(--titulo);font-weight:500;color:var(--acao);line-height:1.2;margin:0}
+h1{font-size:2em;font-weight:400}
+.meta{color:var(--tinta2);margin:6px 0 14px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.grade{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);gap:20px;align-items:start}
+@media (max-width:900px){.grade{grid-template-columns:minmax(0,1fr)}}
+.cartao{background:var(--sup);border:1px solid var(--linha);border-radius:12px;padding:16px}
+button,.botao{font:inherit;font-weight:600;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid var(--acao);background:var(--sup);color:var(--acao);cursor:pointer}
+button.primario{background:var(--acao);color:var(--sup)}
+button.pequeno{min-height:36px;padding:0 10px;font-size:.92em}
+button:disabled{opacity:.6;cursor:not-allowed}
+label{font-weight:600;display:grid;gap:4px}
+input,select,textarea{font:inherit;min-height:44px;padding:8px 10px;border:1px solid #8A9284;border-radius:8px;background:var(--sup);color:var(--tinta);width:100%}
+textarea{min-height:88px;resize:vertical}
+.linha-botoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* o documento publicado */
+#doc{background:var(--sup);border:1px solid var(--linha);border-radius:12px;padding:24px clamp(16px,4vw,40px);overflow-wrap:anywhere}
+#doc h2{font-size:1.45em;margin:1.1em 0 .4em}#doc h3{font-size:1.2em;margin:1em 0 .35em}#doc h4,#doc h5,#doc h6{font-size:1.05em;margin:.9em 0 .3em;color:var(--acao)}
+#doc p,#doc ul,#doc ol,#doc pre,#doc blockquote,#doc figure,#doc dl{margin:0 0 .8em}
+#doc img{max-width:100%;height:auto}
+#doc .rolagem{overflow-x:auto;max-width:100%;margin:0 0 1em}
+#doc table{border-collapse:collapse;min-width:60%}
+#doc th,#doc td{border:1px solid var(--linha);padding:6px 8px;text-align:left;vertical-align:top}
+#doc thead th,#doc tr:first-child th{background:var(--marca);color:var(--sup)}
+#doc pre{white-space:pre-wrap;background:var(--fundo);padding:10px;border-radius:8px}
+#doc blockquote{border-left:4px solid var(--linha);padding-left:12px;color:var(--tinta2)}
+#doc [data-paragrafo]{border-radius:6px;transition:background .15s}
+#doc [data-paragrafo].tem-comentario{background:var(--at-f);box-shadow:-6px 0 0 var(--at-f)}
+#doc [data-paragrafo].escolhido{background:var(--ok-f);box-shadow:-6px 0 0 var(--ok-f),0 0 0 2px var(--marca)}
+.comentar{display:inline-flex;align-items:center;gap:4px;margin-left:6px;min-height:36px;min-width:36px;padding:0 8px;font-size:.8em;font-weight:600;
+  vertical-align:middle;border:1px dashed var(--marca);border-radius:999px;background:var(--sup);color:var(--acao);opacity:.55;font-family:var(--fonte)}
+.comentar:hover,.comentar:focus-visible,.comentar.conta{opacity:1}
+.comentar.conta{border-style:solid;background:var(--at-f);color:var(--at-t);border-color:var(--at-t)}
+/* comentários */
+aside h2{font-size:1.3em;margin-bottom:8px}
+.filtros{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px}
+.filtros button[aria-pressed="true"]{background:var(--acao);color:var(--sup)}
+.conversa{border:1px solid var(--linha);border-radius:10px;padding:10px 12px;margin:0 0 12px;background:var(--sup)}
+.conversa.resolvida{background:var(--fundo)}
+.conversa h3{font-family:var(--fonte);font-size:.95em;font-weight:700;color:var(--tinta)}
+.trecho{display:block;color:var(--tinta2);font-size:.9em;border-left:3px solid var(--linha);padding-left:8px;margin:4px 0 8px}
+.coment{margin:8px 0 0;padding-top:8px;border-top:1px solid var(--trilho)}
+.coment:first-of-type{border-top:0;padding-top:0}
+.quem{font-weight:700}.quando{color:var(--tinta2);font-size:.85em}
+.selo{display:inline-block;padding:0 8px;border-radius:999px;font-size:.78em;font-weight:700;vertical-align:middle}
+.selo.ext{background:var(--in-f);color:var(--in-t)}.selo.ok{background:var(--ok-f);color:var(--ok-t)}.selo.at{background:var(--at-f);color:var(--at-t)}.selo.al{background:var(--al-f);color:var(--al-t)}
+.sugestao{background:var(--tinte);border:1px solid var(--linha);border-radius:8px;padding:8px;margin:6px 0;white-space:pre-wrap}
+.texto{white-space:pre-wrap;margin:2px 0}
+.aviso{background:var(--at-f);color:var(--at-t);border-radius:8px;padding:10px 12px;margin:0 0 12px}
+.erro{background:var(--al-f);color:var(--al-t);border-radius:8px;padding:12px 14px}
+.nota-lgpd{font-size:.88em;color:var(--tinta2)}
+details.painel{margin-top:16px}
+details.painel summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center;color:var(--acao)}
+.convite-link{display:grid;gap:6px;background:var(--ok-f);color:var(--ok-t);padding:10px;border-radius:8px;margin:8px 0}
+ul.convites{list-style:none;padding:0;margin:8px 0}ul.convites li{padding:8px 0;border-top:1px solid var(--trilho)}
+footer{max-width:1240px;margin:0 auto;padding:0 16px 30px;color:var(--tinta2);font-size:.88em}
+@media print{.px-faixa .direita,aside,.comentar,.pular{display:none!important}.grade{display:block}#doc{border:0}}
+</style>
+</head>
+<body>
+<a class="pular" href="#doc" data-t="pular">Pular para o documento</a>
+<div class="faixa-verde" aria-hidden="true"></div>
+<header class="px-faixa">
+  <div class="dentro">
+    <img id="logo" src="/app/icone-192.png" alt="" width="36" height="36">
+    <span class="px-tit">Sistema Physis</span>
+    <div class="direita">
+      <span id="quem-sou" class="quando"></span>
+      <button type="button" id="idioma" class="pequeno" lang="en">English</button>
+    </div>
+  </div>
+</header>
+<main id="principal">
+  <h1 id="titulo" data-t="carregando">Carregando o documento…</h1>
+  <div class="meta">
+    <span id="publicado"></span>
+    <label id="caixa-versao" hidden style="display:flex;gap:6px;align-items:center;font-weight:600"><span data-t="versao">Versão</span>
+      <select id="versao" style="width:auto;min-height:36px;padding:4px 8px"></select></label>
+    <span id="estado-doc"></span>
+  </div>
+  <div id="status" role="status" aria-live="polite" class="so-leitor"></div>
+  <div id="erro" class="erro" role="alert" hidden></div>
+  <div id="avisos" class="aviso" hidden></div>
+  <div class="grade" id="grade" hidden>
+    <article id="doc" aria-labelledby="titulo" tabindex="-1"></article>
+    <aside aria-labelledby="t-coment" class="cartao">
+      <h2 id="t-coment" data-t="comentarios">Comentários</h2>
+      <p class="nota-lgpd" data-t="como">Use “Comentar” ao lado de cada parágrafo, ou deixe um comentário geral abaixo.</p>
+      <div class="filtros" role="group" aria-label="Filtro" id="filtros">
+        <button type="button" class="pequeno" data-filtro="aberto" aria-pressed="true" data-t="abertos">Abertos</button>
+        <button type="button" class="pequeno" data-filtro="resolvido" aria-pressed="false" data-t="resolvidos">Resolvidos</button>
+        <button type="button" class="pequeno" data-filtro="todos" aria-pressed="false" data-t="todos">Todos</button>
+      </div>
+      <form id="novo" class="cartao" style="padding:12px;margin-bottom:14px">
+        <p style="margin:0 0 8px"><strong data-t="sobre">Sobre:</strong> <span id="alvo"></span>
+          <button type="button" class="pequeno" id="geral" data-t="usarGeral">Comentário geral</button></p>
+        <label><span data-t="seuComentario">Seu comentário</span><textarea id="texto-novo" maxlength="4000" required></textarea></label>
+        <div id="caixa-sugestao" hidden>
+          <label style="margin-top:8px"><span data-t="sugestaoRot">Sugerir novo texto para este trecho (opcional)</span>
+            <textarea id="sugestao-nova" maxlength="4000"></textarea></label>
+        </div>
+        <div class="linha-botoes" style="margin-top:8px"><button type="submit" class="primario" data-t="enviar">Enviar comentário</button></div>
+      </form>
+      <div id="conversas"></div>
+      <details class="painel" id="painel-equipe" hidden>
+        <summary data-t="revisores">Revisores externos e documento</summary>
+        <form id="form-convite" style="display:grid;gap:8px">
+          <label><span data-t="nome">Nome de quem vai revisar</span><input id="cv-nome" maxlength="80" required autocomplete="off"></label>
+          <label><span data-t="email">E-mail (opcional, só para a equipe ver)</span><input id="cv-email" type="email" maxlength="160" autocomplete="off"></label>
+          <label><span data-t="prazo">Vale por (dias, até 30)</span><input id="cv-dias" type="number" min="1" max="30" value="7" inputmode="numeric"></label>
+          <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="cv-comenta" type="checkbox" checked style="width:24px;min-height:24px"><span data-t="podeComentar">Pode comentar (sem marcar: só lê)</span></label>
+          <div class="linha-botoes"><button type="submit" class="primario" data-t="criarConvite">Criar link de revisão</button></div>
+        </form>
+        <div id="convite-novo"></div>
+        <h3 style="font-family:var(--fonte);font-size:1em;margin-top:12px" data-t="convites">Links criados</h3>
+        <ul class="convites" id="convites"></ul>
+        <div class="linha-botoes" style="margin-top:10px"><button type="button" id="arquivar" data-t="arquivar">Arquivar documento</button></div>
+      </details>
+      <p class="nota-lgpd" id="lgpd" style="margin-top:14px"></p>
+    </aside>
+  </div>
+</main>
+<footer><p data-t="rodape">Documento gerado pelo Sistema Physis · Physis Engineering</p></footer>
+<script>
+(function () {
+  "use strict";
+  var D = {
+    pt: { pular: "Pular para o documento", carregando: "Carregando o documento…", versao: "Versão", comentarios: "Comentários",
+      como: "Use “Comentar” ao lado de cada parágrafo, ou deixe um comentário geral abaixo.", abertos: "Abertos", resolvidos: "Resolvidos", todos: "Todos",
+      sobre: "Sobre:", usarGeral: "Comentário geral", geralTxt: "o documento todo", seuComentario: "Seu comentário",
+      sugestaoRot: "Sugerir novo texto para este trecho (opcional)", enviar: "Enviar comentário", revisores: "Revisores externos e documento",
+      nome: "Nome de quem vai revisar", email: "E-mail (opcional, só para a equipe ver)", prazo: "Vale por (dias, até 30)",
+      podeComentar: "Pode comentar (sem marcar: só lê)", criarConvite: "Criar link de revisão", convites: "Links criados", arquivar: "Arquivar documento",
+      desarquivar: "Reabrir documento", rodape: "Documento gerado pelo Sistema Physis · Physis Engineering",
+      comentar: "Comentar", conversa: "Comentário", comentarP: "Comentar este trecho: ", nComent: function (n) { return n + (n === 1 ? " comentário" : " comentários"); },
+      publicadoEm: "Publicado em", atualizadoEm: "atualizado em", atual: "atual", arquivado: "Arquivado: comentários fechados",
+      responder: "Responder", resposta: "Sua resposta", enviarResp: "Enviar resposta", resolver: "Resolver", reabrir: "Reabrir", editar: "Editar",
+      salvar: "Salvar", cancelar: "Cancelar", apagar: "Apagar", apagado: "Comentário apagado.", editado: "editado", irTrecho: "Ir ao trecho",
+      externo: "revisor externo", resolvidoPor: "Resolvido por", sugere: "Sugere o texto:", aceitar: "Aceitar e criar nova versão", recusar: "Recusar",
+      sugAceita: "Sugestão aceita", sugRecusada: "Sugestão recusada", sugPendente: "Sugestão pendente", nenhum: "Nenhum comentário aqui.",
+      deVersao: function (v) { return "feito na versão " + v; }, paragrafoSumiu: "o trecho mudou nesta versão",
+      enviado: "Comentário enviado.", falha: "Não deu certo: ", confirmaApagar: "Apagar este comentário?",
+      linkCriado: "Link criado. Copie agora: ele não aparece de novo.", copiar: "Copiar link", copiado: "Link copiado.",
+      vence: "vence em", vencido: "vencido", revogado: "revogado", revogar: "Revogar", acessos: "acessos", soLeitura: "só leitura",
+      semConvites: "Nenhum link criado ainda.", entrar: "Este documento é da equipe Physis. Entre no Hub Physis para ver.", irEntrar: "Entrar no Hub Physis",
+      voceE: function (n, ext) { return (ext ? "Revisando como " : "Você: ") + n; },
+      lgpdEquipe: "LGPD: guardamos o texto de cada comentário, o nome de quem comentou e a data. Do revisor externo guardamos também o nome e o e-mail informados no convite e quantas vezes o link foi usado; passado o prazo de retenção, nome e e-mail viram “Revisor externo”. Só a equipe Physis vê o e-mail. A direção pode apagar o documento e tudo o que há nele.",
+      lgpdConvite: "LGPD: o seu nome e os seus comentários ficam visíveis para a equipe Physis e para quem mais revisar este documento; o seu e-mail, só para a equipe. Guardamos também quantas vezes este link foi usado. Depois que o convite acaba, o seu nome é trocado por “Revisor externo”. Para pedir acesso, correção ou exclusão dos seus dados, fale com a Physis.",
+      lerSo: "Este link permite só a leitura.", titulo: "Documento para revisão · Physis" },
+    en: { pular: "Skip to the document", carregando: "Loading the document…", versao: "Version", comentarios: "Comments",
+      como: "Use “Comment” next to each paragraph, or leave a general comment below.", abertos: "Open", resolvidos: "Resolved", todos: "All",
+      sobre: "About:", usarGeral: "General comment", geralTxt: "the whole document", seuComentario: "Your comment",
+      sugestaoRot: "Suggest new text for this passage (optional)", enviar: "Send comment", revisores: "External reviewers and document",
+      nome: "Reviewer's name", email: "E-mail (optional, visible only to the team)", prazo: "Valid for (days, up to 30)",
+      podeComentar: "Can comment (unchecked: read only)", criarConvite: "Create review link", convites: "Links created", arquivar: "Archive document",
+      desarquivar: "Reopen document", rodape: "Document generated by Sistema Physis · Physis Engineering",
+      comentar: "Comment", conversa: "Comment", comentarP: "Comment on this passage: ", nComent: function (n) { return n + (n === 1 ? " comment" : " comments"); },
+      publicadoEm: "Published on", atualizadoEm: "updated on", atual: "current", arquivado: "Archived: comments closed",
+      responder: "Reply", resposta: "Your reply", enviarResp: "Send reply", resolver: "Resolve", reabrir: "Reopen", editar: "Edit",
+      salvar: "Save", cancelar: "Cancel", apagar: "Delete", apagado: "Comment deleted.", editado: "edited", irTrecho: "Go to passage",
+      externo: "external reviewer", resolvidoPor: "Resolved by", sugere: "Suggests the text:", aceitar: "Accept and create new version", recusar: "Reject",
+      sugAceita: "Suggestion accepted", sugRecusada: "Suggestion rejected", sugPendente: "Suggestion pending", nenhum: "No comments here.",
+      deVersao: function (v) { return "made on version " + v; }, paragrafoSumiu: "the passage changed in this version",
+      enviado: "Comment sent.", falha: "It did not work: ", confirmaApagar: "Delete this comment?",
+      linkCriado: "Link created. Copy it now: it will not be shown again.", copiar: "Copy link", copiado: "Link copied.",
+      vence: "expires on", vencido: "expired", revogado: "revoked", revogar: "Revoke", acessos: "uses", soLeitura: "read only",
+      semConvites: "No links created yet.", entrar: "This document belongs to the Physis team. Sign in to the Physis Hub to see it.", irEntrar: "Sign in to the Physis Hub",
+      voceE: function (n, ext) { return (ext ? "Reviewing as " : "You: ") + n; },
+      lgpdEquipe: "LGPD (Brazil's data protection law): we keep each comment's text, the commenter's name and the date. For external reviewers we also keep the name and e-mail given in the invitation and how many times the link was used; after the retention period, name and e-mail become “External reviewer”. Only the Physis team sees e-mails. Management can delete the document and everything in it.",
+      lgpdConvite: "LGPD (Brazil's data protection law): your name and comments are visible to the Physis team and to other reviewers of this document; your e-mail only to the team. We also keep how many times this link was used. After the invitation ends, your name is replaced by “External reviewer”. To request access, correction or deletion of your data, contact Physis.",
+      lerSo: "This link is read only.", titulo: "Document for review · Physis" }
+  };
+  var lang = (function () { try { var q = new URLSearchParams(location.search).get("lang"); if (q) return /^en/i.test(q) ? "en" : "pt"; var s = localStorage.getItem("physis-doc-lang"); if (s) return s; } catch (e) {} return /^en/i.test(navigator.language || "") ? "en" : "pt"; })();
+  var L = D[lang];
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); };
+  var docId = (location.pathname.match(/\/documento\/([A-Za-z0-9_-]{16,64})\/?$/) || [])[1] || "";
+  // convite: o código chega depois do "#" (não vai ao servidor nem a registros); guardado só nesta aba
+  var convite = null;
+  try {
+    var m = /(?:^|[#&])convite=([A-Za-z0-9_-]{20,200})/.exec(location.hash);
+    if (m) { convite = m[1]; sessionStorage.setItem("physis-convite-" + docId, convite); history.replaceState(null, "", location.pathname + location.search); }
+    else convite = sessionStorage.getItem("physis-convite-" + docId);
+  } catch (e) {}
+  var csrf = null, doc = null, filtro = "aberto", alvo = "geral";
+
+  function traduzir() {
+    document.documentElement.lang = lang === "en" ? "en-GB" : "pt-BR";
+    document.querySelectorAll("[data-t]").forEach(function (el) { var v = L[el.dataset.t]; if (typeof v === "string") el.textContent = v; });
+    var b = $("#idioma"); b.textContent = lang === "en" ? "Português" : "English"; b.lang = lang === "en" ? "pt-BR" : "en";
+    $("#filtros").setAttribute("aria-label", lang === "en" ? "Filter" : "Filtro");
+    if (!doc) document.title = L.titulo;
+  }
+  function dizer(t) { var s = $("#status"); s.textContent = ""; setTimeout(function () { s.textContent = t; }, 30); }
+  function quando(ts) { try { return new Date(ts * 1000).toLocaleString(lang === "en" ? "en-GB" : "pt-BR", { dateStyle: "medium", timeStyle: "short" }); } catch (e) { return ""; } }
+  function api(metodo, rota, corpo) {
+    var h = { "Accept": "application/json" };
+    if (convite) h["X-Physis-Convite"] = convite;
+    if (csrf) h["X-Physis-CSRF"] = csrf;
+    if (corpo !== undefined) h["Content-Type"] = "application/json";
+    return fetch("/api/documentos/" + docId + rota, { method: metodo, headers: h, credentials: "same-origin", cache: "no-store", body: corpo === undefined ? undefined : JSON.stringify(corpo) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j._status = r.status; return j; }); });
+  }
+  function erro(txt, entrar) {
+    var e = $("#erro"); e.hidden = false;
+    e.innerHTML = esc(txt) + (entrar ? ' <a href="/">' + esc(L.irEntrar) + "</a>" : "");
+    $("#titulo").textContent = lang === "en" ? "Document unavailable" : "Documento indisponível";
+    $("#grade").hidden = true;
+  }
+
+  /* defesa a mais: o servidor já limpou o HTML (documentos.sanitizar_html); aqui só se confere de novo */
+  function inserirDocumento(html) {
+    var tpl = document.createElement("template"); tpl.innerHTML = html;
+    tpl.content.querySelectorAll("script,style,iframe,object,embed,link,meta,base,form,svg,math").forEach(function (n) { n.remove(); });
+    tpl.content.querySelectorAll("*").forEach(function (n) {
+      Array.prototype.slice.call(n.attributes).forEach(function (a) {
+        if (/^on/i.test(a.name) || a.name === "style" || ((a.name === "href" || a.name === "src") && !/^(#|data:image\/(png|jpeg|gif|webp);base64,)/i.test(a.value))) n.removeAttribute(a.name);
+      });
+    });
+    tpl.content.querySelectorAll("table").forEach(function (t) {
+      var w = document.createElement("div"); w.className = "rolagem"; w.tabIndex = 0; w.setAttribute("role", "region");
+      w.setAttribute("aria-label", (t.querySelector("caption") || {}).textContent || (lang === "en" ? "Table" : "Tabela"));
+      t.parentNode.insertBefore(w, t); w.appendChild(t);
+    });
+    var art = $("#doc"); art.innerHTML = ""; art.appendChild(tpl.content);
+  }
+  function contar() {
+    var n = {};
+    doc.comentarios.forEach(function (c) { if (!c.pai && c.estado === "aberto" && !c.apagado && c.versao <= doc.versao) n[c.paragrafo] = (n[c.paragrafo] || 0) + 1; });
+    return n;
+  }
+  function botoesComentar() {
+    var n = contar();
+    document.querySelectorAll("#doc .comentar").forEach(function (b) { b.remove(); });
+    document.querySelectorAll("#doc [data-paragrafo]").forEach(function (el) {
+      var id = el.getAttribute("data-paragrafo"), p = doc.paragrafos[id] || {}, q = n[id] || 0;
+      el.classList.toggle("tem-comentario", q > 0);
+      if (!doc.eu.pode_comentar && !q) return;
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "comentar" + (q ? " conta" : ""); b.dataset.alvo = id;
+      b.textContent = q ? String(q) : "+";
+      b.setAttribute("aria-label", (q ? L.nComent(q) + " · " : "") + L.comentarP + (p.trecho || id).slice(0, 80));
+      b.title = L.comentar;
+      if (p.tag === "tr") { if (el.closest("thead") && !q) return; var ult = el.lastElementChild; if (ult) ult.appendChild(b); }
+      else if (p.tag === "table") { var w = el.closest(".rolagem") || el; w.parentNode.insertBefore(b, w); }
+      else if (/^h[2-6]$/.test(p.tag || "")) el.insertAdjacentElement("afterend", b);     // fora do título: não muda o nome do título para o leitor de tela
+      else if (p.tag === "figure" || p.tag === "blockquote") el.insertBefore(b, el.firstChild);
+      else el.appendChild(b);
+    });
+  }
+  function escolher(id, focar) {
+    alvo = id;
+    document.querySelectorAll("#doc .escolhido").forEach(function (e) { e.classList.remove("escolhido"); });
+    var p = doc.paragrafos[id];
+    if (id !== "geral") { var el = document.querySelector('#doc [data-paragrafo="' + id + '"]'); if (el) el.classList.add("escolhido"); }
+    $("#alvo").textContent = id === "geral" ? L.geralTxt : "“" + ((p && p.trecho) || id).slice(0, 90) + "”";
+    var trocavel = p && /^(p|h[2-6]|li|pre|blockquote|dt|dd|caption|summary|legend)$/.test(p.tag);
+    $("#caixa-sugestao").hidden = !trocavel;
+    if (!trocavel) $("#sugestao-nova").value = "";
+    if (focar) $("#texto-novo").focus();
+  }
+
+  function conversaHtml(raiz, filhos) {
+    var p = doc.paragrafos[raiz.paragrafo], resolvida = raiz.estado === "resolvido";
+    var h = '<section class="conversa' + (resolvida ? " resolvida" : "") + '" aria-labelledby="cv-' + raiz.id + '">';
+    var trecho = raiz.paragrafo === "geral" ? L.geralTxt : p ? p.trecho : L.paragrafoSumiu;
+    h += '<h3 id="cv-' + raiz.id + '">' + (raiz.paragrafo === "geral" ? esc(L.usarGeral) : esc(L.conversa) + " #" + raiz.id) +
+      (resolvida ? ' <span class="selo ok">' + esc(L.resolvidos.replace(/s$/, "")) + "</span>" : "") + "</h3>";
+    h += '<span class="trecho">' + esc(String(trecho || "").slice(0, 160)) + (raiz.versao !== doc.versao ? " · " + esc(L.deVersao(raiz.versao)) : "") + "</span>";
+    if (p && raiz.paragrafo !== "geral") h += '<button type="button" class="pequeno" data-ir="' + esc(raiz.paragrafo) + '">' + esc(L.irTrecho) + "</button>";
+    [raiz].concat(filhos).forEach(function (c) {
+      h += '<div class="coment" id="c-' + c.id + '"><span class="quem">' + esc(c.autor) + "</span>" + (c.autor_tipo === "convite" ? ' <span class="selo ext">' + esc(L.externo) + "</span>" : "") +
+        ' <span class="quando">· ' + esc(quando(c.criado_em)) + (c.editado_em && !c.apagado ? " · " + esc(L.editado) : "") + "</span>";
+      if (c.apagado) h += '<p class="texto"><em>' + esc(L.apagado) + "</em></p>";
+      else {
+        h += '<p class="texto" data-texto="' + c.id + '">' + esc(c.texto) + "</p>";
+        if (c.sugestao) {
+          var selo = c.sugestao_estado === "aceita" ? '<span class="selo ok">' + esc(L.sugAceita) + "</span>" : c.sugestao_estado === "recusada" ? '<span class="selo al">' + esc(L.sugRecusada) + "</span>" : '<span class="selo at">' + esc(L.sugPendente) + "</span>";
+          h += "<div><strong>" + esc(L.sugere) + "</strong> " + selo + '<div class="sugestao" lang="' + document.documentElement.lang + '">' + esc(c.sugestao) + "</div>";
+          if (doc.eu.pode_resolver && c.sugestao_estado === "pendente" && !doc.arquivado) h += '<div class="linha-botoes"><button type="button" class="pequeno primario" data-sug="' + c.id + '" data-aceitar="1">' + esc(L.aceitar) + '</button><button type="button" class="pequeno" data-sug="' + c.id + '">' + esc(L.recusar) + "</button></div>";
+          h += "</div>";
+        }
+        var acoes = "";
+        if (c.pode_editar && !doc.arquivado) acoes += '<button type="button" class="pequeno" data-editar="' + c.id + '">' + esc(L.editar) + "</button>";
+        if (c.pode_apagar && !doc.arquivado) acoes += '<button type="button" class="pequeno" data-apagar="' + c.id + '">' + esc(L.apagar) + "</button>";
+        if (acoes) h += '<div class="linha-botoes">' + acoes + "</div>";
+      }
+      h += "</div>";
+    });
+    if (resolvida && raiz.resolvido_por) h += '<p class="quando">' + esc(L.resolvidoPor) + " " + esc(raiz.resolvido_por) + " · " + esc(quando(raiz.resolvido_em)) + "</p>";
+    var acoesC = "";
+    if (doc.eu.pode_comentar) acoesC += '<button type="button" class="pequeno" data-responder="' + raiz.id + '" aria-expanded="false" aria-controls="r-' + raiz.id + '">' + esc(L.responder) + "</button>";
+    if (doc.eu.pode_resolver && !doc.arquivado) acoesC += '<button type="button" class="pequeno" data-resolver="' + raiz.id + '" data-valor="' + (resolvida ? "0" : "1") + '">' + esc(resolvida ? L.reabrir : L.resolver) + "</button>";
+    if (acoesC) h += '<div class="linha-botoes" style="margin-top:8px">' + acoesC + "</div>";
+    h += '<form id="r-' + raiz.id + '" data-pai="' + raiz.id + '" hidden style="margin-top:8px"><label><span>' + esc(L.resposta) + '</span><textarea maxlength="4000" required></textarea></label>' +
+      '<div class="linha-botoes" style="margin-top:6px"><button type="submit" class="primario pequeno">' + esc(L.enviarResp) + "</button></div></form>";
+    return h + "</section>";
+  }
+  function conversas() {
+    var raizes = doc.comentarios.filter(function (c) { return !c.pai; }), filhos = {};
+    doc.comentarios.forEach(function (c) { if (c.pai) (filhos[c.pai] = filhos[c.pai] || []).push(c); });
+    var lista = raizes.filter(function (c) { return filtro === "todos" || c.estado === filtro; });
+    // na ordem do documento; os gerais primeiro
+    var ordem = {}; Object.keys(doc.paragrafos).forEach(function (k, i) { ordem[k] = i + 1; }); ordem.geral = 0;
+    lista.sort(function (a, b) { return ((ordem[a.paragrafo] == null ? 1e9 : ordem[a.paragrafo]) - (ordem[b.paragrafo] == null ? 1e9 : ordem[b.paragrafo])) || a.id - b.id; });
+    $("#conversas").innerHTML = lista.length ? lista.map(function (r) { return conversaHtml(r, filhos[r.id] || []); }).join("") : '<p class="quando">' + esc(L.nenhum) + "</p>";
+  }
+  function convitesHtml(lista) {
+    if (!lista.length) return '<li class="quando">' + esc(L.semConvites) + "</li>";
+    return lista.map(function (c) {
+      var est = c.revogado ? L.revogado : c.ativo ? L.vence + " " + quando(c.expira) : L.vencido;
+      return "<li><strong>" + esc(c.nome) + "</strong>" + (c.email ? " · " + esc(c.email) : "") + (c.pode_comentar ? "" : " · " + esc(L.soLeitura)) +
+        '<br><span class="quando">' + esc(est) + " · " + c.acessos + " " + esc(L.acessos) + "</span>" +
+        (c.ativo ? ' <button type="button" class="pequeno" data-revogar="' + c.id + '">' + esc(L.revogar) + "</button>" : "") + "</li>";
+    }).join("");
+  }
+  function carregarConvites() {
+    if (!doc || !doc.eu.pode_convidar) return;
+    api("GET", "/convites").then(function (j) { if (j.ok) $("#convites").innerHTML = convitesHtml(j.convites); });
+  }
+  function pintar(manterFoco) {
+    document.title = doc.titulo + " · Physis";
+    $("#titulo").textContent = doc.titulo;
+    $("#publicado").textContent = L.publicadoEm + " " + quando(doc.criado_em) + (doc.atualizado_em > doc.criado_em + 1 ? " · " + L.atualizadoEm + " " + quando(doc.atualizado_em) : "");
+    $("#estado-doc").innerHTML = doc.arquivado ? '<span class="selo al">' + esc(L.arquivado) + "</span>" : (!doc.eu.pode_comentar ? '<span class="selo at">' + esc(L.lerSo) + "</span>" : "");
+    var sel = $("#versao");
+    sel.innerHTML = doc.versoes.map(function (v) { return '<option value="' + v.versao + '"' + (v.versao === doc.versao ? " selected" : "") + ">" + v.versao + (v.versao === doc.versao_atual ? " (" + esc(L.atual) + ")" : "") + (v.nota ? " · " + esc(v.nota.slice(0, 40)) : "") + "</option>"; }).join("");
+    $("#caixa-versao").hidden = doc.versoes.length < 2;
+    var av = $("#avisos"); av.hidden = !(doc.avisos && doc.avisos.length); av.textContent = (doc.avisos || []).join(" · ");
+    $("#quem-sou").textContent = L.voceE(doc.eu.nome, doc.eu.tipo === "convite");
+    $("#novo").hidden = !doc.eu.pode_comentar || doc.versao !== doc.versao_atual;
+    $("#painel-equipe").hidden = !doc.eu.pode_convidar;
+    $("#arquivar").textContent = doc.arquivado ? L.desarquivar : L.arquivar;
+    $("#lgpd").textContent = doc.eu.tipo === "convite" ? L.lgpdConvite : L.lgpdEquipe;
+    if (!manterFoco) inserirDocumento(doc.html);
+    botoesComentar(); conversas();
+    if (!doc.paragrafos[alvo]) alvo = "geral";
+    escolher(alvo, false);
+    $("#grade").hidden = false;
+  }
+  function carregar(versao, manterFoco) {
+    return api("GET", versao ? "?versao=" + versao : "").then(function (j) {
+      if (j._status === 401) return erro(L.entrar, true);
+      if (!j.ok) return erro(j.erro || (L.falha + j._status), j._status === 403 && !convite);
+      doc = j; pintar(manterFoco); carregarConvites();
+    }).catch(function (e) { erro(L.falha + (e && e.message || e)); });
+  }
+  function depois(j, ok) {
+    if (!j.ok) { dizer(L.falha + (j.erro || j._status)); return false; }
+    if (ok) dizer(ok);
+    return carregar(doc.versao_atual === doc.versao ? null : doc.versao, true).then(function () { return true; });
+  }
+
+  // ── eventos ──
+  $("#idioma").addEventListener("click", function () {
+    lang = lang === "en" ? "pt" : "en"; L = D[lang]; try { localStorage.setItem("physis-doc-lang", lang); } catch (e) {}
+    traduzir(); if (doc) pintar(true); $("#idioma").focus();
+  });
+  $("#logo").addEventListener("error", function () { this.hidden = true; });
+  if ($("#logo").complete && !$("#logo").naturalWidth) $("#logo").hidden = true;
+  $("#filtros").addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-filtro]"); if (!b) return;
+    filtro = b.dataset.filtro; document.querySelectorAll("[data-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); conversas();
+  });
+  $("#versao").addEventListener("change", function () { carregar(this.value); });
+  $("#geral").addEventListener("click", function () { escolher("geral", true); });
+  $("#doc").addEventListener("click", function (ev) { var b = ev.target.closest(".comentar"); if (!b) return; escolher(b.dataset.alvo, true); filtro = "todos"; document.querySelectorAll("[data-filtro]").forEach(function (x) { x.setAttribute("aria-pressed", String(x.dataset.filtro === "todos")); }); conversas(); });
+  $("#novo").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var texto = $("#texto-novo").value.trim(), sug = $("#sugestao-nova").value.trim(), bt = this.querySelector("button[type=submit]");
+    if (!texto && !sug) return $("#texto-novo").focus();
+    bt.disabled = true;
+    api("POST", "/comentarios", { paragrafo: alvo, texto: texto, sugestao: sug || undefined, versao: doc.versao }).then(function (j) {
+      return depois(j, L.enviado).then(function (ok) { if (ok) { $("#texto-novo").value = ""; $("#sugestao-nova").value = ""; var c = document.getElementById("c-" + j.id); if (c) c.scrollIntoView({ block: "nearest" }); } });
+    }).then(function () { bt.disabled = false; });
+  });
+  $("#conversas").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button"); if (!b) return;
+    if (b.dataset.ir) { var el = document.querySelector('#doc [data-paragrafo="' + b.dataset.ir + '"]'); if (el) { escolher(b.dataset.ir, false); el.setAttribute("tabindex", "-1"); el.focus(); el.scrollIntoView({ block: "center" }); } return; }
+    if (b.dataset.responder) { var f = document.getElementById("r-" + b.dataset.responder); f.hidden = !f.hidden; b.setAttribute("aria-expanded", String(!f.hidden)); if (!f.hidden) f.querySelector("textarea").focus(); return; }
+    if (b.dataset.resolver) { var id = b.dataset.resolver; api("POST", "/comentarios/" + id + "/resolver", { resolvido: b.dataset.valor === "1" }).then(function (j) { return depois(j, b.dataset.valor === "1" ? L.resolvidos : L.abertos); }); return; }
+    if (b.dataset.sug) { api("POST", "/comentarios/" + b.dataset.sug + "/sugestao", { aceitar: !!b.dataset.aceitar }).then(function (j) { if (j.ok && j.versao) { dizer(L.sugAceita); return carregar(null); } return depois(j, L.sugRecusada); }); return; }
+    if (b.dataset.apagar) { if (!confirm(L.confirmaApagar)) return; api("POST", "/comentarios/" + b.dataset.apagar + "/apagar", {}).then(function (j) { return depois(j, L.apagado); }); return; }
+    if (b.dataset.editar) {
+      var cid = b.dataset.editar, p = document.querySelector('[data-texto="' + cid + '"]'), atual = p.textContent;
+      var form = document.createElement("form");
+      form.innerHTML = '<label><span>' + esc(L.editar) + '</span><textarea maxlength="4000" required></textarea></label><div class="linha-botoes" style="margin-top:6px"><button type="submit" class="pequeno primario">' + esc(L.salvar) + '</button><button type="button" class="pequeno" data-cancelar="1">' + esc(L.cancelar) + "</button></div>";
+      form.querySelector("textarea").value = atual; p.replaceWith(form); b.hidden = true; form.querySelector("textarea").focus();
+      form.addEventListener("submit", function (e2) { e2.preventDefault(); api("POST", "/comentarios/" + cid + "/editar", { texto: form.querySelector("textarea").value }).then(function (j) { return depois(j, L.salvar); }); });
+      form.querySelector("[data-cancelar]").addEventListener("click", function () { conversas(); var bb = document.querySelector('[data-editar="' + cid + '"]'); if (bb) bb.focus(); });
+    }
+  });
+  $("#conversas").addEventListener("submit", function (ev) {
+    var f = ev.target.closest("form[data-pai]"); if (!f) return; ev.preventDefault();
+    var txt = f.querySelector("textarea").value.trim(); if (!txt) return;
+    api("POST", "/comentarios", { pai: Number(f.dataset.pai), texto: txt }).then(function (j) { return depois(j, L.enviado); });
+  });
+  $("#form-convite").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    api("POST", "/convites", { nome: $("#cv-nome").value, email: $("#cv-email").value, dias: Number($("#cv-dias").value) || 7, pode_comentar: $("#cv-comenta").checked }).then(function (j) {
+      if (!j.ok) return dizer(L.falha + (j.erro || j._status));
+      var link = j.link.indexOf("http") === 0 ? j.link : location.origin + j.link;
+      $("#convite-novo").innerHTML = '<div class="convite-link" role="status"><strong>' + esc(L.linkCriado) + '</strong><input readonly aria-label="Link" value="' + esc(link) + '"><div><button type="button" class="pequeno" id="copiar-convite">' + esc(L.copiar) + "</button></div></div>";
+      $("#copiar-convite").addEventListener("click", function () { var i = $("#convite-novo input"); i.select(); (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(function () { dizer(L.copiado); }, function () { document.execCommand && document.execCommand("copy"); dizer(L.copiado); }); });
+      $("#convite-novo input").focus(); $("#convite-novo input").select();
+      $("#cv-nome").value = ""; $("#cv-email").value = ""; carregarConvites();
+    });
+  });
+  $("#convites").addEventListener("click", function (ev) { var b = ev.target.closest("[data-revogar]"); if (!b) return; api("POST", "/convites/" + b.dataset.revogar + "/revogar", {}).then(function (j) { if (j.ok) { dizer(L.revogado); carregarConvites(); } else dizer(L.falha + j.erro); }); });
+  $("#arquivar").addEventListener("click", function () { api("POST", "/arquivar", { arquivado: !doc.arquivado }).then(function (j) { return depois(j, doc.arquivado ? L.desarquivar : L.arquivado); }); });
+
+  traduzir();
+  if (!docId) { erro(lang === "en" ? "Invalid link." : "Link inválido."); return; }
+  // equipe com sessão: busca o token CSRF; revisor externo não tem sessão e segue sem ele
+  fetch("/api/instancia", { cache: "no-store", credentials: "same-origin" }).then(function (r) { return r.json(); }).then(function (j) { csrf = j && j.csrf; }, function () {}).then(function () { carregar(null); });
+})();
+</script>
+</body>
+</html>

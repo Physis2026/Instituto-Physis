@@ -1,0 +1,31 @@
+{
+  "name": "physis-app-nativo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "App Physis para Android e iPhone: a mesma plataforma do PWA, embrulhada com Capacitor só para o Bluetooth (Saúde) e, depois, notificações. Ver physis-hub/docs/APP_NATIVO.md.",
+  "license": "UNLICENSED",
+  "//": "Versões fixas (sem ^ nem ~). Conferir versões ao instalar: npm view <pacote> versions; todas da linha 6 do Capacitor.",
+  "scripts": {
+    "preparar": "python scripts/preparar_www.py",
+    "icones": "python scripts/gerar_icones.py",
+    "plataformas": "python scripts/aplicar_plataformas.py",
+    "sincronizar": "npx cap sync",
+    "android": "npx cap open android",
+    "ios": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "6.2.0",
+    "@capacitor/android": "6.2.0",
+    "@capacitor/ios": "6.2.0",
+    "@capacitor/preferences": "6.0.2",
+    "@capacitor/local-notifications": "6.1.0",
+    "@capacitor-community/bluetooth-le": "6.0.0",
+    "@capawesome-team/capacitor-android-foreground-service": "6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "6.2.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

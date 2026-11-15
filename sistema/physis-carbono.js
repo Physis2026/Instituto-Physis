@@ -115,7 +115,10 @@ function contexto(c){ c = c || ler(); const ctx = {}, ano = String(c.ano || "");
   try { if (window.AVAC && typeof calcLer === "function"){ const o = calcLer("avac"), e = o && o.e ? o.e : null; if (e){ const R = window.AVAC.calcular(e); if (R && R.ac && R.ac.kWt > 0) ctx.avac_kwt = R.ac.kWt; } } } catch (e){}
   try { if (typeof solarCalc === "function"){ const s = solarCalc(); if (s && s.ger > 0) ctx.solar_kwh = s.ger; } } catch (e){}
   return ctx; }
-const kwhAno = (c, ctx) => { c = c || ler(); const k = num(c.kwh); if (k != null) return k; ctx = ctx || contexto(c); return ctx.kwh_ano != null ? ctx.kwh_ano : null; };
+/* kWh do ano sem chamar solarCalc (que pode chamar de volta o Carbono): campo do Carbono ou contas do Início */
+const kwhAno = c => { c = migrar(c || ler()); const k = num(c.kwh); if (k != null) return k; const ano = String(c.ano || "");
+  const perfil = typeof perfilLer === "function" ? perfilLer() : Object.assign({ historico:[] }, lerLS("physis-perfil", {})), h = (perfil.historico || []).filter(x => x.mes && num(x.kwh) != null).sort((a, b) => a.mes.localeCompare(b.mes));
+  const doAno = h.filter(x => x.mes.slice(0, 4) === ano), u = doAno.length === 12 ? doAno : h.slice(-12); return u.length ? u.reduce((s, x) => s + num(x.kwh), 0) * (doAno.length === 12 ? 1 : 12 / u.length) : null; };
 const nomeRes = t => typeof RC_POR_ID !== "undefined" && RC_POR_ID[t] ? RC_POR_ID[t].nome : (NOMES_RC[t] || (TIPOS_RES.find(x => x[0] === t) || [t, t])[1]);
 const nomeComb = (F, k) => (F.misturas[k] && F.misturas[k].nome) || (F.combustiveis[k] && F.combustiveis[k].nome) || k;
 const unComb = (F, k) => (F.misturas[k] && F.misturas[k].unidade) || (F.combustiveis[k] && F.combustiveis[k].unidade) || "";
@@ -318,7 +321,7 @@ function abaSbce(c, R, F){ const sit = R.sbce, S = F.sbce, ck = c.sbce;
     ["Eficiência energética e troca de combustível", R.metas.medidas_t, "MDL AMS-II (eficiência), AMS-III (troca de combustível)", "Eficiência elétrica no Brasil gera pouco crédito, porque a rede já é pouco emissora; troca de diesel ou GLP rende mais."]];
   return `<p class="t2 apoio">Enquadramento no Sistema Brasileiro de Comércio de Emissões (Lei 15.042/2024) e o potencial de gerar créditos de carbono.</p>
     <section class="cartao" aria-labelledby="h-cb-sbce"><h2 id="h-cb-sbce">Enquadramento no SBCE</h2><div class="grade">${cartao("cb-sb1", "Emissões diretas (escopo 1)", T(R.e1), "tCO₂e por ano", `<span class="selo ${quadro[0]}">${sit === "voluntario" ? "Abaixo do limite" : sit === "relato" ? "Deve monitorar e relatar" : "Deve relatar e conciliar"}</span>`)}${cartao("cb-sb2", "Pronto para o SBCE?", `<span class="selo ${pronto[0]}">${pronto[1]}</span>`, "")}</div>
-      <p>${E(quadro[1])}</p><p class="t2 pq">Os limites valem por instalação ou fonte e olham as emissões diretas; a lei deixou de fora das obrigações a produção agropecuária primária. Os ativos do sistema são a Cota Brasileira de Emissões (CBE) e o Certificado de Redução ou Remoção Verificada de Emissões (CRVE). ${aviso("verificar regulamentação: o órgão gestor ainda está publicando regras, prazos e formato do relato (" + E(S._fonte) + ")")}</p>
+      <p>${E(quadro[1])}</p><p class="t2 pq">Os limites valem por instalação ou fonte e olham as emissões diretas; a lei deixou de fora das obrigações a produção agropecuária primária. Os ativos do sistema são a Cota Brasileira de Emissões (CBE) e o Certificado de Redução ou Remoção Verificada de Emissões (CRVE). ${aviso("regulamentação em publicação pelo órgão gestor: conferir regras, prazos e formato do relato antes de decidir")}</p>
       <h3 class="t3">Lista de preparação</h3><div>${itens.map(([k, r, auto]) => `<div><label for="cb-sb-${k}" style="display:flex;gap:8px;align-items:center"><input id="cb-sb-${k}" type="checkbox" data-carb-campo="sbce.${k}" ${ck[k] ? "checked" : ""}> ${E(r)}${auto && !ck[k] ? ' <span class="selo in">sugestão: os dados indicam que já está feito</span>' : ""}</label></div>`).join("")}</div></section>
     <section class="cartao" aria-labelledby="h-cb-cred"><h2 id="h-cb-cred">Potencial de créditos</h2>${tabela("Projetos com potencial de crédito", ["Projeto", "Potencial (tCO₂e por ano)", "Famílias de metodologia", "Adicionalidade e permanência"], proj.map(([n, t, m, a]) => `<tr><th scope="row">${E(n)}</th><td>${T(t)}</td><td>${E(m)}</td><td>${E(a)}</td></tr>`))}
       <p class="t2 pq">${aviso("nomes das metodologias citados para orientar; confirmar a versão vigente no registro escolhido (Verra, Gold Standard, mecanismo do Acordo de Paris ou CRVE do SBCE)")}</p>
@@ -343,7 +346,7 @@ function tela(){ const F = base(), h1 = "<h1>Carbono</h1>";
 
 /* resumo para o Relatório ESG e outros módulos */
 function resumo(){ const F = base(); if (!F) return null; const c = ler(), R = calcular(c, contexto(c), F);
-  return { ano:c.ano, gwp:R.gwp, e1:R.e1, e2_loc:R.e2_loc, e2_mkt:R.e2_mkt, e3:R.e3, total:R.total, por_gas:R.porGas, por_grupo:R.porGrupo, por_cat:R.porCat, bio_t:R.bio_t, fora_t:R.fora_t, remocoes_t:R.remocoes_t, evitadas:R.evitadas, evitadas_t:R.evitadas_t,
+  return { ano:c.ano, gwp:R.gwp, e1:R.e1, e2_loc:R.e2_loc, e2_mkt:R.e2_mkt, e3:R.e3, total:R.total, por_gas:R.porGas, por_grupo:R.porGrupo, por_cat:R.porCat, bio_t:R.bio_t, fora_t:R.fora_t, remocoes_t:R.remocoes_t, evitadas:R.evitadas, evitadas_t:R.evitadas_t, solar_kwh:num(c.solar_kwh),
     medido:R.medido, incerteza:R.incerteza, int_m2:R.int_m2, int_prod:R.int_prod, producao_un:R.producao_un, kwh:R.kwh, fator_rede:R.fator_rede, metas:{ ano_base:R.metas.ano_base, base_t:R.metas.base_t, pct:R.metas.pct, alvo:R.metas.alvo, net_zero:R.metas.net_zero, medidas_t:R.metas.medidas_t },
     sbce:R.sbce, sbce_check:c.sbce, cats3:c.e3.cats, linhas:R.linhas.length }; }
 

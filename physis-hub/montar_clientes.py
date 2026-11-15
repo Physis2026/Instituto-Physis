@@ -31,16 +31,22 @@ def main() -> None:
     a = ap.parse_args()
     a.saida.mkdir(parents=True, exist_ok=True)
     base = json.loads(FICHAS.read_text(encoding="utf-8"))
+    # "suporte" de uma ficha substitui o da Physis só para ela; "_leia" não é campo de configuração
+    for f in base["clientes"]:
+        if isinstance(f.get("suporte"), dict):
+            f["suporte"] = {k: v for k, v in f["suporte"].items() if not k.startswith("_")}
     fichas, suporte = base["clientes"], base.get("suporte")
     for f in fichas:
         if a.so and f["org"] != a.so:
             continue
         gestao = RAIZ / "sistema" / "gestao-interna-physis.html" if f.get("gestao_interna") else None
+        # o Instituto Physis (e qualquer ficha com "instalacao") tem suporte, marca e banco próprios
         pacote = montar(f["org"], f.get("lugar", "lugar01"), f["modulos"], a.saida, PROGRAMAS["sustainkit"],
                         LICENCA_PADRAO, PROGRAMAS["supervisao"], gestao, PROGRAMAS["planejador"],
-                        bool(f.get("pesquisa")), f.get("nome", ""), None, suporte)
+                        bool(f.get("pesquisa")), f.get("nome", ""), f.get("cursos"), f.get("suporte") or suporte,
+                        f.get("instalacao", "physis"), f.get("marca"), f.get("banco", ""))
         print(f"{f['nome']}: {pacote.name} ({pacote.stat().st_size // 1024} kB) · módulos: {', '.join(f['modulos'])}"
-              + (" · pesquisa" if f.get("pesquisa") else ""))
+              + (" · pesquisa" if f.get("pesquisa") else "") + (f" · instalação {f['instalacao']}" if f.get("instalacao") else ""))
 
 
 if __name__ == "__main__":

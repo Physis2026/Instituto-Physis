@@ -22,6 +22,11 @@ const IGEA = [["igea_01","Contexto e partes interessadas"],["igea_02","Lideranç
 const NIVEL = { 1:"inicial", 2:"em desenvolvimento", 3:"definido", 4:"gerenciado", 5:"otimizado" };
 const G_SIS = [["ambiental","Gestão ambiental","ISO 14001"],["energia","Gestão de energia","ISO 50001"],["seguranca","Segurança do trabalho","ISO 45001"],["netzero","Net zero","inventário e metas"]];
 
+/* sem o painel (rcResumo): mesmo critério de desvio da Economia circular — tudo o que não vai para aterro ou incineração */
+const RC_UN = { kg_mes:1, kg_sem:52 / 12, kg_dia:30, t_mes:1000, l_mes:0.92 }, NAO_DESVIA = ["aterro","aterro1","incineracao","publica"], EXIGE_MTR = ["reciclagem","compostagem","incineracao","aterro","aterro1","reversa"];
+function resumoRc(l){ const kg = r => (num(r.qtd) || 0) * (RC_UN[r.un] || 1), tot = l.reduce((s, r) => s + kg(r), 0), desv = l.filter(r => NAO_DESVIA.indexOf(r.rota) < 0).reduce((s, r) => s + kg(r), 0);
+  return { tot, pct: tot ? desv / tot : null, mtr: l.filter(r => EXIGE_MTR.indexOf(r.rota) >= 0) }; }
+
 /* ════════ junta os dados ════════ */
 function relatorioEsgDados(){ const d = { data: new Date().toISOString().slice(0, 10) };
   const p = tenta(() => typeof perfilLer === "function" ? perfilLer() : Object.assign({ c:{}, historico:[] }, lerLS("physis-perfil", {})), { c:{}, historico:[] }), pc = p.c || {};
@@ -33,7 +38,7 @@ function relatorioEsgDados(){ const d = { data: new Date().toISOString().slice(0
   d.carbono = tenta(() => window.PhysisCarbono ? window.PhysisCarbono.resumo() : null, null);
   if (!d.carbono){ const c = lerLS("physis-carbono", null); if (c) d.carbono = { antigo:true, kwh: num(c.kwh), solar_kwh: num(c.solar_kwh) }; }
   const rc = tenta(() => typeof rcLer === "function" ? rcLer() : lerLS("physis-residuos-plano", []), []);
-  if (Array.isArray(rc) && rc.length){ const s = tenta(() => typeof rcResumo === "function" ? rcResumo(rc) : null, null); d.residuos = { tipos: rc.length, kg_mes: s ? s.tot : null, desvio: s ? s.pct : null, mtr: s ? s.mtr.length : null }; } else d.residuos = null;
+  if (Array.isArray(rc) && rc.length){ const s = tenta(() => typeof rcResumo === "function" ? rcResumo(rc) : resumoRc(rc), null); d.residuos = { tipos: rc.length, kg_mes: s ? s.tot : null, desvio: s ? s.pct : null, mtr: s ? s.mtr.length : null }; } else d.residuos = null;
   const sbn = tenta(() => typeof sbnLer === "function" ? sbnLer() : lerLS("physis-sbn", { plano:[] }), { plano:[] }), plantas = typeof SBN !== "undefined" && SBN && SBN.plantas ? SBN.plantas : [];
   const plano = sbn.plano || []; d.sbn = plano.length ? { mudas: plano.reduce((s, x) => s + (num(x.qtd) || 0), 0), especies: new Set(plano.map(x => x.n)).size, nativas: plantas.length ? new Set(plano.filter(x => { const q = plantas.find(y => String(y.n) === String(x.n)); return q && String(q.nativa_br) === "True"; }).map(x => x.n)).size : null } : null;
   const g = tenta(() => typeof gLer === "function" ? gLer() : Object.assign({ atividades:[], compras:[], manutencao:[], producao:[], fatores:[], sistemas:{}, indicadores:[] }, lerLS("physis-gestao-cliente", {})), { atividades:[], compras:[], sistemas:{} });
@@ -75,7 +80,7 @@ function relatorioEsgHtml(d){ d = d || relatorioEsgDados(); LAC = [];
     tr(["Eletricidade", val(en.kwh != null ? N(en.kwh, 0) : null, "kWh/ano", "Consumo de eletricidade", "contas de luz no Início"), intE != null ? E(N(intE, 1)) + " kWh/m²·ano" : "—"]),
     tr(["Água", val(ag.m3 != null ? N(ag.m3, 0) : null, "m³/ano", "Consumo de água", "contas de água no Início"), "—"]),
     tr(["Resíduos desviados do aterro", rs && rs.desvio != null ? E(Math.round(rs.desvio * 100)) + "%" : falta("Desvio de resíduos", "Economia circular"), "meta de referência: 90% (lixo zero)"]),
-    tr(["Maturidade da gestão (1 a 5)", igMedia != null ? E(N(igMedia, 1)) + " · " + E(NIVEL[Math.round(igMedia)]) : falta("Maturidade da gestão", "Certificações → ISO 50001 → maturidade (IGEA)"), ig.length + " de 13 elementos avaliados"])]));
+    tr(["Maturidade da gestão (1 a 5)", igMedia != null ? E(N(igMedia, 1)) + " · " + E(NIVEL[Math.floor(igMedia)]) : falta("Maturidade da gestão", "Certificações → ISO 50001 → maturidade (IGEA)"), ig.length + " de 13 elementos avaliados"])]));
 
   /* 2. limites do relato e qualidade dos dados */
   const qual = [["Contas de luz", en.meses, 12], ["Contas de água", ag.meses, 12]].map(([n, m, a]) => tr([E(n), m ? m + " de " + a + " meses" : falta(n, "Início → contas"), m >= a ? '<span class="selo ok">completo</span>' : m ? '<span class="selo at">parcial</span>' : "—"]));
@@ -89,11 +94,11 @@ function relatorioEsgHtml(d){ d = d || relatorioEsgDados(); LAC = [];
     + tab("Emissões por gás", ["Gás", "tCO₂e por ano"], [["CO₂","CO2"],["CH₄","CH4"],["N₂O","N2O"],["HFCs","HFC"],["SF₆","SF6"]].map(([n, k]) => tr([n, E(T((cb.por_gas || {})[k] || 0))]))) + `<p class="t2 pq">GWP ${E(cb.gwp)}; GHG Protocol (abordagem do Programa Brasileiro GHG Protocol). Intensidade: ${cb.int_m2 != null ? E(N(cb.int_m2, 1)) + " kgCO₂e/m²·ano" : "sem área"}${cb.int_prod != null ? "; " + E(N(cb.int_prod, 3)) + " kgCO₂e por " + E(cb.producao_un) : ""}.</p>`
     : `<p>${falta("Inventário de emissões por escopo", "aba Carbono")}</p>`;
   const amb = sec("amb", "3. Ambiental", `
-    <h4>3.1 Energia</h4><p>Eletricidade: ${val(en.kwh != null ? N(en.kwh, 0) : null, "kWh por ano", "Eletricidade", "contas de luz no Início")}${intE != null ? " · " + E(N(intE, 1)) + " kWh/m²·ano" : ""}. Geração solar: ${en.solar_kwh ? E(N(en.solar_kwh, 0)) + " kWh por ano (estimativa da aba Energia solar)" : "não dimensionada"}.</p>
+    <h4>3.1 Energia</h4><p>Eletricidade: ${val(en.kwh != null ? N(en.kwh, 0) : null, "kWh por ano", "Eletricidade", "contas de luz no Início")}${intE != null ? " · " + E(N(intE, 1)) + " kWh/m²·ano" : ""}. Geração solar: ${en.solar_kwh ? E(N(en.solar_kwh, 0)) + " kWh por ano (estimativa da aba Energia solar)" : cb && cb.solar_kwh ? E(N(cb.solar_kwh, 0)) + " kWh por ano (informada no Carbono)" : "não dimensionada"}.</p>
     <h4>3.2 Água</h4><p>Consumo: ${val(ag.m3 != null ? N(ag.m3, 0) : null, "m³ por ano", "Água", "contas de água no Início")}.</p>
     <h4>3.3 Resíduos</h4><p>${rs ? E(rs.tipos) + " tipos de resíduo com rota definida; " + (rs.kg_mes != null ? E(N(rs.kg_mes * 12 / 1000, 1)) + " t por ano; " : "") + (rs.desvio != null ? E(Math.round(rs.desvio * 100)) + "% desviado do aterro; " : "") + (rs.mtr != null ? E(rs.mtr) + " fluxos exigem MTR." : "") : falta("Plano de resíduos", "Economia circular")}</p>
     <h4>3.4 Carbono por escopo</h4>${carbTab}
-    <h4>3.5 Biodiversidade e soluções baseadas na natureza</h4><p>${sb ? E(N(sb.mudas, 0)) + " mudas de " + E(sb.especies) + " espécies no plano" + (sb.nativas != null ? " (" + E(sb.nativas) + " nativas do Brasil)" : "") + (cb && cb.remocoes_t ? "; remoção estimada de " + E(T(cb.remocoes_t)) + " tCO₂ por ano." : ".") : falta("Plano de plantio e restauração", "SbN e viveiro")}</p>`);
+    <h4>3.5 Biodiversidade e soluções baseadas na natureza</h4><p>${sb ? E(N(sb.mudas, 0)) + " mudas de " + E(sb.especies) + (sb.especies === 1 ? " espécie no plano" : " espécies no plano") + (sb.nativas != null ? " (" + E(sb.nativas) + " nativas do Brasil)" : "") + (cb && cb.remocoes_t ? "; remoção estimada de " + E(T(cb.remocoes_t)) + " tCO₂ por ano." : ".") : falta("Plano de plantio e restauração", "SbN e viveiro")}</p>`);
 
   /* 4. social */
   const segSis = (ge.sistemas || []).find(x => x.id === "seguranca"), i45 = (d.certs || []).find(x => x.id === "iso45001");
@@ -101,7 +106,7 @@ function relatorioEsgHtml(d){ d = d || relatorioEsgDados(); LAC = [];
       tr(["Segurança do trabalho (rotina de gestão)", segSis ? E(segSis.feitos) + " de 10 itens feitos" : falta("Itens de segurança do trabalho", "Gestão → Sistemas de gestão"), "Gestão"]),
       tr(["Segurança do trabalho (ISO 45001)", i45 && i45.pct != null ? E(Math.round(i45.pct * 100)) + "% dos critérios avaliados" : falta("Gap da ISO 45001", "Certificações"), "Certificações"]),
       tr(["Acidentes e taxa de frequência", falta("Registro de acidentes e horas trabalhadas", "a registrar (fase 2)"), "—"]),
-      tr(["Capacitação", so.cursos && so.cursos.length ? E(so.cursos.length) + " cursos concluídos neste aparelho (" + E(so.cursos.join(", ")) + ")" : falta("Cursos concluídos e horas de treinamento", "Cursos"), "Cursos"]),
+      tr(["Capacitação", so.cursos && so.cursos.length ? E(so.cursos.length) + (so.cursos.length === 1 ? " curso concluído" : " cursos concluídos") + " neste aparelho (" + E(so.cursos.join(", ")) + ")" : falta("Cursos concluídos e horas de treinamento", "Cursos"), "Cursos"]),
       tr(["Acessibilidade do lugar (ABNT NBR 9050)", falta("Diagnóstico de acessibilidade", "a avaliar (fase 2)"), "—"]),
       tr(["Pessoas", val(so.colaboradores != null ? N(so.colaboradores, 0) : null, "colaboradores", "Número de colaboradores", "Início"), "Início"]),
       tr(["Diversidade (gênero, raça, PcD)", falta("Composição da equipe", "a registrar (fase 2)"), "—"])]));
@@ -109,8 +114,8 @@ function relatorioEsgHtml(d){ d = d || relatorioEsgDados(); LAC = [];
   /* 5. governança */
   const igTab = tab("Maturidade da gestão por elemento (escala 1 a 5)", ["Elemento", "Nível", "Evidência"], (d.igea || IGEA.map(([id, nome]) => ({ id, nome }))).map(x => tr([E(x.nome), x.na ? "não se aplica" : x.nivel != null ? E(x.nivel) + " · " + E(NIVEL[x.nivel]) : '<span class="selo al">não avaliado</span>', E(x.ev || "—")])));
   const certTab = (d.certs || []).length ? tab("Certificações e sistemas de gestão escolhidos", ["Certificação", "Atendimento", "Obrigatórios pendentes"], d.certs.map(x => tr([E(x.nome), x.pct != null ? E(Math.round(x.pct * 100)) + "% (" + E(x.n) + " critérios avaliados)" : "não avaliado", E(x.obrigPend != null ? x.obrigPend : "—")]))) : `<p>${falta("Gap analysis de certificações", "Certificações")}</p>`;
-  const sisTab = tab("Sistemas de gestão na rotina", ["Sistema", "Itens feitos", "Com evidência"], (ge.sistemas || []).map(x => tr([E(x.nome) + " · apoio à " + E(x.ref), E(x.feitos) + " de 10", E(x.comEvid)])));
-  const gov = sec("gov", "5. Governança", `<h4>5.1 Maturidade da gestão (metodologia IGEA, Physis)</h4><p>Média: ${igMedia != null ? "<strong>" + E(N(igMedia, 1)) + "</strong> (" + E(NIVEL[Math.round(igMedia)]) + "), " + ig.length + " de 13 elementos" : falta("Avaliação de maturidade", "Certificações → ISO 50001 → maturidade (IGEA)")}. Escala: 1 inicial, 2 em desenvolvimento, 3 definido, 4 gerenciado, 5 otimizado.</p>${igTab}
+  const sisTab = tab("Sistemas de gestão na rotina", ["Sistema", "Itens feitos", "Com evidência"], (ge.sistemas || []).map(x => tr([E(x.nome) + " · referência: " + E(x.ref), E(x.feitos) + " de 10", E(x.comEvid)])));
+  const gov = sec("gov", "5. Governança", `<h4>5.1 Maturidade da gestão (metodologia IGEA, Physis)</h4><p>Média: ${igMedia != null ? "<strong>" + E(N(igMedia, 1)) + "</strong> (" + E(NIVEL[Math.floor(igMedia)]) + "), " + ig.length + " de 13 elementos" : falta("Avaliação de maturidade", "Certificações → ISO 50001 → maturidade (IGEA)")}. Escala: 1 inicial, 2 em desenvolvimento, 3 definido, 4 gerenciado, 5 otimizado.</p>${igTab}
     <h4>5.2 Certificações</h4>${certTab}<h4>5.3 Políticas e sistemas de gestão</h4>${sisTab}
     <h4>5.4 Plano de ação e indicadores</h4><p>${ge.acoes ? E(ge.feitas) + " de " + E(ge.acoes) + " ações concluídas; " + E(ge.vencidas) + " com prazo vencido. " : falta("Plano de ação", "Gestão → Plano de ação") + " "}${ge.indicadores ? E(ge.indicadores) + " indicadores próprios acompanhados. " : ""}${ge.swot ? E(ge.swot) + " fatores internos e externos registrados." : ""}</p>
     <h4>5.5 Clima e mercado regulado</h4><p>${cb ? "Enquadramento no SBCE (Lei 15.042/2024): " + E({ voluntario:"abaixo do limite de relato", relato:"obrigado a monitorar e relatar", obrigacao:"obrigado a relatar e conciliar" }[cb.sbce]) + ". Itens de preparação feitos: " + E(Object.keys(cb.sbce_check || {}).filter(k => cb.sbce_check[k]).length) + " de 7. " + verif : falta("Enquadramento no SBCE", "Carbono → SBCE e créditos")}</p>`);

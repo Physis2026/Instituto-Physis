@@ -92,7 +92,7 @@ Mata Atlântica 131, Cerrado 95, Amazônia 74, Pampa 50, Caatinga 47, Pantanal 3
 
 - Dados ecológicos e de clima vêm de conhecimento geral e de perfis por grupo (`clima.confianca` baixa/média); itens com `conferir: true` pedem especialista.
 - A base de UCs não tem coordenadas: a lista é por UF/região e a distância (raio de 3 km) só é calculada se `lat/lon` forem acrescentados.
-- O Planejador grava metros locais; o mapa GIS supõe x leste, y norte a partir de `lat0/lon0`.
+- O Planejador grava metros locais: x leste, y norte a partir de `lat0/lon0` (**confirmado pela direção em 15/11/2026**).
 - A declividade usa grade de 40 células (o Planejador usa 110): a área de APP é aproximada.
 - Fotos (campo `imagem`) ficam para a fase 2.
 - Os dados foram gerados uma vez por script de migração a partir da base v88 (fora do repositório); edições futuras são diretas no JSON.

@@ -1,0 +1,11 @@
+[Unit]
+Description=Physis Hub - copia de seguranca todo dia de madrugada
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+RandomizedDelaySec=15min
+# se o aparelho estava desligado na hora, faz assim que ligar
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -14,12 +14,22 @@ TIPOS = {
     "ZONA": "Irrigacao por zonas com bomba (Caixinha)",
     "COL": "Coleira (SmartColar)",
     "COM": "Comedouro (AutoFeeder)",
+    "PLUV": "Pluviometro de bascula",
 }
+# MED e PUL (Saude) nunca passam por aqui: o hub as entrega a saude.py antes (dado sensivel fora de `medicao`).
+INTENSIDADE_INTERVALO_MAX_S = 3 * 3600     # intervalo maior que isso: a intensidade nao e calculada
 
 
 def tipo_da_linha(campos: dict[str, str]) -> str:
     t = campos.get("TIPO", "SOLO").strip().upper()
     return t if t in TIPOS else "SOLO"
+
+
+def intensidade_chuva(mm: float | None, intervalo_s: float | None) -> float | None:
+    """mm/h no intervalo entre duas linhas do pluviometro; None sem intervalo valido."""
+    if mm is None or not intervalo_s or intervalo_s <= 0 or intervalo_s > INTENSIDADE_INTERVALO_MAX_S:
+        return None
+    return round(mm * 3600.0 / intervalo_s, 2)
 
 
 def media_controle(u1: float | None, u2: float | None) -> float | None:
@@ -74,11 +84,17 @@ def interpretar(campos: dict[str, str]) -> dict:
             "niv": f("NIV"), "porc": para_int(campos.get("PORC"), 0),
             "tag": campos.get("TAG", ""), "bloq": para_bool(campos.get("BLOQ")),
         })
+    elif tipo == "PLUV":
+        pul = para_float(campos.get("PUL"))
+        est.update({"chi": f("CHI"), "pul": int(pul) if pul is not None else None})
     return est
 
 
-def adaptar(campos: dict[str, str], org: str, lugar: str) -> list[dict]:
-    """Lista de medicoes physis/1 geradas por uma linha valida."""
+def adaptar(campos: dict[str, str], org: str, lugar: str, intervalo_s: float | None = None) -> list[dict]:
+    """Lista de medicoes physis/1 geradas por uma linha valida.
+
+    intervalo_s: segundos desde a linha anterior do mesmo no (o hub informa); so o pluviometro usa,
+    para a intensidade da chuva em mm/h."""
     e = interpretar(campos)
     base = f"{lugar}-no{e['id']:02d}"
     ts, out = e["ts"], []
@@ -108,4 +124,7 @@ def adaptar(campos: dict[str, str], org: str, lugar: str) -> list[dict]:
     elif e["tipo"] == "COM":
         _m(out, org, "nivel", base, e["niv"], ts)
         _m(out, org, "porcoes", base, float(e["porc"]), ts)
+    elif e["tipo"] == "PLUV":
+        _m(out, org, "chuva", base, e["chi"], ts)
+        _m(out, org, "chuva_intensidade", base, intensidade_chuva(e["chi"], intervalo_s), ts)
     return out

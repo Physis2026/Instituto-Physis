@@ -1233,6 +1233,8 @@ ESQUEMAS = {
     "codigo": {"codigo": (S, 20, True)},
     "suporte": {"assunto": (S, 140, True), "mensagem": (S, 4000, True), "contato": (S, 160, False), "canal": (S, 20, False)},
     "chave": {"no": ((int, S), 9999, False), "rotulo": (S, 80, False)},
+    # caixa de chamados (POST /api/suporte/chamados/<numero>): resposta = {texto, assunto?}
+    "chamado": {"estado": (S, 20, False), "responsavel": (S, 120, False), "nota": (S, 4000, False), "resposta": (dict, 2, False)},
     "vazio": {},
 }
 

@@ -92,7 +92,11 @@ No topo: `from . import robos as robos_mod`. Em `criar_manipulador`, depois de `
 | instituto | Gestão → **Editais** (botão "Esboçar projeto" no edital) | Abre o esqueleto em seções editáveis, com as `pendencias` como lista de conferência; selo de revisão sempre |
 | pluviometro | Painel → **Monitoramento verde → Acrescentar pluviômetro** (e Gestão → Manutenção) | Formulário (nó, pino, placa, lugar já preenchido) → botões "Baixar YAML" e "Baixar secrets de exemplo" + avisos |
 
-## 6. Proposta TIPO:PLUV (pluviômetro de báscula)
+## 6. TIPO:PLUV (pluviômetro de báscula) — feito no hub em 15/11/2026
+
+Situação: itens 1 a 5 abaixo feitos no servidor (`protocolo.py`, `adaptador.py`, `nucleo.py`, `hub.py`, `clima.py`,
+`alertas_clima.py`; testes em `tests/test_pluviometro_saude.py`). Falta: `physis-nucleo.js` (grandezas `chuva` e
+`chuva_intensidade`, com a integração das telas), os dois `protocolo.cpp` e o pluviômetro físico (calibração).
 
 Linha V6: `ID:31,TIPO:PLUV,CHI:0.20,PUL:44,BAT:-,TS:1794600000`
 

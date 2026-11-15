@@ -58,6 +58,12 @@ Regras gerais: decimal sempre com ponto; `-` (ou `--`, `n/d`, `null`, `nan`) = s
 quebra de linha dentro da mensagem vira espaço; chaves desconhecidas são aceitas como extensão
 e repassadas ao computador central (ver `EXTENSAO_V6.md`).
 
+Tipos (`TIPO`) que o hub aceita (`physis_hub/protocolo.py`, `TIPOS_CONHECIDOS`): `SOLO` (ou ausente), `ZONA`, `COL`,
+`COM`, `PLUV` (pluviômetro, desde 15/11/2026) e, com `PHYSIS_SAUDE_V6=1` (padrão), `MED` e `PUL` (Saúde, a homologar;
+vão para a Saúde, nunca para `medicao`). Outro `TIPO` = `tipo_desconhecido`. Chaves e exemplos em `EXTENSAO_V6.md`.
+**Pendente:** levar `PLUV`, `MED` e `PUL` aos dois `protocolo.cpp` (o receptor repassa chaves e tipos sem conferir, então
+funciona hoje sem regravar, mas a lista comum deve ficar igual).
+
 ## 4. Comandos (receptor → nó)
 
 ```

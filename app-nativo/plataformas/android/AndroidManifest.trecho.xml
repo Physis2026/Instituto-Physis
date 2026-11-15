@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Trechos do AndroidManifest.xml do app Physis. scripts/aplicar_plataformas.py põe cada parte no
+     android/app/src/main/AndroidManifest.xml gerado por "npx cap add android" (pode rodar de novo: não duplica).
+     O <manifest> precisa de xmlns:tools="http://schemas.android.com/tools" (o script acrescenta). -->
+<trechos xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+
+  <!-- PERMISSOES: antes de <application> -->
+  <permissoes>
+    <!-- Android 12+ (API 31+): procurar e conectar SEM localização. neverForLocation = o app declara que não usa
+         o Bluetooth para saber onde a pessoa está (então o sistema não pede a permissão de localização). -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" tools:targetApi="s" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!-- Android 11 ou anterior (API <= 30): o sistema exige localização para procurar aparelhos BLE. Só nesses. -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
+    <!-- Avisos (Android 13+) e monitoramento contínuo da pulseira (serviço em primeiro plano, Android 14+ exige o tipo) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <!-- O app instala também em celular sem BLE (a plataforma continua útil); a aba Saúde avisa. -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+  </permissoes>
+
+  <!-- APLICACAO: atributos de <application>. Sem backup na nuvem do Google: dado de saúde não sai do celular
+       para terceiros (LGPD; regra 11 de independência). -->
+  <aplicacao android:allowBackup="false" android:fullBackupContent="false" android:usesCleartextTraffic="false" />
+
+  <!-- SERVICOS: dentro de <application>. Serviço em primeiro plano do plugin
+       @capawesome-team/capacitor-android-foreground-service (conferir os nomes no README da versão instalada).
+       Tipo connectedDevice: "manter a conexão com um aparelho Bluetooth" (Android 14+). A notificação é fixa e
+       diz o que está acontecendo ("Physis: pulseira conectada"). -->
+  <servicos>
+    <service android:name="io.capawesome.capacitorjs.plugins.foregroundservice.AndroidForegroundService"
+             android:foregroundServiceType="connectedDevice" android:exported="false" />
+    <receiver android:name="io.capawesome.capacitorjs.plugins.foregroundservice.NotificationActionBroadcastReceiver"
+              android:exported="false" />
+  </servicos>
+
+</trechos>

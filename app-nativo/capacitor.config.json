@@ -1,0 +1,44 @@
+{
+  "appId": "br.com.physisengineering.app",
+  "appName": "Physis",
+  "webDir": "www",
+  "loggingBehavior": "none",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "capacitor",
+    "hostname": "localhost",
+    "cleartext": false,
+    "allowNavigation": []
+  },
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false,
+    "minWebViewVersion": 88
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "scrollEnabled": true,
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    },
+    "CapacitorCookies": {
+      "enabled": true
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_physis",
+      "iconColor": "#33512F"
+    },
+    "BluetoothLe": {
+      "displayStrings": {
+        "scanning": "Procurando aparelhos Physis…",
+        "cancel": "Cancelar",
+        "availableDevices": "Aparelhos encontrados",
+        "noDeviceFound": "Nenhum aparelho Physis encontrado"
+      }
+    }
+  }
+}

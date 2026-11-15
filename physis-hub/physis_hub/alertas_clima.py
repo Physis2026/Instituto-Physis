@@ -304,6 +304,13 @@ class AlertasClima:
             lista = self._ler() if quem is None else self._ler("ativa=1 AND quem=?", (quem,))
         return [self._mascarar(d) for d in lista]
 
+    def atividades_do_perfil(self) -> list[str]:
+        """Atividades aprendidas da descrição do negócio (Início → perfil guardado no servidor), só as que têm regra."""
+        try:
+            return [a for a in self.hub.cliente_aprendido()["atividades"] if a in ATIVIDADES]
+        except Exception:          # noqa: BLE001 — hub antigo/sem perfil: as assinaturas seguem com as próprias atividades
+            return []
+
     # ── avaliação e envio ──
     def alertas_agora(self) -> list[dict]:
         agora = self.relogio()
@@ -322,7 +329,10 @@ class AlertasClima:
                 prob = self.aprendizado.previsao_chuva()
             except Exception:       # noqa: BLE001 — sem modelo, as regras seguem valendo
                 prob = None
-        return avaliar((dados.get("openmeteo") or {}).get("dias") or [], dados.get("cemaden"), prob, hoje)
+        # chuva medida: o pluviômetro Physis do lugar (TIPO:PLUV) vale mais que a estação do CEMADEN do município
+        with self.hub._trava:
+            medida = clima_mod.chuva_medida_local(self._db, agora)
+        return avaliar((dados.get("openmeteo") or {}).get("dias") or [], medida or dados.get("cemaden"), prob, hoje)
 
     def ciclo(self) -> dict:
         agora = self.relogio()
@@ -334,12 +344,15 @@ class AlertasClima:
             assin = self._ler()
             self._db.execute("DELETE FROM alerta_envio WHERE criado < ?", (agora - RETENCAO_DIAS * 86400,))
             self._db.commit()
+        do_perfil = self.atividades_do_perfil()
         for s in assin:
+            # sem atividades escolhidas na assinatura, valem as aprendidas da descrição do negócio (perfil no servidor)
+            minhas = set(s["atividades"] or do_perfil)
             for a in alertas:
                 ativ = REGRAS[a["regra"]][1]
                 if a["regra"] not in s["alertas"] or NIVEIS[a["nivel"]] < NIVEIS[s["nivel_min"]]:
                     continue
-                if ativ is not None and not set(ativ) & set(s["atividades"]):
+                if ativ is not None and not set(ativ) & minhas:
                     continue
                 with self.hub._trava:
                     ja = self._db.execute("SELECT MAX(CASE nivel WHEN 'alerta' THEN 2 ELSE 1 END) FROM alerta_envio "

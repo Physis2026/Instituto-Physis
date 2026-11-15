@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baixar o app Physis</title>
+<meta name="description" content="App Physis para Android e iPhone: loja, download direto do APK com conferência ou instalação pelo navegador.">
+<link rel="manifest" href="/app/manifest-plataforma.webmanifest">
+<style>
+:root { --fundo:#F4F6F1; --sup:#FFFFFF; --texto:#1C2B21; --texto2:#4A4F44; --acao:#33512F; --logo:#4B7547; --linha:#C9D2C4;
+  --areia:#EFE8D6; --at-t:#8A6410; --at-f:#F6EAD0; --in-t:#1C3550; --in-f:#DBE7F1; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--fundo); color: var(--texto); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.pular { position: absolute; left: -999px; top: 0; background: var(--sup); color: var(--acao); padding: 8px 12px; }
+.pular:focus { left: 16px; top: 8px; z-index: 2; }
+header.faixa { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center;
+  max-width: 64rem; margin: 0 auto; padding: 12px 16px; }
+.marca { font-family: Fraunces, Georgia, serif; color: var(--acao); font-size: 1.25rem; font-weight: 600; text-decoration: none; }
+main { max-width: 64rem; margin: 0 auto; padding: 0 16px 40px; }
+h1 { font-family: Fraunces, Georgia, serif; color: var(--acao); font-weight: 600; font-size: clamp(1.75rem, 5vw, 2.4rem); margin: 8px 0 8px; }
+h2 { font-size: 1.25rem; margin: 0 0 8px; }
+h3 { font-size: 1.05rem; margin: 16px 0 6px; }
+.intro { color: var(--texto2); max-width: 44rem; margin: 0 0 24px; }
+.grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 16px; }
+section.cartao { background: var(--sup); border: 1px solid var(--linha); border-radius: 12px; padding: 16px; min-width: 0; }
+.botao { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: 8px 18px;
+  border-radius: 8px; font-weight: 600; text-decoration: none; background: var(--acao); color: #FFFFFF; border: 1px solid var(--acao); margin: 4px 8px 4px 0; }
+.botao.sec { background: var(--sup); color: var(--acao); }
+button.botao { font: inherit; font-weight: 600; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--in-t); outline-offset: 2px; }
+.qr { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
+.qr svg, .qr .vazio { width: 176px; height: 176px; max-width: 100%; border: 1px solid var(--linha); border-radius: 8px; }
+.qr .vazio { display: flex; align-items: center; justify-content: center; text-align: center; padding: 8px; color: var(--texto2); background: var(--areia); font-size: .9rem; }
+.dica { color: var(--texto2); font-size: .95rem; }
+.aviso { color: var(--at-t); background: var(--at-f); border-radius: 8px; padding: 8px 12px; }
+.info { color: var(--in-t); background: var(--in-f); border-radius: 8px; padding: 8px 12px; }
+code, .hash { font-family: ui-monospace, Consolas, monospace; font-size: .9rem; overflow-wrap: anywhere; word-break: break-all; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--fundo); border: 1px solid var(--linha); border-radius: 8px; padding: 8px 12px; margin: 6px 0; }
+ol, ul { padding-left: 1.3rem; }
+li { margin: 4px 0; }
+a { color: var(--acao); }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 8px 0; }
+dt { font-weight: 600; }
+dd { margin: 0; min-width: 0; }
+</style>
+</head>
+<body>
+<a class="pular" href="#conteudo" data-en="Skip to content">Pular para o conteúdo</a>
+<header class="faixa">
+  <a class="marca" href="/">Physis</a>
+  <button type="button" class="botao sec" id="idioma" lang="en">English</button>
+</header>
+<main id="conteudo">
+  <h1 data-en="Get the Physis app">Baixar o app Physis</h1>
+  <p class="intro" data-en="The Physis app is the same platform you use in the browser, plus Bluetooth for the pill box and the wristband, and notices on your phone. Your data stays on your place's server or on Physis' server, never with app stores or advertisers.">O app Physis é a mesma plataforma que você usa no navegador, mais o Bluetooth para a caixinha de remédios e a pulseira, e avisos no celular. Os seus dados ficam no servidor do seu lugar ou no da Physis, nunca com lojas de aplicativos nem com anunciantes.</p>
+
+  <div class="grade">
+    <section class="cartao" aria-labelledby="h-android">
+      <h2 id="h-android">Android</h2>
+      <h3 data-en="Google Play">Google Play</h3>
+      <p><a class="botao" data-preencher-href="url-play" href="#" data-en="Open on Google Play">Abrir no Google Play</a></p>
+      <div class="qr"><!--QR:play--><div class="vazio" role="img" aria-label="Código QR do Google Play: gerado na publicação">QR do Google Play: gerado na publicação</div><!--/QR:play--></div>
+
+      <h3 data-en="Direct download (APK)">Download direto (APK)</h3>
+      <p class="dica" data-en="For phones without Google Play, or if you prefer not to use a store. The file is the same app, signed by Physis.">Para celular sem Google Play, ou se você prefere não usar loja. O arquivo é o mesmo app, assinado pela Physis.</p>
+      <p><a class="botao" data-preencher-href="url-apk" href="#" download="physis.apk" data-en="Download the APK">Baixar o APK</a></p>
+      <div class="qr"><!--QR:apk--><div class="vazio" role="img" aria-label="Código QR do APK: gerado na publicação">QR do APK: gerado na publicação</div><!--/QR:apk--></div>
+      <dl>
+        <dt data-en="Version">Versão</dt><dd data-preencher="versao">[MARCADOR: versão]</dd>
+        <dt data-en="Size">Tamanho</dt><dd data-preencher="tamanho">[MARCADOR: tamanho]</dd>
+        <dt>SHA-256</dt><dd class="hash" data-preencher="sha256">[MARCADOR: SHA-256 do APK]</dd>
+        <dt data-en="Signing certificate">Certificado</dt><dd class="hash" data-preencher="certificado">[MARCADOR: SHA-256 do certificado de assinatura]</dd>
+      </dl>
+      <details>
+        <summary data-en="How to check the file before installing">Como conferir o arquivo antes de instalar</summary>
+        <ol>
+          <li data-en="Compute the SHA-256 of the downloaded file and compare it, character by character, with the one above.">Calcule o SHA-256 do arquivo baixado e compare, letra por letra, com o de cima.</li>
+        </ol>
+        <p class="dica">Windows (PowerShell):</p>
+        <pre><code>Get-FileHash .\physis.apk -Algorithm SHA256</code></pre>
+        <p class="dica">Linux:</p>
+        <pre><code>sha256sum physis.apk</code></pre>
+        <p class="dica">macOS:</p>
+        <pre><code>shasum -a 256 physis.apk</code></pre>
+        <p class="dica" data-en="Signature (Android SDK build-tools): the certificate SHA-256 must match the one above.">Assinatura (Android SDK build-tools): o SHA-256 do certificado tem de ser igual ao de cima.</p>
+        <pre><code>apksigner verify --print-certs physis.apk</code></pre>
+        <p class="dica" data-en="The same checksum is also at /app/android.apk.sha256 on this server.">A mesma soma também está em /app/android.apk.sha256 neste servidor.</p>
+      </details>
+      <p class="aviso" data-en="To install, Android asks you to allow this source once. Updates of the APK are not automatic: come back to this page, or use the store.">Para instalar, o Android pede para permitir esta origem uma vez. As atualizações do APK não são automáticas: volte a esta página, ou use a loja.</p>
+      <p class="dica" data-en="Independence: the source code is open and a Physis F-Droid repository (self-hosted) is planned, so the app never depends on a single store.">Independência: o código é aberto e está previsto um repositório F-Droid da própria Physis, para o app nunca depender de uma só loja.</p>
+    </section>
+
+    <section class="cartao" aria-labelledby="h-iphone">
+      <h2 id="h-iphone">iPhone</h2>
+      <h3 data-en="App Store">App Store</h3>
+      <p><a class="botao" data-preencher-href="url-appstore" href="#" data-en="Open on the App Store">Abrir na App Store</a></p>
+      <div class="qr"><!--QR:appstore--><div class="vazio" role="img" aria-label="Código QR da App Store: gerado na publicação">QR da App Store: gerado na publicação</div><!--/QR:appstore--></div>
+      <p class="info" data-en="The iPhone does not allow installing apps from a file outside the App Store (except through alternative marketplaces in the European Union). The free path that works on any iPhone is installing from the browser, below; Bluetooth on the iPhone needs the App Store app.">O iPhone não deixa instalar app por arquivo fora da App Store (só em lojas alternativas na União Europeia). O caminho gratuito que funciona em qualquer iPhone é instalar pelo navegador, abaixo; o Bluetooth no iPhone precisa do app da App Store.</p>
+    </section>
+
+    <section class="cartao" aria-labelledby="h-navegador">
+      <h2 id="h-navegador" data-en="Install from the browser (no store)">Instalar pelo navegador (sem loja)</h2>
+      <p class="dica" data-en="Open your platform address (it starts with https) and:">Abra o endereço da sua plataforma (começa com https) e:</p>
+      <h3 data-en="Android (Chrome or Edge)">Android (Chrome ou Edge)</h3>
+      <ol>
+        <li data-en="Tap the ⋮ menu at the top right.">Toque no menu ⋮, no alto à direita.</li>
+        <li data-en="Tap “Install app”.">Toque em “Instalar app”.</li>
+      </ol>
+      <p class="dica" data-en="In Chrome on Android, the platform can already talk Bluetooth to the pill box while the screen is open.">No Chrome do Android, a plataforma já fala Bluetooth com a caixinha enquanto a tela está aberta.</p>
+      <h3 data-en="iPhone (Safari)">iPhone (Safari)</h3>
+      <ol>
+        <li data-en="Tap Share (the square with an arrow).">Toque em Compartilhar (o quadrado com a seta).</li>
+        <li data-en="Tap “Add to Home Screen”.">Toque em “Adicionar à Tela de Início”.</li>
+      </ol>
+      <div class="qr"><!--QR:pwa--><div class="vazio" role="img" aria-label="Código QR da plataforma: gerado na publicação">QR da plataforma: gerado na publicação</div><!--/QR:pwa--></div>
+    </section>
+
+    <section class="cartao" aria-labelledby="h-requisitos">
+      <h2 id="h-requisitos" data-en="Requirements">Requisitos</h2>
+      <ul>
+        <li data-en="Android 8.0 or later. For the pill box and the wristband: Bluetooth 4.2 or later (almost every phone since 2016).">Android 8.0 ou mais novo. Para a caixinha e a pulseira: Bluetooth 4.2 ou mais novo (quase todo celular desde 2016).</li>
+        <li data-en="iPhone with iOS 15 or later.">iPhone com iOS 15 ou mais novo.</li>
+        <li data-en="In the browser: Chrome, Edge, Safari or Firefox, current versions.">No navegador: Chrome, Edge, Safari ou Firefox, em versão atual.</li>
+        <li data-en="The address of your platform server (given by Physis or by whoever runs your place's system).">O endereço do servidor da sua plataforma (dado pela Physis ou por quem cuida do sistema do seu lugar).</li>
+      </ul>
+    </section>
+
+    <section class="cartao" aria-labelledby="h-privacidade">
+      <h2 id="h-privacidade" data-en="Privacy in short">Privacidade, em resumo</h2>
+      <ul>
+        <li data-en="The app sends data only to the server you choose on first use. No advertising, no tracking, no analytics from other companies.">O app só manda dados para o servidor que você escolhe no primeiro uso. Sem publicidade, sem rastreamento, sem análise de uso de outras empresas.</li>
+        <li data-en="Health data (medicine times, wristband alerts) is sensitive under the LGPD: it is only kept with consent, only seen by authorized people, and can be deleted.">Dado de saúde (horários de remédio, alertas da pulseira) é sensível pela LGPD: só é guardado com consentimento, só é visto por quem foi autorizado e pode ser apagado.</li>
+        <li data-en="Without internet, records wait on the phone, encrypted, and are deleted after being sent.">Sem internet, os registros esperam no celular, cifrados, e são apagados depois de enviados.</li>
+        <li data-en="Bluetooth is never used to find out where you are.">O Bluetooth nunca é usado para descobrir onde você está.</li>
+      </ul>
+      <p><a data-preencher-href="url-termos" href="#" data-en="Terms of use">Termos de uso</a> · <a data-preencher-href="url-privacidade" href="#" data-en="Privacy policy">Política de privacidade</a></p>
+    </section>
+  </div>
+</main>
+<script>
+(function () {
+  "use strict";
+  var b = document.getElementById("idioma"), en = false;
+  var els = document.querySelectorAll("[data-en]");
+  for (var i = 0; i < els.length; i++) els[i].setAttribute("data-pt", els[i].textContent);
+  b.addEventListener("click", function () {
+    en = !en;
+    document.documentElement.lang = en ? "en" : "pt-BR";
+    document.title = en ? "Get the Physis app" : "Baixar o app Physis";
+    for (var i = 0; i < els.length; i++) els[i].textContent = els[i].getAttribute(en ? "data-en" : "data-pt");
+    b.textContent = en ? "Português" : "English";
+    b.setAttribute("lang", en ? "pt-BR" : "en");
+  });
+})();
+</script>
+</body>
+</html>

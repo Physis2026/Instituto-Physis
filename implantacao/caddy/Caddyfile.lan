@@ -1,0 +1,27 @@
+# Caddy na rede local do cliente (instalar.sh --caddy lan). __NOME__ = IP ou nome do aparelho na rede.
+# Certificado da CA local do Caddy ("tls internal"): instale o root.crt nos aparelhos (docs/IMPLANTACAO.md),
+# senão o navegador avisa e o app não instala no celular.
+{
+	admin localhost:2019
+}
+
+http://__NOME__ {
+	redir https://{host}{uri} permanent
+}
+
+https://__NOME__ {
+	tls internal
+	encode gzip
+	request_body {
+		max_size 60MB
+	}
+	header {
+		# 1 dia enquanto a CA local é nova; suba para 31536000 depois de instalar o root.crt em todos os aparelhos
+		Strict-Transport-Security "max-age=86400"
+		-Server
+	}
+	reverse_proxy 127.0.0.1:__PORTA__ {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto https
+	}
+}

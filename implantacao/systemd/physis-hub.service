@@ -1,0 +1,51 @@
+# Physis Hub — serviço systemd (instalado por implantacao/instalar.sh)
+# Código só leitura em /opt/physis/atual; dados graváveis só em /var/lib/physis; segredos em /etc/physis/physis.env.
+[Unit]
+Description=Physis Hub (servidor da plataforma Physis)
+Documentation=file:///opt/physis/atual/docs/IMPLANTACAO.md
+After=network-online.target time-sync.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=physis
+Group=physis
+WorkingDirectory=/opt/physis/atual
+EnvironmentFile=/etc/physis/physis.env
+ExecStart=/usr/bin/python3 -m physis_hub.servidor
+# SIGINT = KeyboardInterrupt no hub: para as tarefas e fecha o banco com calma
+KillSignal=SIGINT
+TimeoutStopSec=30
+Restart=on-failure
+RestartSec=5
+UMask=0027
+
+# ── endurecimento ──
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/physis
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RemoveIPC=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+
+[Install]
+WantedBy=multi-user.target

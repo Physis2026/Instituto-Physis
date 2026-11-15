@@ -1,0 +1,65 @@
+# Caddy do servidor da Physis: a ÚNICA porta aberta. Variáveis em env/caddy.env.
+#   PHYSIS_TLS = "internal" (CA própria, rede local/testes) ou o e-mail do Let's Encrypt (com domínio)
+#   PHYSIS_DOMINIO_HUB / _AUTOMACOES / _BI / _MAPAS = nomes de cada serviço
+#   PHYSIS_REDES_EQUIPE = redes que podem abrir Node-RED, Superset e GeoServer (ex.: VPN 100.64.0.0/10)
+{
+	admin 127.0.0.1:2019
+}
+
+(seguranca) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+	encode gzip
+}
+
+(so_equipe) {
+	@fora not remote_ip {$PHYSIS_REDES_EQUIPE:127.0.0.1/32}
+	respond @fora "Acesso só pela rede da equipe." 403
+}
+
+# Plataforma, loja e Gestão (Physis Hub)
+{$PHYSIS_DOMINIO_HUB:hub.localhost} {
+	tls {$PHYSIS_TLS:internal}
+	import seguranca
+	request_body {
+		max_size 60MB
+	}
+	reverse_proxy hub:8700 {
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+}
+
+# Automações visuais (Node-RED; login próprio + só rede da equipe)
+{$PHYSIS_DOMINIO_AUTOMACOES:automacoes.localhost} {
+	tls {$PHYSIS_TLS:internal}
+	import seguranca
+	import so_equipe
+	reverse_proxy nodered:1880
+}
+
+# BI (Superset; login próprio + só rede da equipe)
+{$PHYSIS_DOMINIO_BI:bi.localhost} {
+	tls {$PHYSIS_TLS:internal}
+	import seguranca
+	import so_equipe
+	reverse_proxy superset:8088
+}
+
+# Mapas (GeoServer). WMS/WFS de leitura abertos; a administração (/geoserver/web, /rest) só para a equipe.
+{$PHYSIS_DOMINIO_MAPAS:mapas.localhost} {
+	tls {$PHYSIS_TLS:internal}
+	import seguranca
+	@admin path /geoserver/web* /geoserver/rest* /geoserver/j_spring* /geoserver/gwc/rest*
+	handle @admin {
+		import so_equipe
+		reverse_proxy geoserver:8080
+	}
+	handle {
+		reverse_proxy geoserver:8080
+	}
+}

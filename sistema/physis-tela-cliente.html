@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script id="pxp-cedo">(function(){var r=document.documentElement,t=null,p=null;try{p=JSON.parse(localStorage.getItem("physis-pref")||"null");t=p&&p.tema||localStorage.getItem("physis-pref-tema");}catch(e){}var v=!!(p&&p.verde);if(t!=="claro"&&t!=="escuro"){try{t=matchMedia("(prefers-color-scheme: dark)").matches?"escuro":"claro";}catch(e){t="claro";}}r.setAttribute("data-tema",v?"escuro":t);if(v)r.classList.add("a11y-verde");})();</script>
+<script id="px-em-quadro">(function(){var q=false;try{q=window.self!==window.top;}catch(e){q=true;}if(q||/em-quadro/.test(location.hash||""))document.documentElement.setAttribute("data-em-quadro","");})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Physis · Painel do Cliente</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -362,14 +363,46 @@ html.a11y-calma{--bg-FCF2F0:var(--px-sup)}
 #rc-estado{opacity:1!important}
 :is([style^="color: rgb(168, 84, 50)"],[style*="; color: rgb(168, 84, 50)"]){color:#7A2214}
 </style>
+<style id="px-modelo">
+/* ===== Modelo Physis (igual ao painel da plataforma): faixa com a árvore e o título serifado ===== */
+.px-faixa{background:#F4F6F1;border-bottom:1px solid #C9D2C4;color:#1C2B21}
+.px-faixa .px-in{max-width:1240px;margin:0 auto;padding:10px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.px-faixa .px-id{display:flex;align-items:center;gap:14px;min-width:0;flex-wrap:wrap}
+.px-faixa .px-id img{height:42px!important;width:42px!important;object-fit:cover;object-position:0 50%;display:block;flex:none;background:#F4F6F1;border-radius:6px}
+.px-faixa .px-tit{font-family:Fraunces,Georgia,"Times New Roman",serif!important;font-weight:500;font-size:24px;line-height:1.15;letter-spacing:-.012em;color:#33512F;padding-left:0;border-left:0;margin:0}
+html[data-tema="escuro"] .px-faixa{background:#14180F;border-bottom-color:#4A5A47;color:#EEF2EA}
+html[data-tema="escuro"] .px-faixa .px-id img{background:transparent;filter:brightness(0) invert(1)}
+html[data-tema="escuro"] .px-faixa .px-tit{color:#B9CDB3}
+@media (max-width:480px){.px-faixa .px-in{padding:10px 16px}.px-faixa .px-tit{font-size:21px}}
+/* Painel do cliente no modelo Physis (igual ao painel): faixa clara, título serifado verde, cantos de 8 px. Só aparência. */
+:root{--r:8px;--papel:#F4F6F1;--verde-fundo:#33512F}
+header.topo{background:var(--bg-FFFFFF,#FFFFFF);color:var(--px-tinta);border-bottom:1px solid var(--px-linha);padding:12px 20px}
+.marca h1.tc-tit{margin:0;font-family:Fraunces,Georgia,"Times New Roman",serif;font-weight:400;font-size:2.1em;line-height:1.15;color:var(--px-acao)}
+.marca h1.tc-tit span{display:inline;font-size:inherit;color:inherit;line-height:inherit}
+.orgbadge{background:var(--px-sup);border:1px solid var(--px-linha);color:var(--px-tinta);border-radius:8px;padding:6px 10px}
+.orgbadge.vazio{background:#F5E2D7;border-color:#7A2214;color:#7A2214}
+.chave{min-height:44px;padding:0 14px;border:1px solid var(--px-linha);border-radius:8px;color:var(--px-tinta);background:var(--px-sup);font-size:14px;font-weight:600}
+.chave:hover{border-color:var(--px-acao)}
+.chave[aria-pressed="true"]{background:var(--px-acao);border-color:var(--px-acao);color:var(--px-sup)}
+h2{font-family:Fraunces,Georgia,"Times New Roman",serif;font-weight:500;font-size:1.6em;color:var(--px-acao)}
+:focus-visible{outline:3px solid var(--px-acao)!important;outline-offset:2px!important}
+html[data-tema="escuro"] header.topo{background:var(--px-sup);border-bottom-color:var(--px-linha)}
+html[data-tema="escuro"] .orgbadge.vazio{background:#5C2B2E;border-color:#FF8A80;color:#F5E2D7}
+html[data-tema="escuro"] .chave[aria-pressed="true"]{color:#14180F}
+/* Dentro da plataforma (quadro): o título, a faixa e a barra de preferências ficam na plataforma. */
+html[data-em-quadro] .px-faixa,html[data-em-quadro] header.topo .marca{display:none!important}
+html[data-em-quadro] header.topo{justify-content:flex-end;background:transparent;border-bottom:0}
+html[data-em-quadro] h1:not(.pv-h h1){display:none!important}
+@media (max-width:480px){header.topo{padding:10px 16px}.marca h1.tc-tit{font-size:1.6em}}
+</style>
 </head>
 <body>
 <a class="px-pular" href="#px-conteudo">Ir para o conteúdo</a>
-<div class="px-faixa" role="banner"><div class="px-in"><div class="px-id"><img alt="Physis Engineering" src="data:image/png;base64,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"><span class="px-tit">Physis PDI - Sistema Integrado</span></div><nav aria-label="Sistemas Physis"><a class="px-l" href="physis-tela-cliente.html" aria-current="page">Painel do cliente</a><a class="px-l" href="physis-scada-demo.html">SCADA</a><a class="px-l" href="gestao-physis.html">Gestão</a><div id="pxp-lugar"></div></nav></div></div>
+<div class="px-faixa" role="banner"><div class="px-in"><div class="px-id"><img alt="Physis Engineering" src="data:image/png;base64,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"><span class="px-tit" data-t="pxTit">Physis PDI - Sistema Integrado</span></div><nav aria-label="Sistemas Physis"><a class="px-l" href="physis-tela-cliente.html" aria-current="page">Painel do cliente</a><a class="px-l" href="physis-scada-demo.html">SCADA</a><a class="px-l" href="gestao-physis.html">Gestão</a><div id="pxp-lugar"></div></nav></div></div>
 
 <header class="topo">
   <div class="marca">
-    <div><span data-t="marcaSub">Painel do cliente · auditoria RECP</span></div>
+    <h1 class="tc-tit"><span data-t="marcaSub">Painel do cliente · auditoria RECP</span></h1>
   </div>
   <div class="orgbadge vazio" id="orgBadge">org_id: —</div>
   <div class="chaveiro">
@@ -567,7 +600,7 @@ html.a11y-calma{--bg-FCF2F0:var(--px-sup)}
 
       <div class="aviso grave" data-t="avisoCalVer"></div>
 
-      <h3 data-t="hPlano">Plano de medição <span id="contaPlano" class="dica"></span></h3>
+      <h3><span data-t="hPlano">Plano de medição</span> <span id="contaPlano" class="dica"></span></h3>
       <div id="painelPlano"></div>
 
       <h3 data-t="hComprova">A economia é comprovável?</h3>
@@ -580,7 +613,7 @@ html.a11y-calma{--bg-FCF2F0:var(--px-sup)}
       </div>
       <div id="painelComprova"></div>
 
-      <h3 data-t="hInstrumentos">Instrumentos <span id="contaInstr" class="dica"></span></h3>
+      <h3><span data-t="hInstrumentos">Instrumentos</span> <span id="contaInstr" class="dica"></span></h3>
       <div class="rolagem"><table class="dados" id="tabInstr"></table></div>
       <div class="barra-acoes">
         <button class="btn vazado" id="btnAddInstr" data-t="bAddInstr">Adicionar instrumento</button>
@@ -642,7 +675,7 @@ html.a11y-calma{--bg-FCF2F0:var(--px-sup)}
       <h3 data-t="hRegimes">Regimes aplicáveis</h3>
       <div id="painelRegimes"></div>
 
-      <h3 data-t="hLacunas">O que falta no inventário <span id="contaLacunas" class="dica"></span></h3>
+      <h3><span data-t="hLacunas">O que falta no inventário</span> <span id="contaLacunas" class="dica"></span></h3>
       <p class="sub" data-t="lacunasSub">Medido contra a ISO 14064-1 e o GHG Protocol. Cada linha marcada como pendente é uma frente de serviço, não só um defeito.</p>
       <div id="listaLacunas"></div>
     </section>
@@ -713,6 +746,7 @@ html.a11y-calma{--bg-FCF2F0:var(--px-sup)}
 /* ============================ 1. IDIOMAS ============================ */
 const T = {
 pt:{
+ pxTit:"Physis PDI - Sistema Integrado",
  marcaSub:"Painel do cliente · auditoria RECP", modoCliente:"Modo cliente", modoAuditor:"Modo auditoria",
  legCliente:"Cliente preenche", legPhysis:"Physis preenche na auditoria",
  legSalvar:"Os dados vivem no arquivo. Exporte antes de fechar.",
@@ -790,6 +824,7 @@ pt:{
  fatores:[["fator_rede","Rede elétrica (tCO₂/MWh)","0,0289"],["fator_diesel","Diesel (kgCO₂e/L)","2,671"],
            ["fator_glp","GLP (kgCO₂e/kg)","2,939"],["fator_gn","Gás natural (kgCO₂e/m³)","1,999"]],
 
+ rot_fator_rede:"Rede elétrica (tCO₂/MWh)", rot_fator_diesel:"Diesel (kgCO₂e/L)", rot_fator_glp:"GLP (kgCO₂e/kg)", rot_fator_gn:"Gás natural (kgCO₂e/m³)",
  carbH:"Carbono",
  carbSub:"Quais regimes de carbono alcançam esta unidade, e o que falta no inventário para atender cada um. Responda os gatilhos: o painel se recalcula sozinho a partir das emissões da aba de sustentabilidade.",
  avisoCredito:"<b>Inventário não é crédito de carbono.</b> Esta tela calcula quanto a unidade emite. Crédito é outra coisa: exige projeto com metodologia credenciada, prova de adicionalidade, linha de base, validação e verificação por organismo independente e registro em plataforma. Eficiência energética com retorno positivo costuma reprovar no teste de adicionalidade justamente porque o projeto se paga sozinho.",
@@ -896,6 +931,7 @@ pt:{
  gruposConf:{tec:"Habilitação técnica",amb:"Ambiental",sst:"Saúde e segurança",edif:"Edificação e funcionamento",sg:"Sistemas de gestão"}
 },
 en:{
+ pxTit:"Physis PDI - Integrated System",
  marcaSub:"Client dashboard · RECP audit", modoCliente:"Client mode", modoAuditor:"Audit mode",
  legCliente:"Filled by the client", legPhysis:"Filled by Physis during the audit",
  legSalvar:"Data lives in the file. Export before you close.",
@@ -974,6 +1010,7 @@ en:{
  fatores:[["fator_rede","Grid electricity (tCO₂/MWh)","0.0289"],["fator_diesel","Diesel (kgCO₂e/L)","2.671"],
           ["fator_glp","LPG (kgCO₂e/kg)","2.939"],["fator_gn","Natural gas (kgCO₂e/m³)","1.999"]],
 
+ rot_fator_rede:"Grid electricity (tCO₂/MWh)", rot_fator_diesel:"Diesel (kgCO₂e/L)", rot_fator_glp:"LPG (kgCO₂e/kg)", rot_fator_gn:"Natural gas (kgCO₂e/m³)",
  carbH:"Carbon",
  carbSub:"Which carbon regimes reach this site, and what the inventory still lacks to meet each one. Answer the triggers: the panel recalculates from the emissions on the sustainability tab.",
  avisoCredito:"<b>An inventory is not a carbon credit.</b> This screen calculates how much the site emits. A credit is a different thing: it needs a project under an accredited methodology, proof of additionality, a baseline, validation and verification by an independent body, and registration. Energy efficiency with a positive payback usually fails the additionality test precisely because the project pays for itself.",
@@ -1199,7 +1236,7 @@ function montarFatores(){
   const g=$("#gradeFatores");g.innerHTML="";
   t().fatores.forEach(f=>{
     const d=document.createElement("div");d.className="campo";d.dataset.dono="physis";
-    d.innerHTML='<label for="f_'+f[0]+'"><span>'+f[1]+'</span></label>'+
+    d.innerHTML='<label for="f_'+f[0]+'"><span data-t="rot_'+f[0]+'">'+f[1]+'</span></label>'+
       '<input id="f_'+f[0]+'" class="num" data-tab="indicador" data-col="'+f[0]+'" inputmode="decimal">';
     g.appendChild(d);
     const i=d.querySelector("input");
@@ -1341,7 +1378,7 @@ function calcConformidade(){
 
 /* ======================= 6b. CARBONO ======================= */
 const REGIMES=[
-{id:"sbce", base:"Lei 15.042/2024 · SBCE",
+{id:"sbce", base:"Lei 15.042/2024 · SBCE", baseEn:"Law 15.042/2024 · SBCE",
  pt:"Mercado regulado brasileiro de carbono",
  en:"Brazilian regulated carbon market",
  ptE:"Acima de 10.000 tCO₂e/ano: plano de monitoramento e relato anual de emissões ao órgão gestor. Acima de 25.000 tCO₂e/ano: também conciliação periódica com CBEs. O relato passa por avaliação de conformidade de organismo de inspeção acreditado — que não pode ser quem fez o inventário. Multas de R$ 50 mil a R$ 20 milhões, ou até 3% do faturamento bruto.",
@@ -1351,7 +1388,7 @@ const REGIMES=[
    if(c.co2>=25000)return{s:"aplica",pt:"Faixa cheia: plano, relato e conciliação periódica.",en:"Full tier: plan, report and periodic reconciliation."};
    if(c.co2>=10000)return{s:"aplica",pt:"Faixa de relato: plano de monitoramento e relato anual.",en:"Reporting tier: monitoring plan and annual report."};
    return{s:"nao",pt:"Abaixo de 10.000 tCO₂e/ano pelo escopo 1+2 calculado aqui. Cuidado: o inventário está incompleto (falta escopo 3, fugitivas e gases não-CO₂), e os setores regulados ainda serão definidos em regulamentação de 2026.",en:"Below 10,000 tCO₂e/yr on the scope 1+2 calculated here. Careful: the inventory is incomplete, and the regulated sectors are still to be defined by 2026 regulation."};}},
-{id:"cbam", base:"Regulamento (UE) 2023/956 · CBAM",
+{id:"cbam", base:"Regulamento (UE) 2023/956 · CBAM", baseEn:"Regulation (EU) 2023/956 · CBAM",
  pt:"Ajuste de carbono na fronteira da União Europeia",
  en:"EU carbon border adjustment mechanism",
  ptE:"Emissões incorporadas por tonelada de produto e por rota produtiva, com dado verificado, entregues ao importador europeu. Sem dado real, aplica-se valor-padrão da UE, calibrado pela indústria global mais suja e bem mais caro que a emissão real de uma planta brasileira com matriz limpa.",
@@ -1360,7 +1397,7 @@ const REGIMES=[
    if(c.ue!=="sim")return{s:"nao",pt:"Não exporta para a UE.",en:"Does not export to the EU."};
    if(c.cbam&&c.cbam!=="nenhum")return{s:"aplica",pt:"Regime definitivo desde 1º de janeiro de 2026: o importador europeu compra certificados CBAM sobre a emissão embutida. Isso vira cláusula de contrato — quem absorve o custo se negocia.",en:"Definitive regime since 1 January 2026: the EU importer buys CBAM certificates on the embedded emissions. This becomes a contract clause — who absorbs the cost is negotiated."};
    return{s:"avaliar",pt:"Exporta para a UE mas o produto não está na lista atual. A Comissão propôs estender o mecanismo a cerca de 180 produtos manufaturados de aço e alumínio a partir de 2028 — conferir se o produto entra.",en:"Exports to the EU but the product is not on the current list. The Commission proposed extending it to around 180 manufactured steel and aluminium products from 2028 — check whether the product falls in."};}},
-{id:"cvm", base:"Res. CVM 193/2023, alterada pela Res. CVM 244 de 29/05/2026",
+{id:"cvm", base:"Res. CVM 193/2023, alterada pela Res. CVM 244 de 29/05/2026", baseEn:"CVM Res. 193/2023, as amended by CVM Res. 244 of 29/05/2026",
  pt:"Relato financeiro de clima (IFRS S1 e S2)",
  en:"Climate-related financial disclosure (IFRS S1 and S2)",
  ptE:"Escopos 1, 2 e 3, riscos físicos e de transição, metas, análise de cenário. Quem publica precisa seguir CBPS/ISSB e submeter a asseguração por auditor independente.",
@@ -1377,7 +1414,7 @@ const REGIMES=[
    if(c.exigencia==="sim"||c.aberta==="sim"||c.ue==="sim"||(isFinite(c.co2)&&c.co2>=10000))
      return{s:"aplica",pt:"É a base técnica que todos os outros regimes pressupõem. Fazer uma vez serve para todos.",en:"It is the technical base every other regime assumes. Do it once and it serves all of them."};
    return{s:"avaliar",pt:"Voluntário hoje, mas é o pré-requisito de qualquer outro passo.",en:"Voluntary today, but it is the prerequisite for any other step."};}},
-{id:"ghg", base:"GHG Protocol · Programa Brasileiro",
+{id:"ghg", base:"GHG Protocol · Programa Brasileiro", baseEn:"GHG Protocol · Brazilian Programme",
  pt:"Registro público de inventário",
  en:"Public inventory registry",
  ptE:"Inventário publicado no registro do Programa Brasileiro GHG Protocol, com selo conforme completude e verificação. É o formato que a maioria dos clientes e editais brasileiros reconhece de imediato.",
@@ -1393,7 +1430,7 @@ const REGIMES=[
  f:function(c){
   if(c.alega==="neutro"||c.alega==="ambos")return{s:"aplica",pt:"A empresa já anuncia carbono neutro. A alegação está feita; falta o lastro. Sem inventário verificado e créditos aposentados no nome dela, isso é exposição a publicidade enganosa hoje, não amanhã.",en:"The company already advertises carbon neutral. The claim is made; the backing is missing. Without a verified inventory and credits retired in its name, this is a greenwashing exposure today, not tomorrow."};
   return{s:"avaliar",pt:"Só depois do inventário verificado. Não é ponto de partida.",en:"Only after a verified inventory. Not a starting point."};}},
-{id:"netzero", base:"IWA 42:2022 · ISO 14060 em elaboração",
+{id:"netzero", base:"IWA 42:2022 · ISO 14060 em elaboração", baseEn:"IWA 42:2022 · ISO 14060 under development",
  pt:"Net zero — emissões líquidas zero",
  en:"Net zero — net zero emissions",
  ptE:"Redução profunda nos escopos 1, 2 e 3 por trajetória alinhada à ciência, com metas intermediárias datadas e net zero até 2050 no mais tardar. Só o resíduo é neutralizado, e com crédito de remoção, não de evitação. Compensar no lugar de reduzir não conta.",
@@ -1402,7 +1439,7 @@ const REGIMES=[
   if(c.alega==="netzero"||c.alega==="ambos")return{s:"aplica",pt:"A empresa já anuncia net zero. Atenção ao que hoje existe para dar lastro: a IWA 42:2022 é orientação saída de acordo de workshop, não norma certificável — não há certificado ISO de net zero para exibir. A ISO 14060 está sendo elaborada a partir dela, com consulta pública encerrada em 2026 e publicação esperada para 2027.",en:"The company already advertises net zero. Mind what exists to back it: IWA 42:2022 is guidance from a workshop agreement, not a certifiable standard — there is no ISO net zero certificate to display. ISO 14060 is being developed from it, with public consultation closed in 2026 and publication expected in 2027."};
   if(c.alega==="futuro")return{s:"avaliar",pt:"Meta anunciada sem norma publicada para dar lastro. Ancorar em trajetória científica e em metas intermediárias datadas, e revisar quando a ISO 14060 sair.",en:"Target announced with no published standard to back it. Anchor it in a science-based pathway and dated interim targets, and revise when ISO 14060 is published."};
   return{s:"avaliar",pt:"Não confundir com neutralidade: neutralidade admite compensação, net zero exige a redução primeiro e só neutraliza o resíduo, com remoção. Vender um pelo outro é o erro mais caro desta área.",en:"Do not confuse it with neutrality: neutrality admits offsetting, net zero requires the reduction first and only neutralises the residual, with removals. Selling one as the other is the costliest mistake in this field."};}},
-{id:"voluntario", base:"Verra VCS · Gold Standard · CRVE do SBCE",
+{id:"voluntario", base:"Verra VCS · Gold Standard · CRVE do SBCE", baseEn:"Verra VCS · Gold Standard · SBCE CRVE",
  pt:"Geração de crédito no mercado voluntário",
  en:"Credit generation in the voluntary market",
  ptE:"Metodologia aprovada, adicionalidade, linha de base, monitoramento, validação e verificação por organismo independente, registro. Pela Lei 15.042/2024 um crédito pode virar CRVE e ser usado no SBCE ou exportado como ITMO, se a metodologia for credenciada.",
@@ -1410,7 +1447,7 @@ const REGIMES=[
  f:function(c){
    if(c.vender!=="sim")return{s:"nao",pt:"Não é o objetivo declarado.",en:"Not the stated objective."};
    return{s:"avaliar",pt:"Atenção à adicionalidade: projeto de eficiência energética que se paga em poucos anos costuma reprovar, porque o teste pergunta se o projeto aconteceria de qualquer jeito. O ganho real da Physis aqui é medir e verificar, não gerar crédito.",en:"Mind additionality: an energy efficiency project with a short payback usually fails, because the test asks whether it would have happened anyway. Physis's real value here is measuring and verifying, not generating credits."};}},
-{id:"cbio", base:"Lei 13.576/2017 · RenovaBio",
+{id:"cbio", base:"Lei 13.576/2017 · RenovaBio", baseEn:"Law 13.576/2017 · RenovaBio",
  pt:"CBIO — crédito de descarbonização",
  en:"Decarbonisation credit (RenovaBio)",
  ptE:"Certificação da produção de biocombustível por firma inspetora credenciada na ANP, nota de eficiência energético-ambiental, emissão primária de CBIO. Obrigação de aquisição recai sobre distribuidores de combustível.",
@@ -1418,7 +1455,7 @@ const REGIMES=[
  f:function(c){
    if(c.combustivel!=="sim")return{s:"nao",pt:"Não produz, importa nem distribui combustível. CBIO não é crédito de carbono de indústria em geral — confusão comum.",en:"Does not produce, import or distribute fuel. This is not a general industrial carbon credit — a common confusion."};
    return{s:"aplica",pt:"Verificar posição na cadeia: produtor e importador certificam e emitem; distribuidor tem meta de aquisição.",en:"Check the position in the chain: producers and importers certify and issue; distributors have a purchase target."};}},
-{id:"irec", base:"I-REC · certificados de energia",
+{id:"irec", base:"I-REC · certificados de energia", baseEn:"I-REC · energy certificates",
  pt:"Escopo 2 pela abordagem de mercado",
  en:"Scope 2 market-based approach",
  ptE:"Certificado rastreável e aposentado em nome da empresa, no mesmo ano e mercado do consumo. Sem isso, comprar de comercializadora que se diz verde não zera o escopo 2 no relato.",
@@ -1464,7 +1501,7 @@ function renderCarbono(){
     const rot=v.s==="aplica"?d.sAplica:(v.s==="nao"?d.sNao:d.sAvaliar);
     const div=document.createElement("div");
     div.className="aviso "+cls;div.dataset.regime=g.id;div.dataset.status=v.s;
-    div.innerHTML="<b>"+g[il]+"</b> · <span class=\"norma\">"+g.base+"</span>"+
+    div.innerHTML="<b>"+g[il]+"</b> · <span class=\"norma\">"+(il==="en"&&g.baseEn||g.base)+"</span>"+
       "<div style=\"margin:4px 0\"><span class=\"pilula"+(v.s==="aplica"?"":" aud")+"\">"+rot+"</span> "+v[il]+"</div>"+
       "<div class=\"dica\" style=\"font-size:12.5px\">"+d.exigeLabel+" "+g[il+"E"]+"</div>";
     p.appendChild(div);
@@ -1529,7 +1566,7 @@ const CERTS=[
   if(!isFinite(c.desvio))return{s:"avaliar",pt:"Preencha os resíduos para medir o desvio atual.",en:"Fill in the waste tab to measure current diversion."};
   if(c.desvio>=90)return{s:"aplica",pt:"O desvio medido já passa de 90% no recorte atual. Falta a série de 12 meses e a política formal.",en:"Measured diversion already exceeds 90% on the current data. The 12-month series and the formal policy are still missing."};
   return{s:"nao",pt:"Desvio medido em "+fmt(c.desvio,0)+"%, contra os 90% exigidos. A distância é grande demais para virar meta de curto prazo — mas o número é ótimo argumento de diagnóstico.",en:"Measured diversion of "+fmt(c.desvio,0)+"% against the 90% required. Too far to be a short-term target — but the figure is a strong diagnostic argument."};}},
-{id:"ence", base:"PBE Edifica · ENCE · INI-C/INI-R (Portaria Inmetro 309/2022) · Res. CGIEE 4/2025",
+{id:"ence", base:"PBE Edifica · ENCE · INI-C/INI-R (Portaria Inmetro 309/2022) · Res. CGIEE 4/2025", baseEn:"PBE Edifica · ENCE · INI-C/INI-R (Inmetro Ordinance 309/2022) · CGIEE Res. 4/2025",
  pt:"ENCE — etiqueta brasileira de eficiência energética",
  en:"Brazilian energy efficiency label for buildings",
  ptE:"Escala de A a E, avaliada por organismo de inspeção acreditado pelo Inmetro, em projeto e em edificação construída. A Resolução CGIEE nº 4/2025 passou a exigir comprovação de desempenho energético para alvará de construção e habite-se em novas edificações públicas, comerciais, de serviços e residenciais. O atestado do caminho simplificado vai acompanhado de ART ou RRT.",
@@ -1620,7 +1657,7 @@ function renderCert(){
     var rot=v.s==="aplica"?d.sAplica:(v.s==="nao"?d.sNao:d.sAvaliar);
     var div=document.createElement("div");
     div.className="aviso "+cls;div.dataset.cert=g.id;div.dataset.status=v.s;
-    div.innerHTML="<b>"+g[il]+'</b> · <span class="norma">'+g.base+"</span>"+
+    div.innerHTML="<b>"+g[il]+'</b> · <span class="norma">'+(il==="en"&&g.baseEn||g.base)+"</span>"+
       '<div style="margin:4px 0"><span class="pilula'+(v.s==="aplica"?"":" aud")+'">'+rot+"</span> "+v[il]+"</div>"+
       '<div class="dica" style="font-size:12.5px">'+d.exigeLabel+" "+g[il+"E"]+"</div>";
     p.appendChild(div);

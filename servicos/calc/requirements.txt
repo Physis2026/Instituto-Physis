@@ -1,0 +1,12 @@
+# Motores de cálculo da Physis (todos de código aberto). Versões fixas; conferir com "pip check" no build.
+# pvlib (BSD-3), windpowerlib (MIT), wntr (Revised BSD; usa o EPANET 2.2, domínio público/MIT),
+# pyswmm (BSD-2; inclui o motor SWMM 5, domínio público). EnergyPlus (BSD-3) entra no Dockerfile.
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.1
+networkx==3.3
+matplotlib==3.9.0
+pvlib==0.11.0
+windpowerlib==0.2.2
+wntr==1.2.0
+pyswmm==2.0.1

@@ -1,0 +1,17 @@
+# Cópia de segurança diária do banco do Physis Hub (disparada por physis-backup.timer)
+[Unit]
+Description=Physis Hub - copia de seguranca cifrada
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/physis/implantacao/backup.sh
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=read-only
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
