@@ -9318,6 +9318,166 @@
      "tituloEn": "",
      "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
     }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f2-pdf-bim",
+    "titulo": "PDF ou imagem para BIM (fase 2): subir planta em PDF ou foto, calibrar a escala com dois pontos, traçar paredes, portas, janelas, cômodos e telhados por cima e gerar o IFC; reconhecimento automático por IA depois. Feito quando: uma planta real vira IFC usado pela Solar e pelo AVAC. (responsável prin",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f6b0a744dc09",
+    "titulo": "PDF ou imagem para BIM (fase 2): subir planta em PDF ou foto, calibrar a escala com dois pontos, traçar paredes, portas, janelas, cômodos e telhados por cima e gerar o IFC; reconhecimento automático por IA depois. Feito quando: uma planta real vira IFC usado pela Solar e pelo AVAC. (com Rafaella)",
+    "pessoa_id": "ericklopes",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-0956ee04ffa4",
+    "titulo": "PDF ou imagem para BIM (fase 2): subir planta em PDF ou foto, calibrar a escala com dois pontos, traçar paredes, portas, janelas, cômodos e telhados por cima e gerar o IFC; reconhecimento automático por IA depois. Feito quando: uma planta real vira IFC usado pela Solar e pelo AVAC. (com Rafaella)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f2-cad-3d",
+    "titulo": "CAD com parâmetros no Physis 3D (fase 2): modelos editáveis (manípulo com rosca, porca, suporte, conectores), furos e junções em qualquer peça, saída STL, 3MF e STEP. Feito quando: uma peça editada por parâmetros é impressa e registrada na biblioteca. (responsável principal; com Rafaella, Arthur, Ry",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-76ab7fe3469f",
+    "titulo": "CAD com parâmetros no Physis 3D (fase 2): modelos editáveis (manípulo com rosca, porca, suporte, conectores), furos e junções em qualquer peça, saída STL, 3MF e STEP. Feito quando: uma peça editada por parâmetros é impressa e registrada na biblioteca. (com Rafael)",
+    "pessoa_id": "rafaella",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-5798c252b519",
+    "titulo": "CAD com parâmetros no Physis 3D (fase 2): modelos editáveis (manípulo com rosca, porca, suporte, conectores), furos e junções em qualquer peça, saída STL, 3MF e STEP. Feito quando: uma peça editada por parâmetros é impressa e registrada na biblioteca. (com Rafael)",
+    "pessoa_id": "arthur",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-a46978f4ba1f",
+    "titulo": "CAD com parâmetros no Physis 3D (fase 2): modelos editáveis (manípulo com rosca, porca, suporte, conectores), furos e junções em qualquer peça, saída STL, 3MF e STEP. Feito quando: uma peça editada por parâmetros é impressa e registrada na biblioteca. (com Rafael)",
+    "pessoa_id": "ryan",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-d165d0e865f8",
+    "titulo": "CAD com parâmetros no Physis 3D (fase 2): modelos editáveis (manípulo com rosca, porca, suporte, conectores), furos e junções em qualquer peça, saída STL, 3MF e STEP. Feito quando: uma peça editada por parâmetros é impressa e registrada na biblioteca. (com Rafael)",
+    "pessoa_id": "laura",
+    "projeto_id": "imp-0072df0e",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 4. Revisão técnica dos módulos"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-f2-ia-3d",
+    "titulo": "Gerador de modelo 3D por IA a partir de texto e imagem (fase 2): TripoSR/TripoSG no servidor com GPU, reparo da malha, medida real informada e revisão humana antes de imprimir (doc 23b, seção 2.20). Feito quando: uma peça gerada passa pelo reparo e entra no Physis 3D com memorial. (responsável princ",
+    "pessoa_id": "erickoliveira",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
+   },
+   {
+    "org_id": "physis",
+    "tarefa_id": "imp-5bd087fe1a16",
+    "titulo": "Gerador de modelo 3D por IA a partir de texto e imagem (fase 2): TripoSR/TripoSG no servidor com GPU, reparo da malha, medida real informada e revisão humana antes de imprimir (doc 23b, seção 2.20). Feito quando: uma peça gerada passa pelo reparo e entra no Physis 3D com memorial. (com Eric Oliveira",
+    "pessoa_id": "rafael",
+    "projeto_id": "imp-4eda7c98",
+    "horizonte": "longa",
+    "peso": 3,
+    "concluida": false,
+    "concluida_em": null,
+    "depende_de": null,
+    "extras": {
+     "tituloEn": "",
+     "projeto_nome": "Fase 2 · 1. Servidor da Physis"
+    }
    }
   ]
  },
