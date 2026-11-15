@@ -261,7 +261,7 @@ function telaEvidencias(certId){
     <p class="t2 pq">O sistema procura evidência no que já está guardado (contas, medidores, planos, inventários, documentos). É apoio à auditoria: confira cada item; a decisão final é da certificadora.${temServidor() ? (servidor ? "" : " Dados do servidor ainda não carregados.") : " Sem servidor: só os dados deste aparelho."}</p>
     ${msgTela ? `<p role="status" class="pq">${escH(msgTela)}</p>` : ""}
     <div class="rolagem"><table><caption class="so-leitor">Evidências por critério de ${escH(cert.nome)}</caption><thead><tr><th scope="col">Critério</th><th scope="col">Situação</th><th scope="col">Evidência</th><th scope="col">Fonte</th><th scope="col">Data</th><th scope="col">Conferir</th></tr></thead><tbody>${linhas}</tbody></table></div>
-    <p><button type="button" data-ev-exportar="${escH(certId)}">Exportar evidências (CSV)</button></p>
+    <p><button type="button" data-ev-exportar="${escH(certId)}">Exportar evidências (CSV)</button> <button type="button" data-ev-xlsx="${escH(certId)}">Exportar evidências (Excel)</button></p>
     <details ${aberto[certId] ? "open" : ""} data-ev-det="${escH(certId)}"><summary>Anexar evidência</summary>${form}<h3 class="t3">Evidências anexadas</h3>${lista}</details></section>`;
 }
 function redesenhar(){
@@ -280,6 +280,7 @@ if (global.document){
     const b = ev.target.closest && ev.target.closest("button"); if (!b) return;
     if (b.dataset.evIr){ const ir = fn("irPara"); if (ir) ir(b.dataset.evIr); else global.location.hash = b.dataset.evIr; }
     else if (b.dataset.evExportar){ const a = global.document.createElement("a"); a.href = URL.createObjectURL(new Blob([csvDe(b.dataset.evExportar)], { type:"text/csv;charset=utf-8" })); a.download = "evidencias-" + b.dataset.evExportar + ".csv"; global.document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
+    else if (b.dataset.evXlsx){ const PE = global.PhysisExportar; if (PE && PE.csvParaXlsx) PE.baixar("evidencias-" + b.dataset.evXlsx + ".xlsx", PE.csvParaXlsx("Evidências " + b.dataset.evXlsx, csvDe(b.dataset.evXlsx)), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); }
     else if (b.dataset.evRemover){ const v = b.dataset.evRemover, cert = b.dataset.evCert; aberto[cert] = true;
       if (v[0] === "s"){ const r = await postar("/api/evidencias/anexo/remover", { id: Number(v.slice(1)) }); msgTela = r && r.ok ? "Evidência removida." : "Não foi possível remover no servidor."; await carregarServidor(true); }
       else { const l = lerJSON(CHAVE_ANEXOS, []), meus = l.filter(a => a.cert === cert), alvo = meus[Number(v.slice(1))]; try { global.localStorage.setItem(CHAVE_ANEXOS, JSON.stringify(l.filter(a => a !== alvo && JSON.stringify(a) !== JSON.stringify(alvo)))); } catch (e){} msgTela = "Evidência removida."; }

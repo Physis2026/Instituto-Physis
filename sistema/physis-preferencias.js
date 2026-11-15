@@ -7,7 +7,7 @@
 
    ORIGINAL ÚNICO: sistema/physis-preferencias.js (desde a v3 a antiga barra px-preferencias da plataforma, da Gestão e do
    SCADA é esta mesma, pela porta PxPref, no fim do arquivo). As telas são arquivos únicos, então cada uma leva uma CÓPIA IGUAL
-   dentro do bloco <script id="physis-preferencias"> (o arquivo inteiro, sem mudar nada). Quem copia é ferramentas/sincronizar.py
+   dentro do bloco script de id "physis-preferencias" (o arquivo inteiro, sem mudar nada). Quem copia é ferramentas/sincronizar.py
    (BLOCOS): physis-hub/web/painel.html, sistema/gestao-interna-physis.html, sistema/physis-scada-demo.html,
    physis-hub/web/consultoria.html, sistema/SustainKit_Definitivo.html, modulos/planejador/planejador-physis.html (e as demos
    geradas delas). O teste physis-hub/tests/test_preferencias.py confere que as cópias são iguais a este arquivo.

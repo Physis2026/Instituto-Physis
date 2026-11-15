@@ -829,7 +829,7 @@ ${r.ucs.length ? `<div class="rolagem"><table><caption>Unidades de conservação
     return `<section class="cartao" aria-labelledby="${id}-h" data-sbn-conferencia="${E(id)}"><h2 id="${id}-h">Conferência</h2>
 <p class="t2">O que um especialista precisa conferir antes de levar o plano a laudo ou ao cliente: espécies com dados incertos, regras dos consórcios e dados que faltam do lugar. ${itens.length ? cont + "." : ""}</p>
 ${itens.length ? `<div class="rolagem"><table><caption>Itens a conferir, com situação, responsável, data e observação</caption><thead><tr><th scope="col">Item</th><th scope="col">O que conferir</th><th scope="col">Situação</th><th scope="col">Responsável</th><th scope="col">Data</th><th scope="col">Observação</th></tr></thead><tbody>${linhas}</tbody></table></div>
-<p><button type="button" data-sbn-conf-exportar="1">Exportar a tabela (CSV)</button></p>` : `<p class="t2">Nada a conferir no plano atual.</p>`}</section>`;
+<p><button type="button" data-sbn-conf-exportar="1">Exportar a tabela (CSV)</button> <button type="button" data-sbn-conf-exportar="xlsx">Exportar a tabela (Excel)</button></p>` : `<p class="t2">Nada a conferir no plano atual.</p>`}</section>`;
   }
   /* liga a tabela (uma vez por elemento): grava cada mudança em localStorage "physis-sbn".conferencia
      (ou em ctx.gravar(estado), se vier) e exporta o CSV; aoMudar(estado, idItem) é opcional */
@@ -844,6 +844,8 @@ ${itens.length ? `<div class="rolagem"><table><caption>Itens a conferir, com sit
     el.addEventListener("change", mudar);
     el.addEventListener("click", ev => { const b = ev.target.closest && ev.target.closest("[data-sbn-conf-exportar]"); if (!b) return;
       const c = C(), csv = "﻿" + conferenciaCsv(c.itens || itensConferencia(c), estado());
+      const PE = raiz.PhysisExportar;   // Excel editável com o mesmo conteúdo (physis-exportar.js), quando a tela tem a biblioteca
+      if (b.dataset.sbnConfExportar === "xlsx" && PE && PE.csvParaXlsx) { try { PE.baixar("conferencia-sbn.xlsx", PE.csvParaXlsx("Conferência do plano SbN", csv), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); } catch (e) {} return; }
       try { const a = raiz.document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" })); a.download = "conferencia-sbn.csv"; raiz.document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0); } catch (e) {} });
   }
 

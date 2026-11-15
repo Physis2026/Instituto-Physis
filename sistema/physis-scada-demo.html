@@ -324,6 +324,7 @@ html[data-em-quadro] .env{padding-top:8px}
     <p class="nota" id="tExpNota"></p>
     <div class="acoes">
       <button class="p" id="btCsvAgg">CSV agregado</button>
+      <button id="btXlsxAgg">Excel agregado</button>
       <button id="btJson">JSON · medicao</button>
       <button id="btCsvCru">CSV cru</button>
     </div>
@@ -390,7 +391,7 @@ var T = {
     agregado:"Agregado por minuto", minuto:"Minuto", vmin:"Mín", vmed:"Média", vmax:"Máx", fora:"Fora da faixa",
     expNota:"O que sai daqui entra em `medicao` com origem = 'scada'. O CSV agregado é o padrão; o cru existe e avisa o tamanho.",
     expAviso:"O Excel para de funcionar antes de um milhão de linhas. Vinte tags a cada segundo por um ano dão 630 milhões — exportar cru para Excel é armadilha, e quem cai nela trava o computador na frente do cliente.",
-    csvAgg:"CSV agregado", json:"JSON · medicao", csvCru:"CSV cru",
+    csvAgg:"CSV agregado", xlsxAgg:"Excel agregado", json:"JSON · medicao", csvCru:"CSV cru",
     baixou:function(n,q){return q+" · "+n+" linhas.";},
     cruAviso:function(n){return "Cru com "+n+" linhas. Em uma planta real de um ano seriam centenas de milhões.";},
     leituras:"Leituras cruas", linhasAgg:"Linhas agregadas", reducao:"Redução",
@@ -453,7 +454,7 @@ var T = {
     agregado:"Aggregated by minute", minuto:"Minute", vmin:"Min", vmed:"Mean", vmax:"Max", fora:"Out of range",
     expNota:"What leaves here lands in `medicao` with origem = 'scada'. Aggregated CSV is the default; raw exists and warns about size.",
     expAviso:"Excel stops working before a million rows. Twenty tags every second for a year make 630 million — exporting raw to Excel is a trap, and whoever falls for it freezes the laptop in front of the client.",
-    csvAgg:"Aggregated CSV", json:"JSON · medicao", csvCru:"Raw CSV",
+    csvAgg:"Aggregated CSV", xlsxAgg:"Aggregated Excel", json:"JSON · medicao", csvCru:"Raw CSV",
     baixou:function(n,q){return q+" · "+n+" rows.";},
     cruAviso:function(n){return "Raw with "+n+" rows. A real plant over a year would be hundreds of millions.";},
     leituras:"Raw readings", linhasAgg:"Aggregated rows", reducao:"Reduction",
@@ -1362,7 +1363,7 @@ function idioma(){
   $("#tCliNota").textContent = d.cliNota; $("#tCliRodape").textContent = d.cliRodape;
   $("#tHisNota").textContent = d.hisNota; $("#tAgregado").textContent = d.agregado;
   $("#tExpNota").textContent = d.expNota; $("#tExpAviso").textContent = d.expAviso;
-  $("#btCsvAgg").textContent = d.csvAgg; $("#btJson").textContent = d.json;
+  $("#btCsvAgg").textContent = d.csvAgg; $("#btXlsxAgg").textContent = d.xlsxAgg; $("#btJson").textContent = d.json;
   $("#btCsvCru").textContent = d.csvCru;
   $("#btPausa").textContent = rodando ? d.pausar : d.seguir;
   $("#btIdioma").textContent = d.idioma;
@@ -1393,6 +1394,12 @@ $("#btIdioma").onclick = function(){ EN = !EN; idioma(); };
 $("#btCsvAgg").onclick = function(){
   baixar("physis_scada_agregado.csv", csvAgg(), "text/csv;charset=utf-8");
   dizer(t().baixou(agg.length, t().csvAgg));
+};
+/* o mesmo agregado em Excel editável (números como números); o cru fica só em CSV, como avisa a tela */
+$("#btXlsxAgg").onclick = function(){
+  var PE = window.PhysisExportar; if (!PE || !PE.csvParaXlsx) return;
+  PE.baixar("physis_scada_agregado.xlsx", PE.csvParaXlsx(t().csvAgg, csvAgg(), { decimal: "." }), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+  dizer(t().baixou(agg.length, t().xlsxAgg));
 };
 $("#btJson").onclick = function(){
   var j = jsonMedicao();
@@ -1501,7 +1508,7 @@ window.PhysisScadaDemo = {
 })();
 </script>
 <script>
-/* physis-exportar.js v2 · 14/11/2026
+/* physis-exportar.js v3 · 15/11/2026
  *
  * Baixar a tela em Word (.docx), Excel (.xlsx) e PDF, e encaminhar a colegas.
  * Sem dependência externa e sem internet: os três arquivos são montados aqui.
@@ -1516,25 +1523,36 @@ window.PhysisScadaDemo = {
  *           (O Excel não tem marca d'água de verdade; a faixa e o cabeçalho de impressão fazem esse papel.)
  * Paleta: verde ação #33512F, marca #4B7547, texto #1C2B21, secundário #4A4F44, linha #C9D2C4, areia #EFE8D6.
  *
+ * v3 (15/11/2026, "todo cliente baixa os próprios dados em Word e Excel editáveis, em toda tela"):
+ *   - programa aberto num quadro (iframe) da mesma origem: o conteúdo visível do quadro entra no arquivo;
+ *   - planilha(titulo, cab, linhas, {decimal}) e csvParaXlsx(titulo, textoCsv, {decimal}): o mesmo Excel da barra
+ *     para os lugares que baixavam só CSV; número vira número e data vira data (célula editável, não texto).
+ *
  * Uso:  PhysisExportar.barra({ raiz: function () { return elemento; },
  *                              titulo: function () { return "Propostas"; },
- *                              encaminhar: { pessoas: [...], enviar: function (id, nota, link) {...} } })
+ *                              idiomaTela: function () { return document.documentElement.lang; },   // opcional
+ *                              encaminhar: { pessoas: [...], enviar: function (id, nota, link) {...} } })   // ou false
+ *       PhysisExportar.baixarPlanilha("leituras", "Leituras", ["data","pH"], [["14/11/2026 08:00","6,8"]])
  */
 (function (g) {
   "use strict";
   var EN = /^en/i.test((g.navigator && g.navigator.language) || "pt");
-  var TX = EN ? { baixar: "Download this screen", word: "Word", pdf: "PDF", excel: "Excel", enc: "Forward to colleagues",
+  var TX_EN = { baixar: "Download this screen", word: "Word", pdf: "PDF", excel: "Excel", enc: "Forward to colleagues",
       para: "To", nota: "Note (optional)", link: "Link to this screen", enviar: "Send notice", copiar: "Copy link and note",
       copiado: "Copied.", semCopia: "Select the text and copy it.", baixado: function (n) { return n + " saved."; },
       falha: "The download could not be started.", vazio: "There is nothing on this screen to export.",
       semServidor: "Without the Physis server the notice cannot be delivered straight to a colleague. Copy the link and the note and send them.",
-      gerado: "Generated on", escolha: "Choose who", cancelado: "The download was cancelled." }
-    : { baixar: "Baixar esta tela", word: "Word", pdf: "PDF", excel: "Excel", enc: "Encaminhar a colegas",
+      gerado: "Generated on", escolha: "Choose who", cancelado: "The download was cancelled." };
+  var TX_PT = { baixar: "Baixar esta tela", word: "Word", pdf: "PDF", excel: "Excel", enc: "Encaminhar a colegas",
       para: "Para", nota: "Recado (opcional)", link: "Link desta tela", enviar: "Enviar aviso", copiar: "Copiar link e recado",
       copiado: "Copiado.", semCopia: "Selecione o texto e copie.", baixado: function (n) { return n + " baixado."; },
       falha: "Não foi possível iniciar o download.", vazio: "Não há nada nesta tela para exportar.",
       semServidor: "Sem o servidor Physis, o aviso não chega direto ao colega. Copie o link e o recado e envie.",
       gerado: "Gerado em", escolha: "Escolha para quem", cancelado: "O download foi cancelado." };
+  /* idioma: o do navegador; a barra usa o da tela quando ela informa (op.idiomaTela, p. ex. SCADA e Gestão, que não traduzem o DOM) */
+  var TX = EN ? TX_EN : TX_PT;
+
+  function TX_PADRAO(op) { if (op && typeof op.idiomaTela === "function") { try { var q = String(op.idiomaTela() || ""); if (q) return /^en/i.test(q) ? TX_EN : TX_PT; } catch (e) {} } return EN ? TX_EN : TX_PT; }
 
   /* ───────── utilidades ───────── */
   function bytes(s) { return new TextEncoder().encode(s); }
@@ -1661,7 +1679,11 @@ window.PhysisScadaDemo = {
     blocos.forEach(function (b) {
       if (b.h) { linhas.push([]); linhas.push([{ v: b.t, e: 1 }]); }
       else if (b.tabela) { if (b.tabela.cab.length) linhas.push(b.tabela.cab.map(function (c) { return { v: c, e: 7 }; }));
-        b.tabela.linhas.forEach(function (l) { linhas.push(l.map(function (c) { var dt = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(limpo(c));
+        b.tabela.linhas.forEach(function (l) { linhas.push(l.map(function (c) {
+          if (typeof c === "number") return isFinite(c) ? { v: c, e: 9, n: true, larg: 10 } : { v: "", e: 9 };
+          if (ehData(c)) { var hr = c.getHours() || c.getMinutes() || c.getSeconds(); return { v: serial(c), e: hr ? 12 : 5, n: true, larg: hr ? 17 : 12 }; }
+          if (c && typeof c === "object" && "s" in c) return { v: String(c.s == null ? "" : c.s), e: 9 };
+          var dt = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(limpo(c));
           if (dt) return { v: Math.round((Date.UTC(+dt[3], +dt[2] - 1, +dt[1]) - Date.UTC(1899, 11, 30)) / 86400000), e: 5, n: true, larg: 12 };
           var n = numero(c); return n === null ? { v: c, e: 9 } : { v: n, e: /R\$/.test(c) ? 10 : /%\s*$/.test(c) ? 11 : 9, n: true, larg: /R\$/.test(c) ? Math.max(14, limpo(c).length + 4) : 10 }; })); }); linhas.push([]); }
       else linhas.push([{ v: b.t, e: 0 }]);
@@ -1681,17 +1703,18 @@ window.PhysisScadaDemo = {
     // a árvore da Physis no canto do cabeçalho, como nas telas
     var desenho = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:oneCellAnchor><xdr:from><xdr:col>0</xdr:col><xdr:colOff>57150</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>47625</xdr:rowOff></xdr:from><xdr:ext cx="333375" cy="333375"/><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="2" name="Logo Physis" descr="Logo da Physis"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="333375" cy="333375"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:oneCellAnchor></xdr:wsDr>';
     if (!larg.length) folha = folha.replace("<cols></cols>", "");
-    // estilos: 0 normal · 1 negrito · 2 título verde · 3 R$ · 4 % · 5 data · 6 faixa da marca · 7 cabeçalho de tabela · 8 nota cinza · 9 célula com borda · 10 R$ com borda · 11 % com borda
+    // estilos: 0 normal · 1 negrito · 2 título verde · 3 R$ · 4 % · 5 data · 6 faixa da marca · 7 cabeçalho de tabela · 8 nota cinza · 9 célula com borda · 10 R$ com borda · 11 % com borda · 12 data e hora com borda
     var estilos = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet ' + M + '><numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;R$&quot;\\ #,##0.00"/></numFmts>' +
       '<fonts count="7"><font><sz val="10"/><color rgb="FF1C2B21"/><name val="Arial"/></font><font><b/><sz val="10"/><color rgb="FF1C2B21"/><name val="Arial"/></font><font><b/><sz val="14"/><color rgb="FF33512F"/><name val="Arial"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Arial"/></font><font><sz val="9"/><color rgb="FF4A4F44"/><name val="Arial"/></font><font><sz val="17"/><color rgb="FF33512F"/><name val="Georgia"/></font></fonts>' +
       '<fills count="5"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF33512F"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FF4B7547"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF4F6F1"/><bgColor indexed="64"/></patternFill></fill></fills>' +
       '<borders count="3"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFC9D2C4"/></left><right style="thin"><color rgb="FFC9D2C4"/></right><top style="thin"><color rgb="FFC9D2C4"/></top><bottom style="thin"><color rgb="FFC9D2C4"/></bottom><diagonal/></border><border><left/><right/><top/><bottom style="medium"><color rgb="FF33512F"/></bottom><diagonal/></border></borders>' +
-      '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="12">' +
+      '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="13">' +
       '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
       '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>' +
       '<xf numFmtId="0" fontId="6" fillId="4" borderId="2" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" indent="' + (lg ? 4 : 0) + '"/></xf><xf numFmtId="0" fontId="4" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"><alignment vertical="center" wrapText="1"/></xf>' +
       '<xf numFmtId="0" fontId="5" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"><alignment vertical="top" wrapText="1"/></xf>' +
       '<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/><xf numFmtId="10" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>' +
+      '<xf numFmtId="22" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>' +
       '</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
     var aba = xml(String(titulo || "Physis").replace(/[\\\/\?\*\[\]:]/g, " ").slice(0, 31)) || "Physis";
     return zip([
@@ -1705,6 +1728,42 @@ window.PhysisScadaDemo = {
         { nome: "xl/drawings/drawing1.xml", dados: desenho },
         { nome: "xl/drawings/_rels/drawing1.xml.rels", dados: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/logo-physis.png"/></Relationships>' },
         { nome: "xl/media/logo-physis.png", dados: lg.png }] : []));
+  }
+
+  /* ───────── planilha a partir de linhas (os lugares que baixavam só CSV) ───────── */
+  function ehData(c) { return Object.prototype.toString.call(c) === "[object Date]" && !isNaN(c.getTime()); }
+  function serial(d) { return (Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()) - Date.UTC(1899, 11, 30)) / 86400000; }
+  /* texto de uma célula -> número, data ou texto. decimal "," (padrão, pt-BR: 1.234,5) ou "." (7.125) */
+  function tipar(v, decimal) {
+    if (v == null) return { s: "" }; if (typeof v === "number" || ehData(v)) return v;
+    var s = limpo(v), m; if (!s) return { s: "" };
+    if ((m = /^(\d{2})\/(\d{2})\/(\d{4})(?:,?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/.exec(s))) return new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+    if ((m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?$/.exec(s))) return new Date(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+    if (/^[+\-−]?0\d/.test(s) && !/^[+\-−]?0[.,]\d/.test(s)) return { s: s };            // código com zero à esquerda (nó 03, CEP)
+    var neg = /^[\-−]/.test(s), c = s.replace(/^[+\-−]/, ""), n = null;
+    if (/^\d+$/.test(c)) n = Number(c);
+    else if (decimal === ".") { if (/^\d+\.\d+$/.test(c)) n = Number(c); else if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(c)) n = Number(c.replace(/,/g, "")); }
+    else { if (/^\d+,\d+$/.test(c)) n = Number(c.replace(",", ".")); else if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(c)) n = Number(c.replace(/\./g, "").replace(",", ".")); else if (/^\d+\.\d+$/.test(c)) n = Number(c); }
+    if (n === null || !isFinite(n)) return /R\$|%\s*$/.test(s) ? s : { s: s };              // R$ e % ficam com o leitor do Excel da barra
+    return neg ? -n : n;
+  }
+  function planilha(titulo, cab, linhas, op) {
+    var dec = op && op.decimal === "." ? "." : ",";
+    return xlsx(titulo, [{ tabela: { cab: (cab || []).map(function (c) { return limpo(c); }), linhas: (linhas || []).map(function (l) { return l.map(function (c) { return tipar(c, dec); }); }) } }]);
+  }
+  /* CSV (com ; ou ,) -> { cab, linhas } */
+  function deCsv(texto) {
+    texto = String(texto || "").replace(/^\uFEFF/, ""); var pl = texto.split(/\r?\n/)[0] || "", sep = (pl.match(/;/g) || []).length >= (pl.match(/,/g) || []).length ? ";" : ",";
+    var linhas = [], l = [], cel = "", aspas = false;
+    for (var i = 0; i < texto.length; i++) { var ch = texto[i];
+      if (aspas) { if (ch === '"') { if (texto[i + 1] === '"') { cel += '"'; i++; } else aspas = false; } else cel += ch; continue; }
+      if (ch === '"') aspas = true; else if (ch === sep) { l.push(cel); cel = ""; } else if (ch === "\n" || ch === "\r") { if (ch === "\r" && texto[i + 1] === "\n") i++; l.push(cel); cel = ""; if (l.some(function (x) { return x !== ""; })) linhas.push(l); l = []; } else cel += ch; }
+    l.push(cel); if (l.some(function (x) { return x !== ""; })) linhas.push(l);
+    return { cab: linhas.shift() || [], linhas: linhas, sep: sep };
+  }
+  function csvParaXlsx(titulo, texto, op) { var c = deCsv(texto); return planilha(titulo, c.cab, c.linhas, { decimal: op && op.decimal ? op.decimal : (c.sep === "," ? "." : ",") }); }
+  function baixarPlanilha(nome, titulo, cab, linhas, op) {
+    return baixar(String(nome || arquivo(titulo)).replace(/\.(csv|xlsx)$/i, "") + ".xlsx", planilha(titulo, cab, linhas, op), MIME.xlsx);
   }
 
   /* ───────── PDF (A4, texto e tabelas; fontes padrão, WinAnsi) ───────── */
@@ -1786,8 +1845,10 @@ window.PhysisScadaDemo = {
   }
 
   /* ───────── tirar da tela o que será exportado ───────── */
-  var BLOCO = /^(DIV|P|TABLE|UL|OL|SECTION|ARTICLE|FIELDSET|H1|H2|H3|H4|H5|DL|DETAILS|PRE|LABEL|INPUT|SELECT|TEXTAREA|LI|DT|DD|FORM|MAIN|HEADER|FOOTER|ASIDE|NAV|SUMMARY|LEGEND|OUTPUT)$/;
-  function some(el) { if (el.hidden || el.getAttribute("aria-hidden") === "true" || /\b(so-leitor|px-exportar|px-fora)\b/.test(el.className || "")) return true; var s = g.getComputedStyle(el); return s.display === "none" || s.visibility === "hidden"; }
+  var BLOCO = /^(DIV|P|TABLE|UL|OL|SECTION|ARTICLE|FIELDSET|H1|H2|H3|H4|H5|DL|DETAILS|PRE|LABEL|INPUT|SELECT|TEXTAREA|LI|DT|DD|FORM|MAIN|HEADER|FOOTER|ASIDE|NAV|SUMMARY|LEGEND|OUTPUT|IFRAME)$/;
+  function some(el) { if (el.hidden || el.getAttribute("aria-hidden") === "true" || /\b(so-leitor|px-exportar|px-fora|px-pular|pp-pular|salto)\b/.test(el.className || "")) return true; var w = (el.ownerDocument && el.ownerDocument.defaultView) || g, s = w.getComputedStyle(el); return s.display === "none" || s.visibility === "hidden"; }
+  /* programa num quadro da mesma origem (srcdoc ou mesmo servidor): o corpo do quadro; outra origem: nada (o navegador não deixa ler) */
+  function corpoDoQuadro(f) { try { var d = f.contentDocument; return d && d.body ? d.body : null; } catch (e) { return null; } }
   function valorDe(c) {
     if (c.tagName === "SELECT") return c.selectedOptions[0] ? limpo(c.selectedOptions[0].textContent) : "";
     if (c.type === "checkbox" || c.type === "radio") return c.checked ? (EN ? "yes" : "sim") : null;
@@ -1825,6 +1886,7 @@ window.PhysisScadaDemo = {
           if (cab.length || linhasT.length) out.push({ tabela: { cab: cab, linhas: linhasT } }); return;
         }
         if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return controle(f);
+        if (tag === "IFRAME") { var cq = corpoDoQuadro(f); if (cq) anda(cq); return; }
         if (tag === "LABEL") { var c = f.control || f.querySelector("input,select,textarea"); if (c) return controle(c); }
         if (tag === "DETAILS" && !f.open) { var s = f.querySelector("summary"); return; }
         if (tag === "LI") { if (f.querySelector("ul,ol,table,input,select,textarea")) return anda(f); var tli = limpo(textoSemControles(f)); if (tli) out.push({ t: tli, lista: true }); return; }
@@ -1852,6 +1914,7 @@ window.PhysisScadaDemo = {
   /* ───────── a barra que aparece em cada tela ───────── */
   var seq = 0;
   function barra(op) {
+    var TX = TX_PADRAO(op);
     var id = "px-exp-" + (++seq), aberto = false, el = document.createElement("section");
     el.className = "px-exportar"; el.setAttribute("aria-label", TX.baixar);
     el.style.cssText = "margin:18px 0 0;padding:12px 14px;border:1px solid #D6DBCF;border-radius:10px;background:transparent;display:flex;flex-direction:column;gap:10px;font:inherit";
@@ -1870,6 +1933,8 @@ window.PhysisScadaDemo = {
     };
     var dizer = function (t) { var m = el.querySelector("[data-px-msg]"); if (m) m.textContent = t; };
     pinta();
+    /* tela que troca de idioma sem recarregar (SCADA): a barra acompanha o lang do <html> */
+    if (typeof op.idiomaTela === "function" && g.MutationObserver) new MutationObserver(function () { var n = TX_PADRAO(op); if (n !== TX) { TX = n; el.setAttribute("aria-label", TX.baixar); pinta(); } }).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
     el.addEventListener("click", function (ev) {
       var b = ev.target.closest("button"); if (!b) return;
       if (b.dataset.pxF) { var r = gerar(b.dataset.pxF, op.titulo(), op.raiz()); if (!r) return dizer(TX.vazio);
@@ -1884,23 +1949,28 @@ window.PhysisScadaDemo = {
     return el;
   }
 
-  g.PhysisExportar = { docx: docx, xlsx: xlsx, pdf: pdf, extrair: extrair, gerar: gerar, baixar: baixar, barra: barra, zip: zip, numero: numero };
+  g.PhysisExportar = { docx: docx, xlsx: xlsx, pdf: pdf, extrair: extrair, gerar: gerar, baixar: baixar, barra: barra, zip: zip, numero: numero,
+    planilha: planilha, csvParaXlsx: csvParaXlsx, deCsv: deCsv, tipar: tipar, baixarPlanilha: baixarPlanilha };
 })(typeof window !== "undefined" ? window : this);
 
 </script>
 <script>
-/* Padrão Physis · "Baixar esta tela" e "Encaminhar a colegas" em toda tela. */
+/* Padrão Physis · "Baixar esta tela" (Word, PDF e Excel) em toda tela.
+   Dentro da plataforma (html[data-em-quadro]) quem baixa é a barra da plataforma, que já leva o conteúdo deste quadro. */
 (function () {
+  var st = document.createElement("style");
+  st.textContent = "html[data-em-quadro] .px-exportar[data-px-geral]{display:none!important}";
+  (document.head || document.documentElement).appendChild(st);
   function montar() {
     if (!window.PhysisExportar || document.querySelector("[data-px-geral]")) return;
     var app = document.getElementById("app"), raiz = app || document.querySelector("main#px-conteudo") || document.querySelector(".env") || document.querySelector("main");
     if (!raiz) return;
-    var b = window.PhysisExportar.barra({ raiz: function () { return raiz; },
+    var b = window.PhysisExportar.barra({ idiomaTela: function () { return document.documentElement.lang; }, raiz: function () { return raiz; },
       titulo: function () {
         var base = (document.title || "Physis").split("·")[0].trim(), t = "";
         Array.prototype.some.call(raiz.querySelectorAll("h1, h2"), function (h) { var x = (h.innerText || "").replace(/\s+/g, " ").trim(); if (x && h.offsetParent !== null) { t = x.slice(0, 60); return true; } return false; });
         return !t || t.toLowerCase() === base.toLowerCase() ? base : (t.toLowerCase().indexOf(base.toLowerCase()) === 0 ? t : base + " · " + t); },
-      encaminhar: window.PhysisAvisos || false });
+      encaminhar: false });
     b.setAttribute("data-px-geral", "1"); b.style.maxWidth = "1180px"; b.style.margin = "18px auto 24px"; b.style.boxSizing = "border-box"; b.style.width = "calc(100% - 32px)";
     (app ? app.parentNode : raiz).appendChild(b);
   }
@@ -1919,7 +1989,7 @@ window.PhysisScadaDemo = {
 
    ORIGINAL ÚNICO: sistema/physis-preferencias.js (desde a v3 a antiga barra px-preferencias da plataforma, da Gestão e do
    SCADA é esta mesma, pela porta PxPref, no fim do arquivo). As telas são arquivos únicos, então cada uma leva uma CÓPIA IGUAL
-   dentro do bloco <script id="physis-preferencias"> (o arquivo inteiro, sem mudar nada). Quem copia é ferramentas/sincronizar.py
+   dentro do bloco script de id "physis-preferencias" (o arquivo inteiro, sem mudar nada). Quem copia é ferramentas/sincronizar.py
    (BLOCOS): physis-hub/web/painel.html, sistema/gestao-interna-physis.html, sistema/physis-scada-demo.html,
    physis-hub/web/consultoria.html, sistema/SustainKit_Definitivo.html, modulos/planejador/planejador-physis.html (e as demos
    geradas delas). O teste physis-hub/tests/test_preferencias.py confere que as cópias são iguais a este arquivo.
