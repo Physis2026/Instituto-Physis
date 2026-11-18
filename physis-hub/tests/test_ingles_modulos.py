@@ -41,6 +41,7 @@ NAO_E_TELA = {
                 "manuais de frutas desidratadas: 55 a 65 °C; umidade final de 15 a 20 % b.u. — verificar",
                 "valores genéricos — trocar pelos do produto"},
     "parceiros": set(),
+    "frota": set(),
 }
 
 
@@ -170,6 +171,11 @@ class ServidorVerde(_Modulo, unittest.TestCase):
 @unittest.skipUnless(NO_REPO, "só no repositório")
 class Secador(_Modulo, unittest.TestCase):
     ARQ, NOME, DIC, RX = "physis-secador.js", "secador", "window.SECADOR_I18N = ", "window.SECADOR_I18N_RX = "
+
+
+@unittest.skipUnless(NO_REPO, "só no repositório")
+class Frota(_Modulo, unittest.TestCase):
+    ARQ, NOME, DIC, RX = "physis-frota.js", "frota", "window.FROTA_I18N = ", "window.FROTA_I18N_RX = "
 
 
 @unittest.skipUnless(NO_REPO, "só no repositório")

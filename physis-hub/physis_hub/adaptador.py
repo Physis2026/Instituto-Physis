@@ -18,6 +18,7 @@ TIPOS = {
     "SEC": "Secador solar (a homologar)",
     "ENE": "Medidor de energia (potencia ativa, tensao, corrente, fator de potencia)",
     "HID": "Medidor de agua (vazao e pressao)",
+    "VEI": "Veiculo da frota: GPS, velocidade, rumo, vazao e nivel de combustivel, horimetro, odometro (em desenvolvimento)",
 }
 # MED e PUL (Saude) nunca passam por aqui: o hub as entrega a saude.py antes (dado sensivel fora de `medicao`).
 INTENSIDADE_INTERVALO_MAX_S = 3 * 3600     # intervalo maior que isso: a intensidade nao e calculada
@@ -98,6 +99,10 @@ def interpretar(campos: dict[str, str]) -> dict:
         est.update({"pw": f("PW"), "qr": f("QR"), "s": f("S"), "v": f("V"), "i": f("I"), "fp": f("FP")})
     elif tipo == "HID":
         est.update({"q": f("Q"), "pr": f("PR")})
+    elif tipo == "VEI":
+        b = lambda k: None if para_float(campos.get(k)) is None else para_bool(campos.get(k))
+        est.update({"lat": f("LAT"), "lon": f("LON"), "vel": f("VEL"), "rumo": f("RUMO"), "flx": f("FLX"), "niv": f("NIV"),
+                    "hor": f("HOR"), "odo": f("ODO"), "ign": b("IGN"), "gps": b("GPS")})
     return est
 
 
@@ -161,4 +166,17 @@ def adaptar(campos: dict[str, str], org: str, lugar: str, intervalo_s: float | N
     elif e["tipo"] == "HID":
         _m(out, org, "vazao", base, e["q"], ts)
         _m(out, org, "pressao", base, e["pr"], ts)
+    elif e["tipo"] == "VEI":
+        # frota (docs/FROTA.md): GPS só com posição válida (GPS:0 = sem posição); o resto vai como medido
+        if e["gps"] is not False:
+            _m(out, org, "latitude", base, e["lat"], ts)
+            _m(out, org, "longitude", base, e["lon"], ts)
+        _m(out, org, "velocidade", base, e["vel"], ts)
+        _m(out, org, "rumo", base, e["rumo"], ts)
+        _m(out, org, "vazao_combustivel", base, e["flx"], ts)
+        _m(out, org, "nivel_combustivel", base, e["niv"], ts)
+        _m(out, org, "horimetro", base, e["hor"], ts)
+        _m(out, org, "odometro", base, e["odo"], ts)
+        if e["ign"] is not None:
+            _m(out, org, "estado", base + "-ignicao", 1.0 if e["ign"] else 0.0, ts)
     return out

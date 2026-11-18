@@ -106,6 +106,8 @@ flowchart LR
   resiliencia -->|mon.bateria, mon.sinal_radio| monitoramento
   sbn -->|sbn.plano| carbono
   sbn -->|sbn.plano| certificacoes
+  frota -.->|frota.litros_movel| carbono
+  frota -.->|frota.custo_mes| gestao
   secador -->|mon.bateria| aprendizado
   secador -->|mon.bateria, mon.sinal_radio| monitoramento
   solar -.->|solar.geracao| carbono
@@ -385,6 +387,25 @@ Premissas da base estão no fim, numa tabela só. 'Lote' = entra no lote de inte
 | `sec.lote` | Lote: produto, peso e umidade iniciais, umidade desejada | kg; % b.u. | digitado | Secador · lotes (physis-calc-secador) | secador | localStorage physis-calc-secador → cliente_estado | 0 a 100 | nao |
 | `sec.resultado_lote` | Água a tirar, peso alvo e fim previsto do lote | kg; h | calculado | secador.previsao_lote | secador | calculado na hora | a definir [CONFERIR] | nao |
 | `sec.dimensionamento` | Área do coletor, vazão de ar e CO₂ evitado | m²; m³/h; kgCO₂/ano | calculado | secador.dimensionar | secador | calculado na hora | a definir [CONFERIR] | nao |
+
+### Frota e combustível (em desenvolvimento, 18/11/2026; `FROTA.md`)
+
+| Id | Nome | Unidade | Tipo | Origem | Quem usa | Guardado em | Faixa | Lote |
+|---|---|---|---|---|---|---|---|---|
+| `frota.posicao` | Posição do veículo (GPS) | grau | medido | V6 VEI LAT, LON, GPS | frota | tabela medicao (latitude/longitude); tabela frota_ponto | -90 a 90 | sim |
+| `frota.velocidade_rumo` | Velocidade e rumo | km/h; grau | medido | V6 VEI VEL, RUMO | frota | tabela medicao (velocidade, rumo); tabela frota_ponto | ≥ 0; 0 a 360 | sim |
+| `frota.vazao_combustivel` | Vazão de combustível | L/h | medido | V6 VEI FLX | frota | tabela medicao (vazao_combustivel); tabela frota_ponto | ≥ 0 | sim |
+| `frota.nivel_combustivel` | Nível do tanque | % | medido | V6 VEI NIV | frota | tabela medicao (nivel_combustivel); tabela frota_ponto | 0 a 100 | sim |
+| `frota.horimetro_odometro` | Horímetro e odômetro | h; km | medido | V6 VEI HOR, ODO | frota | tabela medicao (horimetro, odometro); tabela frota_ponto | ≥ 0 | sim |
+| `frota.ignicao` | Ignição | 0/1 | medido | V6 VEI IGN | frota | tabela medicao (estado, ativo -ignicao) | 0/1 | sim |
+| `frota.veiculo` | Veículo (tipo, placa, combustível, tanque, consumo esperado, nó) | L; L/100 km ou L/h | digitado | Frota · Veículos | frota | tabela frota_veiculo | — | não |
+| `frota.abastecimento` | Abastecimento (data, litros, preço com a fonte, odômetro, comprovante) | L; R$/L | digitado | Frota · Abastecimentos ou CSV do cartão | frota | tabela frota_abastecimento | — | não |
+| `frota.cerca` | Cerca desenhada no mapa | grau | digitado | Frota · Cercas | frota | tabela frota_cerca | 3 a 500 vértices | não |
+| `frota.distancia_consumo` | Distância, litros, horas de motor, marcha lenta e consumo | km; L; h | calculado | frota.por_dia | frota | calculado na hora | — | não |
+| `frota.alertas` | Consumo acima do normal, nível caindo parado, marcha lenta, cerca | — | calculado | frota.analise | frota | calculado na hora | premissas frota.* | não |
+| `frota.litros_movel` | Litros medidos por combustível no ano | L | calculado | frota.para_carbono | carbono (o medido substitui o digitado) | calculado na hora | — | não |
+| `frota.custo_mes` | Litros e custo dos abastecimentos por mês | L; R$ | calculado | frota.custos_por_mes | gestao | calculado na hora | — | não |
+| `frota.co2e` | Emissões da frota | tCO₂e | calculado | frota.co2e (carbono.combustao) | frota | calculado na hora | — | não |
 
 ### Premissas da base (`sistema/physis-premissas.json`)
 

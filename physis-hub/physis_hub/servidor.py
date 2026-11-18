@@ -78,6 +78,7 @@ from . import evidencias as evidencias_mod
 from . import municipio as municipio_mod
 from . import parceiros as parceiros_mod
 from . import impressao3d as impressao3d_mod
+from . import frota as frota_mod
 from . import mapeamento as mapeamento_mod
 from . import simulacao as simulacao_mod
 from . import cep as cep_mod
@@ -559,6 +560,8 @@ for _k, _v in ESQUEMAS_ROTAS.items():
     seg.ESQUEMAS.setdefault(_k, _v)
 for _k, _v in fornecedores_mod.ESQUEMAS.items():          # fornecedores e equipamentos (docs/FORNECEDORES.md)
     seg.ESQUEMAS.setdefault(_k, _v)
+for _k, _v in frota_mod.ESQUEMAS.items():                 # frota e combustível (docs/FROTA.md, em desenvolvimento)
+    seg.ESQUEMAS.setdefault(_k, _v)
 
 
 def esquema_documento(caminho: str) -> str | None:
@@ -817,6 +820,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                        "fornecedores": lambda: fornecedores_mod.Fornecedores(
                                            hub, pasta=fornecedores_mod.pasta_padrao(banco_da_instancia(instancia)))}[nome]()
             return modulos_vivos[nome]
+    # Frota e combustível (docs/FROTA.md): criada já na partida, porque o hub entrega a ela cada linha VEI (com a trava do hub)
+    frota = frota_mod.Frota(hub, pasta=frota_mod.pasta_padrao(banco_da_instancia(instancia)))
+    modulos_vivos["frota"] = frota
+    hub.frota_receptor = frota.receber_v6
     cfg_pegada = pegada_mod.config_de(instancia)          # None = desligada (PHYSIS_PEGADA=0)
     # ── Segurança (seguranca.py; docs/SEGURANCA.md) ──
     proxies = seg.proxies_confiaveis()                  # PHYSIS_PROXY_CONFIAVEL: só deles vale X-Forwarded-*
@@ -1060,6 +1067,17 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     else:
                         self._json(cod, r)
                 return True
+            # Frota e combustível (frota.py; docs/FROTA.md): cliente vê; comprovante e exportação só a equipe
+            if p.startswith("/api/frota/"):
+                qv = self._exigir(seg.CLIENTE)
+                if qv:
+                    cod, r = modulo("frota").rota("GET", p, qv, None, q)
+                    if isinstance(r, tuple):                       # ("bytes", nome, tipo, dados): CSV ou comprovante
+                        self._enviar_bytes(r[3], r[2], {"Content-Disposition": "attachment; filename*=UTF-8''" + quote(r[1]),
+                                                        "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
+                    else:
+                        self._json(cod, r)
+                return True
             # Physis 3D (impressao3d.py; docs/PHYSIS_3D.md): só com sessão de participante (cliente ou acima)
             if p.startswith("/api/3d/"):
                 q3 = self._exigir(seg.CLIENTE)
@@ -1195,6 +1213,21 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if esq and self._ler(corpo, esq) is None:
                     return True
                 self._rota_mapeamento("POST", u, parse_qs(u.query), corpo, qm)
+                return True
+            # Frota: só a equipe grava (CSV até 4 MB, comprovante até 10 MB); apagar veículo e retenção só a direção
+            if p.startswith("/api/frota/"):
+                qv = self._exigir(seg.EQUIPE)
+                if not qv or (p in ("/api/frota/importar", "/api/frota/comprovante") and self._limitado("arquivo")):
+                    return True
+                corpo = self._corpo_grande(max(frota_mod.ARQ_MAX, frota_mod.CSV_MAX) + 64 * 1024)
+                if corpo is None and (self.headers.get("Content-Length") or "0").strip() == "0":
+                    corpo = b"{}"
+                if corpo is None:
+                    self._recusar_corpo("arquivo grande demais (máximo 10 MB)")
+                    return True
+                if p == "/api/frota/veiculo/remover" and not self._sensivel(qv):
+                    return True
+                self._json(*modulo("frota").rota("POST", p, qv, corpo, parse_qs(u.query)))
                 return True
             # Physis 3D: malha e foto vão em base64 dentro do JSON (até impressao3d.CORPO_MAX)
             if p.startswith("/api/3d/"):

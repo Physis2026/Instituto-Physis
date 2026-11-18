@@ -198,6 +198,11 @@
       "nome": "Simulação (em desenvolvimento)",
       "aba": "simulacao",
       "classe": "pesquisa"
+    },
+    "frota": {
+      "nome": "Frota e combustível (em desenvolvimento)",
+      "aba": "frota",
+      "classe": "contrato"
     }
   },
   "loja": {
@@ -34716,6 +34721,96 @@
             ]
           }
         ]
+      },
+      "frota": {
+        "nome": "Frota e combustível",
+        "venda": false,
+        "modulos": [
+          "frota"
+        ],
+        "sem_modulo": null,
+        "variaveis_necessarias": [
+          {
+            "variavel": "frota.posicao",
+            "consumidor": "frota",
+            "necessario": true,
+            "fonte": [
+              "frota"
+            ]
+          },
+          {
+            "variavel": "frota.velocidade_rumo",
+            "consumidor": "frota",
+            "necessario": true,
+            "fonte": [
+              "frota"
+            ]
+          },
+          {
+            "variavel": "frota.vazao_combustivel",
+            "consumidor": "frota",
+            "necessario": true,
+            "fonte": [
+              "frota"
+            ]
+          },
+          {
+            "variavel": "frota.nivel_combustivel",
+            "consumidor": "frota",
+            "necessario": true,
+            "fonte": [
+              "frota"
+            ]
+          },
+          {
+            "variavel": "frota.horimetro_odometro",
+            "consumidor": "frota",
+            "necessario": true,
+            "fonte": [
+              "frota"
+            ]
+          },
+          {
+            "variavel": "frota.ignicao",
+            "consumidor": "frota",
+            "necessario": true,
+            "fonte": [
+              "frota"
+            ]
+          },
+          {
+            "variavel": "frota.veiculo",
+            "consumidor": "frota",
+            "necessario": true,
+            "fonte": [
+              "frota"
+            ]
+          },
+          {
+            "variavel": "frota.abastecimento",
+            "consumidor": "frota",
+            "necessario": true,
+            "fonte": [
+              "frota"
+            ]
+          },
+          {
+            "variavel": "frota.distancia_consumo",
+            "consumidor": "frota",
+            "necessario": true,
+            "fonte": [
+              "frota"
+            ]
+          },
+          {
+            "variavel": "frota.alertas",
+            "consumidor": "frota",
+            "necessario": true,
+            "fonte": [
+              "frota"
+            ]
+          }
+        ]
       }
     },
     "fonte": "physis-hub/physis_hub/hub.py ITEM_MODULOS e CERTIFICACOES_LOJA; physis-hub/web/painel.html LOJA_VENDA"
@@ -36977,6 +37072,12 @@
         {
           "modulo": "carbono",
           "tela": "lugar do inventário",
+          "necessario": false,
+          "modo": "automatico"
+        },
+        {
+          "modulo": "frota",
+          "tela": "Frota · centro do mapa e da frota simulada",
           "necessario": false,
           "modo": "automatico"
         }
@@ -45997,6 +46098,1337 @@
         "fornecedores.dias_desatualizado"
       ],
       "entradas": []
+    },
+    {
+      "id": "frota.posicao",
+      "nome": {
+        "pt": "Posição do veículo (GPS)",
+        "en": "Vehicle position (GPS)"
+      },
+      "unidade": "grau",
+      "tipo": "measured",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "sensor": {
+          "tipo_v6": "VEI",
+          "chave": "LAT LON GPS"
+        },
+        "api": "POST /api/v6/linha ou ponte MQTT (nó \"tipo\": \"veiculo\")"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/adaptador.py",
+          "linha": 0,
+          "simbolo": "def adaptar"
+        },
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def receber_v6"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · mapa, consumo e alertas",
+          "necessario": true,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "tabela medicao (grandeza='latitude'/'longitude', ativo do nó VEI)",
+        "tabela frota_ponto (lat, lon)",
+        "tabela leitura (linha crua)"
+      ],
+      "frequencia": "uma linha VEI por envio do rastreador (o simulador: 2 min com o motor ligado, 30 min parado)",
+      "agregacao": "bruto",
+      "faixa": {
+        "min": -90,
+        "max": 90,
+        "fonte": "protocolo.FAIXAS_VEI"
+      },
+      "qualidade": [
+        "'-', nan, null = sem leitura (campo sai)",
+        "fora da faixa física (protocolo.FAIXAS_VEI): campo descartado",
+        "GPS:0 = posição não confiável (latitude e longitude não entram)",
+        "linha com SIM:SIMULADO = ponto marcado v6-simulado (nunca vai ao Carbono)"
+      ],
+      "lote": "sim (lote diário, registros validados)",
+      "premissas": [],
+      "entradas": [],
+      "nota": "Dado pessoal de quem dirige (LGPD): retenção frota.retencao_dias; motorista só como código."
+    },
+    {
+      "id": "frota.velocidade_rumo",
+      "nome": {
+        "pt": "Velocidade e rumo do veículo",
+        "en": "Vehicle speed and heading"
+      },
+      "unidade": "km/h; grau",
+      "tipo": "measured",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "sensor": {
+          "tipo_v6": "VEI",
+          "chave": "VEL RUMO"
+        },
+        "api": "POST /api/v6/linha ou ponte MQTT (nó \"tipo\": \"veiculo\")"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/adaptador.py",
+          "linha": 0,
+          "simbolo": "def adaptar"
+        },
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def receber_v6"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · mapa, consumo e alertas",
+          "necessario": true,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "tabela medicao (grandeza='velocidade'/'rumo')",
+        "tabela frota_ponto (vel, rumo)"
+      ],
+      "frequencia": "uma linha VEI por envio do rastreador (o simulador: 2 min com o motor ligado, 30 min parado)",
+      "agregacao": "bruto",
+      "faixa": {
+        "min": 0,
+        "max": null,
+        "fonte": "protocolo.FAIXAS_VEI (RUMO 0 a 360)"
+      },
+      "qualidade": [
+        "'-', nan, null = sem leitura (campo sai)",
+        "fora da faixa física (protocolo.FAIXAS_VEI): campo descartado",
+        "GPS:0 = posição não confiável (latitude e longitude não entram)",
+        "linha com SIM:SIMULADO = ponto marcado v6-simulado (nunca vai ao Carbono)"
+      ],
+      "lote": "sim (lote diário, registros validados)",
+      "premissas": [],
+      "entradas": []
+    },
+    {
+      "id": "frota.vazao_combustivel",
+      "nome": {
+        "pt": "Vazão de combustível (fluxômetro ou OBD-II/CAN)",
+        "en": "Fuel flow (flow meter or OBD-II/CAN)"
+      },
+      "unidade": "L/h",
+      "tipo": "measured",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "sensor": {
+          "tipo_v6": "VEI",
+          "chave": "FLX"
+        },
+        "api": "POST /api/v6/linha ou ponte MQTT (nó \"tipo\": \"veiculo\")"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/adaptador.py",
+          "linha": 0,
+          "simbolo": "def adaptar"
+        },
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def receber_v6"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · mapa, consumo e alertas",
+          "necessario": true,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "tabela medicao (grandeza='vazao_combustivel')",
+        "tabela frota_ponto (flx)"
+      ],
+      "frequencia": "uma linha VEI por envio do rastreador (o simulador: 2 min com o motor ligado, 30 min parado)",
+      "agregacao": "bruto",
+      "faixa": {
+        "min": 0,
+        "max": null,
+        "fonte": "protocolo.FAIXAS_VEI"
+      },
+      "qualidade": [
+        "'-', nan, null = sem leitura (campo sai)",
+        "fora da faixa física (protocolo.FAIXAS_VEI): campo descartado",
+        "GPS:0 = posição não confiável (latitude e longitude não entram)",
+        "linha com SIM:SIMULADO = ponto marcado v6-simulado (nunca vai ao Carbono)"
+      ],
+      "lote": "sim (lote diário, registros validados)",
+      "premissas": [],
+      "entradas": []
+    },
+    {
+      "id": "frota.nivel_combustivel",
+      "nome": {
+        "pt": "Nível do tanque",
+        "en": "Tank level"
+      },
+      "unidade": "%",
+      "tipo": "measured",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "sensor": {
+          "tipo_v6": "VEI",
+          "chave": "NIV"
+        },
+        "api": "POST /api/v6/linha ou ponte MQTT (nó \"tipo\": \"veiculo\")"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/adaptador.py",
+          "linha": 0,
+          "simbolo": "def adaptar"
+        },
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def receber_v6"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · mapa, consumo e alertas",
+          "necessario": true,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "tabela medicao (grandeza='nivel_combustivel')",
+        "tabela frota_ponto (niv)"
+      ],
+      "frequencia": "uma linha VEI por envio do rastreador (o simulador: 2 min com o motor ligado, 30 min parado)",
+      "agregacao": "bruto",
+      "faixa": {
+        "min": 0,
+        "max": 100,
+        "fonte": "protocolo.FAIXAS_VEI"
+      },
+      "qualidade": [
+        "'-', nan, null = sem leitura (campo sai)",
+        "fora da faixa física (protocolo.FAIXAS_VEI): campo descartado",
+        "GPS:0 = posição não confiável (latitude e longitude não entram)",
+        "linha com SIM:SIMULADO = ponto marcado v6-simulado (nunca vai ao Carbono)"
+      ],
+      "lote": "sim (lote diário, registros validados)",
+      "premissas": [],
+      "entradas": []
+    },
+    {
+      "id": "frota.horimetro_odometro",
+      "nome": {
+        "pt": "Horímetro e odômetro",
+        "en": "Hour meter and odometer"
+      },
+      "unidade": "h; km",
+      "tipo": "measured",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "sensor": {
+          "tipo_v6": "VEI",
+          "chave": "HOR ODO"
+        },
+        "api": "POST /api/v6/linha ou ponte MQTT (nó \"tipo\": \"veiculo\")"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/adaptador.py",
+          "linha": 0,
+          "simbolo": "def adaptar"
+        },
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def receber_v6"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · mapa, consumo e alertas",
+          "necessario": true,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "tabela medicao (grandeza='horimetro'/'odometro')",
+        "tabela frota_ponto (hor, odo)"
+      ],
+      "frequencia": "uma linha VEI por envio do rastreador (o simulador: 2 min com o motor ligado, 30 min parado)",
+      "agregacao": "bruto",
+      "faixa": {
+        "min": 0,
+        "max": null,
+        "fonte": "protocolo.FAIXAS_VEI"
+      },
+      "qualidade": [
+        "'-', nan, null = sem leitura (campo sai)",
+        "fora da faixa física (protocolo.FAIXAS_VEI): campo descartado",
+        "GPS:0 = posição não confiável (latitude e longitude não entram)",
+        "linha com SIM:SIMULADO = ponto marcado v6-simulado (nunca vai ao Carbono)"
+      ],
+      "lote": "sim (lote diário, registros validados)",
+      "premissas": [],
+      "entradas": []
+    },
+    {
+      "id": "frota.ignicao",
+      "nome": {
+        "pt": "Ignição do veículo",
+        "en": "Vehicle ignition"
+      },
+      "unidade": "0/1",
+      "tipo": "measured",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "sensor": {
+          "tipo_v6": "VEI",
+          "chave": "IGN"
+        },
+        "api": "POST /api/v6/linha ou ponte MQTT (nó \"tipo\": \"veiculo\")"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/adaptador.py",
+          "linha": 0,
+          "simbolo": "def adaptar"
+        },
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def receber_v6"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · mapa, consumo e alertas",
+          "necessario": true,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "tabela medicao (grandeza='estado', ativo -ignicao)",
+        "tabela frota_ponto (ign)"
+      ],
+      "frequencia": "uma linha VEI por envio do rastreador (o simulador: 2 min com o motor ligado, 30 min parado)",
+      "agregacao": "bruto",
+      "faixa": {
+        "min": 0,
+        "max": 1,
+        "fonte": "protocolo.BINARIOS_VEI"
+      },
+      "qualidade": [
+        "'-', nan, null = sem leitura (campo sai)",
+        "fora da faixa física (protocolo.FAIXAS_VEI): campo descartado",
+        "GPS:0 = posição não confiável (latitude e longitude não entram)",
+        "linha com SIM:SIMULADO = ponto marcado v6-simulado (nunca vai ao Carbono)"
+      ],
+      "lote": "sim (lote diário, registros validados)",
+      "premissas": [],
+      "entradas": []
+    },
+    {
+      "id": "frota.veiculo",
+      "nome": {
+        "pt": "Veículo: tipo, placa, combustível, tanque, consumo esperado e nó",
+        "en": "Vehicle: type, plate, fuel, tank, expected consumption and node"
+      },
+      "unidade": "L; L/100 km ou L/h",
+      "tipo": "typed",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "campo": "Frota · Veículos (POST /api/frota/veiculo)"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def validar_veiculo"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota · veículos",
+          "necessario": true,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "tabela frota_veiculo"
+      ],
+      "frequencia": "quando a equipe cadastra",
+      "agregacao": "por veículo",
+      "faixa": {
+        "min": 0,
+        "max": null,
+        "fonte": "frota.validar_veiculo"
+      },
+      "qualidade": [],
+      "lote": "nao",
+      "premissas": [],
+      "entradas": []
+    },
+    {
+      "id": "frota.abastecimento",
+      "nome": {
+        "pt": "Abastecimento: data, litros, preço com a fonte, odômetro ou horímetro, comprovante",
+        "en": "Refuelling: date, litres, price with source, odometer or hour meter, receipt"
+      },
+      "unidade": "L; R$/L",
+      "tipo": "typed",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "campo": "Frota · Abastecimentos, ou CSV do cartão-combustível"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def validar_abastecimento"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota · abastecimentos",
+          "necessario": true,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "tabela frota_abastecimento",
+        "tabela frota_arquivo (comprovante, SHA-256)"
+      ],
+      "frequencia": "por abastecimento",
+      "agregacao": "por abastecimento",
+      "faixa": {
+        "min": 0,
+        "max": null,
+        "fonte": "frota.validar_abastecimento"
+      },
+      "qualidade": [
+        "preço só com a fonte (nota, cartão, bomba, estimado)",
+        "CSV: tudo ou nada, resumo SHA-256"
+      ],
+      "lote": "nao",
+      "premissas": [],
+      "entradas": []
+    },
+    {
+      "id": "frota.cerca",
+      "nome": {
+        "pt": "Cerca (polígono desenhado no mapa)",
+        "en": "Geofence (polygon drawn on the map)"
+      },
+      "unidade": "grau",
+      "tipo": "typed",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "campo": "Frota · Cercas"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def validar_poligono"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota · cercas",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "tabela frota_cerca"
+      ],
+      "frequencia": "quando a equipe desenha",
+      "agregacao": "por cerca",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "3 a 500 vértices"
+      },
+      "qualidade": [],
+      "lote": "nao",
+      "premissas": [],
+      "entradas": []
+    },
+    {
+      "id": "frota.distancia_consumo",
+      "nome": {
+        "pt": "Distância, litros, horas de motor, marcha lenta e consumo por dia e mês",
+        "en": "Distance, litres, engine hours, idling and consumption per day and month"
+      },
+      "unidade": "km; L; h; L/100 km; L/h",
+      "tipo": "calculated",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "calculo": "frota.por_dia"
+      },
+      "formula": "haversine entre pontos (ou ODO); L = Σ trapézios da vazão; L/100 km = L ÷ km × 100; L/h = L ÷ horas de motor",
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def por_dia"
+        },
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def haversine_km"
+        },
+        {
+          "arquivo": "sistema/physis-frota.js",
+          "linha": 0,
+          "simbolo": "function porDia"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota · consumo",
+          "necessario": true,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "calculado na hora (GET /api/frota/estado)"
+      ],
+      "frequencia": "a cada consulta",
+      "agregacao": "dia e mês",
+      "faixa": {
+        "min": 0,
+        "max": null,
+        "fonte": "a definir [CONFERIR]"
+      },
+      "qualidade": [],
+      "lote": "nao",
+      "premissas": [
+        "frota.gps_salto_kmh",
+        "frota.marcha_lenta_vel_kmh",
+        "frota.marcha_lenta_min"
+      ],
+      "entradas": [
+        "frota.posicao",
+        "frota.velocidade_rumo",
+        "frota.vazao_combustivel",
+        "frota.horimetro_odometro",
+        "frota.ignicao",
+        "frota.abastecimento"
+      ]
+    },
+    {
+      "id": "frota.alertas",
+      "nome": {
+        "pt": "Alertas da frota: consumo acima do normal, nível caindo parado, marcha lenta longa, saída da cerca",
+        "en": "Fleet alerts"
+      },
+      "unidade": "—",
+      "tipo": "calculated",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "calculo": "frota.Frota.analise"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def analise"
+        },
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def quedas_sem_andar"
+        },
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def saidas_da_cerca"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota · alertas",
+          "necessario": true,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "calculado na hora (GET /api/frota/estado)"
+      ],
+      "frequencia": "a cada consulta",
+      "agregacao": "por evento",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "premissas frota.*"
+      },
+      "qualidade": [],
+      "lote": "nao",
+      "premissas": [
+        "frota.anomalia_z",
+        "frota.anomalia_desvio_min_pct",
+        "frota.anomalia_amostra_min",
+        "frota.ewma_alfa",
+        "frota.queda_nivel_pct",
+        "frota.parado_distancia_km"
+      ],
+      "entradas": [
+        "frota.distancia_consumo",
+        "frota.nivel_combustivel",
+        "frota.cerca",
+        "frota.veiculo"
+      ]
+    },
+    {
+      "id": "frota.litros_movel",
+      "nome": {
+        "pt": "Litros medidos por combustível no ano (combustão móvel)",
+        "en": "Measured litres per fuel in the year (mobile combustion)"
+      },
+      "unidade": "L (m³ de GNV)",
+      "tipo": "calculated",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "calculo": "frota.para_carbono"
+      },
+      "formula": "Σ litros dos abastecimentos do ano por combustível; veículo sem abastecimento no ano: litros pela vazão",
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def para_carbono"
+        },
+        {
+          "arquivo": "sistema/physis-frota.js",
+          "linha": 0,
+          "simbolo": "function paraCarbono"
+        },
+        {
+          "arquivo": "physis-hub/physis_hub/carbono.py",
+          "linha": 0,
+          "simbolo": "frota_movel"
+        },
+        {
+          "arquivo": "sistema/physis-carbono.js",
+          "linha": 0,
+          "simbolo": "ctx.frota_movel"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "carbono",
+          "tela": "Escopo 1 · combustão móvel (o medido substitui o digitado, que fica de reserva)",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "calculado na hora (GET /api/frota/estado → para_carbono)"
+      ],
+      "frequencia": "a cada consulta",
+      "agregacao": "ano do inventário",
+      "faixa": {
+        "min": 0,
+        "max": null,
+        "fonte": "abastecimentos e vazão"
+      },
+      "qualidade": [
+        "só dado real: pontos simulados nunca entram"
+      ],
+      "lote": "nao",
+      "premissas": [],
+      "entradas": [
+        "frota.abastecimento",
+        "frota.vazao_combustivel",
+        "frota.veiculo"
+      ]
+    },
+    {
+      "id": "frota.custo_mes",
+      "nome": {
+        "pt": "Litros e custo dos abastecimentos por mês",
+        "en": "Refuelling litres and cost per month"
+      },
+      "unidade": "L; R$",
+      "tipo": "calculated",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "calculo": "frota.custos_por_mes"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def custos_por_mes"
+        },
+        {
+          "arquivo": "sistema/physis-frota.js",
+          "linha": 0,
+          "simbolo": "function resumoGestao"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "gestao",
+          "tela": "Gestão · Indicadores · Financeiro (Combustível da frota)",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "calculado na hora (GET /api/frota/estado → custos_por_mes)"
+      ],
+      "frequencia": "a cada consulta",
+      "agregacao": "mês",
+      "faixa": {
+        "min": 0,
+        "max": null,
+        "fonte": "abastecimentos com preço"
+      },
+      "qualidade": [
+        "abastecimento sem preço conta litros e não custo"
+      ],
+      "lote": "nao",
+      "premissas": [],
+      "entradas": [
+        "frota.abastecimento"
+      ]
+    },
+    {
+      "id": "frota.co2e",
+      "nome": {
+        "pt": "Emissões da frota (tCO₂e fóssil e CO₂ biogênico à parte)",
+        "en": "Fleet emissions"
+      },
+      "unidade": "tCO₂e",
+      "tipo": "calculated",
+      "modulo": "frota",
+      "produtores": [
+        "frota"
+      ],
+      "origem": {
+        "calculo": "frota.co2e → carbono.combustao (movel)"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def co2e"
+        },
+        {
+          "arquivo": "sistema/physis-frota.js",
+          "linha": 0,
+          "simbolo": "function co2e"
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota · consumo",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "calculado na hora"
+      ],
+      "frequencia": "a cada consulta",
+      "agregacao": "por veículo",
+      "faixa": {
+        "min": 0,
+        "max": null,
+        "fonte": "base de fatores do Carbono"
+      },
+      "qualidade": [],
+      "lote": "nao",
+      "premissas": [],
+      "entradas": [
+        "frota.abastecimento",
+        "frota.veiculo"
+      ]
+    },
+    {
+      "id": "premissa.frota.anomalia_z",
+      "nome": {
+        "pt": "Limite do z robusto para consumo acima do normal de um veículo",
+        "en": "Robust z threshold for fleet consumption above normal"
+      },
+      "unidade": "adimensional (z robusto = 0,6745 × (x − mediana) ÷ MAD)",
+      "tipo": "premissa",
+      "modulo": "bases",
+      "produtores": [
+        "bases"
+      ],
+      "origem": {
+        "base": "sistema/physis-premissas.json",
+        "id": "frota.anomalia_z"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "sistema/physis-premissas.json",
+          "linha": 0,
+          "simbolo": "\"frota.anomalia_z\""
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · alertas e retenção",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "sistema/physis-premissas.json (cópia em physis-calc-comum.js)"
+      ],
+      "frequencia": "versionada (atualizado 2026-11-18)",
+      "agregacao": "valor padrão; o projeto pode trocar com motivo",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "opções da base"
+      },
+      "qualidade": [
+        "status 'conferir'"
+      ],
+      "lote": "nao",
+      "premissas": [
+        "frota.anomalia_z"
+      ],
+      "entradas": []
+    },
+    {
+      "id": "premissa.frota.anomalia_desvio_min_pct",
+      "nome": {
+        "pt": "Diferença mínima acima do normal para o consumo virar alerta",
+        "en": "Minimum deviation above normal for a consumption alert"
+      },
+      "unidade": "% acima da mediana do veículo",
+      "tipo": "premissa",
+      "modulo": "bases",
+      "produtores": [
+        "bases"
+      ],
+      "origem": {
+        "base": "sistema/physis-premissas.json",
+        "id": "frota.anomalia_desvio_min_pct"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "sistema/physis-premissas.json",
+          "linha": 0,
+          "simbolo": "\"frota.anomalia_desvio_min_pct\""
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · alertas e retenção",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "sistema/physis-premissas.json (cópia em physis-calc-comum.js)"
+      ],
+      "frequencia": "versionada (atualizado 2026-11-18)",
+      "agregacao": "valor padrão; o projeto pode trocar com motivo",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "opções da base"
+      },
+      "qualidade": [
+        "status 'conferir'"
+      ],
+      "lote": "nao",
+      "premissas": [
+        "frota.anomalia_desvio_min_pct"
+      ],
+      "entradas": []
+    },
+    {
+      "id": "premissa.frota.anomalia_amostra_min",
+      "nome": {
+        "pt": "Amostras de consumo antes de o sistema dizer o normal de um veículo",
+        "en": "Consumption samples before stating a vehicle's normal"
+      },
+      "unidade": "amostras (dias medidos ou trechos entre abastecimentos)",
+      "tipo": "premissa",
+      "modulo": "bases",
+      "produtores": [
+        "bases"
+      ],
+      "origem": {
+        "base": "sistema/physis-premissas.json",
+        "id": "frota.anomalia_amostra_min"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "sistema/physis-premissas.json",
+          "linha": 0,
+          "simbolo": "\"frota.anomalia_amostra_min\""
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · alertas e retenção",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "sistema/physis-premissas.json (cópia em physis-calc-comum.js)"
+      ],
+      "frequencia": "versionada (atualizado 2026-11-18)",
+      "agregacao": "valor padrão; o projeto pode trocar com motivo",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "opções da base"
+      },
+      "qualidade": [
+        "status 'conferir'"
+      ],
+      "lote": "nao",
+      "premissas": [
+        "frota.anomalia_amostra_min"
+      ],
+      "entradas": []
+    },
+    {
+      "id": "premissa.frota.ewma_alfa",
+      "nome": {
+        "pt": "Peso da amostra nova na média móvel exponencial do consumo",
+        "en": "Exponential moving average weight (fleet consumption)"
+      },
+      "unidade": "0 a 1",
+      "tipo": "premissa",
+      "modulo": "bases",
+      "produtores": [
+        "bases"
+      ],
+      "origem": {
+        "base": "sistema/physis-premissas.json",
+        "id": "frota.ewma_alfa"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "sistema/physis-premissas.json",
+          "linha": 0,
+          "simbolo": "\"frota.ewma_alfa\""
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · alertas e retenção",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "sistema/physis-premissas.json (cópia em physis-calc-comum.js)"
+      ],
+      "frequencia": "versionada (atualizado 2026-11-18)",
+      "agregacao": "valor padrão; o projeto pode trocar com motivo",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "opções da base"
+      },
+      "qualidade": [
+        "status 'conferir'"
+      ],
+      "lote": "nao",
+      "premissas": [
+        "frota.ewma_alfa"
+      ],
+      "entradas": []
+    },
+    {
+      "id": "premissa.frota.queda_nivel_pct",
+      "nome": {
+        "pt": "Queda de nível do tanque, com o veículo parado, que vira alerta de vazamento ou furto",
+        "en": "Tank level drop while stopped that raises a leak or theft alert"
+      },
+      "unidade": "% do tanque (já descontado o que a vazão mediu)",
+      "tipo": "premissa",
+      "modulo": "bases",
+      "produtores": [
+        "bases"
+      ],
+      "origem": {
+        "base": "sistema/physis-premissas.json",
+        "id": "frota.queda_nivel_pct"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "sistema/physis-premissas.json",
+          "linha": 0,
+          "simbolo": "\"frota.queda_nivel_pct\""
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · alertas e retenção",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "sistema/physis-premissas.json (cópia em physis-calc-comum.js)"
+      ],
+      "frequencia": "versionada (atualizado 2026-11-18)",
+      "agregacao": "valor padrão; o projeto pode trocar com motivo",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "opções da base"
+      },
+      "qualidade": [
+        "status 'conferir'"
+      ],
+      "lote": "nao",
+      "premissas": [
+        "frota.queda_nivel_pct"
+      ],
+      "entradas": []
+    },
+    {
+      "id": "premissa.frota.parado_distancia_km",
+      "nome": {
+        "pt": "Distância máxima do ponto de partida para o veículo contar como parado",
+        "en": "Maximum distance that still counts as stopped"
+      },
+      "unidade": "km",
+      "tipo": "premissa",
+      "modulo": "bases",
+      "produtores": [
+        "bases"
+      ],
+      "origem": {
+        "base": "sistema/physis-premissas.json",
+        "id": "frota.parado_distancia_km"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "sistema/physis-premissas.json",
+          "linha": 0,
+          "simbolo": "\"frota.parado_distancia_km\""
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · alertas e retenção",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "sistema/physis-premissas.json (cópia em physis-calc-comum.js)"
+      ],
+      "frequencia": "versionada (atualizado 2026-11-18)",
+      "agregacao": "valor padrão; o projeto pode trocar com motivo",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "opções da base"
+      },
+      "qualidade": [
+        "status 'conferir'"
+      ],
+      "lote": "nao",
+      "premissas": [
+        "frota.parado_distancia_km"
+      ],
+      "entradas": []
+    },
+    {
+      "id": "premissa.frota.marcha_lenta_vel_kmh",
+      "nome": {
+        "pt": "Velocidade abaixo da qual o motor ligado conta como marcha lenta",
+        "en": "Speed below which the running engine counts as idling"
+      },
+      "unidade": "km/h",
+      "tipo": "premissa",
+      "modulo": "bases",
+      "produtores": [
+        "bases"
+      ],
+      "origem": {
+        "base": "sistema/physis-premissas.json",
+        "id": "frota.marcha_lenta_vel_kmh"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "sistema/physis-premissas.json",
+          "linha": 0,
+          "simbolo": "\"frota.marcha_lenta_vel_kmh\""
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · alertas e retenção",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "sistema/physis-premissas.json (cópia em physis-calc-comum.js)"
+      ],
+      "frequencia": "versionada (atualizado 2026-11-18)",
+      "agregacao": "valor padrão; o projeto pode trocar com motivo",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "opções da base"
+      },
+      "qualidade": [
+        "status 'conferir'"
+      ],
+      "lote": "nao",
+      "premissas": [
+        "frota.marcha_lenta_vel_kmh"
+      ],
+      "entradas": []
+    },
+    {
+      "id": "premissa.frota.marcha_lenta_min",
+      "nome": {
+        "pt": "Tempo de marcha lenta seguida que vira alerta",
+        "en": "Idling time that raises an alert"
+      },
+      "unidade": "min",
+      "tipo": "premissa",
+      "modulo": "bases",
+      "produtores": [
+        "bases"
+      ],
+      "origem": {
+        "base": "sistema/physis-premissas.json",
+        "id": "frota.marcha_lenta_min"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "sistema/physis-premissas.json",
+          "linha": 0,
+          "simbolo": "\"frota.marcha_lenta_min\""
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · alertas e retenção",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "sistema/physis-premissas.json (cópia em physis-calc-comum.js)"
+      ],
+      "frequencia": "versionada (atualizado 2026-11-18)",
+      "agregacao": "valor padrão; o projeto pode trocar com motivo",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "opções da base"
+      },
+      "qualidade": [
+        "status 'conferir'"
+      ],
+      "lote": "nao",
+      "premissas": [
+        "frota.marcha_lenta_min"
+      ],
+      "entradas": []
+    },
+    {
+      "id": "premissa.frota.gps_salto_kmh",
+      "nome": {
+        "pt": "Velocidade implícita acima da qual um trecho de GPS é descartado (salto de posição)",
+        "en": "Implied speed above which a GPS stretch is discarded"
+      },
+      "unidade": "km/h",
+      "tipo": "premissa",
+      "modulo": "bases",
+      "produtores": [
+        "bases"
+      ],
+      "origem": {
+        "base": "sistema/physis-premissas.json",
+        "id": "frota.gps_salto_kmh"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "sistema/physis-premissas.json",
+          "linha": 0,
+          "simbolo": "\"frota.gps_salto_kmh\""
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · alertas e retenção",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "sistema/physis-premissas.json (cópia em physis-calc-comum.js)"
+      ],
+      "frequencia": "versionada (atualizado 2026-11-18)",
+      "agregacao": "valor padrão; o projeto pode trocar com motivo",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "opções da base"
+      },
+      "qualidade": [
+        "status 'conferir'"
+      ],
+      "lote": "nao",
+      "premissas": [
+        "frota.gps_salto_kmh"
+      ],
+      "entradas": []
+    },
+    {
+      "id": "premissa.frota.retencao_dias",
+      "nome": {
+        "pt": "Dias que os pontos de GPS dos veículos ficam guardados",
+        "en": "Days the vehicles' GPS points are kept"
+      },
+      "unidade": "dias",
+      "tipo": "premissa",
+      "modulo": "bases",
+      "produtores": [
+        "bases"
+      ],
+      "origem": {
+        "base": "sistema/physis-premissas.json",
+        "id": "frota.retencao_dias"
+      },
+      "formula": null,
+      "onde": [
+        {
+          "arquivo": "sistema/physis-premissas.json",
+          "linha": 0,
+          "simbolo": "\"frota.retencao_dias\""
+        }
+      ],
+      "consumidores": [
+        {
+          "modulo": "frota",
+          "tela": "Frota e combustível · alertas e retenção",
+          "necessario": false,
+          "modo": "automatico"
+        }
+      ],
+      "armazenamento": [
+        "sistema/physis-premissas.json (cópia em physis-calc-comum.js)"
+      ],
+      "frequencia": "versionada (atualizado 2026-11-18)",
+      "agregacao": "valor padrão; o projeto pode trocar com motivo",
+      "faixa": {
+        "min": null,
+        "max": null,
+        "fonte": "opções da base"
+      },
+      "qualidade": [
+        "status 'conferir'"
+      ],
+      "lote": "nao",
+      "premissas": [
+        "frota.retencao_dias"
+      ],
+      "entradas": []
     }
   ],
   "estatisticas": [
@@ -46531,6 +47963,47 @@
         "certificacoes"
       ],
       "premissas": []
+    },
+    {
+      "id": "frota.consumo_normal",
+      "nome": "Consumo normal de cada veículo e consumo acima do normal",
+      "metodo": "Mediana e desvio absoluto mediano (MAD) das amostras anteriores do veículo; z robusto = 0,6745·(x − mediana)/MAD; alerta com z > frota.anomalia_z e x ≥ mediana·(1 + frota.anomalia_desvio_min_pct/100); média móvel exponencial (frota.ewma_alfa) para a tendência",
+      "onde": [
+        {
+          "arquivo": "physis-hub/physis_hub/frota.py",
+          "linha": 0,
+          "simbolo": "def anomalia_consumo"
+        },
+        {
+          "arquivo": "sistema/physis-frota.js",
+          "linha": 0,
+          "simbolo": "function anomaliaConsumo"
+        }
+      ],
+      "entradas": [
+        "frota.distancia_consumo",
+        "frota.abastecimento"
+      ],
+      "saidas": [
+        "mediana",
+        "mad",
+        "ewma",
+        "z",
+        "n (tamanho da amostra)",
+        "anomalo"
+      ],
+      "amostra_minima": "frota.anomalia_amostra_min (8) amostras do próprio veículo; abaixo disso diz 'aprendendo' e não alerta",
+      "validacao": "dados sintéticos limpos (2000 sementes × 82 amostras) sem alarme falso e valor fora com alarme (tests/test_frota.py)",
+      "armazenamento": "calculado na hora (sem modelo guardado)",
+      "consumidores": [
+        "frota"
+      ],
+      "premissas": [
+        "frota.anomalia_z",
+        "frota.anomalia_desvio_min_pct",
+        "frota.anomalia_amostra_min",
+        "frota.ewma_alfa"
+      ]
     }
   ],
   "fluxos": [
@@ -47717,6 +49190,22 @@
       "modo": "automatico",
       "necessario": true,
       "tela": "biodigestor sem aquecimento"
+    },
+    {
+      "de": "frota",
+      "para": "carbono",
+      "variavel": "frota.litros_movel",
+      "modo": "automatico",
+      "necessario": false,
+      "tela": "Carbono · Escopo 1 · combustão móvel (medido na frota; o digitado fica de reserva)"
+    },
+    {
+      "de": "frota",
+      "para": "gestao",
+      "variavel": "frota.custo_mes",
+      "modo": "automatico",
+      "necessario": false,
+      "tela": "Gestão · Indicadores · Financeiro (Combustível da frota)"
     }
   ],
   "lacunas": [

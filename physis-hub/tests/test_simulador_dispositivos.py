@@ -8,6 +8,8 @@ Protege:
    mesma semente.
 3. O hub aceita tudo pela rota dos aparelhos, com e sem chave, e a água vai para a lista da aba Água marcada.
 4. --limpar tira só o que é simulado.
+5. Veículos (frota, TIPO:VEI): linhas válidas em volta do centro, nível caindo parado um dia por semana, o carro saindo
+   da cerca, e a frota do hub acha os alertas com os veículos e a cerca cadastrados.
 """
 import importlib.util
 import json
@@ -76,15 +78,15 @@ class Linhas(unittest.TestCase):
         return [(t, c) for t, c in self.campos if c.get("TIPO") == tipo and (no is None or c["ID"] == f"{no:02d}")]
 
     def test_validas_marcadas_e_curtas(self):
-        self.assertEqual(len(self.linhas), 21 * 96 * 6)
+        self.assertEqual(len([l for _, l in self.linhas if ",TIPO:VEI," not in l]), 21 * 96 * 6)
         for _, l in self.linhas:
             ok, motivo, c = protocolo.validar_telemetria(l)
             self.assertTrue(ok, (motivo, l))
             self.assertNotIn("_FORA", c, l)
             self.assertLessEqual(len(l), protocolo.LINHA_MAX)
             self.assertTrue(l.endswith(",SIM:SIMULADO/teste"))
-        self.assertEqual({c["TIPO"] for _, c in self.campos}, {"SOLO", "PLUV", "ENE", "HID", "SEC"})
-        self.assertEqual({c["ID"] for _, c in self.campos}, {"81", "82", "83", "84", "85", "86"})
+        self.assertEqual({c["TIPO"] for _, c in self.campos}, {"SOLO", "PLUV", "ENE", "HID", "SEC", "VEI"})
+        self.assertEqual({c["ID"] for _, c in self.campos}, {"81", "82", "83", "84", "85", "86", "87", "88", "89"})
 
     def test_energia_coerente(self):
         for _, c in self.de("ENE"):
@@ -170,11 +172,14 @@ class PelaRedeELimpar(unittest.TestCase):
         cli.entrar("teste", "senha-bem-longa-1")
         mundo = self.s.Mundo(FIM - 86400, "teste", 80)
         cli.preparar_chaves(mundo)
-        self.assertEqual(sorted(cli.chaves), [81, 82, 83, 84, 85, 86])
+        self.assertEqual(sorted(cli.chaves), [81, 82, 83, 84, 85, 86, 87, 88, 89])
         linhas = mundo.linhas(FIM - 900, 900) + mundo.linhas(FIM, 900)
-        self.assertEqual(cli.enviar(linhas)["aceitas"], 12)
+        self.assertEqual(cli.enviar(linhas)["aceitas"], len(linhas))
         sem_chave = self.s.Hub(self.url)                              # rede local: sem chave também entra
-        self.assertEqual(sem_chave.enviar(mundo.linhas(FIM + 900, 900))["aceitas"], 6)
+        mais = mundo.linhas(FIM + 900, 900)
+        self.assertEqual(sem_chave.enviar(mais)["aceitas"], len(mais))
+        self.assertEqual(cli.preparar_frota(mundo), 3)                # os 3 veículos SIMULADOS e a cerca de teste
+        self.assertEqual(cli.preparar_frota(mundo), 0)                # de novo: não duplica
         # água: uma leitura de verdade já existe e fica
         real = [{"q": "2026-11-14T12:00:00.000Z", "ponto": "pos", "ph": 7.0, "origem": "manual"}]
         self.h.cliente_gravar("physis-ph-leituras", json.dumps(real), 0, "pessoa")
@@ -188,7 +193,8 @@ class PelaRedeELimpar(unittest.TestCase):
         with self.assertRaises(SystemExit):                          # hub ligado: recusa
             self.s.main(["--limpar", "--banco", self.banco, "--hub", self.url])
         r = self.s.limpar(Path(self.banco))
-        self.assertEqual((r["leituras"], r["chaves"], r["agua"]), (18, 6, 2))
+        self.assertEqual((r["leituras"], r["chaves"], r["agua"]), (len(linhas) + len(mais), 9, 2))
+        self.assertGreater(r["frota"], 0)
         db = sqlite3.connect(self.banco)
         try:
             self.assertEqual([x[0] for x in db.execute("SELECT no FROM leitura")], [3])
@@ -201,3 +207,51 @@ class PelaRedeELimpar(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipUnless(ARQ.is_file(), "simulador fica só no repositório")
+class Veiculos(unittest.TestCase):
+    """Frota SIMULADA: 3 veículos em volta do centro, com as duas anomalias de propósito."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.s = carregar()
+        cls.centro = (-15.79, -47.88)
+        cls.mundo = cls.s.Mundo(FIM - 8 * 86400, "teste", 80, centro=cls.centro)
+        cls.linhas, t = [], cls.mundo.inicio + 900
+        while t <= FIM:
+            cls.linhas += [l for l in cls.mundo.linhas(t, 900) if ",TIPO:VEI," in l]
+            t += 900
+
+    def test_linhas_validas_em_volta_do_centro(self):
+        self.assertGreater(len(self.linhas), 1000)
+        for l in self.linhas:
+            ok, motivo, c = protocolo.validar_telemetria(l)
+            self.assertTrue(ok, (motivo, l))
+            self.assertNotIn("_FORA", c, l)
+            self.assertLessEqual(len(l), protocolo.LINHA_MAX)
+            self.assertTrue(l.endswith(",SIM:SIMULADO/teste"))
+            self.assertLess(abs(float(c["LAT"]) - self.centro[0]), 0.1)
+            self.assertLess(abs(float(c["LON"]) - self.centro[1]), 0.1)
+        self.assertEqual({protocolo.extrair_campos(l)["ID"] for l in self.linhas}, {"87", "88", "89"})
+        self.assertTrue(any("HOR:" in l for l in self.linhas if l.startswith("ID:89,")))
+
+    def test_hub_acha_as_anomalias(self):
+        from physis_hub import carbono, frota
+        h = Hub(relogio=lambda: FIM + 60)
+        h.instancia = {}
+        f = frota.Frota(h, fatores=carbono.carregar())
+        h.frota_receptor = f.receber_v6
+        for n, (placa, tipo, comb, tanque, cons, un) in self.s.VEICULOS.items():
+            f.gravar_veiculo({"tipo": tipo, "placa": placa, "combustivel": comb, "tanque_l": tanque, "consumo_esperado": cons,
+                              "consumo_unidade": un, "no": self.mundo.ident(n)}, "teste")
+        f.gravar_cerca({"nome": "Cerca de teste", "poligono": [list(self.mundo.desloca(a, b)) for a, b in self.s.CERCA_KM]}, "teste")
+        r = h.receber_lote("\n".join(self.linhas))
+        self.assertEqual((r["aceitas"], r["descartadas"]), (len(self.linhas), 0))
+        tipos = {a["tipo"] for a in f.estado()["alertas"]}
+        self.assertIn("queda_nivel", tipos)                       # nível caindo parado (vazamento ou furto)
+        self.assertIn("cerca", tipos)                             # o carro saiu da cerca
+        self.assertNotIn("consumo", tipos)                        # consumo normal: nenhum alarme falso
+        self.assertEqual(f.estado()["para_carbono"], [])          # simulado não vai para o Carbono
+        calmo = self.s.Mundo(FIM - 8 * 86400, "teste", 80, anomalias=0.0, centro=self.centro)
+        self.assertEqual(calmo.anomalias, 0.0)

@@ -43,11 +43,19 @@ FAIXAS: dict[str, tuple[float | None, float | None, str]] = {
     # medidor de energia (TIPO:ENE, 15/11/2026): potência reativa e aparente; o fator de potência já é "fp"
     "potencia_reativa": (None, None, "kvar"),
     "potencia_aparente": (None, None, "kVA"),
+    # veículo da frota (TIPO:VEI, em desenvolvimento): sem faixa de alarme (os alertas são do módulo frota.py)
+    "velocidade": (None, None, "km/h"),
+    "rumo": (None, None, "grau"),
+    "vazao_combustivel": (None, None, "L/h"),
+    "nivel_combustivel": (0, 100, "%"),
+    "horimetro": (None, None, "h"),
+    "odometro": (None, None, "km"),
 }
 GRANDEZAS_NOVAS = ("umidade_solo", "estado", "previsao_min", "bateria", "rssi", "snr",
                    "latitude", "longitude", "atividade", "impacto", "porcoes", "chuva", "chuva_intensidade",
                    "temperatura_interna", "umidade_interna", "temperatura_coletor", "peso_produto", "irradiancia",
-                   "potencia_reativa", "potencia_aparente")
+                   "potencia_reativa", "potencia_aparente",
+                   "velocidade", "rumo", "vazao_combustivel", "nivel_combustivel", "horimetro", "odometro")
 
 
 def org_valido(org: str) -> bool:

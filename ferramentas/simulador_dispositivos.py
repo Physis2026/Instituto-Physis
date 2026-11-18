@@ -14,15 +14,22 @@ Como entra no hub (o mesmo caminho dos aparelhos de verdade, docs/PROTOCOLO.md e
 Toda linha leva a chave extra SIM:SIMULADO/teste (o hub aceita chave desconhecida e guarda a linha inteira), e é por ela
 que --limpar acha o que apagar.
 
-Aparelhos (ID = --id-base + n; padrão 81 a 86):
+Aparelhos (ID = --id-base + n; padrão 81 a 89):
   81 SOLO  nó de solo "Talhão A": umidade do solo (2 sensores), irrigação, temperatura e umidade do ar, solo, bateria
   82 SOLO  nó de solo "Talhão B"
   83 PLUV  pluviômetro de báscula (CHI mm no intervalo, PUL pulsos)
   84 ENE   medidor de energia (PW kW, QR kvar, S kVA, V, I, FP), com geração solar ao meio-dia
   85 HID   medidor de água (Q m³/h, PR bar)
   86 SEC   secador solar (TI UI TE UE TC VENT PESO IRR)
+  87 VEI   caminhão SIMULADO (GPS, VEL, RUMO, FLX, NIV, ODO, IGN): ida e volta de hora em hora até a "cidade" (3 km)
+  88 VEI   carro SIMULADO: uma viagem por dia ao vizinho
+  89 VEI   trator SIMULADO (com HOR): linhas de ida e volta num talhão
+Os veículos andam em volta do local da instalação (GET /api/clima → lugar; ou --lat/--lon; sem nenhum, um ponto de exemplo
+avisado na tela), com uma linha a cada 2 min com o motor ligado e a cada 30 min parado, só nos últimos --dias-veiculos dias.
+Com --usuario, o simulador cadastra os 3 veículos ("SIMULADO") e uma cerca de teste na aba Frota e combustível.
 Ciclo diário (sol, temperatura, umidade, consumo) e anomalias de propósito: sensor travado, salto de temperatura,
-bateria descarregando, fator de potência baixo, dia de desperdício de energia, vazamento de madrugada, pH fora da faixa.
+bateria descarregando, fator de potência baixo, dia de desperdício de energia, vazamento de madrugada, pH fora da faixa,
+nível do caminhão caindo parado de madrugada (vazamento ou furto, um dia por semana) e o carro saindo da cerca (um dia por semana).
 
 Uso:
   python ferramentas/simulador_dispositivos.py --hub http://localhost:8802 --uma-vez --dias 21
@@ -64,7 +71,17 @@ APARELHOS = (  # (n, TIPO, nome)
     (4, "ENE", "Medidor de energia"),
     (5, "HID", "Medidor de água"),
     (6, "SEC", "Secador solar"),
+    (7, "VEI", "Caminhão SIMULADO"),
+    (8, "VEI", "Carro SIMULADO"),
+    (9, "VEI", "Trator SIMULADO"),
 )
+# veículos (frota): n -> (placa, tipo, combustível, tanque L, consumo esperado, unidade); todos marcados SIMULADO
+VEICULOS = {7: ("SIM-1A01", "caminhao", "diesel_b", 300.0, 35.0, "l_100km"), 8: ("SIM-2B02", "carro", "gasolina_c", 50.0, 10.0, "l_100km"),
+            9: ("SIM-3C03", "trator", "diesel_b", 120.0, 8.0, "l_h")}
+PONTO_EXEMPLO = (-22.5051, -43.1784)            # o mesmo ponto de exemplo da tela (physis-frota.js), só sem o local da instalação
+CERCA_KM = ((-4, -4), (-4, 5), (4, 5), (4, -4))  # cerca de teste: (km ao norte, km a leste) em volta do local
+PASSO_VEI_S = 120
+NOMES_VEI = {n: nome for n, tipo, nome in APARELHOS if tipo == "VEI"}
 LIMITE_SOLO = 30.0
 MM_POR_PULSO = 0.2794
 
@@ -127,7 +144,8 @@ class Mundo:
     """Estado dos aparelhos simulados. `linhas(t, passo_s)` avança o mundo de t - passo_s até t e devolve uma linha
     por aparelho. Determinístico pela semente (o mesmo período gera as mesmas linhas)."""
 
-    def __init__(self, inicio: float, semente: str = "physis", id_base: int = 80, anomalias: float = 1.0):
+    def __init__(self, inicio: float, semente: str = "physis", id_base: int = 80, anomalias: float = 1.0,
+                 centro: tuple[float, float] | None = None, veiculos_desde: float | None = None):
         if not 0 <= id_base <= 99 - len(APARELHOS):
             raise ValueError("--id-base precisa deixar os IDs entre 1 e 99")
         self.inicio, self.semente, self.id_base, self.anomalias = inicio, semente, id_base, anomalias
@@ -138,6 +156,10 @@ class Mundo:
         self.peso = 120.0                                    # kg no secador
         self.lote_inicio = inicio
         self.travado: dict[int, float] = {}
+        self.centro = centro or PONTO_EXEMPLO
+        self.veiculos_desde = inicio if veiculos_desde is None else veiculos_desde
+        self.vei = {n: {"niv": 80.0 - 5 * (n - 7), "odo": 84200.0 if n == 7 else 31200.0 if n == 8 else None,
+                        "hor": 1520.0 if n == 9 else None, "pos": None, "t": None} for n in VEICULOS}
 
     def ident(self, n: int) -> int:
         return self.id_base + n
@@ -274,6 +296,105 @@ class Mundo:
                 ("UE", _f(ue, 1)), ("TC", _f(tc, 1)), ("VENT", "1" if ti > 38 else "0"), ("PESO", _f(self.peso, 2)),
                 ("IRR", _f(irr, 0)), ("BAT", _f(3.9 + 0.15 * sol, 2))]
 
+    # veículos (frota)
+    def desloca(self, km_n: float, km_l: float) -> tuple[float, float]:
+        lat0, lon0 = self.centro
+        return lat0 + km_n / 110.574, lon0 + km_l / (111.32 * math.cos(math.radians(lat0)))
+
+    @staticmethod
+    def _ao_longo(wps, f: float):
+        seg = [math.dist(wps[i - 1], wps[i]) for i in range(1, len(wps))]
+        a = max(0.0, min(1.0, f)) * sum(seg)
+        for i, d in enumerate(seg):
+            if a <= d:
+                k = a / d if d else 0.0
+                return wps[i][0] + k * (wps[i + 1][0] - wps[i][0]), wps[i][1] + k * (wps[i + 1][1] - wps[i][1])
+            a -= d
+        return wps[-1]
+
+    def _vei_estado(self, n: int, t: float) -> tuple[tuple[float, float], int]:
+        """((km ao norte, km a leste), ignição) do veículo n no instante t."""
+        h, nd = self.hora(t), self.n_dia(t)
+        if n == 7:                 # caminhão: de hora em hora, 6 min até a cidade, carga com o motor desligado, 6 min de volta
+            estrada = [(0, 0), (0.4, 1.2), (1.6, 2.2), (2.5, 3.0)]
+            if 7 <= h < 17:
+                m = (h - 7) * 60 % 60
+                if m < 6:
+                    return self._ao_longo(estrada, m / 6), 1
+                if m < 30:
+                    return estrada[-1], 0
+                if m < 36:
+                    return self._ao_longo(estrada, 1 - (m - 30) / 6), 1
+            return (-0.03, 0.05), 0
+        if n == 8:                 # carro: ida às 8 h, volta às 10 h 40; um dia por semana sai da cerca (7 km ao sul)
+            fora = self.anomalias and nd % 7 == 2
+            rota = [(0, 0), (-3.0, -1.5), (-7.0, -2.0)] if fora else [(0, 0), (-1.2, 1.5), (-2.6, 2.4)]
+            dur = 0.2 if fora else 0.1
+            if 8 <= h < 8 + dur:
+                return self._ao_longo(rota, (h - 8) / dur), 1
+            if 8 + dur <= h < 10.67:
+                return rota[-1], 0
+            if 10.67 <= h < 10.67 + dur:
+                return self._ao_longo(rota, 1 - (h - 10.67) / dur), 1
+            return (0.02, -0.04), 0
+        if 7.5 <= h < 16:          # trator: linhas de 0,8 km a cerca de 6 km/h num talhão a oeste
+            k = (h - 7.5) * 7.5
+            i, fr = int(k), k - int(k)
+            return (0.6 + (1 - fr if i % 2 else fr) * 0.8, -2.6 + 0.03 * (i % 30)), 1
+        return (0.5, -2.5), 0
+
+    def _vei(self, n: int, t: float) -> list[tuple[str, str]] | None:
+        """Uma linha VEI do veículo n em t (None quando o veículo não manda nada neste instante)."""
+        _, _, _, tanque, _, _ = VEICULOS[n]
+        st = self.vei[n]
+        (kn, kl), ign = self._vei_estado(n, t)
+        lat, lon = self.desloca(kn, kl)
+        ant = st["pos"] or (lat, lon)
+        dt = max(1.0, t - st["t"]) if st["t"] is not None else float(PASSO_VEI_S)
+        km = 2 * 6371.0088 * math.asin(math.sqrt(math.sin(math.radians(lat - ant[0]) / 2) ** 2 + math.cos(math.radians(ant[0]))
+                                                  * math.cos(math.radians(lat)) * math.sin(math.radians(lon - ant[1]) / 2) ** 2))
+        vel = km / (dt / 3600)
+        anda = vel >= 1.0
+        r = _rng(self.semente, "vei", n, int(t))
+        if ign and anda:
+            flx = 13 + 2 * r.random() if n == 7 else 4.5 + r.random() if n == 8 else 9 + 1.5 * r.random()
+        else:
+            flx = 2.2 if ign and n != 9 else 0.0
+        st["niv"] -= flx * dt / 3600 / tanque * 100
+        h, nd = self.hora(t), self.n_dia(t)
+        vazando = bool(n == 7 and self.anomalias and nd % 7 == 5 and 2.0 <= h < 2.7)
+        if vazando:
+            st["niv"] -= 0.0042 * dt                          # ANOMALIA: o nível cai parado (cerca de 10 % em 40 min)
+        if st["niv"] < 30 and ign and not vazando:
+            st["niv"] = 95.0                                  # abastecido ao sair (o simulador não inventa abastecimento nem preço)
+        if st["odo"] is not None:
+            st["odo"] += km
+        if st["hor"] is not None and ign:
+            st["hor"] += dt / 3600
+        st["pos"], st["t"] = (lat, lon), t
+        if t < self.veiculos_desde or not (ign or vazando or (h * 60) % 30 < PASSO_VEI_S / 60):
+            return None                                       # parado e desligado: uma linha a cada 30 min
+        rumo = (math.degrees(math.atan2(lon - ant[1], lat - ant[0])) + 360) % 360 if anda else None
+        c = [("ID", f"{self.ident(n):02d}"), ("TIPO", "VEI"), ("LAT", _f(lat, 6)), ("LON", _f(lon, 6)), ("VEL", _f(vel, 1)),
+             ("RUMO", _f(rumo, 0)), ("FLX", _f(flx, 2)), ("NIV", _f(max(0.0, st["niv"]), 1))]
+        if st["hor"] is not None:
+            c.append(("HOR", _f(st["hor"], 2)))
+        if st["odo"] is not None:
+            c.append(("ODO", _f(st["odo"], 1)))
+        return c + [("IGN", str(ign)), ("GPS", "1"), ("BAT", _f(3.95 + 0.1 * ign, 2))]
+
+    def linhas_veiculos(self, t: float, passo_s: float) -> list[str]:
+        """As linhas dos veículos no intervalo (t - passo_s, t], uma a cada PASSO_VEI_S (ou menos, se o passo for menor)."""
+        out, sub = [], min(PASSO_VEI_S, passo_s)
+        k = t - passo_s + sub
+        while k <= t + 1e-6:
+            for n in VEICULOS:
+                c = self._vei(n, k)
+                if c:
+                    out.append(formatar(c + [("TS", str(int(k)))]))
+            k += sub
+        return out
+
     def linhas(self, t: float, passo_s: float) -> list[str]:
         """Uma linha por aparelho no instante t (TS = t), cobrindo o intervalo (t - passo_s, t]."""
         chuva = self.chuva_mm(t - passo_s, t)
@@ -282,7 +403,7 @@ class Mundo:
         for campos in (self._solo(1, t, passo_s, chuva), self._solo(2, t, passo_s, chuva), self._pluv(t, chuva),
                        self._ene(t), self._hid(t), self._sec(t, passo_s)):
             out.append(formatar(campos + [ts]))
-        return out
+        return out + self.linhas_veiculos(t, passo_s)
 
     def agua(self, t: float) -> list[dict]:
         """Leituras de qualidade da água (antes e depois do filtro), marcadas como simuladas."""
@@ -386,6 +507,34 @@ class Hub:
                     total[k] += int(r.get(k, 0))
         return total
 
+    def local(self) -> tuple[float, float] | None:
+        """O local da instalação pelo hub (GET /api/clima → lugar), ou None."""
+        st, r = self.pedir("GET", "/api/clima")
+        lugar = ((r or {}).get("lugar") or {}) if st == 200 else {}
+        try:
+            return (float(lugar["lat"]), float(lugar["lon"])) if lugar.get("lat") is not None else None
+        except (TypeError, ValueError, KeyError):
+            return None
+
+    def preparar_frota(self, mundo: Mundo) -> int:
+        """Cadastra os veículos SIMULADOS (ligados aos nós 87 a 89) e a cerca de teste na aba Frota e combustível."""
+        st, r = self.pedir("GET", "/api/frota/estado")
+        if st != 200:
+            print(f"  frota: sem acesso (HTTP {st}); os pontos ficam como nós sem veículo.", file=sys.stderr)
+            return 0
+        placas = {v.get("placa") for v in r.get("veiculos") or []}
+        feitos = 0
+        for n, (placa, tipo, comb, tanque, cons, un) in VEICULOS.items():
+            if placa in placas:
+                continue
+            st, _ = self.pedir("POST", "/api/frota/veiculo", {"tipo": tipo, "placa": placa, "nome": NOMES_VEI[n], "combustivel": comb,
+                                                            "tanque_l": tanque, "consumo_esperado": cons, "consumo_unidade": un,
+                                                            "no": mundo.ident(n)})
+            feitos += st == 200
+        if not any(ROTULO in str(c.get("nome", "")) for c in r.get("cercas") or []):
+            self.pedir("POST", "/api/frota/cerca", {"nome": f"Cerca de teste ({ROTULO})", "poligono": [list(mundo.desloca(a, b)) for a, b in CERCA_KM]})
+        return feitos
+
     def gravar_agua(self, novas: list[dict], manter: int = 2000) -> bool:
         """Junta as leituras simuladas às da aba Água (as de verdade ficam), com controle de versão."""
         for _ in range(3):
@@ -424,7 +573,7 @@ def limpar(banco: Path) -> dict:
     db = sqlite3.connect(str(banco))
     try:
         tabelas = {r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-        out = {"leituras": 0, "medicoes": 0, "chaves": 0, "agua": 0, "modelos": 0}
+        out = {"leituras": 0, "medicoes": 0, "chaves": 0, "agua": 0, "modelos": 0, "frota": 0}
         padrao = f"%{CAMPO_MARCA}%"
         if "leitura" in tabelas:
             seqs = [r[0] for r in db.execute("SELECT seq FROM leitura WHERE linha LIKE ?", (padrao,))]
@@ -462,6 +611,8 @@ def limpar(banco: Path) -> dict:
             for dia, ativos in por_dia.items():
                 db.execute("INSERT OR REPLACE INTO clima_observado(dia,origem,mm,atualizado) VALUES(?,?,?,?)",
                            (dia, "physis", round(sum(ativos.values()) / len(ativos), 2), time.time()))
+        if "frota_ponto" in tabelas:                    # pontos dos veículos simulados (linhas V6 marcadas)
+            out["frota"] = db.execute("DELETE FROM frota_ponto WHERE origem='v6-simulado'").rowcount
         if "modelo" in tabelas and out["leituras"]:
             out["modelos"] = db.execute("DELETE FROM modelo").rowcount
         db.commit()
@@ -497,7 +648,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--dias", type=float, default=21.0, help="dias de histórico no --uma-vez (padrão 21: o consumo aprende com 14)")
     ap.add_argument("--passo-min", type=float, default=15.0, help="minutos entre leituras no histórico (padrão 15)")
     ap.add_argument("--intervalo", type=float, default=30.0, help="segundos entre leituras no modo contínuo (padrão 30)")
-    ap.add_argument("--id-base", type=int, default=80, help="IDs dos nós = base + 1..6 (padrão 81 a 86)")
+    ap.add_argument("--id-base", type=int, default=80, help="IDs dos nós = base + 1..9 (padrão 81 a 89)")
+    ap.add_argument("--dias-veiculos", type=float, default=7.0, help="dias de GPS dos veículos no --uma-vez (padrão 7)")
+    ap.add_argument("--lat", type=float, help="latitude do centro das rotas (sem ela: o local do hub, ou um ponto de exemplo)")
+    ap.add_argument("--lon", type=float, help="longitude do centro das rotas")
     ap.add_argument("--semente", default="physis", help="mesma semente, mesmos dados")
     ap.add_argument("--sem-anomalias", action="store_true", help="dados só normais")
     ap.add_argument("--usuario", help="conta da direção: cria chaves por aparelho, grava a água e treina os modelos")
@@ -514,7 +668,8 @@ def main(argv: list[str] | None = None) -> int:
             raise SystemExit("O hub ainda está ligado. Desligue (Ctrl+C na janela dele) e rode o --limpar de novo.")
         r = limpar(Path(a.banco).expanduser())
         print(f"Limpo: {r['leituras']} leituras e {r['medicoes']} medições simuladas, {r['chaves']} chaves revogadas, "
-              f"{r['agua']} leituras de água simuladas, {r['modelos']} modelos (o hub treina de novo ao ligar).")
+              f"{r['agua']} leituras de água simuladas, {r['frota']} pontos de GPS simulados, {r['modelos']} modelos "
+              "(o hub treina de novo ao ligar). Os veículos e a cerca SIMULADO saem na aba Frota (Veículos, Apagar).")
         return 0
     if not a.hub:
         ap.error("informe --hub (ex.: http://localhost:8802) ou --limpar")
@@ -523,18 +678,25 @@ def main(argv: list[str] | None = None) -> int:
           + ", ".join(f"{a.id_base + n:02d} {tipo} {nome}" for n, tipo, nome in APARELHOS))
     hub = Hub(base)
     logado = False
+    centro = (a.lat, a.lon) if a.lat is not None and a.lon is not None else None
     if a.usuario:
         hub.entrar(a.usuario, ler_senha(a.senha_arquivo))
         logado = True
         hub.preparar_chaves(Mundo(time.time(), a.semente, a.id_base))
         print(f"Chaves criadas para {len(hub.chaves)} aparelhos (rótulo \"{ROTULO}\"; as chaves não são mostradas).")
+    centro = centro or hub.local()
+    if not centro:
+        print(f"Sem local da instalação: os veículos andam em volta do ponto de exemplo {PONTO_EXEMPLO} (use --lat e --lon).")
+    if logado:
+        print(f"Frota: {hub.preparar_frota(Mundo(time.time(), a.semente, a.id_base, centro=centro))} veículos SIMULADOS cadastrados.")
     else:
         print("Sem --usuario: linhas sem chave (o hub aceita só da rede local); qualidade da água fica de fora.")
 
     agora = time.time()
     if a.uma_vez:
         passo = max(60.0, a.passo_min * 60)
-        mundo = Mundo(agora - a.dias * 86400, a.semente, a.id_base, 0.0 if a.sem_anomalias else 1.0)
+        mundo = Mundo(agora - a.dias * 86400, a.semente, a.id_base, 0.0 if a.sem_anomalias else 1.0, centro=centro,
+                      veiculos_desde=agora - a.dias_veiculos * 86400)
         linhas, agua, t = [], [], mundo.inicio + passo
         while t <= agora:
             linhas += mundo.linhas(t, passo)
@@ -551,7 +713,7 @@ def main(argv: list[str] | None = None) -> int:
             print("Modelos treinados agora." if st == 200 else f"Treino não rodou (HTTP {st}); o hub treina às 3 h.")
         return 0
 
-    mundo = Mundo(agora - a.dias * 86400, a.semente, a.id_base, 0.0 if a.sem_anomalias else 1.0)
+    mundo = Mundo(agora - a.dias * 86400, a.semente, a.id_base, 0.0 if a.sem_anomalias else 1.0, centro=centro)
     passo, anterior, ultima_agua = max(1.0, a.intervalo), agora - max(1.0, a.intervalo), 0.0
     print(f"Modo contínuo: uma leitura por aparelho a cada {passo:g} s. Ctrl+C para parar.")
     try:

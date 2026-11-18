@@ -20,7 +20,8 @@ EPOCH_MAX_VALIDO = 4_102_444_800   # 2100-01-01
 # as grava em `medicao`. PHYSIS_SAUDE_V6=0 volta a recusar MED/PUL (tipo_desconhecido) no receptor e no /api/v6/linha.
 TIPOS_SAUDE = ("MED", "PUL")
 # ENE: medidor de energia (PW kW, QR kvar, S kVA, V, I, FP); HID: medidor de água (Q m3/h, PR bar). Desde 15/11/2026, docs/EXTENSAO_V6.md.
-TIPOS_CONHECIDOS = ("SOLO", "ZONA", "COL", "COM", "PLUV", "SEC", "ENE", "HID") + TIPOS_SAUDE
+# VEI: veículo da frota (rastreador GPS, leitor OBD-II/CAN, medidor de vazão), em desenvolvimento desde 18/11/2026 (docs/FROTA.md).
+TIPOS_CONHECIDOS = ("SOLO", "ZONA", "COL", "COM", "PLUV", "SEC", "ENE", "HID", "VEI") + TIPOS_SAUDE
 # Limites de plausibilidade fisica, largos de proposito. NAO sao faixas de operacao:
 # as faixas de operacao de cada equipamento devem ser confirmadas pela equipe tecnica da Physis.
 # CHI: mm de chuva no intervalo (0 a 200); PUL so e contador de pulsos quando TIPO:PLUV (na pulseira, PUL e o TIPO).
@@ -37,7 +38,14 @@ _INF = float("inf")
 # QR (potência reativa, kvar) tem sinal (indutiva +, capacitiva -); S (potência aparente, kVA) não é negativa.
 FAIXAS_ENE = {"V": (0.0, _INF), "I": (0.0, _INF), "FP": (-1.0, 1.0), "S": (0.0, _INF)}
 FAIXAS_HID = {"Q": (0.0, _INF)}
-FAIXAS_POR_TIPO = {"SEC": FAIXAS_SEC, "ENE": FAIXAS_ENE, "HID": FAIXAS_HID}
+# VEI (frota, em desenvolvimento; docs/FROTA.md): LAT/LON graus, VEL km/h, RUMO graus (0 a 360), FLX vazão de combustível L/h,
+# NIV nível do tanque %, HOR horímetro h, ODO odômetro km; IGN (ignição) e GPS (posição válida) só 0/1. Só limites da física:
+# o teto de cada rastreador ou sensor é da folha de dados dele, a definir [CONFERIR].
+FAIXAS_VEI = {"LAT": (-90.0, 90.0), "LON": (-180.0, 180.0), "VEL": (0.0, _INF), "RUMO": (0.0, 360.0), "FLX": (0.0, _INF),
+              "NIV": (0.0, 100.0), "HOR": (0.0, _INF), "ODO": (0.0, _INF)}
+BINARIOS_VEI = ("IGN", "GPS")
+FAIXAS_POR_TIPO = {"SEC": FAIXAS_SEC, "ENE": FAIXAS_ENE, "HID": FAIXAS_HID, "VEI": FAIXAS_VEI}
+BINARIOS_POR_TIPO = {"SEC": BINARIOS_SEC, "VEI": BINARIOS_VEI}
 
 
 def saude_v6_ligada() -> bool:
@@ -139,8 +147,8 @@ def validar_telemetria(bruta: str) -> tuple[bool, str, dict[str, str]]:
             del campos["PUL"]                           # contador de pulsos: inteiro >= 0
             campos["_FORA"] = "PUL"
     fora = []
-    if tipo == "SEC":
-        for k in BINARIOS_SEC:
+    if tipo in BINARIOS_POR_TIPO:
+        for k in BINARIOS_POR_TIPO[tipo]:
             if k in campos and campos[k].strip().lower() not in SENTINELAS and campos[k].strip() not in ("0", "1"):
                 fora.append(k)
     faixas = dict(FAIXAS_PLAUSIVEIS, **FAIXAS_POR_TIPO.get(tipo, {}))

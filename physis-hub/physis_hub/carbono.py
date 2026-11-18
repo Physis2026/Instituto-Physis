@@ -326,9 +326,12 @@ def calcular(estado: dict, ctx: dict | None = None, F: dict | None = None) -> di
     for x in c.get("estac", []):
         g, b = combustao(F, x["comb"], n0(x.get("qtd")), "estacionaria", teor(x), bool(x.get("nr")))
         add(1, "estacionaria", g, x.get("q", "estimado"), bio_kg=b)
-    for x in c.get("movel", []):
+    # combustão móvel: o medido na Frota (ctx["frota_movel"], de frota.para_carbono) vale sobre o digitado, que fica de
+    # reserva; c["movel_auto"] False volta ao digitado. Mesma regra de physis-carbono.js.
+    med_frota = bool(ctx.get("frota_movel")) and c.get("movel_auto", True) is not False
+    for x in (ctx["frota_movel"] if med_frota else c.get("movel", [])):
         g, b = combustao(F, x["comb"], n0(x.get("qtd")), "movel", teor(x))
-        add(1, "movel", g, x.get("q", "estimado"), bio_kg=b)
+        add(1, "movel", g, "medido" if med_frota else x.get("q", "estimado"), bio_kg=b)
     for x in c.get("refrig", []):
         if x.get("modo") == "carga":
             vz = F["vazamento"].get(x.get("equip") or "split", F["vazamento"]["split"])

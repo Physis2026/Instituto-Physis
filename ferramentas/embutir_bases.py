@@ -39,6 +39,7 @@ MODULOS = {"mod-avac": S / "physis-avac.js", "mod-saude": S / "physis-saude.js",
            "mod-aprendizado-ui": S / "physis-aprendizado-ui.js",  # o que o hub aprendeu + avisos de clima
            "mod-odf": S / "physis-odf.js",                        # ODT, ODS e PDF/A ao lado do "Baixar esta tela"
            "mod-secador": S / "physis-secador.js",                # aba Secador solar (em desenvolvimento)
+           "mod-frota": S / "physis-frota.js",                    # aba Frota e combustível (em desenvolvimento)
            "mod-servidor-verde": S / "physis-servidor-verde.js",  # aba Servidor verde (em desenvolvimento)
            "mod-suporte-remoto": S / "physis-suporte-remoto.js",  # "Permitir suporte" (Minha conta da direção)
            "mod-physis-3d": S / "physis-3d.js",                   # aba Physis 3D (em desenvolvimento)

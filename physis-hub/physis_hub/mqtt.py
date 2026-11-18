@@ -20,6 +20,10 @@ A ponte:
 5. medidores ("tipo": "energia" ou "agua" no nó, desde 15/11/2026): os sensores viram a linha TIPO:ENE
    (PW kW, V, I, FP) ou TIPO:HID (Q m³/h, PR bar). Só leitura. É o caminho de energia, tensão, corrente,
    fator de potência, vazão e pressão até a tabela medicao (e daí ao modelo de consumo do aprendizado).
+6. veículo da frota ("tipo": "veiculo" no nó, docs/FROTA.md, em desenvolvimento): rastreador GPS, leitor OBD-II/CAN ou
+   medidor de vazão ligados a um ESP32/gateway que publica no broker. Os sensores viram a linha TIPO:VEI (LAT, LON, VEL,
+   RUMO, FLX, NIV, HOR, ODO, IGN). A linha sai quando chega o objeto "gatilho" (padrão: a longitude), para latitude e
+   longitude irem juntas; um objeto "json" opcional recebe tudo de uma vez ({"lat":..,"lon":..,"vel":..}). Só leitura.
 
 Só a biblioteca padrão (socket/ssl): MQTT 3.1.1, QoS 0, usuário e senha, TLS opcional (porta 8883).
 A senha vem de PHYSIS_MQTT_SENHA (nunca do código nem do instancia.json).
@@ -211,10 +215,65 @@ class NoMedidor:
         return ",".join(partes + [f"TS:{self.ultimo_ts}"])
 
 
+class NoVeiculo(NoMedidor):
+    """Veículo (só leitura): {"no": "trator-1", "id": 61, "tipo": "veiculo", "lat": "latitude", "lon": "longitude",
+    "vel": "velocidade", "rumo": "rumo", "flx": "vazao_combustivel", "niv": "nivel_combustivel", "hor": "horimetro",
+    "odo": "odometro", "ign": "ignicao", "gatilho": "lon"} ou {"no": "...", "id": 62, "tipo": "veiculo", "json": "posicao"}.
+    Unidades do contrato: graus, km/h, graus, L/h, %, h, km; ignição ON/OFF. Os nomes dos objetos são do YAML ou do
+    gateway de cada aparelho [CONFERIR com o equipamento escolhido]."""
+    BOOL = ("ign",)
+    CHAVES = ("lat", "lon", "vel", "rumo", "flx", "niv", "hor", "odo", "ign")
+    CASAS = {"lat": 6, "lon": 6, "vel": 1, "rumo": 0, "flx": 2, "niv": 1, "hor": 1, "odo": 1, "bat": 2}
+
+    def __init__(self, cfg: dict):
+        self.nome = str(cfg["no"])
+        self.id = int(cfg["id"])
+        if not 1 <= self.id <= 99:
+            raise ValueError("id do nó entre 1 e 99")
+        self.tipo_v6, self.chaves = "VEI", self.CHAVES
+        self.obj = {k: str(cfg[k]) for k in self.CHAVES + ("bat", "json") if cfg.get(k)}
+        if not any(k in self.obj for k in self.CHAVES + ("json",)):
+            raise ValueError("veículo sem nenhuma grandeza configurada")
+        self.gatilho = str(cfg.get("gatilho") or ("lon" if "lon" in self.obj else "json" if "json" in self.obj else
+                                                  next(k for k in self.CHAVES if k in self.obj)))
+        self.val: dict[str, float | int | None] = {}
+        self.online = None
+        self.pronto = False            # só manda a linha quando o objeto gatilho chegou
+
+    def receber_json(self, carga: str) -> bool:
+        try:
+            d = json.loads(carga)
+        except ValueError:
+            return False
+        if not isinstance(d, dict):
+            return False
+        for k in self.CHAVES + ("bat",):
+            if k in d:
+                x = _liga(str(d[k])) if k in self.BOOL else _num(str(d[k]))
+                if x is not None:
+                    self.val[k] = x
+        return True
+
+    def linha(self, agora: float) -> str | None:
+        if not self.pronto:
+            return None
+        self.pronto = False
+        self.ultimo_ts = max(int(agora), getattr(self, "ultimo_ts", 0) + 1)
+        partes = [f"ID:{self.id}", "TIPO:VEI"]
+        for k in self.CHAVES + ("bat",):
+            x = self.val.get(k)
+            if x is None:
+                continue
+            partes.append(f"{'BAT' if k == 'bat' else k.upper()}:{int(x) if k in self.BOOL else f'{x:.{self.CASAS[k]}f}'}")
+        return ",".join(partes + [f"TS:{self.ultimo_ts}"])
+
+
 def _no_de(cfg: dict):
     t = str(cfg.get("tipo", "")).lower()
     if t == "secador":
         return NoSecador(cfg)
+    if t == "veiculo":
+        return NoVeiculo(cfg)
     if t in NoMedidor.TIPOS:
         return NoMedidor(cfg)
     return No(cfg)
@@ -257,6 +316,19 @@ class Ponte:
         k = no.chave_de(partes[2])
         if not k:
             return [], []
+        if isinstance(no, NoVeiculo):           # veículo: junta os objetos e manda a linha quando chega o gatilho
+            if k == "json":
+                if not no.receber_json(carga):
+                    return [], []
+            else:
+                x = _liga(carga) if k in no.BOOL else _num(carga)
+                if x is None:
+                    return [], []
+                no.val[k] = x
+            if k == no.gatilho:
+                no.pronto = True
+            l = no.linha(self.relogio())
+            return ([l] if l else []), []
         x = _liga(carga) if k in no.BOOL else _num(carga)
         if x is None:
             return [], []

@@ -66,7 +66,7 @@ Sem `--usuario`, o hub aceita as linhas sem chave só porque elas vêm do própr
 
 ## O que você deve ver
 
-Os aparelhos simulados são os nós **81 a 86**:
+Os aparelhos simulados são os nós **81 a 89**:
 
 | Nó | Aparelho | Onde aparece |
 |---|---|---|
@@ -75,6 +75,7 @@ Os aparelhos simulados são os nós **81 a 86**:
 | 84 | Medidor de energia: P, Q, S, V, I e fator de potência, com geração solar ao meio-dia | energia, consumo |
 | 85 | Medidor de água: vazão e pressão | Água, consumo |
 | 86 | Secador solar | Secador |
+| 87, 88, 89 | Caminhão, carro e trator SIMULADOS (linha `TIPO:VEI`): GPS em volta do local da instalação, vazão e nível de combustível, odômetro (trator: horímetro). Nível do caminhão caindo parado de madrugada um dia por semana; o carro sai da cerca de teste um dia por semana | Frota e combustível (com `--usuario`, os 3 veículos e a cerca de teste são cadastrados; sem ele, aparecem como "nós sem veículo") |
 
 - **Monitoramento:** os nós aparecem online, com a umidade do solo subindo e descendo no dia; a irrigação liga quando o
   solo passa do limite de 30 %. O cartão de previsão mostra Open-Meteo, INMET e CEMADEN atualizados.
@@ -99,7 +100,7 @@ ou o nome que estiver em `"banco"` no `instancia.json`):
 Sai tudo o que tem a marca de simulado: leituras e medições, chaves dos aparelhos (revogadas), leituras de água
 simuladas, a chuva do pluviômetro simulado e os modelos aprendidos (o hub treina de novo ao ligar). O que é de verdade
 fica. O registro encadeado e os lotes de integridade **não** são apagados (eles não podem ser alterados, de propósito):
-os eventos "nó descoberto" dos nós 81 a 86 continuam lá. Por isso, para entregar a um cliente, use sempre um pacote
+os eventos "nó descoberto" dos nós 81 a 89 continuam lá. Por isso, para entregar a um cliente, use sempre um pacote
 **novo**, nunca um que passou pelo simulador.
 
 ## Opções

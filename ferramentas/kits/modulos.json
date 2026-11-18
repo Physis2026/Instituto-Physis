@@ -924,6 +924,55 @@
    "aba": "secador"
   },
   {
+   "id": "frota",
+   "nome": "Frota e combustível (GPS, abastecimentos e consumo)",
+   "tipo": "modulo",
+   "responsaveis": [
+    "Ryan",
+    "Arthur"
+   ],
+   "metodologia": "frota",
+   "doc17_secao": null,
+   "o_que_revisar": "Em desenvolvimento. Responsáveis PROVISÓRIOS (Ryan: fornecedores e equipamentos; Arthur: hardware e PDI), a direção confirma. Limites dos alertas (premissas frota.*), opções de rastreador, leitor OBD-II/CAN, fluxômetro e sensor de nível, colunas do CSV do cartão-combustível e textos da aba. Modelo ou faixa de aparelho sem folha de dados fica [CONFERIR].",
+   "editaveis": [
+    {
+     "arquivo": "sistema/physis-metodologia.json",
+     "partes": [
+      [
+       "modulos",
+       "frota"
+      ]
+     ],
+     "normas_de": "frota"
+    },
+    {
+     "arquivo": "sistema/physis-premissas.json",
+     "premissas_de": "frota"
+    },
+    {
+     "arquivo": "sistema/physis-i18n-modulos.json",
+     "i18n_de": "referencia"
+    }
+   ],
+   "referencia": [
+    "physis-hub/docs/FROTA.md",
+    "physis-hub/physis_hub/frota.py",
+    "sistema/physis-frota.js",
+    "physis-hub/tests/test_frota.py"
+   ],
+   "conferir": [
+    {
+     "arquivo": "physis-hub/web/painel.html",
+     "como": "Abra a plataforma da Casa Physis (pesquisa) e vá à aba Frota e combustível."
+    }
+   ],
+   "testes": [
+    "test_frota",
+    "test_metodologia"
+   ],
+   "aba": "frota"
+  },
+  {
    "id": "servidor-verde",
    "nome": "Servidor verde (dimensionamento para projetos externos e pegada do servidor)",
    "tipo": "modulo",

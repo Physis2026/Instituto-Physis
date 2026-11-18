@@ -30,6 +30,7 @@ Sem `TIPO`, a linha e do no de solo e irrigacao (compatibilidade com o que esta 
 | `SEC` | Secador solar (monitoramento, **em desenvolvimento**) | `TI UI TE UE TC VENT ABT PESO IRR BAT TS` (`ABT`, `PESO` e `IRR` opcionais) | `ID:41,TIPO:SEC,TI:38.5,UI:42.0,TE:27.1,UE:70.0,TC:52.3,VENT:1,PESO:84.20,IRR:820,BAT:3.95,TS:1794600000` |
 | `ENE` | Medidor de energia (ESP com Modbus ou pulso, ou ponte MQTT) | `PW QR S V I FP BAT TS` (pelo menos uma grandeza) | `ID:61,TIPO:ENE,PW:12.430,QR:4.910,S:13.370,V:221.5,I:19.80,FP:0.930,TS:1794600000` |
 | `HID` | Medidor de água (vazão e pressão) | `Q PR BAT TS` (pelo menos uma grandeza) | `ID:62,TIPO:HID,Q:3.250,PR:2.40,TS:1794600000` |
+| `VEI` | Veículo da frota: rastreador GPS, leitor OBD-II/CAN ou medidor de vazão (**em desenvolvimento**, `FROTA.md`) | `LAT LON VEL RUMO FLX NIV HOR ODO IGN GPS BAT TS` (todas opcionais; pelo menos uma) | `ID:61,TIPO:VEI,LAT:-22.50512,LON:-43.17845,VEL:42.5,RUMO:183,FLX:12.40,NIV:63.5,HOR:1234.5,ODO:45678.9,IGN:1,GPS:1,BAT:3.95,TS:1794600000` |
 | `MED` | Caixinha de remédios (Saúde, **a homologar**) | `CMP EVT BAT TS` | `ID:31,TIPO:MED,CMP:1,EVT:TOMADO,BAT:3.91,TS:1794650400` |
 | `PUL` | Pulseira (Saúde, **a homologar**) | `LAT LON GPS CRISE BPM MOV BAT TS` | `ID:51,TIPO:PUL,LAT:-22.51003,LON:-43.18012,GPS:1,CRISE:1,BPM:128,MOV:2,BAT:3.80,TS:1794650400` |
 
@@ -51,6 +52,15 @@ Significados novos:
   Com `ENE` e `HID` em `medicao`, o modelo de consumo do aprendizado (média do dia × 24 h = kWh/dia e m³/dia) passa a
   ter dado. Pela ponte MQTT: nó com `"tipo": "energia"` ou `"tipo": "agua"` (`physis_hub/mqtt.py`, `NoMedidor`).
   Sem comando: `CMD` para esses nós é ignorado. Firmware do medidor (ESP): a definir.
+- `VEI` (frota, desde 18/11/2026, **em desenvolvimento**; `FROTA.md`): `LAT`/`LON` em graus (com `GPS:0` a posição não
+  vale e não vira grandeza), `VEL` velocidade em km/h, `RUMO` em graus (0 a 360, norte = 0), `FLX` vazão de combustível em L/h,
+  `NIV` nível do tanque em %, `HOR` horímetro em horas, `ODO` odômetro em km, `IGN` ignição 0/1. Limites só físicos
+  (`protocolo.FAIXAS_VEI`: graus válidos, nada negativo, RUMO até 360, NIV até 100); o teto de cada rastreador ou sensor é da
+  folha de dados dele [CONFERIR]. Grandezas physis/1: `latitude`, `longitude`, `velocidade`, `rumo`, `vazao_combustivel`,
+  `nivel_combustivel`, `horimetro`, `odometro` e `estado` (ativo `-ignicao`). O hub também entrega cada linha à frota
+  (`Hub.frota_receptor` → `frota.Frota.receber_v6`), que guarda o ponto do veículo ligado ao nó. Pela ponte MQTT: nó com
+  `"tipo": "veiculo"` (`mqtt.NoVeiculo`, só leitura; ver `MQTT.md`). `NIV` do comedouro (`COM`) continua sem faixa: as
+  faixas valem só com `TIPO:VEI`.
 - `MED`/`PUL`: o hub entrega à Saúde (`saude.py`) **antes** do adaptador; nada vai para `medicao` nem para o painel.
   `PHYSIS_SAUDE_V6=0` volta a recusar os dois (`tipo_desconhecido`). Ver `SAUDE.md`.
 

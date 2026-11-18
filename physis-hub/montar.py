@@ -27,7 +27,8 @@ AQUI = Path(__file__).resolve().parent
 MODULOS = ("monitoramento", "agua", "zonas", "animais", "coleiras", "comedouros", "sustainkit", "supervisao", "gestao",
            "painel", "planejador", "certificacoes", "solar", "avac", "turbinas", "sbn", "circular", "carbono",
            "resiliencia", "medicamentos", "pulseira", "cursos", "secador", "servidor-verde",
-           "impressao3d")   # Physis 3D: do Instituto Physis (decisão de 18/11/2026)
+           "impressao3d",   # Physis 3D: do Instituto Physis (decisão de 18/11/2026)
+           "frota")         # Frota e combustível (em desenvolvimento, 18/11/2026)
 # instalação: "physis" (padrão: plataforma de cliente ou servidor da Physis) ou "instituto" (Instituto Physis:
 # pesquisa, cursos e projetos sociais; mesmo código, banco, marca, suporte e catálogo próprios; docs/INSTITUTO.md)
 INSTALACOES = ("physis", "instituto")

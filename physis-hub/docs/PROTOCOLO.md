@@ -60,7 +60,9 @@ e repassadas ao computador central (ver `EXTENSAO_V6.md`).
 
 Tipos (`TIPO`) que o hub aceita (`physis_hub/protocolo.py`, `TIPOS_CONHECIDOS`): `SOLO` (ou ausente), `ZONA`, `COL`,
 `COM`, `PLUV` (pluviômetro, desde 15/11/2026), `ENE` (medidor de energia) e `HID` (medidor de água: vazão e pressão),
-ambos desde 15/11/2026, `SEC` (secador solar, em desenvolvimento; chaves e faixas em `SECADOR.md`) e,
+ambos desde 15/11/2026, `SEC` (secador solar, em desenvolvimento; chaves e faixas em `SECADOR.md`), `VEI` (veículo da
+frota, em desenvolvimento desde 18/11/2026: GPS, velocidade, rumo, vazão e nível de combustível, horímetro, odômetro e
+ignição; chaves e faixas em `EXTENSAO_V6.md` e `FROTA.md`) e,
 com `PHYSIS_SAUDE_V6=1` (padrão), `MED` e `PUL` (Saúde, a homologar; vão para a Saúde, nunca para `medicao`). Outro `TIPO` =
 `tipo_desconhecido`. Chaves e exemplos em `EXTENSAO_V6.md`.
 **Firmware (conferido em 15/11/2026):** os dois `protocolo.cpp` (receptor e transmissor V6) não têm lista de `TIPO`. O

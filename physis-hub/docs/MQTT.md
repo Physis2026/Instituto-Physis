@@ -33,6 +33,23 @@ Campos de cada nó: `no` (nome do ESPHome), `id` (1 a 99, único no lugar), `u1`
 `ir1`/`ir2` (válvulas), `bomba`, `bat` e `tmax` (minutos máximos por rega). O nome do objeto é o `name`
 do ESPHome em minúsculas, com `_` no lugar dos espaços.
 
+### Veículo da frota (`"tipo": "veiculo"`, em desenvolvimento; `FROTA.md`)
+
+Para um rastreador GPS, um leitor OBD-II/CAN ou um medidor de vazão ligados a um ESP32 ou gateway que publica no broker.
+Só leitura (nenhum comando vai ao veículo). Cada campo diz o nome do objeto que o aparelho publica:
+
+```json
+{"no": "caminhao-1", "id": 61, "tipo": "veiculo", "lat": "latitude", "lon": "longitude", "vel": "velocidade",
+ "rumo": "rumo", "flx": "vazao_combustivel", "niv": "nivel_combustivel", "hor": "horimetro", "odo": "odometro",
+ "ign": "ignicao", "gatilho": "lon"}
+```
+
+A linha V6 `TIPO:VEI` sai quando chega o objeto `gatilho` (padrão: a longitude), para latitude e longitude irem juntas.
+Gateway que publica tudo num JSON só: `{"no": "obd-1", "id": 62, "tipo": "veiculo", "json": "dados"}` e o tópico
+`obd-1/sensor/dados/state` com `{"lat": -22.5, "lon": -43.18, "vel": 42, "flx": 12.4, "niv": 63, "odo": 45678.9}`.
+Unidades do contrato: graus, km/h, graus, L/h, %, h, km; ignição `ON`/`OFF`. Os nomes dos objetos e o que cada leitor
+OBD-II/CAN consegue ler (nem todo veículo informa vazão ou nível pela rede) dependem do aparelho escolhido [CONFERIR].
+
 ## 2. O que a ponte faz
 
 | Vem do nó | Vira |

@@ -137,7 +137,10 @@
     bateria: [3.3, 4.3, "V"], rssi: [-120, 0, "dBm"], snr: [null, null, "dB"], latitude: [-90, 90, "grau"],
     longitude: [-180, 180, "grau"], atividade: [null, null, "0-2"], impacto: [null, null, "0/1"], porcoes: [null, null, "un"],
     // medidor de energia (TIPO:ENE): potência reativa e aparente; o fator de potência já é "fp"
-    potencia_reativa: [null, null, "kvar"], potencia_aparente: [null, null, "kVA"]
+    potencia_reativa: [null, null, "kvar"], potencia_aparente: [null, null, "kVA"],
+    // veículo da frota (TIPO:VEI, em desenvolvimento): sem faixa de alarme (os alertas são da aba Frota e combustível)
+    velocidade: [null, null, "km/h"], rumo: [null, null, "grau"], vazao_combustivel: [null, null, "L/h"],
+    nivel_combustivel: [0, 100, "%"], horimetro: [null, null, "h"], odometro: [null, null, "km"]
   };
   function avaliarAlarme(grandeza, valor, faixas) {
     var f = (faixas || FAIXAS)[grandeza];

@@ -135,6 +135,7 @@ class Hub:
         self.guardar_medicoes = guardar_medicoes
         self.enviar_comando = enviar_comando      # funcao(linha) -> (ok, detalhe) ou None
         self.saude_receptor = None                # funcao(linha, origem) -> dict de saude.registrar_evento (o servidor liga)
+        self.frota_receptor = None                # funcao(est, ts, linha) do frota.py para cada linha VEI aceita (o servidor liga)
         self.secador_produtos: dict[int, str] = {}  # no SEC -> produto do lote (secador.PRODUTOS); vazio = limite generico
         self.relogio = relogio
         self.instancia: dict | None = None        # instancia.json (lido na primeira vez que for preciso; testes podem pôr o dict)
@@ -250,6 +251,11 @@ class Hub:
                  for m in adaptador.adaptar(campos_ts, self.org, self.lugar, intervalo)])
             if est["tipo"] == "PLUV" and est.get("chi") is not None:
                 self._chuva_do_dia(ts or agora)
+        if est["tipo"] == "VEI" and self.frota_receptor is not None:
+            try:                        # frota (docs/FROTA.md): ponto de GPS e sensores do veículo ligado ao nó
+                self.frota_receptor(est, ts or agora, linha)
+            except Exception:           # noqa: BLE001 — um defeito na frota não derruba a telemetria
+                self.descartes["frota_erro"] += 1
         self._atualizar_no(est, agora, linha)
         return "aceita"
 
@@ -1140,7 +1146,7 @@ class Hub:
     # e-mail de acesso na fila de saída. O código nunca aparece na loja: só no e-mail.
     MODULOS_PLATAFORMA = ("monitoramento", "agua", "zonas", "animais", "coleiras", "comedouros", "sustainkit", "supervisao",
                           "gestao", "painel", "planejador", "certificacoes", "solar", "avac", "turbinas", "sbn", "circular",
-                          "carbono", "resiliencia", "medicamentos", "pulseira", "secador")
+                          "carbono", "resiliencia", "medicamentos", "pulseira", "secador", "frota")
     ATIVAR_ERROS = 5
     ATIVAR_ESPERA_S = 15 * 60
 
@@ -1175,6 +1181,7 @@ class Hub:
                     "P17": ("sbn",), "P18": ("agua",),   # reúso e chuva vai com a Qualidade da água (à venda)
                     "P19": ("sbn",), "P11": ("circular",), "P16": ("circular",),
                     "P20": ("circular",), "P22": ("circular",), "P27": ("circular",), "P23": ("secador",),
+                    "frota": ("frota",),   # Frota e combustível (em desenvolvimento, só na loja interna; 18/11/2026)
                     # D17 (15/11/2026): níveis 2 a 4 de cada certificação (regra em sistema/physis-certificacoes.json,
                     # niveis_loja; conferida por tests/test_cert_niveis.py). N3 = N2 (consultoria é serviço); N4 = N3 + M&V + SustainKit (D20).
                     'cert-iso9001-n2': ('certificacoes', 'gestao', 'monitoramento'),

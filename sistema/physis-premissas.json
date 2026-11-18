@@ -1556,6 +1556,133 @@
       "fonte": "política interna da Physis (proposta; a direção confirma)",
       "status": "conferir",
       "nota": "Usado por physis_hub/fornecedores.py (premissa_dias); sem a base, 90."
+    },
+    {
+      "id": "frota.anomalia_z",
+      "grandeza": "Limite do z robusto para consumo acima do normal de um veículo",
+      "valor_padrao": 3.5,
+      "unidade": "adimensional (z robusto = 0,6745 × (x − mediana) ÷ MAD)",
+      "opcoes": [
+        {
+          "rotulo": "Mais sensível",
+          "valor": 3.0,
+          "quando": "frota pequena e bem conhecida"
+        },
+        {
+          "rotulo": "Padrão",
+          "valor": 3.5,
+          "quando": "referência da literatura para o z modificado"
+        },
+        {
+          "rotulo": "Menos alarmes",
+          "valor": 4.5,
+          "quando": "uso muito variado (trator em serviços diferentes)"
+        }
+      ],
+      "fonte": "Iglewicz e Hoaglin (1993), How to Detect and Handle Outliers: z modificado acima de 3,5 como candidato a valor atípico. [CONFERIR] com os dados da frota da Casa Physis.",
+      "status": "conferir",
+      "nota": "Usada por physis_hub/frota.py e sistema/physis-frota.js (Frota e combustível, em desenvolvimento)."
+    },
+    {
+      "id": "frota.anomalia_desvio_min_pct",
+      "grandeza": "Diferença mínima acima do normal para o consumo virar alerta",
+      "valor_padrao": 15.0,
+      "unidade": "% acima da mediana do veículo",
+      "opcoes": [],
+      "fonte": "proposta da Physis: variação menor que essa é ruído de operação (carga, terreno, trânsito) e a amostra pequena exagera o z. [CONFERIR] com os dados da frota.",
+      "status": "conferir",
+      "nota": "Usada por physis_hub/frota.py e sistema/physis-frota.js (Frota e combustível, em desenvolvimento). O alerta pede o z robusto acima do limite E esta diferença."
+    },
+    {
+      "id": "frota.anomalia_amostra_min",
+      "grandeza": "Amostras de consumo antes de o sistema dizer o normal de um veículo",
+      "valor_padrao": 8,
+      "unidade": "amostras (dias medidos ou trechos entre abastecimentos)",
+      "opcoes": [],
+      "fonte": "política proposta da Physis (com menos amostras, mediana e MAD variam demais). [CONFERIR]",
+      "status": "conferir",
+      "nota": "Usada por physis_hub/frota.py e sistema/physis-frota.js (Frota e combustível, em desenvolvimento)."
+    },
+    {
+      "id": "frota.ewma_alfa",
+      "grandeza": "Peso da amostra nova na média móvel exponencial do consumo",
+      "valor_padrao": 0.3,
+      "unidade": "0 a 1",
+      "opcoes": [],
+      "fonte": "valor usual de suavização exponencial (0,2 a 0,3 em controle estatístico de processo). [CONFERIR]",
+      "status": "conferir",
+      "nota": "Usada por physis_hub/frota.py e sistema/physis-frota.js (Frota e combustível, em desenvolvimento)."
+    },
+    {
+      "id": "frota.queda_nivel_pct",
+      "grandeza": "Queda de nível do tanque, com o veículo parado, que vira alerta de vazamento ou furto",
+      "valor_padrao": 5.0,
+      "unidade": "% do tanque (já descontado o que a vazão mediu)",
+      "opcoes": [],
+      "fonte": "proposta da Physis; depende da resolução do sensor de nível do veículo (folha de dados). [CONFERIR]",
+      "status": "conferir",
+      "nota": "Usada por physis_hub/frota.py e sistema/physis-frota.js (Frota e combustível, em desenvolvimento)."
+    },
+    {
+      "id": "frota.parado_distancia_km",
+      "grandeza": "Distância máxima do ponto de partida para o veículo contar como parado",
+      "valor_padrao": 0.2,
+      "unidade": "km",
+      "opcoes": [],
+      "fonte": "proposta da Physis; acima do erro típico de posição de um GPS comum parado. [CONFERIR] com o rastreador escolhido.",
+      "status": "conferir",
+      "nota": "Usada por physis_hub/frota.py e sistema/physis-frota.js (Frota e combustível, em desenvolvimento)."
+    },
+    {
+      "id": "frota.marcha_lenta_vel_kmh",
+      "grandeza": "Velocidade abaixo da qual o motor ligado conta como marcha lenta",
+      "valor_padrao": 3.0,
+      "unidade": "km/h",
+      "opcoes": [],
+      "fonte": "proposta da Physis. [CONFERIR]",
+      "status": "conferir",
+      "nota": "Usada por physis_hub/frota.py e sistema/physis-frota.js (Frota e combustível, em desenvolvimento)."
+    },
+    {
+      "id": "frota.marcha_lenta_min",
+      "grandeza": "Tempo de marcha lenta seguida que vira alerta",
+      "valor_padrao": 20.0,
+      "unidade": "min",
+      "opcoes": [],
+      "fonte": "proposta da Physis. [CONFERIR] com a operação (trator parado com tomada de força ligada não é marcha lenta).",
+      "status": "conferir",
+      "nota": "Usada por physis_hub/frota.py e sistema/physis-frota.js (Frota e combustível, em desenvolvimento)."
+    },
+    {
+      "id": "frota.gps_salto_kmh",
+      "grandeza": "Velocidade implícita acima da qual um trecho de GPS é descartado (salto de posição)",
+      "valor_padrao": 200.0,
+      "unidade": "km/h",
+      "opcoes": [],
+      "fonte": "proposta da Physis (filtro de ponto errado do GPS). [CONFERIR]",
+      "status": "conferir",
+      "nota": "Usada por physis_hub/frota.py e sistema/physis-frota.js (Frota e combustível, em desenvolvimento)."
+    },
+    {
+      "id": "frota.retencao_dias",
+      "grandeza": "Dias que os pontos de GPS dos veículos ficam guardados",
+      "valor_padrao": 365,
+      "unidade": "dias",
+      "opcoes": [
+        {
+          "rotulo": "Mínimo para relatório anual",
+          "valor": 365,
+          "quando": "inventário de emissões do ano"
+        },
+        {
+          "rotulo": "Curto",
+          "valor": 90,
+          "quando": "só operação do dia a dia"
+        }
+      ],
+      "fonte": "LGPD (Lei 13.709/2018, art. 15 e 16: término do tratamento quando a finalidade acaba); prazo proposto pela Physis, a direção confirma. [CONFERIR]",
+      "status": "conferir",
+      "nota": "Usada por physis_hub/frota.py e sistema/physis-frota.js (Frota e combustível, em desenvolvimento). A direção muda na aba (POST /api/frota/config)."
     }
   ],
   "normas": {

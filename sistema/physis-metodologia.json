@@ -3648,6 +3648,211 @@
           "o_que_falta": "Correlação entre entradas."
         }
       ]
+    },
+    "frota": {
+      "nome": "Frota e combustível",
+      "resumo": "Distância, consumo, marcha lenta, alertas e CO₂e da frota (versão 0.1, em desenvolvimento).",
+      "calculos": [
+        {
+          "id": "frota.distancia",
+          "nome": "Distância percorrida",
+          "o_que_calcula": "Quilômetros rodados pelos pontos de GPS ou pelo odômetro.",
+          "formula": {
+            "texto": "d = 2R · asen(√(sen²(Δφ/2) + cos φ₁ · cos φ₂ · sen²(Δλ/2))); trecho com velocidade implícita acima de v_salto sai da soma; com odômetro no começo e no fim, vale ODO_fim − ODO_começo",
+            "variaveis": [
+              {
+                "simbolo": "R",
+                "significado": "raio médio da Terra",
+                "unidade": "km"
+              },
+              {
+                "simbolo": "φ, λ",
+                "significado": "latitude e longitude",
+                "unidade": "rad"
+              },
+              {
+                "simbolo": "v_salto",
+                "significado": "velocidade implícita que marca salto de GPS",
+                "unidade": "km/h"
+              }
+            ]
+          },
+          "premissas": [
+            "frota.gps_salto_kmh"
+          ],
+          "normas": [
+            {
+              "codigo": "sem norma aplicável",
+              "edicao": "—",
+              "item": "",
+              "como_e_usada": "Fórmula de haversine (geometria esférica)."
+            }
+          ],
+          "limites_de_validade": "Esfera de raio médio (erro abaixo de 0,5 %); pontos espaçados cortam curvas.",
+          "fonte_de_dados": "Linha V6 TIPO:VEI (LAT, LON, ODO) ou CSV do rastreador.",
+          "status": "simplificado",
+          "o_que_falta": "Conferir com o odômetro de um veículo da Casa Physis.",
+          "onde": "physis_hub/frota.py (espelho: sistema/physis-frota.js) · distancia(), haversine_km()"
+        },
+        {
+          "id": "frota.consumo",
+          "nome": "Consumo por km e por hora",
+          "o_que_calcula": "Litros pela vazão, horas de motor e o consumo em L/100 km ou L/h; sem vazão, pelo método do tanque cheio.",
+          "formula": {
+            "texto": "L = Σ (FLXᵢ + FLXᵢ₊₁)/2 · Δt só nos trechos com vazão nas duas pontas (buraco > 15 min não entra); km e horas de motor dos mesmos trechos; L/100 km = L ÷ km × 100; L/h = L ÷ horas; amostra = dia completo; tanque cheio: litros do abastecimento ÷ (ODO − ODO anterior) × 100",
+            "variaveis": [
+              {
+                "simbolo": "FLX",
+                "significado": "vazão de combustível",
+                "unidade": "L/h"
+              },
+              {
+                "simbolo": "Δt",
+                "significado": "intervalo entre leituras",
+                "unidade": "h"
+              }
+            ]
+          },
+          "premissas": [],
+          "normas": [
+            {
+              "codigo": "sem norma aplicável",
+              "edicao": "—",
+              "item": "",
+              "como_e_usada": "Método de referência descrito na fórmula."
+            }
+          ],
+          "limites_de_validade": "Diesel com retorno precisa de medição diferencial; tanque cheio supõe tanque cheio nos dois abastecimentos.",
+          "fonte_de_dados": "FLX e HOR da linha VEI; abastecimentos digitados ou do cartão.",
+          "status": "simplificado",
+          "o_que_falta": "Conferir o fluxômetro escolhido e a forma de medir com retorno.",
+          "onde": "physis_hub/frota.py (espelho: sistema/physis-frota.js) · trechos_com_vazao(), litros_do_fluxo(), horas_motor(), consumo(), consumo_entre_abastecimentos()"
+        },
+        {
+          "id": "frota.anomalia",
+          "nome": "Consumo acima do normal do veículo",
+          "o_que_calcula": "Se a amostra nova de consumo está acima do normal aprendido do próprio veículo.",
+          "formula": {
+            "texto": "z = 0,6745 · (x − mediana) ÷ MAD; alerta se z > z_lim e x ≥ mediana · (1 + d_min/100), com n ≥ n_min amostras; EWMA = α·x + (1 − α)·EWMA anterior",
+            "variaveis": [
+              {
+                "simbolo": "MAD",
+                "significado": "desvio absoluto mediano das amostras anteriores",
+                "unidade": "L/100 km ou L/h"
+              },
+              {
+                "simbolo": "z_lim, d_min, n_min, α",
+                "significado": "premissas do alerta",
+                "unidade": "—"
+              }
+            ]
+          },
+          "premissas": [
+            "frota.anomalia_z",
+            "frota.anomalia_desvio_min_pct",
+            "frota.anomalia_amostra_min",
+            "frota.ewma_alfa"
+          ],
+          "normas": [
+            {
+              "codigo": "sem norma aplicável",
+              "edicao": "—",
+              "item": "",
+              "como_e_usada": "z modificado de Iglewicz e Hoaglin (1993)."
+            }
+          ],
+          "limites_de_validade": "Mudança de serviço (outra carga, outro terreno) muda o normal; o alerta pede conferência, não conclui.",
+          "fonte_de_dados": "Amostras diárias pela vazão ou trechos entre abastecimentos.",
+          "status": "simplificado",
+          "o_que_falta": "Conferir os limites com 2 a 3 meses de dados reais da frota.",
+          "onde": "physis_hub/frota.py (espelho: sistema/physis-frota.js) · anomalia_consumo(), normal_aprendido()"
+        },
+        {
+          "id": "frota.alertas",
+          "nome": "Nível caindo parado, marcha lenta e cerca",
+          "o_que_calcula": "Queda de nível com o veículo parado (vazamento ou furto possível), marcha lenta longa e saída da cerca.",
+          "formula": {
+            "texto": "queda = NIV_começo − NIV_agora − (litros pela vazão ÷ tanque × 100) ≥ q_lim com deslocamento ≤ d_parado; marcha lenta: motor ligado e VEL < v_lim por ≥ t_lim; cerca: ponto dentro → fora (método do raio)",
+            "variaveis": [
+              {
+                "simbolo": "q_lim",
+                "significado": "queda mínima",
+                "unidade": "% do tanque"
+              },
+              {
+                "simbolo": "d_parado",
+                "significado": "deslocamento máximo para contar como parado",
+                "unidade": "km"
+              },
+              {
+                "simbolo": "v_lim, t_lim",
+                "significado": "velocidade e tempo da marcha lenta",
+                "unidade": "km/h; min"
+              }
+            ]
+          },
+          "premissas": [
+            "frota.queda_nivel_pct",
+            "frota.parado_distancia_km",
+            "frota.marcha_lenta_vel_kmh",
+            "frota.marcha_lenta_min"
+          ],
+          "normas": [
+            {
+              "codigo": "sem norma aplicável",
+              "edicao": "—",
+              "item": "",
+              "como_e_usada": "Método de referência descrito na fórmula."
+            },
+            {
+              "codigo": "Lei 13.709/2018",
+              "edicao": "2018",
+              "item": "art. 6º e 15 (finalidade e término)",
+              "como_e_usada": "Posição do veículo é dado pessoal de quem dirige: aviso, código no lugar do nome e retenção."
+            }
+          ],
+          "limites_de_validade": "Sensor de nível com resolução pior que q_lim não vê vazamento pequeno.",
+          "fonte_de_dados": "NIV, VEL, FLX, IGN da linha VEI; cercas desenhadas na aba.",
+          "status": "simplificado",
+          "o_que_falta": "Testar com sensor de nível e rastreador reais.",
+          "onde": "physis_hub/frota.py (espelho: sistema/physis-frota.js) · quedas_sem_andar(), marcha_lenta(), saidas_da_cerca(), ponto_no_poligono()"
+        },
+        {
+          "id": "frota.co2e",
+          "nome": "Emissões da frota",
+          "o_que_calcula": "CO₂e dos litros abastecidos (ou medidos pela vazão), pelo mesmo caminho do Carbono.",
+          "formula": {
+            "texto": "igual a carb.escopo1 (combustão móvel): energia do combustível × fator por gás × GWP; mistura do diesel B e da gasolina C pela base de fatores",
+            "variaveis": [
+              {
+                "simbolo": "L",
+                "significado": "litros (m³ de GNV)",
+                "unidade": "L"
+              }
+            ]
+          },
+          "premissas": [],
+          "normas": [
+            {
+              "codigo": "GHG Protocol",
+              "edicao": "2004 / 2015",
+              "item": "escopo 1, combustão móvel",
+              "como_e_usada": "Frota própria no escopo 1; CO₂ da parte bio à parte."
+            },
+            {
+              "codigo": "IPCC 2006",
+              "edicao": "2006",
+              "item": "vol. 2, cap. 3 (transporte)",
+              "como_e_usada": "Fatores de CH₄ e N₂O de veículos, já na base do Carbono."
+            }
+          ],
+          "limites_de_validade": "Teor de mistura conforme a base de fatores do período.",
+          "fonte_de_dados": "Abastecimentos do ano; vazão para veículo sem abastecimento.",
+          "status": "conforme",
+          "o_que_falta": "",
+          "onde": "physis_hub/frota.py (espelho: sistema/physis-frota.js) · co2e(), para_carbono() → carbono.calcular (ctx.frota_movel)"
+        }
+      ]
     }
   },
   "adequacoes": [
