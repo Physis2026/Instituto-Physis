@@ -31,7 +31,6 @@ ALVOS = [
     RAIZ / "physis-hub" / "docs" / "physis-exportar.js",
     RAIZ / "sistema" / "gestao-interna-physis.html",
     RAIZ / "sistema" / "physis-scada-demo.html",
-    RAIZ / "physis-hub" / "web" / "consultoria.html",
     RAIZ / "sistema" / "SustainKit_Definitivo.html",
     RAIZ / "modulos" / "planejador" / "planejador-physis.html",
     RAIZ / "physis-hub" / "web" / "painel.html",

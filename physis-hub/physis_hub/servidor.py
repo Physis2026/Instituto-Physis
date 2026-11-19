@@ -79,6 +79,7 @@ from . import municipio as municipio_mod
 from . import parceiros as parceiros_mod
 from . import impressao3d as impressao3d_mod
 from . import frota as frota_mod
+from . import intercambio as intercambio_mod
 from . import mapeamento as mapeamento_mod
 from . import simulacao as simulacao_mod
 from . import cep as cep_mod
@@ -818,7 +819,13 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                        "impressao3d": lambda: impressao3d_mod.Impressao3D(
                                            hub, impressao3d_mod.pasta_padrao(banco_da_instancia(instancia))),
                                        "fornecedores": lambda: fornecedores_mod.Fornecedores(
-                                           hub, pasta=fornecedores_mod.pasta_padrao(banco_da_instancia(instancia)))}[nome]()
+                                           hub, pasta=fornecedores_mod.pasta_padrao(banco_da_instancia(instancia))),
+                                       # intercâmbio com plataformas parceiras (docs/INTERCAMBIO.md): chave só no arquivo do servidor
+                                       "intercambio": lambda: intercambio_mod.Intercambio(
+                                           hub, instancia.get("intercambio_id") or os.environ.get("PHYSIS_INTERCAMBIO_ID") or hub.org,
+                                           os.environ.get("PHYSIS_INTERCAMBIO_CHAVES") or instancia.get("intercambio_chaves")
+                                           or (Path(banco_da_instancia(instancia)).resolve().parent / "intercambio-chaves.json"),
+                                           cursos=lambda: instancia.get("cursos") or [])}[nome]()
             return modulos_vivos[nome]
     # Frota e combustível (docs/FROTA.md): criada já na partida, porque o hub entrega a ela cada linha VEI (com a trava do hub)
     frota = frota_mod.Frota(hub, pasta=frota_mod.pasta_padrao(banco_da_instancia(instancia)))
@@ -937,6 +944,36 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             if codigo == 429:
                 return self._recusar(429, obj, {"Retry-After": str(obj.get("espera", 60))})
             return self._json(codigo, obj)
+
+        def _intercambio(self, metodo: str, u, corpo: bytes, q: dict) -> None:
+            """/api/intercambio/v1/* = a outra plataforma (assinatura HMAC, sem sessão, só HTTPS ou rede local/VPN);
+            /api/intercambio/* = a direção desta instalação (recebidos: equipe). Ver docs/INTERCAMBIO.md."""
+            ic = modulo("intercambio")
+            if u.path.startswith(intercambio_mod.PREFIXO + "v1/"):
+                cod, dados, cab = ic.rota_parceiro(metodo, u.path + ("?" + u.query if u.query else ""), self.headers, corpo,
+                                                   self._ip(), self._https() or self._local())
+                self.send_response(cod)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(dados)))
+                for k, v in cab.items():
+                    self.send_header(k, v)
+                self.end_headers()
+                self.wfile.write(dados)
+                return
+            conta = self._exigir(seg.EQUIPE if (metodo == "GET" and u.path == intercambio_mod.PREFIXO + "recebidos") else seg.DIRECAO)
+            if not conta:
+                return
+            d = None
+            if metodo == "POST":
+                try:
+                    d = json.loads(corpo.decode("utf-8")) if corpo else {}
+                except (ValueError, UnicodeDecodeError):
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                if not isinstance(d, dict):
+                    return self._json(400, {"ok": False, "erro": "json invalido"})
+                if u.path.endswith(("/parceiro/chave", "/parceiro/remover")) and not self._sensivel(conta):
+                    return
+            self._json(*ic.rota_admin(metodo, u.path, conta, d, q))
 
         def _enviar_bytes(self, dados: bytes, tipo: str, cabecalhos: dict | None = None) -> None:
             self.send_response(200)
@@ -1066,6 +1103,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                                         "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
                     else:
                         self._json(cod, r)
+                return True
+            # Intercâmbio (intercambio.py; docs/INTERCAMBIO.md): /v1/ = outra plataforma, com assinatura; o resto = direção
+            if p.startswith("/api/intercambio/"):
+                self._intercambio("GET", u, b"", q)
                 return True
             # Frota e combustível (frota.py; docs/FROTA.md): cliente vê; comprovante e exportação só a equipe
             if p.startswith("/api/frota/"):
@@ -1213,6 +1254,17 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if esq and self._ler(corpo, esq) is None:
                     return True
                 self._rota_mapeamento("POST", u, parse_qs(u.query), corpo, qm)
+                return True
+            # Intercâmbio: pacote de até 4 MB (intercambio.CORPO_MAX)
+            if p.startswith("/api/intercambio/"):
+                if (self.headers.get("Content-Length") or "0").strip() in ("", "0"):
+                    corpo = b""
+                else:
+                    corpo = self._corpo_grande(intercambio_mod.CORPO_MAX)
+                    if corpo is None:
+                        self._recusar_corpo("pacote grande demais (máximo 4 MB)")
+                        return True
+                self._intercambio("POST", u, corpo, parse_qs(u.query))
                 return True
             # Frota: só a equipe grava (CSV até 4 MB, comprovante até 10 MB); apagar veículo e retenção só a direção
             if p.startswith("/api/frota/"):

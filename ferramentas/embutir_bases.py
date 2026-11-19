@@ -42,6 +42,7 @@ MODULOS = {"mod-avac": S / "physis-avac.js", "mod-saude": S / "physis-saude.js",
            "mod-frota": S / "physis-frota.js",                    # aba Frota e combustível (em desenvolvimento)
            "mod-servidor-verde": S / "physis-servidor-verde.js",  # aba Servidor verde (em desenvolvimento)
            "mod-suporte-remoto": S / "physis-suporte-remoto.js",  # "Permitir suporte" (Minha conta da direção)
+           "mod-intercambio": S / "physis-intercambio.js",        # intercâmbio com plataformas parceiras (Minha conta da direção)
            "mod-physis-3d": S / "physis-3d.js",                   # aba Physis 3D (em desenvolvimento)
            "mod-simulacao-casos": S / "simulacao-exemplos" / "casos.js",   # exemplos da Simulação (dados fictícios)
            "mod-simulacao": S / "physis-simulacao.js",

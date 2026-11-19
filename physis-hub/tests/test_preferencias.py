@@ -26,7 +26,7 @@ PLANEJADOR = RAIZ / "modulos" / "planejador" / "planejador-physis.html"
 DEMOS = sorted((RAIZ / "demos").glob("physis-demo-*.html"))
 # demos/ é gerada por demos/gerar_demos.py a partir dos originais; só a do Planejador leva este módulo
 # (as outras vêm da plataforma e do SCADA, que têm a barra de preferências própria, com os mesmos controles).
-PAGINAS = [CONSULTORIA, SUSTAINKIT, PLANEJADOR, RAIZ / "demos" / "physis-demo-planejador.html", RAIZ / "demos" / "physis-demo-sustainkit.html"]
+PAGINAS = [p for p in [CONSULTORIA] if p.exists()] + [SUSTAINKIT, PLANEJADOR, RAIZ / "demos" / "physis-demo-planejador.html", RAIZ / "demos" / "physis-demo-sustainkit.html"]
 
 ROTULOS_PT = ["Idioma", "Tema", "Claro", "Escuro", "Automático", "Modo de conforto", "Acessibilidade (PcD)",
               "Fundo verde", "Texto maior", "Mais espaçamento", "Menos estímulo", "Foco reforçado", "Fonte para dislexia",
@@ -251,7 +251,7 @@ class Paginas(unittest.TestCase):
                 self.assertIn('chave: "physis-pref"', html)
 
     def test_sem_id_repetido_e_um_titulo(self):
-        for pag in (CONSULTORIA, SUSTAINKIT):
+        for pag in [p for p in (CONSULTORIA, SUSTAINKIT) if p.exists()]:
             with self.subTest(pag.name):
                 p = ler_textos(pag.read_text(encoding="utf-8"))
                 repetidos = sorted({i for i in p.ids if p.ids.count(i) > 1})
@@ -264,7 +264,7 @@ class Paginas(unittest.TestCase):
         self.assertNotIn("id:'btn-conforto'", html)     # o modo de conforto é o da barra compartilhada
 
     def test_dicionarios_validos(self):
-        for pag in (CONSULTORIA, SUSTAINKIT, PLANEJADOR):
+        for pag in [p for p in (CONSULTORIA, SUSTAINKIT, PLANEJADOR) if p.exists()]:
             with self.subTest(pag.name):
                 d = objeto_js(pag.read_text(encoding="utf-8"), "var T =" if pag == PLANEJADOR else "dicionario")
                 self.assertGreater(len(d), 40)
@@ -274,6 +274,7 @@ class Paginas(unittest.TestCase):
                     self.assertEqual(k, re.sub(r"\s+", " ", k).strip(), f"chave com espaço sobrando: {k!r}")
                     self.assertNotRegex(v, r"NBR 15527:2007|LEED v4\.1|Portaria 309/2019", "edição antiga no inglês")
 
+    @unittest.skipUnless(CONSULTORIA.exists(), "consultoria e catálogo comercial são da Physis Engineering (fora do repositório do Instituto, 18/11/2026)")
     def test_consultoria_toda_traduzida(self):
         html = CONSULTORIA.read_text(encoding="utf-8")
         d, exc = objeto_js(html, "dicionario"), set(lista_js(html, "excecoes"))
@@ -325,8 +326,7 @@ class Demos(unittest.TestCase):
 
     def test_cada_demo(self):
         nomes = {p.name for p in DEMOS}
-        clientes = {"physis-demo-casa-physis.html": "casa-physis", "physis-demo-santa-clara.html": "fazenda-santa-clara",
-                    "physis-demo-santa-clara-v2.html": "fazenda-santa-clara-v2"}         # demos por cliente (15/11/2026)
+        clientes = {}   # repositório do Instituto: sem demos de clientes da Physis (18/11/2026)
         self.assertEqual(nomes, {"physis-demo-cliente.html", "physis-demo-scada.html", "physis-demo-planejador.html",
                                  "physis-demo-sustainkit.html", "physis-demo-monitoramento.html"} | set(clientes))
         # os módulos de cada demo de cliente são os da ficha (clientes/clientes.json)

@@ -1,3 +1,22 @@
+# Instituto Physis · repositório próprio
+
+Desde 18/11/2026 este é o repositório do **Instituto Physis**, separado do Sistema Physis da Physis Engineering
+(`C:\physis\physis-sistema`). Começou do commit `e31aa7f` da Physis (último com o Instituto e o Physis 3D juntos,
+1180 testes OK), com o histórico. Mudanças da separação:
+
+- **Intercâmbio** trazido da Physis (`ee1a949`): `physis_hub/intercambio.py`, `sistema/physis-intercambio.js`,
+  `docs/INTERCAMBIO.md`. É a única ligação com a Physis: cada lado guarda o seu banco e só recebe o que a direção aprovar.
+  Dados de saúde nunca passam pelo intercâmbio.
+- **Ficha única** em `clientes/clientes.json`: `instituto-physis`, com Physis 3D (`impressao3d`), Economia circular
+  (`circular`) e Saúde (`medicamentos`, `pulseira`). Fichas dos clientes da Physis ficam no repositório da Physis.
+- **Fora daqui**: demos de clientes (Casa Physis, Santa Clara), página e modelo da consultoria e catálogo comercial da loja.
+- Decisões do Instituto: Physis M&V (`Sistema Physis\27_Decisoes_Fase2_Estrutura_e_Physis_MV.md`) e
+  `Casa Physis\3_Instituto_Physis`. Propriedade intelectual e quem vende os produtos esperam o advogado e a D37.
+- Próximas etapas (com aprovação): Gestão própria do Instituto (Fase 0 pelo kit 17) e InovaSTEM; esperam templates,
+  logos e marcas no M&V (D43).
+
+---
+
 # Sistema Physis · guia para o Claude Code
 
 Leia este arquivo antes de qualquer mudança. Os detalhes estão em `physis-hub/docs/`.

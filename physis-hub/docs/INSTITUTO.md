@@ -1,12 +1,14 @@
-# Instituto Physis: o gêmeo do servidor
+# Instituto Physis: repositório e instalação próprios
 
-Versão de 15/11/2026.
+Versão de 18/11/2026 (antes: 15/11/2026, "gêmeo do servidor").
 
 ## Em uma frase
 
-O Instituto Physis (pesquisa, cursos e projetos sociais) usa **o mesmo código** do servidor da Physis, mas é **outra
-instalação**: outro arquivo de configuração, outro banco, outra marca, outro suporte e outro catálogo. Os dados das
-duas nunca se misturam, mesmo rodando na mesma máquina.
+O Instituto Physis (pesquisa, cursos, projetos sociais e o Physis 3D) tem **repositório próprio**
+(`C:\physis\instituto-physis`), separado do Sistema Physis da Physis Engineering por decisão de 18/11/2026. Começou do
+mesmo código (commit `e31aa7f` da Physis, com o histórico), mas é **outra instalação**: outro banco, outra marca, outro
+suporte e outro catálogo. A única ligação com a Physis é o **intercâmbio** (`docs/INTERCAMBIO.md`): cada lado guarda o
+seu banco e só recebe os conjuntos combinados depois que a direção aprova. Dados de saúde nunca passam pelo intercâmbio.
 
 ## O que é separado
 
@@ -17,7 +19,8 @@ duas nunca se misturam, mesmo rodando na mesma máquina.
 | Marca nas telas | Physis Engineering | `"marca": {nome, logo_texto, cores}` | ficha `instituto-physis`; cores **só** da `PALETA.md` (o `montar.py` recusa outras) |
 | Suporte (e-mail e WhatsApp) | `suporte` geral do `clientes.json` | `suporte` da própria ficha | `suporte_email` / `suporte_whatsapp` no `instancia.json`, ou `PHYSIS_SUPORTE_EMAIL` / `PHYSIS_SUPORTE_WHATSAPP` no serviço |
 | Catálogo da loja | tabela `loja_item` do banco da Physis | tabela `loja_item` do banco do Instituto | cada banco tem o seu; a equipe do Instituto revisa e publica o dela |
-| Módulos | os da ficha | `gestao, cursos, sbn, resiliencia, carbono, certificacoes`, com `pesquisa: true` | ficha `instituto-physis` |
+| Módulos | os da ficha | `gestao, cursos, sbn, resiliencia, carbono, certificacoes, impressao3d` (Physis 3D, só do Instituto), `circular` (Economia circular: pesquisa, oficinas e trilhas), `medicamentos, pulseira` (Saúde e suporte TEA; consentimento do responsável legal para menores), com `pesquisa: true` | ficha `instituto-physis` |
+| Código | repositório da Physis | repositório do Instituto | separação de 18/11/2026; troca de dados só pelo intercâmbio |
 | Endereço | `hub.physis…` | `instituto.physis…` (a definir) | proxy (Caddy/nginx) |
 
 `/api/instancia` devolve `"instalacao": "instituto"` e `"marca"` para as telas mostrarem o nome e as cores certas.
@@ -32,7 +35,7 @@ python montar_clientes.py --saida ../pacotes --so instituto-physis
 Ou à mão:
 
 ```
-python montar.py --org instituto-physis --lugar sede-instituto --modulos gestao,cursos,sbn,resiliencia,carbono,certificacoes \
+python montar.py --org instituto-physis --lugar sede-instituto --modulos gestao,cursos,sbn,resiliencia,carbono,certificacoes,impressao3d,circular,medicamentos,pulseira \
                  --pesquisa --nome "Instituto Physis" --instalacao instituto --banco physis-instituto.db \
                  --suporte-email <e-mail> --suporte-whatsapp <número> --marca marca-instituto.json --saida ../pacotes
 ```
@@ -40,7 +43,8 @@ python montar.py --org instituto-physis --lugar sede-instituto --modulos gestao,
 ## Rodar os dois na mesma máquina
 
 Cada um na sua pasta, como serviço próprio, em porta própria e só em `127.0.0.1`; o proxy com HTTPS escolhe pelo nome
-(`Host`). Nada é compartilhado além do código (cada pasta tem a sua cópia).
+(`Host`). Nada é compartilhado: o pacote da Physis sai do repositório da Physis e o do Instituto sai deste repositório.
+Depois de instalar, cada direção cadastra a outra em Minha conta → "Intercâmbio com outras plataformas" (`docs/INTERCAMBIO.md`).
 
 ```
 /srv/physis/physis-physis-site/        PHYSIS_PORTA=8700  (banco physis-hub.db)
@@ -60,9 +64,8 @@ PHYSIS_SMTP_*  (conta da Physis)           PHYSIS_SMTP_*  (conta do Instituto)
 ```
 
 Atenção: **não** defina `PHYSIS_BANCO` nem `PHYSIS_SUPORTE_*` em comum para os dois (num arquivo de ambiente global, por
-exemplo): a variável vence o `instancia.json` e os dois passariam a usar o mesmo banco ou o mesmo suporte. Para rodar as
-duas a partir de uma única cópia do código, aponte cada serviço para o seu arquivo com `PHYSIS_INSTANCIA=/caminho/instancia.json`
-(o banco fica na pasta desse arquivo).
+exemplo): a variável vence o `instancia.json` e os dois passariam a usar o mesmo banco ou o mesmo suporte. Também não
+use o mesmo arquivo de chaves do intercâmbio (`PHYSIS_INTERCAMBIO_CHAVES`) nos dois.
 
 **Caddy**:
 
@@ -92,9 +95,14 @@ Instituto com a conta da Physis, e vice-versa. Faça a cópia de segurança dos 
 
 ## O que ainda falta confirmar ([MARCADOR])
 
-- Nome jurídico do Instituto, e-mail e WhatsApp de suporte (na ficha estão como `[MARCADOR]`; enquanto isso, o suporte
+- Nome jurídico: "Instituto Physis" (D62 do Physis M&V), a confirmar depois do registro e do CNPJ (previsto para
+  fev/2027, kit de abertura 17). E-mail e WhatsApp de suporte (na ficha estão como `[MARCADOR]`; enquanto isso, o suporte
   registra o chamado mas não envia e-mail, porque o endereço não é válido).
-- Cores da marca (hoje dois azuis da `PALETA.md`, `#2C5A6E` e `#1C3550`, a aprovar) e o texto do logo.
-- Endereço público e conta de e-mail (SMTP) do Instituto.
-- Se a Gestão do Instituto será a Gestão interna da Physis (hoje não: o pacote não leva `gestao-interna-physis.html`).
+- Cores da marca (hoje dois azuis da `PALETA.md`, `#2C5A6E` e `#1C3550`, a aprovar) e o texto do logo: esperam o sistema
+  de marcas do M&V (D43).
+- Endereço público: subdomínio da Physis (D64), domínio exato a confirmar; conta de e-mail (SMTP) do Instituto.
+- Gestão: o Instituto terá a **sua própria** Gestão (cópia da Gestão Physis, com banco e tarefas próprios: Fase 0 pelo
+  kit 17 e as 22 tarefas tiradas do sistema da Physis). Próxima etapa, depois dos templates e logos do M&V.
+- Propriedade intelectual dos projetos e quem vende os produtos (peças 3D, cosméticos): esperam o advogado e a D37.
+- Global South Alliance: só entra aqui depois da cessão do contrato ao CNPJ do Instituto (D67).
 - As telas ainda não leem `marca` de `/api/instancia` (tarefa da integração das telas).

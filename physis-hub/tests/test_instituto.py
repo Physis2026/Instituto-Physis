@@ -30,7 +30,7 @@ class Ficha(unittest.TestCase):
         f = [x for x in json.loads(FICHAS.read_text(encoding="utf-8"))["clientes"] if x["org"] == "instituto-physis"][0]
         self.assertEqual(f["instalacao"], "instituto")
         self.assertTrue(f["pesquisa"])
-        self.assertEqual(set(f["modulos"]), {"gestao", "cursos", "sbn", "resiliencia", "carbono", "certificacoes", "impressao3d"})   # Physis 3D é do Instituto (18/11/2026)
+        self.assertEqual(set(f["modulos"]), {"gestao", "cursos", "sbn", "resiliencia", "carbono", "certificacoes", "impressao3d", "circular", "medicamentos", "pulseira"})   # Physis 3D é do Instituto (18/11/2026)
         self.assertTrue(set(f["modulos"]) <= set(montar.MODULOS))
         self.assertTrue(montar.conferir_marca(f["marca"]))                 # cores da paleta (senão SystemExit)
         self.assertNotEqual(f["banco"], "physis-hub.db")

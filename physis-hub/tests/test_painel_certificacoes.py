@@ -66,6 +66,7 @@ class SemHubEPesquisa(unittest.TestCase):
         for rota in ("/gestao/", "/loja/", "/consultoria/", "/municipio", "/documento", "/app/baixar"):
             self.assertIn(f'"{rota}"', p)
 
+    @unittest.skip("ficha da Casa Physis fora do repositório do Instituto (Physis Engineering, 18/11/2026)")
     def test_casa_physis_com_tudo(self):
         f = next(x for x in json.loads(ler(RAIZ / "clientes" / "clientes.json"))["clientes"] if x["org"] == "casa-physis")
         self.assertTrue(f["pesquisa"] and f["gestao_interna"])

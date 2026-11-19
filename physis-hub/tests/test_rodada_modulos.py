@@ -60,7 +60,6 @@ class RodadaModulos(unittest.TestCase):
         self.assertIn('{ id:"consultoria-pers", g:"func", cod:"Consultoria", nome:"Consultoria personalizada"', self.p)
         self.assertIn('preco:5000, apartir:true', self.p)
         self.assertIn('"a partir de " + brl2(pr)', self.p)
-        self.assertIn("A partir de R$ 5.000,00", ler("physis-hub", "web", "consultoria.html"))
         import sys
         sys.path.insert(0, str(RAIZ / "physis-hub"))
         from physis_hub.hub import Hub
@@ -102,7 +101,7 @@ class RodadaModulos(unittest.TestCase):
         self.assertNotRegex(b, r"(?i)pulseira|caixinha|wristband|pill box")
 
     def test_5_odf_e_pdfa_nas_telas(self):
-        for partes in (("physis-hub", "web", "consultoria.html"), ("sistema", "SustainKit_Definitivo.html"), ("modulos", "planejador", "planejador-physis.html")):
+        for partes in (("sistema", "SustainKit_Definitivo.html"), ("modulos", "planejador", "planejador-physis.html")):
             with self.subTest(partes[-1]):
                 h = ler(*partes)
                 self.assertIn("window.PhysisODF.acoplar(b, { idiomaTela: idioma, raiz: raiz, titulo: titulo, pdfa: true });", h)
@@ -115,7 +114,7 @@ class RodadaModulos(unittest.TestCase):
     def test_6_teste_de_navegador_das_telas(self):
         t = ler("ferramentas", "testes-navegador", "telas.html")
         for tela in ("physis-hub/web/painel.html", "sistema/SustainKit_Definitivo.html", "modulos/planejador/planejador-physis.html",
-                     "sistema/gestao-interna-physis.html", "sistema/physis-scada-demo.html", "physis-hub/web/consultoria.html",
+                     "sistema/gestao-interna-physis.html", "sistema/physis-scada-demo.html",
                      "physis-hub/web/documento.html", "physis-hub/web/municipio.html", "app-nativo/site/baixar.html"):
             self.assertIn('"%s"' % tela, t, tela)
         for conf in ("sem título principal", "sem a barra de preferências", "sem nome", "rolagem lateral", "erro de JavaScript"):

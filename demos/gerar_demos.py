@@ -70,11 +70,9 @@ SELO = ("Demonstração · dados simulados", "Demo · simulated data")
 # Demos por cliente (15/11/2026): a mesma plataforma, com os módulos da ficha de clientes/clientes.json (ficam em dia
 # com ela), o lugar de exemplo da demonstração e os nós V6 simulados. arquivo → (org da ficha, dispositivos, rótulo en)
 FICHAS = RAIZ / "clientes" / "clientes.json"
-DEMOS_CLIENTES = {
-    "physis-demo-casa-physis.html": ("casa-physis", "{ campo:6, zonas:1, col:3, com:1 }", "Casa Physis · Net Zero"),
-    "physis-demo-santa-clara.html": ("fazenda-santa-clara", "{ campo:6, zonas:0, col:0, com:0 }", "Fazenda Santa Clara"),
-    "physis-demo-santa-clara-v2.html": ("fazenda-santa-clara-v2", "{ campo:6, zonas:0, col:0, com:0 }", "Fazenda Santa Clara · version 2"),
-}
+# Repositório do Instituto Physis (18/11/2026): sem demos de clientes da Physis Engineering (Casa Physis, Santa Clara);
+# elas ficam no repositório da Physis.
+DEMOS_CLIENTES = {}
 
 
 def ficha(org: str) -> dict:
