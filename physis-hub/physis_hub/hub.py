@@ -466,8 +466,11 @@ class Hub:
         return bool(r) and r[0] == "administrador" and bool(r[1])
 
     def criar_conta(self, nome: str, usuario: str, senha: str, autor: int | None = None,
-                    pessoa: str = "", papel: str = "operador") -> dict:
+                    pessoa: str = "", papel: str = "operador", autocadastro: bool = False) -> dict:
         """A primeira conta e criada por quem abre a instalacao e vira administradora; as demais, por um administrador.
+
+        autocadastro=True (cadastro aberto da comunidade, comunidade.py): a propria pessoa cria a conta, sempre com papel
+        cliente (participante), e so depois que a instalacao ja tem a conta da direcao.
 
         Com PHYSIS_DOMINIO_EMAIL definido (ex.: physisengineering.com), as contas novas precisam ser e-mails desse dominio."""
         nome, usuario = (nome or "").strip(), (usuario or "").strip().lower()
@@ -484,7 +487,11 @@ class Hub:
             return {"ok": False, "erro": "Papel invalido."}
         with self._trava:
             primeira = not self.tem_conta()
-            if not primeira and not self._eh_admin(autor):
+            if autocadastro:
+                if primeira:
+                    return {"ok": False, "erro": "A instalacao ainda nao tem a conta da direcao."}
+                papel = seg.CLIENTE
+            elif not primeira and not self._eh_admin(autor):
                 return {"ok": False, "erro": "So um administrador cria novas contas."}
             papel = "administrador" if primeira else papel
             sal = os.urandom(16)

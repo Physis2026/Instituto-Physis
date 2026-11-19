@@ -58,6 +58,7 @@ MATERIAIS = ("rpetg", "rpp", "rhdpe", "rabs", "rpla")
 FORMATOS = ("stl", "obj", "3mf")
 ARQ_MAX = 40 * 1024 * 1024          # malha guardada
 FOTO_MAX = 8 * 1024 * 1024
+PENDENTE = "aguardando moderação"   # motivo das peças, tópicos e mensagens à espera da equipe (moderação prévia)
 CORPO_MAX = 60 * 1024 * 1024        # JSON com base64 (o servidor lê com _corpo_grande)
 DESCOMPACTADO_MAX = 200 * 1024 * 1024
 TRIANGULOS_MAX = 3_000_000
@@ -628,8 +629,11 @@ def _texto(v, n: int) -> str:
 
 
 class Impressao3D:
-    def __init__(self, hub, pasta: str | os.PathLike, fatiador: Fatiador | None = None, relogio=None, perfis_mat: dict | None = None):
+    def __init__(self, hub, pasta: str | os.PathLike, fatiador: Fatiador | None = None, relogio=None, perfis_mat: dict | None = None,
+                 moderacao_previa: bool = False):
         self.hub = hub
+        # moderação prévia (Instituto, 19/11/2026): o que a comunidade publica só aparece depois que a equipe aprova
+        self.moderacao_previa = bool(moderacao_previa)
         self.pasta = Path(pasta)
         self.relogio = relogio or hub.relogio
         self.fatiador = fatiador or Fatiador()
@@ -726,8 +730,8 @@ class Impressao3D:
         return dict(zip(self.COLS, r)) if r else None
 
     def _ve(self, p: dict, quem: dict | None) -> bool:
-        if not quem:
-            return False
+        if not quem:              # visitante (leitura aberta, rota_publica): só o que está publicado e não oculto
+            return p["estado"] == "publicada" and not p["oculta"]
         if _eh_equipe(quem) or p["autor"] == quem.get("usuario"):
             return True
         return p["estado"] == "publicada" and not p["oculta"]
@@ -781,9 +785,12 @@ class Impressao3D:
         with self.hub._trava:
             self._db.execute("UPDATE p3d_peca SET estado='publicada', licenca=?, publicada=?, atualizado=? WHERE id=?",
                              (lic, self.relogio(), self.relogio(), p["id"]))
+            espera = self.moderacao_previa and not _eh_equipe(quem)
+            if espera:
+                self._db.execute("UPDATE p3d_peca SET oculta=1, oculta_motivo=? WHERE id=?", (PENDENTE, p["id"]))
             self.hub.registrar("impressao3d", quem["usuario"], {"o_que": "peça publicada", "id": p["id"], "licenca": lic})
             self._db.commit()
-        return {"ok": True, "estado": "publicada", "licenca": lic}
+        return {"ok": True, "estado": "publicada", "licenca": lic, **({"aviso": "Aparece para todos depois da moderação."} if espera else {})}
 
     def curar(self, ident: int, d: dict, quem: dict) -> dict:
         if not _eh_equipe(quem):
@@ -1050,9 +1057,11 @@ class Impressao3D:
         q += ("WHERE t.peca=? " if peca is not None else "WHERE t.peca IS NULL ") + "GROUP BY t.id ORDER BY MAX(m.criado) DESC"
         out = []
         for i, pc, tit, aut, cr, oc, n, ult in self._db.execute(q, (peca,) if peca is not None else ()):
-            if oc and not eq:
+            pend = bool(oc) and self._pendente_topico(i)
+            if oc and not (eq or (pend and quem and aut == quem.get("usuario"))):
                 continue
-            out.append({"id": i, "peca": pc, "titulo": tit, "autor_nome": self._nome(aut), "criado": cr, "mensagens": n, "ultima": ult})
+            out.append({"id": i, "peca": pc, "titulo": tit, "autor_nome": self._nome(aut), "criado": cr, "mensagens": n, "ultima": ult,
+                        **({"pendente": True} if pend else {})})
         return {"ok": True, "topicos": out}
 
     def abrir_topico(self, d: dict, quem: dict) -> dict:
@@ -1070,15 +1079,22 @@ class Impressao3D:
         if len(tit) < 3 or len(txt) < 2:
             return {"ok": False, "erro": "título e mensagem"}
         with self.hub._trava:
-            cur = self._db.execute("INSERT INTO p3d_topico(peca,titulo,autor,criado) VALUES(?,?,?,?)", (peca, tit, quem["usuario"], self.relogio()))
-            self._db.execute("INSERT INTO p3d_mensagem(topico,autor,texto,criado) VALUES(?,?,?,?)", (cur.lastrowid, quem["usuario"], txt, self.relogio()))
+            espera = int(self.moderacao_previa and not _eh_equipe(quem))
+            cur = self._db.execute("INSERT INTO p3d_topico(peca,titulo,autor,criado,oculto) VALUES(?,?,?,?,?)",
+                                   (peca, tit, quem["usuario"], self.relogio(), espera))
+            self._db.execute("INSERT INTO p3d_mensagem(topico,autor,texto,criado,oculta,oculta_motivo) VALUES(?,?,?,?,?,?)",
+                             (cur.lastrowid, quem["usuario"], txt, self.relogio(), espera, PENDENTE if espera else ""))
             self.hub.registrar("impressao3d", quem["usuario"], {"o_que": "tópico", "id": cur.lastrowid, "peca": peca})
             self._db.commit()
-        return {"ok": True, "id": cur.lastrowid}
+        return {"ok": True, "id": cur.lastrowid, **({"pendente": True} if espera else {})}
 
-    def _topico_visivel(self, ident: int, quem: dict):
-        t = self._db.execute("SELECT id, peca, titulo, oculto FROM p3d_topico WHERE id=?", (int(ident),)).fetchone()
-        if not t or (t[3] and not _eh_equipe(quem)):
+    def _pendente_topico(self, ident: int) -> bool:
+        r = self._db.execute("SELECT oculta_motivo FROM p3d_mensagem WHERE topico=? ORDER BY id LIMIT 1", (int(ident),)).fetchone()
+        return bool(r and r[0] == PENDENTE)
+
+    def _topico_visivel(self, ident: int, quem: dict | None):
+        t = self._db.execute("SELECT id, peca, titulo, oculto, autor FROM p3d_topico WHERE id=?", (int(ident),)).fetchone()
+        if not t or (t[3] and not (_eh_equipe(quem) or (quem and t[4] == quem.get("usuario") and self._pendente_topico(t[0])))):
             return None
         if t[1] is not None:
             p = self._ler_peca(t[1])
@@ -1093,7 +1109,10 @@ class Impressao3D:
         eq = _eh_equipe(quem)
         out = []
         for i, aut, txt, cr, oc, mot in self._db.execute("SELECT id, autor, texto, criado, oculta, oculta_motivo FROM p3d_mensagem WHERE topico=? ORDER BY id", (t[0],)):
-            m = {"id": i, "autor_nome": self._nome(aut), "criado": cr, "oculta": bool(oc)}
+            if oc and mot == PENDENTE and not (eq or (quem and aut == quem.get("usuario"))):
+                continue                        # à espera da moderação: só o autor e a equipe veem
+            m = {"id": i, "autor_nome": self._nome(aut), "criado": cr, "oculta": bool(oc),
+                 **({"pendente": True} if oc and mot == PENDENTE else {})}
             m["texto"] = txt if (not oc or eq) else f"Mensagem retirada pela moderação: {mot}"
             if eq and oc:
                 m["oculta_motivo"] = mot
@@ -1110,9 +1129,81 @@ class Impressao3D:
         if len(txt) < 2:
             return {"ok": False, "erro": "escreva a mensagem"}
         with self.hub._trava:
-            cur = self._db.execute("INSERT INTO p3d_mensagem(topico,autor,texto,criado) VALUES(?,?,?,?)", (t[0], quem["usuario"], txt, self.relogio()))
+            espera = int(self.moderacao_previa and not _eh_equipe(quem))
+            cur = self._db.execute("INSERT INTO p3d_mensagem(topico,autor,texto,criado,oculta,oculta_motivo) VALUES(?,?,?,?,?,?)",
+                                   (t[0], quem["usuario"], txt, self.relogio(), espera, PENDENTE if espera else ""))
             self._db.commit()
-        return {"ok": True, "id": cur.lastrowid}
+        return {"ok": True, "id": cur.lastrowid, **({"pendente": True} if espera else {})}
+
+    # ── moderação prévia: fila e decisão (a fila geral fica em comunidade.py) ─────────────────────
+    def pendentes(self) -> list[dict]:
+        itens = []
+        for i, nome, aut, at in self._db.execute("SELECT id, nome, autor, atualizado FROM p3d_peca WHERE estado='publicada' AND oculta=1 "
+                                                 "AND oculta_motivo=? ORDER BY atualizado", (PENDENTE,)):
+            itens.append({"tipo": "p3d_peca", "id": i, "titulo": nome, "autor_nome": self._nome(aut), "criado": at})
+        for i, tit, aut, cr in self._db.execute("SELECT id, titulo, autor, criado FROM p3d_topico WHERE oculto=1 ORDER BY criado").fetchall():
+            if self._pendente_topico(i):
+                prim = self._db.execute("SELECT texto FROM p3d_mensagem WHERE topico=? ORDER BY id LIMIT 1", (i,)).fetchone()
+                itens.append({"tipo": "p3d_topico", "id": i, "titulo": tit, "texto": prim[0] if prim else "",
+                              "autor_nome": self._nome(aut), "criado": cr})
+        for i, top, aut, txt, cr in self._db.execute("SELECT m.id, m.topico, m.autor, m.texto, m.criado FROM p3d_mensagem m JOIN p3d_topico t "
+                                                     "ON t.id=m.topico WHERE m.oculta=1 AND m.oculta_motivo=? AND t.oculto=0 ORDER BY m.criado",
+                                                     (PENDENTE,)).fetchall():
+            itens.append({"tipo": "p3d_mensagem", "id": i, "topico": top, "texto": txt, "autor_nome": self._nome(aut), "criado": cr})
+        return itens
+
+    def decidir_pendente(self, tipo: str, ident: int, decisao: str, motivo: str, quem: dict) -> dict:
+        if not _eh_equipe(quem):
+            return {"ok": False, "erro": "só a equipe modera", "codigo": 403}
+        aprovar = decisao == "aprovar"
+        motivo = _texto(motivo, 400) or "recusada pela moderação"
+        with self.hub._trava:
+            if tipo == "p3d_peca":
+                n = self._db.execute("UPDATE p3d_peca SET oculta=?, oculta_motivo=? WHERE id=? AND oculta=1 AND oculta_motivo=?",
+                                     (0 if aprovar else 1, "" if aprovar else motivo, int(ident), PENDENTE)).rowcount
+            elif tipo == "p3d_topico":
+                n = self._db.execute("UPDATE p3d_mensagem SET oculta=?, oculta_motivo=?, oculta_por=? WHERE id=(SELECT MIN(id) FROM p3d_mensagem "
+                                     "WHERE topico=?) AND oculta_motivo=?",
+                                     (0 if aprovar else 1, "" if aprovar else motivo, quem["usuario"], int(ident), PENDENTE)).rowcount
+                if n and aprovar:
+                    self._db.execute("UPDATE p3d_topico SET oculto=0 WHERE id=?", (int(ident),))
+            elif tipo == "p3d_mensagem":
+                n = self._db.execute("UPDATE p3d_mensagem SET oculta=?, oculta_motivo=?, oculta_por=? WHERE id=? AND oculta=1 AND oculta_motivo=?",
+                                     (0 if aprovar else 1, "" if aprovar else motivo, quem["usuario"], int(ident), PENDENTE)).rowcount
+            else:
+                return {"ok": False, "erro": "tipo do Physis 3D desconhecido"}
+            if n:
+                self.hub.registrar("impressao3d", quem["usuario"], {"o_que": "moderação prévia", "tipo": tipo, "id": int(ident),
+                                                                   "decisao": decisao})
+            self._db.commit()
+        return {"ok": n > 0, **({} if n else {"erro": "item não encontrado ou já decidido", "codigo": 404})}
+
+    # ── leitura aberta (site do Instituto): só GET, sem sessão, só o que está publicado e aprovado ──
+    def rota_publica(self, caminho: str, consulta: dict | None = None):
+        if not caminho.startswith("/api/publico/3d/"):
+            return None
+        g = lambda k: ((consulta or {}).get(k) or [""])[0][:80]
+        c = caminho[len("/api/publico/3d"):]
+        if c == "/pecas":
+            r = self.listar(None, g("busca"), g("material"))
+            r["estado_modulo"] = r.pop("estado", ESTADO)
+            return 200, r
+        if c == "/materiais":
+            return 200, {"ok": True, "materiais": self.perfis, "aviso": "Valores típicos de literatura para o polímero virgem: conferir com o fornecedor."}
+        if c == "/forum":
+            pc = g("peca")
+            return self._r(self.topicos(None, int(pc) if pc.isdigit() else None))
+        m = re.fullmatch(r"/forum/(\d{1,12})", c)
+        if m:
+            return self._r(self.mensagens(int(m.group(1)), None))
+        m = re.fullmatch(r"/pecas/(\d{1,12})(/memorial)?", c)
+        if m:
+            return self._r(self.memorial(int(m.group(1)), None) if m.group(2) else self.peca(int(m.group(1)), None))
+        m = re.fullmatch(r"/arquivo/([0-9a-f]{64})", c)
+        if m:
+            a = self.arquivo(m.group(1), None)
+            return (200, ("bytes",) + a) if a else (404, {"ok": False, "erro": "arquivo não encontrado"})
+        return 404, {"ok": False, "erro": "rota desconhecida"}
 
     # ── fatiar uma revisão no serviço ────────────────────────────────────────────────────────────
     def fatiar_revisao(self, ident: int, d: dict, quem: dict) -> dict:

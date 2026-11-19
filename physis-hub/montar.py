@@ -231,6 +231,10 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         inst["instalacao"] = instalacao
         # banco próprio: os dados (contas, catálogo da loja, chamados, cursos) nunca se misturam com os da Physis
         inst["banco"] = banco or f"physis-{instalacao}.db"
+        if instalacao == "instituto":
+            # comunidade aberta (19/11/2026, docs/COMUNIDADE.md): leitura aberta, cadastro próprio, moderação antes de aparecer
+            inst["cadastro_aberto"] = True
+            inst["moderacao_previa"] = True
     elif banco:
         inst["banco"] = banco
     if marca:

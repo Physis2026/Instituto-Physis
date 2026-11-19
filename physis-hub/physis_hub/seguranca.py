@@ -503,6 +503,11 @@ def apagar_titular(hub, conta: dict, senha: str) -> dict:
             n["instalacoes"] = hub._db.execute("UPDATE instalacao SET email=? WHERE lower(email)=?", (_ANON, u.lower())).rowcount
         hub._db.execute("UPDATE gestao_estado SET por='[conta apagada]' WHERE por=?", (u,))
         hub._db.execute("UPDATE gestao_arquivo SET por='[conta apagada]' WHERE por=?", (u,))
+        # comunidade aberta (comunidade.py): nome público, responsável e autodeclaração saem; o que foi publicado fica sem nome
+        if hub._db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='com_participante'").fetchone():
+            n["comunidade"] = hub._db.execute("UPDATE com_participante SET nome_publico='Participante removido', responsavel_nome='', "
+                                              "responsavel_email='', delas=0, delas_em=NULL, removido=1 WHERE lower(usuario)=?",
+                                              (u.lower(),)).rowcount
         n["sessoes"] = hub._db.execute("DELETE FROM sessao WHERE conta=?", (r[0],)).rowcount
         hub._db.execute("DELETE FROM conta_token WHERE conta=? OR lower(usuario)=?", (r[0], u.lower()))
         hub._db.execute("DELETE FROM consentimento WHERE conta=?", (r[0],))

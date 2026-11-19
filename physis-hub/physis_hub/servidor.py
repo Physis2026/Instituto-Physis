@@ -80,6 +80,7 @@ from . import parceiros as parceiros_mod
 from . import impressao3d as impressao3d_mod
 from . import frota as frota_mod
 from . import intercambio as intercambio_mod
+from . import comunidade as comunidade_mod
 from . import mapeamento as mapeamento_mod
 from . import simulacao as simulacao_mod
 from . import cep as cep_mod
@@ -561,6 +562,8 @@ for _k, _v in ESQUEMAS_ROTAS.items():
     seg.ESQUEMAS.setdefault(_k, _v)
 for _k, _v in fornecedores_mod.ESQUEMAS.items():          # fornecedores e equipamentos (docs/FORNECEDORES.md)
     seg.ESQUEMAS.setdefault(_k, _v)
+for _k, _v in comunidade_mod.ESQUEMAS.items():      # comunidade aberta do Instituto (docs/COMUNIDADE.md)
+    seg.ESQUEMAS.setdefault(_k, _v)
 for _k, _v in frota_mod.ESQUEMAS.items():                 # frota e combustível (docs/FROTA.md, em desenvolvimento)
     seg.ESQUEMAS.setdefault(_k, _v)
 
@@ -817,7 +820,12 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                        "municipio": lambda: municipio_mod.Municipio(hub, clima=clima, aprendizado=aprendizado),
                                        "parceiros": lambda: parceiros_mod.Parceiros(hub),
                                        "impressao3d": lambda: impressao3d_mod.Impressao3D(
-                                           hub, impressao3d_mod.pasta_padrao(banco_da_instancia(instancia))),
+                                           hub, impressao3d_mod.pasta_padrao(banco_da_instancia(instancia)),
+                                           moderacao_previa=bool(instancia.get("moderacao_previa"))),
+                                       # comunidade aberta (Instituto): cadastro próprio, fórum com moderação prévia, Delas
+                                       "comunidade": lambda: comunidade_mod.Comunidade(
+                                           hub, aberto=bool(instancia.get("cadastro_aberto")),
+                                           impressao3d=lambda: modulo("impressao3d")),
                                        "fornecedores": lambda: fornecedores_mod.Fornecedores(
                                            hub, pasta=fornecedores_mod.pasta_padrao(banco_da_instancia(instancia))),
                                        # intercâmbio com plataformas parceiras (docs/INTERCAMBIO.md): chave só no arquivo do servidor
@@ -1051,6 +1059,23 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     self._doc_resposta(r)
                     return True
                 return False
+            # Comunidade aberta e leitura aberta do Physis 3D (docs/COMUNIDADE.md): /api/publico/* nunca usa a sessão
+            if p.startswith("/api/publico/3d/"):
+                r = modulo("impressao3d").rota_publica(p, q)
+                if isinstance(r[1], tuple):                       # ("bytes", nome, tipo, dados)
+                    self._enviar_bytes(r[1][3], r[1][2], {"Content-Disposition": "attachment; filename*=UTF-8''" + quote(r[1][1]),
+                                                          "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
+                else:
+                    self._json(*r)
+                return True
+            if p.startswith("/api/publico/comunidade/"):
+                self._json(*modulo("comunidade").rota("GET", p, None, None, q))
+                return True
+            if p.startswith("/api/comunidade/"):
+                qc = self._exigir(seg.CLIENTE)
+                if qc:
+                    self._json(*modulo("comunidade").rota("GET", p, qc, None, q))
+                return True
             # painel municipal: página e modo público sem conta; operador = equipe
             if p in ("/municipio", "/municipio/"):
                 if not (WEB / "municipio.html").is_file():
@@ -1381,6 +1406,37 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 r = (evidencias_mod.remover(hub, d["id"], qe["usuario"]) if p.endswith("/remover")
                      else evidencias_mod.anexar(hub, d, qe["usuario"]))
                 self._json(200 if r["ok"] else 400, r)
+                return True
+            # Comunidade aberta (docs/COMUNIDADE.md): cadastro público com limite por IP; o resto com sessão e CSRF
+            if p == "/api/publico/cadastro":
+                if self._limitado("entrar"):
+                    return True
+                d = self._ler(corpo, "com_cadastro")
+                if d is None:
+                    return True
+                r = modulo("comunidade").cadastrar(d)
+                if not r.get("ok"):
+                    self._json(r.pop("codigo", 400), r)
+                    return True
+                aceito, versao = seg._consentimento_do_corpo(d)
+                if aceito:
+                    seg.consentimento_registrar(hub, r["id"], r["usuario"], versao, True, self._ip())
+                self._mandar(seg.confirmar_enviar(hub, r["id"], url_publica))
+                self._json(200, r)
+                return True
+            if p.startswith("/api/comunidade/"):
+                qc = self._exigir(seg.CLIENTE)
+                if not qc:
+                    return True
+                com = modulo("comunidade")
+                esq = com.esquema_post(p)
+                if not esq:
+                    self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                    return True
+                d = self._ler(corpo, esq)
+                if d is None:
+                    return True
+                self._json(*com.rota("POST", p, qc, d))
                 return True
             if not p.startswith("/api/parceiros"):
                 return False
