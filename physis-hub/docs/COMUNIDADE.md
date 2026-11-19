@@ -32,10 +32,17 @@ próprio cadastro, aceita os termos (LGPD) e o que ela escreve só aparece **dep
 | `POST /api/comunidade/forum` · `/forum/<id>` · `/delas` · `/participante` · `/sair` | participante (CSRF) | publicar, responder, autodeclarar, nome público, sair |
 | `GET /api/comunidade/moderacao` · `POST /api/comunidade/moderar` | equipe | fila única: fórum, menores e Physis 3D (`tipo`: topico, mensagem, menor, p3d_peca, p3d_topico, p3d_mensagem) |
 
+## Site (etapa 2, 19/11/2026)
+
+`web/site.html`, servido pelo hub do Instituto em `/` (a plataforma, com login, passa para `/plataforma/`; nas outras
+instalações `/` continua sendo a plataforma). Abas: Início, Rede InovaSTEM, InovaSTEM Delas, Physis 3D (biblioteca aberta,
+fórum e quadro de modelagem: o que funciona e o que está em desenvolvimento), Parcerias e projetos, Eventos, Longo prazo e
+Participar (cadastro, autodeclaração Delas, sair e, para a equipe, a fila de moderação). Português e inglês, tema claro e
+escuro, barra única de preferências, um título só, sem internet. Números vindos dos documentos levam `[CONFERIR]`; o que
+falta é `[MARCADOR]`. Testes: `tests/test_site.py`; conferência no navegador em `ferramentas/testes-navegador/telas.html`.
+
 ## O que ainda falta (próximas etapas)
 
-- Etapa 2: as páginas do site (Início, InovaSTEM, InovaSTEM Delas, Physis 3D, Parcerias e projetos, Eventos, Longo prazo),
-  em português e inglês, com a barra de preferências e as regras de acessibilidade do `CLAUDE.md`.
 - Etapa 3: agenda própria e coletor de oportunidades com hackathons (segurança, computação quântica, modelos virtuais e
   gêmeo digital, feiras, eventos de outras redes, desafios abertos e chamadas).
 - Aviso por e-mail ao responsável legal e à pessoa quando a moderação decidir (hoje fica só no registro).

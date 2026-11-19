@@ -2057,6 +2057,12 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             if u.path in ("/loja/interna", "/loja/interna/"):
                 # a pagina em si nao tem dado; os dados internos so vem com sessao
                 return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
+            # Site do Instituto (19/11/2026, docs/COMUNIDADE.md): público em "/"; a plataforma (login) passa para /plataforma/
+            if instancia.get("instalacao") == "instituto" and (WEB / "site.html").exists():
+                if u.path in ("/", "/inicio", "/inicio/"):
+                    return self._arquivo(WEB / "site.html", "text/html; charset=utf-8")
+                if u.path in ("/plataforma", "/plataforma/"):
+                    return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
             if u.path.startswith("/api/") and self._barrado():
                 return
             if u.path in ("/sustainkit", "/sustainkit/") and (WEB / "sustainkit.html").exists():

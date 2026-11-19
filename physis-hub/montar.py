@@ -167,6 +167,9 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
     # documento para comentários (/documento/<id>): toda plataforma tem equipe que publica e revisor que comenta
     if (AQUI / "web" / "documento.html").is_file():
         shutil.copy2(AQUI / "web" / "documento.html", pasta / "web" / "documento.html")
+    # site público do Instituto e da Rede InovaSTEM (/; a plataforma vai para /plataforma/): só no pacote do Instituto
+    if instalacao == "instituto" and (AQUI / "web" / "site.html").is_file():
+        shutil.copy2(AQUI / "web" / "site.html", pasta / "web" / "site.html")
     # painel municipal de resiliência (/municipio): com o módulo resiliência ou na instalação de pesquisa
     if ("resiliencia" in modulos or pesquisa) and (AQUI / "web" / "municipio.html").is_file():
         shutil.copy2(AQUI / "web" / "municipio.html", pasta / "web" / "municipio.html")
