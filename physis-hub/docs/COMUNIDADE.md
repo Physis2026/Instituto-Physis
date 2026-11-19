@@ -41,9 +41,25 @@ Participar (cadastro, autodeclaração Delas, sair e, para a equipe, a fila de m
 escuro, barra única de preferências, um título só, sem internet. Números vindos dos documentos levam `[CONFERIR]`; o que
 falta é `[MARCADOR]`. Testes: `tests/test_site.py`; conferência no navegador em `ferramentas/testes-navegador/telas.html`.
 
+## Agenda de eventos e oportunidades (etapa 3, 19/11/2026)
+
+`physis_hub/agenda.py`. Quatro tipos mapeados, mais os eventos do próprio Instituto: hackathons de segurança e computação
+quântica; modelos virtuais e gêmeo digital; feiras e eventos de outras redes; desafios abertos e chamadas.
+
+| Origem | Como entra |
+|---|---|
+| Equipe | `POST /api/agenda/criar`: publicado na hora (a equipe é a moderação) |
+| Participante | `POST /api/agenda/sugerir`: "sugerido", vai para a fila única de moderação (`tipo: evento`) |
+| Coletor de eventos (`editais.py`) | `POST /api/agenda/importar` (equipe): só os itens dos quatro tipos, como "sugerido"; o mesmo item nunca entra duas vezes. O coletor passou a reconhecer hackathon, CTF, desafio, challenge, maratona e competição |
+
+`GET /api/publico/agenda?categoria=` mostra só o publicado que ainda não terminou (ou sem data, "data a confirmar"); a equipe vê
+tudo em `GET /api/agenda`. Link só `https://`; data `AAAA-MM-DD`; o que o coletor não achou fica vazio. Novas fontes de
+hackathons e desafios entram pela lista de fontes do coletor (a equipe acrescenta e confere cada endereço). Testes:
+`tests/test_agenda.py`.
+
 ## O que ainda falta (próximas etapas)
 
-- Etapa 3: agenda própria e coletor de oportunidades com hackathons (segurança, computação quântica, modelos virtuais e
-  gêmeo digital, feiras, eventos de outras redes, desafios abertos e chamadas).
+- Fontes públicas de hackathons e desafios no coletor: a equipe escolhe e confere os endereços (nenhuma foi acrescentada
+  sem conferência).
 - Aviso por e-mail ao responsável legal e à pessoa quando a moderação decidir (hoje fica só no registro).
 - Marca, logo e cores do Instituto, da InovaSTEM e da InovaSTEM Delas: esperam o M&V (D43).

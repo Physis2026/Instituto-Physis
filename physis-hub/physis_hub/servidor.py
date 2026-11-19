@@ -81,6 +81,7 @@ from . import impressao3d as impressao3d_mod
 from . import frota as frota_mod
 from . import intercambio as intercambio_mod
 from . import comunidade as comunidade_mod
+from . import agenda as agenda_mod
 from . import mapeamento as mapeamento_mod
 from . import simulacao as simulacao_mod
 from . import cep as cep_mod
@@ -564,6 +565,8 @@ for _k, _v in fornecedores_mod.ESQUEMAS.items():          # fornecedores e equip
     seg.ESQUEMAS.setdefault(_k, _v)
 for _k, _v in comunidade_mod.ESQUEMAS.items():      # comunidade aberta do Instituto (docs/COMUNIDADE.md)
     seg.ESQUEMAS.setdefault(_k, _v)
+for _k, _v in agenda_mod.ESQUEMAS.items():          # agenda de eventos e oportunidades (docs/COMUNIDADE.md)
+    seg.ESQUEMAS.setdefault(_k, _v)
 for _k, _v in frota_mod.ESQUEMAS.items():                 # frota e combustível (docs/FROTA.md, em desenvolvimento)
     seg.ESQUEMAS.setdefault(_k, _v)
 
@@ -825,7 +828,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                        # comunidade aberta (Instituto): cadastro próprio, fórum com moderação prévia, Delas
                                        "comunidade": lambda: comunidade_mod.Comunidade(
                                            hub, aberto=bool(instancia.get("cadastro_aberto")),
-                                           impressao3d=lambda: modulo("impressao3d")),
+                                           impressao3d=lambda: modulo("impressao3d"), agenda=lambda: modulo("agenda")),
+                                       "agenda": lambda: agenda_mod.Agenda(hub),
                                        "fornecedores": lambda: fornecedores_mod.Fornecedores(
                                            hub, pasta=fornecedores_mod.pasta_padrao(banco_da_instancia(instancia))),
                                        # intercâmbio com plataformas parceiras (docs/INTERCAMBIO.md): chave só no arquivo do servidor
@@ -1070,6 +1074,16 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return True
             if p.startswith("/api/publico/comunidade/"):
                 self._json(*modulo("comunidade").rota("GET", p, None, None, q))
+                return True
+            if p == "/api/publico/agenda":
+                r = modulo("agenda").publicos((q.get("categoria") or [""])[0][:30])
+                self._json(r.pop("codigo", 200), r)
+                return True
+            if p == "/api/agenda":
+                qa = self._exigir(seg.EQUIPE)
+                if qa:
+                    r = modulo("agenda").todos(qa)
+                    self._json(r.pop("codigo", 200), r)
                 return True
             if p.startswith("/api/comunidade/"):
                 qc = self._exigir(seg.CLIENTE)
@@ -1423,6 +1437,27 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     seg.consentimento_registrar(hub, r["id"], r["usuario"], versao, True, self._ip())
                 self._mandar(seg.confirmar_enviar(hub, r["id"], url_publica))
                 self._json(200, r)
+                return True
+            if p in ("/api/agenda/criar", "/api/agenda/sugerir", "/api/agenda/importar") or re.fullmatch(r"/api/agenda/\d{1,12}/arquivar", p):
+                qa = self._exigir(seg.CLIENTE)
+                if not qa:
+                    return True
+                ag = modulo("agenda")
+                if p.endswith("/importar"):
+                    d = self._ler(corpo, "ag_importar")
+                    if d is None:
+                        return True
+                    r = ag.importar(eventos_col.ler_cache().get("itens", []), qa, d.get("limite") or 100)
+                elif p.endswith("/arquivar"):
+                    if self._ler(corpo, "vazio") is None:
+                        return True
+                    r = ag.arquivar(int(p.split("/")[3]), qa)
+                else:
+                    d = self._ler(corpo, "ag_evento")
+                    if d is None:
+                        return True
+                    r = ag.criar(d, qa) if p.endswith("/criar") else ag.sugerir(d, qa, modulo("comunidade").pode_publicar)
+                self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
                 return True
             if p.startswith("/api/comunidade/"):
                 qc = self._exigir(seg.CLIENTE)

@@ -78,8 +78,9 @@ def _eh_direcao(quem: dict | None) -> bool:
 
 
 class Comunidade:
-    def __init__(self, hub, aberto: bool = False, impressao3d=None, relogio=None):
+    def __init__(self, hub, aberto: bool = False, impressao3d=None, relogio=None, agenda=None):
         self.hub = hub
+        self.agenda = agenda                      # função que devolve a agenda de eventos (ou None)
         self.aberto = bool(aberto)
         self.p3d = impressao3d                      # função que devolve o módulo Physis 3D (ou None)
         self.relogio = relogio or hub.relogio
@@ -310,6 +311,9 @@ class Comunidade:
         p3d = self.p3d() if callable(self.p3d) else self.p3d
         if p3d is not None and hasattr(p3d, "pendentes"):
             itens += p3d.pendentes()
+        ag = self.agenda() if callable(self.agenda) else self.agenda
+        if ag is not None:
+            itens += ag.pendentes()
         return {"ok": True, "itens": itens, "total": len(itens)}
 
     def _conta_id(self, usuario: str) -> int:
@@ -325,6 +329,11 @@ class Comunidade:
             return {"ok": False, "erro": "decisão: aprovar ou recusar"}
         if dec == "recusar" and not motivo:
             return {"ok": False, "erro": "diga o motivo da recusa"}
+        if tipo == "evento":
+            ag = self.agenda() if callable(self.agenda) else self.agenda
+            if ag is None:
+                return {"ok": False, "erro": "agenda não está ligada", "codigo": 404}
+            return ag.decidir(ident, dec, motivo, quem)
         if tipo.startswith("p3d_"):
             p3d = self.p3d() if callable(self.p3d) else self.p3d
             if p3d is None:
@@ -351,7 +360,7 @@ class Comunidade:
                 elif r:
                     n = 1      # recusa: a conta segue só para navegar; o motivo fica no registro
             else:
-                return {"ok": False, "erro": "tipo: topico, mensagem, menor, p3d_peca, p3d_topico ou p3d_mensagem"}
+                return {"ok": False, "erro": "tipo: topico, mensagem, menor, evento, p3d_peca, p3d_topico ou p3d_mensagem"}
             if n:
                 self.hub.registrar("comunidade", quem["usuario"], {"o_que": "moderação", "tipo": tipo, "id": ident, "decisao": dec,
                                                                   "motivo": motivo})

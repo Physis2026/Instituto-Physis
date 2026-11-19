@@ -64,7 +64,9 @@ AREAS = {
 }
 MARCAS = {
     "edital": ["edital", "editais", "chamada", "chamamento", "selecao publica", "call for", "funding", "grant", "premio", "programa", "convocatoria", "tender"],
-    "evento": ["evento", "congresso", "feira", "seminario", "forum", "summit", "conference", "conferencia", "expo", "workshop", "webinar", "encontro", "simposio", "week", "semana"],
+    "evento": ["evento", "congresso", "feira", "seminario", "forum", "summit", "conference", "conferencia", "expo", "workshop", "webinar", "encontro", "simposio", "week", "semana",
+              # oportunidades da agenda do Instituto (19/11/2026, agenda.py): hackathons, desafios e competições
+              "hackathon", "hackaton", "ctf", "desafio", "challenge", "maratona", "competicao", "competition"],
 }
 
 # Gancho para o servidor de IA local (4 GPUs no destino). Hoje é None: a relevância é só a regra de palavras.

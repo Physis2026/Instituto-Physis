@@ -161,7 +161,13 @@ const T = {
     par_passos_t:"Como propor", par_passos:["Faça o seu cadastro (Participar).","Abra um tópico no fórum de parcerias: objetivo, público, prazo e o que você oferece.","A equipe do Instituto avalia, publica e responde."],
     par_forum:"Fórum de parcerias e novos projetos",
     // eventos
-    eve_t:"Eventos e oportunidades", eve_intro:"Participação em feiras, eventos de outras redes, hackathons e desafios. A agenda e o mapa de oportunidades entram na próxima etapa do site.",
+    eve_t:"Eventos e oportunidades", eve_intro:"Participação em feiras, eventos de outras redes, hackathons e desafios. Tudo o que vem de participantes ou do coletor de eventos passa pela equipe antes de aparecer.",
+    eve_agenda:"Agenda", eve_todos:"Todos", eve_vazio:"Nenhum evento publicado neste tipo ainda.", eve_sem_data:"data a confirmar",
+    eve_mod:{online:"Online", presencial:"Presencial", hibrido:"Híbrido", "":"Não informada"}, eve_abrir:"Abrir o link",
+    eve_sugerir_t:"Sugerir uma oportunidade", eve_criar_t:"Nova oportunidade (equipe)", eve_tipo:"Tipo", eve_titulo:"Título", eve_desc:"Descrição",
+    eve_inicio:"Início (AAAA-MM-DD)", eve_fim:"Fim (AAAA-MM-DD)", eve_modalidade:"Modalidade", eve_local:"Local", eve_link:"Link (começa com https://)",
+    eve_fonte:"Fonte", eve_enviar:"Enviar para moderação", eve_publicar:"Publicar", eve_importar:"Trazer do coletor de eventos",
+    eve_importado:"Do coletor: {n} novos para a moderação, {f} fora dos tipos, {r} já trazidos.", eve_proprio:"Eventos do Instituto",
     eve_tipos_t:"O que vamos mapear",
     eve_tipos:[["Hackathons de segurança e computação quântica","Inclui o hackathon online de segurança cibernética da InovaSTEM, com desafios só em ambiente próprio e isolado (data [MARCADOR])."],
                ["Modelos virtuais e gêmeo digital","Desafios de melhoria de modelos virtuais, simulação e gêmeo digital."],
@@ -191,7 +197,7 @@ const T = {
     forum_vazio:"Nenhum tópico publicado ainda.", ver:"Ver", voltar:"Voltar", mensagens:"mensagens", pendente:"aguardando moderação",
     resposta:"Responder", resposta_enviar:"Enviar resposta",
     mod_t:"Moderação (equipe)", mod_vazio:"Nada esperando moderação.", mod_aprovar:"Aprovar", mod_recusar:"Recusar", mod_motivo:"Motivo da recusa",
-    mod_tipos:{topico:"Tópico",mensagem:"Resposta",menor:"Autorização de menor",p3d_peca:"Peça 3D",p3d_topico:"Tópico 3D",p3d_mensagem:"Mensagem 3D"},
+    mod_tipos:{topico:"Tópico",mensagem:"Resposta",menor:"Autorização de menor",evento:"Evento ou oportunidade",p3d_peca:"Peça 3D",p3d_topico:"Tópico 3D",p3d_mensagem:"Mensagem 3D"},
     rodape_contato:"Contato: [MARCADOR]", rodape_codigo:"Software aberto, hospedado pelo próprio Instituto."
   },
   en: {
@@ -239,7 +245,13 @@ const T = {
     par_t:"Partnerships and new projects", par_intro:"Universities, companies, organisations and individuals can propose research projects, workshops, challenges and partnerships. The proposal goes to the partnerships forum and the team answers after moderation.",
     par_passos_t:"How to propose", par_passos:["Sign up (Join).","Open a topic in the partnerships forum: goal, audience, timeline and what you offer.","The Institute's team reviews, publishes and answers."],
     par_forum:"Partnerships and new projects forum",
-    eve_t:"Events and opportunities", eve_intro:"Taking part in fairs, other networks' events, hackathons and challenges. The calendar and the opportunity map come in the next stage of the site.",
+    eve_t:"Events and opportunities", eve_intro:"Taking part in fairs, other networks' events, hackathons and challenges. Everything that comes from participants or from the event collector is reviewed by the team before it appears.",
+    eve_agenda:"Calendar", eve_todos:"All", eve_vazio:"No events published for this type yet.", eve_sem_data:"date to be confirmed",
+    eve_mod:{online:"Online", presencial:"In person", hibrido:"Hybrid", "":"Not informed"}, eve_abrir:"Open the link",
+    eve_sugerir_t:"Suggest an opportunity", eve_criar_t:"New opportunity (team)", eve_tipo:"Type", eve_titulo:"Title", eve_desc:"Description",
+    eve_inicio:"Start (YYYY-MM-DD)", eve_fim:"End (YYYY-MM-DD)", eve_modalidade:"Format", eve_local:"Place", eve_link:"Link (starts with https://)",
+    eve_fonte:"Source", eve_enviar:"Send for moderation", eve_publicar:"Publish", eve_importar:"Bring from the event collector",
+    eve_importado:"From the collector: {n} new for moderation, {f} outside the types, {r} already brought.", eve_proprio:"Institute events",
     eve_tipos_t:"What we will map",
     eve_tipos:[["Security and quantum computing hackathons","Includes InovaSTEM's online cybersecurity hackathon, with challenges only in our own isolated environment (date [MARCADOR])."],
                ["Virtual models and digital twins","Challenges to improve virtual models, simulation and digital twins."],
@@ -267,7 +279,7 @@ const T = {
     forum_vazio:"No topics published yet.", ver:"View", voltar:"Back", mensagens:"messages", pendente:"awaiting moderation",
     resposta:"Reply", resposta_enviar:"Send reply",
     mod_t:"Moderation (team)", mod_vazio:"Nothing awaiting moderation.", mod_aprovar:"Approve", mod_recusar:"Reject", mod_motivo:"Reason for rejection",
-    mod_tipos:{topico:"Topic",mensagem:"Reply",menor:"Minor's authorisation",p3d_peca:"3D part",p3d_topico:"3D topic",p3d_mensagem:"3D message"},
+    mod_tipos:{topico:"Topic",mensagem:"Reply",menor:"Minor's authorisation",evento:"Event or opportunity",p3d_peca:"3D part",p3d_topico:"3D topic",p3d_mensagem:"3D message"},
     rodape_contato:"Contact: [MARCADOR]", rodape_codigo:"Open-source software, hosted by the Institute itself."
   }
 };
@@ -275,6 +287,8 @@ let lang = "pt";
 try { lang = (localStorage.getItem("physis-idioma") === "en") ? "en" : "pt"; } catch (e) {}
 const ABAS = ["inicio", "inovastem", "delas", "p3d", "parcerias", "eventos", "longo", "participar"];
 const CAT_DA_ABA = { inovastem:"inovastem", delas:"delas", p3d:null, parcerias:"parcerias", eventos:"eventos" };
+const TIPOS_AGENDA = ["hackathon_seg_quantum", "modelos_gemeo", "feiras_redes", "desafios_chamadas", "instituto"];   // agenda.py
+let tipoAgenda = "";
 let inst = null, eu = null, aba = "inicio", topicoAberto = null;
 const $ = id => document.getElementById(id);
 const t = k => T[lang][k];
@@ -347,9 +361,63 @@ function telaParcerias() {
 }
 
 function telaEventos() {
+  const nomes = t("eve_tipos").map(x => x[0]).concat([t("eve_proprio")]);
+  const filtro = `<ul class="lista" style="list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:6px">` +
+    [["", t("eve_todos")]].concat(TIPOS_AGENDA.map((k, i) => [k, nomes[i]])).map(([k, n]) =>
+      `<li><button class="botao${k === tipoAgenda ? "" : " sec"}" type="button" data-tipo="${k}" aria-pressed="${k === tipoAgenda}">${esc(n)}</button></li>`).join("") + "</ul>";
   return cartao(t("eve_t"), `<p>${esc(t("eve_intro"))}</p>`, "inst")
-    + `<section><h2>${esc(t("eve_tipos_t"))}</h2><div class="grade">${t("eve_tipos").map(([a, b]) => `<div class="cartao"><h3>${esc(a)}</h3><p>${esc(b)}</p><span class="selo dev">${esc(t("planejado"))}</span></div>`).join("")}</div></section>`
+    + `<section><h2>${esc(t("eve_tipos_t"))}</h2><div class="grade">${t("eve_tipos").map(([a, b]) => `<div class="cartao"><h3>${esc(a)}</h3><p>${esc(b)}</p></div>`).join("")}</div></section>`
+    + `<section class="cartao" id="agenda"><h2>${esc(t("eve_agenda"))}</h2>${filtro}<div id="agenda-lista"><p>${esc(t("carregando"))}</p></div></section>`
+    + (eu && (eu.equipe || eu.pode_publicar) ? `<section class="cartao" id="agenda-form"></section>` : "")
     + `<section class="cartao" id="forum"></section>`;
+}
+
+function formAgenda() {
+  const alvo = $("agenda-form");
+  if (!alvo) return;
+  const equipe = eu && eu.equipe;
+  const nomes = t("eve_tipos").map(x => x[0]).concat([t("eve_proprio")]);
+  const tipos = (equipe ? TIPOS_AGENDA : TIPOS_AGENDA.slice(0, 4));
+  alvo.innerHTML = `<h2>${esc(equipe ? t("eve_criar_t") : t("eve_sugerir_t"))}</h2><form id="ag-f">
+    <label for="ag-tipo">${esc(t("eve_tipo"))}</label><select id="ag-tipo">${tipos.map(k => `<option value="${k}">${esc(nomes[TIPOS_AGENDA.indexOf(k)])}</option>`).join("")}</select>
+    <label for="ag-tit">${esc(t("eve_titulo"))}</label><input type="text" id="ag-tit" maxlength="200" required>
+    <label for="ag-desc">${esc(t("eve_desc"))}</label><textarea id="ag-desc" maxlength="2000"></textarea>
+    <div class="campos"><div><label for="ag-ini">${esc(t("eve_inicio"))}</label><input type="text" id="ag-ini" maxlength="10" inputmode="numeric" pattern="\\d{4}-\\d{2}-\\d{2}"></div>
+      <div><label for="ag-fim">${esc(t("eve_fim"))}</label><input type="text" id="ag-fim" maxlength="10" inputmode="numeric" pattern="\\d{4}-\\d{2}-\\d{2}"></div>
+      <div><label for="ag-mod">${esc(t("eve_modalidade"))}</label><select id="ag-mod">${["", "online", "presencial", "hibrido"].map(m => `<option value="${m}">${esc(t("eve_mod")[m])}</option>`).join("")}</select></div>
+      <div><label for="ag-local">${esc(t("eve_local"))}</label><input type="text" id="ag-local" maxlength="160"></div></div>
+    <label for="ag-link">${esc(t("eve_link"))}</label><input type="text" id="ag-link" maxlength="500" inputmode="url">
+    <label for="ag-fonte">${esc(t("eve_fonte"))}</label><input type="text" id="ag-fonte" maxlength="160">
+    <div class="acoes"><button class="botao" type="submit">${esc(equipe ? t("eve_publicar") : t("eve_enviar"))}</button>
+      ${equipe ? `<button class="botao sec" type="button" id="ag-importar">${esc(t("eve_importar"))}</button>` : ""}</div>
+    <p class="msg" id="ag-msg" role="status"></p></form>`;
+  $("ag-f").onsubmit = async ev => {
+    ev.preventDefault();
+    const corpo = { categoria: $("ag-tipo").value, titulo: $("ag-tit").value, descricao: $("ag-desc").value, inicio: $("ag-ini").value,
+                    fim: $("ag-fim").value, modalidade: $("ag-mod").value, local: $("ag-local").value, link: $("ag-link").value, fonte: $("ag-fonte").value };
+    const r = await pedir(equipe ? "/api/agenda/criar" : "/api/agenda/sugerir", corpo);
+    $("ag-msg").textContent = r.ok ? (r.estado === "publicado" ? "✓" : t("publicar_ok")) : (r.erro || t("sem_hub"));
+    $("ag-msg").className = "msg" + (r.ok ? "" : " erro");
+    if (r.ok) { $("ag-f").reset(); agenda(); }
+  };
+  const imp = $("ag-importar");
+  if (imp) imp.onclick = async () => {
+    const r = await pedir("/api/agenda/importar", {});
+    $("ag-msg").textContent = r.ok ? t("eve_importado").replace("{n}", r.novos).replace("{f}", r.fora_dos_tipos).replace("{r}", r.repetidos) : (r.erro || t("sem_hub"));
+    $("ag-msg").className = "msg" + (r.ok ? "" : " erro");
+  };
+}
+
+async function agenda() {
+  const alvo = $("agenda-lista");
+  if (!alvo) return;
+  const j = await pedir("/api/publico/agenda" + (tipoAgenda ? "?categoria=" + encodeURIComponent(tipoAgenda) : ""));
+  if (!j.ok) { alvo.innerHTML = `<p class="faixa erro">${esc(t("sem_hub"))}</p>`; return; }
+  const quando = x => !x.inicio ? t("eve_sem_data") : (x.fim && x.fim !== x.inicio ? `${x.inicio} → ${x.fim}` : x.inicio);
+  alvo.innerHTML = j.itens.length ? j.itens.map(x => `<div class="item"><h3>${esc(x.titulo)}</h3>
+      <span class="t2 pq">${esc(lang === "en" ? x.categoria_nome_en : x.categoria_nome)} · ${esc(quando(x))} · ${esc(t("eve_mod")[x.modalidade] || "")}${x.local ? " · " + esc(x.local) : ""}${x.fonte ? " · " + esc(x.fonte) : ""}</span>
+      ${x.descricao ? `<p>${esc(x.descricao)}</p>` : ""}${x.link && x.link.startsWith("https://") ? `<div class="acoes"><a class="botao sec" href="${esc(x.link)}" rel="noopener noreferrer">${esc(t("eve_abrir"))}</a></div>` : ""}</div>`).join("")
+    : `<p>${esc(t("eve_vazio"))}</p>`;
 }
 
 function telaLongo() {
@@ -482,6 +550,12 @@ async function moderacao() {
 
 function ligar() {
   if (CAT_DA_ABA[aba]) forum(CAT_DA_ABA[aba]);
+  if (aba === "eventos") {
+    agenda(); formAgenda();
+    document.querySelectorAll("[data-tipo]").forEach(b => b.onclick = () => { tipoAgenda = b.getAttribute("data-tipo");
+      document.querySelectorAll("[data-tipo]").forEach(o => { const sim = o.getAttribute("data-tipo") === tipoAgenda;
+        o.className = "botao" + (sim ? "" : " sec"); o.setAttribute("aria-pressed", String(sim)); }); agenda(); });
+  }
   if (aba === "p3d") { biblioteca(); forum3d(); }
   if (aba === "participar") {
     moderacao();
