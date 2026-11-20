@@ -79,77 +79,82 @@ def salvar(nome: str, xml: str):
     print("gerado:", nome)
 
 
-# ── 1. Apresentação da rede e da plataforma (slides) ──
-s = odf.Slides("InovaSTEM · Apresentação da rede e da plataforma", "Apresentação da rede e da plataforma")
-s.capa("InovaSTEM", "Rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos. Versão beta, lançamento em 26/11/2026.",
-       "uma iniciativa PHYSIS")
-s.duas("Missão e visão",
-       ["Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos."],
-       ["Ser referência na América Latina em troca aberta de conhecimento e desafios de modelagem para a transição justa."],
-       "Quem somos", "Missão", "Visão 2031")
-s.duas("Duas redes, um só lugar",
-       ["Aberta a todas as pessoas e organizações: troca de informações, parcerias e desafios de modelagem com códigos abertos.",
-        "Laboratório vivo de pesquisa, desenvolvimento e inovação: conexão e trocas abertas para o desenvolvimento tecnológico."],
-       ["Rede dedicada a mulheres (jovens, cis e trans) que lideram em STEM: formação, acolhimento entre pares, rodas de conversa e mentoria.",
-        "Rede de apoio entre pares; não oferece atendimento psicológico nem clínico."],
-       "As redes", "InovaSTEM", "InovaSTEM Delas")
-s.topicos("O laboratório vivo online",
-          ["**Modelagem online:** GIS e mapas, BIM (IFC) e modelos 3D no navegador.",
-           "**Simulação (Fase 1):** calor, estrutura, ventilação, terreno, incerteza, biogás e otimização QUBO, com método, hipóteses e limites em cada resultado.",
-           "**Desafios e projetos abertos:** desafios reais publicados pela equipe e projetos sugeridos pela comunidade.",
-           "**Fórum com moderação:** tudo o que é publicado passa pela equipe antes de aparecer.",
-           "**Hackathon de cibersegurança:** março de 2027, online, só em ambiente próprio e isolado (CTF)."],
-          "A plataforma", "Simulação Fase 2 e gêmeo digital: em desenvolvimento.")
-s.tabela("Modelagem online", ["Ferramenta", "O que faz", "Situação"],
-         [["GIS e mapas", "Desenhar e analisar áreas no mapa, camadas e terreno", "Funciona"],
-          ["BIM (IFC)", "Abrir e ler modelos IFC de edificações", "Funciona"],
-          ["Simulação (Fase 1)", "Contas leves no navegador, iguais às do servidor", "Funciona"],
-          ["Physis 3D", "Abrir, medir, ajustar e fatiar peças de plástico reciclado", "Em desenvolvimento"],
-          ["Simulação (Fase 2)", "Resolvedores abertos em servidor, comparados com referência", "Em desenvolvimento"],
-          ["Gêmeo digital", "Modelo virtual ligado a dados medidos", "Em desenvolvimento"]],
-         [5.5, 13.5, 5.8], "A plataforma", "Resultados de cálculo servem para aprender: não substituem projeto assinado por profissional habilitado.")
-s.topicos("Como participar",
-          ["**Cadastro de interesse:** nome, e-mail e o que te interessa. Rápido, sem senha.",
-           "**Conta da plataforma:** para escrever no fórum e publicar.",
-           "**Idade:** a partir de 16 anos; de 16 a 17 anos, com o responsável legal [CONFERIR com o advogado].",
-           "**Sugira um projeto aberto** ou acompanhe os desafios.",
-           "**Endereço:** inovastem.physisengineering.com [CONFERIR]"],
-          "Participar")
-salvar("01_InovaSTEM_Apresentacao_rede_e_plataforma.fodp", s.xml())
+def gerar():
+    # ── 1. Apresentação da rede e da plataforma (slides) ──
+    s = odf.Slides("InovaSTEM · Apresentação da rede e da plataforma", "Apresentação da rede e da plataforma")
+    s.capa("InovaSTEM", "Rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos. Versão beta, lançamento em 26/11/2026.",
+           "uma iniciativa PHYSIS")
+    s.duas("Missão e visão",
+           ["Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos."],
+           ["Ser referência na América Latina em troca aberta de conhecimento e desafios de modelagem para a transição justa."],
+           "Quem somos", "Missão", "Visão 2031")
+    s.duas("Duas redes, um só lugar",
+           ["Aberta a todas as pessoas e organizações: troca de informações, parcerias e desafios de modelagem com códigos abertos.",
+            "Laboratório vivo de pesquisa, desenvolvimento e inovação: conexão e trocas abertas para o desenvolvimento tecnológico."],
+           ["Rede dedicada a mulheres (jovens, cis e trans) que lideram em STEM: formação, acolhimento entre pares, rodas de conversa e mentoria.",
+            "Rede de apoio entre pares; não oferece atendimento psicológico nem clínico."],
+           "As redes", "InovaSTEM", "InovaSTEM Delas")
+    s.topicos("O laboratório vivo online",
+              ["**Modelagem online:** GIS e mapas, BIM (IFC) e modelos 3D no navegador.",
+               "**Simulação (Fase 1):** calor, estrutura, ventilação, terreno, incerteza, biogás e otimização QUBO, com método, hipóteses e limites em cada resultado.",
+               "**Desafios e projetos abertos:** desafios reais publicados pela equipe e projetos sugeridos pela comunidade.",
+               "**Fórum com moderação:** tudo o que é publicado passa pela equipe antes de aparecer.",
+               "**Hackathon de cibersegurança:** março de 2027, online, só em ambiente próprio e isolado (CTF)."],
+              "A plataforma", "Simulação Fase 2 e gêmeo digital: em desenvolvimento.")
+    s.tabela("Modelagem online", ["Ferramenta", "O que faz", "Situação"],
+             [["GIS e mapas", "Desenhar e analisar áreas no mapa, camadas e terreno", "Funciona"],
+              ["BIM (IFC)", "Abrir e ler modelos IFC de edificações", "Funciona"],
+              ["Simulação (Fase 1)", "Contas leves no navegador, iguais às do servidor", "Funciona"],
+              ["Physis 3D", "Abrir, medir, ajustar e fatiar peças de plástico reciclado", "Em desenvolvimento"],
+              ["Simulação (Fase 2)", "Resolvedores abertos em servidor, comparados com referência", "Em desenvolvimento"],
+              ["Gêmeo digital", "Modelo virtual ligado a dados medidos", "Em desenvolvimento"]],
+             [5.5, 13.5, 5.8], "A plataforma", "Resultados de cálculo servem para aprender: não substituem projeto assinado por profissional habilitado.")
+    s.topicos("Como participar",
+              ["**Cadastro de interesse:** nome, e-mail e o que te interessa. Rápido, sem senha.",
+               "**Conta da plataforma:** para escrever no fórum e publicar.",
+               "**Idade:** a partir de 16 anos; de 16 a 17 anos, com o responsável legal [CONFERIR com o advogado].",
+               "**Sugira um projeto aberto** ou acompanhe os desafios.",
+               "**Endereço:** inovastem.physisengineering.com [CONFERIR]"],
+              "Participar")
+    salvar("01_InovaSTEM_Apresentacao_rede_e_plataforma.fodp", s.xml())
 
-# ── 2. Patrocínio: tabela única ──
-t = odf.Texto("Patrocínio da InovaSTEM", "Tabela única de cotas", "Patrocínio")
-t.p("A InovaSTEM é uma rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos; a InovaSTEM "
-    "Delas forma e acolhe mulheres em STEM. A cota Amigo é só para pessoa física; empresas a partir de R$ 1.000.")
-t.h1("Cotas")
-t.tabela(["Cota", "Para quem", "Faixa anual", "Contrapartidas"],
-         [["Amigo", "Só pessoa física", "R$ 750", "[MARCADOR: contrapartidas da cota Amigo]"],
-          ["Apoiador", "Empresas e organizações", "R$ 1.000 a R$ 4.999", "Nome no site e no relatório anual, certificado de apoio, eventos abertos"],
-          ["Parceiro", "Empresas e organizações", "R$ 5.000 a R$ 14.999", "Logo nos materiais, grupo de trabalho, relatório de impacto"],
-          ["Patrocinador", "Empresas e organizações", "R$ 15.000 a R$ 29.999", "Desafio real ou trilha associada à marca, fala em evento, relatório dedicado"],
-          ["Patrocinador master", "Empresas e organizações", "R$ 30.000 a R$ 50.000", "Convite para o comitê, co-branding, prioridade em desafios e projetos, destaque na mostra anual"]],
-         [3.2, 3.6, 3.6, 6.6])
-t.nota("Valores do Caderno de Patrocínio v2, em revisão [CONFERIR].")
-t.h1("Regras")
-t.lista(["Patrocínio não compra decisões nem dá acesso a dados pessoais.",
-         "Toda cota de empresa vem com um compromisso de entrevistas ou vagas de estágio para as egressas [CONFERIR].",
-         "Quem recebe e presta contas dos recursos: [MARCADOR: entidade, até a definição da organização parceira]."])
-t.h1("Contato")
-t.p("[MARCADOR: contato da InovaSTEM]")
-salvar("02_InovaSTEM_Patrocinio_tabela_unica.fodt", t.xml())
+    # ── 2. Patrocínio: tabela única ──
+    t = odf.Texto("Patrocínio da InovaSTEM", "Tabela única de cotas", "Patrocínio")
+    t.p("A InovaSTEM é uma rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos; a InovaSTEM "
+        "Delas forma e acolhe mulheres em STEM. A cota Amigo é só para pessoa física; empresas a partir de R$ 1.000.")
+    t.h1("Cotas")
+    t.tabela(["Cota", "Para quem", "Faixa anual", "Contrapartidas"],
+             [["Amigo", "Só pessoa física", "R$ 750", "[MARCADOR: contrapartidas da cota Amigo]"],
+              ["Apoiador", "Empresas e organizações", "R$ 1.000 a R$ 4.999", "Nome no site e no relatório anual, certificado de apoio, eventos abertos"],
+              ["Parceiro", "Empresas e organizações", "R$ 5.000 a R$ 14.999", "Logo nos materiais, grupo de trabalho, relatório de impacto"],
+              ["Patrocinador", "Empresas e organizações", "R$ 15.000 a R$ 29.999", "Desafio real ou trilha associada à marca, fala em evento, relatório dedicado"],
+              ["Patrocinador master", "Empresas e organizações", "R$ 30.000 a R$ 50.000", "Convite para o comitê, co-branding, prioridade em desafios e projetos, destaque na mostra anual"]],
+             [3.2, 3.6, 3.6, 6.6])
+    t.nota("Valores do Caderno de Patrocínio v2, em revisão [CONFERIR].")
+    t.h1("Regras")
+    t.lista(["Patrocínio não compra decisões nem dá acesso a dados pessoais.",
+             "Toda cota de empresa vem com um compromisso de entrevistas ou vagas de estágio para as egressas [CONFERIR].",
+             "Quem recebe e presta contas dos recursos: [MARCADOR: entidade, até a definição da organização parceira]."])
+    t.h1("Contato")
+    t.p("[MARCADOR: contato da InovaSTEM]")
+    salvar("02_InovaSTEM_Patrocinio_tabela_unica.fodt", t.xml())
 
-# ── 3. Ecossistema ──
-t = odf.Texto("Ecossistema", "Onde a InovaSTEM se encaixa", "Ecossistema")
-t.p("A InovaSTEM é uma iniciativa da Physis Engineering, empresa de engenharia de sustentabilidade de Petrópolis (RJ), com "
-    "liderança feminina. Cada frente tem uma missão própria.")
-t.tabela(["Frente", "Missão"],
-         [["Physis Engineering", "Acelerar a transição justa com engenharia de precisão e dados verificáveis, para que cada ganho de energia, água e carbono possa ser medido, comprovado e compartilhado."],
-          ["Casa Physis", "Oferecer hospedagem, alimentação e produtos de baixo impacto que mostram na prática, e com dados, como viver bem na Mata Atlântica e fortalecer a economia local."],
-          ["InovaSTEM", "Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos."],
-          ["InovaSTEM Delas", "Formar, acolher e fortalecer mulheres em STEM, com redes de apoio entre pares, mentoria e projetos aplicados à sustentabilidade."]],
-         [4.2, 12.8])
-t.h1("Dois living labs")
-t.lista(["**Casa Physis:** instalação física em Petrópolis (RJ), sistema conectado, projeto vitrine.",
-         "**InovaSTEM:** living lab de pesquisa, desenvolvimento e inovação online: fórum, trocas, desafios, eventos e cursos.",
-         "A Physis Engineering mede os resultados com M&V transparente e auditável."])
-salvar("03_InovaSTEM_Ecossistema.fodt", t.xml())
+    # ── 3. Ecossistema ──
+    t = odf.Texto("Ecossistema", "Onde a InovaSTEM se encaixa", "Ecossistema")
+    t.p("A InovaSTEM é uma iniciativa da Physis Engineering, empresa de engenharia de sustentabilidade de Petrópolis (RJ), com "
+        "liderança feminina. Cada frente tem uma missão própria.")
+    t.tabela(["Frente", "Missão"],
+             [["Physis Engineering", "Acelerar a transição justa com engenharia de precisão e dados verificáveis, para que cada ganho de energia, água e carbono possa ser medido, comprovado e compartilhado."],
+              ["Casa Physis", "Oferecer hospedagem, alimentação e produtos de baixo impacto que mostram na prática, e com dados, como viver bem na Mata Atlântica e fortalecer a economia local."],
+              ["InovaSTEM", "Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos."],
+              ["InovaSTEM Delas", "Formar, acolher e fortalecer mulheres em STEM, com redes de apoio entre pares, mentoria e projetos aplicados à sustentabilidade."]],
+             [4.2, 12.8])
+    t.h1("Dois living labs")
+    t.lista(["**Casa Physis:** instalação física em Petrópolis (RJ), sistema conectado, projeto vitrine.",
+             "**InovaSTEM:** living lab de pesquisa, desenvolvimento e inovação online: fórum, trocas, desafios, eventos e cursos.",
+             "A Physis Engineering mede os resultados com M&V transparente e auditável."])
+    salvar("03_InovaSTEM_Ecossistema.fodt", t.xml())
+
+
+if __name__ == "__main__":
+    gerar()
