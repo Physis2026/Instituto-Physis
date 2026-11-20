@@ -55,7 +55,7 @@ select{width:100%;font-size:12px}
 .status-box{padding:9px;border-radius:8px;text-align:center;margin-top:6px}
 .status-ok{background:#DCEBD8}.status-ok .status-title{color:#1F4A1C}
 .status-err{background:#F5E2D7}.status-err .status-title{color:#7A2214}
-.status-info{background:#DBE7F1}.status-info .status-title{color:#2C5A6E}
+.status-info{background:#F4F1EA}.status-info .status-title{color:#2F7D5B}
 .status-title{font-weight:800;font-size:13px}
 .status-sub{font-size:11px;margin-top:2px}
 .footer{background:#fff;border-top:1px solid #C9D2C4;padding:7px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:20px}
@@ -167,11 +167,11 @@ html[data-tema=escuro] :is(.res-row,.mini-info,.chk-item,.agro-item){background:
 html[data-tema=escuro] .res-row.hi{background:#3A4A38;border-color:#7FA874}
 html[data-tema=escuro] .status-ok{background:#1F4A1C}html[data-tema=escuro] .status-ok .status-title{color:#DCEBD8}
 html[data-tema=escuro] .status-err{background:#5C2B2E}html[data-tema=escuro] .status-err .status-title{color:#F5E2D7}
-html[data-tema=escuro] .status-info{background:#1C3550}html[data-tema=escuro] .status-info .status-title{color:#DBE7F1}
+html[data-tema=escuro] .status-info{background:#1A4D2E}html[data-tema=escuro] .status-info .status-title{color:#F4F1EA}
 html[data-tema=escuro] .pill{background:#2A3829;border-color:#4A5A47;color:#D9D3C2}
 html[data-tema=escuro] .pill.active{background:#3A4A38;border-color:#B9CDB3;color:#EEF2EA}
 html[data-tema=escuro] .cert-btn-title{color:#EEF2EA!important}
-html[data-tema=escuro] .cert-pct-box{background:#1C2B21!important}html[data-tema=escuro] .cert-pct-num{color:#B8D0E0!important}
+html[data-tema=escuro] .cert-pct-box{background:#1C2B21!important}html[data-tema=escuro] .cert-pct-num{color:#C3D0BD!important}
 html[data-tema=escuro] .cert-btn-bar,html[data-tema=escuro] .cert-bar{background:#4A5A47}
 html[data-tema=escuro] .mat-cat{background:#3A4A38;color:#DCEBD8}
 html[data-tema=escuro] .chk-item.done{background:#1F4A1C;border-color:#7FA874}html[data-tema=escuro] .chk-item.done .chk-text{color:#DCEBD8}
@@ -189,7 +189,7 @@ html[data-tema=escuro] [style*="background:#F4F6F1"]{background:#1C2B21!importan
 html[data-tema=escuro] [style*="background:#DCEBD8"]{background:#1F4A1C!important}
 html[data-tema=escuro] [style*="background:#F6EAD0"],html[data-tema=escuro] [style*="background:#EFE8D6"]{background:#33372E!important}
 html[data-tema=escuro] [style*="background:#F5E2D7"]{background:#5C2B2E!important}
-html[data-tema=escuro] [style*="background:#DBE7F1"]{background:#1C3550!important}
+html[data-tema=escuro] [style*="background:#F4F1EA"]{background:#1A4D2E!important}
 html[data-tema=escuro] [style*="background:#EEF4EA"]{background:#3A4A38!important}
 html[data-tema=escuro] #o-chart [style*="background:#33512F"]{background:#B9CDB3!important}
 html[data-tema=escuro] #o-chart [style*="background:#DCEBD8"]{background:#7FA874!important}
@@ -200,7 +200,7 @@ html[data-tema=escuro] [style*="color:#1F4A1C"]{color:#DCEBD8!important}
 html[data-tema=escuro] [style*="color:#8A6410"]{color:#E5D5AE!important}
 html[data-tema=escuro] [style*="color:#7A2214"]{color:#F5E2D7!important}
 html[data-tema=escuro] [style*="color:#4B7547"]{color:#A8BFA0!important}
-html[data-tema=escuro] [style*="color:#2C5A6E"]{color:#B8D0E0!important}
+html[data-tema=escuro] [style*="color:#2F7D5B"]{color:#C3D0BD!important}
 html[data-tema=escuro] [style*="#C9D2C4"]{border-color:#4A5A47!important}
 
 /* ===== Modelo Physis (igual ao painel da plataforma): faixa com a árvore e o título serifado ===== */
@@ -914,8 +914,8 @@ var SK = (function(){
   };
   var MAT_ZONA={
     0:{e:'CLT + SIP',v:'Análise local',i:'Verificar',c:'Verificar',es:'Vidro duplo',l:'Internacional',cor:'#EFE8D6'},
-    1:{e:'CLT + SIP 150mm',v:'SIP + BTC + hempcrete',i:'Lã rocha 100mm',c:'Sanduíche 80mm + telhado verde',es:'Vidro triplo argônio',l:'Frio — Zona 1',cor:'#DBE7F1'},
-    2:{e:'CLT + SIP 100mm',v:'SIP + BTC',i:'Lã rocha 75mm',c:'Sanduíche 60mm + telhado verde',es:'Vidro triplo argônio',l:'Muito frio — Zona 2',cor:'#DBE7F1'},
+    1:{e:'CLT + SIP 150mm',v:'SIP + BTC + hempcrete',i:'Lã rocha 100mm',c:'Sanduíche 80mm + telhado verde',es:'Vidro triplo argônio',l:'Frio — Zona 1',cor:'#F4F1EA'},
+    2:{e:'CLT + SIP 100mm',v:'SIP + BTC',i:'Lã rocha 75mm',c:'Sanduíche 60mm + telhado verde',es:'Vidro triplo argônio',l:'Muito frio — Zona 2',cor:'#F4F1EA'},
     3:{e:'CLT + SIP 100mm',v:'SIP + BTC / Hempcrete',i:'Lã PET 50mm',c:'Sanduíche 50mm + telhado verde',es:'Vidro duplo câmara ar',l:'Temperado — Zona 3',cor:'#EFE8D6'},
     4:{e:'CLT ou SIP',v:'SIP ou BTC',i:'Lã PET cobertura',c:'Telhado verde',es:'Vidro duplo Low-E',l:'Subquente — Zona 4',cor:'#EEF4EA'},
     5:{e:'CLT ou geopolímero',v:'BTC + alta inércia',i:'Lã rocha cobertura',c:'Sanduíche + câmara ar',es:'Vidro duplo Low-E',l:'Quente seco — Zona 5',cor:'#F6EAD0'},
@@ -1080,7 +1080,7 @@ function cidadeAtual(){var k=sel('s-cidade');return k&&SK.CIDADES[k]?SK.CIDADES[
 
 /* A lista antiga de 16 materiais (texto, com preços) saiu em 15/11/2026: o bloco Materiais lê a base sistema/physis-materiais.json. */
 const CERTS={
-  leed:{n:'LEED v5 BD+C (Abril 2025)',cor:'#2C5A6E',items:[
+  leed:{n:'LEED v5 BD+C (Abril 2025)',cor:'#2F7D5B',items:[
     'Descarbonização — NZEB + eletrificação + ACV obrigatório',
     'Carbono Incorporado — LCA + EPD obrigatória (ISO 14025)',
     'Energia — M&V datalogger + Arc platform',
@@ -1092,14 +1092,14 @@ const CERTS={
     'Equidade Social — práticas justas na obra (NOVO v5)',
     'Registro na plataforma Arc (arc-app.gbci.org)',
   ]},
-  edge:{n:'EDGE (IFC/Banco Mundial)',cor:'#2C5A6E',items:[
+  edge:{n:'EDGE (IFC/Banco Mundial)',cor:'#2F7D5B',items:[
     'Energia: redução ≥20% vs. linha de base',
     'Água: redução ≥20% vs. linha de base',
     'Carbono incorporado: redução ≥20%',
     'EPDs dos materiais principais',
     'Registro em edgebuildings.com',
   ]},
-  casaazul:{n:'Selo Casa Azul — Caixa',cor:'#2C5A6E',items:[
+  casaazul:{n:'Selo Casa Azul — Caixa',cor:'#2F7D5B',items:[
     'INI-R Nível A (PBE Edifica, Portaria Inmetro 309/2022)',
     'Captação pluvial (NBR 15527:2019)',
     'Coleta seletiva e compostagem',
@@ -1120,11 +1120,11 @@ const CERTS={
   ]},
 };
 const CHECKLIST=[
-  {f:'Fase 1 — Planejamento',cor:'#2C5A6E',items:['Verificar zoneamento e zona de risco','Obter LPLS','Elaborar PGRCC','Submeter ao INEA','Registrar no LEED Arc ou EDGE']},
-  {f:'Fase 2 — Pré-Produção',cor:'#2C5A6E',items:['Encomendar CLT, SIP e sistemas solar','Instalar cisterna e captação','Executar fundação com SPDA']},
-  {f:'Fase 3 — Montagem',cor:'#2C5A6E',items:['Montar estrutura CLT + SIP','Instalar sistema FV (NBR 16690)','Instalar inversor + bateria + DPS']},
-  {f:'Fase 4 — Acabamento',cor:'#2C5A6E',items:['Aplicar tadelakt ou cal','Aplicar tinta Arpex zero VOC','Configurar Home Assistant + IoT','Paisagismo com mudas nativas']},
-  {f:'Fase 5 — Certificação',cor:'#2C5A6E',items:['Solicitar Habite-se','Homologação ANEEL FV','Auditoria LEED/EDGE','Manual digital ao hóspede']},
+  {f:'Fase 1 — Planejamento',cor:'#2F7D5B',items:['Verificar zoneamento e zona de risco','Obter LPLS','Elaborar PGRCC','Submeter ao INEA','Registrar no LEED Arc ou EDGE']},
+  {f:'Fase 2 — Pré-Produção',cor:'#2F7D5B',items:['Encomendar CLT, SIP e sistemas solar','Instalar cisterna e captação','Executar fundação com SPDA']},
+  {f:'Fase 3 — Montagem',cor:'#2F7D5B',items:['Montar estrutura CLT + SIP','Instalar sistema FV (NBR 16690)','Instalar inversor + bateria + DPS']},
+  {f:'Fase 4 — Acabamento',cor:'#2F7D5B',items:['Aplicar tadelakt ou cal','Aplicar tinta Arpex zero VOC','Configurar Home Assistant + IoT','Paisagismo com mudas nativas']},
+  {f:'Fase 5 — Certificação',cor:'#2F7D5B',items:['Solicitar Habite-se','Homologação ANEEL FV','Auditoria LEED/EDGE','Manual digital ao hóspede']},
 ];
 const MODELOS=[
   {id:'chale',icon:'🏡',n:'Chalé Individual',e:'1 un · 60–120m²',s:'8–12 kWp',c:'EDGE + LEED Gold',cor:'#EEF4EA'},
@@ -1492,7 +1492,7 @@ function renderCerts(){
   const ok=c.items.filter((_,i)=>certStatus[certAtual+'_'+i]==='✅ Atende').length;
   const pct=Math.round(ok/total*100);
   const statusOpts=['✅ Atende','⚠️ Parcial','❌ Não atende','⬜ N/A'];
-  const statusBg={'✅ Atende':'#DCEBD8','⚠️ Parcial':'#F6EAD0','❌ Não atende':'#F5E2D7','⬜ N/A':'#DBE7F1'};
+  const statusBg={'✅ Atende':'#DCEBD8','⚠️ Parcial':'#F6EAD0','❌ Não atende':'#F5E2D7','⬜ N/A':'#F4F1EA'};
   const counts=statusOpts.reduce((a,o)=>{a[o]=c.items.filter((_,i)=>certStatus[certAtual+'_'+i]===o).length;return a;},{});
   $('cert-panel').innerHTML=`
     <div class="cert-header"><div><h3 style="font-weight:700;font-size:13px;color:#1C2B21">${c.n}</h3><div style="font-size:11px;color:#4A4F44">${total} critérios</div></div>
@@ -1932,7 +1932,7 @@ function iniciarDemo(){
     ".pp-pular:focus{left:8px}",
     "@media (max-width:560px){.pp-painel{position:fixed;left:16px;right:16px;top:auto;bottom:16px;width:auto;max-width:none;max-height:78vh}}",
     /* régua de leitura */
-    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1C3550;border-bottom:2px solid #1C3550;background:rgba(255,246,223,.28);display:none}",
+    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1A4D2E;border-bottom:2px solid #1A4D2E;background:rgba(255,246,223,.28);display:none}",
     "html.a11y-regua .pp-regua{display:block}",
     "html[data-tema=escuro] .pp-regua{border-color:#FFF6DF;background:rgba(255,246,223,.12)}",
     /* preferências que valem para qualquer página */
@@ -1944,7 +1944,7 @@ function iniciarDemo(){
     "html.a11y-calma *,html.a11y-calma *::before,html.a11y-calma *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}",
     "html.a11y-calma{scroll-behavior:auto!important}html.a11y-calma :is(marquee,blink){display:none!important}",
     "html.a11y-simples [data-pp-secundario]{display:none!important}",
-    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1C3550!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
+    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1A4D2E!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
     "html.a11y-foco[data-tema=escuro] :focus-visible,html.a11y-foco[data-tema=escuro] :focus{outline-color:#FFF6DF!important;box-shadow:0 0 0 7px #14180F!important}",
     "html.a11y-foco :focus:not(:focus-visible){outline:none!important;box-shadow:none!important}",
     "html.a11y-dislexia :is(body,button,input,select,textarea){font-family:\"Atkinson Hyperlegible\",Lexend,Verdana,Tahoma,sans-serif!important}",
@@ -4212,7 +4212,7 @@ function iniciarDemo(){
 #physis-demo-faixa .pdf-linha.pdf-alerta{color:#7A2214;background:#F5E2D7;font-weight:600}
 #physis-demo-faixa button{font:inherit;font-weight:600;min-height:44px;min-width:44px;padding:6px 14px;border-radius:8px;border:1px solid #5C3F00;background:#FFFFFF;color:#5C3F00;cursor:pointer}
 #physis-demo-faixa .pdf-convite{color:#5C3F00}
-#physis-demo-faixa a:focus-visible,#physis-demo-faixa button:focus-visible,#physis-demo-compra a:focus-visible{outline:3px solid #1C3550;outline-offset:2px}
+#physis-demo-faixa a:focus-visible,#physis-demo-faixa button:focus-visible,#physis-demo-compra a:focus-visible{outline:3px solid #1A4D2E;outline-offset:2px}
 #physis-demo-compra{position:fixed;left:0;right:0;bottom:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center;padding:8px 16px calc(8px + env(safe-area-inset-bottom));background:#FFFFFF;color:#1C2B21;border-top:2px solid #B9A97F;font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;box-sizing:border-box}
 #physis-demo-compra .pdf-selo{font-weight:700;color:#5C3F00}
 #physis-demo-compra a{display:inline-flex;align-items:center;min-height:44px;padding:8px 18px;border-radius:8px;font-weight:700;text-decoration:none}
@@ -4235,7 +4235,7 @@ html[data-tema=escuro] #physis-demo-compra{background:#2A3829;color:#EEF2EA;bord
 html[data-tema=escuro] #physis-demo-compra .pdf-selo{color:#E5D5AE}
 html[data-tema=escuro] #physis-demo-compra .pdf-comprar{background:#B9CDB3;color:#14180F}
 html[data-tema=escuro] #physis-demo-compra .pdf-outra{color:#B9CDB3}
-html[data-tema=escuro] #physis-demo-faixa a:focus-visible,html[data-tema=escuro] #physis-demo-faixa button:focus-visible,html[data-tema=escuro] #physis-demo-compra a:focus-visible{outline-color:#B8D0E0}
+html[data-tema=escuro] #physis-demo-faixa a:focus-visible,html[data-tema=escuro] #physis-demo-faixa button:focus-visible,html[data-tema=escuro] #physis-demo-compra a:focus-visible{outline-color:#C3D0BD}
 @media print{#physis-demo-compra,#physis-demo-espaco{display:none}}
 </style>
 <script id="physis-demo-provedor">

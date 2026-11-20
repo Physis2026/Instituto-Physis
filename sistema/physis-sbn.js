@@ -577,7 +577,7 @@ ${r.itens.length ? `<button type="button" data-sbn-cons-plano="${E(id)}">Levar a
   }
 
   /* ───────────── mapa de plantio (GIS/BIM do Planejador + espaçamento) ───────────── */
-  const CORES = ["#33512F", "#4B7547", "#7FA36B", "#2C5A6E", "#5B8FA8", "#9A6A3A", "#C29A4B", "#8A6410", "#6B4F8A", "#A0526E", "#3F7F6E", "#B7793B"];
+  const CORES = ["#33512F", "#4B7547", "#7FA36B", "#2F7D5B", "#8FB183", "#9A6A3A", "#C29A4B", "#8A6410", "#BB6B4A", "#A0526E", "#3F7F6E", "#B7793B"];
   const corDe = n => CORES[Math.abs(+n || 0) % CORES.length];
   const VERDES = ["horta", "gramado", "mata", "infiltracao"];
   /* estado do mapa: áreas desenhadas no Planejador + as ajustadas pelo usuário (salvoJson tem prioridade, por id) */

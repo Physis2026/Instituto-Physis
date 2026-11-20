@@ -487,6 +487,11 @@ class Pacote(unittest.TestCase):
                 self.assertEqual((inst["instalacao"], inst["banco"]), ("inovastem", "physis-inovastem.db"))
                 self.assertTrue(inst["cadastro_aberto"] and inst["moderacao_previa"])
                 self.assertEqual(inst["inovastem"]["whatsapp_grupo"], "")
+                # LEIA-ME do pacote: senha mínima e banco do próprio sistema (falha informada pela sessão do Instituto)
+                leia = z.read(next(n for n in nomes if n.endswith("/LEIA-ME.md"))).decode("utf-8")
+                self.assertIn(f"pelo menos {seg.SENHA_MIN} caracteres", leia)
+                self.assertIn("`physis-inovastem.db`", leia)
+                self.assertIn("/laboratorio", leia)
             # com o Planejador, o nome da instalação não pode ser trocado pelo último arquivo de vendor/ (defeito de 19/11)
             plan = Path(tmp) / "planejador.html"
             plan.write_text("<!doctype html><title>p</title>", encoding="utf-8")

@@ -17,13 +17,13 @@
   h1 { font-family:Fraunces, Georgia, serif; color:var(--verde); }
   .cartao { background:var(--sup); border:1px solid var(--linha); border-radius:10px; padding:12px 16px; margin:12px 0; }
   .faixa { border-radius:8px; padding:8px 12px; margin:8px 0; }
-  .faixa.at { background:#F6EAD0; color:#5C3F00; } .faixa.al { background:#F5E2D7; color:#7A2214; } .faixa.ok { background:#DCEBD8; color:#1F4A1C; } .faixa.in { background:#DBE7F1; color:#1C3550; }
-  .selo { display:inline-block; padding:2px 8px; border-radius:99px; font-size:.85em; } .selo.ok { background:#DCEBD8; color:#1F4A1C; } .selo.at { background:#F6EAD0; color:#5C3F00; } .selo.in { background:#DBE7F1; color:#1C3550; }
+  .faixa.at { background:#F6EAD0; color:#5C3F00; } .faixa.al { background:#F5E2D7; color:#7A2214; } .faixa.ok { background:#DCEBD8; color:#1F4A1C; } .faixa.in { background:#F4F1EA; color:#1A4D2E; }
+  .selo { display:inline-block; padding:2px 8px; border-radius:99px; font-size:.85em; } .selo.ok { background:#DCEBD8; color:#1F4A1C; } .selo.at { background:#F6EAD0; color:#5C3F00; } .selo.in { background:#F4F1EA; color:#1A4D2E; }
   .t2 { color:var(--tinta2); } .pq { font-size:.9em; display:block; } .so-leitor { position:absolute; left:-9999px; }
   .grade { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:8px; } .numero { font-size:1.6em; font-weight:700; display:block; }
   .precos { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:8px; } .rolagem { overflow-x:auto; }
   table { border-collapse:collapse; width:100%; } th, td { border-bottom:1px solid var(--linha); padding:4px 6px; text-align:left; vertical-align:top; }
-  button, input, select { min-height:44px; font:inherit; } button { cursor:pointer; } :focus-visible { outline:3px solid #3D6E8F; outline-offset:2px; }
+  button, input, select { min-height:44px; font:inherit; } button { cursor:pointer; } :focus-visible { outline:3px solid #4A8A5A; outline-offset:2px; }
   .chips { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; } .passou { color:#1F4A1C; font-weight:700; } .falhou { color:#7A2214; font-weight:700; }
   html[data-tema="escuro"] .passou, html:not([data-tema="claro"]) .passou { }
 </style>
@@ -70,7 +70,7 @@ async function principal() {
   const px = p => [((p[0] - Math.min(...xs)) * k).toFixed(1), (Hh - (p[1] - Math.min(...ys)) * k * 1.1).toFixed(1)];
   const pocos = [...doc.getElementsByTagName("Point")].map(p => p.textContent.trim().split(",").map(Number));
   const t = plan.terreno, kk = 111320 * Math.cos(t.lat0 * Math.PI / 180), casa = plan.itens[0], cantos = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, c]) => [t.lon0 + (casa.x + a * casa.w / 2) / kk, t.lat0 + (casa.y + c * casa.d / 2) / 110540]);
-  document.getElementById("mapa").innerHTML = `<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="max-width:${W}px" role="img" aria-label="Lote de exemplo com a casa e dois poços"><polygon points="${anel.map(p => px(p).join(",")).join(" ")}" fill="#EFE8D6" stroke="#4A4F44"/><polygon points="${cantos.map(p => px(p).join(",")).join(" ")}" fill="#C9D2C4" stroke="#1C2B21"/>${pocos.map(p => `<circle cx="${px(p)[0]}" cy="${px(p)[1]}" r="5" fill="#3D6E8F"/>`).join("")}<text x="${W - 6}" y="14" text-anchor="end" font-size="12" fill="#1C2B21">N ↑</text></svg><p class="t2">Bege: lote (GeoJSON). Cinza: casa (Planejador). Azul: poços (KML).</p>`;
+  document.getElementById("mapa").innerHTML = `<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="max-width:${W}px" role="img" aria-label="Lote de exemplo com a casa e dois poços"><polygon points="${anel.map(p => px(p).join(",")).join(" ")}" fill="#EFE8D6" stroke="#4A4F44"/><polygon points="${cantos.map(p => px(p).join(",")).join(" ")}" fill="#C9D2C4" stroke="#1C2B21"/>${pocos.map(p => `<circle cx="${px(p)[0]}" cy="${px(p)[1]}" r="5" fill="#4A8A5A"/>`).join("")}<text x="${W - 6}" y="14" text-anchor="end" font-size="12" fill="#1C2B21">N ↑</text></svg><p class="t2">Bege: lote (GeoJSON). Cinza: casa (Planejador). Azul: poços (KML).</p>`;
   /* ── 2. IFC ── */
   const tipos = {}; (ifcTxt.match(/^#\d+=(IFC\w+)\(/gm) || []).forEach(l => { const x = l.replace(/^#\d+=/, "").replace("(", ""); tipos[x] = (tipos[x] || 0) + 1; });
   confere("IFC: cabeçalho STEP e esquema IFC4", ifcTxt.startsWith("ISO-10303-21;") && /FILE_SCHEMA\(\('IFC4'\)\);/.test(ifcTxt) && /END-ISO-10303-21;\s*$/.test(ifcTxt), "");

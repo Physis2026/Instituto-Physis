@@ -179,7 +179,7 @@
     ".pp-pular:focus{left:8px}",
     "@media (max-width:560px){.pp-painel{position:fixed;left:16px;right:16px;top:auto;bottom:16px;width:auto;max-width:none;max-height:78vh}}",
     /* régua de leitura */
-    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1C3550;border-bottom:2px solid #1C3550;background:rgba(255,246,223,.28);display:none}",
+    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1A4D2E;border-bottom:2px solid #1A4D2E;background:rgba(255,246,223,.28);display:none}",
     "html.a11y-regua .pp-regua{display:block}",
     "html[data-tema=escuro] .pp-regua{border-color:#FFF6DF;background:rgba(255,246,223,.12)}",
     /* preferências que valem para qualquer página */
@@ -191,7 +191,7 @@
     "html.a11y-calma *,html.a11y-calma *::before,html.a11y-calma *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}",
     "html.a11y-calma{scroll-behavior:auto!important}html.a11y-calma :is(marquee,blink){display:none!important}",
     "html.a11y-simples [data-pp-secundario]{display:none!important}",
-    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1C3550!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
+    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1A4D2E!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
     "html.a11y-foco[data-tema=escuro] :focus-visible,html.a11y-foco[data-tema=escuro] :focus{outline-color:#FFF6DF!important;box-shadow:0 0 0 7px #14180F!important}",
     "html.a11y-foco :focus:not(:focus-visible){outline:none!important;box-shadow:none!important}",
     "html.a11y-dislexia :is(body,button,input,select,textarea){font-family:\"Atkinson Hyperlegible\",Lexend,Verdana,Tahoma,sans-serif!important}",

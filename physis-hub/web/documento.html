@@ -12,14 +12,14 @@
 :root{
   color-scheme:light;
   --fundo:#F4F6F1;--sup:#FFFFFF;--tinta:#1C2B21;--tinta2:#4A4F44;--acao:#33512F;--marca:#4B7547;--linha:#C9D2C4;--trilho:#E3E8DE;
-  --ok-f:#DCEBD8;--ok-t:#1F4A1C;--at-f:#F6EAD0;--at-t:#8A6410;--al-f:#F5E2D7;--al-t:#7A2214;--in-f:#DBE7F1;--in-t:#1C3550;--areia-f:#EFE8D6;--tinte:#EEF4EA;
+  --ok-f:#DCEBD8;--ok-t:#1F4A1C;--at-f:#F6EAD0;--at-t:#8A6410;--al-f:#F5E2D7;--al-t:#7A2214;--in-f:#F4F1EA;--in-t:#1A4D2E;--areia-f:#EFE8D6;--tinte:#EEF4EA;
   --fonte:Lexend,Inter,system-ui,-apple-system,"Segoe UI",sans-serif;--titulo:Fraunces,Georgia,serif;
 }
 /* tema escuro (barra de preferências): variantes da paleta, como no painel municipal */
 html[data-tema="escuro"]{
   color-scheme:dark;
   --fundo:#1C2B21;--sup:#2A3829;--tinta:#EEF2EA;--tinta2:#D9D3C2;--acao:#B9CDB3;--marca:#A8BFA0;--linha:#4A5A47;--trilho:#33372E;
-  --ok-f:#1F4A1C;--ok-t:#DCEBD8;--at-f:#33372E;--at-t:#E5D5AE;--al-f:#5C2B2E;--al-t:#FF8A80;--in-f:#1C3550;--in-t:#DBE7F1;--areia-f:#33372E;--tinte:#2A3829;
+  --ok-f:#1F4A1C;--ok-t:#DCEBD8;--at-f:#33372E;--at-t:#E5D5AE;--al-f:#5C2B2E;--al-t:#FF8A80;--in-f:#1A4D2E;--in-t:#F4F1EA;--areia-f:#33372E;--tinte:#2A3829;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -633,7 +633,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 16px 30px;color:var(--tinta2);fo
     ".pp-pular:focus{left:8px}",
     "@media (max-width:560px){.pp-painel{position:fixed;left:16px;right:16px;top:auto;bottom:16px;width:auto;max-width:none;max-height:78vh}}",
     /* régua de leitura */
-    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1C3550;border-bottom:2px solid #1C3550;background:rgba(255,246,223,.28);display:none}",
+    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1A4D2E;border-bottom:2px solid #1A4D2E;background:rgba(255,246,223,.28);display:none}",
     "html.a11y-regua .pp-regua{display:block}",
     "html[data-tema=escuro] .pp-regua{border-color:#FFF6DF;background:rgba(255,246,223,.12)}",
     /* preferências que valem para qualquer página */
@@ -645,7 +645,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 16px 30px;color:var(--tinta2);fo
     "html.a11y-calma *,html.a11y-calma *::before,html.a11y-calma *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}",
     "html.a11y-calma{scroll-behavior:auto!important}html.a11y-calma :is(marquee,blink){display:none!important}",
     "html.a11y-simples [data-pp-secundario]{display:none!important}",
-    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1C3550!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
+    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1A4D2E!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
     "html.a11y-foco[data-tema=escuro] :focus-visible,html.a11y-foco[data-tema=escuro] :focus{outline-color:#FFF6DF!important;box-shadow:0 0 0 7px #14180F!important}",
     "html.a11y-foco :focus:not(:focus-visible){outline:none!important;box-shadow:none!important}",
     "html.a11y-dislexia :is(body,button,input,select,textarea){font-family:\"Atkinson Hyperlegible\",Lexend,Verdana,Tahoma,sans-serif!important}",

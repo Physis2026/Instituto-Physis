@@ -29,7 +29,7 @@ const MATERIAIS_RESERVA = {
   rhdpe: { nome:"rHDPE (PEAD reciclado)", densidade_g_cm3:0.95, bico_c:240, bico_faixa_c:[220, 260], mesa_c:100, mesa_faixa_c:[90, 110], contracao_pct:2.5, contracao_faixa_pct:[1.5, 4.0], diametro_mm:1.75 },
   rabs: { nome:"rABS (ABS reciclado)", densidade_g_cm3:1.04, bico_c:240, bico_faixa_c:[230, 255], mesa_c:100, mesa_faixa_c:[95, 110], contracao_pct:0.6, contracao_faixa_pct:[0.4, 0.8], diametro_mm:1.75 },
   rpla: { nome:"PLA reciclado", densidade_g_cm3:1.24, bico_c:205, bico_faixa_c:[190, 220], mesa_c:60, mesa_faixa_c:[50, 65], contracao_pct:0.3, contracao_faixa_pct:[0.2, 0.5], diametro_mm:1.75 } };
-const CORES_MATERIAL = { rpetg:"#7FA9C4", rpp:"#D9D3C2", rhdpe:"#E9E6DB", rabs:"#546A7B", rpla:"#7FA874" };
+const CORES_MATERIAL = { rpetg:"#8FB183", rpp:"#D9D3C2", rhdpe:"#E9E6DB", rabs:"#4A5A47", rpla:"#7FA874" };
 const LICENCAS = { "CC-BY-4.0":"Creative Commons Atribuição 4.0", "CC-BY-SA-4.0":"Creative Commons Atribuição-CompartilhaIgual 4.0", "CC0-1.0":"Creative Commons Zero 1.0 (domínio público)",
   "CERN-OHL-S-2.0":"CERN Open Hardware Licence 2.0, fortemente recíproca", "CERN-OHL-W-2.0":"CERN Open Hardware Licence 2.0, fracamente recíproca", "CERN-OHL-P-2.0":"CERN Open Hardware Licence 2.0, permissiva" };
 const PROBLEMAS = { empenamento:"Empenamento (warping)", adesao:"Pouca adesão à mesa", fios:"Fios (stringing)", delaminacao:"Separação de camadas", subextrusao:"Subextrusão",

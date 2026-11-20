@@ -8,10 +8,10 @@
 <link rel="manifest" href="/app/manifest-plataforma.webmanifest">
 <style>
 :root { --fundo:#F4F6F1; --sup:#FFFFFF; --texto:#1C2B21; --texto2:#4A4F44; --acao:#33512F; --logo:#4B7547; --linha:#C9D2C4;
-  --areia:#EFE8D6; --at-t:#8A6410; --at-f:#F6EAD0; --in-t:#1C3550; --in-f:#DBE7F1; }
+  --areia:#EFE8D6; --at-t:#8A6410; --at-f:#F6EAD0; --in-t:#1A4D2E; --in-f:#F4F1EA; }
 /* tema escuro (barra de preferências): variantes da paleta */
 html[data-tema="escuro"] { color-scheme: dark; --fundo:#1C2B21; --sup:#2A3829; --texto:#EEF2EA; --texto2:#D9D3C2; --acao:#B9CDB3; --logo:#A8BFA0; --linha:#4A5A47;
-  --areia:#33372E; --at-t:#E5D5AE; --at-f:#33372E; --in-t:#DBE7F1; --in-f:#1C3550; }
+  --areia:#33372E; --at-t:#E5D5AE; --at-f:#33372E; --in-t:#F4F1EA; --in-f:#1A4D2E; }
 html[data-tema="escuro"] .botao { color: #1C2B21; }
 html[data-tema="escuro"] .botao.sec { color: var(--acao); }
 * { box-sizing: border-box; }
@@ -333,7 +333,7 @@ var BAIXAR_IDIOMA = (function () {
     ".pp-pular:focus{left:8px}",
     "@media (max-width:560px){.pp-painel{position:fixed;left:16px;right:16px;top:auto;bottom:16px;width:auto;max-width:none;max-height:78vh}}",
     /* régua de leitura */
-    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1C3550;border-bottom:2px solid #1C3550;background:rgba(255,246,223,.28);display:none}",
+    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1A4D2E;border-bottom:2px solid #1A4D2E;background:rgba(255,246,223,.28);display:none}",
     "html.a11y-regua .pp-regua{display:block}",
     "html[data-tema=escuro] .pp-regua{border-color:#FFF6DF;background:rgba(255,246,223,.12)}",
     /* preferências que valem para qualquer página */
@@ -345,7 +345,7 @@ var BAIXAR_IDIOMA = (function () {
     "html.a11y-calma *,html.a11y-calma *::before,html.a11y-calma *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}",
     "html.a11y-calma{scroll-behavior:auto!important}html.a11y-calma :is(marquee,blink){display:none!important}",
     "html.a11y-simples [data-pp-secundario]{display:none!important}",
-    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1C3550!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
+    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1A4D2E!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
     "html.a11y-foco[data-tema=escuro] :focus-visible,html.a11y-foco[data-tema=escuro] :focus{outline-color:#FFF6DF!important;box-shadow:0 0 0 7px #14180F!important}",
     "html.a11y-foco :focus:not(:focus-visible){outline:none!important;box-shadow:none!important}",
     "html.a11y-dislexia :is(body,button,input,select,textarea){font-family:\"Atkinson Hyperlegible\",Lexend,Verdana,Tahoma,sans-serif!important}",

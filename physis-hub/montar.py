@@ -57,13 +57,13 @@ Precisa só de Python 3.10 ou mais novo, num computador ou Raspberry Pi da sua r
     python3 -m physis_hub.servidor
 
 Abra no navegador `http://<endereço deste computador>:8700/`.
-
+{inst}
 ## 2. Primeiro acesso
 
-Na primeira abertura a tela pede o seu nome, um usuário e uma senha de pelo menos 10 caracteres.
+Na primeira abertura {onde_entrar} pede o seu nome, um usuário e uma senha de pelo menos {senha_min} caracteres.
 Quem cria esse acesso passa a ser a pessoa administradora. A senha fica guardada só neste
 computador, de forma protegida; ninguém na Physis a recebe. Se for esquecida, apague o arquivo
-`physis-hub.db` para recomeçar (isso apaga também os dados guardados).
+`{banco}` para recomeçar (isso apaga também os dados guardados).
 
 ## 3. A plataforma chega zerada
 
@@ -266,8 +266,20 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
     (pasta / "LICENSE").write_text(texto_licenca(licenca), encoding="utf-8")
     sk = ("- **SustainKit:** já funciona, sem equipamento. Abra pela aba SustainKit.\n"
           if "sustainkit" in modulos else "")
+    # 19/11/2026: o mínimo de senha e o nome do banco vêm do próprio sistema (antes o texto dizia 10 e physis-hub.db sempre)
+    from physis_hub import seguranca as _seg
+    eh_inst = instalacao in ("instituto", "inovastem")
+    inst_txt = ("\nNo Instituto Physis, `/` é o **site público** (leitura aberta, cadastro da comunidade e moderação) e a\n"
+                "**plataforma** da equipe fica em `/plataforma/`. Detalhes em `docs/COMUNIDADE.md` e `docs/INSTITUTO.md`.\n"
+                if instalacao == "instituto" else
+                "\nNa InovaSTEM, `/` é o **site público** (cadastro, fórum com moderação, desafios), `/laboratorio` tem a Simulação\n"
+                "e o Physis 3D, e a **área da equipe** fica em `/plataforma/`. Detalhes em `docs/INOVASTEM.md`.\n"
+                if instalacao == "inovastem" else "")
     (pasta / "LEIA-ME.md").write_text(GUIA.format(org=org, lugar=lugar, modulos=", ".join(modulos),
-                                                  quando=time.strftime("%d/%m/%Y"), sk=sk, licenca=licenca), encoding="utf-8")
+                                                  quando=time.strftime("%d/%m/%Y"), sk=sk, licenca=licenca, inst=inst_txt,
+                                                  onde_entrar=("a plataforma (`/plataforma/`)" if eh_inst else "a tela"),
+                                                  senha_min=_seg.SENHA_MIN, banco=inst.get("banco") or "physis-hub.db"),
+                                      encoding="utf-8")
     if (AQUI / "modelos").is_dir():          # modelos dos documentos automáticos (docs/DOCUMENTOS_AUTOMATICOS.md)
         shutil.copytree(AQUI / "modelos", pasta / "modelos")
     escrever_manual(pasta, modulos, nome or org)

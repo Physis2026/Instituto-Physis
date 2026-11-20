@@ -43,16 +43,16 @@ CORES = {
     "#FFCDD2": "#F5E2D7",  # fundo "não atende"
     "#FCE4EC": "#F5E2D7",
     "#B71C1C": "#7A2214",  # texto "alerta"
-    "#DBEAFE": "#DBE7F1",  # fundos azuis -> informação
-    "#E3F2FD": "#DBE7F1",
-    "#EFF6FF": "#DBE7F1",
-    "#BFDBFE": "#DBE7F1",
-    "#1565C0": "#2C5A6E",  # textos azuis -> informação
-    "#1976D2": "#2C5A6E",
-    "#0D47A1": "#2C5A6E",
-    "#1E40AF": "#2C5A6E",
-    "#2196F3": "#2C5A6E",
-    "#0288D1": "#2C5A6E",
+    "#DBEAFE": "#F4F1EA",  # fundos azuis -> informação
+    "#E3F2FD": "#F4F1EA",
+    "#EFF6FF": "#F4F1EA",
+    "#BFDBFE": "#F4F1EA",
+    "#1565C0": "#2F7D5B",  # textos azuis -> informação
+    "#1976D2": "#2F7D5B",
+    "#0D47A1": "#2F7D5B",
+    "#1E40AF": "#2F7D5B",
+    "#2196F3": "#2F7D5B",
+    "#0288D1": "#2F7D5B",
     "#EDE7F6": "#EFE8D6",  # roxos -> areia
     "#F3E5F5": "#EFE8D6",
     "#6A1B9A": "#4A4F44",

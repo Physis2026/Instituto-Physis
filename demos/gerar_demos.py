@@ -230,7 +230,7 @@ ESTILO = """<style id="physis-demo-estilo">
 #physis-demo-faixa .pdf-linha.pdf-alerta{color:#7A2214;background:#F5E2D7;font-weight:600}
 #physis-demo-faixa button{font:inherit;font-weight:600;min-height:44px;min-width:44px;padding:6px 14px;border-radius:8px;border:1px solid #5C3F00;background:#FFFFFF;color:#5C3F00;cursor:pointer}
 #physis-demo-faixa .pdf-convite{color:#5C3F00}
-#physis-demo-faixa a:focus-visible,#physis-demo-faixa button:focus-visible,#physis-demo-compra a:focus-visible{outline:3px solid #1C3550;outline-offset:2px}
+#physis-demo-faixa a:focus-visible,#physis-demo-faixa button:focus-visible,#physis-demo-compra a:focus-visible{outline:3px solid #1A4D2E;outline-offset:2px}
 #physis-demo-compra{position:fixed;left:0;right:0;bottom:0;z-index:2147482000;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center;padding:8px 16px calc(8px + env(safe-area-inset-bottom));background:#FFFFFF;color:#1C2B21;border-top:2px solid #B9A97F;font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;box-sizing:border-box}
 #physis-demo-compra .pdf-selo{font-weight:700;color:#5C3F00}
 #physis-demo-compra a{display:inline-flex;align-items:center;min-height:44px;padding:8px 18px;border-radius:8px;font-weight:700;text-decoration:none}
@@ -253,7 +253,7 @@ html[data-tema=escuro] #physis-demo-compra{background:#2A3829;color:#EEF2EA;bord
 html[data-tema=escuro] #physis-demo-compra .pdf-selo{color:#E5D5AE}
 html[data-tema=escuro] #physis-demo-compra .pdf-comprar{background:#B9CDB3;color:#14180F}
 html[data-tema=escuro] #physis-demo-compra .pdf-outra{color:#B9CDB3}
-html[data-tema=escuro] #physis-demo-faixa a:focus-visible,html[data-tema=escuro] #physis-demo-faixa button:focus-visible,html[data-tema=escuro] #physis-demo-compra a:focus-visible{outline-color:#B8D0E0}
+html[data-tema=escuro] #physis-demo-faixa a:focus-visible,html[data-tema=escuro] #physis-demo-faixa button:focus-visible,html[data-tema=escuro] #physis-demo-compra a:focus-visible{outline-color:#C3D0BD}
 @media print{#physis-demo-compra,#physis-demo-espaco{display:none}}
 </style>"""
 

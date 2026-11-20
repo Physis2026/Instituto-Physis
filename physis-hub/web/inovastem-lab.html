@@ -1562,7 +1562,7 @@ function autoteste(casos) {
 var E = function (s) { return typeof esc === "function" ? esc(s) : String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
 var fmt = function (v, c) { return v == null || !isFinite(v) ? "—" : Number(v).toLocaleString("pt-BR", { minimumFractionDigits: c == null ? 2 : c, maximumFractionDigits: c == null ? 2 : c }); };
 var RAMPA_CALOR = ["#EFE8D6", "#E5D5AE", "#C9A227", "#C08A1E", "#A85432", "#7A2214"];
-var RAMPA_AGUA = ["#DBE7F1", "#B8D0E0", "#7FA9C4", "#3D6E8F", "#2C5A6E", "#1C3550"];
+var RAMPA_AGUA = ["#F4F1EA", "#C3D0BD", "#8FB183", "#4A8A5A", "#2F7D5B", "#1A4D2E"];
 var RAMPA_AR = ["#EEF4EA", "#CDDCC4", "#A8BFA0", "#7FA874", "#4B7547", "#33512F"];
 function cor(v, a, b, rampa) { if (v == null || !isFinite(v)) return "#D6DBCF"; var t = b > a ? (v - a) / (b - a) : 0; t = Math.max(0, Math.min(0.9999, t)); return rampa[Math.floor(t * rampa.length)]; }
 function legenda(a, b, rampa, un) { var cd = Math.abs(b - a) < 0.1 ? 3 : Math.abs(b - a) < 10 ? 2 : 1;
@@ -1600,7 +1600,7 @@ function svgBarras(id, titulo, rot, vals, un) {
 function svgLinha(id, titulo, ys, un) {
   var W = 480, H = 200, m = 30, a = Math.min.apply(null, ys), b = Math.max.apply(null, ys); if (b === a) b = a + 1;
   var pts = ys.map(function (y, i) { return (m + (W - 2 * m) * i / Math.max(1, ys.length - 1)).toFixed(1) + "," + (H - m - (H - 2 * m) * (y - a) / (b - a)).toFixed(1); }).join(" ");
-  return "<figure style='margin:0'><svg id='" + id + "' viewBox='0 0 " + W + " " + H + "' width='100%' style='max-width:" + W + "px' role='img' aria-labelledby='" + id + "-t'><title id='" + id + "-t'>" + E(titulo + " — de " + fmt(a, 2) + " a " + fmt(b, 2) + " " + un) + "</title><polyline points='" + pts + "' fill='none' stroke='#3D6E8F' stroke-width='2'/></svg></figure>";
+  return "<figure style='margin:0'><svg id='" + id + "' viewBox='0 0 " + W + " " + H + "' width='100%' style='max-width:" + W + "px' role='img' aria-labelledby='" + id + "-t'><title id='" + id + "-t'>" + E(titulo + " — de " + fmt(a, 2) + " a " + fmt(b, 2) + " " + un) + "</title><polyline points='" + pts + "' fill='none' stroke='#4A8A5A' stroke-width='2'/></svg></figure>";
 }
 function tabelaKV(cap, linhas) { return "<div class='rolagem'><table><caption>" + E(cap) + "</caption><tbody>" + linhas.map(function (l) { return "<tr><th scope='row'>" + E(l[0]) + "</th><td>" + l[1] + "</td></tr>"; }).join("") + "</tbody></table></div>"; }
 function envelopeHtml(r) {
@@ -1737,7 +1737,7 @@ const MATERIAIS_RESERVA = {
   rhdpe: { nome:"rHDPE (PEAD reciclado)", densidade_g_cm3:0.95, bico_c:240, bico_faixa_c:[220, 260], mesa_c:100, mesa_faixa_c:[90, 110], contracao_pct:2.5, contracao_faixa_pct:[1.5, 4.0], diametro_mm:1.75 },
   rabs: { nome:"rABS (ABS reciclado)", densidade_g_cm3:1.04, bico_c:240, bico_faixa_c:[230, 255], mesa_c:100, mesa_faixa_c:[95, 110], contracao_pct:0.6, contracao_faixa_pct:[0.4, 0.8], diametro_mm:1.75 },
   rpla: { nome:"PLA reciclado", densidade_g_cm3:1.24, bico_c:205, bico_faixa_c:[190, 220], mesa_c:60, mesa_faixa_c:[50, 65], contracao_pct:0.3, contracao_faixa_pct:[0.2, 0.5], diametro_mm:1.75 } };
-const CORES_MATERIAL = { rpetg:"#7FA9C4", rpp:"#D9D3C2", rhdpe:"#E9E6DB", rabs:"#546A7B", rpla:"#7FA874" };
+const CORES_MATERIAL = { rpetg:"#8FB183", rpp:"#D9D3C2", rhdpe:"#E9E6DB", rabs:"#4A5A47", rpla:"#7FA874" };
 const LICENCAS = { "CC-BY-4.0":"Creative Commons Atribuição 4.0", "CC-BY-SA-4.0":"Creative Commons Atribuição-CompartilhaIgual 4.0", "CC0-1.0":"Creative Commons Zero 1.0 (domínio público)",
   "CERN-OHL-S-2.0":"CERN Open Hardware Licence 2.0, fortemente recíproca", "CERN-OHL-W-2.0":"CERN Open Hardware Licence 2.0, fracamente recíproca", "CERN-OHL-P-2.0":"CERN Open Hardware Licence 2.0, permissiva" };
 const PROBLEMAS = { empenamento:"Empenamento (warping)", adesao:"Pouca adesão à mesa", fios:"Fios (stringing)", delaminacao:"Separação de camadas", subextrusao:"Subextrusão",
@@ -2522,7 +2522,7 @@ irLab();
     ".pp-pular:focus{left:8px}",
     "@media (max-width:560px){.pp-painel{position:fixed;left:16px;right:16px;top:auto;bottom:16px;width:auto;max-width:none;max-height:78vh}}",
     /* régua de leitura */
-    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1C3550;border-bottom:2px solid #1C3550;background:rgba(255,246,223,.28);display:none}",
+    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1A4D2E;border-bottom:2px solid #1A4D2E;background:rgba(255,246,223,.28);display:none}",
     "html.a11y-regua .pp-regua{display:block}",
     "html[data-tema=escuro] .pp-regua{border-color:#FFF6DF;background:rgba(255,246,223,.12)}",
     /* preferências que valem para qualquer página */
@@ -2534,7 +2534,7 @@ irLab();
     "html.a11y-calma *,html.a11y-calma *::before,html.a11y-calma *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}",
     "html.a11y-calma{scroll-behavior:auto!important}html.a11y-calma :is(marquee,blink){display:none!important}",
     "html.a11y-simples [data-pp-secundario]{display:none!important}",
-    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1C3550!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
+    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1A4D2E!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
     "html.a11y-foco[data-tema=escuro] :focus-visible,html.a11y-foco[data-tema=escuro] :focus{outline-color:#FFF6DF!important;box-shadow:0 0 0 7px #14180F!important}",
     "html.a11y-foco :focus:not(:focus-visible){outline:none!important;box-shadow:none!important}",
     "html.a11y-dislexia :is(body,button,input,select,textarea){font-family:\"Atkinson Hyperlegible\",Lexend,Verdana,Tahoma,sans-serif!important}",
