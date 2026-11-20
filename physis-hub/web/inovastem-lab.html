@@ -40,6 +40,15 @@ html[data-tema="escuro"]{
   --delas:#7C3AED;--delas-f:#3D2A5C;--delas-t:#C4B5FD;--sobre-delas:#FFFFFF;
   --ok-f:#0B3D2E;--ok-t:#F4F1EA;--al-f:#0B3D2E;--al-t:#D9A58C;--at-f:#0B3D2E;--at-t:#D9A58C;--erro-msg:#D9A58C;
 }
+/* Modo de conforto (fundo verde, menos estímulo): o módulo liga o tema escuro e html.a11y-verde; aqui as cores calmas do
+   "fundo verde (opção)" da PALETA.md, iguais em todas as telas (na Delas, só os detalhes ficam lilás). Pedido da dona, 20/11/2026 */
+html.a11y-verde[data-tema] body,html.a11y-verde[data-tema] body.aba-delas{
+  --fundo:#1C2B21;--sup:#2A3829;--campo:#1C2B21;--texto:#EEF2EA;--tinta2:#C3D0BD;--titulo-cor:#EEF2EA;--link:#EEF2EA;
+  --sec:#EEF2EA;--sobrancelha:#D9A58C;--faixa:#2A3829;--rodape:#2A3829;--linha:#4A5A47;--borda-campo:#8A9182;--suave:#1C2B21;
+  --delas-f:#2A3829;--ok-f:#1C2B21;--ok-t:#EEF2EA;--al-f:#1C2B21;--at-f:#1C2B21;
+}
+html.a11y-verde[data-tema] body.aba-delas{--delas-t:#C4B5FD;--tinta2:#C3D0BD}
+html.a11y-verde[data-tema] body .pp-barra,html.a11y-verde[data-tema] body.aba-delas .pp-barra{--pp-f:#2A3829;--pp-t:#EEF2EA;--pp-l:#8A9182;--pp-a:#B9CDB3;--pp-at:#1C2B21}
 /* Barra única de preferências: só as cores, pelas variáveis dela (o módulo não muda). Escuro = tipo A; Delas = roxo */
 html[data-tema="escuro"] body .pp-barra{--pp-f:#0F4535;--pp-t:#F4F1EA;--pp-l:#8A9182;--pp-a:#C3D0BD;--pp-at:#0B3D2E}
 html body.aba-delas .pp-barra{--pp-f:#FFFFFF;--pp-t:#2B2143;--pp-l:#7C3AED;--pp-a:#7C3AED;--pp-at:#FFFFFF}

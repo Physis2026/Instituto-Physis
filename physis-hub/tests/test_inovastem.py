@@ -308,7 +308,7 @@ class Pagina(unittest.TestCase):
         cls.css = re.search(r"<style>(.*?)</style>", cls.h, re.S).group(1)
 
     def tokens(self, seletor: str) -> dict:
-        bloco = re.search(re.escape(seletor) + r"\{(.*?)\n\}", self.css, re.S).group(1)
+        bloco = re.search(r"(?m)^" + re.escape(seletor) + r"\{(.*?)\n\}", self.css, re.S).group(1)   # bloco que começa na linha
         return dict(re.findall(r"--([a-z0-9-]+):(#[0-9A-Fa-f]{6})", bloco))
 
     def test_regras_da_tela(self):
@@ -333,12 +333,13 @@ class Pagina(unittest.TestCase):
         escuro = dict(claro, **escuro)
         delas_escuro = dict(escuro, **self.tokens('html[data-tema="escuro"] body.aba-delas'))
         delas_claro = dict(claro, **self.tokens('body.aba-delas'))   # tela lilás da Delas no claro (dona, 20/11/2026)
+        conforto = dict(escuro, **self.tokens('html.a11y-verde[data-tema] body,html.a11y-verde[data-tema] body.aba-delas'))   # modo de conforto (20/11/2026)
         pares = [("texto", "fundo"), ("texto", "sup"), ("tinta2", "fundo"), ("tinta2", "sup"), ("titulo-cor", "fundo"),
                  ("titulo-cor", "sup"), ("link", "fundo"), ("link", "sup"), ("sobre-acao", "acao"), ("sobre-delas", "delas"),
                  ("delas-t", "delas-f"), ("texto", "delas-f"), ("ok-t", "ok-f"), ("al-t", "al-f"), ("at-t", "at-f"),
                  ("sobrancelha", "fundo"), ("sec", "fundo"), ("sec", "sup"), ("sobre-faixa", "faixa"), ("texto", "campo"),
                  ("erro-msg", "sup"), ("erro-msg", "fundo")]
-        for nome, tk in (("claro", claro), ("escuro", escuro), ("Delas escuro", delas_escuro), ("Delas claro", delas_claro)):
+        for nome, tk in (("claro", claro), ("escuro", escuro), ("Delas escuro", delas_escuro), ("Delas claro", delas_claro), ("conforto", conforto)):
             for a, b in pares:
                 self.assertGreaterEqual(round(contraste(tk[a], tk[b]), 2), 4.5, f"{nome}: --{a} sobre --{b}")
             self.assertGreaterEqual(contraste(tk["borda-campo"], tk["sup"]), 3.0, f"{nome}: borda dos campos")
@@ -365,6 +366,7 @@ class Pagina(unittest.TestCase):
         neutros = {"#D9D3C2", "#8A9284", "#8A9182", "#4A4F44", "#4A5A47"}
         avisos = {"#7A2214", "#F5E2D7", "#D9A58C", "#BB6B4A"}     # terracota nos avisos (dona, 20/11/2026): o laranja fica para a marca
         tipos = {"#1A4D2E", "#0F4535", "#2F5E4E", "#C3D0BD", "#8FB183"}    # tipos de tela A e B (dona, 20/11/2026)
+        tipos |= {"#1C2B21", "#2A3829", "#EEF2EA", "#B9CDB3"}           # modo de conforto: "fundo verde (opção)" da PALETA.md
         delas = {"#7C3AED", "#EDE9FE", "#C4B5FD", "#2B2143", "#3D2A5C", "#5B4A7A"}   # roxo: só a Delas
         usadas = {c.upper() for c in re.findall(r"#[0-9A-Fa-f]{6}", self.css)}
         self.assertEqual(usadas - guia - neutros - avisos - tipos - delas, set(), "cor fora do guia")
