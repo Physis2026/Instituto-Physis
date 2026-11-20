@@ -2,7 +2,7 @@
 """Teste de estresse do Physis Hub, sem hardware.
 
 Sobe o hub numa porta local e o ataca pela mesma rota que o Receptor V6 usa.
-Uso: python3 estresse.py [--ciclos 200] [--porta 8791]
+Uso: python3 estresse.py [--ciclos 200] [--porta 0]
 Sai com codigo 0 se todos os cenarios passarem.
 """
 from __future__ import annotations
@@ -49,12 +49,15 @@ def lotes(linhas: list[str], n: int = 8):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--ciclos", type=int, default=200)
-    ap.add_argument("--porta", type=int, default=8791)
+    ap.add_argument("--porta", type=int, default=0, help="0 = porta livre escolhida pelo sistema (padrão)")
     a = ap.parse_args()
     pasta = tempfile.mkdtemp(prefix="physis-estresse-")
     banco = os.path.join(pasta, "hub.db")
     hub = Hub(banco, org="org-teste", lugar="estresse")
     srv = iniciar(hub, a.porta, endereco="127.0.0.1")
+    # 20/11/2026: com porta fixa (8791) o teste falhava quando outro programa já escutava nela (no Windows o bind
+    # "funciona" e os pedidos caem no outro programa). Agora a porta vem do próprio servidor.
+    a.porta = srv.server_address[1]
     rng = random.Random(11)
 
     # 1 ── Volume: 99 dispositivos, lotes de 8 como o receptor ────────────────
