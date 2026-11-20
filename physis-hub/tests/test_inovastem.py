@@ -331,9 +331,10 @@ class Pagina(unittest.TestCase):
         self.assertEqual(fora, set(), "cores fora da PALETA.md")
         claro, escuro = self.tokens(":root"), self.tokens('html[data-tema="escuro"]')
         escuro = dict(claro, **escuro)
-        delas_escuro = dict(escuro, **self.tokens('html[data-tema="escuro"] body.aba-delas'))
+        delas_escuro = dict(escuro, **self.tokens('body.aba-delas'), **{})   # herda o bloco claro da Delas, como no navegador
+        delas_escuro.update(self.tokens('html[data-tema="escuro"] body.aba-delas'))
         delas_claro = dict(claro, **self.tokens('body.aba-delas'))   # tela lilás da Delas no claro (dona, 20/11/2026)
-        conforto = dict(escuro, **self.tokens('html.a11y-verde[data-tema] body,html.a11y-verde[data-tema] body.aba-delas'))   # modo de conforto (20/11/2026)
+        conforto = dict(escuro, **self.tokens('html.a11y-verde[data-tema] body:not(.aba-delas)'))   # modo de conforto (20/11/2026)
         pares = [("texto", "fundo"), ("texto", "sup"), ("tinta2", "fundo"), ("tinta2", "sup"), ("titulo-cor", "fundo"),
                  ("titulo-cor", "sup"), ("link", "fundo"), ("link", "sup"), ("sobre-acao", "acao"), ("sobre-delas", "delas"),
                  ("delas-t", "delas-f"), ("texto", "delas-f"), ("ok-t", "ok-f"), ("al-t", "al-f"), ("at-t", "at-f"),
@@ -404,6 +405,13 @@ class Pagina(unittest.TestCase):
         self.assertIn("Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos", self.js)
         self.assertNotIn("Formar mulheres e jovens", self.h)   # formação só na Delas (dona, 20/11/2026)
         self.assertNotIn("M&V aberto", self.h)
+
+    def test_toda_chave_usada_existe(self):
+        # botão vazio na Delas (20/11/2026): chave renomeada e ainda usada
+        bloco = re.search(r"const T = \{(.*?)\n\};", self.js, re.S).group(1)
+        pt = bloco.split("\n  en: {", 1)[0]
+        for k in set(re.findall(r'\bt\("([a-z0-9_]+)"\)', self.js)):
+            self.assertRegex(pt, rf"(?<![a-z0-9_]){k}:", k)
 
     def test_portugues_e_ingles_iguais(self):
         bloco = re.search(r"const T = \{(.*?)\n\};", self.js, re.S).group(1)
