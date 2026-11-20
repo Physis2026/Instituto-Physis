@@ -14,6 +14,11 @@ este módulo traz só o que é próprio da InovaSTEM:
 - Materiais para download: só os arquivos que a direção pôs na pasta de materiais e listou no instancia.json (PDF e ODF).
 - Link do grupo de WhatsApp: opcional (regra 11). Só aparece quando é um convite https://chat.whatsapp.com/.
 - LGPD: a equipe apaga um interesse pelo e-mail (pedido do titular); as sugestões ficam sem nome e sem e-mail.
+- Fila de impressão (Modelagem 3D, aprovada pela dona em 20/11/2026): participante com conta pede a impressão de uma peça
+  da biblioteca do Physis 3D (id da peça, material, observação); a equipe aprova ou recusa (com motivo) e muda a situação
+  (pendente → aprovada → imprimindo → pronta, ou recusada). O arquivo da peça é baixado pela rota do Physis 3D
+  (/api/3d/arquivo/<sha256>) e aberto LOCALMENTE no CrealityPrint ou no HALOT; o servidor e o navegador não chamam
+  nenhum programa. O registro encadeado guarda só números e situações, nunca a conta de quem pediu.
 """
 from __future__ import annotations
 
@@ -22,6 +27,7 @@ import os
 import re
 from pathlib import Path
 
+from . import impressao3d as impressao3d_mod
 from . import seguranca as seg
 
 VERSAO_AVISO = "beta-2026-11"            # aviso de privacidade beta, em revisão jurídica
@@ -47,6 +53,10 @@ EXTENSOES_MATERIAIS = {".pdf": "application/pdf", ".odt": "application/vnd.oasis
 _EMAIL = re.compile(r"[^@\s]{1,64}@[^@\s]{1,120}\.[^@\s]{2,40}")
 _WHATS = re.compile(r"https://chat\.whatsapp\.com/[A-Za-z0-9]{10,40}")
 _ARQ = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,100}")
+# Fila de impressão: situações e passos permitidos (a recusa sempre com motivo)
+ESTADOS_IMPRESSAO = ("pendente", "aprovada", "imprimindo", "pronta", "recusada")
+PASSOS_IMPRESSAO = {"pendente": ("aprovada", "recusada"), "aprovada": ("imprimindo", "recusada"), "imprimindo": ("pronta",)}
+MATERIAIS_IMPRESSAO = ("",) + tuple(impressao3d_mod.MATERIAIS)      # "" = a equipe escolhe; os perfis do Physis 3D
 _S = str
 ESQUEMAS = {
     "ino_interesse": {"nome": (_S, 120, True), "email": (_S, 160, True), "areas": (list, len(AREAS), False),
@@ -59,6 +69,8 @@ ESQUEMAS = {
                      "prazo": (_S, 10, False), "aceite": (bool, None, False)},
     "ino_moderar": {"id": (int, 10**12, True), "decisao": (_S, 10, True), "motivo": (_S, 400, False)},
     "ino_remover": {"email": (_S, 160, True)},
+    "ino_impressao": {"peca": (int, 10**12, True), "material": (_S, 20, False), "observacao": (_S, 1000, False)},
+    "ino_impressao_estado": {"id": (int, 10**12, True), "estado": (_S, 20, True), "motivo": (_S, 400, False)},
 }
 
 ESQUEMA = """
@@ -73,6 +85,11 @@ CREATE TABLE IF NOT EXISTS ino_proposta (
   area TEXT NOT NULL DEFAULT '', organizacao TEXT NOT NULL DEFAULT '', nome TEXT NOT NULL DEFAULT '',
   email TEXT NOT NULL DEFAULT '', prazo TEXT NOT NULL DEFAULT '', estado TEXT NOT NULL, motivo TEXT NOT NULL DEFAULT '',
   criado_por TEXT NOT NULL DEFAULT '', criado REAL NOT NULL, moderado_por TEXT NOT NULL DEFAULT '', moderado_em REAL);
+CREATE TABLE IF NOT EXISTS ino_impressao (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, peca INTEGER NOT NULL, revisao INTEGER NOT NULL, arquivo_sha256 TEXT NOT NULL,
+  arquivo_nome TEXT NOT NULL, material TEXT NOT NULL DEFAULT '', observacao TEXT NOT NULL DEFAULT '', estado TEXT NOT NULL,
+  motivo TEXT NOT NULL DEFAULT '', pedido_por TEXT NOT NULL, criado REAL NOT NULL, atualizado REAL NOT NULL);
+CREATE INDEX IF NOT EXISTS ino_impressao_quem ON ino_impressao(pedido_por);
 """
 
 
@@ -100,8 +117,9 @@ def config_de(instancia: dict) -> dict:
 
 
 class InovaSTEM:
-    def __init__(self, hub, instancia: dict | None = None, pasta_materiais: Path | None = None, relogio=None):
+    def __init__(self, hub, instancia: dict | None = None, pasta_materiais: Path | None = None, relogio=None, impressao3d=None):
         self.hub = hub
+        self._impressao3d = impressao3d          # módulo do Physis 3D (ou função que o devolve): peças e arquivos
         self.cfg = config_de(instancia or {})
         self.pasta_materiais = Path(pasta_materiais) if pasta_materiais else None
         self.relogio = relogio or hub.relogio
@@ -284,5 +302,88 @@ class InovaSTEM:
         self.hub.registrar("inovastem", quem["usuario"], {"o_que": "exclusão a pedido", "interesses": n, "propostas": m})
         return {"ok": True, "interesses": n, "propostas": m}
 
+    # ── fila de impressão (Modelagem 3D) ───────────────────────────────────────────────────────
+    def _i3d(self):
+        m = self._impressao3d
+        return m() if callable(m) and not hasattr(m, "_ler_peca") else m
 
-__all__ = ["InovaSTEM", "ESQUEMAS", "AREAS", "VERSAO_AVISO", "config_de", "link_whatsapp"]
+    COLS_IMP = ("id", "peca", "revisao", "arquivo_sha256", "arquivo_nome", "material", "observacao", "estado", "motivo", "criado", "atualizado")
+
+    def _itens_impressao(self, onde: str, args: tuple, equipe: bool) -> list:
+        i3d = self._i3d()
+        itens = []
+        for r in self._db.execute("SELECT " + ",".join(self.COLS_IMP) + ", pedido_por FROM ino_impressao" + onde, args).fetchall():
+            x = dict(zip(self.COLS_IMP, r))
+            p = i3d._ler_peca(x["peca"]) if i3d else None
+            x["peca_nome"] = p["nome"] if p else ""
+            x["arquivo_url"] = "/api/3d/arquivo/" + x["arquivo_sha256"]
+            x["proximos"] = list(PASSOS_IMPRESSAO.get(x["estado"], ()))
+            if equipe:          # a equipe vê o nome público de quem pediu (o do Physis 3D), nunca o e-mail
+                x["nome_publico"] = i3d._nome(r[-1]) if i3d else "Participante"
+            itens.append(x)
+        return itens
+
+    def pedir_impressao(self, d: dict, quem: dict) -> dict:
+        """Participante com conta pede a impressão da última revisão de uma peça que ele pode ver (dele ou publicada)."""
+        if not quem or not quem.get("usuario"):
+            return {"ok": False, "erro": "entre com a sua conta para pedir impressão", "codigo": 401}
+        i3d = self._i3d()
+        if i3d is None:
+            return {"ok": False, "erro": "a biblioteca do Physis 3D não está ligada nesta instalação", "codigo": 503}
+        p = i3d._ler_peca(d.get("peca"))
+        if not p or not i3d._ve(p, quem):
+            return {"ok": False, "erro": "peça não encontrada", "codigo": 404}
+        rev = self._db.execute("SELECT numero, arquivo_sha256, arquivo_nome FROM p3d_revisao WHERE peca=? ORDER BY numero DESC LIMIT 1",
+                               (p["id"],)).fetchone()
+        if not rev:
+            return {"ok": False, "erro": "a peça ainda não tem arquivo: envie uma revisão no Physis 3D (Peças 3D → Biblioteca)"}
+        mat = _texto(d.get("material"), 20)
+        if mat not in MATERIAIS_IMPRESSAO:
+            return {"ok": False, "erro": "material: " + ", ".join(m for m in MATERIAIS_IMPRESSAO if m) + " (ou em branco: a equipe escolhe)"}
+        agora = self.relogio()
+        with self.hub._trava:
+            ident = self._db.execute(
+                "INSERT INTO ino_impressao(peca,revisao,arquivo_sha256,arquivo_nome,material,observacao,estado,pedido_por,criado,atualizado)"
+                " VALUES(?,?,?,?,?,?,?,?,?,?)", (p["id"], rev[0], rev[1], rev[2], mat, _texto(d.get("observacao"), 1000), "pendente",
+                                                  quem["usuario"], agora, agora)).lastrowid
+            self._db.commit()
+        # registro encadeado: só números e a situação (nunca a conta de quem pediu)
+        self.hub.registrar("inovastem", "participante", {"o_que": "impressão pedida", "id": ident, "peca": p["id"], "revisao": rev[0]})
+        return {"ok": True, "id": ident, "estado": "pendente"}
+
+    def minhas_impressoes(self, quem: dict) -> dict:
+        if not quem or not quem.get("usuario"):
+            return {"ok": False, "erro": "entre com a sua conta", "codigo": 401}
+        return {"ok": True, "itens": self._itens_impressao(" WHERE pedido_por=? ORDER BY criado DESC LIMIT 200", (quem["usuario"],), False),
+                "estados": list(ESTADOS_IMPRESSAO), "materiais": [m for m in MATERIAIS_IMPRESSAO if m]}
+
+    def fila_impressao(self, quem: dict) -> dict:
+        if not _eh_equipe(quem):
+            return {"ok": False, "erro": "só a equipe vê a fila de impressão", "codigo": 403}
+        ordem = " ORDER BY CASE estado WHEN 'pendente' THEN 0 WHEN 'aprovada' THEN 1 WHEN 'imprimindo' THEN 2 ELSE 3 END, criado LIMIT 500"
+        return {"ok": True, "itens": self._itens_impressao(ordem, (), True), "estados": list(ESTADOS_IMPRESSAO)}
+
+    def mudar_impressao(self, d: dict, quem: dict) -> dict:
+        """Equipe: pendente → aprovada → imprimindo → pronta; recusada (com motivo) enquanto não começou a imprimir."""
+        if not _eh_equipe(quem):
+            return {"ok": False, "erro": "só a equipe muda a situação da fila", "codigo": 403}
+        novo = _texto(d.get("estado"), 20)
+        if novo not in ESTADOS_IMPRESSAO:
+            return {"ok": False, "erro": "estado: " + ", ".join(ESTADOS_IMPRESSAO)}
+        motivo = _texto(d.get("motivo"), 400)
+        if novo == "recusada" and len(motivo) < 3:
+            return {"ok": False, "erro": "Escreva o motivo da recusa."}
+        with self.hub._trava:
+            r = self._db.execute("SELECT estado FROM ino_impressao WHERE id=?", (int(d.get("id") or 0),)).fetchone()
+            if not r:
+                return {"ok": False, "erro": "pedido não encontrado", "codigo": 404}
+            if novo not in PASSOS_IMPRESSAO.get(r[0], ()):
+                return {"ok": False, "erro": f"de '{r[0]}' não se passa para '{novo}'", "codigo": 409}
+            self._db.execute("UPDATE ino_impressao SET estado=?, motivo=?, atualizado=? WHERE id=?",
+                             (novo, motivo if novo == "recusada" else "", self.relogio(), int(d["id"])))
+            self._db.commit()
+        self.hub.registrar("inovastem", "equipe", {"o_que": "impressão", "id": int(d["id"]), "estado": novo})
+        return {"ok": True, "estado": novo}
+
+
+__all__ = ["InovaSTEM", "ESQUEMAS", "AREAS", "VERSAO_AVISO", "ESTADOS_IMPRESSAO", "PASSOS_IMPRESSAO", "config_de", "link_whatsapp"]

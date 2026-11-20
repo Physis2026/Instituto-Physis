@@ -835,7 +835,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                        "agenda": lambda: agenda_mod.Agenda(hub),
                                        # InovaSTEM (D94): interesse, desafios e projetos abertos, materiais, WhatsApp opcional
                                        "inovastem": lambda: inovastem_mod.InovaSTEM(
-                                           hub, instancia, pasta_materiais=Path(banco_da_instancia(instancia)).resolve().parent / "materiais"),
+                                           hub, instancia, pasta_materiais=Path(banco_da_instancia(instancia)).resolve().parent / "materiais",
+                                           impressao3d=lambda: modulo("impressao3d")),     # fila de impressão: peças do Physis 3D
                                        "fornecedores": lambda: fornecedores_mod.Fornecedores(
                                            hub, pasta=fornecedores_mod.pasta_padrao(banco_da_instancia(instancia))),
                                        # intercâmbio com plataformas parceiras (docs/INTERCAMBIO.md): chave só no arquivo do servidor
@@ -1096,6 +1097,16 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     qi2 = self._exigir(seg.EQUIPE)
                     if qi2:
                         r = ino.fila(qi2) if p.endswith("/fila") else ino.interesses(qi2)
+                        self._json(r.pop("codigo", 200), r)
+                elif p == "/api/inovastem/impressao/minhas":          # fila de impressão: os pedidos de quem tem conta
+                    qi2 = self._exigir(seg.CLIENTE)
+                    if qi2:
+                        r = ino.minhas_impressoes(qi2)
+                        self._json(r.pop("codigo", 200), r)
+                elif p == "/api/inovastem/impressao/fila":            # fila de impressão: a equipe vê todos os pedidos
+                    qi2 = self._exigir(seg.EQUIPE)
+                    if qi2:
+                        r = ino.fila_impressao(qi2)
                         self._json(r.pop("codigo", 200), r)
                 else:
                     self._json(404, {"ok": False, "erro": "rota desconhecida"})
@@ -1486,8 +1497,18 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     r = ino.interesse(d) if p.endswith("/interesse") else ino.sugerir_projeto(d)
                     self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
                     return True
+                if p == "/api/inovastem/impressao":                   # fila de impressão: participante com conta pede
+                    qi2 = self._exigir(seg.CLIENTE)
+                    if not qi2:
+                        return True
+                    d = self._ler(corpo, "ino_impressao")
+                    if d is None:
+                        return True
+                    r = ino.pedir_impressao(d, qi2)
+                    self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
+                    return True
                 equipe_ino = {"/api/inovastem/desafio": "ino_proposta", "/api/inovastem/moderar": "ino_moderar",
-                              "/api/inovastem/remover": "ino_remover"}
+                              "/api/inovastem/remover": "ino_remover", "/api/inovastem/impressao/estado": "ino_impressao_estado"}
                 if p not in equipe_ino:
                     self._json(404, {"ok": False, "erro": "rota desconhecida"})
                     return True
@@ -1498,7 +1519,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if d is None:
                     return True
                 r = (ino.publicar_desafio(d, qi2) if p.endswith("/desafio") else ino.moderar(d, qi2) if p.endswith("/moderar")
-                     else ino.remover_interesse(d, qi2))
+                     else ino.mudar_impressao(d, qi2) if p.endswith("/impressao/estado") else ino.remover_interesse(d, qi2))
                 self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
                 return True
             if p in ("/api/agenda/criar", "/api/agenda/sugerir", "/api/agenda/importar") or re.fullmatch(r"/api/agenda/\d{1,12}/arquivar", p):

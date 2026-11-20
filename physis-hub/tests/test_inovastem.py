@@ -13,6 +13,10 @@ Protege:
    (claro e escuro), sem internet, sem eval, ids fixos únicos, PT e EN com as mesmas chaves, abas pedidas, sem a marca do
    Instituto, sem "open source" (D92), hackathon em março de 2027, Amigo só pessoa física.
 6. Pacote inovastem: leva o site, a pasta de materiais e a configuração; o do Instituto não leva o site da InovaSTEM.
+7. Modelagem 3D (dona, 20/11/2026): fila de impressão (papéis, sessão e CSRF, estados, recusa com motivo, registro sem dado
+   pessoal, só na instalação inovastem); /laboratorio com as 8 subabas na ordem (Enviar arquivo primeiro) e com role/aria de
+   abas, fluxo visível e passos no projeto comum inovastem-projeto/1, um bloco por fenômeno pelo motor da simulação,
+   sistema/physis-imagem-3d.js (imagem → CAD 2D e 3D; peças de teste) copiado igual, gerador em dia; site em PT e EN.
 """
 import json
 import os
@@ -511,6 +515,322 @@ class Pacote(unittest.TestCase):
         import montar
         montar.conferir_marca(f["marca"])          # cores só da PALETA.md (SystemExit se não)
         self.assertNotIn("Instituto", f["marca"]["logo_texto"])
+
+
+# ── Modelagem 3D (Physis 3D), estrutura aprovada pela dona em 20/11/2026 ──────────────────────────────────────────────
+STL_1 = (b"\0" * 80) + (1).to_bytes(4, "little") + (b"\0" * 12) + b"".join(
+    v.to_bytes(4, "little") for v in [0, 0, 0, 0x3F800000, 0, 0, 0, 0x3F800000, 0]) + b"\0\0"      # um triângulo
+
+
+class FilaImpressao(unittest.TestCase):
+    """Fila de impressão (physis_hub/inovastem.py): papéis, estados, recusa com motivo, registro sem dado pessoal."""
+
+    def setUp(self):
+        import base64
+        from physis_hub import impressao3d as m3
+        self.tmp = tempfile.TemporaryDirectory()
+        self.h = Hub(org="ino-fila")
+        self.i3d = m3.Impressao3D(self.h, Path(self.tmp.name) / "p3d", fatiador=m3.Fatiador(url=""))
+        self.i = ino_mod.InovaSTEM(self.h, {}, impressao3d=lambda: self.i3d)      # como o servidor liga (função)
+        self.ana = {"usuario": "ana@x.example", "papel": seg.CLIENTE}
+        self.bia = {"usuario": "bia@x.example", "papel": seg.CLIENTE}
+        self.peca = self.i3d.criar({"nome": "Suporte de vaso"}, self.ana)["id"]
+        self.sem_arquivo = self.i3d.criar({"nome": "Sem arquivo"}, self.ana)["id"]
+        r = self.i3d.revisar(self.peca, {"arquivo_b64": base64.b64encode(STL_1).decode(), "arquivo_nome": "vaso.stl", "nota": "primeira"}, self.ana)
+        self.assertTrue(r["ok"], r)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_papeis_e_estados(self):
+        self.assertEqual(self.i.pedir_impressao({"peca": self.peca}, self.bia).get("codigo"), 404, "rascunho de outra pessoa")
+        self.assertFalse(self.i.pedir_impressao({"peca": self.sem_arquivo}, self.ana)["ok"])
+        self.assertFalse(self.i.pedir_impressao({"peca": self.peca, "material": "ouro"}, self.ana)["ok"])
+        self.assertEqual(self.i.pedir_impressao({"peca": self.peca}, None).get("codigo"), 401)
+        r = self.i.pedir_impressao({"peca": self.peca, "material": "rpetg", "observacao": "para a horta"}, self.ana)
+        self.assertEqual((r["ok"], r["estado"]), (True, "pendente"), r)
+        pid = r["id"]
+        # participante não vê a fila da equipe nem muda a situação
+        self.assertEqual(self.i.fila_impressao(self.ana).get("codigo"), 403)
+        self.assertEqual(self.i.mudar_impressao({"id": pid, "estado": "aprovada"}, self.ana).get("codigo"), 403)
+        # a equipe segue os passos; pular passo é recusado (409)
+        self.assertEqual(self.i.mudar_impressao({"id": pid, "estado": "pronta"}, EQUIPE).get("codigo"), 409)
+        self.assertFalse(self.i.mudar_impressao({"id": pid, "estado": "voando"}, EQUIPE)["ok"])
+        for e in ("aprovada", "imprimindo", "pronta"):
+            self.assertEqual(self.i.mudar_impressao({"id": pid, "estado": e}, EQUIPE).get("estado"), e)
+        self.assertEqual(self.i.mudar_impressao({"id": pid, "estado": "recusada", "motivo": "tarde"}, EQUIPE).get("codigo"), 409)
+        self.assertEqual(self.i.mudar_impressao({"id": 999, "estado": "aprovada"}, EQUIPE).get("codigo"), 404)
+        minhas = self.i.minhas_impressoes(self.ana)["itens"]
+        self.assertEqual([(x["id"], x["estado"], x["peca_nome"]) for x in minhas], [(pid, "pronta", "Suporte de vaso")])
+        self.assertEqual(self.i.minhas_impressoes(self.bia)["itens"], [], "cada um vê só os seus pedidos")
+        # o arquivo é o da última revisão, baixado pela rota do Physis 3D (a equipe vê todas as peças)
+        sha = minhas[0]["arquivo_sha256"]
+        self.assertEqual(minhas[0]["arquivo_url"], "/api/3d/arquivo/" + sha)
+        self.assertEqual(self.i3d.arquivo(sha, EQUIPE)[0], "vaso.stl")
+
+    def test_recusa_com_motivo_e_peca_publicada(self):
+        r = self.i.pedir_impressao({"peca": self.peca}, self.ana)
+        self.assertFalse(self.i.mudar_impressao({"id": r["id"], "estado": "recusada"}, EQUIPE)["ok"], "recusa pede motivo")
+        self.assertEqual(self.i.mudar_impressao({"id": r["id"], "estado": "recusada", "motivo": "peça maior que a mesa"}, EQUIPE)["estado"], "recusada")
+        x = self.i.minhas_impressoes(self.ana)["itens"][0]
+        self.assertEqual((x["estado"], x["motivo"], x["proximos"]), ("recusada", "peça maior que a mesa", []))
+        # peça publicada (e não oculta): qualquer participante com conta pode pedir
+        self.i3d.aderir("ana@x.example", {"nome_publico": "Ana", "consentimento": True})
+        self.assertTrue(self.i3d.publicar(self.peca, {"licenca": "CC-BY-4.0", "consentimento": True}, self.ana)["ok"])
+        self.assertTrue(self.i.pedir_impressao({"peca": self.peca}, self.bia)["ok"])
+
+    def test_registro_e_fila_sem_dado_pessoal(self):
+        r = self.i.pedir_impressao({"peca": self.peca, "observacao": "obs"}, self.ana)
+        self.i.mudar_impressao({"id": r["id"], "estado": "recusada", "motivo": "sem filamento"}, EQUIPE)
+        linhas = self.h._db.execute("SELECT origem, conteudo FROM registro WHERE tipo='inovastem'").fetchall()
+        self.assertEqual(len(linhas), 2)
+        texto = json.dumps(linhas, ensure_ascii=False)
+        for pessoal in ("ana@x.example", "eq@x.example", "obs", "sem filamento"):
+            self.assertNotIn(pessoal, texto)
+        fila = self.i.fila_impressao(EQUIPE)
+        self.assertEqual(len(fila["itens"]), 1)
+        self.assertNotIn("ana@x.example", json.dumps(fila), "a equipe vê o nome público, nunca o e-mail")
+        self.assertIn("nome_publico", fila["itens"][0])
+
+    def test_esquemas_estritos(self):
+        self.assertIn("ino_impressao", seg.ESQUEMAS)
+        self.assertIsNone(seg.validar({"peca": 1, "material": "rpla", "observacao": "x"}, seg.ESQUEMAS["ino_impressao"]))
+        self.assertIsNotNone(seg.validar({"peca": 1, "email": "a@b.example"}, seg.ESQUEMAS["ino_impressao"]))
+        self.assertIsNotNone(seg.validar({"material": "rpla"}, seg.ESQUEMAS["ino_impressao"]))
+        self.assertIsNotNone(seg.validar({"id": 1}, seg.ESQUEMAS["ino_impressao_estado"]))
+        self.assertEqual(ino_mod.ESTADOS_IMPRESSAO, ("pendente", "aprovada", "imprimindo", "pronta", "recusada"))
+
+
+class FilaImpressaoRotas(unittest.TestCase):
+    """Rotas /api/inovastem/impressao*: só na instalação inovastem, sessão, papel e CSRF como as outras."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.antes = {k: os.environ.get(k) for k in ("PHYSIS_3D_PASTA", "PHYSIS_LIMITE_ENTRAR", "PHYSIS_CONFIRMAR_EMAIL")}
+        for k in cls.antes:
+            os.environ.pop(k, None)
+        os.environ["PHYSIS_LIMITE_ENTRAR"] = "0"
+        cls.tmp = tempfile.TemporaryDirectory()
+        os.environ["PHYSIS_3D_PASTA"] = str(Path(cls.tmp.name) / "3d")
+        cls.h = Hub(org="ino-fila-rotas")
+        cls.srv = servidor.iniciar(cls.h, 0, endereco="127.0.0.1", instancia={
+            "login": True, "cadastro_aberto": True, "moderacao_previa": True, "instalacao": "inovastem"})
+        cls.porta = cls.srv.server_address[1]
+        adm = cls.h.criar_conta("Direção", "dir@f.example", SENHA)
+        cls.h.criar_conta("Participante", "par@f.example", SENHA, adm["id"], papel="cliente")
+        cls.dir, cls.par = cls.sessao("dir@f.example"), cls.sessao("par@f.example")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.srv.shutdown()
+        cls.srv.server_close()
+        cls.tmp.cleanup()
+        for k, v in cls.antes.items():
+            os.environ.pop(k, None)
+            if v is not None:
+                os.environ[k] = v
+
+    @classmethod
+    def sessao(cls, usuario):
+        tk = cls.h.entrar(usuario, SENHA)["token"]
+        return ("physis_sessao=" + tk, seg.csrf_de(cls.h, tk))
+
+    def pedir(self, metodo, rota, corpo=None, s=None, porta=None):
+        return Rotas.pedir(self, metodo, rota, corpo, s, porta)
+
+    def test_fluxo_com_sessao_papel_e_csrf(self):
+        import base64
+        st, r = self.pedir("POST", "/api/3d/pecas", {"nome": "Gancho", "material": ""}, self.par)
+        self.assertEqual(st, 200, r)
+        pid = r["id"]
+        st, r = self.pedir("POST", f"/api/3d/pecas/{pid}/revisao", {"arquivo_b64": base64.b64encode(STL_1).decode(), "arquivo_nome": "g.stl"}, self.par)
+        self.assertEqual(st, 200, r)
+        # sem sessão: 401; campo fora do esquema: 400; CSRF errado: 403
+        self.assertEqual(self.pedir("POST", "/api/inovastem/impressao", {"peca": pid})[0], 401)
+        self.assertEqual(self.pedir("GET", "/api/inovastem/impressao/minhas")[0], 401)
+        self.assertEqual(self.pedir("POST", "/api/inovastem/impressao", {"peca": pid, "extra": 1}, self.par)[0], 400)
+        st, r = self.pedir("POST", "/api/inovastem/impressao", {"peca": pid}, (self.par[0], "csrf-errado"))
+        self.assertEqual((st, r.get("csrf")), (403, True))
+        st, r = self.pedir("POST", "/api/inovastem/impressao", {"peca": pid, "material": "rpla", "observacao": "teste"}, self.par)
+        self.assertEqual((st, r.get("estado")), (200, "pendente"), r)
+        iid = r["id"]
+        st, m = self.pedir("GET", "/api/inovastem/impressao/minhas", s=self.par)
+        self.assertEqual([x["id"] for x in m["itens"]], [iid])
+        # participante não é equipe
+        self.assertEqual(self.pedir("GET", "/api/inovastem/impressao/fila", s=self.par)[0], 403)
+        self.assertEqual(self.pedir("POST", "/api/inovastem/impressao/estado", {"id": iid, "estado": "aprovada"}, self.par)[0], 403)
+        st, f = self.pedir("GET", "/api/inovastem/impressao/fila", s=self.dir)
+        self.assertEqual((st, [x["id"] for x in f["itens"]]), (200, [iid]))
+        self.assertNotIn("par@f.example", json.dumps(f))
+        st, r = self.pedir("POST", "/api/inovastem/impressao/estado", {"id": iid, "estado": "imprimindo"}, self.dir)
+        self.assertEqual(st, 409, r)
+        st, r = self.pedir("POST", "/api/inovastem/impressao/estado", {"id": iid, "estado": "aprovada"}, self.dir)
+        self.assertEqual((st, r.get("estado")), (200, "aprovada"), r)
+        # o arquivo baixa pela rota do Physis 3D, com sessão (para abrir localmente no CrealityPrint ou no HALOT)
+        req = urllib.request.Request(f"http://127.0.0.1:{self.porta}{f['itens'][0]['arquivo_url']}", headers={"Cookie": self.dir[0]})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            self.assertEqual((resp.status, resp.read()), (200, STL_1))
+            self.assertIn("attachment", resp.headers["Content-Disposition"])
+
+    def test_rotas_nao_existem_em_outra_instalacao(self):
+        h = Hub(org="ino-fila-outra")
+        srv = servidor.iniciar(h, 0, endereco="127.0.0.1", instancia={"login": True, "instalacao": "instituto"})
+        try:
+            porta = srv.server_address[1]
+            self.assertEqual(self.pedir("GET", "/api/inovastem/impressao/minhas", porta=porta)[0], 404)
+            self.assertEqual(self.pedir("POST", "/api/inovastem/impressao", {"peca": 1}, porta=porta)[0], 404)
+        finally:
+            srv.shutdown()
+            srv.server_close()
+
+
+class Modelagem3D(unittest.TestCase):
+    """/laboratorio = Modelagem 3D (Physis 3D): 8 subabas, projeto comum, simulação por fenômeno, fila e galeria."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(RAIZ / "ferramentas"))
+        import montar_lab_inovastem as lab
+        cls.lab = lab
+        cls.h = ler(AQUI / "web" / "inovastem-lab.html")
+        cls.js = re.search(r'<script id="lab-inovastem">\n(.*?)</script>', cls.h, re.S).group(1)
+        cls.fora = re.sub(r"<script.*?</script>", "", cls.h, flags=re.S)
+
+    def test_oito_subabas_na_ordem_com_aria(self):
+        # 7 aprovadas pela dona em 20/11/2026 e "Enviar arquivo" (acréscimo do mesmo dia) como a primeira do fluxo
+        ordem = ["arquivo", "lugar", "edificacao", "pecas", "simulacao", "escaneamento", "fila", "galeria"]
+        self.assertEqual([k for k, _ in self.lab.SUBABAS], ordem)
+        self.assertEqual(re.findall(r'<a role="tab" id="tab-([a-z]+)" href="#\1" aria-controls="lab"', self.fora), ordem)
+        self.assertEqual(self.fora.count('role="tablist"'), 1)
+        self.assertIn('id="lab" role="tabpanel"', self.fora)
+        self.assertEqual(self.fora.count('aria-selected="true"'), 1)
+        for k in ordem:
+            self.assertRegex(self.js, rf"\b{k}: tela[A-Za-z]+", k)
+        self.assertIn('"3d": "pecas"', self.js, "endereço antigo #3d abre Peças 3D")
+        for tecla in ("ArrowRight", "ArrowLeft", "Home", "End"):
+            self.assertIn(tecla, self.js)
+        self.assertEqual(self.h, self.lab.montar(), "rode: python ferramentas/montar_lab_inovastem.py")
+
+    def test_projeto_comum(self):
+        self.assertIn('ESQ_PROJETO = "inovastem-projeto/1"', self.js)
+        self.assertIn("lugar: null, edificacao: null, pecas: [], resultados: []", self.js)
+        # localStorage só com try/catch; exportar e importar arquivo
+        for linha in self.js.splitlines():
+            if "localStorage." in linha:
+                self.assertIn("try", linha, linha.strip())
+        for k in ("proj-exportar", "proj-importar", "Exportar o projeto", "Importar um projeto", 'id="lab-proj"'):
+            self.assertIn(k, self.h, k)
+        # o contrato do lugar é o do Mapeamento
+        from physis_hub import mapeamento
+        self.assertIn(f'ESQ_LUGAR = "{mapeamento.ESQUEMA_GEOMETRIA}"', self.js)
+        self.assertIn('localStorage.getItem("physis-geometria-lugar")', self.js)
+        self.assertIn("/api/mapeamento/ifc/ler", self.js)
+
+    def test_simulacao_um_bloco_por_fenomeno_pelo_motor(self):
+        nomes = re.findall(r'\{ id: "([a-z]+)", nome: "([^"]+)", prefixos: \[([^\]]+)\]', self.js)
+        self.assertEqual([n for _, n, _ in nomes], ["Calor", "Estrutura", "Ventilação e vento", "Terreno e água", "Incerteza", "Biogás", "Otimização QUBO"])
+        casos = json.loads(ler(RAIZ / "sistema" / "simulacao-exemplos" / "casos.json"))["casos"]
+        for fid, _, pref in nomes:
+            p = re.findall(r'"([a-z]+\.)"', pref)
+            self.assertTrue(any(c.get("exemplo") and any(c["solver"].startswith(x) for x in p) for c in casos), fid)
+        for k in ("o que faz", "Entradas", "O que sai", "Limites de validade", "Guardar no projeto"):
+            self.assertIn(k, self.js.replace("O que faz", "o que faz"), k)
+        motor = ler(RAIZ / "sistema" / "physis-simulacao.js")
+        for f in ("rodarCaso", "desenhoCaso"):
+            self.assertIn(f"SIMULACAO.{f}(", self.js)
+            self.assertIn(f"{f}: {f}", motor, f"o motor exporta {f}")
+        self.assertIn("SIMULACAO.terreno.gradeDaGeometria(proj.lugar.dados)", self.js)
+        self.assertIn("telaPhysis3D()", self.js)
+
+    def test_fila_galeria_e_escaneamento(self):
+        for rota in ("/api/inovastem/impressao/minhas", "/api/inovastem/impressao/fila", "/api/inovastem/impressao/estado",
+                     '"/api/inovastem/impressao"', "/api/publico/3d/pecas", "/api/publico/3d/arquivo/", "/api/3d/pecas", "X-Physis-CSRF"):
+            self.assertIn(rota, self.js, rota)
+        for k in ("CrealityPrint", "HALOT", "Nada é instalado nem chamado pelo navegador", "[MARCADOR: modelos exatos das impressoras]",
+                  "Todos os direitos reservados", "moderação", "STL", "OBJ", "fotogrametria"):
+            self.assertIn(k, self.js, k)
+        from physis_hub import impressao3d as m3
+        for cod, nome in m3.LICENCAS.items():          # só licenças abertas (decisão da dona)
+            self.assertRegex(cod, r"^(CC|CERN-OHL)")
+            self.assertNotRegex(nome.lower(), r"reservad|proprietár")
+
+    def test_regras_da_tela(self):
+        self.assertEqual(len(re.findall(r"<h1\b", self.fora)), 1)
+        self.assertNotRegex(self.js, r"<h1[\s>]", "a casca não escreve h1 (o único é o logo)")
+        self.assertNotRegex(self.js, r"\beval\(|new Function\(")
+        self.assertNotRegex(self.js.replace("http://www.w3.org/2000/svg", ""), r"https?://", "só o nome do formato SVG (namespace)")
+        self.assertNotRegex(self.fora, r'(?i)(src|href)\s*=\s*"https?://')
+        css = re.search(r"<style>\n(.*?)</style>", self.h, re.S).group(1)
+        casca = self.lab.CASCA_CSS
+        self.assertEqual(re.findall(r"#[0-9A-Fa-f]{6}", casca), [], "a casca só usa as variáveis do guia")
+        self.assertIn(casca, css)
+        self.assertNotRegex(re.sub(r"const CORES = .*", "", self.js), r"#[0-9A-Fa-f]{6}\b", "nenhuma cor nova na casca")
+        corpo = re.sub(r"<script.*?</script>", "", self.h, flags=re.S)
+        ids = re.findall(r'\bid="([^"$]+)"', corpo)
+        self.assertEqual(len(ids), len(set(ids)), ids)
+        self.assertNotIn("Modelagem online", self.h)
+
+    def test_site_mostra_as_7_subabas(self):
+        site = ler(PAGINA)
+        js = re.search(r'<script id="site-inovastem">\n(.*?)</script>', site, re.S).group(1)
+        bloco = re.search(r"const T = \{(.*?)\n\};", js, re.S).group(1)
+        pt, en = bloco.split("\n  en: {", 1)
+        for lingua in (pt, en):
+            linhas = re.search(r"mod_linhas:\[(.*?)\]\],", lingua, re.S).group(1)
+            self.assertEqual(re.findall(r'\["([a-z]+)",', linhas), [k for k, _ in self.lab.SUBABAS])
+        self.assertIn('modelagem:"Modelagem 3D"', pt)
+        self.assertIn('href="/laboratorio#${esc(l[0])}"', js)
+        self.assertNotIn("Modelagem online", site)
+
+
+class EnviarArquivoEImagem3D(unittest.TestCase):
+    """Subaba "Enviar arquivo" e sistema/physis-imagem-3d.js (acréscimos da dona em 20/11/2026). O autoteste do módulo roda no
+    navegador (PhysisImagem3D.autoteste(): máscara, contornos, DXF, SVG, relevo fechado com volume conferido, peças de teste)."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(RAIZ / "ferramentas"))
+        import montar_lab_inovastem as lab
+        cls.lab = lab
+        cls.mod = ler(RAIZ / "sistema" / "physis-imagem-3d.js").replace("\r\n", "\n")
+        cls.h = ler(AQUI / "web" / "inovastem-lab.html")
+        cls.js = re.search(r'<script id="lab-inovastem">\n(.*?)</script>', cls.h, re.S).group(1)
+
+    def test_modulo_copiado_igual_e_sem_mudar_o_motor(self):
+        self.assertIn(("lab-imagem3d", RAIZ / "sistema" / "physis-imagem-3d.js"), self.lab.BLOCOS)
+        m = re.search(r'<script id="lab-imagem3d">\n(.*?)</script>', self.h, re.S)
+        self.assertEqual(m.group(1), self.mod)
+        self.assertLess(self.h.index('id="lab-3d"'), self.h.index('id="lab-imagem3d"'), "o módulo vem depois do motor do Physis 3D")
+        self.assertNotRegex(self.mod, r"window\.PHYSIS3D\s*=|PHYSIS3D\.[A-Za-z]+\s*=[^=]", "não troca nada do motor")
+        self.assertNotRegex(self.mod, r"\beval\(|new Function\(|fetch\(|XMLHttpRequest")
+        self.assertNotRegex(self.mod.replace("http://www.w3.org/2000/svg", ""), r"https?://")
+        for f in ("mascara", "contornos", "svg", "dxf", "relevo", "testes", "autoteste"):
+            self.assertRegex(self.mod, r"window\.PhysisImagem3D = \{[^}]*\b" + f + r"\b", f)
+        self.assertIn("P.escreverSTL(", self.mod)
+
+    def test_pecas_de_teste_proprias(self):
+        ids = re.findall(r'id: "([a-z0-9-]+)", nome: "', self.mod)
+        self.assertEqual(ids, ["cubo-calibracao-20mm", "teste-balanco-30-45-60", "teste-ponte-10-20-30mm", "teste-espessura-parede"])
+        self.assertEqual(self.mod.count("observar:"), 4)
+        self.assertNotRegex(self.mod.lower(), r"benchy|3dbenchy|thingiverse|printables")
+        for k in ("teste-baixar", "teste-abrir", "Arquivos de teste para impressão", "Baixar STL"):
+            self.assertIn(k, self.js, k)
+
+    def test_enviar_arquivo_fluxo_e_passos(self):
+        for k in ("PhysisImagem3D.svg(", "PhysisImagem3D.dxf(", "PHYSIS3D.escreverSTL(", "PHYSIS3D.escrever3MF(", "I.relevo(M,", "window.PhysisImagem3D",
+                  "Enviar para Peças 3D / impressão", 'getElementById("p3d-arquivo")', "new DataTransfer()", "getPointAtLength",
+                  "Sem uma biblioteca de fora", "[MARCADOR: decidir a leitura de PDF]", "data-lab-par"):
+            self.assertIn(k, self.js, k)
+        # SVG: só formas e atributos de geometria (nada de script, evento ou link)
+        atrib = re.search(r"const SVG_ATRIBUTOS = \[(.*?)\];", self.js).group(1)
+        self.assertNotRegex(atrib, r'"on|href|style')
+        self.assertIn('arquivos: [], passos: []', self.js)
+        fluxo = re.findall(r'\["([a-z]+)", "[^"]+", \[', re.search(r"const FLUXO = \[(.*?)\]\];", self.js, re.S).group(1))
+        self.assertEqual(fluxo, ["arquivo", "lugar", "pecas", "simulacao", "fila", "galeria"])
+        for passo in ("arquivo", "lugar", "edificacao", "pecas", "simulacao", "fila", "galeria"):
+            self.assertIn(f'registrarPasso("{passo}"', self.js, passo)
+        self.assertIn("qualquer assunto", self.h)
+        self.assertIn("outra ferramenta, a final (módulo pago)", self.h)
 
 
 if __name__ == "__main__":
