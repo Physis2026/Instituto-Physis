@@ -180,12 +180,16 @@ const T = {
     pular:"Pular para o conteúdo", titulo:"InovaSTEM", beta:"versão beta",
     sub:"Rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos",
     sub_delas:"Rede dedicada a mulheres (jovens, cis e trans) em STEM: formação, acolhimento entre pares e mentoria",
+    pd_t:"Entrar na InovaSTEM Delas", pd_intro:"Ao entrar na InovaSTEM Delas, você entra automaticamente também na InovaSTEM, a rede aberta de trocas, parcerias e desafios de modelagem.",
+    pd_autodecl:"Sou mulher (cis ou trans). É uma autodeclaração: não pedimos documento.", pd_auto_falta:"Para entrar na InovaSTEM Delas, marque a autodeclaração.",
+    pd_enviar:"Entrar na InovaSTEM Delas", pd_ok:"Pronto! Você está na InovaSTEM Delas e também na InovaSTEM. As novidades chegam pelo seu e-mail.",
+    pd_conta:"Para o fórum da Delas, crie também a sua conta em Participar e marque a autodeclaração.",
     endosso_a:"uma iniciativa", endosso_b:"", inscreva:"Inscreva-se", menu:"Menu", logo_alt:"InovaSTEM, página inicial", delas_logo_alt:"InovaSTEM Delas",
     hero_sobrancelha:"Versão beta · lançamento em 26/11/2026", passo:"Passo {n} de 2", continuar:"Continuar", voltar_passo:"Voltar",
     passo1_falta:"Preencha o nome ou apelido e um e-mail válido para continuar.",
     int_idade_min:"A participação é a partir de 16 anos; de 16 a 17 anos, com o responsável legal [CONFERIR com o advogado].",
     nav:"Seções do site", carregando:"Carregando…", sem_hub:"Não foi possível falar com o servidor. Tente de novo em instantes.",
-    abas:{inicio:"Início", delas:"InovaSTEM Delas", desafios:"Desafios e projetos", forum:"Fórum", modelagem:"Modelagem 3D",
+    abas:{inicio:"Início", delas:"InovaSTEM Delas", delas_entrar:"Entrar na InovaSTEM Delas", desafios:"Desafios e projetos", forum:"Fórum", modelagem:"Modelagem 3D",
           hackathon:"Hackathon", materiais:"Materiais", participar:"Participar", termos:"Termos de uso (beta)", privacidade:"Privacidade (beta)"},
     marcador:"[MARCADOR]", conferir:"[CONFERIR]", funciona:"Funciona", em_dev:"Em desenvolvimento", beta_selo:"Beta",
     // início
@@ -318,12 +322,16 @@ const T = {
     pular:"Skip to content", titulo:"InovaSTEM", beta:"beta version",
     sub:"An open network for exchanging information, partnerships and modelling challenges with open code",
     sub_delas:"A network dedicated to women (young, cis and trans) in STEM: training, peer support and mentoring",
+    pd_t:"Join InovaSTEM Hers", pd_intro:"When you join InovaSTEM Hers, you automatically join InovaSTEM too, the open network for exchange, partnerships and modelling challenges.",
+    pd_autodecl:"I am a woman (cis or trans). This is a self-declaration: no document is required.", pd_auto_falta:"To join InovaSTEM Hers, tick the self-declaration.",
+    pd_enviar:"Join InovaSTEM Hers", pd_ok:"Done! You are in InovaSTEM Hers and in InovaSTEM too. News will arrive by e-mail.",
+    pd_conta:"For the Hers forum, also create your account under Join and tick the self-declaration.",
     endosso_a:"a", endosso_b:"initiative", inscreva:"Sign up", menu:"Menu", logo_alt:"InovaSTEM, home page", delas_logo_alt:"InovaSTEM Hers",
     hero_sobrancelha:"Beta version · launch on 26 November 2026", passo:"Step {n} of 2", continuar:"Continue", voltar_passo:"Back",
     passo1_falta:"Fill in your name or nickname and a valid e-mail to continue.",
     int_idade_min:"Participation starts at age 16; from 16 to 17, with the legal guardian [CONFERIR with the lawyer].",
     nav:"Site sections", carregando:"Loading…", sem_hub:"Could not reach the server. Please try again shortly.",
-    abas:{inicio:"Home", delas:"InovaSTEM Hers", desafios:"Challenges and projects", forum:"Forum", modelagem:"3D modelling",
+    abas:{inicio:"Home", delas:"InovaSTEM Hers", delas_entrar:"Join InovaSTEM Hers", desafios:"Challenges and projects", forum:"Forum", modelagem:"3D modelling",
           hackathon:"Hackathon", materiais:"Materials", participar:"Join", termos:"Terms of use (beta)", privacidade:"Privacy (beta)"},
     marcador:"[MARCADOR]", conferir:"[CONFERIR]", funciona:"Working", em_dev:"In development", beta_selo:"Beta",
     ini_missao_t:"Mission", ini_missao:"To connect people, organisations and projects to exchange information, build partnerships and solve modelling challenges with open code.",
@@ -450,7 +458,7 @@ let lang = "pt";
 try { lang = (localStorage.getItem("physis-idioma") === "en") ? "en" : "pt"; } catch (e) {}
 const ABAS = ["inicio", "delas", "desafios", "forum", "modelagem", "hackathon", "materiais", "participar"];
 const MENU = ["delas", "desafios", "forum", "modelagem", "hackathon", "materiais"];   // guia: menu de até 6 itens; Início = logo; Participar = botão
-const EXTRAS = ["termos", "privacidade"];                   // no rodapé, fora da barra de abas
+const EXTRAS = ["termos", "privacidade", "delas_entrar"];                   // no rodapé, fora da barra de abas
 const CAT_DA_ABA = { delas:"delas", desafios:"desafios", modelagem:"modelagem", hackathon:"hackathon" };
 const CATS_FORUM = ["geral", "inovastem", "modelagem", "desafios", "hackathon", "eventos"];   // comunidade.py
 let inst = null, eu = null, ino = null, aba = "inicio", topicoAberto = null, catForum = "geral", areaPre = "", passoInt = 1;
@@ -516,10 +524,10 @@ function telaInicio() {
 function telaDelas() {
   return cartao(t("del_t"), `<div class="logo-delas"><img class="so-claro" src="${LOGO_DELAS[0]}" alt="${esc(t("delas_logo_alt"))}" width="94" height="120">
       <img class="so-escuro" src="${LOGO_DELAS[1]}" alt="${esc(t("delas_logo_alt"))}" width="95" height="120"></div><p><strong>${esc(t("del_missao"))}</strong></p>
-      <div class="acoes"><a class="botao delas" href="#participar">${esc(t("ini_chamar"))}</a>${botaoCompartilhar(t("del_convidar"), "comp-delas")}</div>
+      <div class="acoes"><a class="botao delas" href="#delas_entrar">${esc(t("ini_chamar"))}</a>${botaoCompartilhar(t("del_convidar"), "comp-delas")}</div>
       <p class="msg" id="comp-msg" role="status"></p>`, "delas")
     + `<section><h2>${esc(t("ini_duas_t"))}</h2><div class="grade"><div class="cartao delas"><h3>${esc(t("ini_duas")[1][0])}</h3><p>${esc(t("ini_duas")[1][1])}</p>
-       <div class="acoes"><a class="botao delas" href="#participar">${esc(t("ini_chamar"))}</a></div></div>
+       <div class="acoes"><a class="botao delas" href="#delas_entrar">${esc(t("ini_chamar"))}</a></div></div>
        <div class="cartao marca"><h3>${esc(t("ini_duas")[0][0])}</h3><p>${esc(t("ini_duas")[0][1])}</p>
        <div class="acoes"><a class="botao sec" href="/laboratorio">${esc(t("mod_abrir_sim"))}</a><a class="botao sec" href="#desafios">${esc(t("abas").desafios)}</a></div></div></div></section>`
     + cartao(t("del_dif_t"), `<p>${esc(t("del_dif"))}</p>`)
@@ -709,20 +717,45 @@ function telaJuridico(qual) {
     + blocos.map(([a, b]) => `<h3>${esc(a)}</h3><p>${esc(b)}</p>`).join("") + `</section>`;
 }
 
-const TELAS = { inicio: telaInicio, delas: telaDelas, desafios: telaDesafios, forum: telaForum, modelagem: telaModelagem,
+function telaDelasEntrar() {
+  const areas = (ino ? ino.areas : []).filter(a => a.id !== "delas");
+  return cartao(t("pd_t"), `<p>${esc(t("pd_intro"))}</p><form id="pd" novalidate>
+      <div class="campos">
+        <div><label for="pd-nome">${esc(t("int_nome"))}</label><input type="text" id="pd-nome" autocomplete="nickname" required maxlength="120"></div>
+        <div><label for="pd-email">${esc(t("int_email"))}</label><input type="email" id="pd-email" autocomplete="email" required maxlength="160"></div>
+      </div>
+      <label class="opcao"><input type="checkbox" id="pd-auto" required>${esc(t("pd_autodecl"))}</label>
+      <fieldset><legend>${esc(t("int_idade"))}</legend><p class="t2 pq">${esc(t("int_idade_min"))}</p>
+        <label class="opcao"><input type="radio" name="pd-idade" value="maior" checked>${esc(t("int_maior"))}</label>
+        <label class="opcao"><input type="radio" name="pd-idade" value="menor">${esc(t("int_menor"))}</label>
+        <div id="pd-resp" hidden><p class="t2 pq">${esc(t("int_menor_aviso"))}</p><div class="campos">
+          <div><label for="pd-resp-nome">${esc(t("int_resp_nome"))}</label><input type="text" id="pd-resp-nome" maxlength="120"></div>
+          <div><label for="pd-resp-email">${esc(t("int_resp_email"))}</label><input type="email" id="pd-resp-email" maxlength="160"></div></div></div>
+      </fieldset>
+      <fieldset><legend>${esc(t("int_areas"))}</legend>${areas.map(a => `<label class="opcao"><input type="checkbox" name="pd-area" value="${esc(a.id)}">${esc(lang === "en" ? a.nome_en : a.nome)}</label>`).join("")}</fieldset>
+      <div class="campos">
+        <div><label for="pd-cidade">${esc(t("int_cidade"))}</label><input type="text" id="pd-cidade" autocomplete="address-level2" maxlength="80"></div>
+        <div><label for="pd-inst">${esc(t("int_inst"))}</label><input type="text" id="pd-inst" autocomplete="organization" maxlength="120"></div>
+      </div>
+      <label class="opcao"><input type="checkbox" id="pd-aceite" required>${esc(t("int_aceite"))} <a href="#privacidade">${esc(t("abas").privacidade)}</a></label>
+      <div class="acoes"><button class="botao delas" type="submit">${esc(t("pd_enviar"))}</button></div>
+      <p class="msg" id="pd-msg" role="status"></p><p class="t2 pq">${esc(t("pd_conta"))}</p></form>`, "delas");
+}
+
+const TELAS = { delas_entrar: telaDelasEntrar, inicio: telaInicio, delas: telaDelas, desafios: telaDesafios, forum: telaForum, modelagem: telaModelagem,
                 hackathon: telaHackathon, materiais: telaMateriais, participar: telaParticipar,
                 termos: () => telaJuridico("termos"), privacidade: () => telaJuridico("privacidade") };
 
 let LOGO_INOVA = null;
 function cabecalho() {
   // na tela da Delas, o cabeçalho é dela (logo e frase); nas outras, o da InovaSTEM (dona, 20/11/2026)
-  const imgs = document.querySelectorAll("h1.logo img"), delas = aba === "delas";
+  const imgs = document.querySelectorAll("h1.logo img"), delas = aba === "delas" || aba === "delas_entrar";
   if (!LOGO_INOVA) LOGO_INOVA = [...imgs].map(i => i.getAttribute("src"));
   imgs.forEach((im, i) => { im.setAttribute("src", delas ? LOGO_DELAS[i] : LOGO_INOVA[i]); im.alt = delas ? t("delas_logo_alt") : t("logo_alt"); });
   const sub = document.querySelector('header [data-t="sub"]'); if (sub) sub.textContent = t(delas ? "sub_delas" : "sub");
 }
 function desenhar() {
-  document.body.classList.toggle("aba-delas", aba === "delas");
+  document.body.classList.toggle("aba-delas", aba === "delas" || aba === "delas_entrar");
   aplicarIdioma(); desenharAbas(); rodape(); cabecalho();
   $("corpo").innerHTML = TELAS[aba]();
   ligar();
@@ -867,6 +900,23 @@ function ligar() {
         organizacao: $("des-org").value, prazo: $("des-prazo").value });
       $("des-msg").textContent = r.ok ? "✓" : (r.erro || t("sem_hub")); $("des-msg").className = "msg" + (r.ok ? "" : " erro");
       if (r.ok) { fd.reset(); propostas(); }
+    };
+  }
+  if (aba === "delas_entrar") {
+    const fp = $("pd");
+    fp.querySelectorAll('input[name="pd-idade"]').forEach(r => r.onchange = () => { $("pd-resp").hidden = fp.querySelector('input[name="pd-idade"]:checked').value !== "menor"; });
+    fp.onsubmit = async ev => {
+      ev.preventDefault();
+      if (!$("pd-auto").checked) { $("pd-msg").textContent = t("pd_auto_falta"); $("pd-msg").className = "msg erro"; $("pd-auto").focus(); return; }
+      const maior = fp.querySelector('input[name="pd-idade"]:checked').value === "maior";
+      const corpo = { nome: $("pd-nome").value, email: $("pd-email").value,
+                      areas: ["delas"].concat([...fp.querySelectorAll('input[name="pd-area"]:checked')].map(x => x.value)),
+                      cidade: $("pd-cidade").value, instituicao: $("pd-inst").value, genero: "feminino", quero_delas: true,
+                      maior_de_idade: maior, aceite: $("pd-aceite").checked, versao: (ino && ino.versao_aviso) || "" };
+      if (!maior) { corpo.responsavel_nome = $("pd-resp-nome").value; corpo.responsavel_email = $("pd-resp-email").value; }
+      const r = await pedir("/api/publico/inovastem/interesse", corpo);
+      $("pd-msg").textContent = r.ok ? t("pd_ok") : (r.erro || t("sem_hub")); $("pd-msg").className = "msg" + (r.ok ? "" : " erro");
+      if (r.ok) { fp.reset(); $("pd-resp").hidden = true; }
     };
   }
   if (aba === "participar") {

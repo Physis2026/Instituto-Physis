@@ -412,6 +412,11 @@ class Pagina(unittest.TestCase):
             self.assertEqual(_n_itens(pt, k), _n_itens(en, k), k)
 
     def test_conteudo_pedido(self):
+        # formulário próprio da Delas: entra na Delas e, automaticamente, na InovaSTEM (dona, 20/11/2026)
+        self.assertIn('"delas_entrar"', self.js)
+        self.assertIn('href="#delas_entrar"', self.js)
+        self.assertIn('genero: "feminino", quero_delas: true', self.js)
+        self.assertIn('areas: ["delas"].concat(', self.js)
         for aba in ("inicio", "delas", "desafios", "forum", "modelagem", "hackathon", "materiais", "participar", "termos", "privacidade"):
             self.assertIn(f'"{aba}"', self.js, aba)
         for rota in ("/api/publico/inovastem/interesse", "/api/publico/inovastem/projeto", "/api/publico/cadastro",
