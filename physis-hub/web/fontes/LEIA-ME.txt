@@ -1,0 +1,3 @@
+Fontes do Guia de Identidade da Família Physis (19/11/2026): Josefin Sans (títulos e nomes) e Lora (texto).
+Licença SIL Open Font License 1.1 (OFL-*.txt). Cópia de C:\physis\identidade\fontes (fontes variáveis, eixo wght).
+Servidas pelo próprio servidor em /fontes/ (sem Google Fonts, sem internet). Usadas por web/inovastem.html.

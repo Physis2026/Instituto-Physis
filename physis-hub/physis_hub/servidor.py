@@ -82,6 +82,7 @@ from . import frota as frota_mod
 from . import intercambio as intercambio_mod
 from . import comunidade as comunidade_mod
 from . import agenda as agenda_mod
+from . import inovastem as inovastem_mod
 from . import mapeamento as mapeamento_mod
 from . import simulacao as simulacao_mod
 from . import cep as cep_mod
@@ -567,6 +568,8 @@ for _k, _v in comunidade_mod.ESQUEMAS.items():      # comunidade aberta do Insti
     seg.ESQUEMAS.setdefault(_k, _v)
 for _k, _v in agenda_mod.ESQUEMAS.items():          # agenda de eventos e oportunidades (docs/COMUNIDADE.md)
     seg.ESQUEMAS.setdefault(_k, _v)
+for _k, _v in inovastem_mod.ESQUEMAS.items():       # InovaSTEM living lab (D94, docs/INOVASTEM.md)
+    seg.ESQUEMAS.setdefault(_k, _v)
 for _k, _v in frota_mod.ESQUEMAS.items():                 # frota e combustível (docs/FROTA.md, em desenvolvimento)
     seg.ESQUEMAS.setdefault(_k, _v)
 
@@ -830,6 +833,9 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                            hub, aberto=bool(instancia.get("cadastro_aberto")),
                                            impressao3d=lambda: modulo("impressao3d"), agenda=lambda: modulo("agenda")),
                                        "agenda": lambda: agenda_mod.Agenda(hub),
+                                       # InovaSTEM (D94): interesse, desafios e projetos abertos, materiais, WhatsApp opcional
+                                       "inovastem": lambda: inovastem_mod.InovaSTEM(
+                                           hub, instancia, pasta_materiais=Path(banco_da_instancia(instancia)).resolve().parent / "materiais"),
                                        "fornecedores": lambda: fornecedores_mod.Fornecedores(
                                            hub, pasta=fornecedores_mod.pasta_padrao(banco_da_instancia(instancia))),
                                        # intercâmbio com plataformas parceiras (docs/INTERCAMBIO.md): chave só no arquivo do servidor
@@ -1075,6 +1081,25 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             if p.startswith("/api/publico/comunidade/"):
                 self._json(*modulo("comunidade").rota("GET", p, None, None, q))
                 return True
+            # InovaSTEM (D94, docs/INOVASTEM.md): só na instalação inovastem
+            if p.startswith("/api/publico/inovastem") or p.startswith("/api/inovastem/"):
+                if instancia.get("instalacao") != "inovastem":
+                    self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                    return True
+                ino = modulo("inovastem")
+                if p == "/api/publico/inovastem":
+                    self._json(200, ino.publico())
+                elif p == "/api/publico/inovastem/propostas":
+                    r = ino.propostas((q.get("tipo") or [""])[0][:20])
+                    self._json(r.pop("codigo", 200), r)
+                elif p in ("/api/inovastem/fila", "/api/inovastem/interesses"):
+                    qi2 = self._exigir(seg.EQUIPE)
+                    if qi2:
+                        r = ino.fila(qi2) if p.endswith("/fila") else ino.interesses(qi2)
+                        self._json(r.pop("codigo", 200), r)
+                else:
+                    self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                return True
             if p == "/api/publico/agenda":
                 r = modulo("agenda").publicos((q.get("categoria") or [""])[0][:30])
                 self._json(r.pop("codigo", 200), r)
@@ -1204,6 +1229,13 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     self._json(404, {"ok": False, "erro": "demonstração desconhecida"})
                 else:
                     self._enviar_bytes(arq.read_bytes(), "text/html; charset=utf-8", {"Cache-Control": "public, max-age=3600"})
+                return True
+            if p.rstrip("/") in ("/termos", "/privacidade") and instancia.get("instalacao") == "inovastem":
+                # InovaSTEM (D94): termos de uso e aviso de privacidade BETA ficam no próprio site, em revisão jurídica
+                self.send_response(302)
+                self.send_header("Location", "/#" + p.strip("/"))
+                self.send_header("Content-Length", "0")
+                self.end_headers()
                 return True
             if p.rstrip("/") in JURIDICO_ROTAS:
                 pagina = pagina_juridico(JURIDICO_ROTAS[p.rstrip("/")])
@@ -1437,6 +1469,37 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     seg.consentimento_registrar(hub, r["id"], r["usuario"], versao, True, self._ip())
                 self._mandar(seg.confirmar_enviar(hub, r["id"], url_publica))
                 self._json(200, r)
+                return True
+            # InovaSTEM (D94): interesse e sugestão de projeto são públicos (limite por IP); o resto é da equipe
+            if p.startswith("/api/publico/inovastem/") or p.startswith("/api/inovastem/"):
+                if instancia.get("instalacao") != "inovastem":
+                    self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                    return True
+                ino = modulo("inovastem")
+                publicas_ino = {"/api/publico/inovastem/interesse": "ino_interesse", "/api/publico/inovastem/projeto": "ino_proposta"}
+                if p in publicas_ino:
+                    if self._limitado("entrar"):
+                        return True
+                    d = self._ler(corpo, publicas_ino[p])
+                    if d is None:
+                        return True
+                    r = ino.interesse(d) if p.endswith("/interesse") else ino.sugerir_projeto(d)
+                    self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
+                    return True
+                equipe_ino = {"/api/inovastem/desafio": "ino_proposta", "/api/inovastem/moderar": "ino_moderar",
+                              "/api/inovastem/remover": "ino_remover"}
+                if p not in equipe_ino:
+                    self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                    return True
+                qi2 = self._exigir(seg.EQUIPE)
+                if not qi2:
+                    return True
+                d = self._ler(corpo, equipe_ino[p])
+                if d is None:
+                    return True
+                r = (ino.publicar_desafio(d, qi2) if p.endswith("/desafio") else ino.moderar(d, qi2) if p.endswith("/moderar")
+                     else ino.remover_interesse(d, qi2))
+                self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
                 return True
             if p in ("/api/agenda/criar", "/api/agenda/sugerir", "/api/agenda/importar") or re.fullmatch(r"/api/agenda/\d{1,12}/arquivar", p):
                 qa = self._exigir(seg.CLIENTE)
@@ -2098,6 +2161,32 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     return self._arquivo(WEB / "site.html", "text/html; charset=utf-8")
                 if u.path in ("/plataforma", "/plataforma/"):
                     return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
+            # Site da InovaSTEM (D94, docs/INOVASTEM.md): público em "/", plataforma em /plataforma/, termos e aviso beta no
+            # próprio site; o Planejador (GIS e BIM, roda no navegador) fica aberto: é o laboratório vivo
+            if instancia.get("instalacao") == "inovastem" and (WEB / "inovastem.html").exists():
+                if u.path in ("/", "/inicio", "/inicio/"):
+                    # sem cache: depois de cada atualização do site, quem volta recebe a versão nova
+                    return self._enviar_bytes((WEB / "inovastem.html").read_bytes(), "text/html; charset=utf-8",
+                                              {"Cache-Control": "no-cache"})
+                if u.path in ("/plataforma", "/plataforma/"):
+                    return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
+                if u.path in ("/planejador", "/planejador/") and (WEB / "planejador.html").exists():
+                    return self._arquivo(WEB / "planejador.html", "text/html; charset=utf-8")
+                if u.path in ("/laboratorio", "/laboratorio/") and (WEB / "inovastem-lab.html").exists():
+                    # Laboratório: Simulação (Fase 1) e Physis 3D no navegador, sem conta (ferramentas/montar_lab_inovastem.py)
+                    return self._enviar_bytes((WEB / "inovastem-lab.html").read_bytes(), "text/html; charset=utf-8",
+                                              {"Cache-Control": "no-cache"})
+                if u.path in ("/fontes/JosefinSans.ttf", "/fontes/Lora.ttf") and (WEB / u.path.lstrip("/")).is_file():
+                    # fontes do guia de identidade (OFL), servidas aqui: o site não chama a internet
+                    return self._enviar_bytes((WEB / u.path.lstrip("/")).read_bytes(), "font/ttf",
+                                              {"Cache-Control": "public, max-age=2592000"})
+                if u.path.startswith("/materiais/"):
+                    r = modulo("inovastem").arquivo_material(u.path.split("/", 2)[2])
+                    if not r:
+                        return self._json(404, {"ok": False, "erro": "material não encontrado"})
+                    nome = u.path.split("/", 2)[2]
+                    return self._enviar_bytes(r[1], r[0], {"Content-Disposition": "attachment; filename*=UTF-8''" + quote(nome),
+                                                           "X-Content-Type-Options": "nosniff"})
             if u.path.startswith("/api/") and self._barrado():
                 return
             if u.path in ("/sustainkit", "/sustainkit/") and (WEB / "sustainkit.html").exists():

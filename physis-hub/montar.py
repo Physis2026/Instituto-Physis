@@ -31,7 +31,11 @@ MODULOS = ("monitoramento", "agua", "zonas", "animais", "coleiras", "comedouros"
            "frota")         # Frota e combustível (em desenvolvimento, 18/11/2026)
 # instalação: "physis" (padrão: plataforma de cliente ou servidor da Physis) ou "instituto" (Instituto Physis:
 # pesquisa, cursos e projetos sociais; mesmo código, banco, marca, suporte e catálogo próprios; docs/INSTITUTO.md)
-INSTALACOES = ("physis", "instituto")
+INSTALACOES = ("physis", "instituto", "inovastem")   # inovastem: site e living lab da InovaSTEM (D94, docs/INOVASTEM.md)
+LEIA_MATERIAIS = ("Materiais para download do site da InovaSTEM (docs/INOVASTEM.md).\n"
+                  "Ponha aqui só arquivos aprovados pela direção, em PDF ou ODF (.pdf, .odt, .odp, .ods), e liste cada um no\n"
+                  "instancia.json, em inovastem.materiais: {\"titulo\": ..., \"arquivo\": ..., \"grupo\": ...}.\n"
+                  "Arquivo fora da lista não aparece nem pode ser baixado.\n")
 LICENCA_PADRAO = "Licença Physis de Uso e Adaptação (minuta em revisão jurídica)"
 VENDOR_ARQUIVOS = ("maplibre-gl.js", "maplibre-gl.css", "pmtiles.js", "web-ifc-api-iife.js", "web-ifc.wasm", "three.min.js",
                    "LEIA-ME.md", "LICENSE-maplibre-gl.txt", "LICENSE-three.txt")
@@ -170,6 +174,15 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
     # site público do Instituto e da Rede InovaSTEM (/; a plataforma vai para /plataforma/): só no pacote do Instituto
     if instalacao == "instituto" and (AQUI / "web" / "site.html").is_file():
         shutil.copy2(AQUI / "web" / "site.html", pasta / "web" / "site.html")
+    # site da InovaSTEM (D94): só no pacote inovastem, com a pasta de materiais (a direção põe e lista cada arquivo)
+    if instalacao == "inovastem":
+        shutil.copy2(AQUI / "web" / "inovastem.html", pasta / "web" / "inovastem.html")
+        if (AQUI / "web" / "inovastem-lab.html").is_file():   # Laboratório (/laboratorio): Simulação e Physis 3D
+            shutil.copy2(AQUI / "web" / "inovastem-lab.html", pasta / "web" / "inovastem-lab.html")
+        if (AQUI / "web" / "fontes").is_dir():      # Josefin Sans e Lora (OFL), servidas em /fontes/
+            shutil.copytree(AQUI / "web" / "fontes", pasta / "web" / "fontes")
+        (pasta / "materiais").mkdir()
+        (pasta / "materiais" / "LEIA-ME.txt").write_text(LEIA_MATERIAIS, encoding="utf-8")
     # painel municipal de resiliência (/municipio): com o módulo resiliência ou na instalação de pesquisa
     if ("resiliencia" in modulos or pesquisa) and (AQUI / "web" / "municipio.html").is_file():
         shutil.copy2(AQUI / "web" / "municipio.html", pasta / "web" / "municipio.html")
@@ -199,10 +212,11 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         # mapa e leitor BIM do Planejador: bibliotecas abertas, entregues pelo próprio servidor (sem internet).
         # O pacote do servidor da Physis também leva, para montar sozinho a plataforma de quem compra.
         (pasta / "web" / "vendor").mkdir(exist_ok=True)
-        for nome in VENDOR_ARQUIVOS:
-            origem = next((p for p in (AQUI.parent / "vendor" / nome, AQUI / "web" / "vendor" / nome) if p.is_file()), None)
+        # (19/11/2026: o laço usava "nome" e sobrescrevia o nome da instalação: o instancia.json saía "LICENSE-three.txt")
+        for arq in VENDOR_ARQUIVOS:
+            origem = next((p for p in (AQUI.parent / "vendor" / arq, AQUI / "web" / "vendor" / arq) if p.is_file()), None)
             if origem:
-                shutil.copy2(origem, pasta / "web" / "vendor" / nome)
+                shutil.copy2(origem, pasta / "web" / "vendor" / arq)
     if gestao is not None and gestao.is_file():      # só o pacote interno da Physis leva o programa de gestão interna
         shutil.copy2(gestao, pasta / "web" / "gestao.html")
         if (AQUI / "web" / "consultoria.html").exists():      # página pública de consultoria do site da Physis
@@ -234,10 +248,14 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         inst["instalacao"] = instalacao
         # banco próprio: os dados (contas, catálogo da loja, chamados, cursos) nunca se misturam com os da Physis
         inst["banco"] = banco or f"physis-{instalacao}.db"
-        if instalacao == "instituto":
+        if instalacao in ("instituto", "inovastem"):
             # comunidade aberta (19/11/2026, docs/COMUNIDADE.md): leitura aberta, cadastro próprio, moderação antes de aparecer
             inst["cadastro_aberto"] = True
             inst["moderacao_previa"] = True
+        if instalacao == "inovastem":
+            # WhatsApp: só o convite https://chat.whatsapp.com/… que a direção mandar (opcional; o fórum é o canal principal)
+            inst["inovastem"] = {"whatsapp_grupo": "", "hackathon": "2027-03", "endereco": "inovastem.physisengineering.com",
+                                 "materiais": []}
     elif banco:
         inst["banco"] = banco
     if marca:
@@ -274,7 +292,7 @@ def main() -> None:
     ap.add_argument("--nome", default="", help="nome do cliente para a tela")
     ap.add_argument("--licenca", default=LICENCA_PADRAO)
     ap.add_argument("--saida", type=Path, default=Path("entregas"))
-    ap.add_argument("--instalacao", default="physis", choices=INSTALACOES, help="instituto = Instituto Physis (docs/INSTITUTO.md)")
+    ap.add_argument("--instalacao", default="physis", choices=INSTALACOES, help="instituto = Instituto Physis (docs/INSTITUTO.md); inovastem = InovaSTEM (docs/INOVASTEM.md)")
     ap.add_argument("--banco", default="", help="nome do arquivo do banco (padrão do instituto: physis-instituto.db)")
     ap.add_argument("--suporte-email", default="", help="e-mail de suporte desta instalação")
     ap.add_argument("--suporte-whatsapp", default="", help="WhatsApp de suporte desta instalação")

@@ -1,0 +1,1839 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>InovaSTEM</title>
+<meta name="description" content="InovaSTEM: rede de mulheres e jovens em STEM e plataforma online de laboratório vivo (GIS, BIM, 3D e simulações). Uma iniciativa da Physis Engineering. Versão beta.">
+<!-- Site e plataforma da InovaSTEM como living lab online (D94, 19/11/2026). Servido pela instalação "inovastem" em "/";
+     a plataforma (com login) fica em /plataforma/ e o Planejador (GIS e BIM) em /planejador. Não chama a internet: só as rotas
+     do próprio servidor (/api/instancia, /api/publico/*, /api/comunidade/*, /api/inovastem/*). docs/INOVASTEM.md. -->
+<script>(function(){var r=document.documentElement,t=null,p=null;try{p=JSON.parse(localStorage.getItem("physis-pref")||"null");t=p&&p.tema||localStorage.getItem("physis-pref-tema");}catch(e){}if(t!=="claro"&&t!=="escuro"){try{t=matchMedia("(prefers-color-scheme: dark)").matches?"escuro":"claro";}catch(e){t="claro";}}r.setAttribute("data-tema",t);})();</script>
+<style>
+@font-face{font-family:"Josefin Sans";src:url("/fontes/JosefinSans.ttf") format("truetype");font-weight:100 700;font-display:swap}
+@font-face{font-family:Lora;src:url("/fontes/Lora.ttf") format("truetype");font-weight:400 700;font-display:swap}
+/* Guia de Identidade da Família Physis (19/11/2026), Opção B · marcas endossadas. Cores SEM alteração (docs/PALETA.md):
+   base comum: verde profundo #0B3D2E, carvão #1B1F23, creme #F4F1EA, laranja semente #F97316 (só semente, ícones e
+   números de destaque; nunca texto branco sobre ele), laranja de botão #C2410C (botão com texto branco);
+   InovaSTEM: fundo claro #FFF7ED, assinatura #F97316, versão escura creme + laranja;
+   InovaSTEM Delas: fundo #EDE9FE, roxo #7C3AED, versão escura lilás claro #C4B5FD + laranja.
+   Proporção 60/30/10. Tipografia: Josefin Sans (títulos e nome) e Lora (texto); sem internet: usa a fonte instalada ou
+   a reserva da pilha. Arquivos (licença OFL) em web/fontes, servidos em /fontes/. Logos: as imagens do guia, sem alteração,
+   versão clara no tema claro e versão escura no tema escuro. Roxo só na InovaSTEM Delas. Avisos: verde profundo (ok) e terracota (atenção e erro; o laranja fica só para a marca).
+   Tipografia (dona, 20/11): Josefin Sans só no logo e em títulos grandes (h2, 24 px ou mais, peso 400); o resto em Lora, caixa normal. Linhas e bordas: neutros
+   esverdeados e areia da PALETA.md. Sem azul. */
+:root{
+  color-scheme:light;
+  --fundo:#FFF7ED;--sup:#FFFFFF;--campo:#FFFFFF;--texto:#1B1F23;--tinta2:#4A4F44;--titulo-cor:#0B3D2E;--link:#0B3D2E;
+  --acao:#C2410C;--sobre-acao:#FFFFFF;--sec:#0B3D2E;--sobrancelha:#C2410C;--semente:#F97316;--numero:#0B3D2E;
+  --faixa:#0B3D2E;--sobre-faixa:#F4F1EA;--linha:#D9D3C2;--borda-campo:#8A9284;--suave:#F4F1EA;
+  --delas:#7C3AED;--delas-f:#EDE9FE;--delas-t:#7C3AED;--sobre-delas:#FFFFFF;
+  --ok-f:#F4F1EA;--ok-t:#0B3D2E;--al-f:#F5E2D7;--al-t:#7A2214;--at-f:#F5E2D7;--at-t:#7A2214;--erro-msg:#7A2214;
+  --titulo:"Josefin Sans","Century Gothic",Futura,"Segoe UI",system-ui,sans-serif;
+  --fonte:Lora,Georgia,"Times New Roman",serif;
+}
+html[data-tema="escuro"]{
+  color-scheme:dark;
+  --fundo:#1B1F23;--sup:#0B3D2E;--campo:#1B1F23;--texto:#F4F1EA;--tinta2:#D9D3C2;--titulo-cor:#F4F1EA;--link:#F4F1EA;
+  --acao:#C2410C;--sobre-acao:#FFFFFF;--sec:#F4F1EA;--sobrancelha:#F97316;--semente:#F97316;--numero:#F97316;
+  --faixa:#0B3D2E;--sobre-faixa:#F4F1EA;--linha:#4A5A47;--borda-campo:#8A9182;--suave:#1B1F23;
+  --delas:#7C3AED;--delas-f:#1B1F23;--delas-t:#C4B5FD;--sobre-delas:#FFFFFF;
+  --ok-f:#0B3D2E;--ok-t:#F4F1EA;--al-f:#1B1F23;--al-t:#D9A58C;--at-f:#1B1F23;--at-t:#D9A58C;--erro-msg:#D9A58C;
+}
+html[data-tema="escuro"] .so-claro,html:not([data-tema="escuro"]) .so-escuro{display:none}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--texto);font:1.05rem/1.6 var(--fonte);overflow-wrap:anywhere}
+a{color:var(--link)}
+:focus-visible{outline:3px solid var(--link);outline-offset:2px}
+.pular{position:absolute;left:-9999px;top:8px;background:var(--acao);color:var(--sobre-acao);padding:8px 14px;border-radius:8px;z-index:10}
+.pular:focus{left:8px}
+.in{max-width:1180px;margin:0 auto;padding:0 16px}
+.endosso{background:var(--faixa);color:var(--sobre-faixa);font:400 .9rem/1.4 var(--fonte)}
+.endosso .in{display:flex;justify-content:flex-end;align-items:center;min-height:36px;gap:6px}
+.marca-physis{font-family:var(--titulo);letter-spacing:.18em;text-transform:uppercase}
+header{border-bottom:1px solid var(--linha);padding:10px 0;background:var(--fundo)}
+.ferramentas{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.cabeca{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;margin-top:6px}
+h1.logo{margin:0;line-height:0}
+h1.logo a{display:inline-block;border-radius:8px}
+h1.logo img{height:64px;width:auto}
+.cabeca nav{flex:1 1 100%;order:3}
+#cta{margin-left:auto}
+#menu-bt{display:none}
+@media (min-width:1000px){.cabeca nav{flex:1 1 auto;order:0}#cta{order:4}}
+.sub{color:var(--tinta2);margin:8px 0 0;font-size:.95rem}
+.beta{display:inline-block;margin-left:6px;font:700 .8rem/1.6 var(--fonte);border-radius:999px;padding:0 10px;background:var(--at-f);color:var(--at-t);border:1px solid var(--linha)}
+nav.abas ul{list-style:none;display:flex;flex-wrap:wrap;gap:4px 6px;margin:0;padding:0}
+nav.abas a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;border-radius:8px;color:var(--texto);text-decoration:none;
+  font:600 1rem/1.2 var(--fonte);border-bottom:3px solid transparent}
+nav.abas a[aria-current="page"]{border-bottom-color:var(--semente);color:var(--titulo-cor)}
+nav.abas a.delas[aria-current="page"]{border-bottom-color:var(--delas)}
+h2{font:400 clamp(1.5rem,3.6vw,2rem)/1.2 var(--titulo);letter-spacing:.02em;color:var(--titulo-cor);margin:0 0 10px}
+h3{font:700 1.08rem/1.3 var(--fonte);margin:0 0 6px}
+main section{margin:20px 0}
+.hero{padding:22px 0 8px}
+.sobrancelha{font:700 1rem/1.4 var(--fonte);color:var(--sobrancelha);margin:0 0 10px}
+.hero h2{font-size:clamp(1.8rem,5vw,2.9rem);max-width:22ch}
+.hero p.chamada{max-width:60ch;font-size:1.1rem}
+.cartao{background:var(--sup);border:1px solid var(--linha);border-radius:12px;padding:16px}
+.cartao.marca{border-top:4px solid var(--semente)}
+.cartao.delas{border-top:4px solid var(--delas);background:var(--delas-f)}
+.cartao.delas h2,.cartao.delas h3{color:var(--delas-t)}
+.logo-delas img{height:120px;width:auto;display:block;margin:0 0 10px}
+.grade{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.botao{display:inline-flex;align-items:center;justify-content:center;font:700 1rem/1.2 var(--fonte);min-height:44px;padding:6px 18px;border-radius:8px;
+  border:2px solid var(--acao);background:var(--acao);color:var(--sobre-acao);cursor:pointer;text-decoration:none;text-align:center}
+.botao.sec{background:transparent;color:var(--sec);border-color:var(--sec)}
+.botao.delas{background:var(--delas);border-color:var(--delas);color:var(--sobre-delas)}
+.botao[disabled]{opacity:.6;cursor:wait}
+.acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.selo{display:inline-block;border-radius:999px;padding:1px 10px;font-size:.85rem;font-weight:700;border:1px solid var(--linha);white-space:nowrap}
+.selo.ok{background:var(--ok-f);color:var(--ok-t)}
+.selo.dev{background:var(--at-f);color:var(--at-t)}
+.faixa{border-radius:12px;padding:12px 16px;font-weight:600;border:1px solid var(--linha);border-left:6px solid var(--at-t);background:var(--at-f);color:var(--at-t)}
+.faixa.erro{background:var(--al-f);color:var(--al-t)}
+.nota-delas{border-left:6px solid var(--delas);background:var(--delas-f);color:var(--texto);border-radius:8px;padding:10px 14px;margin:10px 0 0}
+.progresso p{margin:0 0 6px;font:700 .95rem/1.4 var(--fonte)}
+.barra{height:10px;border-radius:999px;background:var(--suave);border:1px solid var(--borda-campo);overflow:hidden}
+.barra span{display:block;height:100%;background:var(--semente);width:50%}
+.barra span.p2{width:100%}
+.t2{color:var(--tinta2)}
+.pq{font-size:.9rem}
+.rolagem{overflow-x:auto;border:1px solid var(--linha);border-radius:12px;background:var(--sup)}
+table{border-collapse:collapse;width:100%}
+caption{text-align:left;padding:10px 12px 0;color:var(--tinta2);font-size:.92rem}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--linha);vertical-align:top}
+thead th{background:var(--suave)}
+ul.lista,ol.lista{margin:6px 0 0;padding-left:20px}
+ul.pilulas{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+label{font-weight:600;display:block;margin-top:10px}
+input[type=text],input[type=email],input[type=password],select,textarea{font:inherit;min-height:44px;padding:6px 10px;border:1px solid var(--borda-campo);
+  border-radius:8px;background:var(--campo);color:var(--texto);width:100%}
+textarea{min-height:110px}
+input[type=checkbox],input[type=radio]{width:20px;height:20px;accent-color:var(--acao);vertical-align:-4px;margin-right:6px}
+.opcao{font-weight:400;display:block;margin-top:8px}
+.campos{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+fieldset{border:1px solid var(--linha);border-radius:12px;padding:10px 14px;margin:12px 0 0}
+legend{font-weight:700;padding:0 6px}
+.msg{min-height:1.4em;font-weight:600;margin:8px 0 0}
+.msg.erro{color:var(--erro-msg);border-left:4px solid var(--erro-msg);padding-left:8px}
+.item{border-top:1px solid var(--linha);padding:10px 0}
+.item:first-child{border-top:0}
+.item p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.juridico h3{margin-top:14px}
+footer{border-top:1px solid var(--linha);margin-top:28px;padding:16px 0 28px;color:var(--tinta2);font-size:.92rem;background:var(--fundo)}
+footer ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;padding:0;margin:6px 0 0}
+footer a{display:inline-flex;align-items:center;min-height:44px}
+@media (max-width:760px){#menu-bt{display:inline-flex;margin-left:auto}#cta{margin-left:0}#abas{display:none}#abas.aberto{display:block}#abas ul{flex-direction:column}h1.logo img{height:56px}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="pular" href="#conteudo" data-t="pular">Pular para o conteúdo</a>
+<div class="endosso"><div class="in" id="endosso"></div></div>
+<header>
+  <div class="in">
+    <div class="ferramentas" id="pp-lugar" data-physis-preferencias="lugar"></div>
+    <div class="cabeca">
+      <!-- Logo da InovaSTEM, opção 2 (pessoas em círculo), do Guia de Identidade de 19/11/2026, sem alteração -->
+      <h1 class="logo"><a href="#inicio" id="logo-link"><img class="so-claro" width="70" height="64" alt="InovaSTEM"
+        src="data:image/webp;base64,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"><img class="so-escuro" width="70" height="64" alt="InovaSTEM"
+        src="data:image/webp;base64,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"></a></h1>
+      <button class="botao sec" type="button" id="menu-bt" aria-expanded="false" aria-controls="abas" data-t="menu">Menu</button>
+      <a class="botao" id="cta" href="#participar" data-t="inscreva">Inscreva-se</a>
+      <nav class="abas" id="abas" aria-label="Seções do site"></nav>
+    </div>
+    <p class="sub"><span data-t="sub">Rede de mulheres e jovens em STEM e laboratório vivo online</span> <span class="beta" data-t="beta">versão beta</span></p>
+  </div>
+</header>
+<main id="conteudo" class="in" tabindex="-1">
+  <div id="estado" role="status" aria-live="polite"></div>
+  <div id="corpo"></div>
+</main>
+<footer><div class="in" id="rodape"></div></footer>
+<script id="site-inovastem">
+"use strict";
+/* Site da InovaSTEM (D94, 19/11/2026): teste em 24/11, lançamento em 26/11/2026. Marca endossada pela Physis Engineering,
+   sem a marca do Instituto (site separado). Não chama a internet. Leitura aberta; o cadastro de interesse não pede conta;
+   fórum, modelagem 3D e publicação pedem conta e passam pela moderação. Números dos documentos levam [CONFERIR];
+   o que falta é [MARCADOR]. Termos e aviso de privacidade: BETA, em revisão jurídica. */
+const T = {
+  pt: {
+    pular:"Pular para o conteúdo", titulo:"InovaSTEM", beta:"versão beta",
+    sub:"Rede de mulheres e jovens em STEM e laboratório vivo online",
+    endosso_a:"uma iniciativa", endosso_b:"", inscreva:"Inscreva-se", menu:"Menu", logo_alt:"InovaSTEM, página inicial", delas_logo_alt:"InovaSTEM Delas",
+    hero_sobrancelha:"Versão beta · lançamento em 26/11/2026", passo:"Passo {n} de 2", continuar:"Continuar", voltar_passo:"Voltar",
+    passo1_falta:"Preencha o nome ou apelido e um e-mail válido para continuar.",
+    int_idade_min:"A participação é a partir de 16 anos; de 16 a 17 anos, com o responsável legal [CONFERIR com o advogado].",
+    nav:"Seções do site", carregando:"Carregando…", sem_hub:"Não foi possível falar com o servidor. Tente de novo em instantes.",
+    abas:{inicio:"Início", delas:"InovaSTEM Delas", desafios:"Desafios e projetos", forum:"Fórum", modelagem:"Modelagem online",
+          hackathon:"Hackathon", materiais:"Materiais", participar:"Participar", termos:"Termos de uso (beta)", privacidade:"Privacidade (beta)"},
+    marcador:"[MARCADOR]", conferir:"[CONFERIR]", funciona:"Funciona", em_dev:"Em desenvolvimento", beta_selo:"Beta",
+    // início
+    ini_missao_t:"Missão", ini_missao:"Formar mulheres e jovens de comunidades sub-representadas em STEM, com projetos aplicados à sustentabilidade, mentoria e acolhimento.",
+    ini_visao_t:"Visão 2031", ini_visao:"Em 2031, ser uma rede de referência na América Latina em formação STEM aplicada e liderança feminina na transição justa.",
+    ini_lab_t:"Um laboratório vivo online",
+    ini_lab:"A InovaSTEM é um laboratório vivo de pesquisa, desenvolvimento e inovação: um espaço aberto de conexão e trocas para o desenvolvimento tecnológico, com ferramentas abertas de modelagem, desafios reais de sustentabilidade, fórum, eventos e cursos.",
+    ini_blocos:[["Modelagem online","GIS e mapas, BIM (IFC) e modelos 3D no navegador. Gêmeo digital e simulações em desenvolvimento."],
+                ["Desafios e projetos abertos","Desafios reais publicados pela equipe e projetos sugeridos pela comunidade."],
+                ["Fórum com moderação","Perguntas, trocas e mentoria. Tudo o que é publicado passa pela equipe antes de aparecer."],
+                ["Hackathon de cibersegurança","Março de 2027, online, com desafios só em ambiente próprio e isolado (CTF)."]],
+    ini_duas_t:"Duas redes, um só lugar",
+    ini_duas:[["InovaSTEM","Aberta a todas as pessoas que querem aprender e criar em ciência, tecnologia, engenharia e matemática."],
+              ["InovaSTEM Delas","Rede dedicada a mulheres (jovens, cis e trans) que lideram em STEM: acolhimento entre pares, rodas de conversa e mentoria."]],
+    ini_chamar:"Quero participar", ini_whats:"Entrar no grupo de WhatsApp", ini_whats_nota:"O grupo de WhatsApp é opcional. O fórum da plataforma continua sendo o canal principal.",
+    ini_whats_falta:"Link do grupo de WhatsApp: em breve.",
+    ini_physis_t:"Quem realiza", ini_physis:"A InovaSTEM é uma iniciativa da Physis Engineering, empresa de engenharia de sustentabilidade de Petrópolis (RJ), com liderança feminina. Esta é a versão beta da plataforma: tudo pode mudar com as sugestões de quem participa.",
+    compartilhar:"Compartilhar a InovaSTEM", compartilhado:"Link copiado. Obrigada por compartilhar!", compartilhar_txt:"Conheça a InovaSTEM: rede de mulheres e jovens em STEM e laboratório vivo online.",
+    // Delas
+    del_t:"InovaSTEM Delas", del_missao:"Acolher e fortalecer mulheres em STEM com redes de apoio entre pares e mentoria.",
+    del_visao:"Visão 2031: ser a rede de referência em permanência e liderança de mulheres em STEM na América Latina.",
+    del_o_que_t:"O que acontece aqui", del_o_que:["Acolhimento entre pares: mulheres que estudam e trabalham em STEM conversando entre si.","Rodas de conversa e mentoria.","Oportunidades, desafios e eventos para mulheres em STEM.","Um fórum só para quem faz parte da rede."],
+    del_nao:"A InovaSTEM Delas é uma rede de apoio entre pares. Não oferece atendimento psicológico nem clínico. Em situação de emergência, procure o serviço de saúde mais próximo ou ligue 188 (CVV) [CONFERIR].",
+    del_dif_t:"InovaSTEM e InovaSTEM Delas", del_dif:"A InovaSTEM é aberta a todas as pessoas. A InovaSTEM Delas é a rede dedicada a mulheres (jovens, cis e trans), também administrada pela equipe da InovaSTEM, para que nenhuma mulher caminhe sozinha em STEM.",
+    del_entrar_t:"Como entrar", del_entrar:["No cadastro de interesse, escolha \"Feminino\" e marque que quer participar da Delas.","Para o fórum da Delas, crie a sua conta e marque a autodeclaração. Não pedimos documento: só você e a direção sabem que você se declarou."],
+    del_convidar:"Convide uma amiga", del_fechado:"O fórum da InovaSTEM Delas abre para quem se autodeclarou. Crie a sua conta e marque a autodeclaração em Participar.",
+    del_forum:"Fórum da InovaSTEM Delas",
+    // desafios e projetos
+    des_t:"Desafios e projetos abertos", des_intro:"Desafios abertos são problemas reais publicados pela equipe. Projetos abertos são ideias sugeridas pela comunidade e aprovadas pela moderação. Qualquer pessoa pode sugerir.",
+    des_desafios:"Desafios abertos", des_projetos:"Projetos abertos", des_vazio_d:"Nenhum desafio aberto ainda. O primeiro sai em breve.", des_vazio_p:"Nenhum projeto aberto aprovado ainda. Sugira o primeiro!",
+    des_prazo:"Prazo", des_area:"Área", des_org:"Quem propõe",
+    sug_t:"Sugerir um projeto aberto", sug_intro:"Não precisa de conta. A sugestão aparece no site depois da moderação. O seu e-mail serve só para a equipe responder e nunca aparece no site.",
+    sug_titulo:"Título do projeto", sug_desc:"O que o projeto resolve, para quem e como (pelo menos 20 letras)", sug_area:"Área", sug_area_nenhuma:"Sem área definida",
+    sug_org:"Organização ou grupo (opcional; aparece no site)", sug_nome:"Seu nome (opcional; não aparece no site)", sug_email:"Seu e-mail (para a equipe responder)",
+    sug_aceite:"Li o aviso de privacidade (beta) e concordo com o uso do meu e-mail para a resposta da equipe.", sug_enviar:"Enviar para moderação",
+    sug_ok:"Recebido! A equipe avalia e publica depois da moderação.",
+    des_criar_t:"Publicar um desafio (equipe)", des_prazo_campo:"Prazo (AAAA-MM-DD, opcional)", des_publicar:"Publicar desafio",
+    des_forum:"Fórum de desafios e projetos",
+    // fórum
+    for_t:"Fórum", for_intro:"Leitura aberta. Para escrever, crie a sua conta em Participar. Tudo o que é publicado passa pela equipe de moderação antes de aparecer.",
+    for_regras_t:"Regras de convivência", for_regras:["Respeito sempre. Nada de assédio, discriminação ou discurso de ódio.","Não publique dados pessoais seus nem de outras pessoas (telefone, endereço, documentos).","Cite a fonte do que não é seu e respeite as licenças.","Na dúvida, pergunte: aqui todo mundo está aprendendo."],
+    for_cats:{geral:"Geral", inovastem:"Rede InovaSTEM", modelagem:"Modelagem online", desafios:"Desafios e projetos", hackathon:"Hackathon", eventos:"Eventos e oportunidades"},
+    for_escolha:"Escolha o fórum",
+    // modelagem
+    mod_t:"Modelagem online", mod_intro:"Ferramentas abertas que rodam no navegador, para aprender com casos reais de sustentabilidade. Esta frente (F5) junta BIM, GIS, 3D, gêmeo digital e simulações.",
+    mod_cols:["Ferramenta","O que faz","Onde abrir","Situação"],
+    mod_linhas:[["GIS e mapas (Planejador)","Desenhar e analisar áreas no mapa, camadas e terreno.","planejador","ok"],
+                ["BIM (IFC)","Abrir e ler modelos IFC de edificações, no Planejador.","planejador","ok"],
+                ["Simulação (Fase 1)","Calor em paredes e peças, estrutura (treliça, pórtico, chapa), ventilação, escoamento qualitativo, terreno e enxurrada, incerteza (Monte Carlo), biogás e otimização QUBO. Cada resultado mostra método, hipóteses e limites.","lab_sim","ok"],
+                ["Physis 3D","Abrir STL, OBJ e 3MF, medir, ajustar e fatiar peças de plástico reciclado, no navegador.","lab_3d","dev"],
+                ["Simulação (Fase 2)","Resolvedores abertos em servidor (CalculiX, FEniCSx, OpenFOAM), sempre comparados com uma referência.","em_breve","dev"],
+                ["Gêmeo digital","Modelo virtual ligado a dados medidos.","em_breve","dev"]],
+    mod_abrir_plan:"Abrir o Planejador (GIS e BIM)", mod_abrir_sim:"Abrir a Simulação", mod_abrir_3d:"Abrir o Physis 3D", mod_em_breve:"Em breve",
+    mod_conta:"Planejador, Simulação e Physis 3D abrem sem conta e rodam no seu navegador. Para publicar peças na biblioteca e escrever no fórum, crie a sua conta em Participar.",
+    mod_bib:"Biblioteca aberta do Physis 3D", mod_sem_pecas:"Nenhuma peça publicada ainda.", mod_memorial:"Memorial", mod_licenca:"Licença", mod_revisoes:"revisões",
+    mod_forum:"Fórum de modelagem",
+    // hackathon
+    hac_t:"Hackathon de cibersegurança InovaSTEM", hac_data:"Março de 2027 · online · dia a confirmar",
+    hac_intro:"Uma competição no formato CTF (capture a bandeira): equipes resolvem desafios de segurança da informação num ambiente próprio e isolado, montado só para o hackathon.",
+    hac_regras_t:"O que já está decidido", hac_regras:["Os desafios rodam só no ambiente próprio e isolado do hackathon. Nenhum sistema real é alvo.","Regulamento com código de conduta, regras de LGPD e de divulgação responsável, publicado antes das inscrições.","Achou uma falha fora do ambiente do hackathon? Não explore: avise a equipe pelo canal de contato."],
+    hac_falta_t:"O que ainda será definido", hac_falta:["Dia exato [MARCADOR]","Público, faixa etária e tamanho das equipes [MARCADOR]","Premiação [MARCADOR]","Parcerias e mentoria técnica [MARCADOR]"],
+    hac_interesse:"Quero ser avisada ou avisado", hac_forum:"Fórum do hackathon",
+    // materiais
+    mat_t:"Materiais", mat_intro:"Apresentação da rede e da plataforma, patrocínio e ecossistema. Os documentos para download aparecem aqui depois da aprovação da direção.",
+    mat_rede_t:"Apresentação da rede e da plataforma", mat_rede:["Rede de formação e acolhimento em STEM, com prioridade para mulheres e jovens de comunidades sub-representadas.","Plataforma online como laboratório vivo: modelagem (GIS, BIM, 3D), desafios e projetos abertos, fórum com moderação e eventos.","Turma piloto prevista para o 2º semestre de 2027, no Rio de Janeiro, com instituições parceiras de educação técnica [CONFERIR].","Metas da turma piloto: 20 a 25 participantes e 80% de conclusão [CONFERIR]."],
+    mat_pat_t:"Patrocínio", mat_pat_intro:"Tabela única. A cota Amigo é só para pessoa física; empresas a partir de R$ 1.000.",
+    mat_pat_cols:["Cota","Para quem","Faixa anual","Contrapartidas"],
+    mat_pat_linhas:[["Amigo","Só pessoa física","R$ 750","[MARCADOR: contrapartidas da cota Amigo]"],
+                    ["Apoiador","Empresas e organizações","R$ 1.000 a R$ 4.999","Nome no site e no relatório anual, certificado de apoio, eventos abertos"],
+                    ["Parceiro","Empresas e organizações","R$ 5.000 a R$ 14.999","Logo nos materiais, grupo de trabalho, relatório de impacto"],
+                    ["Patrocinador","Empresas e organizações","R$ 15.000 a R$ 29.999","Desafio real ou trilha associada à marca, fala em evento, relatório dedicado"],
+                    ["Patrocinador master","Empresas e organizações","R$ 30.000 a R$ 50.000","Convite para o comitê, co-branding, prioridade em desafios e projetos, destaque na mostra anual"]],
+    mat_pat_regras:["Patrocínio não compra decisões nem dá acesso a dados pessoais.","Toda cota de empresa vem com um compromisso de entrevistas ou vagas de estágio para as egressas [CONFERIR].","Quem recebe e presta contas dos recursos: [MARCADOR: entidade, até a definição da organização parceira]."],
+    mat_pat_fonte:"Valores do Caderno de Patrocínio v2, em revisão [CONFERIR].",
+    mat_eco_t:"Ecossistema Physis", mat_eco:[["Physis Engineering","Acelerar a transição justa com engenharia de precisão e dados verificáveis, para que cada ganho de energia, água e carbono possa ser medido, comprovado e compartilhado."],["Casa Physis","Oferecer hospedagem, alimentação e produtos de baixo impacto que mostram na prática, e com dados, como viver bem na Mata Atlântica e fortalecer a economia local."],["InovaSTEM","Formar mulheres e jovens de comunidades sub-representadas em STEM, com projetos aplicados à sustentabilidade, mentoria e acolhimento."]],
+    mat_docs_t:"Documentos para download", mat_docs_vazio:"Os documentos estão em revisão e aparecem aqui assim que forem aprovados.", mat_baixar:"Baixar",
+    // participar
+    par_t:"Participar", par_intro:"Dois jeitos de participar: o cadastro de interesse (rápido, sem senha) e a conta da plataforma (para escrever no fórum e usar a modelagem 3D).",
+    int_t:"Cadastro de interesse", int_intro:"Pedimos só o necessário. Você recebe as novidades da InovaSTEM pelo e-mail informado.",
+    int_nome:"Nome ou apelido", int_email:"E-mail", int_areas:"O que te interessa", int_cidade:"Cidade (opcional)", int_inst:"Instituição de ensino ou trabalho (opcional)",
+    int_genero:"Gênero (opcional)", int_gen_opc:{"":"Selecione","feminino":"Feminino","masculino":"Masculino","nao_informar":"Prefiro não informar"},
+    int_gen_nota:"A InovaSTEM é aberta a todas as pessoas. Mulheres (jovens, cis e trans) também têm uma rede dedicada: a InovaSTEM Delas, de acolhimento entre pares e mentoria. Conhece alguém que vai gostar? Compartilhe!",
+    int_delas_convite:"Você também pode fazer parte da InovaSTEM Delas, a rede dedicada a mulheres em STEM.", int_delas_quero:"Quero participar também da InovaSTEM Delas", int_delas_ver:"Conhecer a InovaSTEM Delas",
+    int_idade:"Idade", int_maior:"Tenho 18 anos ou mais", int_menor:"Tenho de 16 a 17 anos",
+    int_resp_nome:"Nome do responsável legal", int_resp_email:"E-mail do responsável legal", int_menor_aviso:"Para menores de 18 anos, a equipe fala também com o responsável legal.",
+    int_aceite:"Li e aceito o aviso de privacidade (beta).", int_enviar:"Enviar cadastro de interesse",
+    int_ok:"Cadastro recebido. Obrigada! Você vai receber as novidades por e-mail.", int_ok_delas:" Bem-vinda também à InovaSTEM Delas!",
+    cad_t:"Conta da plataforma", cad_intro:"Para escrever no fórum, sugerir eventos e usar a ferramenta Physis 3D.",
+    cad_nome:"Nome completo", cad_email:"E-mail (será o seu usuário)", cad_senha:"Senha (12 caracteres ou mais)", cad_pub:"Nome público (aparece no que você publicar; pode ser apelido)",
+    cad_delas:"Autodeclaração (opcional): sou mulher (cis ou trans) e quero acessar a InovaSTEM Delas.",
+    cad_aceite:"Li e aceito os termos de uso (beta) e o aviso de privacidade (beta).", cad_enviar:"Criar conta", cad_ok:"Conta criada. Confira o seu e-mail e entre pela plataforma.",
+    entrar_plataforma:"Entrar", area_equipe:"Área da equipe", ent_t:"Entrar na sua conta", ent_usuario:"E-mail", ent_senha:"Senha",
+    ent_enviar:"Entrar", ent_erro:"E-mail ou senha não conferem.", sair_conta:"Sair da conta",
+    eu_t:"Sua participação", eu_nome:"Nome público", eu_pode:"Pode publicar", eu_nao_pode:"Ainda não pode publicar",
+    eu_delas:"Acesso à InovaSTEM Delas (autodeclaração)", eu_delas_salvar:"Salvar autodeclaração", eu_sair:"Sair da comunidade",
+    eu_sair_aviso:"Ao sair, o seu nome público vira 'Participante removido' e os dados do responsável e a autodeclaração são apagados.",
+    publicar_t:"Novo tópico", publicar_tit:"Título", publicar_txt:"Mensagem", publicar_enviar:"Enviar para moderação",
+    publicar_ok:"Recebido. Aparece para todos depois da moderação da equipe.", publicar_login:"Crie a sua conta ou entre para escrever.",
+    forum_vazio:"Nenhum tópico publicado ainda.", ver:"Ver", voltar:"Voltar", mensagens:"mensagens", pendente:"aguardando moderação",
+    resposta:"Responder", resposta_enviar:"Enviar resposta",
+    // equipe
+    eq_mod_t:"Moderação do fórum e dos cadastros (equipe)", eq_mod_vazio:"Nada esperando moderação.", eq_aprovar:"Aprovar", eq_recusar:"Recusar", eq_motivo:"Motivo da recusa",
+    eq_mod_tipos:{topico:"Tópico",mensagem:"Resposta",menor:"Autorização de menor",evento:"Evento ou oportunidade",p3d_peca:"Peça 3D",p3d_topico:"Tópico 3D",p3d_mensagem:"Mensagem 3D"},
+    eq_prop_t:"Projetos sugeridos esperando moderação (equipe)", eq_prop_contato:"Contato (só a equipe vê)",
+    eq_int_t:"Cadastros de interesse (equipe)", eq_int_total:"Total de cadastros", eq_int_baixar:"Baixar planilha (CSV) neste computador",
+    eq_int_aviso:"Dado pessoal: guarde a planilha só em pasta protegida da equipe e apague quando não precisar mais.",
+    eq_rem_t:"Pedido de exclusão (LGPD)", eq_rem_email:"E-mail de quem pediu a exclusão", eq_rem_enviar:"Apagar o cadastro", eq_rem_ok:"Apagados: {i} cadastro(s) e dados de {p} sugestão(ões).",
+    // termos e privacidade (BETA)
+    jur_aviso:"Versão beta · em revisão jurídica. Este texto ainda pode mudar e não substitui a versão final, que será publicada depois da revisão.",
+    ter_t:"Termos de uso (beta)",
+    ter_blocos:[["O que é","A InovaSTEM é uma rede e uma plataforma online de formação em STEM, realizada pela Physis Engineering [MARCADOR: razão social e CNPJ]. Esta é uma versão beta: funções podem mudar, falhar ou sair do ar."],
+                ["Quem pode usar","Qualquer pessoa pode ler o site. Para escrever no fórum ou publicar, é preciso criar uma conta. Menores de 18 anos publicam depois que a equipe registra a autorização do responsável legal."],
+                ["Moderação","Tudo o que é publicado passa pela equipe de moderação antes de aparecer. A equipe pode recusar ou retirar conteúdo que desrespeite as regras de convivência, sempre com motivo."],
+                ["Conteúdo e licenças","Você continua dona ou dono do que publica. Peças do Physis 3D são publicadas com a licença aberta que você escolher. Não publique o que não é seu sem permissão."],
+                ["Ferramentas","As ferramentas de modelagem servem para aprender. Resultados de cálculo e simulação não substituem projeto assinado por profissional habilitado."],
+                ["Hackathon","Os desafios de cibersegurança valem só dentro do ambiente isolado do hackathon. Tentar invadir qualquer outro sistema, inclusive esta plataforma, é proibido e encerra a participação."],
+                ["Contato","[MARCADOR: e-mail de contato da InovaSTEM]"]],
+    pri_t:"Aviso de privacidade (beta)",
+    pri_blocos:[["Quem cuida dos seus dados","Physis Engineering [MARCADOR: razão social, CNPJ e endereço]. Encarregado de dados: [MARCADOR: nome e e-mail]."],
+                ["O que coletamos","Cadastro de interesse: nome ou apelido, e-mail, áreas de interesse e, se você quiser, cidade, instituição e gênero. Para menores de 18 anos, nome e e-mail do responsável legal. Conta da plataforma: nome, e-mail, senha (guardada de forma protegida) e nome público. Sugestão de projeto: e-mail para a resposta e, se você quiser, nome e organização."],
+                ["Para quê","Mandar as novidades da InovaSTEM, responder às sugestões, organizar o fórum, os desafios e o hackathon. O gênero serve só para o convite da InovaSTEM Delas. A autodeclaração da Delas serve só para liberar o fórum da Delas: só você e a direção sabem."],
+                ["O que não fazemos","Não vendemos nem cedemos os seus dados. Patrocinadores não têm acesso a dados pessoais. O site não usa rastreadores nem programas de terceiros."],
+                ["Onde ficam","No servidor próprio da InovaSTEM, operado pela Physis Engineering. Por quanto tempo: [MARCADOR: prazo de guarda]."],
+                ["Seus direitos","Você pode pedir para ver, corrigir ou apagar os seus dados a qualquer momento, pelo contato abaixo. Quem tem conta pode sair da comunidade em Participar."],
+                ["Contato para privacidade","[MARCADOR: e-mail do encarregado de dados]"]],
+    rodape_realiza:"InovaSTEM · uma iniciativa PHYSIS", rodape_beta:"Versão beta: termos e aviso de privacidade em revisão jurídica.",
+    acessibilidade:"Acessibilidade", contato:"Contato: [MARCADOR]"
+  },
+  en: {
+    pular:"Skip to content", titulo:"InovaSTEM", beta:"beta version",
+    sub:"A network of women and young people in STEM and an online living lab",
+    endosso_a:"a", endosso_b:"initiative", inscreva:"Sign up", menu:"Menu", logo_alt:"InovaSTEM, home page", delas_logo_alt:"InovaSTEM Delas",
+    hero_sobrancelha:"Beta version · launch on 26 November 2026", passo:"Step {n} of 2", continuar:"Continue", voltar_passo:"Back",
+    passo1_falta:"Fill in your name or nickname and a valid e-mail to continue.",
+    int_idade_min:"Participation starts at age 16; from 16 to 17, with the legal guardian [CONFERIR with the lawyer].",
+    nav:"Site sections", carregando:"Loading…", sem_hub:"Could not reach the server. Please try again shortly.",
+    abas:{inicio:"Home", delas:"InovaSTEM Delas", desafios:"Challenges and projects", forum:"Forum", modelagem:"Online modelling",
+          hackathon:"Hackathon", materiais:"Materials", participar:"Join", termos:"Terms of use (beta)", privacidade:"Privacy (beta)"},
+    marcador:"[MARCADOR]", conferir:"[CONFERIR]", funciona:"Working", em_dev:"In development", beta_selo:"Beta",
+    ini_missao_t:"Mission", ini_missao:"To train women and young people from under-represented communities in STEM, with projects applied to sustainability, mentoring and support.",
+    ini_visao_t:"Vision 2031", ini_visao:"By 2031, to be a reference network in Latin America for applied STEM training and women's leadership in the just transition.",
+    ini_lab_t:"An online living lab",
+    ini_lab:"InovaSTEM is a research, development and innovation living lab: an open space for connection and exchange towards technological development, with open modelling tools, real sustainability challenges, a forum, events and courses.",
+    ini_blocos:[["Online modelling","GIS and maps, BIM (IFC) and 3D models in the browser. Digital twin and simulations in development."],
+                ["Open challenges and projects","Real challenges published by the team and projects suggested by the community."],
+                ["Moderated forum","Questions, exchanges and mentoring. Everything posted is reviewed by the team before it appears."],
+                ["Cybersecurity hackathon","March 2027, online, with challenges only in our own isolated environment (CTF)."]],
+    ini_duas_t:"Two networks, one place",
+    ini_duas:[["InovaSTEM","Open to everyone who wants to learn and create in science, technology, engineering and mathematics."],
+              ["InovaSTEM Delas","A network dedicated to women (young, cis and trans) who lead in STEM: peer support, conversation circles and mentoring."]],
+    ini_chamar:"I want to join", ini_whats:"Join the WhatsApp group", ini_whats_nota:"The WhatsApp group is optional. The platform forum remains the main channel.",
+    ini_whats_falta:"WhatsApp group link: coming soon.",
+    ini_physis_t:"Who runs it", ini_physis:"InovaSTEM is an initiative of Physis Engineering, a sustainability engineering company in Petrópolis (RJ), Brazil, led by women. This is the beta version of the platform: everything may change with participants' suggestions.",
+    compartilhar:"Share InovaSTEM", compartilhado:"Link copied. Thank you for sharing!", compartilhar_txt:"Meet InovaSTEM: a network of women and young people in STEM and an online living lab.",
+    del_t:"InovaSTEM Delas", del_missao:"To support and strengthen women in STEM through peer support networks and mentoring.",
+    del_visao:"Vision 2031: to be the reference network for the retention and leadership of women in STEM in Latin America.",
+    del_o_que_t:"What happens here", del_o_que:["Peer support: women who study and work in STEM talking to each other.","Conversation circles and mentoring.","Opportunities, challenges and events for women in STEM.","A forum only for network members."],
+    del_nao:"InovaSTEM Delas is a peer support network. It does not provide psychological or clinical care. In an emergency, go to the nearest health service or call 188 (CVV, Brazil) [CONFERIR].",
+    del_dif_t:"InovaSTEM and InovaSTEM Delas", del_dif:"InovaSTEM is open to everyone. InovaSTEM Delas is the network dedicated to women (young, cis and trans), also run by the InovaSTEM team, so that no woman walks alone in STEM.",
+    del_entrar_t:"How to join", del_entrar:["In the interest form, choose \"Female\" and tick that you want to join Delas.","For the Delas forum, create your account and tick the self-declaration. No document is required: only you and the board know that you declared."],
+    del_convidar:"Invite a friend", del_fechado:"The InovaSTEM Delas forum opens to those who self-declared. Create your account and tick the self-declaration under Join.",
+    del_forum:"InovaSTEM Delas forum",
+    des_t:"Open challenges and projects", des_intro:"Open challenges are real problems published by the team. Open projects are ideas suggested by the community and approved by moderation. Anyone can suggest one.",
+    des_desafios:"Open challenges", des_projetos:"Open projects", des_vazio_d:"No open challenges yet. The first one is coming soon.", des_vazio_p:"No approved open projects yet. Suggest the first one!",
+    des_prazo:"Deadline", des_area:"Area", des_org:"Proposed by",
+    sug_t:"Suggest an open project", sug_intro:"No account needed. The suggestion appears on the site after moderation. Your e-mail is only for the team to reply and never appears on the site.",
+    sug_titulo:"Project title", sug_desc:"What the project solves, for whom and how (at least 20 letters)", sug_area:"Area", sug_area_nenhuma:"No area defined",
+    sug_org:"Organisation or group (optional; shown on the site)", sug_nome:"Your name (optional; not shown on the site)", sug_email:"Your e-mail (for the team to reply)",
+    sug_aceite:"I have read the privacy notice (beta) and agree to my e-mail being used for the team's reply.", sug_enviar:"Send for moderation",
+    sug_ok:"Received! The team reviews it and publishes after moderation.",
+    des_criar_t:"Publish a challenge (team)", des_prazo_campo:"Deadline (YYYY-MM-DD, optional)", des_publicar:"Publish challenge",
+    des_forum:"Challenges and projects forum",
+    for_t:"Forum", for_intro:"Open to read. To post, create your account under Join. Everything posted is reviewed by the moderation team before it appears.",
+    for_regras_t:"Community rules", for_regras:["Always be respectful. No harassment, discrimination or hate speech.","Do not post personal data, yours or anyone else's (phone, address, documents).","Credit what is not yours and respect licences.","When in doubt, ask: everyone here is learning."],
+    for_cats:{geral:"General", inovastem:"InovaSTEM Network", modelagem:"Online modelling", desafios:"Challenges and projects", hackathon:"Hackathon", eventos:"Events and opportunities"},
+    for_escolha:"Choose the forum",
+    mod_t:"Online modelling", mod_intro:"Open tools that run in the browser, to learn from real sustainability cases. This area (F5) brings together BIM, GIS, 3D, digital twins and simulations.",
+    mod_cols:["Tool","What it does","Where to open","Status"],
+    mod_linhas:[["GIS and maps (Planner)","Draw and analyse areas on the map, layers and terrain.","planejador","ok"],
+                ["BIM (IFC)","Open and read IFC building models, in the Planner.","planejador","ok"],
+                ["Simulation (Phase 1)","Heat in walls and parts, structures (truss, frame, plate), ventilation, qualitative flow, terrain and runoff, uncertainty (Monte Carlo), biogas and QUBO optimisation. Each result shows method, assumptions and limits.","lab_sim","ok"],
+                ["Physis 3D","Open STL, OBJ and 3MF, measure, adjust and slice recycled-plastic parts, in the browser.","lab_3d","dev"],
+                ["Simulation (Phase 2)","Open solvers on the server (CalculiX, FEniCSx, OpenFOAM), always compared with a reference.","em_breve","dev"],
+                ["Digital twin","A virtual model linked to measured data.","em_breve","dev"]],
+    mod_abrir_plan:"Open the Planner (GIS and BIM)", mod_abrir_sim:"Open Simulation", mod_abrir_3d:"Open Physis 3D", mod_em_breve:"Coming soon",
+    mod_conta:"The Planner, Simulation and Physis 3D open without an account and run in your browser. To publish parts in the library and post in the forum, create your account under Join.",
+    mod_bib:"Physis 3D open library", mod_sem_pecas:"No parts published yet.", mod_memorial:"Development log", mod_licenca:"Licence", mod_revisoes:"revisions",
+    mod_forum:"Modelling forum",
+    hac_t:"InovaSTEM cybersecurity hackathon", hac_data:"March 2027 · online · exact day to be confirmed",
+    hac_intro:"A CTF (capture the flag) competition: teams solve information security challenges in our own isolated environment, built only for the hackathon.",
+    hac_regras_t:"Already decided", hac_regras:["Challenges run only in the hackathon's own isolated environment. No real system is a target.","Rules with a code of conduct, LGPD (Brazilian data protection) and responsible disclosure, published before registration.","Found a flaw outside the hackathon environment? Do not exploit it: tell the team through the contact channel."],
+    hac_falta_t:"Still to be defined", hac_falta:["Exact day [MARCADOR]","Audience, age range and team size [MARCADOR]","Prizes [MARCADOR]","Partners and technical mentoring [MARCADOR]"],
+    hac_interesse:"Let me know", hac_forum:"Hackathon forum",
+    mat_t:"Materials", mat_intro:"Presentation of the network and the platform, sponsorship and ecosystem. Downloadable documents appear here after the board approves them.",
+    mat_rede_t:"Presentation of the network and the platform", mat_rede:["A STEM training and support network, with priority for women and young people from under-represented communities.","An online platform as a living lab: modelling (GIS, BIM, 3D), open challenges and projects, a moderated forum and events.","Pilot cohort planned for the second half of 2027, in Rio de Janeiro, with partner technical education institutions [CONFERIR].","Pilot cohort targets: 20 to 25 participants and 80% completion [CONFERIR]."],
+    mat_pat_t:"Sponsorship", mat_pat_intro:"A single table. The Friend tier is for individuals only; companies start at R$ 1,000.",
+    mat_pat_cols:["Tier","For whom","Annual range","Benefits"],
+    mat_pat_linhas:[["Friend","Individuals only","R$ 750","[MARCADOR: Friend tier benefits]"],
+                    ["Supporter","Companies and organisations","R$ 1,000 to R$ 4,999","Name on the site and in the annual report, support certificate, open events"],
+                    ["Partner","Companies and organisations","R$ 5,000 to R$ 14,999","Logo on materials, working group, impact report"],
+                    ["Sponsor","Companies and organisations","R$ 15,000 to R$ 29,999","Real challenge or track linked to the brand, a talk at an event, dedicated report"],
+                    ["Master sponsor","Companies and organisations","R$ 30,000 to R$ 50,000","Invitation to the committee, co-branding, priority in challenges and projects, highlight at the annual showcase"]],
+    mat_pat_regras:["Sponsorship does not buy decisions or access to personal data.","Every company tier comes with a commitment to interviews or internships for graduates [CONFERIR].","Who receives and accounts for the funds: [MARCADOR: entity, until the partner organisation is defined]."],
+    mat_pat_fonte:"Figures from the Sponsorship Booklet v2, under review [CONFERIR].",
+    mat_eco_t:"Physis ecosystem", mat_eco:[["Physis Engineering","To accelerate the just transition with precision engineering and verifiable data, so that every energy, water and carbon gain can be measured, proven and shared."],["Casa Physis","To offer low-impact lodging, food and products that show in practice, and with data, how to live well in the Atlantic Forest and strengthen the local economy."],["InovaSTEM","To train women and young people from under-represented communities in STEM, with projects applied to sustainability, mentoring and support."]],
+    mat_docs_t:"Documents to download", mat_docs_vazio:"The documents are under review and will appear here once approved.", mat_baixar:"Download",
+    par_t:"Join", par_intro:"Two ways to take part: the interest form (quick, no password) and a platform account (to post in the forum and use 3D modelling).",
+    int_t:"Interest form", int_intro:"We only ask for what is needed. You will receive InovaSTEM news at the e-mail you give.",
+    int_nome:"Name or nickname", int_email:"E-mail", int_areas:"What interests you", int_cidade:"City (optional)", int_inst:"School or workplace (optional)",
+    int_genero:"Gender (optional)", int_gen_opc:{"":"Select","feminino":"Female","masculino":"Male","nao_informar":"Prefer not to say"},
+    int_gen_nota:"InovaSTEM is open to everyone. Women (young, cis and trans) also have a dedicated network: InovaSTEM Delas, for peer support and mentoring. Know someone who would like it? Share!",
+    int_delas_convite:"You can also be part of InovaSTEM Delas, the network dedicated to women in STEM.", int_delas_quero:"I also want to join InovaSTEM Delas", int_delas_ver:"Meet InovaSTEM Delas",
+    int_idade:"Age", int_maior:"I am 18 or older", int_menor:"I am 16 to 17",
+    int_resp_nome:"Legal guardian's name", int_resp_email:"Legal guardian's e-mail", int_menor_aviso:"For people under 18, the team also talks to the legal guardian.",
+    int_aceite:"I have read and accept the privacy notice (beta).", int_enviar:"Send interest form",
+    int_ok:"Form received. Thank you! You will receive news by e-mail.", int_ok_delas:" Welcome to InovaSTEM Delas too!",
+    cad_t:"Platform account", cad_intro:"To post in the forum, suggest events and use the Physis 3D tool.",
+    cad_nome:"Full name", cad_email:"E-mail (your username)", cad_senha:"Password (12 characters or more)", cad_pub:"Public name (shown on what you publish; can be a nickname)",
+    cad_delas:"Self-declaration (optional): I am a woman (cis or trans) and want to access InovaSTEM Delas.",
+    cad_aceite:"I have read and accept the terms of use (beta) and the privacy notice (beta).", cad_enviar:"Create account", cad_ok:"Account created. Check your e-mail and sign in through the platform.",
+    entrar_plataforma:"Sign in", area_equipe:"Team area", ent_t:"Sign in to your account", ent_usuario:"E-mail", ent_senha:"Password",
+    ent_enviar:"Sign in", ent_erro:"E-mail or password do not match.", sair_conta:"Sign out",
+    eu_t:"Your participation", eu_nome:"Public name", eu_pode:"Can publish", eu_nao_pode:"Cannot publish yet",
+    eu_delas:"Access to InovaSTEM Delas (self-declaration)", eu_delas_salvar:"Save self-declaration", eu_sair:"Leave the community",
+    eu_sair_aviso:"When you leave, your public name becomes 'Participante removido' and the guardian's data and the self-declaration are deleted.",
+    publicar_t:"New topic", publicar_tit:"Title", publicar_txt:"Message", publicar_enviar:"Send for moderation",
+    publicar_ok:"Received. It appears to everyone after the team's moderation.", publicar_login:"Create your account or sign in to post.",
+    forum_vazio:"No topics published yet.", ver:"View", voltar:"Back", mensagens:"messages", pendente:"awaiting moderation",
+    resposta:"Reply", resposta_enviar:"Send reply",
+    eq_mod_t:"Forum and sign-up moderation (team)", eq_mod_vazio:"Nothing awaiting moderation.", eq_aprovar:"Approve", eq_recusar:"Reject", eq_motivo:"Reason for rejection",
+    eq_mod_tipos:{topico:"Topic",mensagem:"Reply",menor:"Minor's authorisation",evento:"Event or opportunity",p3d_peca:"3D part",p3d_topico:"3D topic",p3d_mensagem:"3D message"},
+    eq_prop_t:"Suggested projects awaiting moderation (team)", eq_prop_contato:"Contact (team only)",
+    eq_int_t:"Interest forms (team)", eq_int_total:"Total forms", eq_int_baixar:"Download spreadsheet (CSV) to this computer",
+    eq_int_aviso:"Personal data: keep the spreadsheet only in a protected team folder and delete it when no longer needed.",
+    eq_rem_t:"Deletion request (LGPD)", eq_rem_email:"E-mail of the person asking for deletion", eq_rem_enviar:"Delete the form", eq_rem_ok:"Deleted: {i} form(s) and data from {p} suggestion(s).",
+    jur_aviso:"Beta version · under legal review. This text may still change and does not replace the final version, to be published after the review.",
+    ter_t:"Terms of use (beta)",
+    ter_blocos:[["What it is","InovaSTEM is a STEM training network and online platform run by Physis Engineering [MARCADOR: company name and CNPJ]. This is a beta version: features may change, fail or go offline."],
+                ["Who can use it","Anyone can read the site. To post in the forum or publish, you need an account. People under 18 can publish once the team records the legal guardian's authorisation."],
+                ["Moderation","Everything posted is reviewed by the moderation team before it appears. The team may reject or remove content that breaks the community rules, always giving a reason."],
+                ["Content and licences","You keep ownership of what you publish. Physis 3D parts are published under the open licence you choose. Do not publish what is not yours without permission."],
+                ["Tools","The modelling tools are for learning. Calculation and simulation results do not replace a design signed by a licensed professional."],
+                ["Hackathon","Cybersecurity challenges are valid only inside the hackathon's isolated environment. Trying to break into any other system, including this platform, is forbidden and ends participation."],
+                ["Contact","[MARCADOR: InovaSTEM contact e-mail]"]],
+    pri_t:"Privacy notice (beta)",
+    pri_blocos:[["Who looks after your data","Physis Engineering [MARCADOR: company name, CNPJ and address]. Data protection officer: [MARCADOR: name and e-mail]."],
+                ["What we collect","Interest form: name or nickname, e-mail, areas of interest and, if you wish, city, institution and gender. For people under 18, the legal guardian's name and e-mail. Platform account: name, e-mail, password (stored in protected form) and public name. Project suggestion: e-mail for the reply and, if you wish, name and organisation."],
+                ["What for","To send InovaSTEM news, answer suggestions and organise the forum, challenges and hackathon. Gender is used only for the InovaSTEM Delas invitation. The Delas self-declaration only opens the Delas forum: only you and the board know."],
+                ["What we do not do","We do not sell or share your data. Sponsors have no access to personal data. The site uses no trackers or third-party programs."],
+                ["Where it is kept","On InovaSTEM's own server, operated by Physis Engineering. For how long: [MARCADOR: retention period]."],
+                ["Your rights","You can ask to see, correct or delete your data at any time, through the contact below. Account holders can leave the community under Join."],
+                ["Privacy contact","[MARCADOR: data protection officer's e-mail]"]],
+    rodape_realiza:"InovaSTEM · a PHYSIS initiative", rodape_beta:"Beta version: terms and privacy notice under legal review.",
+    acessibilidade:"Accessibility", contato:"Contact: [MARCADOR]"
+  }
+};
+// Logos da InovaSTEM Delas, opção 1 (roxo + laranja) do Guia de Identidade de 19/11/2026, sem alteração: [claro, escuro]
+const LOGO_DELAS = ["data:image/webp;base64,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",
+                    "data:image/webp;base64,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"];
+let lang = "pt";
+try { lang = (localStorage.getItem("physis-idioma") === "en") ? "en" : "pt"; } catch (e) {}
+const ABAS = ["inicio", "delas", "desafios", "forum", "modelagem", "hackathon", "materiais", "participar"];
+const MENU = ["delas", "desafios", "forum", "modelagem", "hackathon", "materiais"];   // guia: menu de até 6 itens; Início = logo; Participar = botão
+const EXTRAS = ["termos", "privacidade"];                   // no rodapé, fora da barra de abas
+const CAT_DA_ABA = { delas:"delas", desafios:"desafios", modelagem:"modelagem", hackathon:"hackathon" };
+const CATS_FORUM = ["geral", "inovastem", "modelagem", "desafios", "hackathon", "eventos"];   // comunidade.py
+let inst = null, eu = null, ino = null, aba = "inicio", topicoAberto = null, catForum = "geral", areaPre = "", passoInt = 1;
+const $ = id => document.getElementById(id);
+const t = k => T[lang][k];
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const data = s => { try { return new Date(s * 1000).toLocaleDateString(lang === "en" ? "en-GB" : "pt-BR"); } catch (e) { return ""; } };
+const nomeArea = a => ino ? ((ino.areas.find(x => x.id === a) || {})[lang === "en" ? "nome_en" : "nome"] || "") : "";
+
+async function pedir(rota, corpo) {
+  const op = { headers: { "Content-Type": "application/json" }, credentials: "same-origin" };
+  if (corpo !== undefined) { op.method = "POST"; op.body = JSON.stringify(corpo); if (inst && inst.csrf) op.headers["X-Physis-CSRF"] = inst.csrf; }
+  const r = await fetch(rota, op);
+  let j = {}; try { j = await r.json(); } catch (e) {}
+  j._status = r.status;
+  return j;
+}
+
+function aplicarIdioma() {
+  document.documentElement.lang = lang === "en" ? "en" : "pt-BR";
+  document.querySelectorAll("[data-t]").forEach(el => { const v = t(el.getAttribute("data-t")); if (typeof v === "string") el.textContent = v; });
+  document.title = t("titulo") + " · " + t("abas")[aba];
+  $("abas").setAttribute("aria-label", t("nav"));
+  document.querySelectorAll("h1.logo img").forEach(im => im.alt = t("logo_alt"));
+  $("endosso").innerHTML = `<span>${esc(t("endosso_a"))}</span> <span class="marca-physis">Physis</span>${t("endosso_b") ? " <span>" + esc(t("endosso_b")) + "</span>" : ""}`;
+}
+
+function desenharAbas() {
+  $("abas").innerHTML = "<ul>" + MENU.map(a => `<li><a href="#${a}"${a === "delas" ? ' class="delas"' : ""}${a === aba ? ' aria-current="page"' : ""}>${esc(t("abas")[a])}</a></li>`).join("") + "</ul>";
+  if (aba === "inicio") $("logo-link").setAttribute("aria-current", "page"); else $("logo-link").removeAttribute("aria-current");
+  if (aba === "participar") $("cta").setAttribute("aria-current", "page"); else $("cta").removeAttribute("aria-current");
+}
+
+function rodape() {
+  $("rodape").innerHTML = `<p><strong>${esc(t("rodape_realiza"))}</strong> · ${esc(t("rodape_beta"))} · ${esc(t("contato"))}</p>
+    <ul><li><a href="#termos">${esc(t("abas").termos)}</a></li><li><a href="#privacidade">${esc(t("abas").privacidade)}</a></li>
+    <li><a href="/acessibilidade">${esc(t("acessibilidade"))}</a></li><li><a href="#participar">${esc(t("entrar_plataforma"))}</a></li>
+    <li><a href="/plataforma/">${esc(t("area_equipe"))}</a></li></ul>`;
+}
+
+const cartao = (tit, html, cls) => `<section class="cartao${cls ? " " + cls : ""}"><h2>${esc(tit)}</h2>${html}</section>`;
+const lista = arr => `<ul class="lista">${arr.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
+const selo = s => s === "ok" ? `<span class="selo ok">${esc(t("funciona"))}</span>` : `<span class="selo dev">${esc(t("em_dev"))}</span>`;
+const grade = arr => `<div class="grade">${arr.map(([a, b]) => `<div class="cartao"><h3>${esc(a)}</h3><p>${esc(b)}</p></div>`).join("")}</div>`;
+const botaoCompartilhar = (rot, id) => `<button class="botao sec" type="button" data-compartilhar id="${id}">${esc(rot)}</button>`;
+
+function whatsapp() {
+  if (ino && ino.whatsapp && ino.whatsapp.startsWith("https://chat.whatsapp.com/"))
+    return `<a class="botao sec" href="${esc(ino.whatsapp)}" rel="noopener noreferrer">${esc(t("ini_whats"))}</a>`;
+  return "";
+}
+
+function telaInicio() {
+  const w = whatsapp();
+  return `<section class="hero"><p class="sobrancelha">${esc(t("hero_sobrancelha"))}</p><h2>${esc(t("ini_missao"))}</h2>
+      <p class="chamada">${esc(t("ini_lab"))}</p><div class="acoes"><a class="botao" href="#participar">${esc(t("ini_chamar"))}</a>
+      <a class="botao sec" href="#delas">${esc(t("int_delas_ver"))}</a></div></section>`
+    + `<section><h2>${esc(t("ini_duas_t"))}</h2><div class="grade"><div class="cartao marca"><h3>${esc(t("ini_duas")[0][0])}</h3><p>${esc(t("ini_duas")[0][1])}</p></div>
+       <div class="cartao delas"><h3>${esc(t("ini_duas")[1][0])}</h3><p>${esc(t("ini_duas")[1][1])}</p></div></div></section>`
+    + `<section><h2>${esc(t("ini_lab_t"))}</h2>${grade(t("ini_blocos"))}</section>`
+    + cartao(t("ini_visao_t"), `<p>${esc(t("ini_visao"))}</p>`)
+    + cartao(t("ini_physis_t"), `<p>${esc(t("ini_physis"))}</p><div class="acoes">${w}${botaoCompartilhar(t("compartilhar"), "comp-inicio")}</div>
+      <p class="t2 pq">${esc(w ? t("ini_whats_nota") : t("ini_whats_falta"))}</p><p class="msg" id="comp-msg" role="status"></p>`);
+}
+
+function telaDelas() {
+  return cartao(t("del_t"), `<div class="logo-delas"><img class="so-claro" src="${LOGO_DELAS[0]}" alt="${esc(t("delas_logo_alt"))}" width="94" height="120">
+      <img class="so-escuro" src="${LOGO_DELAS[1]}" alt="${esc(t("delas_logo_alt"))}" width="95" height="120"></div><p><strong>${esc(t("del_missao"))}</strong></p><p>${esc(t("del_visao"))}</p>
+      <div class="acoes"><a class="botao delas" href="#participar">${esc(t("ini_chamar"))}</a>${botaoCompartilhar(t("del_convidar"), "comp-delas")}</div>
+      <p class="msg" id="comp-msg" role="status"></p>`, "delas")
+    + cartao(t("del_dif_t"), `<p>${esc(t("del_dif"))}</p>`)
+    + cartao(t("del_o_que_t"), lista(t("del_o_que")) + `<p class="faixa">${esc(t("del_nao"))}</p>`)
+    + cartao(t("del_entrar_t"), `<ol class="lista">${t("del_entrar").map(x => `<li>${esc(x)}</li>`).join("")}</ol>`)
+    + `<section class="cartao" id="forum"></section>`;
+}
+
+function telaDesafios() {
+  const areas = ino ? ino.areas : [];
+  return cartao(t("des_t"), `<p>${esc(t("des_intro"))}</p>`, "marca")
+    + `<section class="cartao" id="lista-desafios"><h2>${esc(t("des_desafios"))}</h2><p>${esc(t("carregando"))}</p></section>`
+    + `<section class="cartao" id="lista-projetos"><h2>${esc(t("des_projetos"))}</h2><p>${esc(t("carregando"))}</p></section>`
+    + cartao(t("sug_t"), `<p class="t2">${esc(t("sug_intro"))}</p><form id="sug" novalidate>
+        <label for="sug-tit">${esc(t("sug_titulo"))}</label><input type="text" id="sug-tit" maxlength="160" required>
+        <label for="sug-desc">${esc(t("sug_desc"))}</label><textarea id="sug-desc" maxlength="4000" required></textarea>
+        <div class="campos"><div><label for="sug-area">${esc(t("sug_area"))}</label><select id="sug-area"><option value="">${esc(t("sug_area_nenhuma"))}</option>
+          ${areas.map(a => `<option value="${esc(a.id)}">${esc(lang === "en" ? a.nome_en : a.nome)}</option>`).join("")}</select></div>
+          <div><label for="sug-org">${esc(t("sug_org"))}</label><input type="text" id="sug-org" maxlength="120"></div>
+          <div><label for="sug-nome">${esc(t("sug_nome"))}</label><input type="text" id="sug-nome" maxlength="120" autocomplete="name"></div>
+          <div><label for="sug-email">${esc(t("sug_email"))}</label><input type="email" id="sug-email" maxlength="160" autocomplete="email" required></div></div>
+        <label class="opcao"><input type="checkbox" id="sug-aceite" required>${esc(t("sug_aceite"))} <a href="#privacidade">${esc(t("abas").privacidade)}</a></label>
+        <div class="acoes"><button class="botao" type="submit">${esc(t("sug_enviar"))}</button></div><p class="msg" id="sug-msg" role="status"></p></form>`)
+    + (eu && eu.equipe ? cartao(t("des_criar_t"), `<form id="des-f">
+        <label for="des-tit">${esc(t("sug_titulo"))}</label><input type="text" id="des-tit" maxlength="160" required>
+        <label for="des-desc">${esc(t("sug_desc"))}</label><textarea id="des-desc" maxlength="4000" required></textarea>
+        <div class="campos"><div><label for="des-area">${esc(t("sug_area"))}</label><select id="des-area"><option value="">${esc(t("sug_area_nenhuma"))}</option>
+          ${areas.map(a => `<option value="${esc(a.id)}">${esc(lang === "en" ? a.nome_en : a.nome)}</option>`).join("")}</select></div>
+          <div><label for="des-org">${esc(t("sug_org"))}</label><input type="text" id="des-org" maxlength="120"></div>
+          <div><label for="des-prazo">${esc(t("des_prazo_campo"))}</label><input type="text" id="des-prazo" maxlength="10" inputmode="numeric" pattern="\\d{4}-\\d{2}-\\d{2}"></div></div>
+        <div class="acoes"><button class="botao" type="submit">${esc(t("des_publicar"))}</button></div><p class="msg" id="des-msg" role="status"></p></form>`) : "")
+    + `<section class="cartao" id="forum"></section>`;
+}
+
+async function propostas() {
+  for (const [tipo, alvoId, tit, vazio] of [["desafio", "lista-desafios", t("des_desafios"), t("des_vazio_d")], ["projeto", "lista-projetos", t("des_projetos"), t("des_vazio_p")]]) {
+    const alvo = $(alvoId);
+    if (!alvo) continue;
+    const j = await pedir("/api/publico/inovastem/propostas?tipo=" + tipo);
+    if (!j.ok) { alvo.innerHTML = `<h2>${esc(tit)}</h2><p class="faixa erro">${esc(t("sem_hub"))}</p>`; continue; }
+    alvo.innerHTML = `<h2>${esc(tit)}</h2>` + (j.itens.length ? j.itens.map(x => `<div class="item"><h3>${esc(x.titulo)}</h3>
+        <span class="t2 pq">${[x.area ? `${esc(t("des_area"))}: ${esc(lang === "en" ? x.area_nome_en : x.area_nome)}` : "", x.organizacao ? `${esc(t("des_org"))}: ${esc(x.organizacao)}` : "",
+          x.prazo ? `${esc(t("des_prazo"))}: ${esc(x.prazo)}` : ""].filter(Boolean).join(" · ")}</span><p>${esc(x.descricao)}</p></div>`).join("") : `<p>${esc(vazio)}</p>`);
+  }
+}
+
+function telaForum() {
+  return cartao(t("for_t"), `<p>${esc(t("for_intro"))}</p>`, "marca")
+    + cartao(t("for_regras_t"), lista(t("for_regras")))
+    + `<section class="cartao"><h2>${esc(t("for_escolha"))}</h2><ul class="lista" style="list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:6px">`
+    + CATS_FORUM.map(c => `<li><button class="botao${c === catForum ? "" : " sec"}" type="button" data-cat="${c}" aria-pressed="${c === catForum}">${esc(t("for_cats")[c])}</button></li>`).join("")
+    + `</ul></section><section class="cartao" id="forum"></section>`;
+}
+
+function telaModelagem() {
+  const onde = o => o === "planejador" ? `<a class="botao sec" href="/planejador">${esc(t("mod_abrir_plan"))}</a>`
+                  : o === "lab_sim" ? `<a class="botao sec" href="/laboratorio#simulacao">${esc(t("mod_abrir_sim"))}</a>`
+                  : o === "lab_3d" ? `<a class="botao sec" href="/laboratorio#3d">${esc(t("mod_abrir_3d"))}</a>` : esc(t("mod_em_breve"));
+  const linhas = t("mod_linhas").map(l => `<tr><th scope="row">${esc(l[0])}</th><td>${esc(l[1])}</td><td>${onde(l[2])}</td><td>${selo(l[3])}</td></tr>`).join("");
+  return cartao(t("mod_t"), `<p>${esc(t("mod_intro"))}</p><p class="t2">${esc(t("mod_conta"))}</p>
+      <div class="acoes"><a class="botao" href="/laboratorio#simulacao">${esc(t("mod_abrir_sim"))}</a><a class="botao sec" href="/planejador">${esc(t("mod_abrir_plan"))}</a>
+      <a class="botao sec" href="/laboratorio#3d">${esc(t("mod_abrir_3d"))}</a></div>`, "marca")
+    + `<section><div class="rolagem"><table><caption>${esc(t("mod_t"))}</caption><thead><tr>${t("mod_cols").map(c => `<th scope="col">${esc(c)}</th>`).join("")}</tr></thead>
+       <tbody>${linhas}</tbody></table></div></section>`
+    + `<section class="cartao" id="biblioteca"><h2>${esc(t("mod_bib"))}</h2><p>${esc(t("carregando"))}</p></section>`
+    + `<section class="cartao" id="forum"></section>`;
+}
+
+async function biblioteca() {
+  const alvo = $("biblioteca");
+  if (!alvo) return;
+  const j = await pedir("/api/publico/3d/pecas");
+  if (!j.ok) { alvo.innerHTML = `<h2>${esc(t("mod_bib"))}</h2><p class="faixa erro">${esc(t("sem_hub"))}</p>`; return; }
+  alvo.innerHTML = `<h2>${esc(t("mod_bib"))}</h2>` + (j.pecas.length ? j.pecas.map(p => `<div class="item"><h3>${esc(p.nome)}</h3>
+      <span class="t2 pq">${esc(p.autor_nome)} · ${esc(t("mod_licenca"))}: ${esc(p.licenca_nome || p.licenca)} · ${p.revisoes} ${esc(t("mod_revisoes"))}</span>
+      ${p.descricao ? `<p>${esc(p.descricao)}</p>` : ""}<div class="acoes"><a class="botao sec" href="/api/publico/3d/pecas/${+p.id}/memorial">${esc(t("mod_memorial"))}</a></div></div>`).join("")
+      : `<p>${esc(t("mod_sem_pecas"))}</p>`);
+}
+
+function telaHackathon() {
+  return cartao(t("hac_t"), `<p><strong>${esc(t("hac_data"))}</strong></p><p>${esc(t("hac_intro"))}</p>
+      <div class="acoes"><button class="botao" type="button" id="hac-interesse">${esc(t("hac_interesse"))}</button></div>`, "marca")
+    + cartao(t("hac_regras_t"), lista(t("hac_regras")))
+    + cartao(t("hac_falta_t"), lista(t("hac_falta")))
+    + `<section class="cartao" id="forum"></section>`;
+}
+
+function telaMateriais() {
+  const pat = t("mat_pat_linhas").map(l => `<tr><th scope="row">${esc(l[0])}</th><td>${esc(l[1])}</td><td>${esc(l[2])}</td><td>${esc(l[3])}</td></tr>`).join("");
+  const docs = ino && ino.materiais && ino.materiais.length
+    ? `<ul class="lista">${ino.materiais.map(m => `<li>${esc(lang === "en" && m.titulo_en ? m.titulo_en : m.titulo)} (${esc(m.tipo.toUpperCase())}) · <a href="/materiais/${encodeURIComponent(m.arquivo)}">${esc(t("mat_baixar"))}</a></li>`).join("")}</ul>`
+    : `<p>${esc(t("mat_docs_vazio"))}</p>`;
+  return cartao(t("mat_t"), `<p>${esc(t("mat_intro"))}</p>`, "marca")
+    + cartao(t("mat_rede_t"), lista(t("mat_rede")))
+    + `<section><h2>${esc(t("mat_pat_t"))}</h2><p>${esc(t("mat_pat_intro"))}</p><div class="rolagem"><table><caption>${esc(t("mat_pat_t"))}</caption>
+       <thead><tr>${t("mat_pat_cols").map(c => `<th scope="col">${esc(c)}</th>`).join("")}</tr></thead><tbody>${pat}</tbody></table></div>
+       ${lista(t("mat_pat_regras"))}<p class="t2 pq">${esc(t("mat_pat_fonte"))}</p></section>`
+    + `<section><h2>${esc(t("mat_eco_t"))}</h2>${grade(t("mat_eco"))}</section>`
+    + cartao(t("mat_docs_t"), docs);
+}
+
+function telaParticipar() {
+  const areas = ino ? ino.areas : [];
+  const gen = t("int_gen_opc");
+  let h = cartao(t("par_t"), `<p>${esc(t("par_intro"))}</p>`, "marca");
+  h += cartao(t("int_t"), `<p class="t2">${esc(t("int_intro"))}</p><form id="int" novalidate>
+      <div class="progresso"><p id="int-passo-txt">${esc(t("passo").replace("{n}", 1))}</p>
+        <div class="barra" role="progressbar" aria-labelledby="int-passo-txt" aria-valuemin="1" aria-valuemax="2" aria-valuenow="1" id="int-prog"><span id="int-barra"></span></div></div>
+      <div id="int-p1">
+        <div class="campos">
+          <div><label for="int-nome">${esc(t("int_nome"))}</label><input type="text" id="int-nome" autocomplete="nickname" required maxlength="120"></div>
+          <div><label for="int-email">${esc(t("int_email"))}</label><input type="email" id="int-email" autocomplete="email" required maxlength="160"></div>
+        </div>
+        <fieldset><legend>${esc(t("int_areas"))}</legend>${areas.map(a => `<label class="opcao"><input type="checkbox" name="area" value="${esc(a.id)}"${a.id === areaPre ? " checked" : ""}>${esc(lang === "en" ? a.nome_en : a.nome)}</label>`).join("")}</fieldset>
+        <div class="acoes"><button class="botao" type="button" id="int-seguir">${esc(t("continuar"))}</button></div>
+      </div>
+      <div id="int-p2" hidden>
+        <fieldset><legend>${esc(t("int_idade"))}</legend><p class="t2 pq">${esc(t("int_idade_min"))}</p>
+          <label class="opcao"><input type="radio" name="int-idade" value="maior" checked>${esc(t("int_maior"))}</label>
+          <label class="opcao"><input type="radio" name="int-idade" value="menor">${esc(t("int_menor"))}</label>
+          <div id="int-resp" hidden><p class="t2 pq">${esc(t("int_menor_aviso"))}</p><div class="campos">
+            <div><label for="int-resp-nome">${esc(t("int_resp_nome"))}</label><input type="text" id="int-resp-nome" maxlength="120"></div>
+            <div><label for="int-resp-email">${esc(t("int_resp_email"))}</label><input type="email" id="int-resp-email" maxlength="160"></div></div></div>
+        </fieldset>
+        <div class="campos">
+          <div><label for="int-genero">${esc(t("int_genero"))}</label><select id="int-genero" aria-describedby="int-gen-nota">
+            ${["", "feminino", "masculino", "nao_informar"].map(g => `<option value="${g}">${esc(gen[g])}</option>`).join("")}</select></div>
+          <div><label for="int-cidade">${esc(t("int_cidade"))}</label><input type="text" id="int-cidade" autocomplete="address-level2" maxlength="80"></div>
+          <div><label for="int-inst">${esc(t("int_inst"))}</label><input type="text" id="int-inst" autocomplete="organization" maxlength="120"></div>
+        </div>
+        <p class="nota-delas" id="int-gen-nota">${esc(t("int_gen_nota"))}</p>
+        <div class="acoes">${botaoCompartilhar(t("compartilhar"), "comp-part")}</div>
+        <div id="int-delas" class="nota-delas" hidden><p>${esc(t("int_delas_convite"))} <a href="#delas">${esc(t("int_delas_ver"))}</a></p>
+          <label class="opcao"><input type="checkbox" id="int-delas-quero">${esc(t("int_delas_quero"))}</label></div>
+        <label class="opcao"><input type="checkbox" id="int-aceite" required>${esc(t("int_aceite"))} <a href="#privacidade">${esc(t("abas").privacidade)}</a></label>
+        <div class="acoes"><button class="botao sec" type="button" id="int-voltar">${esc(t("voltar_passo"))}</button>
+          <button class="botao" type="submit">${esc(t("int_enviar"))}</button></div>
+      </div>
+      <p class="msg" id="int-msg" role="status"></p><p class="msg" id="comp-msg" role="status"></p></form>`);
+  if (eu && eu.participante) {
+    const p = eu.participante;
+    h += cartao(t("eu_t"), `<p>${esc(t("eu_nome"))}: <strong>${esc(p.nome_publico)}</strong></p>
+      <p>${esc(eu.pode_publicar ? t("eu_pode") : t("eu_nao_pode"))}${eu.motivo ? ": " + esc(eu.motivo) : ""}</p>
+      <label class="opcao"><input type="checkbox" id="eu-delas"${p.delas ? " checked" : ""}>${esc(t("eu_delas"))}</label>
+      <div class="acoes"><button class="botao" type="button" id="eu-delas-salvar">${esc(t("eu_delas_salvar"))}</button>
+      <button class="botao sec" type="button" id="eu-sair">${esc(t("eu_sair"))}</button></div>
+      <p class="t2 pq">${esc(t("eu_sair_aviso"))}</p><p class="msg" id="eu-msg" role="status"></p>`);
+  } else if (!inst || !inst.autenticado) {
+    h += cartao(t("cad_t"), `<p class="t2">${esc(t("cad_intro"))}</p><form id="cad" novalidate>
+      <div class="campos">
+        <div><label for="cad-nome">${esc(t("cad_nome"))}</label><input type="text" id="cad-nome" autocomplete="name" required maxlength="120"></div>
+        <div><label for="cad-email">${esc(t("cad_email"))}</label><input type="email" id="cad-email" autocomplete="email" required maxlength="160"></div>
+        <div><label for="cad-senha">${esc(t("cad_senha"))}</label><input type="password" id="cad-senha" autocomplete="new-password" required minlength="12"></div>
+        <div><label for="cad-pub">${esc(t("cad_pub"))}</label><input type="text" id="cad-pub" required maxlength="80"></div>
+      </div>
+      <fieldset><legend>${esc(t("int_idade"))}</legend><p class="t2 pq">${esc(t("int_idade_min"))}</p>
+        <label class="opcao"><input type="radio" name="idade" value="maior" checked>${esc(t("int_maior"))}</label>
+        <label class="opcao"><input type="radio" name="idade" value="menor">${esc(t("int_menor"))}</label>
+        <div id="cad-resp" hidden><div class="campos">
+          <div><label for="cad-resp-nome">${esc(t("int_resp_nome"))}</label><input type="text" id="cad-resp-nome" maxlength="120"></div>
+          <div><label for="cad-resp-email">${esc(t("int_resp_email"))}</label><input type="email" id="cad-resp-email" maxlength="160"></div></div></div>
+      </fieldset>
+      <label class="opcao"><input type="checkbox" id="cad-delas">${esc(t("cad_delas"))}</label>
+      <label class="opcao"><input type="checkbox" id="cad-aceite" required>${esc(t("cad_aceite"))}</label>
+      <p class="pq"><a href="#termos">${esc(t("abas").termos)}</a> · <a href="#privacidade">${esc(t("abas").privacidade)}</a></p>
+      <div class="acoes"><button class="botao" type="submit">${esc(t("cad_enviar"))}</button><a class="botao sec" href="#ent-f">${esc(t("entrar_plataforma"))}</a></div>
+      <p class="msg" id="cad-msg" role="status"></p></form>`);
+  }
+  if (!inst || !inst.autenticado) {
+    h += cartao(t("ent_t"), `<form id="ent-f"><div class="campos">
+        <div><label for="ent-usuario">${esc(t("ent_usuario"))}</label><input type="email" id="ent-usuario" autocomplete="username" required maxlength="160"></div>
+        <div><label for="ent-senha">${esc(t("ent_senha"))}</label><input type="password" id="ent-senha" autocomplete="current-password" required></div></div>
+        <div class="acoes"><button class="botao" type="submit">${esc(t("ent_enviar"))}</button></div><p class="msg" id="ent-msg" role="status"></p></form>`);
+  } else {
+    h += `<div class="acoes"><button class="botao sec" type="button" id="sair-conta">${esc(t("sair_conta"))}</button></div>`;
+  }
+  if (eu && eu.equipe) {
+    h += `<section class="cartao" id="moderacao"><h2>${esc(t("eq_mod_t"))}</h2><p>${esc(t("carregando"))}</p></section>`
+      + `<section class="cartao" id="fila-ino"><h2>${esc(t("eq_prop_t"))}</h2><p>${esc(t("carregando"))}</p></section>`
+      + `<section class="cartao" id="interesses"><h2>${esc(t("eq_int_t"))}</h2><p>${esc(t("carregando"))}</p></section>`
+      + cartao(t("eq_rem_t"), `<form id="rem"><label for="rem-email">${esc(t("eq_rem_email"))}</label><input type="email" id="rem-email" maxlength="160" required>
+          <div class="acoes"><button class="botao sec" type="submit">${esc(t("eq_rem_enviar"))}</button></div><p class="msg" id="rem-msg" role="status"></p></form>`);
+  }
+  return h;
+}
+
+function telaJuridico(qual) {
+  const blocos = t(qual === "termos" ? "ter_blocos" : "pri_blocos");
+  return `<section class="cartao juridico"><h2>${esc(t(qual === "termos" ? "ter_t" : "pri_t"))}</h2><p class="faixa">${esc(t("jur_aviso"))}</p>`
+    + blocos.map(([a, b]) => `<h3>${esc(a)}</h3><p>${esc(b)}</p>`).join("") + `</section>`;
+}
+
+const TELAS = { inicio: telaInicio, delas: telaDelas, desafios: telaDesafios, forum: telaForum, modelagem: telaModelagem,
+                hackathon: telaHackathon, materiais: telaMateriais, participar: telaParticipar,
+                termos: () => telaJuridico("termos"), privacidade: () => telaJuridico("privacidade") };
+
+function desenhar() {
+  aplicarIdioma(); desenharAbas(); rodape();
+  $("corpo").innerHTML = TELAS[aba]();
+  ligar();
+}
+
+// ── fórum (leitura aberta; com conta, inclui a Delas e os próprios pendentes). Mesmas rotas do site do Instituto ──
+function tituloForum(cat) {
+  return cat === "delas" ? t("del_forum") : cat === "desafios" ? t("des_forum") : cat === "modelagem" ? t("mod_forum")
+       : cat === "hackathon" ? t("hac_forum") : t("for_cats")[cat] || t("for_t");
+}
+
+async function forum(cat) {
+  const alvo = $("forum");
+  if (!alvo) return;
+  const titulo = tituloForum(cat);
+  const base = inst && inst.autenticado ? "/api/comunidade" : "/api/publico/comunidade";
+  if (cat === "delas" && !(eu && (eu.equipe || (eu.participante && eu.participante.delas)))) {
+    alvo.innerHTML = `<h2>${esc(titulo)}</h2><p>${esc(t("del_fechado"))}</p><div class="acoes"><a class="botao delas" href="#participar">${esc(t("abas").participar)}</a></div>`;
+    return;
+  }
+  if (topicoAberto) {
+    const j = await pedir(`${base}/forum/${topicoAberto}`);
+    if (!j.ok) { topicoAberto = null; return forum(cat); }
+    alvo.innerHTML = `<h2>${esc(j.topico.titulo)}</h2>` + j.mensagens.map(m => `<div class="item"><strong>${esc(m.autor_nome)}</strong> <span class="t2 pq">${esc(data(m.criado))}</span>
+        ${m.estado !== "publicado" ? `<span class="selo dev">${esc(t("pendente"))}</span>` : ""}<p>${esc(m.texto)}</p></div>`).join("")
+      + (eu && eu.pode_publicar ? `<form id="resp"><label for="resp-txt">${esc(t("resposta"))}</label><textarea id="resp-txt" maxlength="8000" required></textarea>
+         <div class="acoes"><button class="botao" type="submit">${esc(t("resposta_enviar"))}</button></div><p class="msg" id="resp-msg" role="status"></p></form>` : "")
+      + `<div class="acoes"><button class="botao sec" type="button" id="voltar">${esc(t("voltar"))}</button></div>`;
+    $("voltar").onclick = () => { topicoAberto = null; forum(cat); };
+    const fr = $("resp");
+    if (fr) fr.onsubmit = async ev => { ev.preventDefault(); const r = await pedir(`/api/comunidade/forum/${topicoAberto}`, { texto: $("resp-txt").value });
+      $("resp-msg").textContent = r.ok ? t("publicar_ok") : (r.erro || t("sem_hub")); $("resp-msg").className = "msg" + (r.ok ? "" : " erro"); if (r.ok) forum(cat); };
+    return;
+  }
+  const j = await pedir(`${base}/forum?categoria=${encodeURIComponent(cat)}`);
+  if (j._status === 403) { alvo.innerHTML = `<h2>${esc(titulo)}</h2><p>${esc(t("del_fechado"))}</p>`; return; }
+  if (!j.ok) { alvo.innerHTML = `<h2>${esc(titulo)}</h2><p class="faixa erro">${esc(t("sem_hub"))}</p>`; return; }
+  alvo.innerHTML = `<h2>${esc(titulo)}</h2>` + (j.topicos.length ? j.topicos.map(x => `<div class="item"><h3>${esc(x.titulo)}</h3>
+      <span class="t2 pq">${esc(x.autor_nome)} · ${esc(data(x.criado))} · ${+x.mensagens} ${esc(t("mensagens"))}</span>
+      ${x.estado !== "publicado" ? ` <span class="selo dev">${esc(t("pendente"))}</span>` : ""}
+      <div class="acoes"><button class="botao sec" type="button" data-topico="${+x.id}">${esc(t("ver"))}</button></div></div>`).join("") : `<p>${esc(t("forum_vazio"))}</p>`)
+    + (eu && eu.pode_publicar ? `<form id="novo"><h3>${esc(t("publicar_t"))}</h3><label for="novo-tit">${esc(t("publicar_tit"))}</label><input type="text" id="novo-tit" maxlength="160" required>
+        <label for="novo-txt">${esc(t("publicar_txt"))}</label><textarea id="novo-txt" maxlength="8000" required></textarea>
+        <div class="acoes"><button class="botao" type="submit">${esc(t("publicar_enviar"))}</button></div><p class="msg" id="novo-msg" role="status"></p></form>`
+      : `<p class="t2">${esc(t("publicar_login"))} <a href="#participar">${esc(t("abas").participar)}</a></p>`);
+  alvo.querySelectorAll("[data-topico]").forEach(b => b.onclick = () => { topicoAberto = +b.getAttribute("data-topico"); forum(cat); });
+  const fn = $("novo");
+  if (fn) fn.onsubmit = async ev => { ev.preventDefault(); const r = await pedir("/api/comunidade/forum", { categoria: cat, titulo: $("novo-tit").value, texto: $("novo-txt").value });
+    $("novo-msg").textContent = r.ok ? (r.aviso || t("publicar_ok")) : (r.erro || t("sem_hub")); $("novo-msg").className = "msg" + (r.ok ? "" : " erro"); if (r.ok) setTimeout(() => forum(cat), 1200); };
+}
+
+// ── equipe: moderação da comunidade (mesma fila do Instituto), propostas, cadastros de interesse e exclusão ──
+async function moderacao() {
+  const alvo = $("moderacao");
+  if (!alvo) return;
+  const j = await pedir("/api/comunidade/moderacao");
+  if (!j.ok) { alvo.innerHTML = `<h2>${esc(t("eq_mod_t"))}</h2><p class="faixa erro">${esc(j.erro || t("sem_hub"))}</p>`; return; }
+  alvo.innerHTML = `<h2>${esc(t("eq_mod_t"))}</h2>` + (j.itens.length ? j.itens.map((x, i) => `<div class="item"><h3>${esc(t("eq_mod_tipos")[x.tipo] || x.tipo)}: ${esc(x.titulo || x.nome_publico || "")}</h3>
+      <span class="t2 pq">${esc(x.autor_nome || x.responsavel_nome || "")}${x.responsavel_email ? " · " + esc(x.responsavel_email) : ""}${x.categoria ? " · " + esc(x.categoria) : ""}</span>
+      ${x.texto ? `<p>${esc(x.texto)}</p>` : ""}
+      <label for="mot-${i}">${esc(t("eq_motivo"))}</label><input type="text" id="mot-${i}" maxlength="400">
+      <div class="acoes"><button class="botao" type="button" data-mod="${i}" data-dec="aprovar">${esc(t("eq_aprovar"))}</button>
+      <button class="botao sec" type="button" data-mod="${i}" data-dec="recusar">${esc(t("eq_recusar"))}</button></div><p class="msg" id="mod-msg-${i}" role="status"></p></div>`).join("")
+      : `<p>${esc(t("eq_mod_vazio"))}</p>`);
+  alvo.querySelectorAll("[data-mod]").forEach(b => b.onclick = async () => {
+    const i = +b.getAttribute("data-mod"), x = j.itens[i];
+    const r = await pedir("/api/comunidade/moderar", { tipo: x.tipo, id: x.id, decisao: b.getAttribute("data-dec"), motivo: $("mot-" + i).value });
+    if (r.ok) moderacao(); else { $("mod-msg-" + i).textContent = r.erro || t("sem_hub"); $("mod-msg-" + i).className = "msg erro"; }
+  });
+}
+
+async function filaIno() {
+  const alvo = $("fila-ino");
+  if (!alvo) return;
+  const j = await pedir("/api/inovastem/fila");
+  if (!j.ok) { alvo.innerHTML = `<h2>${esc(t("eq_prop_t"))}</h2><p class="faixa erro">${esc(j.erro || t("sem_hub"))}</p>`; return; }
+  alvo.innerHTML = `<h2>${esc(t("eq_prop_t"))}</h2>` + (j.itens.length ? j.itens.map((x, i) => `<div class="item"><h3>${esc(x.titulo)}</h3>
+      <span class="t2 pq">${esc(nomeArea(x.area))}${x.organizacao ? " · " + esc(x.organizacao) : ""} · ${esc(t("eq_prop_contato"))}: ${esc(x.nome)} ${esc(x.email)}</span><p>${esc(x.descricao)}</p>
+      <label for="pmot-${i}">${esc(t("eq_motivo"))}</label><input type="text" id="pmot-${i}" maxlength="400">
+      <div class="acoes"><button class="botao" type="button" data-prop="${i}" data-dec="aprovar">${esc(t("eq_aprovar"))}</button>
+      <button class="botao sec" type="button" data-prop="${i}" data-dec="recusar">${esc(t("eq_recusar"))}</button></div><p class="msg" id="pmsg-${i}" role="status"></p></div>`).join("")
+      : `<p>${esc(t("eq_mod_vazio"))}</p>`);
+  alvo.querySelectorAll("[data-prop]").forEach(b => b.onclick = async () => {
+    const i = +b.getAttribute("data-prop");
+    const r = await pedir("/api/inovastem/moderar", { id: j.itens[i].id, decisao: b.getAttribute("data-dec"), motivo: $("pmot-" + i).value });
+    if (r.ok) filaIno(); else { $("pmsg-" + i).textContent = r.erro || t("sem_hub"); $("pmsg-" + i).className = "msg erro"; }
+  });
+}
+
+async function interesses() {
+  const alvo = $("interesses");
+  if (!alvo) return;
+  const j = await pedir("/api/inovastem/interesses");
+  if (!j.ok) { alvo.innerHTML = `<h2>${esc(t("eq_int_t"))}</h2><p class="faixa erro">${esc(j.erro || t("sem_hub"))}</p>`; return; }
+  alvo.innerHTML = `<h2>${esc(t("eq_int_t"))}</h2><p>${esc(t("eq_int_total"))}: <strong>${+j.total}</strong></p>
+    <div class="rolagem"><table><caption>${esc(t("int_areas"))}</caption><tbody>${Object.keys(j.por_area).map(k => `<tr><th scope="row">${esc(nomeArea(k))}</th><td>${+j.por_area[k]}</td></tr>`).join("")}</tbody></table></div>
+    <div class="acoes"><button class="botao sec" type="button" id="int-csv">${esc(t("eq_int_baixar"))}</button></div><p class="t2 pq">${esc(t("eq_int_aviso"))}</p>`;
+  $("int-csv").onclick = () => {
+    const cols = ["id", "nome", "email", "areas", "cidade", "instituicao", "quero_delas", "maior", "responsavel_nome", "responsavel_email", "versao_aviso", "criado"];
+    const cel = v => { let s = Array.isArray(v) ? v.join("|") : String(v == null ? "" : v); if (/^[=+\-@]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+    const csv = [cols.join(";")].concat(j.itens.map(x => cols.map(c => cel(c === "criado" ? new Date(x.criado * 1000).toISOString() : x[c])).join(";"))).join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+    a.download = "inovastem-interesses.csv"; document.body.appendChild(a); a.click(); a.remove();
+  };
+}
+
+async function compartilhar() {
+  const url = location.origin + "/";
+  try {
+    if (navigator.share) { await navigator.share({ title: "InovaSTEM", text: t("compartilhar_txt"), url }); return; }
+    await navigator.clipboard.writeText(url);
+    const m = $("comp-msg"); if (m) m.textContent = t("compartilhado");
+  } catch (e) {}
+}
+
+function ligar() {
+  document.querySelectorAll("[data-compartilhar]").forEach(b => b.onclick = compartilhar);
+  if (CAT_DA_ABA[aba]) forum(CAT_DA_ABA[aba]);
+  if (aba === "forum") {
+    forum(catForum);
+    document.querySelectorAll("[data-cat]").forEach(b => b.onclick = () => { catForum = b.getAttribute("data-cat"); topicoAberto = null;
+      document.querySelectorAll("[data-cat]").forEach(o => { const sim = o.getAttribute("data-cat") === catForum;
+        o.className = "botao" + (sim ? "" : " sec"); o.setAttribute("aria-pressed", String(sim)); }); forum(catForum); });
+  }
+  if (aba === "modelagem") biblioteca();
+  if (aba === "hackathon") $("hac-interesse").onclick = () => { areaPre = "hackathon"; location.hash = "#participar"; };
+  if (aba === "desafios") {
+    propostas();
+    const f = $("sug");
+    f.onsubmit = async ev => {
+      ev.preventDefault();
+      const r = await pedir("/api/publico/inovastem/projeto", { titulo: $("sug-tit").value, descricao: $("sug-desc").value, area: $("sug-area").value,
+        organizacao: $("sug-org").value, nome: $("sug-nome").value, email: $("sug-email").value, aceite: $("sug-aceite").checked });
+      $("sug-msg").textContent = r.ok ? t("sug_ok") : (r.erro || t("sem_hub")); $("sug-msg").className = "msg" + (r.ok ? "" : " erro");
+      if (r.ok) f.reset();
+    };
+    const fd = $("des-f");
+    if (fd) fd.onsubmit = async ev => {
+      ev.preventDefault();
+      const r = await pedir("/api/inovastem/desafio", { titulo: $("des-tit").value, descricao: $("des-desc").value, area: $("des-area").value,
+        organizacao: $("des-org").value, prazo: $("des-prazo").value });
+      $("des-msg").textContent = r.ok ? "✓" : (r.erro || t("sem_hub")); $("des-msg").className = "msg" + (r.ok ? "" : " erro");
+      if (r.ok) { fd.reset(); propostas(); }
+    };
+  }
+  if (aba === "participar") {
+    moderacao(); filaIno(); interesses();
+    const fi = $("int");
+    const irPasso = n => {
+      passoInt = n;
+      $("int-p1").hidden = n !== 1; $("int-p2").hidden = n !== 2;
+      $("int-barra").className = n === 2 ? "p2" : ""; $("int-prog").setAttribute("aria-valuenow", String(n));
+      $("int-passo-txt").textContent = t("passo").replace("{n}", n);
+      (n === 2 ? fi.querySelector('input[name="int-idade"]') : $("int-nome")).focus();
+    };
+    $("int-seguir").onclick = () => {
+      const ok = $("int-nome").value.trim().length >= 2 && /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test($("int-email").value.trim());
+      $("int-msg").textContent = ok ? "" : t("passo1_falta"); $("int-msg").className = "msg" + (ok ? "" : " erro");
+      if (ok) irPasso(2); else (($("int-nome").value.trim().length < 2) ? $("int-nome") : $("int-email")).focus();
+    };
+    $("int-voltar").onclick = () => irPasso(1);
+    fi.querySelectorAll('input[name="int-idade"]').forEach(r => r.onchange = () => { $("int-resp").hidden = fi.querySelector('input[name="int-idade"]:checked').value !== "menor"; });
+    $("int-genero").onchange = () => { $("int-delas").hidden = $("int-genero").value !== "feminino"; };
+    fi.onsubmit = async ev => {
+      ev.preventDefault();
+      const maior = fi.querySelector('input[name="int-idade"]:checked').value === "maior";
+      const corpo = { nome: $("int-nome").value, email: $("int-email").value, areas: [...fi.querySelectorAll('input[name="area"]:checked')].map(x => x.value),
+                      cidade: $("int-cidade").value, instituicao: $("int-inst").value, genero: $("int-genero").value,
+                      quero_delas: $("int-genero").value === "feminino" && $("int-delas-quero").checked, maior_de_idade: maior,
+                      aceite: $("int-aceite").checked, versao: (ino && ino.versao_aviso) || "" };
+      if (!maior) { corpo.responsavel_nome = $("int-resp-nome").value; corpo.responsavel_email = $("int-resp-email").value; }
+      const r = await pedir("/api/publico/inovastem/interesse", corpo);
+      $("int-msg").textContent = r.ok ? t("int_ok") + (r.delas ? t("int_ok_delas") : "") : (r.erro || t("sem_hub"));
+      $("int-msg").className = "msg" + (r.ok ? "" : " erro");
+      if (r.ok) { fi.reset(); $("int-resp").hidden = true; $("int-delas").hidden = true; areaPre = ""; irPasso(1); $("int-msg").textContent = t("int_ok") + (r.delas ? t("int_ok_delas") : ""); }
+    };
+    const f = $("cad");
+    if (f) {
+      f.querySelectorAll('input[name="idade"]').forEach(r => r.onchange = () => { $("cad-resp").hidden = f.querySelector('input[name="idade"]:checked').value !== "menor"; });
+      f.onsubmit = async ev => {
+        ev.preventDefault();
+        const maior = f.querySelector('input[name="idade"]:checked').value === "maior";
+        const corpo = { nome: $("cad-nome").value, usuario: $("cad-email").value, senha: $("cad-senha").value, nome_publico: $("cad-pub").value,
+                        maior_de_idade: maior, delas: $("cad-delas").checked, consentimento: { aceito: $("cad-aceite").checked, versao: (ino && ino.versao_aviso) || "1" } };
+        if (!maior) { corpo.responsavel_nome = $("cad-resp-nome").value; corpo.responsavel_email = $("cad-resp-email").value; }
+        const r = await pedir("/api/publico/cadastro", corpo);
+        $("cad-msg").textContent = r.ok ? t("cad_ok") + (r.pode_publicar ? "" : " " + t("int_menor_aviso")) : (r.erro || t("sem_hub"));
+        $("cad-msg").className = "msg" + (r.ok ? "" : " erro");
+        if (r.ok) { f.reset(); $("cad-resp").hidden = true; }
+      };
+    }
+    const ds = $("eu-delas-salvar");
+    if (ds) ds.onclick = async () => { const r = await pedir("/api/comunidade/delas", { autodeclaro: $("eu-delas").checked });
+      $("eu-msg").textContent = r.ok ? "✓" : (r.erro || t("sem_hub")); if (r.ok) await carregarEu(); };
+    const sa = $("eu-sair");
+    if (sa) sa.onclick = async () => { if (!confirm(t("eu_sair_aviso"))) return; const r = await pedir("/api/comunidade/sair", {});
+      $("eu-msg").textContent = r.ok ? "✓" : (r.erro || t("sem_hub")); await carregarEu(); desenhar(); };
+    const fe = $("ent-f");
+    if (fe) fe.onsubmit = async ev => {
+      ev.preventDefault();
+      const r = await pedir("/api/conta/entrar", { usuario: $("ent-usuario").value, senha: $("ent-senha").value });
+      if (!r.ok) { $("ent-msg").textContent = r._status === 429 ? (r.erro || t("sem_hub")) : t("ent_erro"); $("ent-msg").className = "msg erro"; return; }
+      inst = await pedir("/api/instancia"); await carregarEu(); desenhar();
+    };
+    const sc = $("sair-conta");
+    if (sc) sc.onclick = async () => { await pedir("/api/conta/sair", {}); inst = await pedir("/api/instancia"); await carregarEu(); desenhar(); };
+    const rm = $("rem");
+    if (rm) rm.onsubmit = async ev => { ev.preventDefault(); const r = await pedir("/api/inovastem/remover", { email: $("rem-email").value });
+      $("rem-msg").textContent = r.ok ? t("eq_rem_ok").replace("{i}", r.interesses).replace("{p}", r.propostas) : (r.erro || t("sem_hub"));
+      $("rem-msg").className = "msg" + (r.ok ? "" : " erro"); if (r.ok) { rm.reset(); interesses(); } };
+  }
+}
+
+async function carregarEu() {
+  eu = null;
+  if (inst && inst.autenticado) { const j = await pedir("/api/comunidade/eu"); if (j.ok) eu = j; }
+}
+
+function irPara() {
+  const h = (location.hash || "#inicio").slice(1);
+  $("abas").classList.remove("aberto"); $("menu-bt").setAttribute("aria-expanded", "false");
+  aba = ABAS.includes(h) || EXTRAS.includes(h) ? h : "inicio";
+  topicoAberto = null;
+  desenhar();
+  if (h && h !== "inicio") { const c = $("conteudo"); if (c) c.focus({ preventScroll: true }); }
+}
+
+async function iniciar() {
+  aplicarIdioma(); desenharAbas(); rodape();
+  $("estado").textContent = t("carregando");
+  try { inst = await pedir("/api/instancia"); } catch (e) { inst = null; }
+  try { const j = await pedir("/api/publico/inovastem"); ino = j.ok ? j : null; } catch (e) { ino = null; }
+  $("estado").textContent = inst ? "" : t("sem_hub");
+  await carregarEu();
+  window.addEventListener("hashchange", irPara);
+  $("menu-bt").onclick = () => { const abrir = !$("abas").classList.contains("aberto");
+    $("abas").classList.toggle("aberto", abrir); $("menu-bt").setAttribute("aria-expanded", String(abrir));
+    if (abrir) { const a = $("abas").querySelector("a"); if (a) a.focus(); } };
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape" && $("abas").classList.contains("aberto")) {
+    $("abas").classList.remove("aberto"); $("menu-bt").setAttribute("aria-expanded", "false"); $("menu-bt").focus(); } });
+  irPara();
+}
+iniciar();
+</script>
+<script id="physis-preferencias">
+/* physis-preferencias.js v3 · Preferências de leitura e acessibilidade das telas da Physis
+   Barra com 4 controles: [Idioma: Português/English] [Tema: Claro/Escuro/Automático] [Modo de conforto ▾] [Acessibilidade (PcD) ▾].
+   Modo de conforto (neurodivergência: autismo, TDAH, dislexia): fundo verde, texto maior, mais espaçamento, menos estímulo,
+   foco reforçado, fonte para dislexia, régua de leitura, leitura simplificada, lembrar onde parei.
+   Acessibilidade (PcD): cegueira e baixa visão (leitores de tela, ouvir esta tela, alto contraste, zoom, atalhos),
+   surdez (alertas visuais, Libras, legendas), fala (comunicação alternativa · CAA), mobilidade (teclado, comandos de voz).
+
+   ORIGINAL ÚNICO: sistema/physis-preferencias.js (desde a v3 a antiga barra px-preferencias da plataforma, da Gestão e do
+   SCADA é esta mesma, pela porta PxPref, no fim do arquivo). As telas são arquivos únicos, então cada uma leva uma CÓPIA IGUAL
+   dentro do bloco script de id "physis-preferencias" (o arquivo inteiro, sem mudar nada). Quem copia é ferramentas/sincronizar.py
+   (BLOCOS): physis-hub/web/painel.html, sistema/gestao-interna-physis.html, sistema/physis-scada-demo.html,
+   physis-hub/web/consultoria.html, sistema/SustainKit_Definitivo.html, modulos/planejador/planejador-physis.html (e as demos
+   geradas delas). O teste physis-hub/tests/test_preferencias.py confere que as cópias são iguais a este arquivo.
+
+   Uso, uma vez por página, depois do conteúdo:
+     PhysisPreferencias.iniciar({
+       chave: "physis-pref",              // guardado no navegador; a mesma chave em todas as telas = a escolha acompanha a pessoa
+       dicionario: { "Texto em português": "English text" },
+       padroes: [[/^Pedido (\S+) recebido\.$/, "Request $1 received."]],   // textos montados na hora
+       fragmentos: { "Captação de": "Harvesting of" },  // pedaços de textos montados com números ("Captação de " + n + " L")
+       excecoes: ["Physis Engineering"],  // nomes próprios: iguais nas duas línguas
+       ondeColocar: "#pp-lugar",          // elemento ou seletor onde a barra aparece (sem ele: início do <body>)
+       variante: "sobre-verde",           // opcional: barra sobre fundo verde-escuro
+       escalaPorZoom: true,               // texto maior por zoom (telas em px); false = a página usa var(--pp-escala)
+       conteudo: "#conteudo",             // Alt+1, "Pular para o conteúdo" e "Ouvir esta tela"
+       menu: "nav",                       // Alt+2
+       busca: "[role=tablist]",           // Alt+3
+       contato: "#f-desc",                // campo onde a CAA escreve quando nenhum campo está em uso
+       relatar: "#contato",               // "Relatar barreira" sem abrirJuridico(): link do contato
+       lembrar: { salvar: function () { return {}; }, restaurar: function (o) {} },  // opcional: aba aberta etc.
+       esconderEmQuadro: true,            // aberta num quadro (iframe) da plataforma ou com html[data-em-quadro]: sem barra própria, segue a escolha de lá
+       idiomaExterno: { atual, definir }, // tela que se traduz sozinha (o módulo só pede a troca; não traduz o DOM)
+       suporte: function (frase) {},      // CAA sem campo em uso: leva a frase ao suporte da tela
+       tela: "nome",                      // chave do "lembrar onde parei" (padrão: o endereço)
+       aoMudar: function (estado) {}      // chamado depois de cada mudança
+     });
+
+   No <html>: data-tema="claro|escuro" (o que vale), data-tema-escolha="claro|escuro|auto", lang, a variável --pp-escala
+   (1, 1.15 ou 1.3) e as classes physis-conforto, a11y-verde, a11y-texto-1 / a11y-texto-2, a11y-espaco, a11y-calma,
+   a11y-foco, a11y-dislexia, a11y-regua, a11y-simples, a11y-contraste.
+   Cada página define as próprias cores em html[data-tema="escuro"] e html.a11y-verde (os nomes das variáveis mudam de
+   uma tela para outra) e o que some em html.a11y-simples (ou marca elementos com data-pp-secundario).
+   Sem recurso de fora, sem avaliação de código: funciona com a Content-Security-Policy do servidor e sem internet.
+   Comandos de voz usam o reconhecimento do navegador (no Chrome o áudio vai aos servidores do Google): começam desligados.
+
+   Inglês: troca os textos (nós de texto e aria-label, title, placeholder, alt, label e value de botões) pelo par do
+   dicionário, guarda o original para voltar ao português e acompanha o conteúdo novo (MutationObserver).
+   O que não tem par fica em português e entra em PhysisPreferencias.faltando().
+   Elementos com data-pp-manter (ou translate="no") não são traduzidos. */
+(function (global) {
+  "use strict";
+  var doc = global.document;
+  if (!doc || global.PhysisPreferencias) return;
+
+  var PADRAO = { v: 2, idioma: "pt", tema: "auto", conforto: false, verde: false, texto: 0, espaco: false, calma: false, foco: false,
+    dislexia: false, regua: false, simples: false, lembrar: false, contraste: false, libras: false, voz: false, aviso: 4 };
+  var BOOL = ["conforto", "verde", "espaco", "calma", "foco", "dislexia", "regua", "simples", "lembrar", "contraste", "libras", "voz"];
+  var CLASSES = ["verde", "espaco", "calma", "foco", "dislexia", "regua", "simples", "contraste"];
+  var ATRIBUTOS = ["aria-label", "title", "placeholder", "alt", "label", "aria-description", "aria-roledescription"];
+  var IGNORAR = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, NOSCRIPT: 1, TEMPLATE: 1, CODE: 1, PRE: 1 };
+  var ESCALAS = [1, 1.15, 1.3];
+  var FRASES = ["ajuda", "entendi", "pessoa", "sim", "nao", "repetir"];
+
+  /* textos da própria barra, nas duas línguas (a página não precisa traduzir) */
+  var UI = {
+    pt: { grupo: "Preferências de leitura e acessibilidade", idioma: "Idioma", tema: "Tema", claro: "Claro", escuro: "Escuro", auto: "Automático",
+      conforto: "Modo de conforto", ligado: "ligado", a11y: "Acessibilidade (PcD)", fechar: "Fechar", padrao: "Voltar ao padrão",
+      confT: "Modo de conforto", confD: "Para autismo, TDAH, dislexia e para quem se cansa com telas cheias. Vale para todas as telas da Physis e fica guardado neste aparelho.",
+      confLiga: "Ligar o modo de conforto", confLigaD: "Fundo verde, menos estímulo e mais espaçamento de uma vez.",
+      verde: "Fundo verde", verdeD: "Cor de fundo suave, que cansa menos a vista.", texto: "Texto maior", t0: "Normal", t1: "Maior", t2: "Muito maior", aviso: "Tempo dos avisos que somem sozinhos", a4: "4 segundos", a8: "8 segundos", a15: "15 segundos",
+      espaco: "Mais espaçamento", espacoD: "Mais espaço entre linhas, letras e palavras.",
+      calma: "Menos estímulo", calmaD: "Sem animação nem transição, nada piscando, cores mais calmas, nada toca sozinho e menos janelas que se abrem.",
+      foco: "Foco reforçado", focoD: "Contorno grosso no item em que você está.", dislexia: "Fonte para dislexia", dislexiaD: "Letras mais fáceis de distinguir (Atkinson Hyperlegible ou Lexend, já no aparelho).",
+      regua: "Régua de leitura", reguaD: "Uma faixa acompanha o ponteiro ou o item em foco, para não perder a linha.",
+      simples: "Modo leitura simplificada", simplesD: "Esconde enfeites e textos secundários e põe tudo numa coluna só.",
+      lembrar: "Lembrar onde parei", lembrarD: "Ao voltar, a tela abre no mesmo ponto e na mesma aba.",
+      a11yT: "Acessibilidade (PcD)", a11yD: "Recursos para pessoas com deficiência. Vale para todas as telas da Physis e fica guardado neste aparelho.",
+      cegT: "Cegueira e baixa visão", cegD: "Funciona com leitores de tela (NVDA, JAWS, VoiceOver, TalkBack): link para pular ao conteúdo, regiões nomeadas, avisos lidos em voz alta e nome em cada controle.",
+      ouvir: "Ouvir esta tela", pausar: "Pausar", continuar: "Continuar", parar: "Parar", ouvirD: "Lê o conteúdo principal, ou o trecho que você selecionar, com as vozes do próprio aparelho.",
+      semVoz: "Este navegador não tem leitura em voz alta.", contraste: "Alto contraste", contrasteD: "Texto e bordas mais fortes.",
+      zoom: "Zoom até 200% sem quebrar a tela: use Ctrl e + (no Mac, Cmd e +).", atalhos: "Atalhos de teclado",
+      at1: "Alt+1: conteúdo", at2: "Alt+2: menu", at3: "Alt+3: busca ou abas", at0: "Alt+0: este painel", atEsc: "Esc: fecha o painel",
+      surT: "Surdez", surD: "Todo aviso aparece na tela; nenhum depende só de som. Vídeos e áudios precisam de legenda.",
+      libras: "Libras (VLibras)", librasD: "Começa desligado. O VLibras é aberto e do governo, mas carrega programas de fora; aqui ele será instalado no servidor da Physis.",
+      librasOn: "O VLibras ainda não está instalado neste servidor. Enquanto isso, todo conteúdo tem texto escrito; peça à Physis a versão em Libras de qualquer tela pelo Relatar barreira.",
+      falT: "Fala", falD: "Nenhuma função precisa de voz. Use as frases prontas: elas vão para o campo de texto em uso ou para o formulário de contato.",
+      caa: "Comunicação alternativa (CAA)", ajuda: "Preciso de ajuda", entendi: "Não entendi", pessoa: "Quero falar com uma pessoa", sim: "Sim", nao: "Não", repetir: "Pode repetir de outro jeito?",
+      caaMostra: "Mostre esta frase:", caaFoi: "Frase escrita no campo: ",
+      mobT: "Mobilidade", mobD: "Tudo funciona pelo teclado, os botões têm pelo menos 44 px e não há tempo limite.",
+      voz: "Comandos de voz", vozD: "Começa desligado. Atenção à privacidade (LGPD): no Chrome e no Edge o áudio é enviado aos servidores do Google ou da Microsoft para ser entendido. Comandos: ir para conteúdo, próximo, voltar, ler tela, aumentar texto, diminuir texto, parar.",
+      semRec: "Este navegador não reconhece voz.", vozOuve: "Ouvindo comandos de voz.", vozErro: "Os comandos de voz pararam: ",
+      relatar: "Relatar barreira", decT: "Declaração de acessibilidade",
+      relatarD: "Descreva a barreira: o que tentou fazer, em que tela e o que aconteceu. Copie o relato e envie pelo canal de suporte da Physis.",
+      relatarCampo: "O que aconteceu", copiar: "Copiar relato", copiado: "Relato copiado.", caaSup: "Frase levada ao suporte: ",
+      decD: "Estas telas seguem a Lei Brasileira de Inclusão (Lei 13.146/2015), o eMAG e as diretrizes de acessibilidade digital do gov.br, a WCAG 2.2 nível AA e a ABNT NBR 17225.",
+      pular: "Pular para o conteúdo", ok: "Preferência aplicada.", aEn: "English on. Texts not yet translated stay in Portuguese.", aPt: "Português ligado.",
+      aEsc: "Tema escuro ligado.", aClaro: "Tema claro ligado.", aAuto: "Tema automático: segue o aparelho.",
+      aConfOn: "Modo de conforto ligado: fundo verde, menos estímulo e mais espaçamento.", aConfOff: "Modo de conforto desligado.", aPadrao: "Preferências de volta ao padrão.",
+      lido: "Lendo a tela.", lidoFim: "Leitura parada." },
+    en: { grupo: "Reading and accessibility preferences", idioma: "Language", tema: "Theme", claro: "Light", escuro: "Dark", auto: "Automatic",
+      conforto: "Comfort mode", ligado: "on", a11y: "Accessibility (disability)", fechar: "Close", padrao: "Back to default",
+      confT: "Comfort mode", confD: "For autism, ADHD, dyslexia and anyone tired by busy screens. Applies to every Physis screen and is saved on this device.",
+      confLiga: "Turn comfort mode on", confLigaD: "Green background, less stimulation and more spacing at once.",
+      verde: "Green background", verdeD: "A soft background colour that is easier on the eyes.", texto: "Larger text", t0: "Normal", t1: "Larger", t2: "Much larger", aviso: "How long notices stay on screen", a4: "4 seconds", a8: "8 seconds", a15: "15 seconds",
+      espaco: "More spacing", espacoD: "More space between lines, letters and words.",
+      calma: "Less stimulation", calmaD: "No animation or transitions, nothing blinking, calmer colours, nothing plays by itself and fewer pop-ups.",
+      foco: "Stronger focus", focoD: "Thick outline on the item you are on.", dislexia: "Dyslexia-friendly font", dislexiaD: "Letters that are easier to tell apart (Atkinson Hyperlegible or Lexend, already on the device).",
+      regua: "Reading ruler", reguaD: "A band follows the pointer or the focused item, so you do not lose the line.",
+      simples: "Simplified reading mode", simplesD: "Hides decorations and secondary text and puts everything in a single column.",
+      lembrar: "Remember where I stopped", lembrarD: "When you come back, the screen opens at the same point and tab.",
+      a11yT: "Accessibility (disability)", a11yD: "Features for people with disabilities. Applies to every Physis screen and is saved on this device.",
+      cegT: "Blindness and low vision", cegD: "Works with screen readers (NVDA, JAWS, VoiceOver, TalkBack): skip link, named regions, alerts read aloud and a name on every control.",
+      ouvir: "Listen to this screen", pausar: "Pause", continuar: "Resume", parar: "Stop", ouvirD: "Reads the main content, or the text you select, with the device's own voices.",
+      semVoz: "This browser cannot read aloud.", contraste: "High contrast", contrasteD: "Stronger text and borders.",
+      zoom: "Zoom up to 200% without breaking the screen: use Ctrl and + (on a Mac, Cmd and +).", atalhos: "Keyboard shortcuts",
+      at1: "Alt+1: content", at2: "Alt+2: menu", at3: "Alt+3: search or tabs", at0: "Alt+0: this panel", atEsc: "Esc: closes the panel",
+      surT: "Deafness", surD: "Every alert is shown on screen; none relies on sound alone. Videos and audio need captions.",
+      libras: "Libras sign language (VLibras)", librasD: "Off by default. VLibras is open and government-made, but loads outside programs; here it will be installed on the Physis server.",
+      librasOn: "VLibras is not installed on this server yet. Meanwhile, all content has written text; ask Physis for a Libras version of any screen through Report a barrier.",
+      falT: "Speech", falD: "No function needs your voice. Use the ready phrases: they go into the text field in use or into the contact form.",
+      caa: "Augmentative and alternative communication (AAC)", ajuda: "I need help", entendi: "I did not understand", pessoa: "I want to talk to a person", sim: "Yes", nao: "No", repetir: "Can you say it another way?",
+      caaMostra: "Show this phrase:", caaFoi: "Phrase written in the field: ",
+      mobT: "Mobility", mobD: "Everything works with the keyboard, buttons are at least 44 px and there are no time limits.",
+      voz: "Voice commands", vozD: "Off by default. Privacy notice (LGPD): in Chrome and Edge the audio is sent to Google or Microsoft servers to be understood. Commands: go to content, next, back, read screen, bigger text, smaller text, stop.",
+      semRec: "This browser does not recognise speech.", vozOuve: "Listening for voice commands.", vozErro: "Voice commands stopped: ",
+      relatar: "Report a barrier", decT: "Accessibility statement",
+      relatarD: "Describe the barrier: what you tried to do, on which screen and what happened. Copy the report and send it through the Physis support channel.",
+      relatarCampo: "What happened", copiar: "Copy report", copiado: "Report copied.", caaSup: "Phrase taken to support: ",
+      decD: "These screens follow the Brazilian Inclusion Law (Law 13.146/2015), eMAG and the gov.br digital accessibility guidelines, WCAG 2.2 level AA and ABNT NBR 17225.",
+      pular: "Skip to content", ok: "Preference applied.", aEn: "English on. Texts not yet translated stay in Portuguese.", aPt: "Português ligado.",
+      aEsc: "Dark theme on.", aClaro: "Light theme on.", aAuto: "Automatic theme: follows the device.",
+      aConfOn: "Comfort mode on: green background, less stimulation and more spacing.", aConfOff: "Comfort mode off.", aPadrao: "Preferences back to default.",
+      lido: "Reading the screen.", lidoFim: "Reading stopped." }
+  };
+  /* frases da CAA nas duas línguas: entram no dicionário para a tela também traduzir o que já foi escrito */
+
+  var CSS = [
+    /* barra */
+    ".pp-barra{--pp-f:#FFFFFF;--pp-t:#1C2B21;--pp-l:#8A9284;--pp-a:#33512F;--pp-at:#FFFFFF;position:relative;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;line-height:1.3;font-family:inherit;color:var(--pp-t)}",
+    "html[data-tema=escuro] .pp-barra{--pp-f:#1C2B21;--pp-t:#EEF2EA;--pp-l:#8A9182;--pp-a:#B9CDB3;--pp-at:#1C2B21}",
+    ".pp-barra.pp-sobre-verde{--pp-f:transparent;--pp-t:#DCEBD8;--pp-l:#B9CDB3;--pp-a:#DCEBD8;--pp-at:#1C2B21}",
+    ".pp-barra .pp-b,.pp-barra select{font:inherit;font-size:13px;font-weight:600;min-height:36px;min-width:36px;padding:0 10px;border-radius:8px;border:1px solid var(--pp-l);background:var(--pp-f);color:var(--pp-t);cursor:pointer;margin:0;line-height:1.2;width:auto}",
+    ".pp-barra select option{background:#FFFFFF;color:#1C2B21}",
+    ".pp-barra .pp-cx{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--pp-t)}",
+    ".pp-barra .pp-b[aria-expanded=true]{background:var(--pp-a);border-color:var(--pp-a);color:var(--pp-at)}",
+    ".pp-barra .pp-b .pp-seta{display:inline-block;margin-left:4px;font-size:.8em}",
+    ".pp-barra .pp-b .pp-on{font-weight:400}",
+    ".pp-barra .pp-b:focus-visible,.pp-barra select:focus-visible,.pp-painel :focus-visible{outline:3px solid var(--pp-t);outline-offset:2px}",
+    ".pp-painel{position:absolute;right:0;top:calc(100% + 6px);z-index:1000;width:400px;max-width:calc(100vw - 32px);max-height:calc(100vh - 110px);overflow:auto;background:#FFFFFF;color:#1C2B21;border:1px solid #8A9284;border-radius:12px;padding:14px 16px;box-shadow:0 8px 28px rgba(28,43,33,.22);text-align:left;font-size:15px;line-height:1.45;font-weight:400;letter-spacing:normal}",
+    "html[data-tema=escuro] .pp-painel{background:#1C2B21;color:#EEF2EA;border-color:#8A9182}",
+    ".pp-painel[hidden],.pp-painel [hidden]{display:none!important}",
+    ".pp-painel h2{font:700 17px/1.3 inherit;margin:0 0 2px;color:inherit;font-family:inherit}",
+    ".pp-painel h3{font:700 15px/1.3 inherit;margin:14px 0 4px;color:inherit;font-family:inherit;border-top:1px solid #C9D2C4;padding-top:10px}",
+    "html[data-tema=escuro] .pp-painel h3{border-color:#4A5A47}",
+    ".pp-painel p,.pp-painel .pp-d{display:block;font-size:13px;color:#4A4F44;margin:0 0 6px;font-weight:400}",
+    "html[data-tema=escuro] .pp-painel p,html[data-tema=escuro] .pp-painel .pp-d{color:#D9D3C2}",
+    ".pp-painel fieldset{border:1px solid #C9D2C4;border-radius:8px;margin:6px 0;padding:4px 10px 6px}",
+    "html[data-tema=escuro] .pp-painel fieldset{border-color:#4A5A47}",
+    ".pp-painel legend{font-weight:700;padding:0 4px;font-size:14px}",
+    ".pp-painel label{display:flex;gap:8px;align-items:flex-start;min-height:44px;padding:6px 0;cursor:pointer;font-weight:600;color:inherit;font-size:14px}",
+    ".pp-painel fieldset label{display:inline-flex;min-height:36px;margin-right:12px}",
+    ".pp-painel label .pp-d{font-weight:400;margin:2px 0 0}",
+    ".pp-painel input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:#33512F}",
+    "html[data-tema=escuro] .pp-painel input{accent-color:#B9CDB3}",
+    ".pp-painel ul{margin:0 0 6px;padding-left:18px;font-size:13px}",
+    ".pp-painel .pp-acoes{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}",
+    ".pp-painel button{font:inherit;font-size:14px;font-weight:600;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #33512F;background:#FFFFFF;color:#33512F;cursor:pointer}",
+    ".pp-painel button.pp-prim{background:#33512F;color:#FFFFFF}",
+    "html[data-tema=escuro] .pp-painel button{background:#1C2B21;color:#EEF2EA;border-color:#B9CDB3}",
+    "html[data-tema=escuro] .pp-painel button.pp-prim{background:#B9CDB3;color:#1C2B21}",
+    ".pp-painel .pp-caa{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin:6px 0}",
+    ".pp-painel .pp-caa button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 6px;min-height:76px;font-size:13px;line-height:1.2;text-align:center}",
+    ".pp-painel .pp-caa svg{width:28px;height:28px;flex:none}",
+    ".pp-painel .pp-cartao{font-size:22px;font-weight:700;border:2px solid currentColor;border-radius:10px;padding:10px 12px;margin:6px 0}",
+    ".pp-painel .pp-aviso{background:#F6EAD0;color:#5C3F00;border-radius:8px;padding:8px 10px;font-size:13px}",
+    "html[data-tema=escuro] .pp-painel .pp-aviso{background:#33372E;color:#E5D5AE}",
+    ".pp-so-leitor{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}",
+    ".pp-pular{position:absolute;left:-9999px;top:8px;z-index:1001;background:#33512F;color:#FFFFFF;padding:10px 14px;border-radius:8px;font-weight:600}",
+    ".pp-pular:focus{left:8px}",
+    "@media (max-width:560px){.pp-painel{position:fixed;left:16px;right:16px;top:auto;bottom:16px;width:auto;max-width:none;max-height:78vh}}",
+    /* régua de leitura */
+    ".pp-regua{position:fixed;left:0;right:0;height:2.4em;margin-top:-1.2em;pointer-events:none;z-index:999;border-top:2px solid #1C3550;border-bottom:2px solid #1C3550;background:rgba(255,246,223,.28);display:none}",
+    "html.a11y-regua .pp-regua{display:block}",
+    "html[data-tema=escuro] .pp-regua{border-color:#FFF6DF;background:rgba(255,246,223,.12)}",
+    /* preferências que valem para qualquer página */
+    "html.a11y-texto-1.pp-zoom body{zoom:1.15}html.a11y-texto-2.pp-zoom body{zoom:1.3}",
+    "html.a11y-espaco body{letter-spacing:.012em;word-spacing:.06em}",
+    "html.a11y-espaco :is(p,li,dd,dt,label,td,th,figcaption,blockquote,summary,legend){line-height:1.8}",
+    "html.a11y-contraste :is(input,select,textarea,button){border-width:2px}",
+    "html.a11y-contraste a{text-decoration:underline;text-underline-offset:2px}",
+    "html.a11y-calma *,html.a11y-calma *::before,html.a11y-calma *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}",
+    "html.a11y-calma{scroll-behavior:auto!important}html.a11y-calma :is(marquee,blink){display:none!important}",
+    "html.a11y-simples [data-pp-secundario]{display:none!important}",
+    "html.a11y-foco :focus-visible,html.a11y-foco :focus{outline:4px solid #1C3550!important;outline-offset:3px!important;box-shadow:0 0 0 7px #FFF6DF!important}",
+    "html.a11y-foco[data-tema=escuro] :focus-visible,html.a11y-foco[data-tema=escuro] :focus{outline-color:#FFF6DF!important;box-shadow:0 0 0 7px #14180F!important}",
+    "html.a11y-foco :focus:not(:focus-visible){outline:none!important;box-shadow:none!important}",
+    "html.a11y-dislexia :is(body,button,input,select,textarea){font-family:\"Atkinson Hyperlegible\",Lexend,Verdana,Tahoma,sans-serif!important}",
+    "html[data-tema=escuro]{color-scheme:dark}html[data-tema=claro]{color-scheme:light}"
+  ].join("\n");
+
+  var P = { op: null, estado: null, idiomaOriginal: "pt-BR", orig: new WeakMap(), origAttr: new WeakMap(), faltam: {}, obs: null,
+    pausado: false, ui: {}, campo: null, rec: null, falando: false };
+
+  function ler(chave) { try { return global.localStorage.getItem(chave); } catch (e) { return null; } }
+  function gravar(chave, v) { try { global.localStorage.setItem(chave, v); } catch (e) {} }
+  function tem(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
+  function copia(o) { var r = {}; for (var k in o) if (tem(o, k)) r[k] = o[k]; return r; }
+  function limpar(o) {
+    var e = copia(PADRAO);
+    if (o && typeof o === "object") {
+      for (var x in o) if (tem(o, x) && !tem(PADRAO, x) && x !== "legivel" && x !== "fundoVerde") e[x] = o[x];   /* guarda o que outras telas gravam */
+      if (o.fundoVerde) e.verde = true;
+      if (o.idioma === "en" || o.idioma === "pt") e.idioma = o.idioma;
+      if (o.tema === "claro" || o.tema === "escuro" || o.tema === "auto") e.tema = o.tema;
+      var t = parseInt(o.texto, 10); if (t === 0 || t === 1 || t === 2) e.texto = t; else if (o.texto === true) e.texto = 1;
+      var av = parseInt(o.aviso, 10); if (av === 4 || av === 8 || av === 15) e.aviso = av;   /* tempo dos avisos (s), lido pelas telas que mostram avisos que somem */
+      BOOL.forEach(function (k) { if (k in o) e[k] = !!o[k]; });
+      if (o.legivel) e.dislexia = true;            /* nome da v1 */
+    }
+    return e;
+  }
+  function el(sel) { if (!sel) return null; if (typeof sel !== "string") return sel; try { return doc.querySelector(sel); } catch (e) { return null; } }
+
+  /* lê a escolha guardada; na primeira vez, aproveita as chaves antigas da plataforma (painel.html) */
+  function carregar() {
+    var o = null;
+    try { o = JSON.parse(ler(P.op.chave) || "null"); } catch (e) { o = null; }
+    if (o) return limpar(o);
+    var e = copia(PADRAO);
+    if (ler("physis-idioma") === "en") e.idioma = "en";
+    if (ler("physis-conforto") === "1") { e.conforto = true; e.espaco = true; e.calma = true; }
+    if (ler("physis-fundo") === "verde") e.verde = true;
+    try { var pp = JSON.parse(ler("physis-passaporte") || "null"); if (pp) { e.texto = pp.texto ? 1 : 0; e.espaco = e.espaco || !!pp.espaco; e.contraste = !!pp.contraste; e.calma = e.calma || !!pp.calma; e.foco = !!pp.foco; } } catch (x) {}
+    var t = ler("physis-pref-tema"); if (t === "claro" || t === "escuro" || t === "auto") e.tema = t;
+    return e;
+  }
+  function guardar() {
+    var e = P.estado;
+    gravar(P.op.chave, JSON.stringify(e));
+    gravar("physis-pref-tema", e.tema);      /* lido pelo script cedo (pxp-cedo) antes de a tela desenhar */
+    /* espelho nas chaves antigas, para telas antigas seguirem a mesma escolha */
+    gravar("physis-idioma", e.idioma);
+    gravar("physis-conforto", e.conforto ? "1" : "0");
+    gravar("physis-fundo", e.verde ? "verde" : "branco");
+    var pp = {}; try { pp = JSON.parse(ler("physis-passaporte") || "{}") || {}; } catch (x) { pp = {}; }
+    pp.texto = e.texto > 0; pp.espaco = e.espaco; pp.contraste = e.contraste; pp.calma = e.calma; pp.foco = e.foco;
+    gravar("physis-passaporte", JSON.stringify(pp));
+  }
+
+  function sistemaEscuro() { try { return !!(global.matchMedia && global.matchMedia("(prefers-color-scheme: dark)").matches); } catch (e) { return false; } }
+  /* o fundo verde é o escuro esverdeado: as telas o desenham com as cores do tema escuro mais html.a11y-verde */
+  function temaEfetivo() { return P.estado.verde ? "escuro" : P.estado.tema === "auto" ? (sistemaEscuro() ? "escuro" : "claro") : P.estado.tema; }
+  /* telas com tradução própria (plataforma, Gestão, SCADA): idiomaExterno = { atual(), definir(lingua, pelaPessoa) } */
+  function externo() { var i = P.op && P.op.idiomaExterno; return i && typeof i.definir === "function" ? i : null; }
+  function idiomaDaTela() { var i = externo(); if (i && i.atual) { try { return i.atual() === "en" ? "en" : "pt"; } catch (x) {} } return P.estado.idioma; }
+  function txt(k) { return UI[P.estado && P.estado.idioma === "en" ? "en" : "pt"][k]; }
+
+  /* ---------- aplicar no <html> ---------- */
+  function aplicar(anunciar) {
+    var r = doc.documentElement, e = P.estado, cl = r.classList;
+    r.setAttribute("data-tema", temaEfetivo());
+    r.setAttribute("data-tema-escolha", e.tema);
+    cl.toggle("physis-conforto", e.conforto);
+    cl.toggle("a11y-texto-1", e.texto === 1);
+    cl.toggle("a11y-texto-2", e.texto === 2);
+    CLASSES.forEach(function (k) { cl.toggle("a11y-" + k, !!e[k]); });
+    cl.toggle("pp-zoom", P.op.escalaPorZoom !== false);
+    r.style.setProperty("--pp-escala", String(ESCALAS[e.texto]));
+    var meta = doc.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute("content", temaEfetivo() === "escuro" ? "#1C2B21" : "#33512F");
+    if (P.idiomaAplicado !== e.idioma) { P.idiomaAplicado = e.idioma; definirIdioma(e.idioma); }
+    if (e.calma) pararMidias(doc);
+    vozLigar(e.voz);
+    desenharBarra();
+    if (anunciar) dizer(anunciar);
+    if (typeof P.op.aoMudar === "function") { try { P.op.aoMudar(estadoPublico()); } catch (x) { if (global.console) console.error(x); } }
+  }
+  function estadoPublico() { var o = copia(P.estado); o.temaEfetivo = temaEfetivo(); return o; }
+  function mudar(patch, anuncio) {
+    for (var k in patch) if (tem(patch, k)) P.estado[k] = patch[k];
+    P.estado = limpar(P.estado);
+    guardar();
+    aplicar(anuncio);
+  }
+
+  /* ---------- montagem ---------- */
+  function criar(tag, attrs, filhos) {
+    var e = doc.createElement(tag);
+    if (attrs) for (var k in attrs) if (tem(attrs, k) && attrs[k] != null && attrs[k] !== false) e.setAttribute(k, attrs[k] === true ? "" : attrs[k]);
+    (filhos || []).forEach(function (f) { if (f != null) e.appendChild(typeof f === "string" ? doc.createTextNode(f) : f); });
+    return e;
+  }
+  /* ícones simples da CAA (traço, sem cor própria: seguem a cor do texto) */
+  var ICONES = {
+    ajuda: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v6M12 16v1",
+    entendi: "M9 9a3 3 0 1 1 4 2.8c-.7.3-1 .9-1 1.6V15M12 18v1M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z",
+    pessoa: "M12 4a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7zM5 20c0-4 3.1-6.5 7-6.5s7 2.5 7 6.5",
+    sim: "M4 12.5l5 5L20 6.5",
+    nao: "M6 6l12 12M18 6L6 18",
+    repetir: "M4 12a8 8 0 0 1 14-5.3M20 4v4h-4M20 12a8 8 0 0 1-14 5.3M4 20v-4h4"
+  };
+  function icone(nome) {
+    var ns = "http" + "://www.w3.org/2000/svg", s = doc.createElementNS(ns, "svg"), p = doc.createElementNS(ns, "path");
+    s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true"); s.setAttribute("focusable", "false");
+    p.setAttribute("d", ICONES[nome]); p.setAttribute("fill", "none"); p.setAttribute("stroke", "currentColor"); p.setAttribute("stroke-width", "2"); p.setAttribute("stroke-linecap", "round"); p.setAttribute("stroke-linejoin", "round");
+    s.appendChild(p); return s;
+  }
+
+  function montarBarra() {
+    var lugar = el(P.op.ondeColocar), u = P.ui;
+    u.regua = criar("div", { "class": "pp-regua", "aria-hidden": "true", "data-pp-manter": "" });
+    doc.body.appendChild(u.regua);
+    /* dentro de um quadro da plataforma (esconderEmQuadro): a barra fica na plataforma; aqui só se aplica a escolha */
+    if (P.op.esconderEmQuadro) { var q = doc.documentElement.hasAttribute("data-em-quadro"); try { q = q || global.self !== global.top; } catch (e) { q = true; } if (q) return; }
+    var barra = criar("div", { "class": "pp-barra" + (P.op.variante ? " pp-" + P.op.variante : ""), id: "pxp-barra", role: "group", "data-pp-manter": "", translate: "no", "data-physis-preferencias": "barra" });
+    u.idiomaRot = criar("label", { "for": "pp-idioma", "class": "pp-cx" });
+    u.idioma = criar("select", { id: "pp-idioma" }, [criar("option", { value: "pt", lang: "pt-BR" }, ["Português"]), criar("option", { value: "en", lang: "en" }, ["English"])]);
+    u.idiomaRot.appendChild(u.idiomaTxt = criar("span")); u.idiomaRot.appendChild(u.idioma);
+    u.temaRot = criar("label", { "for": "pp-tema", "class": "pp-cx" });
+    u.tema = criar("select", { id: "pp-tema" }, [criar("option", { value: "claro" }), criar("option", { value: "escuro" }), criar("option", { value: "auto" })]);
+    u.temaRot.appendChild(u.temaTxt = criar("span")); u.temaRot.appendChild(u.tema);
+    u.conforto = criar("button", { type: "button", "class": "pp-b", id: "pp-conforto", "aria-expanded": "false", "aria-controls": "pp-painel-conforto" });
+    u.a11y = criar("button", { type: "button", "class": "pp-b", id: "pp-a11y", "aria-expanded": "false", "aria-controls": "pp-painel-a11y" });
+    u.pConf = criar("div", { "class": "pp-painel", id: "pp-painel-conforto", role: "region", "aria-labelledby": "pp-conf-t", hidden: true });
+    u.pA11y = criar("div", { "class": "pp-painel", id: "pp-painel-a11y", role: "region", "aria-labelledby": "pp-a11y-t", hidden: true });
+    u.anuncio = criar("div", { "class": "pp-so-leitor", role: "status", "aria-live": "polite" });
+    [u.idiomaRot, u.temaRot, u.conforto, u.a11y, u.pConf, u.pA11y, u.anuncio].forEach(function (x) { barra.appendChild(x); });
+    u.barra = barra;
+    if (lugar) lugar.appendChild(barra); else doc.body.insertBefore(barra, doc.body.firstChild);
+
+    u.idioma.addEventListener("change", function () { var en = u.idioma.value === "en"; P.pelaPessoa = true; mudar({ idioma: en ? "en" : "pt" }, en ? UI.en.aEn : UI.pt.aPt); });
+    u.tema.addEventListener("change", function () { var v = u.tema.value; mudar({ tema: v }, v === "auto" ? "aAuto" : v === "escuro" ? "aEsc" : "aClaro"); });
+    u.conforto.addEventListener("click", function () { abrir(u.pConf, u.conforto, u.pConf.hidden); });
+    u.a11y.addEventListener("click", function () { abrir(u.pA11y, u.a11y, u.pA11y.hidden); });
+    barra.addEventListener("keydown", function (ev) {
+      if (ev.key !== "Escape") return;
+      if (!u.pConf.hidden) { abrir(u.pConf, u.conforto, false); u.conforto.focus(); }
+      else if (!u.pA11y.hidden) { abrir(u.pA11y, u.a11y, false); u.a11y.focus(); }
+    });
+    doc.addEventListener("click", function (ev) {
+      if (!barra.contains(ev.target) && doc.contains(ev.target)) { abrir(u.pConf, u.conforto, false); abrir(u.pA11y, u.a11y, false); }
+    });
+    [u.pConf, u.pA11y].forEach(function (p) {
+      p.addEventListener("change", function (ev) {
+        var t = ev.target, k = t.getAttribute("data-pp"), patch = {};
+        if (t.name === "pp-texto") return mudar({ texto: parseInt(t.value, 10) }, "ok");
+        if (t.name === "pp-aviso") return mudar({ aviso: parseInt(t.value, 10) }, "ok");
+        if (!k) return;
+        if (k === "conforto") { patch = { conforto: t.checked, verde: t.checked, calma: t.checked, espaco: t.checked }; return mudar(patch, t.checked ? "aConfOn" : "aConfOff"); }
+        patch[k] = t.checked; mudar(patch, k === "libras" && t.checked ? "librasOn" : "ok");
+      });
+      p.addEventListener("click", function (ev) {
+        var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return;
+        var a = b.getAttribute("data-pp-acao");
+        if (a === "fechar") { var dono = p === u.pConf ? u.conforto : u.a11y; abrir(p, dono, false); dono.focus(); }
+        else if (a === "padrao") { var id = P.estado.idioma; P.estado = copia(PADRAO); mudar({ idioma: id }, "aPadrao"); }
+        else if (a === "ouvir") ouvir();
+        else if (a === "pausar") pausarFala();
+        else if (a === "parar") pararFala();
+        else if (a === "relatar") relatar();
+        else if (a === "copiar-relato") copiarRelato();
+        else if (a === "caa") caa(b.getAttribute("data-frase"));
+      });
+    });
+  }
+  function abrir(painel, botao, sim) {
+    var u = P.ui;
+    if (sim) { var outro = painel === u.pConf ? [u.pA11y, u.a11y] : [u.pConf, u.conforto]; outro[0].hidden = true; outro[1].setAttribute("aria-expanded", "false"); }
+    painel.hidden = !sim; botao.setAttribute("aria-expanded", sim ? "true" : "false");
+    if (sim) { var x = painel.querySelector("input,button"); if (x) x.focus(); }
+  }
+
+  function caixa(chave, rot, desc) {
+    var dentro = [criar("span", null, [txt(rot)])];
+    if (desc) dentro[0].appendChild(criar("span", { "class": "pp-d" }, [txt(desc)]));
+    return criar("label", null, [criar("input", { type: "checkbox", "data-pp": chave, id: "pp-c-" + chave })].concat(dentro));
+  }
+  function botao(acao, rot, extra) { var a = { type: "button", "data-pp-acao": acao, id: "pp-b-" + acao + (extra ? "-" + extra : "") }; return criar("button", a, [txt(rot)]); }
+  function desenharPaineis() {
+    var u = P.ui, f;
+    [u.pConf, u.pA11y].forEach(function (p) { while (p.firstChild) p.removeChild(p.firstChild); });
+    /* conforto */
+    f = u.pConf;
+    f.appendChild(criar("h2", { id: "pp-conf-t" }, [txt("confT")]));
+    f.appendChild(criar("p", null, [txt("confD")]));
+    f.appendChild(caixa("conforto", "confLiga", "confLigaD"));
+    f.appendChild(caixa("verde", "verde", "verdeD"));
+    var fs = criar("fieldset", null, [criar("legend", null, [txt("texto")])]);
+    [0, 1, 2].forEach(function (n) { fs.appendChild(criar("label", null, [criar("input", { type: "radio", name: "pp-texto", value: String(n), id: "pp-texto-" + n }), criar("span", null, [txt("t" + n)])])); });
+    f.appendChild(fs);
+    var fa = criar("fieldset", null, [criar("legend", null, [txt("aviso")])]);
+    [4, 8, 15].forEach(function (n) { fa.appendChild(criar("label", null, [criar("input", { type: "radio", name: "pp-aviso", value: String(n), id: "pp-aviso-" + n }), criar("span", null, [txt("a" + n)])])); });
+    f.appendChild(fa);
+    f.appendChild(caixa("espaco", "espaco", "espacoD"));
+    f.appendChild(caixa("calma", "calma", "calmaD"));
+    f.appendChild(caixa("foco", "foco", "focoD"));
+    f.appendChild(caixa("dislexia", "dislexia", "dislexiaD"));
+    f.appendChild(caixa("regua", "regua", "reguaD"));
+    f.appendChild(caixa("simples", "simples", "simplesD"));
+    f.appendChild(caixa("lembrar", "lembrar", "lembrarD"));
+    f.appendChild(criar("div", { "class": "pp-acoes" }, [botao("padrao", "padrao", "c"), botao("fechar", "fechar", "c")]));
+    f.lastChild.lastChild.className = "pp-prim";
+    /* acessibilidade */
+    f = u.pA11y;
+    f.appendChild(criar("h2", { id: "pp-a11y-t" }, [txt("a11yT")]));
+    f.appendChild(criar("p", null, [txt("a11yD")]));
+    f.appendChild(criar("h3", null, [txt("cegT")]));
+    f.appendChild(criar("p", null, [txt("cegD")]));
+    if (global.speechSynthesis && global.SpeechSynthesisUtterance) {
+      f.appendChild(criar("div", { "class": "pp-acoes" }, [botao("ouvir", "ouvir"), botao("pausar", "pausar"), botao("parar", "parar")]));
+      f.appendChild(criar("p", null, [txt("ouvirD")]));
+    }
+    f.appendChild(caixa("contraste", "contraste", "contrasteD"));
+    f.appendChild(criar("p", null, [txt("zoom")]));
+    f.appendChild(criar("p", null, [criar("strong", null, [txt("atalhos")])]));
+    f.appendChild(criar("ul", null, ["at1", "at2", "at3", "at0", "atEsc"].map(function (k) { return criar("li", null, [txt(k)]); })));
+    f.appendChild(criar("h3", null, [txt("surT")]));
+    f.appendChild(criar("p", null, [txt("surD")]));
+    f.appendChild(caixa("libras", "libras", "librasD"));
+    f.appendChild(criar("p", { "class": "pp-aviso", id: "pp-libras-aviso", role: "note" }, [txt("librasOn")]));
+    f.appendChild(criar("h3", null, [txt("falT")]));
+    f.appendChild(criar("p", null, [txt("falD")]));
+    f.appendChild(criar("p", null, [criar("strong", { id: "pp-caa-t" }, [txt("caa")])]));
+    var prancha = criar("div", { "class": "pp-caa", role: "group", "aria-labelledby": "pp-caa-t" });
+    FRASES.forEach(function (k) { var b = criar("button", { type: "button", "data-pp-acao": "caa", "data-frase": k, id: "pp-caa-" + k }); b.appendChild(icone(k)); b.appendChild(criar("span", null, [txt(k)])); prancha.appendChild(b); });
+    f.appendChild(prancha);
+    u.cartao = criar("div", { "class": "pp-cartao", role: "status", "aria-live": "polite", hidden: true, id: "pp-caa-cartao" });
+    f.appendChild(u.cartao);
+    f.appendChild(criar("h3", null, [txt("mobT")]));
+    f.appendChild(criar("p", null, [txt("mobD")]));
+    if (global.SpeechRecognition || global.webkitSpeechRecognition) f.appendChild(caixa("voz", "voz", "vozD"));
+    else f.appendChild(criar("p", null, [txt("semRec")]));
+    u.vozMsg = criar("p", { role: "status", id: "pp-voz-msg" }); f.appendChild(u.vozMsg);
+    f.appendChild(criar("h3", null, [txt("decT")]));
+    f.appendChild(criar("p", null, [txt("decD")]));
+    f.appendChild(criar("div", { "class": "pp-acoes" }, [botao("relatar", "relatar"), botao("padrao", "padrao", "a"), botao("fechar", "fechar", "a")]));
+    f.lastChild.lastChild.className = "pp-prim";
+    f.appendChild(criar("div", { id: "pp-relato", hidden: true }, [criar("p", null, [txt("relatarD")]),
+      criar("label", { "for": "pp-relato-t", style: "min-height:0;display:block" }, [txt("relatarCampo")]),
+      criar("textarea", { id: "pp-relato-t", rows: "4", style: "width:100%;font:inherit;font-size:14px;border:1px solid #8A9284;border-radius:8px;padding:8px;background:inherit;color:inherit" }),
+      criar("div", { "class": "pp-acoes" }, [botao("copiar-relato", "copiar")]), criar("p", { id: "pp-relato-msg", role: "status" })]));
+  }
+  function marcarPaineis() {
+    var u = P.ui, e = P.estado;
+    [u.pConf, u.pA11y].forEach(function (p) {
+      p.querySelectorAll("input").forEach(function (i) {
+        if (i.name === "pp-texto") i.checked = parseInt(i.value, 10) === e.texto;
+        else if (i.name === "pp-aviso") i.checked = parseInt(i.value, 10) === (e.aviso || 4);
+        else if (i.getAttribute("data-pp")) i.checked = !!e[i.getAttribute("data-pp")];
+      });
+    });
+    var av = doc.getElementById("pp-libras-aviso"); if (av) av.hidden = !e.libras;
+  }
+  function desenharBarra() {
+    var u = P.ui, e = P.estado; if (!u.barra) return;
+    if (P.painelIdioma !== e.idioma) {
+      P.painelIdioma = e.idioma;
+      var ativo = doc.activeElement, foco = ativo && u.barra.contains(ativo) ? ativo.id : "";
+      u.barra.setAttribute("aria-label", txt("grupo"));
+      u.idiomaTxt.textContent = txt("idioma");
+      u.temaTxt.textContent = txt("tema");
+      u.tema.options[0].textContent = txt("claro"); u.tema.options[1].textContent = txt("escuro"); u.tema.options[2].textContent = txt("auto");
+      desenharPaineis();
+      if (foco) { var x = doc.getElementById(foco); if (x) x.focus(); }
+    }
+    u.idioma.value = e.idioma;
+    u.tema.value = e.tema;
+    u.conforto.textContent = txt("conforto");
+    if (e.conforto) u.conforto.appendChild(criar("span", { "class": "pp-on" }, [" (" + txt("ligado") + ")"]));
+    u.conforto.appendChild(criar("span", { "class": "pp-seta", "aria-hidden": "true" }, ["▾"]));
+    u.a11y.textContent = txt("a11y");
+    u.a11y.appendChild(criar("span", { "class": "pp-seta", "aria-hidden": "true" }, ["▾"]));
+    marcarPaineis();
+  }
+  function dizer(chaveOuTexto) {
+    var u = P.ui; if (!u.anuncio) return;
+    var t = UI.pt[chaveOuTexto] ? txt(chaveOuTexto) : chaveOuTexto;
+    u.anuncio.textContent = ""; setTimeout(function () { u.anuncio.textContent = t; }, 30);
+  }
+
+  /* ---------- pular, atalhos, régua, lembrar ---------- */
+  function alvoConteudo() { var c = P.op.conteudo; if (typeof c === "function") { try { c = c(); } catch (e) { c = null; } } return el(c) || doc.querySelector("#px-conteudo") || doc.querySelector("main") || doc.querySelector("[role=main]"); }
+  function irPara(x) {
+    if (!x) return;
+    if (!x.hasAttribute("tabindex") && !/^(A|BUTTON|INPUT|SELECT|TEXTAREA)$/.test(x.nodeName)) x.setAttribute("tabindex", "-1");
+    x.focus(); try { x.scrollIntoView({ block: "start" }); } catch (e) {}
+  }
+  function montarPular() {
+    if (doc.querySelector(".pular,.salto,.skip,.px-pular,[data-pp-pular]")) return;
+    var a = criar("a", { "class": "pp-pular", href: "#", "data-pp-pular": "", "data-pp-manter": "" });
+    P.ui.pular = a;
+    a.addEventListener("click", function (ev) { ev.preventDefault(); irPara(alvoConteudo()); });
+    doc.body.insertBefore(a, doc.body.firstChild);
+  }
+  function atalhos(ev) {
+    if (!ev.altKey || ev.ctrlKey || ev.metaKey) return;
+    var k = ev.key, c = ev.code;
+    var n = /^Digit(\d)$/.test(c) ? c.slice(5) : (/^\d$/.test(k) ? k : null);
+    if (n === "1") irPara(alvoConteudo());
+    else if (n === "2") irPara(el(P.op.menu) || doc.querySelector("nav"));
+    else if (n === "3") { var b = el(P.op.busca) || doc.querySelector("input[type=search],[role=search] input,[role=tablist]"); if (b && b.getAttribute("role") === "tablist") b = b.querySelector("[aria-selected=true],[role=tab]") || b; irPara(b); }
+    else if (n === "0") { if (!P.ui.pA11y) return; abrir(P.ui.pA11y, P.ui.a11y, true); }
+    else return;
+    ev.preventDefault();
+  }
+  function regua(y) { var r = P.ui.regua; if (r && P.estado.regua) r.style.top = Math.round(y) + "px"; }
+  function lugarChave() { return "physis-pref-lugar"; }
+  function salvarLugar() {
+    if (!P.estado || !P.estado.lembrar) return;
+    var m = {}; try { m = JSON.parse(ler(lugarChave()) || "{}") || {}; } catch (e) { m = {}; }
+    var o = { y: Math.round(global.scrollY || 0), hash: global.location.hash || "" };
+    if (P.op.lembrar && typeof P.op.lembrar.salvar === "function") { try { o.pagina = P.op.lembrar.salvar(); } catch (e) {} }
+    m[P.op.tela || global.location.pathname] = o;
+    gravar(lugarChave(), JSON.stringify(m));
+  }
+  function restaurarLugar() {
+    if (!P.estado.lembrar) return;
+    var m = {}; try { m = JSON.parse(ler(lugarChave()) || "{}") || {}; } catch (e) { return; }
+    var o = m[P.op.tela || global.location.pathname]; if (!o) return;
+    if (P.op.lembrar && typeof P.op.lembrar.restaurar === "function" && o.pagina) { try { P.op.lembrar.restaurar(o.pagina); } catch (e) {} }
+    if (o.hash && !global.location.hash) { try { global.history.replaceState(null, "", o.hash); global.dispatchEvent(new HashChangeEvent("hashchange")); } catch (e) {} }
+    setTimeout(function () { global.scrollTo(0, o.y || 0); }, 60);
+  }
+
+  /* ---------- menos estímulo: nada toca sozinho; legendas ---------- */
+  function pararMidias(raiz) {
+    if (!raiz.querySelectorAll) return;
+    raiz.querySelectorAll("video[autoplay],audio[autoplay]").forEach(function (m) { try { m.pause(); m.removeAttribute("autoplay"); } catch (e) {} });
+  }
+  function conferirLegendas(raiz) {
+    if (!raiz.querySelectorAll || !global.console) return;
+    var ms = raiz.nodeName === "VIDEO" || raiz.nodeName === "AUDIO" ? [raiz] : raiz.querySelectorAll("video,audio");
+    Array.prototype.forEach.call(ms, function (m) {
+      if (m.__ppLegenda) return; m.__ppLegenda = 1;
+      if (!m.querySelector("track[kind=captions],track[kind=subtitles]")) console.warn("Physis acessibilidade: mídia sem legenda (<track kind=\"captions\">)", m);
+    });
+  }
+
+  /* ---------- ouvir esta tela ---------- */
+  function vozDe(lingua) {
+    var vs = []; try { vs = global.speechSynthesis.getVoices() || []; } catch (e) {}
+    var pref = lingua === "en" ? /^en/i : /^pt/i, br = lingua === "en" ? /^en-US/i : /^pt-BR/i;
+    return vs.filter(function (v) { return br.test(v.lang); })[0] || vs.filter(function (v) { return pref.test(v.lang); })[0] || null;
+  }
+  function textoParaLer() {
+    var sel = ""; try { sel = String(global.getSelection ? global.getSelection() : ""); } catch (e) {}
+    if (sel.trim()) return sel;
+    var a = alvoConteudo() || doc.body;
+    return (a.innerText || a.textContent || "");
+  }
+  function ouvir() {
+    var s = global.speechSynthesis; if (!s) return;
+    s.cancel();
+    var t = textoParaLer().replace(/\s+/g, " ").trim(); if (!t) return;
+    var pedacos = t.match(/[^.!?;:]{1,220}[.!?;:]?/g) || [t], lingua = P.estado.idioma, voz = vozDe(lingua);
+    pedacos.forEach(function (p) {
+      var u = new global.SpeechSynthesisUtterance(p.trim());
+      u.lang = lingua === "en" ? "en-US" : "pt-BR"; if (voz) u.voice = voz;
+      s.speak(u);
+    });
+    P.falando = true; dizer("lido");
+  }
+  function pausarFala() {
+    var s = global.speechSynthesis; if (!s) return;
+    var b = doc.getElementById("pp-b-pausar");
+    if (s.paused) { s.resume(); if (b) b.textContent = txt("pausar"); } else { s.pause(); if (b) b.textContent = txt("continuar"); }
+  }
+  function pararFala() { var s = global.speechSynthesis; if (s) { s.cancel(); P.falando = false; dizer("lidoFim"); } var b = doc.getElementById("pp-b-pausar"); if (b) b.textContent = txt("pausar"); }
+
+  /* ---------- comunicação alternativa ---------- */
+  function ehCampo(x) { return x && (x.nodeName === "TEXTAREA" || (x.nodeName === "INPUT" && /^(text|search|email|tel|url|)$/i.test(x.type || ""))) && !x.disabled && !x.readOnly; }
+  function caa(k) {
+    var frase = txt(k), alvo = ehCampo(P.campo) && doc.contains(P.campo) ? P.campo : el(P.op.contato);
+    if (ehCampo(alvo)) {
+      var ini = alvo.selectionStart, fim = alvo.selectionEnd, v = alvo.value, sep = v && !/\s$/.test(v.slice(0, ini == null ? v.length : ini)) ? " " : "";
+      try { alvo.setRangeText(sep + frase, ini == null ? v.length : ini, fim == null ? v.length : fim, "end"); } catch (e) { alvo.value = v + sep + frase; }
+      alvo.dispatchEvent(new Event("input", { bubbles: true }));
+      abrir(P.ui.pA11y, P.ui.a11y, false);
+      try { alvo.scrollIntoView({ block: "center" }); } catch (e) {}
+      alvo.focus();
+      dizer(txt("caaFoi") + frase);
+    } else if (typeof P.op.suporte === "function") {
+      abrir(P.ui.pA11y, P.ui.a11y, false);
+      try { P.op.suporte(frase); } catch (e) {}
+      dizer(txt("caaSup") + frase);
+    } else {
+      var c = P.ui.cartao; c.hidden = false; c.textContent = "";
+      c.appendChild(criar("span", { "class": "pp-d" }, [txt("caaMostra")])); c.appendChild(doc.createTextNode(frase));
+    }
+  }
+  function relatar() {
+    if (typeof global.abrirJuridico === "function") { try { global.abrirJuridico("acessibilidade"); return; } catch (e) {} }
+    var r = P.op.relatar;
+    if (typeof r === "function") return r();
+    if (typeof r === "string" && r.charAt(0) === "#") { abrir(P.ui.pA11y, P.ui.a11y, false); irPara(el(r)); var c = el(P.op.contato); if (ehCampo(c)) c.focus(); return; }
+    if (typeof r === "string" && r) { global.location.href = r; return; }
+    /* sem canal na página: o relato é escrito aqui e copiado, para enviar pelo suporte da Physis (funciona sem internet) */
+    var box = doc.getElementById("pp-relato"); if (!box) return; box.hidden = false; var t = doc.getElementById("pp-relato-t"); if (t) t.focus();
+  }
+  function copiarRelato() {
+    var t = doc.getElementById("pp-relato-t"), e = estadoPublico();
+    var rel = (t && t.value.trim() ? t.value.trim() + "\n\n" : "") + "Tela: " + doc.title + "\nEndereço: " + global.location.pathname + global.location.hash +
+      "\nQuando: " + new Date().toISOString() + "\nNavegador: " + global.navigator.userAgent + "\nPreferências: tema " + e.temaEfetivo +
+      (e.conforto ? ", conforto" : "") + (e.texto ? ", texto maior" : "") + (e.contraste ? ", alto contraste" : "");
+    var feito = false;
+    try { if (global.navigator.clipboard && global.isSecureContext) { global.navigator.clipboard.writeText(rel); feito = true; } } catch (x) {}
+    if (!feito) { var a = criar("textarea", { style: "position:fixed;left:-9999px", "aria-hidden": "true" }); a.value = rel; doc.body.appendChild(a); a.select(); try { doc.execCommand("copy"); } catch (x) {} doc.body.removeChild(a); }
+    var m = doc.getElementById("pp-relato-msg"); if (m) m.textContent = txt("copiado");
+    dizer("copiado");
+  }
+
+  /* ---------- comandos de voz ---------- */
+  function focaveis() {
+    return Array.prototype.filter.call(doc.querySelectorAll("a[href],button,input,select,textarea,[tabindex]"), function (x) {
+      return !x.disabled && x.tabIndex >= 0 && !x.closest("[hidden],[inert]") && (x.offsetWidth || x.offsetHeight || x.getClientRects().length);
+    });
+  }
+  function moverFoco(passo) { var l = focaveis(), i = l.indexOf(doc.activeElement); var x = l[(i + passo + l.length) % l.length]; if (x) x.focus(); }
+  function comando(frase) {
+    var f = frase.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    if (/conteudo|content/.test(f)) irPara(alvoConteudo());
+    else if (/proximo|next/.test(f)) moverFoco(1);
+    else if (/voltar|anterior|back|previous/.test(f)) moverFoco(-1);
+    else if (/ler|leia|read/.test(f)) ouvir();
+    else if (/aumentar|maior|bigger|larger/.test(f)) mudar({ texto: Math.min(2, P.estado.texto + 1) }, "ok");
+    else if (/diminuir|menor|smaller/.test(f)) mudar({ texto: Math.max(0, P.estado.texto - 1) }, "ok");
+    else if (/parar|pare|stop/.test(f)) pararFala();
+    else return;
+    if (P.ui.vozMsg) P.ui.vozMsg.textContent = "“" + frase.trim() + "”";
+  }
+  function vozLigar(sim) {
+    var R = global.SpeechRecognition || global.webkitSpeechRecognition;
+    if (!R) return;
+    if (!sim) { if (P.rec) { var r0 = P.rec; P.rec = null; try { r0.stop(); } catch (e) {} if (P.ui.vozMsg) P.ui.vozMsg.textContent = ""; } return; }
+    if (P.rec) { P.rec.lang = P.estado.idioma === "en" ? "en-US" : "pt-BR"; return; }
+    var r = new R(); P.rec = r;
+    r.lang = P.estado.idioma === "en" ? "en-US" : "pt-BR"; r.continuous = true; r.interimResults = false;
+    r.onresult = function (ev) { for (var i = ev.resultIndex; i < ev.results.length; i++) if (ev.results[i].isFinal) comando(ev.results[i][0].transcript); };
+    r.onerror = function (ev) { if (P.ui.vozMsg) P.ui.vozMsg.textContent = txt("vozErro") + (ev.error || ""); if (ev.error === "not-allowed" || ev.error === "service-not-allowed") { P.rec = null; mudar({ voz: false }, null); } };
+    r.onend = function () { if (P.rec === r) { try { r.start(); } catch (e) {} } };
+    try { r.start(); if (P.ui.vozMsg) P.ui.vozMsg.textContent = txt("vozOuve"); } catch (e) {}
+  }
+
+  /* ---------- inglês ---------- */
+  var DIC = {}, RX = [], EXC = {};
+  function chave(s) { return String(s).replace(/\s+/g, " ").trim(); }
+  function temLetra(s) { return /[A-Za-zÀ-ÿ]/.test(s); }
+  /* par de um texto já normalizado: dicionário, depois padrões (o segundo item pode ser texto com $1 ou função) */
+  function par(k) {
+    var v = DIC[k];
+    if (v == null) for (var i = 0; i < RX.length; i++) { RX[i][0].lastIndex = 0; if (RX[i][0].test(k)) { v = k.replace(RX[i][0], RX[i][1]); break; } }
+    return v;
+  }
+  /* textos montados no código ("Captação de " + n + " m³ ..."): troca os pedaços conhecidos (opção fragmentos), do maior
+     para o menor e só em limite de palavra. Se sobrar palavra em português, o texto entra em faltando(). */
+  var FRAG = null, FRAGRX = null, LETRA = /[A-Za-zÀ-ÿ]/;
+  var PT_PALAVRA = /[áéíóúâêôãõç]|\b(de|do|da|dos|das|com|sem|para|por|não|um|uma|ou|no|na|nos|nas|em|que|ao|os|as|pelo|pela|entre|até|antes|depois|acima|abaixo)\b/i;
+  function prepararFragmentos(f) {
+    FRAG = {}; var ks = [];
+    for (var k in f) if (tem(f, k)) { var c = chave(k); if (c.length >= 2) { FRAG[c] = f[k]; ks.push(c); } }
+    ks.sort(function (a, b) { return b.length - a.length; });
+    FRAGRX = ks.length ? new RegExp(ks.map(function (x) { return x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("|"), "g") : null;
+  }
+  function fragmentos(k) {
+    if (!FRAGRX) return null;
+    var mudou = false, resto = "", ult = 0;
+    var r = k.replace(FRAGRX, function (m, pos, tudo) {
+      var antes = pos > 0 ? tudo.charAt(pos - 1) : "", depois = tudo.charAt(pos + m.length);
+      if ((LETRA.test(m.charAt(0)) && LETRA.test(antes)) || (LETRA.test(m.charAt(m.length - 1)) && LETRA.test(depois))) return m;
+      mudou = true; resto += tudo.slice(ult, pos) + " "; ult = pos + m.length; return FRAG[m];
+    });
+    if (!mudou) return null;
+    resto += k.slice(ult);
+    if (PT_PALAVRA.test(resto.replace(/\d[\d.,]*/g, " "))) P.faltam[k] = 1;
+    return r;
+  }
+  function traduzir(s) {
+    var k = chave(s); if (!k) return null;
+    if (EXC[k]) return null;
+    var v = par(k);
+    if (v == null && k.indexOf(" · ") > 0) {          /* "A · B": traduz parte por parte, se todas tiverem par */
+      var ps = k.split(" · "), ok = true;
+      ps = ps.map(function (x) { var t = par(x); if (t == null && (EXC[x] || !temLetra(x))) t = x; if (t == null) ok = false; return t; });
+      if (ok) v = ps.join(" · ");
+    }
+    if (v == null) { v = fragmentos(k); if (v != null) return (/^\s/.test(s) ? " " : "") + v + (/\s$/.test(s) ? " " : ""); }
+    if (v == null) { if (temLetra(k)) P.faltam[k] = 1; return null; }
+    return (/^\s/.test(s) ? " " : "") + v + (/\s$/.test(s) ? " " : "");
+  }
+  function pular(e) {
+    for (; e && e.nodeType === 1; e = e.parentElement) {
+      if (IGNORAR[e.nodeName]) return true;
+      if (e.hasAttribute("data-pp-manter") || e.getAttribute("translate") === "no") return true;
+      if (e.isContentEditable) return true;
+    }
+    return false;
+  }
+  function textoNo(n, en) {
+    var o = P.orig.get(n);
+    if (o && n.nodeValue !== o.pt && n.nodeValue !== o.en) { P.orig.delete(n); o = null; }   /* mudou por baixo: é texto novo */
+    if (en) {
+      var base = o ? o.pt : n.nodeValue, t = traduzir(base);
+      if (t != null) { P.orig.set(n, { pt: base, en: t }); if (n.nodeValue !== t) n.nodeValue = t; }
+    } else if (o) { if (n.nodeValue !== o.pt) n.nodeValue = o.pt; P.orig.delete(n); }
+  }
+  function atributosEl(e, en) {
+    var mapa = P.origAttr.get(e) || {}, attrs = ATRIBUTOS.slice();
+    if (e.nodeName === "INPUT" && /^(button|submit|reset)$/i.test(e.type)) attrs.push("value");
+    attrs.forEach(function (a) {
+      if (!e.hasAttribute(a)) return;
+      var atual = e.getAttribute(a), o = mapa[a];
+      if (o && atual !== o.pt && atual !== o.en) { delete mapa[a]; o = null; }
+      if (en) { var base = o ? o.pt : atual, t = traduzir(base); if (t != null) { t = t.trim(); mapa[a] = { pt: base, en: t }; if (atual !== t) e.setAttribute(a, t); } }
+      else if (o) { if (atual !== o.pt) e.setAttribute(a, o.pt); delete mapa[a]; }
+    });
+    P.origAttr.set(e, mapa);
+  }
+  function percorrer(raiz, en) {
+    if (!raiz) return;
+    if (raiz.nodeType === 3) { if (!pular(raiz.parentElement)) textoNo(raiz, en); return; }
+    if (raiz.nodeType !== 1 && raiz.nodeType !== 9 && raiz.nodeType !== 11) return;
+    if (raiz.nodeType === 1 && pular(raiz)) return;
+    var w = doc.createTreeWalker(raiz, 5 /* elementos e textos */, {
+      acceptNode: function (n) {
+        if (n.nodeType === 1 && (IGNORAR[n.nodeName] || n.hasAttribute("data-pp-manter") || n.getAttribute("translate") === "no" || n.isContentEditable)) return 2;
+        return 1;
+      }
+    });
+    if (raiz.nodeType === 1) atributosEl(raiz, en);
+    var n;
+    while ((n = w.nextNode())) { if (n.nodeType === 3) textoNo(n, en); else atributosEl(n, en); }
+  }
+  function tituloDoc(en) {
+    if (P.tituloPt == null) P.tituloPt = doc.title;
+    if (doc.title !== P.tituloPt && doc.title !== P.tituloEn) P.tituloPt = doc.title;
+    if (en) { var t = traduzir(P.tituloPt); P.tituloEn = t ? t.trim() : null; if (t) doc.title = t.trim(); } else if (doc.title !== P.tituloPt) doc.title = P.tituloPt;
+  }
+  function traduzLocal() { return P.estado.idioma === "en" && !P.pausado && !externo(); }
+  function tudo() {
+    if (externo()) return;
+    var en = traduzLocal();
+    percorrer(doc.body, en); tituloDoc(en);
+    if (P.obs) P.obs.takeRecords();
+  }
+  function definirIdioma(qual) {
+    var x = externo();
+    if (x) {   /* a tela traduz a si mesma: só pede a troca, uma vez, quando ela ainda está na outra língua */
+      var pela = !!P.pelaPessoa; P.pelaPessoa = false;
+      if (idiomaDaTela() !== qual) { try { x.definir(qual, pela); } catch (e) { if (global.console) console.error(e); } }
+    } else {
+      doc.documentElement.setAttribute("lang", qual === "en" ? "en" : P.idiomaOriginal);
+      tudo();
+    }
+    if (P.ui.pular) P.ui.pular.textContent = txt("pular");
+    var pl = doc.querySelector("a.px-pular"); if (pl && !P.op.semFaixa) pl.textContent = txt("pular");
+  }
+  function observar() {
+    if (!global.MutationObserver) return;
+    P.obs = new MutationObserver(function (lista) {
+      var en = traduzLocal();
+      lista.forEach(function (m) {
+        if (m.type === "childList") {
+          for (var i = 0; i < m.addedNodes.length; i++) {
+            var a = m.addedNodes[i];
+            if (a.nodeType === 1) { conferirLegendas(a); if (P.estado.calma) pararMidias(a); }
+            if (en && (a.nodeType !== 3 || !pular(a.parentElement))) percorrer(a, true);
+          }
+        } else if (!en) return;
+        else if (m.type === "characterData") { if (!pular(m.target.parentElement)) textoNo(m.target, true); }
+        else if (m.type === "attributes" && !pular(m.target)) atributosEl(m.target, true);
+      });
+      if (en) tituloDoc(true);
+      P.obs.takeRecords();
+    });
+    P.obs.observe(doc.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATRIBUTOS.concat(["value"]) });
+  }
+
+  /* ---------- API ---------- */
+  var API = {
+    versao: 3,
+    iniciar: function (op) {
+      if (P.op) return API;
+      P.op = op || {};
+      P.op.chave = P.op.chave || "physis-pref";
+      var d = P.op.dicionario || {};
+      for (var k in d) if (tem(d, k)) DIC[chave(k)] = d[k];
+      FRASES.forEach(function (f) { if (!DIC[UI.pt[f]]) DIC[UI.pt[f]] = UI.en[f]; });
+      (P.op.padroes || []).forEach(function (p) { RX.push([p[0] instanceof RegExp ? p[0] : new RegExp(p[0]), p[1]]); });
+      (P.op.excecoes || []).forEach(function (x) { EXC[chave(x)] = 1; });
+      if (P.op.fragmentos) prepararFragmentos(P.op.fragmentos);
+      P.idiomaOriginal = doc.documentElement.getAttribute("lang") || "pt-BR";
+      if (!doc.getElementById("pp-estilo")) { var st = doc.createElement("style"); st.id = "pp-estilo"; st.textContent = CSS; (doc.head || doc.documentElement).appendChild(st); }
+      P.estado = carregar();
+      montarPular();
+      montarBarra();
+      aplicar(null);
+      observar();
+      conferirLegendas(doc);
+      restaurarLugar();
+      try {
+        var mm = global.matchMedia("(prefers-color-scheme: dark)");
+        var seguir = function () { if (P.estado.tema === "auto") aplicar(null); };
+        if (mm.addEventListener) mm.addEventListener("change", seguir); else if (mm.addListener) mm.addListener(seguir);
+      } catch (e) {}
+      doc.addEventListener("keydown", atalhos);
+      doc.addEventListener("focusin", function (ev) {
+        var t = ev.target; if (P.ui.barra && P.ui.barra.contains(t)) return;
+        if (ehCampo(t)) P.campo = t;
+        if (P.estado.regua && t.getBoundingClientRect) { var r = t.getBoundingClientRect(); regua(r.top + r.height / 2); }
+      });
+      doc.addEventListener("pointermove", function (ev) { regua(ev.clientY); }, { passive: true });
+      var tempo = null;
+      global.addEventListener("scroll", function () { if (!P.estado.lembrar) return; clearTimeout(tempo); tempo = setTimeout(salvarLugar, 400); }, { passive: true });
+      global.addEventListener("hashchange", salvarLugar);
+      global.addEventListener("pagehide", salvarLugar);
+      /* tela com tradução própria trocou de língua pelo botão dela: a barra e a escolha guardada acompanham */
+      if (externo() && global.MutationObserver) {
+        new MutationObserver(function () {
+          var q = idiomaDaTela(); if (q === P.estado.idioma) return;
+          P.estado.idioma = q; P.idiomaAplicado = q; guardar(); desenharBarra();
+          if (typeof P.op.aoMudar === "function") { try { P.op.aoMudar(estadoPublico()); } catch (x) {} }
+        }).observe(doc.documentElement, { attributes: true, attributeFilter: ["lang"] });
+      }
+      /* outra aba, ou a plataforma que abriu esta tela num quadro, mudou a escolha: segue */
+      global.addEventListener("storage", function (ev) {
+        if (ev.key !== P.op.chave && ev.key !== "physis-pref-tema" && ev.key !== "physis-idioma" && ev.key !== "physis-conforto" && ev.key !== "physis-fundo" && ev.key !== "physis-passaporte") return;
+        var antes = JSON.stringify(P.estado), novo;
+        if (ev.key === P.op.chave) { try { novo = limpar(JSON.parse(ev.newValue || "null")); } catch (e) { return; } }
+        else {
+          novo = copia(P.estado);
+          if (ev.key === "physis-pref-tema" && /^(claro|escuro|auto)$/.test(ev.newValue || "")) novo.tema = ev.newValue;
+          if (ev.key === "physis-idioma") novo.idioma = ev.newValue === "en" ? "en" : "pt";
+          if (ev.key === "physis-conforto") novo.conforto = ev.newValue === "1";
+          if (ev.key === "physis-fundo") novo.verde = ev.newValue === "verde";
+          if (ev.key === "physis-passaporte") { try { var pp = JSON.parse(ev.newValue || "{}"); novo.texto = pp.texto ? Math.max(1, novo.texto) : 0; novo.espaco = !!pp.espaco; novo.contraste = !!pp.contraste; novo.calma = !!pp.calma; } catch (e) {} }
+          novo = limpar(novo);
+        }
+        if (JSON.stringify(novo) === antes) return;
+        P.estado = novo; gravar(P.op.chave, JSON.stringify(novo)); aplicar(null);
+      });
+      return API;
+    },
+    estado: function () { return P.estado ? estadoPublico() : null; },
+    definir: function (patch) { if (P.estado) mudar(patch || {}, null); return API.estado(); },
+    idioma: function () { return P.estado ? P.estado.idioma : "pt"; },
+    /* tradução de um texto solto (para mensagens montadas no código); devolve o próprio texto se não houver par */
+    t: function (s) { if (!P.estado || P.estado.idioma !== "en") return s; var r = traduzir(s); return r == null ? s : r; },
+    /* par em inglês de um texto, qualquer que seja o idioma ligado (para usar dentro de padrões) */
+    par: function (s) { var k = chave(s), r = par(k); if (r == null && k.indexOf(" · ") > 0) { r = traduzir(k); r = r == null ? null : r.trim(); } return r == null ? s : r; },
+    acrescentar: function (dic, padroes) {
+      for (var k in (dic || {})) if (tem(dic, k)) DIC[chave(k)] = dic[k];
+      (padroes || []).forEach(function (p) { RX.push([p[0] instanceof RegExp ? p[0] : new RegExp(p[0]), p[1]]); });
+      if (P.estado) tudo();
+    },
+    /* pausa a tradução (ex.: durante a edição de textos): a tela volta ao português até pausar(false) */
+    pausar: function (sim) { P.pausado = !!sim; if (P.estado) tudo(); },
+    reaplicar: function () { if (P.estado) tudo(); },
+    abrirPainel: function (qual) { if (!P.ui.barra) return; if (qual === "conforto") abrir(P.ui.pConf, P.ui.conforto, true); else abrir(P.ui.pA11y, P.ui.a11y, true); },
+    ouvir: ouvir, parar: pararFala,
+    faltando: function () {
+      P.faltam = {};
+      if (P.estado && P.estado.idioma === "en") tudo();
+      return Object.keys(P.faltam).filter(function (k) { return !DIC[k]; }).sort();
+    }
+  };
+  global.PhysisPreferencias = API;
+
+  /* ---------- PxPref: a mesma barra para as telas com tradução própria (plataforma, Gestão Physis, SCADA) ----------
+     Era um segundo módulo (px-preferencias v1); desde a v3 é só esta porta de entrada para o mesmo código.
+     PxPref.iniciar({ lugar, idioma:{atual,definir}, conteudo, menu, relatar, suporte, tela, lugarAtual, irPara, semFaixa, aoMudar })
+     aoMudar recebe { tema (o que vale: claro|escuro), temaEscolha (claro|escuro|auto), idioma, conforto, verde, texto, ... }. */
+  function formaPx(e) { if (!e) return null; var o = copia(e); o.temaEscolha = e.tema; o.tema = e.temaEfetivo; return o; }
+  var PX = {
+    versao: 3,
+    iniciar: function (op) {
+      op = op || {};
+      var lembrar = op.lugarAtual || op.irPara ? { salvar: op.lugarAtual, restaurar: op.irPara } : null;
+      API.iniciar({ chave: "physis-pref", ondeColocar: op.lugar, conteudo: op.conteudo, menu: op.menu, relatar: op.relatar, suporte: op.suporte,
+        tela: op.tela, semFaixa: op.semFaixa, variante: op.variante, esconderEmQuadro: op.esconderEmQuadro !== false, idiomaExterno: op.idioma,
+        lembrar: lembrar, aoMudar: op.aoMudar ? function (e) { op.aoMudar(formaPx(e)); } : null });
+      return PX;
+    },
+    estado: function () { return formaPx(API.estado()); },
+    definir: function (patch) { API.definir(patch); return PX.estado(); },
+    redesenhar: function () { P.painelIdioma = null; desenharBarra(); },
+    textos: UI
+  };
+  global.PxPref = PX;
+})(typeof window !== "undefined" ? window : this);
+</script>
+<script id="pp-site">
+PxPref.iniciar({ lugar:"#pp-lugar", conteudo:"#conteudo", tela:"site-inovastem",
+  idioma:{ atual:() => lang, definir:v => { lang = v === "en" ? "en" : "pt"; try { localStorage.setItem("physis-idioma", lang); } catch (e){} desenhar(); } } });
+</script>
+</body>
+</html>

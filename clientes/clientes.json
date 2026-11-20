@@ -44,6 +44,40 @@
         "_leia": "Canais próprios do Instituto. Enquanto forem [MARCADOR], o suporte não envia e-mail (o servidor recusa endereço inválido)."
       },
       "confirmar": "Confirmar com a Physis: nome jurídico do Instituto, cores da marca (hoje azuis da PALETA.md, a aprovar), e-mail e WhatsApp de suporte, endereço público e se a Gestão do Instituto é a mesma Gestão interna da Physis (hoje não: o pacote não leva gestao-interna-physis.html)."
+    },
+    {
+      "org": "inovastem",
+      "nome": "InovaSTEM",
+      "lugar": "living-lab-online",
+      "instalacao": "inovastem",
+      "banco": "physis-inovastem.db",
+      "pesquisa": true,
+      "modulos": [
+        "cursos",
+        "impressao3d",
+        "planejador"
+      ],
+      "marca": {
+        "nome": "InovaSTEM",
+        "logo_texto": "InovaSTEM · uma iniciativa PHYSIS",
+        "cores": {
+          "primaria": "#0B3D2E",
+          "acao": "#C2410C",
+          "semente": "#F97316",
+          "fundo": "#FFF7ED",
+          "texto": "#1B1F23",
+          "creme": "#F4F1EA",
+          "delas": "#7C3AED",
+          "delas_fundo": "#EDE9FE"
+        }
+      },
+      "suporte": {
+        "_leia": "Canais da InovaSTEM. Enquanto forem [MARCADOR], o suporte registra mas não envia e-mail.",
+        "email": "[MARCADOR: e-mail da InovaSTEM]",
+        "whatsapp": "[MARCADOR: WhatsApp de suporte da InovaSTEM]"
+      },
+      "projeto": "Site e plataforma da InovaSTEM como living lab online (D94, prioridade 0): teste em 24/11/2026, lançamento em 26/11/2026. Instalação própria (banco, porta 8702, marca e subdomínio inovastem.physisengineering.com), sob a Physis Engineering até o CNPJ do Instituto; sem a marca do Instituto (docs/INOVASTEM.md).",
+      "confirmar": "Confirmar com a direção: link do grupo de WhatsApp (até 25/11), equipe de moderação, e-mail de contato, DNS do subdomínio (Eric) e os materiais aprovados para download."
     }
   ]
 }

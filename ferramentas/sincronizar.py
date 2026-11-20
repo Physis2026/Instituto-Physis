@@ -38,6 +38,7 @@ ALVOS = [
     RAIZ / "physis-hub" / "web" / "documento.html",
     RAIZ / "physis-hub" / "web" / "municipio.html",
     RAIZ / "physis-hub" / "web" / "site.html",           # site do Instituto e da Rede InovaSTEM (19/11/2026)
+    RAIZ / "physis-hub" / "web" / "inovastem.html",      # site e living lab da InovaSTEM (D94, 19/11/2026)
     RAIZ / "app-nativo" / "site" / "baixar.html",
 ]
 # A "Tela do cliente" (sistema/physis-tela-cliente.html) saiu em 15/11/2026: tudo o que ela fazia está nas abas da plataforma.
