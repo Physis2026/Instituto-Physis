@@ -328,12 +328,13 @@ class Pagina(unittest.TestCase):
         claro, escuro = self.tokens(":root"), self.tokens('html[data-tema="escuro"]')
         escuro = dict(claro, **escuro)
         delas_escuro = dict(escuro, **self.tokens('html[data-tema="escuro"] body.aba-delas'))
+        delas_claro = dict(claro, **self.tokens('body.aba-delas'))   # tela lilás da Delas no claro (dona, 20/11/2026)
         pares = [("texto", "fundo"), ("texto", "sup"), ("tinta2", "fundo"), ("tinta2", "sup"), ("titulo-cor", "fundo"),
                  ("titulo-cor", "sup"), ("link", "fundo"), ("link", "sup"), ("sobre-acao", "acao"), ("sobre-delas", "delas"),
                  ("delas-t", "delas-f"), ("texto", "delas-f"), ("ok-t", "ok-f"), ("al-t", "al-f"), ("at-t", "at-f"),
                  ("sobrancelha", "fundo"), ("sec", "fundo"), ("sec", "sup"), ("sobre-faixa", "faixa"), ("texto", "campo"),
                  ("erro-msg", "sup"), ("erro-msg", "fundo")]
-        for nome, tk in (("claro", claro), ("escuro", escuro), ("Delas escuro", delas_escuro)):
+        for nome, tk in (("claro", claro), ("escuro", escuro), ("Delas escuro", delas_escuro), ("Delas claro", delas_claro)):
             for a, b in pares:
                 self.assertGreaterEqual(round(contraste(tk[a], tk[b]), 2), 4.5, f"{nome}: --{a} sobre --{b}")
             self.assertGreaterEqual(contraste(tk["borda-campo"], tk["sup"]), 3.0, f"{nome}: borda dos campos")

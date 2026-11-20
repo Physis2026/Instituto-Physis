@@ -29,11 +29,11 @@ FINALIDADE_MENOR = ("Menores de 18 anos: a conta pode navegar, mas só publica d
 CATEGORIAS = {"geral": "Geral", "inovastem": "Rede InovaSTEM", "delas": "InovaSTEM Delas", "physis-3d": "Physis 3D",
               "eventos": "Eventos e oportunidades", "parcerias": "Parcerias e novos projetos",
               # InovaSTEM (D94, 19/11/2026): fóruns do living lab
-              "modelagem": "Modelagem online (GIS, BIM e 3D)", "desafios": "Desafios e projetos abertos",
+              "modelagem": "Modelagem 3D (GIS, BIM, 3D e simulação)", "desafios": "Desafios e projetos abertos",
               "hackathon": "Hackathon de cibersegurança"}
 CATEGORIAS_EN = {"geral": "General", "inovastem": "InovaSTEM Network", "delas": "InovaSTEM Delas", "physis-3d": "Physis 3D",
                  "eventos": "Events and opportunities", "parcerias": "Partnerships and new projects",
-                 "modelagem": "Online modelling (GIS, BIM and 3D)", "desafios": "Open challenges and projects",
+                 "modelagem": "3D modelling (GIS, BIM, 3D and simulation)", "desafios": "Open challenges and projects",
                  "hackathon": "Cybersecurity hackathon"}
 RESTRITAS = {"delas"}                 # leitura e escrita só para quem se autodeclarou (e a equipe, para moderar)
 ESTADOS = ("pendente", "publicado", "recusado")

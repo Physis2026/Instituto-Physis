@@ -96,13 +96,13 @@ def gerar():
             "Rede de apoio entre pares; não oferece atendimento psicológico nem clínico."],
            "As redes", "InovaSTEM", "InovaSTEM Delas")
     s.topicos("O laboratório vivo online",
-              ["**Modelagem online:** GIS e mapas, BIM (IFC) e modelos 3D no navegador.",
+              ["**Modelagem 3D:** GIS e mapas, BIM (IFC) e modelos 3D no navegador.",
                "**Simulação (Fase 1):** calor, estrutura, ventilação, terreno, incerteza, biogás e otimização QUBO, com método, hipóteses e limites em cada resultado.",
                "**Desafios e projetos abertos:** desafios reais publicados pela equipe e projetos sugeridos pela comunidade.",
                "**Fórum com moderação:** tudo o que é publicado passa pela equipe antes de aparecer.",
                "**Hackathon de cibersegurança:** março de 2027, online, só em ambiente próprio e isolado (CTF)."],
               "A plataforma", "Simulação Fase 2 e gêmeo digital: em desenvolvimento.")
-    s.tabela("Modelagem online", ["Ferramenta", "O que faz", "Situação"],
+    s.tabela("Modelagem 3D", ["Ferramenta", "O que faz", "Situação"],
              [["GIS e mapas", "Desenhar e analisar áreas no mapa, camadas e terreno", "Funciona"],
               ["BIM (IFC)", "Abrir e ler modelos IFC de edificações", "Funciona"],
               ["Simulação (Fase 1)", "Contas leves no navegador, iguais às do servidor", "Funciona"],

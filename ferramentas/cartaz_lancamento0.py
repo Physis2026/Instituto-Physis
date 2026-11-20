@@ -55,7 +55,7 @@ def bloco_qr(titulo: str, url: str, legenda: str) -> str:
 
 t = odf.Texto("InovaSTEM · lançamento 0", "Rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos",
               "Rede Taças e Turbinas · 21/11/2026")
-t.p("Modelagem online (GIS, BIM, 3D e simulação), desafios e projetos abertos, fórum com moderação e o hackathon de "
+t.p("Modelagem 3D (GIS, BIM, 3D e simulação), desafios e projetos abertos, fórum com moderação e o hackathon de "
     "cibersegurança em março de 2027. Versão beta; a plataforma abre em 26/11/2026.")
 t.h1("Entre nos grupos")
 t.partes.append(bloco_qr("InovaSTEM", a.inovastem, "Troca de informações, parcerias e desafios de modelagem."))
