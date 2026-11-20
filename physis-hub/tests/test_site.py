@@ -173,8 +173,17 @@ class Pacote(unittest.TestCase):
                 self.assertTrue(any(n.endswith("/web/site.html") for n in nomes))
                 inst = json.loads(z.read(next(n for n in nomes if n.endswith("/instancia.json"))).decode("utf-8"))
                 self.assertTrue(inst["cadastro_aberto"] and inst["moderacao_previa"])
+                # LEIA-ME do pacote (achado na versão de teste de 19/11/2026): senha mínima e banco certos, site em "/"
+                leia = z.read(next(n for n in nomes if n.endswith("/LEIA-ME.md"))).decode("utf-8")
+                from physis_hub import seguranca as seg
+                self.assertIn(f"pelo menos {seg.SENHA_MIN} caracteres", leia)
+                self.assertIn("`physis-instituto.db`", leia)
+                self.assertIn("/plataforma/", leia)
             with zipfile.ZipFile(zp) as z:
                 self.assertFalse(any(n.endswith("/web/site.html") for n in z.namelist()))
+                leia = z.read(next(n for n in z.namelist() if n.endswith("/LEIA-ME.md"))).decode("utf-8")
+                self.assertIn("`physis-hub.db`", leia)
+                self.assertNotIn("/plataforma/", leia)
 
 
 if __name__ == "__main__":
