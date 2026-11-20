@@ -31,7 +31,7 @@ CATEGORIAS = {"geral": "Geral", "inovastem": "Rede InovaSTEM", "delas": "InovaST
               # InovaSTEM (D94, 19/11/2026): fóruns do living lab
               "modelagem": "Modelagem 3D (GIS, BIM, 3D e simulação)", "desafios": "Desafios e projetos abertos",
               "hackathon": "Hackathon de cibersegurança"}
-CATEGORIAS_EN = {"geral": "General", "inovastem": "InovaSTEM Network", "delas": "InovaSTEM Delas", "physis-3d": "Physis 3D",
+CATEGORIAS_EN = {"geral": "General", "inovastem": "InovaSTEM Network", "delas": "InovaSTEM Hers", "physis-3d": "Physis 3D",
                  "eventos": "Events and opportunities", "parcerias": "Partnerships and new projects",
                  "modelagem": "3D modelling (GIS, BIM, 3D and simulation)", "desafios": "Open challenges and projects",
                  "hackathon": "Cybersecurity hackathon"}

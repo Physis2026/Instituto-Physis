@@ -6,7 +6,7 @@
 <title>InovaSTEM</title>
 <meta name="description" content="InovaSTEM: rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos (GIS, BIM, 3D e simulação). InovaSTEM Delas: formação e rede de mulheres em STEM. Versão beta.">
 <!-- Site e plataforma da InovaSTEM como living lab online (D94, 19/11/2026). Servido pela instalação "inovastem" em "/";
-     a plataforma (com login) fica em /plataforma/ e o Planejador (GIS e BIM) em /planejador. Não chama a internet: só as rotas
+     a área da equipe fica em /plataforma/ e a Modelagem 3D em /laboratorio. Não chama a internet: só as rotas
      do próprio servidor (/api/instancia, /api/publico/*, /api/comunidade/*, /api/inovastem/*). docs/INOVASTEM.md. -->
 <script>(function(){var r=document.documentElement,t=null,p=null;try{p=JSON.parse(localStorage.getItem("physis-pref")||"null");t=p&&p.tema||localStorage.getItem("physis-pref-tema");}catch(e){}if(t!=="claro"&&t!=="escuro"){try{t=matchMedia("(prefers-color-scheme: dark)").matches?"escuro":"claro";}catch(e){t="claro";}}r.setAttribute("data-tema",t);})();</script>
 <style>
@@ -179,6 +179,7 @@ const T = {
   pt: {
     pular:"Pular para o conteúdo", titulo:"InovaSTEM", beta:"versão beta",
     sub:"Rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos",
+    sub_delas:"Rede dedicada a mulheres (jovens, cis e trans) em STEM: formação, acolhimento entre pares e mentoria",
     endosso_a:"uma iniciativa", endosso_b:"", inscreva:"Inscreva-se", menu:"Menu", logo_alt:"InovaSTEM, página inicial", delas_logo_alt:"InovaSTEM Delas",
     hero_sobrancelha:"Versão beta · lançamento em 26/11/2026", passo:"Passo {n} de 2", continuar:"Continuar", voltar_passo:"Voltar",
     passo1_falta:"Preencha o nome ou apelido e um e-mail válido para continuar.",
@@ -227,18 +228,17 @@ const T = {
     for_escolha:"Escolha o fórum",
     // modelagem
     mod_t:"Modelagem 3D (Physis 3D)", mod_intro:"A bancada de desenvolvimento da InovaSTEM, aberta a modelagens de qualquer assunto: oito subabas que leem e gravam um projeto comum, num fluxo que vai do arquivo enviado até a galeria (enviar arquivo, lugar ou edificação, peças 3D, simulação, fila de impressão e galeria). Tudo roda no seu navegador.",
-    mod_final:"O Planejador é outra ferramenta, a final (módulo pago), ligada à Modelagem 3D pelo projeto comum. Só o que for validado aqui passa para ele.",
     mod_projeto:"Projeto comum: lugar, edificação, peças e resultados ficam guardados no seu navegador e você exporta ou importa o arquivo do projeto quando quiser.",
     mod_cols:["Subaba","O que faz","Situação"],
     mod_linhas:[["arquivo","1. Enviar arquivo","Qualquer arquivo. Imagem (PNG, JPG, WebP) e SVG viram CAD 2D (SVG e DXF) e modelo 3D (STL e 3MF), ajustáveis antes de ir para Peças 3D. Malhas STL, OBJ e 3MF vão direto para Peças 3D. Arquivos de teste de impressão para baixar.","dev"],
-                ["lugar","2. Lugar (GIS)","Abre o Planejador e leva para o projeto o arquivo do lugar (terreno, edificações e superfícies) exportado pelo Mapeamento.","dev"],
-                ["edificacao","3. Edificação (BIM)","Abre o Planejador com o leitor IFC e leva o resumo do modelo (pavimentos e elementos por tipo) para o projeto.","dev"],
+                ["lugar","2. Lugar (GIS)","Leva para o projeto o arquivo do lugar (terreno, edificações e superfícies) exportado pelo Mapeamento.","dev"],
+                ["edificacao","3. Edificação (BIM)","Lê o modelo IFC e leva o resumo (pavimentos e elementos por tipo) para o projeto.","dev"],
                 ["pecas","4. Peças 3D","Abre STL, OBJ e 3MF, mede, ajusta e fatia peças de plástico reciclado.","dev"],
                 ["simulacao","5. Simulação","Um bloco por fenômeno: calor, estrutura, ventilação, terreno e água, incerteza, biogás e otimização QUBO, com exemplos e limites de validade.","ok"],
                 ["escaneamento","6. Escaneamento","Modelos do CrealityScan: exporte em STL ou OBJ e abra em Peças 3D.","dev"],
                 ["fila","7. Fila de impressão","Com conta, peça a impressão de uma peça; a equipe aprova e acompanha a situação.","dev"],
                 ["galeria","8. Galeria","Peças publicadas pela comunidade, com licença aberta e memorial.","dev"]],
-    mod_abrir_lab:"Abrir a Modelagem 3D", mod_abrir_plan:"Abrir o Planejador (GIS e BIM)",
+    mod_abrir_lab:"Abrir a Modelagem 3D",
     mod_conta:"As subabas abrem sem conta. Para pedir impressão, enviar peças à galeria e escrever no fórum, crie a sua conta em Participar.",
     mod_bib:"Biblioteca aberta do Physis 3D", mod_sem_pecas:"Nenhuma peça publicada ainda.", mod_memorial:"Memorial", mod_licenca:"Licença", mod_revisoes:"revisões",
     mod_forum:"Fórum de modelagem",
@@ -317,12 +317,13 @@ const T = {
   en: {
     pular:"Skip to content", titulo:"InovaSTEM", beta:"beta version",
     sub:"An open network for exchanging information, partnerships and modelling challenges with open code",
-    endosso_a:"a", endosso_b:"initiative", inscreva:"Sign up", menu:"Menu", logo_alt:"InovaSTEM, home page", delas_logo_alt:"InovaSTEM Delas",
+    sub_delas:"A network dedicated to women (young, cis and trans) in STEM: training, peer support and mentoring",
+    endosso_a:"a", endosso_b:"initiative", inscreva:"Sign up", menu:"Menu", logo_alt:"InovaSTEM, home page", delas_logo_alt:"InovaSTEM Hers",
     hero_sobrancelha:"Beta version · launch on 26 November 2026", passo:"Step {n} of 2", continuar:"Continue", voltar_passo:"Back",
     passo1_falta:"Fill in your name or nickname and a valid e-mail to continue.",
     int_idade_min:"Participation starts at age 16; from 16 to 17, with the legal guardian [CONFERIR with the lawyer].",
     nav:"Site sections", carregando:"Loading…", sem_hub:"Could not reach the server. Please try again shortly.",
-    abas:{inicio:"Home", delas:"InovaSTEM Delas", desafios:"Challenges and projects", forum:"Forum", modelagem:"3D modelling",
+    abas:{inicio:"Home", delas:"InovaSTEM Hers", desafios:"Challenges and projects", forum:"Forum", modelagem:"3D modelling",
           hackathon:"Hackathon", materiais:"Materials", participar:"Join", termos:"Terms of use (beta)", privacidade:"Privacy (beta)"},
     marcador:"[MARCADOR]", conferir:"[CONFERIR]", funciona:"Working", em_dev:"In development", beta_selo:"Beta",
     ini_missao_t:"Mission", ini_missao:"To connect people, organisations and projects to exchange information, build partnerships and solve modelling challenges with open code.",
@@ -333,18 +334,18 @@ const T = {
                 ["Moderated forum","Questions, exchanges and mentoring. Everything posted is reviewed by the team before it appears."],
                 ["Cybersecurity hackathon","March 2027, online, with challenges only in our own isolated environment (CTF)."]],
     ini_duas_t:"The two platforms",
-    ini_duas:[["InovaSTEM", "Open to all people and organisations: information exchange, partnerships and modelling challenges with open code."], ["InovaSTEM Delas", "A network dedicated to women (young, cis and trans) who lead in STEM: training, peer support, conversation circles and mentoring."]],
+    ini_duas:[["InovaSTEM", "Open to all people and organisations: information exchange, partnerships and modelling challenges with open code."], ["InovaSTEM Hers", "A network dedicated to women (young, cis and trans) who lead in STEM: training, peer support, conversation circles and mentoring."]],
     ini_chamar:"I want to join", ini_whats:"Join the WhatsApp group", ini_whats_nota:"The WhatsApp group is optional. The platform forum remains the main channel.",
     ini_whats_falta:"WhatsApp group link: coming soon.",
     ini_physis_t:"Who runs it", ini_physis:"InovaSTEM is an initiative of Physis Engineering, a sustainability engineering company in Petrópolis (RJ), Brazil, led by women. This is the beta version of the platform: everything may change with participants' suggestions.",
     compartilhar:"Share InovaSTEM", compartilhado:"Link copied. Thank you for sharing!", compartilhar_txt:"Meet InovaSTEM: an open network for exchanging information, partnerships and modelling challenges with open code.",
-    del_t:"InovaSTEM Delas", del_missao:"To train, support and strengthen women in STEM, with peer support networks, mentoring and projects applied to sustainability.",
+    del_t:"InovaSTEM Hers", del_missao:"To train, support and strengthen women in STEM, with peer support networks, mentoring and projects applied to sustainability.",
     del_o_que_t:"What happens here", del_o_que:["Training: applied tracks and sustainability projects, with the pilot cohort planned for the second half of 2027 [CONFERIR].", "Peer support: women who study and work in STEM talking to each other.", "Conversation circles and mentoring.", "Opportunities, challenges and events for women in STEM.", "A forum only for network members."],
-    del_nao:"InovaSTEM Delas is a peer support network. It does not provide psychological or clinical care. In an emergency, go to the nearest health service or call 188 (CVV, Brazil) [CONFERIR].",
-    del_dif_t:"InovaSTEM and InovaSTEM Delas", del_dif:"InovaSTEM is open to everyone. InovaSTEM Delas is the network dedicated to women (young, cis and trans), also run by the InovaSTEM team, so that no woman walks alone in STEM.",
-    del_entrar_t:"How to join", del_entrar:["In the interest form, choose \"Female\" and tick that you want to join Delas.","For the Delas forum, create your account and tick the self-declaration. No document is required: only you and the board know that you declared."],
-    del_convidar:"Invite a friend", del_fechado:"The InovaSTEM Delas forum opens to those who self-declared. Create your account and tick the self-declaration under Join.",
-    del_forum:"InovaSTEM Delas forum",
+    del_nao:"InovaSTEM Hers is a peer support network. It does not provide psychological or clinical care. In an emergency, go to the nearest health service or call 188 (CVV, Brazil) [CONFERIR].",
+    del_dif_t:"InovaSTEM and InovaSTEM Hers", del_dif:"InovaSTEM is open to everyone. InovaSTEM Hers is the network dedicated to women (young, cis and trans), also run by the InovaSTEM team, so that no woman walks alone in STEM.",
+    del_entrar_t:"How to join", del_entrar:["In the interest form, choose \"Female\" and tick that you want to join Hers.","For the Hers forum, create your account and tick the self-declaration. No document is required: only you and the board know that you declared."],
+    del_convidar:"Invite a friend", del_fechado:"The InovaSTEM Hers forum opens to those who self-declared. Create your account and tick the self-declaration under Join.",
+    del_forum:"InovaSTEM Hers forum",
     des_t:"Open challenges and projects", des_intro:"Open challenges are real problems published by the team. Open projects are ideas suggested by the community and approved by moderation. Anyone can suggest one.",
     des_desafios:"Open challenges", des_projetos:"Open projects", des_vazio_d:"No open challenges yet. The first one is coming soon.", des_vazio_p:"No approved open projects yet. Suggest the first one!",
     des_prazo:"Deadline", des_area:"Area", des_org:"Proposed by",
@@ -360,18 +361,17 @@ const T = {
     for_cats:{geral:"General", inovastem:"InovaSTEM Network", modelagem:"3D modelling", desafios:"Challenges and projects", hackathon:"Hackathon", eventos:"Events and opportunities"},
     for_escolha:"Choose the forum",
     mod_t:"3D modelling (Physis 3D)", mod_intro:"InovaSTEM's development bench, open to modelling on any subject: eight sub-tabs that read and write one shared project, in a flow that goes from the uploaded file to the gallery (upload a file, site or building, 3D parts, simulation, print queue and gallery). Everything runs in your browser.",
-    mod_final:"The Planner is a different tool, the final one (paid module), connected to 3D modelling through the shared project. Only what is validated here moves on to it.",
     mod_projeto:"Shared project: site, building, parts and results are kept in your browser, and you can export or import the project file whenever you want.",
     mod_cols:["Sub-tab","What it does","Status"],
     mod_linhas:[["arquivo","1. Upload a file","Any file. Images (PNG, JPG, WebP) and SVG become 2D CAD (SVG and DXF) and a 3D model (STL and 3MF), adjustable before going to 3D parts. STL, OBJ and 3MF meshes go straight to 3D parts. Test print files to download.","dev"],
-                ["lugar","2. Site (GIS)","Opens the Planner and brings the site file (terrain, buildings and surfaces) exported by Mapping into the project.","dev"],
-                ["edificacao","3. Building (BIM)","Opens the Planner with the IFC reader and brings the model summary (storeys and elements by type) into the project.","dev"],
+                ["lugar","2. Site (GIS)","Brings the site file (terrain, buildings and surfaces) exported by Mapping into the project.","dev"],
+                ["edificacao","3. Building (BIM)","Reads the IFC model and brings the summary (storeys and elements by type) into the project.","dev"],
                 ["pecas","4. 3D parts","Opens STL, OBJ and 3MF; measures, adjusts and slices recycled-plastic parts.","dev"],
                 ["simulacao","5. Simulation","One block per phenomenon: heat, structure, ventilation, terrain and water, uncertainty, biogas and QUBO optimisation, with examples and validity limits.","ok"],
                 ["escaneamento","6. Scanning","CrealityScan models: export as STL or OBJ and open them in 3D parts.","dev"],
                 ["fila","7. Print queue","With an account, request a print of a part; the team approves it and tracks its status.","dev"],
                 ["galeria","8. Gallery","Parts published by the community, with an open licence and development log.","dev"]],
-    mod_abrir_lab:"Open 3D modelling", mod_abrir_plan:"Open the Planner (GIS and BIM)",
+    mod_abrir_lab:"Open 3D modelling",
     mod_conta:"The sub-tabs open without an account. To request prints, send parts to the gallery and post in the forum, create your account under Join.",
     mod_bib:"Physis 3D open library", mod_sem_pecas:"No parts published yet.", mod_memorial:"Development log", mod_licenca:"Licence", mod_revisoes:"revisions",
     mod_forum:"Modelling forum",
@@ -381,7 +381,7 @@ const T = {
     hac_falta_t:"Still to be defined", hac_falta:["Exact day [MARCADOR]","Audience, age range and team size [MARCADOR]","Prizes [MARCADOR]","Partners and technical mentoring [MARCADOR]"],
     hac_interesse:"Let me know", hac_forum:"Hackathon forum",
     mat_t:"Materials", mat_intro:"Presentation of the network and the platform, sponsorship and ecosystem. Downloadable documents appear here after the board approves them.",
-    mat_rede_t:"Presentation of the network and the platform", mat_rede:["An open network for exchanging information, partnerships and modelling challenges with open code.", "An online platform as a living lab: modelling (GIS, BIM, 3D and simulation), open challenges and projects, a moderated forum and events.", "Training and the women's network: in InovaSTEM Delas."],
+    mat_rede_t:"Presentation of the network and the platform", mat_rede:["An open network for exchanging information, partnerships and modelling challenges with open code.", "An online platform as a living lab: modelling (GIS, BIM, 3D and simulation), open challenges and projects, a moderated forum and events.", "Training and the women's network: in InovaSTEM Hers."],
     mat_pat_t:"Sponsorship", mat_pat_intro:"A single table. The Friend tier is for individuals only; companies start at R$ 1,000.",
     mat_pat_cols:["Tier","For whom","Annual range","Benefits"],
     mat_pat_linhas:[["Friend","Individuals only","R$ 750","[MARCADOR: Friend tier benefits]"],
@@ -397,20 +397,20 @@ const T = {
     int_t:"Interest form", int_intro:"We only ask for what is needed. You will receive InovaSTEM news at the e-mail you give.",
     int_nome:"Name or nickname", int_email:"E-mail", int_areas:"What interests you", int_cidade:"City (optional)", int_inst:"School or workplace (optional)",
     int_genero:"Gender (optional)", int_gen_opc:{"":"Select","feminino":"Female","masculino":"Male","nao_informar":"Prefer not to say"},
-    int_gen_nota:"InovaSTEM is open to everyone. Women (young, cis and trans) also have a dedicated network: InovaSTEM Delas, for peer support and mentoring. Know someone who would like it? Share!",
-    int_delas_convite:"You can also be part of InovaSTEM Delas, the network dedicated to women in STEM.", int_delas_quero:"I also want to join InovaSTEM Delas", int_delas_ver:"Meet InovaSTEM Delas",
+    int_gen_nota:"InovaSTEM is open to everyone. Women (young, cis and trans) also have a dedicated network: InovaSTEM Hers, for peer support and mentoring. Know someone who would like it? Share!",
+    int_delas_convite:"You can also be part of InovaSTEM Hers, the network dedicated to women in STEM.", int_delas_quero:"I also want to join InovaSTEM Hers", int_delas_ver:"Meet InovaSTEM Hers",
     int_idade:"Age", int_maior:"I am 18 or older", int_menor:"I am 16 to 17",
     int_resp_nome:"Legal guardian's name", int_resp_email:"Legal guardian's e-mail", int_menor_aviso:"For people under 18, the team also talks to the legal guardian.",
     int_aceite:"I have read and accept the privacy notice (beta).", int_enviar:"Send interest form",
-    int_ok:"Form received. Thank you! You will receive news by e-mail.", int_ok_delas:" Welcome to InovaSTEM Delas too!",
+    int_ok:"Form received. Thank you! You will receive news by e-mail.", int_ok_delas:" Welcome to InovaSTEM Hers too!",
     cad_t:"Platform account", cad_intro:"To post in the forum, suggest events and use the Physis 3D tool.",
     cad_nome:"Full name", cad_email:"E-mail (your username)", cad_senha:"Password (12 characters or more)", cad_pub:"Public name (shown on what you publish; can be a nickname)",
-    cad_delas:"Self-declaration (optional): I am a woman (cis or trans) and want to access InovaSTEM Delas.",
+    cad_delas:"Self-declaration (optional): I am a woman (cis or trans) and want to access InovaSTEM Hers.",
     cad_aceite:"I have read and accept the terms of use (beta) and the privacy notice (beta).", cad_enviar:"Create account", cad_ok:"Account created. Check your e-mail and sign in through the platform.",
     entrar_plataforma:"Sign in", area_equipe:"Team area", ent_t:"Sign in to your account", ent_usuario:"E-mail", ent_senha:"Password",
     ent_enviar:"Sign in", ent_erro:"E-mail or password do not match.", sair_conta:"Sign out",
     eu_t:"Your participation", eu_nome:"Public name", eu_pode:"Can publish", eu_nao_pode:"Cannot publish yet",
-    eu_delas:"Access to InovaSTEM Delas (self-declaration)", eu_delas_salvar:"Save self-declaration", eu_sair:"Leave the community",
+    eu_delas:"Access to InovaSTEM Hers (self-declaration)", eu_delas_salvar:"Save self-declaration", eu_sair:"Leave the community",
     eu_sair_aviso:"When you leave, your public name becomes 'Participante removido' and the guardian's data and the self-declaration are deleted.",
     publicar_t:"New topic", publicar_tit:"Title", publicar_txt:"Message", publicar_enviar:"Send for moderation",
     publicar_ok:"Received. It appears to everyone after the team's moderation.", publicar_login:"Create your account or sign in to post.",
@@ -434,7 +434,7 @@ const T = {
     pri_t:"Privacy notice (beta)",
     pri_blocos:[["Who looks after your data","Physis Engineering [MARCADOR: company name, CNPJ and address]. Data protection officer: [MARCADOR: name and e-mail]."],
                 ["What we collect","Interest form: name or nickname, e-mail, areas of interest and, if you wish, city, institution and gender. For people under 18, the legal guardian's name and e-mail. Platform account: name, e-mail, password (stored in protected form) and public name. Project suggestion: e-mail for the reply and, if you wish, name and organisation."],
-                ["What for","To send InovaSTEM news, answer suggestions and organise the forum, challenges and hackathon. Gender is used only for the InovaSTEM Delas invitation. The Delas self-declaration only opens the Delas forum: only you and the board know."],
+                ["What for","To send InovaSTEM news, answer suggestions and organise the forum, challenges and hackathon. Gender is used only for the InovaSTEM Hers invitation. The Hers self-declaration only opens the Hers forum: only you and the board know."],
                 ["What we do not do","We do not sell or share your data. Sponsors have no access to personal data. The site uses no trackers or third-party programs."],
                 ["Where it is kept","On InovaSTEM's own server, operated by Physis Engineering. For how long: [MARCADOR: retention period]."],
                 ["Your rights","You can ask to see, correct or delete your data at any time, through the contact below. Account holders can leave the community under Join."],
@@ -577,8 +577,8 @@ function telaForum() {
 function telaModelagem() {
   // Modelagem 3D (Physis 3D), aprovada pela dona em 20/11/2026: 7 subabas em /laboratorio#<subaba>, projeto comum
   const linhas = t("mod_linhas").map(l => `<tr><th scope="row"><a href="/laboratorio#${esc(l[0])}">${esc(l[1])}</a></th><td>${esc(l[2])}</td><td>${selo(l[3])}</td></tr>`).join("");
-  return cartao(t("mod_t"), `<p>${esc(t("mod_intro"))}</p><p><strong>${esc(t("mod_final"))}</strong></p><p class="t2">${esc(t("mod_projeto"))}</p><p class="t2">${esc(t("mod_conta"))}</p>
-      <div class="acoes"><a class="botao" href="/laboratorio#arquivo">${esc(t("mod_abrir_lab"))}</a><a class="botao sec" href="/planejador">${esc(t("mod_abrir_plan"))}</a></div>`, "marca")
+  return cartao(t("mod_t"), `<p>${esc(t("mod_intro"))}</p><p class="t2">${esc(t("mod_projeto"))}</p><p class="t2">${esc(t("mod_conta"))}</p>
+      <div class="acoes"><a class="botao" href="/laboratorio#arquivo">${esc(t("mod_abrir_lab"))}</a></div>`, "marca")
     + `<section><div class="rolagem"><table><caption>${esc(t("mod_t"))}</caption><thead><tr>${t("mod_cols").map(c => `<th scope="col">${esc(c)}</th>`).join("")}</tr></thead>
        <tbody>${linhas}</tbody></table></div></section>`
     + `<section class="cartao" id="biblioteca"><h2>${esc(t("mod_bib"))}</h2><p>${esc(t("carregando"))}</p></section>`
@@ -713,9 +713,17 @@ const TELAS = { inicio: telaInicio, delas: telaDelas, desafios: telaDesafios, fo
                 hackathon: telaHackathon, materiais: telaMateriais, participar: telaParticipar,
                 termos: () => telaJuridico("termos"), privacidade: () => telaJuridico("privacidade") };
 
+let LOGO_INOVA = null;
+function cabecalho() {
+  // na tela da Delas, o cabeçalho é dela (logo e frase); nas outras, o da InovaSTEM (dona, 20/11/2026)
+  const imgs = document.querySelectorAll("h1.logo img"), delas = aba === "delas";
+  if (!LOGO_INOVA) LOGO_INOVA = [...imgs].map(i => i.getAttribute("src"));
+  imgs.forEach((im, i) => { im.setAttribute("src", delas ? LOGO_DELAS[i] : LOGO_INOVA[i]); im.alt = delas ? t("delas_logo_alt") : t("logo_alt"); });
+  const sub = document.querySelector('header [data-t="sub"]'); if (sub) sub.textContent = t(delas ? "sub_delas" : "sub");
+}
 function desenhar() {
   document.body.classList.toggle("aba-delas", aba === "delas");
-  aplicarIdioma(); desenharAbas(); rodape();
+  aplicarIdioma(); desenharAbas(); rodape(); cabecalho();
   $("corpo").innerHTML = TELAS[aba]();
   ligar();
 }

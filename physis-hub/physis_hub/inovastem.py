@@ -41,7 +41,7 @@ AREAS = {
 AREAS_EN = {
     "gis": "GIS (maps)", "bim": "BIM (IFC)", "modelagem3d": "3D modelling", "physis3d": "Physis 3D (recycled-plastic printing)",
     "gemeo": "Digital twin", "simulacoes": "Simulations", "ciberseguranca": "Cybersecurity", "hackathon": "Hackathon",
-    "delas": "InovaSTEM Delas", "mentoria": "Mentoring (I want to mentor)", "desafios": "Open challenges",
+    "delas": "InovaSTEM Hers", "mentoria": "Mentoring (I want to mentor)", "desafios": "Open challenges",
     "projetos": "Open projects", "patrocinio": "Sponsorship", "parcerias": "Partnerships",
 }
 GENEROS = ("", "feminino", "masculino", "nao_informar")

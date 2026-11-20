@@ -196,6 +196,10 @@ class Rotas(unittest.TestCase):
             b = e.read()
             return e.code, (json.loads(b) if b.strip().startswith(b"{") else {})
 
+    def test_sem_planejador(self):
+        # dona, 20/11/2026: Planejador e Modelagem 3D são ferramentas relacionadas, mas separadas
+        self.assertEqual(self.pedir("GET", "/planejador")[0], 404)
+
     def test_paginas(self):
         st, html = self.pedir("GET", "/")
         self.assertEqual(st, 200)
@@ -411,7 +415,7 @@ class Pagina(unittest.TestCase):
         for aba in ("inicio", "delas", "desafios", "forum", "modelagem", "hackathon", "materiais", "participar", "termos", "privacidade"):
             self.assertIn(f'"{aba}"', self.js, aba)
         for rota in ("/api/publico/inovastem/interesse", "/api/publico/inovastem/projeto", "/api/publico/cadastro",
-                     "/api/publico/comunidade", "/api/publico/3d/pecas", "/planejador", "/plataforma/", "X-Physis-CSRF"):
+                     "/api/publico/comunidade", "/api/publico/3d/pecas", "/laboratorio", "/plataforma/", "X-Physis-CSRF"):
             self.assertIn(rota, self.js, rota)
         self.assertIn("Março de 2027", self.js)
         self.assertIn('["Amigo","Só pessoa física","R$ 750"', self.js)
@@ -450,7 +454,7 @@ class Laboratorio(unittest.TestCase):
         self.assertIn('.replace(/<h1(\\s[^>]*)?>/g, "<h2$1>")', self.h)
         self.assertNotRegex(fora, r'(?i)(src|href)\s*=\s*"https?://')
         self.assertIn('id="physis-preferencias"', self.h)
-        self.assertIn('href="/planejador"', self.h)
+        self.assertNotIn("/planejador", fora)   # Planejador fora da InovaSTEM (dona, 20/11/2026); fora = sem os scripts
         self.assertIn("não aprova projeto", self.h)
 
     def test_nenhum_azul_dos_motores_fica_sem_troca(self):
@@ -831,7 +835,10 @@ class EnviarArquivoEImagem3D(unittest.TestCase):
         for passo in ("arquivo", "lugar", "edificacao", "pecas", "simulacao", "fila", "galeria"):
             self.assertIn(f'registrarPasso("{passo}"', self.js, passo)
         self.assertIn("qualquer assunto", self.h)
-        self.assertIn("outra ferramenta, a final (módulo pago)", self.h)
+        # Planejador fora da InovaSTEM (dona, 20/11/2026: relacionadas, mas separadas)
+        fora = re.sub(r'<script id="(?:physis-preferencias|lab-[a-z0-9]+)">.*?</script>', "", self.h, flags=re.S)
+        self.assertNotIn("/planejador", fora)
+        self.assertNotRegex(fora, r"Planejador|Planner")
 
 
 if __name__ == "__main__":

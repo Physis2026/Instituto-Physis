@@ -206,7 +206,7 @@ dl.lab-ficha dd{margin:0}
 </header>
 <main id="conteudo" class="in" tabindex="-1">
   <h2 class="lab-intro">Modelagem 3D (Physis 3D)</h2>
-  <p>A bancada de desenvolvimento da InovaSTEM, aberta a modelagens de qualquer assunto: oito subabas que leem e gravam um projeto comum, num fluxo do arquivo até a galeria. <strong>O Planejador é outra ferramenta, a final (módulo pago)</strong>, ligada a esta pelo projeto comum: só o que for validado aqui passa para ele. <a href="/planejador">Abrir o Planejador</a></p>
+  <p>A bancada de desenvolvimento da InovaSTEM, aberta a modelagens de qualquer assunto: oito subabas que leem e gravam um projeto comum, num fluxo do arquivo até a galeria.</p>
   <section class="lab-projeto" id="lab-proj" aria-label="Projeto comum"></section>
   <div class="lab-abas" id="lab-abas" role="tablist" aria-label="Subabas da Modelagem 3D">
     <a role="tab" id="tab-arquivo" href="#arquivo" aria-controls="lab" aria-selected="true" tabindex="0">1. Enviar arquivo</a>
@@ -2924,14 +2924,12 @@ function telaLugar() {
   const L = proj.lugar;
   return `<h2>Lugar (GIS)</h2>
   <section class="cartao" aria-labelledby="lg-o-h"><h3 id="lg-o-h">O que é</h3>
-    <p>O lugar é o terreno do projeto e o que está em volta: relevo em grade, edificações e superfícies com a orientação e o sol que recebem. Ele é desenhado no Planejador e no Mapeamento; aqui ele entra no projeto comum para as outras subabas lerem (a Simulação usa o terreno no bloco Terreno e água).</p>
-    <p><strong>O Planejador é outra ferramenta, a final (módulo pago)</strong>, ligada à Modelagem 3D pelo projeto comum. Esta é a bancada de desenvolvimento: só o que for validado aqui passa para ele.</p>
-    <div class="acoes"><a class="botao" href="/planejador">Abrir o Planejador</a></div></section>
+    <p>O lugar é o terreno do projeto e o que está em volta: relevo em grade, edificações e superfícies com a orientação e o sol que recebem. Ele vem do Mapeamento da plataforma ou de arquivo; aqui ele entra no projeto comum para as outras subabas lerem (a Simulação usa o terreno no bloco Terreno e água).</p></section>
   <section class="cartao" aria-labelledby="lg-i-h"><h3 id="lg-i-h">Levar o lugar para o projeto</h3>
     <p>O arquivo do lugar segue o contrato <code>physis-geometria-lugar/1</code> (docs/MAPEAMENTO.md): terreno em grade (x para o leste, y para o norte, cotas Z), caixas das edificações, superfícies com orientação e irradiação e os materiais dos elementos BIM. Só dados: nenhuma conta é feita aqui.</p>
     <label for="lg-arq">Arquivo do lugar (.json)</label><input id="lg-arq" type="file" accept=".json,application/json" data-lab-arq="lugar">
     <div class="acoes"><button class="botao sec" type="button" id="lg-nav" data-lab="lugar-navegador">Ler o lugar que o Mapeamento gravou neste navegador</button></div>
-    <p class="t2 pq">O Mapeamento da plataforma grava este contrato no navegador quando você envia o sol nas superfícies para a Solar e o AVAC; se você usou o Mapeamento neste mesmo endereço e navegador, o botão acima lê o lugar. O Planejador ainda não tem botão para baixar o arquivo: [MARCADOR: exportar o lugar (physis-geometria-lugar/1) pelo Planejador].</p>
+    <p class="t2 pq">O Mapeamento da plataforma grava este contrato no navegador quando você envia o sol nas superfícies para a Solar e o AVAC; se você usou o Mapeamento neste mesmo endereço e navegador, o botão acima lê o lugar..</p>
     ${msgHtml("lg-msg", lab.lugar)}</section>
   ${L ? `<section class="cartao" aria-labelledby="lg-r-h"><h3 id="lg-r-h">Lugar no projeto</h3>${tabelaLugar(L)}
     <div class="acoes"><button class="botao sec" type="button" id="lg-tirar" data-lab="lugar-tirar">Tirar o lugar do projeto</button></div></section>` : ""}`;
@@ -2976,9 +2974,7 @@ function telaEdificacao() {
   const Ed = proj.edificacao;
   return `<h2>Edificação (BIM)</h2>
   <section class="cartao" aria-labelledby="ed-o-h"><h3 id="ed-o-h">O que é</h3>
-    <p>A edificação vem de um modelo BIM aberto (IFC). O Planejador guarda o arquivo IFC no projeto dele e escreve o IFC4 do que os módulos dimensionaram. Aqui entra só o resumo do modelo: esquema, projeto, terrenos, edificações, pavimentos e elementos por tipo (leitor básico, sem geometria).</p>
-    <p><strong>O Planejador é outra ferramenta, a final (módulo pago)</strong>, ligada à Modelagem 3D pelo projeto comum. Só o que for validado aqui passa para ele.</p>
-    <div class="acoes"><a class="botao" href="/planejador">Abrir o Planejador</a></div></section>
+    <p>A edificação vem de um modelo BIM aberto (IFC). Aqui entra só o resumo do modelo: esquema, projeto, terrenos, edificações, pavimentos e elementos por tipo (leitor básico, sem geometria).</p></section>
   <section class="cartao" aria-labelledby="ed-1-h"><h3 id="ed-1-h">Caminho 1: ler o IFC no servidor (com conta)</h3>
     <p>O arquivo vai só para o servidor da InovaSTEM, que devolve o resumo (leitor <code>ifc.py</code>) e não guarda o arquivo.</p>
     <label for="ed-ifc">Arquivo IFC (.ifc, texto STEP)</label><input id="ed-ifc" type="file" accept=".ifc">
