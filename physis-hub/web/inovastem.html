@@ -42,6 +42,10 @@ html[data-tema="escuro"]{
   --delas:#7C3AED;--delas-f:#3D2A5C;--delas-t:#C4B5FD;--sobre-delas:#FFFFFF;
   --ok-f:#0B3D2E;--ok-t:#F4F1EA;--al-f:#0B3D2E;--al-t:#D9A58C;--at-f:#0B3D2E;--at-t:#D9A58C;--erro-msg:#D9A58C;
 }
+/* Barra única de preferências: só as cores, pelas variáveis dela (o módulo não muda). Escuro = tipo A; Delas = roxo */
+html[data-tema="escuro"] body .pp-barra{--pp-f:#0F4535;--pp-t:#F4F1EA;--pp-l:#8A9182;--pp-a:#C3D0BD;--pp-at:#0B3D2E}
+html body.aba-delas .pp-barra{--pp-f:#FFFFFF;--pp-t:#2B2143;--pp-l:#7C3AED;--pp-a:#7C3AED;--pp-at:#FFFFFF}
+html[data-tema="escuro"] body.aba-delas .pp-barra{--pp-f:#3D2A5C;--pp-t:#F4F1EA;--pp-l:#C4B5FD;--pp-a:#C4B5FD;--pp-at:#2B2143}
 /* InovaSTEM Delas no claro: tela lilás do guia (#EDE9FE), roxo #7C3AED nos títulos, faixa e rodapé roxo profundo */
 body.aba-delas{
   --fundo:#EDE9FE;--sup:#FFFFFF;--linha:#C4B5FD;--titulo-cor:#7C3AED;--suave:#EDE9FE;--delas-f:#FFFFFF;
