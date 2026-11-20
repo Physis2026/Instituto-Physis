@@ -323,35 +323,49 @@ class Pagina(unittest.TestCase):
         self.assertEqual(fora, set(), "cores fora da PALETA.md")
         claro, escuro = self.tokens(":root"), self.tokens('html[data-tema="escuro"]')
         escuro = dict(claro, **escuro)
+        delas_escuro = dict(escuro, **self.tokens('html[data-tema="escuro"] body.aba-delas'))
         pares = [("texto", "fundo"), ("texto", "sup"), ("tinta2", "fundo"), ("tinta2", "sup"), ("titulo-cor", "fundo"),
                  ("titulo-cor", "sup"), ("link", "fundo"), ("link", "sup"), ("sobre-acao", "acao"), ("sobre-delas", "delas"),
                  ("delas-t", "delas-f"), ("texto", "delas-f"), ("ok-t", "ok-f"), ("al-t", "al-f"), ("at-t", "at-f"),
                  ("sobrancelha", "fundo"), ("sec", "fundo"), ("sec", "sup"), ("sobre-faixa", "faixa"), ("texto", "campo"),
                  ("erro-msg", "sup"), ("erro-msg", "fundo")]
-        for nome, tk in (("claro", claro), ("escuro", escuro)):
+        for nome, tk in (("claro", claro), ("escuro", escuro), ("Delas escuro", delas_escuro)):
             for a, b in pares:
                 self.assertGreaterEqual(round(contraste(tk[a], tk[b]), 2), 4.5, f"{nome}: --{a} sobre --{b}")
             self.assertGreaterEqual(contraste(tk["borda-campo"], tk["sup"]), 3.0, f"{nome}: borda dos campos")
+            self.assertGreaterEqual(contraste(tk["borda-campo"], tk["campo"]), 3.0, f"{nome}: borda do campo sobre o campo")
         self.assertLess(contraste("#FFFFFF", "#F97316"), 4.5, "o laranja nunca é fundo de texto branco")
-        # Guia de Identidade de 19/11/2026: papéis sem alteração
+        # Guia de Identidade de 19/11/2026 e tipos de tela da dona (20/11/2026, PALETA.md): papéis sem alteração
         for tk in (claro, escuro):
             self.assertEqual((tk["acao"].upper(), tk["sobre-acao"].upper(), tk["semente"].upper()), ("#C2410C", "#FFFFFF", "#F97316"))
-            self.assertEqual(tk["faixa"].upper(), "#0B3D2E")
-        self.assertEqual((claro["fundo"].upper(), claro["titulo-cor"].upper(), claro["delas-f"].upper()), ("#FFF7ED", "#0B3D2E", "#EDE9FE"))
-        self.assertEqual((escuro["fundo"].upper(), escuro["texto"].upper(), escuro["delas-t"].upper()), ("#1B1F23", "#F4F1EA", "#C4B5FD"))
+        # tipo B (claro)
+        self.assertEqual((claro["fundo"].upper(), claro["sup"].upper(), claro["faixa"].upper(), claro["titulo-cor"].upper(),
+                          claro["sec"].upper(), claro["sobrancelha"].upper(), claro["delas-f"].upper()),
+                         ("#FFF7ED", "#FFFFFF", "#0B3D2E", "#1A4D2E", "#1A4D2E", "#C2410C", "#EDE9FE"))
+        # tipo A (escuro verde): laranja nunca em texto pequeno
+        self.assertEqual((escuro["fundo"].upper(), escuro["sup"].upper(), escuro["linha"].upper(), escuro["texto"].upper(),
+                          escuro["tinta2"].upper(), escuro["sobrancelha"].upper(), escuro["delas-t"].upper()),
+                         ("#0B3D2E", "#0F4535", "#2F5E4E", "#F4F1EA", "#C3D0BD", "#D9A58C", "#C4B5FD"))
+        # Delas no escuro: roxo profundo
+        self.assertEqual((delas_escuro["fundo"].upper(), delas_escuro["sup"].upper(), delas_escuro["linha"].upper()),
+                         ("#2E1A47", "#3D2A5C", "#5B4A7A"))
 
     def test_so_cores_do_guia_sem_azul_roxo_so_na_delas(self):
         # direção, 19/11/2026: verdes, laranja e terracota; roxo exclusivo da Delas; nada de azul; nada alterado
         guia = {"#0B3D2E", "#1B1F23", "#F4F1EA", "#F97316", "#C2410C", "#FFF7ED", "#7C3AED", "#EDE9FE", "#C4B5FD", "#FFFFFF"}
         neutros = {"#D9D3C2", "#8A9284", "#8A9182", "#4A4F44", "#4A5A47"}
         avisos = {"#7A2214", "#F5E2D7", "#D9A58C"}     # terracota nos avisos (dona, 20/11/2026): o laranja fica para a marca
+        tipos = {"#1A4D2E", "#0F4535", "#2F5E4E", "#C3D0BD", "#8FB183"}    # tipos de tela A e B (dona, 20/11/2026)
+        delas = {"#7C3AED", "#EDE9FE", "#C4B5FD", "#2E1A47", "#3D2A5C", "#5B4A7A"}   # roxo: só a Delas
         usadas = {c.upper() for c in re.findall(r"#[0-9A-Fa-f]{6}", self.css)}
-        self.assertEqual(usadas - guia - neutros - avisos, set(), "cor fora do guia")
+        self.assertEqual(usadas - guia - neutros - avisos - tipos - delas, set(), "cor fora do guia")
+        self.assertTrue(all("aba-delas" in bloco or "delas" in bloco for bloco in re.findall(r"[^}]*(?:#2E1A47|#3D2A5C|#5B4A7A)[^}]*", self.css)),
+                        "roxo profundo só no bloco da Delas")
         estados = re.findall(r"--(?:at|al)-t:(#[0-9A-Fa-f]{6})", self.css) + re.findall(r"--erro-msg:(#[0-9A-Fa-f]{6})", self.css)
         self.assertFalse({c.upper() for c in estados} & {"#F97316", "#C2410C"}, "laranja da marca em aviso")
         for c in usadas:
             r, g, b = (int(c[i:i + 2], 16) for i in (1, 3, 5))
-            if c not in {"#7C3AED", "#EDE9FE", "#C4B5FD"}:
+            if c not in delas:
                 self.assertLess(b - max(r, g), 16, f"tom azul ou roxo fora da Delas: {c}")   # carvão #1B1F23 é neutro (+4)
         roxos = [linha for linha in self.css.splitlines() if "var(--delas" in linha]
         for linha in roxos:
@@ -376,7 +390,8 @@ class Pagina(unittest.TestCase):
             self.assertIn(k, self.js, k)
         # missões recomendadas do doc 37 (D92) no ecossistema; "M&V aberto" fora até a licença
         self.assertIn("Acelerar a transição justa com engenharia de precisão e dados verificáveis", self.js)
-        self.assertIn("Formar mulheres e jovens de comunidades sub-representadas em STEM", self.js)
+        self.assertIn("Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos", self.js)
+        self.assertNotIn("Formar mulheres e jovens", self.h)   # formação só na Delas (dona, 20/11/2026)
         self.assertNotIn("M&V aberto", self.h)
 
     def test_portugues_e_ingles_iguais(self):

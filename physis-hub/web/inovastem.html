@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>InovaSTEM</title>
-<meta name="description" content="InovaSTEM: rede de mulheres e jovens em STEM e plataforma online de laboratório vivo (GIS, BIM, 3D e simulações). Uma iniciativa da Physis Engineering. Versão beta.">
+<meta name="description" content="InovaSTEM: rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos (GIS, BIM, 3D e simulação). InovaSTEM Delas: formação e rede de mulheres em STEM. Versão beta.">
 <!-- Site e plataforma da InovaSTEM como living lab online (D94, 19/11/2026). Servido pela instalação "inovastem" em "/";
      a plataforma (com login) fica em /plataforma/ e o Planejador (GIS e BIM) em /planejador. Não chama a internet: só as rotas
      do próprio servidor (/api/instancia, /api/publico/*, /api/comunidade/*, /api/inovastem/*). docs/INOVASTEM.md. -->
@@ -19,13 +19,15 @@
    InovaSTEM Delas: fundo #EDE9FE, roxo #7C3AED, versão escura lilás claro #C4B5FD + laranja.
    Proporção 60/30/10. Tipografia: Josefin Sans (títulos e nome) e Lora (texto); sem internet: usa a fonte instalada ou
    a reserva da pilha. Arquivos (licença OFL) em web/fontes, servidos em /fontes/. Logos: as imagens do guia, sem alteração,
-   versão clara no tema claro e versão escura no tema escuro. Roxo só na InovaSTEM Delas. Avisos: verde profundo (ok) e terracota (atenção e erro; o laranja fica só para a marca).
+   versão clara no tema claro e versão escura no tema escuro.
+   Tipos de tela (dona, 20/11/2026; PALETA.md, "Tipos de tela"): claro = tipo B; escuro = tipo A (verde profundo); Delas no
+   escuro = roxo profundo. Roxo só na InovaSTEM Delas. Avisos: verde profundo (ok) e terracota (atenção e erro; o laranja fica só para a marca).
    Tipografia (dona, 20/11): Josefin Sans só no logo e em títulos grandes (h2, 24 px ou mais, peso 400); o resto em Lora, caixa normal. Linhas e bordas: neutros
    esverdeados e areia da PALETA.md. Sem azul. */
 :root{
   color-scheme:light;
-  --fundo:#FFF7ED;--sup:#FFFFFF;--campo:#FFFFFF;--texto:#1B1F23;--tinta2:#4A4F44;--titulo-cor:#0B3D2E;--link:#0B3D2E;
-  --acao:#C2410C;--sobre-acao:#FFFFFF;--sec:#0B3D2E;--sobrancelha:#C2410C;--semente:#F97316;--numero:#0B3D2E;
+  --fundo:#FFF7ED;--sup:#FFFFFF;--campo:#FFFFFF;--texto:#1B1F23;--tinta2:#4A4F44;--titulo-cor:#1A4D2E;--link:#1A4D2E;
+  --acao:#C2410C;--sobre-acao:#FFFFFF;--sec:#1A4D2E;--sobrancelha:#C2410C;--semente:#F97316;--numero:#F97316;
   --faixa:#0B3D2E;--sobre-faixa:#F4F1EA;--linha:#D9D3C2;--borda-campo:#8A9284;--suave:#F4F1EA;
   --delas:#7C3AED;--delas-f:#EDE9FE;--delas-t:#7C3AED;--sobre-delas:#FFFFFF;
   --ok-f:#F4F1EA;--ok-t:#0B3D2E;--al-f:#F5E2D7;--al-t:#7A2214;--at-f:#F5E2D7;--at-t:#7A2214;--erro-msg:#7A2214;
@@ -34,11 +36,16 @@
 }
 html[data-tema="escuro"]{
   color-scheme:dark;
-  --fundo:#1B1F23;--sup:#0B3D2E;--campo:#1B1F23;--texto:#F4F1EA;--tinta2:#D9D3C2;--titulo-cor:#F4F1EA;--link:#F4F1EA;
-  --acao:#C2410C;--sobre-acao:#FFFFFF;--sec:#F4F1EA;--sobrancelha:#F97316;--semente:#F97316;--numero:#F97316;
-  --faixa:#0B3D2E;--sobre-faixa:#F4F1EA;--linha:#4A5A47;--borda-campo:#8A9182;--suave:#1B1F23;
-  --delas:#7C3AED;--delas-f:#1B1F23;--delas-t:#C4B5FD;--sobre-delas:#FFFFFF;
-  --ok-f:#0B3D2E;--ok-t:#F4F1EA;--al-f:#1B1F23;--al-t:#D9A58C;--at-f:#1B1F23;--at-t:#D9A58C;--erro-msg:#D9A58C;
+  --fundo:#0B3D2E;--sup:#0F4535;--campo:#0B3D2E;--texto:#F4F1EA;--tinta2:#C3D0BD;--titulo-cor:#F4F1EA;--link:#F4F1EA;
+  --acao:#C2410C;--sobre-acao:#FFFFFF;--sec:#F4F1EA;--sobrancelha:#D9A58C;--semente:#F97316;--numero:#F97316;
+  --faixa:#2F5E4E;--sobre-faixa:#F4F1EA;--linha:#2F5E4E;--borda-campo:#8A9182;--suave:#0B3D2E;
+  --delas:#7C3AED;--delas-f:#3D2A5C;--delas-t:#C4B5FD;--sobre-delas:#FFFFFF;
+  --ok-f:#0B3D2E;--ok-t:#F4F1EA;--al-f:#0B3D2E;--al-t:#D9A58C;--at-f:#0B3D2E;--at-t:#D9A58C;--erro-msg:#D9A58C;
+}
+/* InovaSTEM Delas no escuro: roxo profundo (tipo Delas), lilás, verde #8FB183 e laranja */
+html[data-tema="escuro"] body.aba-delas{
+  --fundo:#2E1A47;--sup:#3D2A5C;--campo:#2E1A47;--linha:#5B4A7A;--tinta2:#C4B5FD;--suave:#2E1A47;
+  --delas-f:#3D2A5C;--faixa:#3D2A5C;--ok-f:#2E1A47;--al-f:#2E1A47;--at-f:#2E1A47;
 }
 html[data-tema="escuro"] .so-claro,html:not([data-tema="escuro"]) .so-escuro{display:none}
 *{box-sizing:border-box}
@@ -57,6 +64,7 @@ header{border-bottom:1px solid var(--linha);padding:10px 0;background:var(--fund
 h1.logo{margin:0;line-height:0}
 h1.logo a{display:inline-block;border-radius:8px}
 h1.logo img{height:64px;width:auto}
+html[data-tema="escuro"] h1.logo img,html[data-tema="escuro"] .logo-delas img{border-radius:10px}
 .cabeca nav{flex:1 1 100%;order:3}
 #cta{margin-left:auto}
 #menu-bt{display:none}
@@ -143,7 +151,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px}
       <a class="botao" id="cta" href="#participar" data-t="inscreva">Inscreva-se</a>
       <nav class="abas" id="abas" aria-label="Seções do site"></nav>
     </div>
-    <p class="sub"><span data-t="sub">Rede de mulheres e jovens em STEM e laboratório vivo online</span> <span class="beta" data-t="beta">versão beta</span></p>
+    <p class="sub"><span data-t="sub">Rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos</span> <span class="beta" data-t="beta">versão beta</span></p>
   </div>
 </header>
 <main id="conteudo" class="in" tabindex="-1">
@@ -160,7 +168,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px}
 const T = {
   pt: {
     pular:"Pular para o conteúdo", titulo:"InovaSTEM", beta:"versão beta",
-    sub:"Rede de mulheres e jovens em STEM e laboratório vivo online",
+    sub:"Rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos",
     endosso_a:"uma iniciativa", endosso_b:"", inscreva:"Inscreva-se", menu:"Menu", logo_alt:"InovaSTEM, página inicial", delas_logo_alt:"InovaSTEM Delas",
     hero_sobrancelha:"Versão beta · lançamento em 26/11/2026", passo:"Passo {n} de 2", continuar:"Continuar", voltar_passo:"Voltar",
     passo1_falta:"Preencha o nome ou apelido e um e-mail válido para continuar.",
@@ -170,8 +178,8 @@ const T = {
           hackathon:"Hackathon", materiais:"Materiais", participar:"Participar", termos:"Termos de uso (beta)", privacidade:"Privacidade (beta)"},
     marcador:"[MARCADOR]", conferir:"[CONFERIR]", funciona:"Funciona", em_dev:"Em desenvolvimento", beta_selo:"Beta",
     // início
-    ini_missao_t:"Missão", ini_missao:"Formar mulheres e jovens de comunidades sub-representadas em STEM, com projetos aplicados à sustentabilidade, mentoria e acolhimento.",
-    ini_visao_t:"Visão 2031", ini_visao:"Em 2031, ser uma rede de referência na América Latina em formação STEM aplicada e liderança feminina na transição justa.",
+    ini_missao_t:"Missão", ini_missao:"Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos.",
+    ini_visao_t:"Visão 2031", ini_visao:"Ser referência na América Latina em troca aberta de conhecimento e desafios de modelagem para a transição justa.",
     ini_lab_t:"Um laboratório vivo online",
     ini_lab:"A InovaSTEM é um laboratório vivo de pesquisa, desenvolvimento e inovação: um espaço aberto de conexão e trocas para o desenvolvimento tecnológico, com ferramentas abertas de modelagem, desafios reais de sustentabilidade, fórum, eventos e cursos.",
     ini_blocos:[["Modelagem online","GIS e mapas, BIM (IFC) e modelos 3D no navegador. Gêmeo digital e simulações em desenvolvimento."],
@@ -179,16 +187,15 @@ const T = {
                 ["Fórum com moderação","Perguntas, trocas e mentoria. Tudo o que é publicado passa pela equipe antes de aparecer."],
                 ["Hackathon de cibersegurança","Março de 2027, online, com desafios só em ambiente próprio e isolado (CTF)."]],
     ini_duas_t:"Duas redes, um só lugar",
-    ini_duas:[["InovaSTEM","Aberta a todas as pessoas que querem aprender e criar em ciência, tecnologia, engenharia e matemática."],
-              ["InovaSTEM Delas","Rede dedicada a mulheres (jovens, cis e trans) que lideram em STEM: acolhimento entre pares, rodas de conversa e mentoria."]],
+    ini_duas:[["InovaSTEM", "Aberta a todas as pessoas e organizações: troca de informações, parcerias e desafios de modelagem com códigos abertos."], ["InovaSTEM Delas", "Rede dedicada a mulheres (jovens, cis e trans) que lideram em STEM: formação, acolhimento entre pares, rodas de conversa e mentoria."]],
     ini_chamar:"Quero participar", ini_whats:"Entrar no grupo de WhatsApp", ini_whats_nota:"O grupo de WhatsApp é opcional. O fórum da plataforma continua sendo o canal principal.",
     ini_whats_falta:"Link do grupo de WhatsApp: em breve.",
     ini_physis_t:"Quem realiza", ini_physis:"A InovaSTEM é uma iniciativa da Physis Engineering, empresa de engenharia de sustentabilidade de Petrópolis (RJ), com liderança feminina. Esta é a versão beta da plataforma: tudo pode mudar com as sugestões de quem participa.",
-    compartilhar:"Compartilhar a InovaSTEM", compartilhado:"Link copiado. Obrigada por compartilhar!", compartilhar_txt:"Conheça a InovaSTEM: rede de mulheres e jovens em STEM e laboratório vivo online.",
+    compartilhar:"Compartilhar a InovaSTEM", compartilhado:"Link copiado. Obrigada por compartilhar!", compartilhar_txt:"Conheça a InovaSTEM: rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos.",
     // Delas
-    del_t:"InovaSTEM Delas", del_missao:"Acolher e fortalecer mulheres em STEM com redes de apoio entre pares e mentoria.",
+    del_t:"InovaSTEM Delas", del_missao:"Formar, acolher e fortalecer mulheres em STEM, com redes de apoio entre pares, mentoria e projetos aplicados à sustentabilidade.",
     del_visao:"Visão 2031: ser a rede de referência em permanência e liderança de mulheres em STEM na América Latina.",
-    del_o_que_t:"O que acontece aqui", del_o_que:["Acolhimento entre pares: mulheres que estudam e trabalham em STEM conversando entre si.","Rodas de conversa e mentoria.","Oportunidades, desafios e eventos para mulheres em STEM.","Um fórum só para quem faz parte da rede."],
+    del_o_que_t:"O que acontece aqui", del_o_que:["Formação: trilhas aplicadas e projetos à sustentabilidade, com a turma piloto prevista para o 2º semestre de 2027 [CONFERIR].", "Acolhimento entre pares: mulheres que estudam e trabalham em STEM conversando entre si.", "Rodas de conversa e mentoria.", "Oportunidades, desafios e eventos para mulheres em STEM.", "Um fórum só para quem faz parte da rede."],
     del_nao:"A InovaSTEM Delas é uma rede de apoio entre pares. Não oferece atendimento psicológico nem clínico. Em situação de emergência, procure o serviço de saúde mais próximo ou ligue 188 (CVV) [CONFERIR].",
     del_dif_t:"InovaSTEM e InovaSTEM Delas", del_dif:"A InovaSTEM é aberta a todas as pessoas. A InovaSTEM Delas é a rede dedicada a mulheres (jovens, cis e trans), também administrada pela equipe da InovaSTEM, para que nenhuma mulher caminhe sozinha em STEM.",
     del_entrar_t:"Como entrar", del_entrar:["No cadastro de interesse, escolha \"Feminino\" e marque que quer participar da Delas.","Para o fórum da Delas, crie a sua conta e marque a autodeclaração. Não pedimos documento: só você e a direção sabem que você se declarou."],
@@ -231,7 +238,7 @@ const T = {
     hac_interesse:"Quero ser avisada ou avisado", hac_forum:"Fórum do hackathon",
     // materiais
     mat_t:"Materiais", mat_intro:"Apresentação da rede e da plataforma, patrocínio e ecossistema. Os documentos para download aparecem aqui depois da aprovação da direção.",
-    mat_rede_t:"Apresentação da rede e da plataforma", mat_rede:["Rede de formação e acolhimento em STEM, com prioridade para mulheres e jovens de comunidades sub-representadas.","Plataforma online como laboratório vivo: modelagem (GIS, BIM, 3D), desafios e projetos abertos, fórum com moderação e eventos.","Turma piloto prevista para o 2º semestre de 2027, no Rio de Janeiro, com instituições parceiras de educação técnica [CONFERIR].","Metas da turma piloto: 20 a 25 participantes e 80% de conclusão [CONFERIR]."],
+    mat_rede_t:"Apresentação da rede e da plataforma", mat_rede:["Rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos.", "Plataforma online como laboratório vivo: modelagem (GIS, BIM, 3D e simulação), desafios e projetos abertos, fórum com moderação e eventos.", "Formação e rede de mulheres: na InovaSTEM Delas."],
     mat_pat_t:"Patrocínio", mat_pat_intro:"Tabela única. A cota Amigo é só para pessoa física; empresas a partir de R$ 1.000.",
     mat_pat_cols:["Cota","Para quem","Faixa anual","Contrapartidas"],
     mat_pat_linhas:[["Amigo","Só pessoa física","R$ 750","[MARCADOR: contrapartidas da cota Amigo]"],
@@ -241,7 +248,7 @@ const T = {
                     ["Patrocinador master","Empresas e organizações","R$ 30.000 a R$ 50.000","Convite para o comitê, co-branding, prioridade em desafios e projetos, destaque na mostra anual"]],
     mat_pat_regras:["Patrocínio não compra decisões nem dá acesso a dados pessoais.","Toda cota de empresa vem com um compromisso de entrevistas ou vagas de estágio para as egressas [CONFERIR].","Quem recebe e presta contas dos recursos: [MARCADOR: entidade, até a definição da organização parceira]."],
     mat_pat_fonte:"Valores do Caderno de Patrocínio v2, em revisão [CONFERIR].",
-    mat_eco_t:"Ecossistema Physis", mat_eco:[["Physis Engineering","Acelerar a transição justa com engenharia de precisão e dados verificáveis, para que cada ganho de energia, água e carbono possa ser medido, comprovado e compartilhado."],["Casa Physis","Oferecer hospedagem, alimentação e produtos de baixo impacto que mostram na prática, e com dados, como viver bem na Mata Atlântica e fortalecer a economia local."],["InovaSTEM","Formar mulheres e jovens de comunidades sub-representadas em STEM, com projetos aplicados à sustentabilidade, mentoria e acolhimento."]],
+    mat_eco_t:"Ecossistema Physis", mat_eco:[["Physis Engineering", "Acelerar a transição justa com engenharia de precisão e dados verificáveis, para que cada ganho de energia, água e carbono possa ser medido, comprovado e compartilhado."], ["Casa Physis", "Oferecer hospedagem, alimentação e produtos de baixo impacto que mostram na prática, e com dados, como viver bem na Mata Atlântica e fortalecer a economia local."], ["InovaSTEM", "Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos."]],
     mat_docs_t:"Documentos para download", mat_docs_vazio:"Os documentos estão em revisão e aparecem aqui assim que forem aprovados.", mat_baixar:"Baixar",
     // participar
     par_t:"Participar", par_intro:"Dois jeitos de participar: o cadastro de interesse (rápido, sem senha) e a conta da plataforma (para escrever no fórum e usar a modelagem 3D).",
@@ -277,7 +284,7 @@ const T = {
     // termos e privacidade (BETA)
     jur_aviso:"Versão beta · em revisão jurídica. Este texto ainda pode mudar e não substitui a versão final, que será publicada depois da revisão.",
     ter_t:"Termos de uso (beta)",
-    ter_blocos:[["O que é","A InovaSTEM é uma rede e uma plataforma online de formação em STEM, realizada pela Physis Engineering [MARCADOR: razão social e CNPJ]. Esta é uma versão beta: funções podem mudar, falhar ou sair do ar."],
+    ter_blocos:[["O que é","A InovaSTEM é uma rede aberta e uma plataforma online de troca de informações, parcerias e desafios de modelagem, realizada pela Physis Engineering [MARCADOR: razão social e CNPJ]. Esta é uma versão beta: funções podem mudar, falhar ou sair do ar."],
                 ["Quem pode usar","Qualquer pessoa pode ler o site. Para escrever no fórum ou publicar, é preciso criar uma conta. Menores de 18 anos publicam depois que a equipe registra a autorização do responsável legal."],
                 ["Moderação","Tudo o que é publicado passa pela equipe de moderação antes de aparecer. A equipe pode recusar ou retirar conteúdo que desrespeite as regras de convivência, sempre com motivo."],
                 ["Conteúdo e licenças","Você continua dona ou dono do que publica. Peças do Physis 3D são publicadas com a licença aberta que você escolher. Não publique o que não é seu sem permissão."],
@@ -297,7 +304,7 @@ const T = {
   },
   en: {
     pular:"Skip to content", titulo:"InovaSTEM", beta:"beta version",
-    sub:"A network of women and young people in STEM and an online living lab",
+    sub:"An open network for exchanging information, partnerships and modelling challenges with open code",
     endosso_a:"a", endosso_b:"initiative", inscreva:"Sign up", menu:"Menu", logo_alt:"InovaSTEM, home page", delas_logo_alt:"InovaSTEM Delas",
     hero_sobrancelha:"Beta version · launch on 26 November 2026", passo:"Step {n} of 2", continuar:"Continue", voltar_passo:"Back",
     passo1_falta:"Fill in your name or nickname and a valid e-mail to continue.",
@@ -306,8 +313,8 @@ const T = {
     abas:{inicio:"Home", delas:"InovaSTEM Delas", desafios:"Challenges and projects", forum:"Forum", modelagem:"Online modelling",
           hackathon:"Hackathon", materiais:"Materials", participar:"Join", termos:"Terms of use (beta)", privacidade:"Privacy (beta)"},
     marcador:"[MARCADOR]", conferir:"[CONFERIR]", funciona:"Working", em_dev:"In development", beta_selo:"Beta",
-    ini_missao_t:"Mission", ini_missao:"To train women and young people from under-represented communities in STEM, with projects applied to sustainability, mentoring and support.",
-    ini_visao_t:"Vision 2031", ini_visao:"By 2031, to be a reference network in Latin America for applied STEM training and women's leadership in the just transition.",
+    ini_missao_t:"Mission", ini_missao:"To connect people, organisations and projects to exchange information, build partnerships and solve modelling challenges with open code.",
+    ini_visao_t:"Vision 2031", ini_visao:"To be a Latin American reference in open knowledge exchange and modelling challenges for the just transition.",
     ini_lab_t:"An online living lab",
     ini_lab:"InovaSTEM is a research, development and innovation living lab: an open space for connection and exchange towards technological development, with open modelling tools, real sustainability challenges, a forum, events and courses.",
     ini_blocos:[["Online modelling","GIS and maps, BIM (IFC) and 3D models in the browser. Digital twin and simulations in development."],
@@ -315,15 +322,14 @@ const T = {
                 ["Moderated forum","Questions, exchanges and mentoring. Everything posted is reviewed by the team before it appears."],
                 ["Cybersecurity hackathon","March 2027, online, with challenges only in our own isolated environment (CTF)."]],
     ini_duas_t:"Two networks, one place",
-    ini_duas:[["InovaSTEM","Open to everyone who wants to learn and create in science, technology, engineering and mathematics."],
-              ["InovaSTEM Delas","A network dedicated to women (young, cis and trans) who lead in STEM: peer support, conversation circles and mentoring."]],
+    ini_duas:[["InovaSTEM", "Open to all people and organisations: information exchange, partnerships and modelling challenges with open code."], ["InovaSTEM Delas", "A network dedicated to women (young, cis and trans) who lead in STEM: training, peer support, conversation circles and mentoring."]],
     ini_chamar:"I want to join", ini_whats:"Join the WhatsApp group", ini_whats_nota:"The WhatsApp group is optional. The platform forum remains the main channel.",
     ini_whats_falta:"WhatsApp group link: coming soon.",
     ini_physis_t:"Who runs it", ini_physis:"InovaSTEM is an initiative of Physis Engineering, a sustainability engineering company in Petrópolis (RJ), Brazil, led by women. This is the beta version of the platform: everything may change with participants' suggestions.",
-    compartilhar:"Share InovaSTEM", compartilhado:"Link copied. Thank you for sharing!", compartilhar_txt:"Meet InovaSTEM: a network of women and young people in STEM and an online living lab.",
-    del_t:"InovaSTEM Delas", del_missao:"To support and strengthen women in STEM through peer support networks and mentoring.",
+    compartilhar:"Share InovaSTEM", compartilhado:"Link copied. Thank you for sharing!", compartilhar_txt:"Meet InovaSTEM: an open network for exchanging information, partnerships and modelling challenges with open code.",
+    del_t:"InovaSTEM Delas", del_missao:"To train, support and strengthen women in STEM, with peer support networks, mentoring and projects applied to sustainability.",
     del_visao:"Vision 2031: to be the reference network for the retention and leadership of women in STEM in Latin America.",
-    del_o_que_t:"What happens here", del_o_que:["Peer support: women who study and work in STEM talking to each other.","Conversation circles and mentoring.","Opportunities, challenges and events for women in STEM.","A forum only for network members."],
+    del_o_que_t:"What happens here", del_o_que:["Training: applied tracks and sustainability projects, with the pilot cohort planned for the second half of 2027 [CONFERIR].", "Peer support: women who study and work in STEM talking to each other.", "Conversation circles and mentoring.", "Opportunities, challenges and events for women in STEM.", "A forum only for network members."],
     del_nao:"InovaSTEM Delas is a peer support network. It does not provide psychological or clinical care. In an emergency, go to the nearest health service or call 188 (CVV, Brazil) [CONFERIR].",
     del_dif_t:"InovaSTEM and InovaSTEM Delas", del_dif:"InovaSTEM is open to everyone. InovaSTEM Delas is the network dedicated to women (young, cis and trans), also run by the InovaSTEM team, so that no woman walks alone in STEM.",
     del_entrar_t:"How to join", del_entrar:["In the interest form, choose \"Female\" and tick that you want to join Delas.","For the Delas forum, create your account and tick the self-declaration. No document is required: only you and the board know that you declared."],
@@ -361,7 +367,7 @@ const T = {
     hac_falta_t:"Still to be defined", hac_falta:["Exact day [MARCADOR]","Audience, age range and team size [MARCADOR]","Prizes [MARCADOR]","Partners and technical mentoring [MARCADOR]"],
     hac_interesse:"Let me know", hac_forum:"Hackathon forum",
     mat_t:"Materials", mat_intro:"Presentation of the network and the platform, sponsorship and ecosystem. Downloadable documents appear here after the board approves them.",
-    mat_rede_t:"Presentation of the network and the platform", mat_rede:["A STEM training and support network, with priority for women and young people from under-represented communities.","An online platform as a living lab: modelling (GIS, BIM, 3D), open challenges and projects, a moderated forum and events.","Pilot cohort planned for the second half of 2027, in Rio de Janeiro, with partner technical education institutions [CONFERIR].","Pilot cohort targets: 20 to 25 participants and 80% completion [CONFERIR]."],
+    mat_rede_t:"Presentation of the network and the platform", mat_rede:["An open network for exchanging information, partnerships and modelling challenges with open code.", "An online platform as a living lab: modelling (GIS, BIM, 3D and simulation), open challenges and projects, a moderated forum and events.", "Training and the women's network: in InovaSTEM Delas."],
     mat_pat_t:"Sponsorship", mat_pat_intro:"A single table. The Friend tier is for individuals only; companies start at R$ 1,000.",
     mat_pat_cols:["Tier","For whom","Annual range","Benefits"],
     mat_pat_linhas:[["Friend","Individuals only","R$ 750","[MARCADOR: Friend tier benefits]"],
@@ -371,7 +377,7 @@ const T = {
                     ["Master sponsor","Companies and organisations","R$ 30,000 to R$ 50,000","Invitation to the committee, co-branding, priority in challenges and projects, highlight at the annual showcase"]],
     mat_pat_regras:["Sponsorship does not buy decisions or access to personal data.","Every company tier comes with a commitment to interviews or internships for graduates [CONFERIR].","Who receives and accounts for the funds: [MARCADOR: entity, until the partner organisation is defined]."],
     mat_pat_fonte:"Figures from the Sponsorship Booklet v2, under review [CONFERIR].",
-    mat_eco_t:"Physis ecosystem", mat_eco:[["Physis Engineering","To accelerate the just transition with precision engineering and verifiable data, so that every energy, water and carbon gain can be measured, proven and shared."],["Casa Physis","To offer low-impact lodging, food and products that show in practice, and with data, how to live well in the Atlantic Forest and strengthen the local economy."],["InovaSTEM","To train women and young people from under-represented communities in STEM, with projects applied to sustainability, mentoring and support."]],
+    mat_eco_t:"Physis ecosystem", mat_eco:[["Physis Engineering", "To accelerate the just transition with precision engineering and verifiable data, so that every energy, water and carbon gain can be measured, proven and shared."], ["Casa Physis", "To offer low-impact lodging, food and products that show in practice, and with data, how to live well in the Atlantic Forest and strengthen the local economy."], ["InovaSTEM", "To connect people, organisations and projects to exchange information, build partnerships and solve modelling challenges with open code."]],
     mat_docs_t:"Documents to download", mat_docs_vazio:"The documents are under review and will appear here once approved.", mat_baixar:"Download",
     par_t:"Join", par_intro:"Two ways to take part: the interest form (quick, no password) and a platform account (to post in the forum and use 3D modelling).",
     int_t:"Interest form", int_intro:"We only ask for what is needed. You will receive InovaSTEM news at the e-mail you give.",
@@ -404,7 +410,7 @@ const T = {
     eq_rem_t:"Deletion request (LGPD)", eq_rem_email:"E-mail of the person asking for deletion", eq_rem_enviar:"Delete the form", eq_rem_ok:"Deleted: {i} form(s) and data from {p} suggestion(s).",
     jur_aviso:"Beta version · under legal review. This text may still change and does not replace the final version, to be published after the review.",
     ter_t:"Terms of use (beta)",
-    ter_blocos:[["What it is","InovaSTEM is a STEM training network and online platform run by Physis Engineering [MARCADOR: company name and CNPJ]. This is a beta version: features may change, fail or go offline."],
+    ter_blocos:[["What it is","InovaSTEM is an open network and online platform for information exchange, partnerships and modelling challenges, run by Physis Engineering [MARCADOR: company name and CNPJ]. This is a beta version: features may change, fail or go offline."],
                 ["Who can use it","Anyone can read the site. To post in the forum or publish, you need an account. People under 18 can publish once the team records the legal guardian's authorisation."],
                 ["Moderation","Everything posted is reviewed by the moderation team before it appears. The team may reject or remove content that breaks the community rules, always giving a reason."],
                 ["Content and licences","You keep ownership of what you publish. Physis 3D parts are published under the open licence you choose. Do not publish what is not yours without permission."],
@@ -696,6 +702,7 @@ const TELAS = { inicio: telaInicio, delas: telaDelas, desafios: telaDesafios, fo
                 termos: () => telaJuridico("termos"), privacidade: () => telaJuridico("privacidade") };
 
 function desenhar() {
+  document.body.classList.toggle("aba-delas", aba === "delas");
   aplicarIdioma(); desenharAbas(); rodape();
   $("corpo").innerHTML = TELAS[aba]();
   ligar();

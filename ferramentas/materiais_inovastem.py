@@ -81,16 +81,16 @@ def salvar(nome: str, xml: str):
 
 # ── 1. Apresentação da rede e da plataforma (slides) ──
 s = odf.Slides("InovaSTEM · Apresentação da rede e da plataforma", "Apresentação da rede e da plataforma")
-s.capa("InovaSTEM", "Rede de mulheres e jovens em STEM e laboratório vivo online. Versão beta, lançamento em 26/11/2026.",
+s.capa("InovaSTEM", "Rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos. Versão beta, lançamento em 26/11/2026.",
        "uma iniciativa PHYSIS")
 s.duas("Missão e visão",
-       ["Formar mulheres e jovens de comunidades sub-representadas em STEM, com projetos aplicados à sustentabilidade, mentoria e acolhimento."],
-       ["Em 2031, ser uma rede de referência na América Latina em formação STEM aplicada e liderança feminina na transição justa."],
+       ["Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos."],
+       ["Ser referência na América Latina em troca aberta de conhecimento e desafios de modelagem para a transição justa."],
        "Quem somos", "Missão", "Visão 2031")
 s.duas("Duas redes, um só lugar",
-       ["Aberta a todas as pessoas que querem aprender e criar em ciência, tecnologia, engenharia e matemática, com prioridade para mulheres e jovens de comunidades sub-representadas.",
+       ["Aberta a todas as pessoas e organizações: troca de informações, parcerias e desafios de modelagem com códigos abertos.",
         "Laboratório vivo de pesquisa, desenvolvimento e inovação: conexão e trocas abertas para o desenvolvimento tecnológico."],
-       ["Rede dedicada a mulheres (jovens, cis e trans) que lideram em STEM: acolhimento entre pares, rodas de conversa e mentoria.",
+       ["Rede dedicada a mulheres (jovens, cis e trans) que lideram em STEM: formação, acolhimento entre pares, rodas de conversa e mentoria.",
         "Rede de apoio entre pares; não oferece atendimento psicológico nem clínico."],
        "As redes", "InovaSTEM", "InovaSTEM Delas")
 s.topicos("O laboratório vivo online",
@@ -119,8 +119,8 @@ salvar("01_InovaSTEM_Apresentacao_rede_e_plataforma.fodp", s.xml())
 
 # ── 2. Patrocínio: tabela única ──
 t = odf.Texto("Patrocínio da InovaSTEM", "Tabela única de cotas", "Patrocínio")
-t.p("A InovaSTEM forma mulheres e jovens de comunidades sub-representadas em STEM, com projetos aplicados à sustentabilidade, "
-    "mentoria e acolhimento. A cota Amigo é só para pessoa física; empresas a partir de R$ 1.000.")
+t.p("A InovaSTEM é uma rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos; a InovaSTEM "
+    "Delas forma e acolhe mulheres em STEM. A cota Amigo é só para pessoa física; empresas a partir de R$ 1.000.")
 t.h1("Cotas")
 t.tabela(["Cota", "Para quem", "Faixa anual", "Contrapartidas"],
          [["Amigo", "Só pessoa física", "R$ 750", "[MARCADOR: contrapartidas da cota Amigo]"],
@@ -145,8 +145,8 @@ t.p("A InovaSTEM é uma iniciativa da Physis Engineering, empresa de engenharia 
 t.tabela(["Frente", "Missão"],
          [["Physis Engineering", "Acelerar a transição justa com engenharia de precisão e dados verificáveis, para que cada ganho de energia, água e carbono possa ser medido, comprovado e compartilhado."],
           ["Casa Physis", "Oferecer hospedagem, alimentação e produtos de baixo impacto que mostram na prática, e com dados, como viver bem na Mata Atlântica e fortalecer a economia local."],
-          ["InovaSTEM", "Formar mulheres e jovens de comunidades sub-representadas em STEM, com projetos aplicados à sustentabilidade, mentoria e acolhimento."],
-          ["InovaSTEM Delas", "Acolher e fortalecer mulheres em STEM com redes de apoio entre pares e mentoria."]],
+          ["InovaSTEM", "Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos."],
+          ["InovaSTEM Delas", "Formar, acolher e fortalecer mulheres em STEM, com redes de apoio entre pares, mentoria e projetos aplicados à sustentabilidade."]],
          [4.2, 12.8])
 t.h1("Dois living labs")
 t.lista(["**Casa Physis:** instalação física em Petrópolis (RJ), sistema conectado, projeto vitrine.",

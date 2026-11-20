@@ -17,13 +17,15 @@
    InovaSTEM Delas: fundo #EDE9FE, roxo #7C3AED, versão escura lilás claro #C4B5FD + laranja.
    Proporção 60/30/10. Tipografia: Josefin Sans (títulos e nome) e Lora (texto); sem internet: usa a fonte instalada ou
    a reserva da pilha. Arquivos (licença OFL) em web/fontes, servidos em /fontes/. Logos: as imagens do guia, sem alteração,
-   versão clara no tema claro e versão escura no tema escuro. Roxo só na InovaSTEM Delas. Avisos: verde profundo (ok) e terracota (atenção e erro; o laranja fica só para a marca).
+   versão clara no tema claro e versão escura no tema escuro.
+   Tipos de tela (dona, 20/11/2026; PALETA.md, "Tipos de tela"): claro = tipo B; escuro = tipo A (verde profundo); Delas no
+   escuro = roxo profundo. Roxo só na InovaSTEM Delas. Avisos: verde profundo (ok) e terracota (atenção e erro; o laranja fica só para a marca).
    Tipografia (dona, 20/11): Josefin Sans só no logo e em títulos grandes (h2, 24 px ou mais, peso 400); o resto em Lora, caixa normal. Linhas e bordas: neutros
    esverdeados e areia da PALETA.md. Sem azul. */
 :root{
   color-scheme:light;
-  --fundo:#FFF7ED;--sup:#FFFFFF;--campo:#FFFFFF;--texto:#1B1F23;--tinta2:#4A4F44;--titulo-cor:#0B3D2E;--link:#0B3D2E;
-  --acao:#C2410C;--sobre-acao:#FFFFFF;--sec:#0B3D2E;--sobrancelha:#C2410C;--semente:#F97316;--numero:#0B3D2E;
+  --fundo:#FFF7ED;--sup:#FFFFFF;--campo:#FFFFFF;--texto:#1B1F23;--tinta2:#4A4F44;--titulo-cor:#1A4D2E;--link:#1A4D2E;
+  --acao:#C2410C;--sobre-acao:#FFFFFF;--sec:#1A4D2E;--sobrancelha:#C2410C;--semente:#F97316;--numero:#F97316;
   --faixa:#0B3D2E;--sobre-faixa:#F4F1EA;--linha:#D9D3C2;--borda-campo:#8A9284;--suave:#F4F1EA;
   --delas:#7C3AED;--delas-f:#EDE9FE;--delas-t:#7C3AED;--sobre-delas:#FFFFFF;
   --ok-f:#F4F1EA;--ok-t:#0B3D2E;--al-f:#F5E2D7;--al-t:#7A2214;--at-f:#F5E2D7;--at-t:#7A2214;--erro-msg:#7A2214;
@@ -32,11 +34,16 @@
 }
 html[data-tema="escuro"]{
   color-scheme:dark;
-  --fundo:#1B1F23;--sup:#0B3D2E;--campo:#1B1F23;--texto:#F4F1EA;--tinta2:#D9D3C2;--titulo-cor:#F4F1EA;--link:#F4F1EA;
-  --acao:#C2410C;--sobre-acao:#FFFFFF;--sec:#F4F1EA;--sobrancelha:#F97316;--semente:#F97316;--numero:#F97316;
-  --faixa:#0B3D2E;--sobre-faixa:#F4F1EA;--linha:#4A5A47;--borda-campo:#8A9182;--suave:#1B1F23;
-  --delas:#7C3AED;--delas-f:#1B1F23;--delas-t:#C4B5FD;--sobre-delas:#FFFFFF;
-  --ok-f:#0B3D2E;--ok-t:#F4F1EA;--al-f:#1B1F23;--al-t:#D9A58C;--at-f:#1B1F23;--at-t:#D9A58C;--erro-msg:#D9A58C;
+  --fundo:#0B3D2E;--sup:#0F4535;--campo:#0B3D2E;--texto:#F4F1EA;--tinta2:#C3D0BD;--titulo-cor:#F4F1EA;--link:#F4F1EA;
+  --acao:#C2410C;--sobre-acao:#FFFFFF;--sec:#F4F1EA;--sobrancelha:#D9A58C;--semente:#F97316;--numero:#F97316;
+  --faixa:#2F5E4E;--sobre-faixa:#F4F1EA;--linha:#2F5E4E;--borda-campo:#8A9182;--suave:#0B3D2E;
+  --delas:#7C3AED;--delas-f:#3D2A5C;--delas-t:#C4B5FD;--sobre-delas:#FFFFFF;
+  --ok-f:#0B3D2E;--ok-t:#F4F1EA;--al-f:#0B3D2E;--al-t:#D9A58C;--at-f:#0B3D2E;--at-t:#D9A58C;--erro-msg:#D9A58C;
+}
+/* InovaSTEM Delas no escuro: roxo profundo (tipo Delas), lilás, verde #8FB183 e laranja */
+html[data-tema="escuro"] body.aba-delas{
+  --fundo:#2E1A47;--sup:#3D2A5C;--campo:#2E1A47;--linha:#5B4A7A;--tinta2:#C4B5FD;--suave:#2E1A47;
+  --delas-f:#3D2A5C;--faixa:#3D2A5C;--ok-f:#2E1A47;--al-f:#2E1A47;--at-f:#2E1A47;
 }
 html[data-tema="escuro"] .so-claro,html:not([data-tema="escuro"]) .so-escuro{display:none}
 *{box-sizing:border-box}
@@ -55,6 +62,7 @@ header{border-bottom:1px solid var(--linha);padding:10px 0;background:var(--fund
 h1.logo{margin:0;line-height:0}
 h1.logo a{display:inline-block;border-radius:8px}
 h1.logo img{height:64px;width:auto}
+html[data-tema="escuro"] h1.logo img,html[data-tema="escuro"] .logo-delas img{border-radius:10px}
 .cabeca nav{flex:1 1 100%;order:3}
 #cta{margin-left:auto}
 #menu-bt{display:none}
