@@ -93,7 +93,8 @@ def montar() -> str:
   <p class="faixa" role="note">Em desenvolvimento (Fase 1). Pré-dimensionamento para aprender e testar ideias: não aprova projeto, não substitui norma nem ensaio. Os exemplos usam dados fictícios. Nada do que você abre aqui sai do seu computador.</p>
   <div id="lab"></div>
 </main>
-<footer><div class="in"><p><strong>InovaSTEM · uma iniciativa PHYSIS</strong> · Versão beta: termos e aviso de privacidade em revisão jurídica.</p>
+<footer><div class="in"><p><strong>InovaSTEM · uma iniciativa PHYSIS</strong> · Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ) · Contato: [MARCADOR]</p>
+  <p>Versão beta: termos e aviso de privacidade em revisão jurídica.</p>
   <ul><li><a href="/#termos">Termos de uso (beta)</a></li><li><a href="/#privacidade">Privacidade (beta)</a></li><li><a href="/acessibilidade">Acessibilidade</a></li></ul></div></footer>
 <script>const ui = {{}};</script>
 {blocos}

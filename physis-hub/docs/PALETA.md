@@ -57,7 +57,7 @@ faixa `#0B3D2E`, linhas `#D9D3C2`, títulos `#1A4D2E`, rótulos pequenos `#C2410
 `#C2410C` + branco, contorno `#1A4D2E`); escuro = **tipo A** (fundo `#0B3D2E`, cartões `#0F4535`, linhas `#2F5E4E`, texto
 `#F4F1EA`, texto 2 `#C3D0BD`, rótulos pequenos `#D9A58C`, laranja só em texto grande); **Delas no escuro** (fundo `#2E1A47`,
 cartões `#3D2A5C`, linhas `#5B4A7A`, lilás `#C4B5FD`, verde `#8FB183`). Ícones: terracota, laranja, ouro suave `#B07A12` ou
-verdes; nenhum azul. `#1A4D2E` `#0F4535` `#2F5E4E` `#C3D0BD` `#2E1A47` `#3D2A5C` `#5B4A7A` `#8FB183` `#B07A12`
+verdes; nenhum azul. `#1A4D2E` `#0F4535` `#2F5E4E` `#C3D0BD` `#2E1A47` `#2B2143` `#3D2A5C` `#5B4A7A` `#8FB183` `#B07A12` `#BB6B4A`
 
 Avisos na InovaSTEM (dona, 20/11/2026): sucesso em verde profundo sobre creme; atenção e erro em **terracota**
 (`#7A2214` sobre `#F5E2D7` no claro, 8,1:1; `#D9A58C` do guia sobre carvão no escuro, 7,7:1). O laranja fica só para a marca

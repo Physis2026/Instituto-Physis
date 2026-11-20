@@ -348,15 +348,15 @@ class Pagina(unittest.TestCase):
                          ("#0B3D2E", "#0F4535", "#2F5E4E", "#F4F1EA", "#C3D0BD", "#D9A58C", "#C4B5FD"))
         # Delas no escuro: roxo profundo
         self.assertEqual((delas_escuro["fundo"].upper(), delas_escuro["sup"].upper(), delas_escuro["linha"].upper()),
-                         ("#2E1A47", "#3D2A5C", "#5B4A7A"))
+                         ("#2B2143", "#3D2A5C", "#5B4A7A"))
 
     def test_so_cores_do_guia_sem_azul_roxo_so_na_delas(self):
         # direção, 19/11/2026: verdes, laranja e terracota; roxo exclusivo da Delas; nada de azul; nada alterado
         guia = {"#0B3D2E", "#1B1F23", "#F4F1EA", "#F97316", "#C2410C", "#FFF7ED", "#7C3AED", "#EDE9FE", "#C4B5FD", "#FFFFFF"}
         neutros = {"#D9D3C2", "#8A9284", "#8A9182", "#4A4F44", "#4A5A47"}
-        avisos = {"#7A2214", "#F5E2D7", "#D9A58C"}     # terracota nos avisos (dona, 20/11/2026): o laranja fica para a marca
+        avisos = {"#7A2214", "#F5E2D7", "#D9A58C", "#BB6B4A"}     # terracota nos avisos (dona, 20/11/2026): o laranja fica para a marca
         tipos = {"#1A4D2E", "#0F4535", "#2F5E4E", "#C3D0BD", "#8FB183"}    # tipos de tela A e B (dona, 20/11/2026)
-        delas = {"#7C3AED", "#EDE9FE", "#C4B5FD", "#2E1A47", "#3D2A5C", "#5B4A7A"}   # roxo: só a Delas
+        delas = {"#7C3AED", "#EDE9FE", "#C4B5FD", "#2B2143", "#3D2A5C", "#5B4A7A"}   # roxo: só a Delas
         usadas = {c.upper() for c in re.findall(r"#[0-9A-Fa-f]{6}", self.css)}
         self.assertEqual(usadas - guia - neutros - avisos - tipos - delas, set(), "cor fora do guia")
         self.assertTrue(all("aba-delas" in bloco or "delas" in bloco for bloco in re.findall(r"[^}]*(?:#2E1A47|#3D2A5C|#5B4A7A)[^}]*", self.css)),
