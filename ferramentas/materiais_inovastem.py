@@ -84,10 +84,11 @@ def gerar():
     s = odf.Slides("InovaSTEM · Apresentação da rede e da plataforma", "Apresentação da rede e da plataforma")
     s.capa("InovaSTEM", "Rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos. Versão beta, lançamento em 26/11/2026.",
            "uma iniciativa PHYSIS")
-    s.duas("Missão e visão",
+    s.duas("Missão e objetivo",
            ["Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos."],
-           ["Ser referência na América Latina em troca aberta de conhecimento e desafios de modelagem para a transição justa."],
-           "Quem somos", "Missão", "Visão 2031")
+           ["Troca de informações, parcerias e desafios de modelagem com códigos abertos.",
+            "Formação e rede de mulheres: na InovaSTEM Delas."],
+           "Quem somos", "Missão", "Objetivo")
     s.duas("Duas redes, um só lugar",
            ["Aberta a todas as pessoas e organizações: troca de informações, parcerias e desafios de modelagem com códigos abertos.",
             "Laboratório vivo de pesquisa, desenvolvimento e inovação: conexão e trocas abertas para o desenvolvimento tecnológico."],
