@@ -199,10 +199,10 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         # mapa e leitor BIM do Planejador: bibliotecas abertas, entregues pelo próprio servidor (sem internet).
         # O pacote do servidor da Physis também leva, para montar sozinho a plataforma de quem compra.
         (pasta / "web" / "vendor").mkdir(exist_ok=True)
-        for nome in VENDOR_ARQUIVOS:
-            origem = next((p for p in (AQUI.parent / "vendor" / nome, AQUI / "web" / "vendor" / nome) if p.is_file()), None)
+        for arq_vendor in VENDOR_ARQUIVOS:      # não reaproveitar "nome" (é o nome da instalação, usado abaixo)
+            origem = next((p for p in (AQUI.parent / "vendor" / arq_vendor, AQUI / "web" / "vendor" / arq_vendor) if p.is_file()), None)
             if origem:
-                shutil.copy2(origem, pasta / "web" / "vendor" / nome)
+                shutil.copy2(origem, pasta / "web" / "vendor" / arq_vendor)
     if gestao is not None and gestao.is_file():      # só o pacote interno da Physis leva o programa de gestão interna
         shutil.copy2(gestao, pasta / "web" / "gestao.html")
         if (AQUI / "web" / "consultoria.html").exists():      # página pública de consultoria do site da Physis

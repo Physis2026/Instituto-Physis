@@ -37,6 +37,16 @@ class Ficha(unittest.TestCase):
 
 
 class Montagem(unittest.TestCase):
+    def test_nome_da_instalacao_sobrevive_ao_vendor(self):
+        """20/11/2026: o laço que copia web/vendor reaproveitava a variável "nome" e trocava o nome da instalação."""
+        with tempfile.TemporaryDirectory() as d:
+            gestao = Path(d) / "gestao.html"
+            gestao.write_text("<!doctype html><title>g</title>", encoding="utf-8")
+            montar.montar("instituto-physis", "sede", ["gestao"], Path(d) / "saida", None, montar.LICENCA_PADRAO,
+                          gestao=gestao, nome="Instituto Physis", instalacao="instituto")
+            inst = json.loads((Path(d) / "saida" / "physis-instituto-physis" / "instancia.json").read_text(encoding="utf-8"))
+        self.assertEqual(inst["nome"], "Instituto Physis")
+
     def test_pacote_do_instituto(self):
         with tempfile.TemporaryDirectory() as d:
             marca = {"nome": "Instituto Physis", "logo_texto": "Instituto Physis", "cores": {"primaria": "#2c5a6e"}}
