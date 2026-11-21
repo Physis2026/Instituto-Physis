@@ -124,6 +124,22 @@ ul.lista-limpa li{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
 #lab .lab-item.sel,#lab .lab-item[aria-pressed=true]{background:var(--acao);border-color:var(--acao);color:var(--sobre-acao)}
 #lab .lab-mini{min-height:44px;padding:4px 8px;font-size:.85rem}
 .lab-pronto{border-left:6px solid var(--semente)}
+.lab-foto-marca{position:relative;line-height:0}
+.lab-foto-marca .lab-foto{max-height:none;object-fit:fill}
+.lab-marcas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;touch-action:none}
+.lab-marcas.ativo{pointer-events:auto;cursor:crosshair;outline:3px dashed var(--semente);outline-offset:-3px}
+.lab-marcas *,.lab-cad.dt *{vector-effect:non-scaling-stroke;stroke-width:1.5px}
+.dt-recorte{fill:none;stroke:var(--semente);stroke-dasharray:6 4}
+.dt-cota{stroke:var(--sobrancelha);fill:var(--sobrancelha)}
+.dt-eixo{stroke:var(--sobrancelha);stroke-dasharray:10 4 2 4;fill:none}
+.dt-centro{fill:none;stroke:var(--sobrancelha)}
+.dt-perfil{fill:currentColor;fill-opacity:.28;stroke:currentColor}
+.dt-padrao{fill:var(--semente);fill-opacity:.4;stroke:var(--semente)}
+.dt-furo{fill:var(--sup);stroke:currentColor;stroke-dasharray:4 2}
+.dt-ignorado{fill:none;stroke:var(--borda-campo);stroke-dasharray:2 3}
+.dt-ign{fill:none;stroke:var(--borda-campo);stroke-dasharray:2 2}
+.dt-traco{fill:none;stroke:var(--tinta2);opacity:.45}
+.lab-cad.dt{background:var(--sup)}
 """
 
 CASCA_JS = r""""use strict";
@@ -183,6 +199,30 @@ const T = {
     ar_lado: "Foto, CAD 2D e 3D", ar_foto: "Foto", ar_foto_alt: "A imagem enviada", ar_cad: "CAD 2D", ar_3d: "3D (girar: arrastar ou setas; aproximar: roda ou + e −)",
     ar_contornos: "contornos", ar_celulas: "Células de material", ar_de: "de", ar_cada: "cada", ar_otsu: "limiar usado", ar_vista_dica: "Para editar a forma com as ferramentas, use \"Editar em Modelos BIM\".",
     ar_editar_bim: "Editar em Modelos BIM (CAD e IFC)",
+    // desenho técnico (dona, 21/11/2026)
+    dt_modo: "Modo de leitura", dt_modo_foto: "Modo foto (silhueta)", dt_modo_desenho: "Modo desenho técnico (traços)", dt_voltar_foto: "Voltar ao modo foto",
+    dt_modo_foto_d: "Foto de uma peça: a mancha escura vira a silhueta, que é extrudada.",
+    dt_modo_desenho_d: "Folha de desenho técnico: lê os traços finos, fecha as regiões e ignora texto, setas, cotas e hachura. Recorte uma vista de cada vez.",
+    dt_marcas: "Marcar na imagem", dt_marcas_d: "Escolha o que marcar e arraste ou clique sobre a foto. Pelo teclado, use as coordenadas logo abaixo.",
+    dt_marcar: { recorte: "Recortar uma vista", cota: "Escala pela cota (2 pontos)", eixo: "Eixo de revolução (2 pontos)", centro: "Centro do padrão" },
+    dt_clique_dica: { recorte: "Arraste um retângulo sobre a vista que quer ler.", cota: "Clique nas duas pontas de uma cota; depois digite o valor em mm.",
+      eixo: "Clique em dois pontos da linha de centro.", centro: "Clique no centro do padrão circular." },
+    dt_inteira: "Usar a imagem inteira", dt_teclado: "Coordenadas pelo teclado (pixels da imagem)",
+    dt_rx: "Recorte: x", dt_ry: "Recorte: y", dt_rw: "Recorte: largura", dt_rh: "Recorte: altura", dt_c1x: "Cota, ponto 1: x", dt_c1y: "Cota, ponto 1: y",
+    dt_c2x: "Cota, ponto 2: x", dt_c2y: "Cota, ponto 2: y", dt_e1x: "Eixo, ponto 1: x", dt_e1y: "Eixo, ponto 1: y", dt_e2x: "Eixo, ponto 2: x", dt_e2y: "Eixo, ponto 2: y",
+    dt_ox: "Centro: x", dt_oy: "Centro: y", dt_cmm: "Valor da cota (mm)", dt_cmm_d: "Com a cota marcada e o valor digitado, a escala vem dela (e não da largura final).",
+    dt_op: "Operação", dt_ops: { extrudar: "Extrudar", revolucionar: "Revolucionar (meia-seção em volta do eixo)" }, dt_seg: "Segmentos da revolução (6 a 512)",
+    dt_lado: "Lado do perfil", dt_lados: { auto: "Automático (o lado com hachura)", "1": "À direita do eixo (ou abaixo)", "-1": "À esquerda do eixo (ou acima)" },
+    dt_padrao: "Padrão circular: cópias (1 = sem padrão)", dt_padrao_d: "Os contornos do tipo \"perfil no padrão\" são extrudados e repetidos em volta do centro (por exemplo, uma pá do rotor e 6 cópias).",
+    dt_res: "Resolução da leitura (células na maior medida, 100 a 1200)", dt_suav: "Suavização (0 a 3)",
+    dt_manter_texto: "Reincluir textos e traços curtos", dt_manter_hachura: "Reincluir hachuras como traço",
+    dt_tipos: { perfil: "perfil", padrao: "perfil no padrão", furo: "furo", ignorado: "ignorado" }, dt_ignorados: "ignorados",
+    dt_ign: { texto: "textos e setas", traco_curto: "traços curtos", hachura: "hachuras" }, dt_nenhum: "Nenhum contorno fechado nesta vista.",
+    dt_tipo: "Tipo", dt_forma: "Forma", dt_motivo: "Por quê", dt_circulo: "círculo", dt_retas: "retas", dt_arcos: "arcos",
+    dt_motivos: { cota: "pequeno demais (seta ou cota)", texto: "quadro de texto", manual: "escolha sua", hachurada: "seção hachurada" },
+    dt_sem_eixo: "Para revolucionar, marque o eixo (2 pontos) ou use uma vista com a linha de centro.", dt_sem_perfil: "Nenhum contorno do tipo perfil: escolha o tipo na tabela de contornos.",
+    dt_escala_cota: "Escala pela cota marcada", dt_escala_largura: "Escala pela largura final digitada", dt_celula: "célula", dt_eixo_ok: "eixo marcado", dt_eixo_achado: "linha de centro achada no desenho", dt_corpos: "corpos",
+    dt_fase2: "Fase 2 (servidor, dezembro): fotos reais de peças por fotogrametria (COLMAP ou Meshroom) e IA de uma foto (TripoSR ou Depth Anything), depois de conferir a placa de vídeo do servidor e as licenças [MARCADOR].",
     // peças de teste
     tp_t: "Arquivos de teste para impressão", tp_txt: "Gerados aqui mesmo, pelo motor do Physis 3D (sem conta e sem nada copiado de terceiros). Baixe em STL, abra em Peças 3D ou peça a impressão.",
     tp_observar: "O que observar:",
@@ -317,6 +357,29 @@ const T = {
     ar_lado: "Photo, 2D CAD and 3D", ar_foto: "Photo", ar_foto_alt: "The uploaded image", ar_cad: "2D CAD", ar_3d: "3D (rotate: drag or arrow keys; zoom: wheel or + and −)",
     ar_contornos: "outlines", ar_celulas: "Material cells", ar_de: "of", ar_cada: "each", ar_otsu: "threshold used", ar_vista_dica: "To edit the shape with the tools, use \"Edit in BIM models\".",
     ar_editar_bim: "Edit in BIM models (CAD and IFC)",
+    dt_modo: "Reading mode", dt_modo_foto: "Photo mode (silhouette)", dt_modo_desenho: "Technical drawing mode (lines)", dt_voltar_foto: "Back to photo mode",
+    dt_modo_foto_d: "Photo of a part: the dark blob becomes the silhouette, which is extruded.",
+    dt_modo_desenho_d: "Technical drawing sheet: reads the thin lines, closes the regions and ignores text, arrows, dimensions and hatching. Crop one view at a time.",
+    dt_marcas: "Mark on the image", dt_marcas_d: "Choose what to mark and drag or click on the photo. With the keyboard, use the coordinates just below.",
+    dt_marcar: { recorte: "Crop one view", cota: "Scale from a dimension (2 points)", eixo: "Revolution axis (2 points)", centro: "Pattern centre" },
+    dt_clique_dica: { recorte: "Drag a rectangle over the view you want to read.", cota: "Click both ends of a dimension; then type its value in mm.",
+      eixo: "Click two points on the centre line.", centro: "Click the centre of the circular pattern." },
+    dt_inteira: "Use the whole image", dt_teclado: "Coordinates by keyboard (image pixels)",
+    dt_rx: "Crop: x", dt_ry: "Crop: y", dt_rw: "Crop: width", dt_rh: "Crop: height", dt_c1x: "Dimension, point 1: x", dt_c1y: "Dimension, point 1: y",
+    dt_c2x: "Dimension, point 2: x", dt_c2y: "Dimension, point 2: y", dt_e1x: "Axis, point 1: x", dt_e1y: "Axis, point 1: y", dt_e2x: "Axis, point 2: x", dt_e2y: "Axis, point 2: y",
+    dt_ox: "Centre: x", dt_oy: "Centre: y", dt_cmm: "Dimension value (mm)", dt_cmm_d: "With the dimension marked and its value typed, the scale comes from it (not from the final width).",
+    dt_op: "Operation", dt_ops: { extrudar: "Extrude", revolucionar: "Revolve (half-section around the axis)" }, dt_seg: "Revolution segments (6 to 512)",
+    dt_lado: "Profile side", dt_lados: { auto: "Automatic (the hatched side)", "1": "Right of the axis (or below)", "-1": "Left of the axis (or above)" },
+    dt_padrao: "Circular pattern: copies (1 = no pattern)", dt_padrao_d: "Outlines of type \"profile in pattern\" are extruded and repeated around the centre (for example, one rotor blade and 6 copies).",
+    dt_res: "Reading resolution (cells along the largest side, 100 to 1200)", dt_suav: "Smoothing (0 to 3)",
+    dt_manter_texto: "Include texts and short lines again", dt_manter_hachura: "Include hatching again as lines",
+    dt_tipos: { perfil: "profile", padrao: "profile in pattern", furo: "hole", ignorado: "ignored" }, dt_ignorados: "ignored",
+    dt_ign: { texto: "texts and arrows", traco_curto: "short lines", hachura: "hatching" }, dt_nenhum: "No closed outline in this view.",
+    dt_tipo: "Type", dt_forma: "Shape", dt_motivo: "Why", dt_circulo: "circle", dt_retas: "lines", dt_arcos: "arcs",
+    dt_motivos: { cota: "too small (arrow or dimension)", texto: "text block", manual: "your choice", hachurada: "hatched section" },
+    dt_sem_eixo: "To revolve, mark the axis (2 points) or use a view with a centre line.", dt_sem_perfil: "No outline of type profile: choose the type in the outline table.",
+    dt_escala_cota: "Scale from the marked dimension", dt_escala_largura: "Scale from the typed final width", dt_celula: "cell", dt_eixo_ok: "axis marked", dt_eixo_achado: "centre line found in the drawing", dt_corpos: "bodies",
+    dt_fase2: "Phase 2 (server, December): real photos of parts through photogrammetry (COLMAP or Meshroom) and single-photo AI (TripoSR or Depth Anything), after checking the server graphics card and the licences [MARCADOR].",
     tp_t: "Test print files", tp_txt: "Generated right here by the Physis 3D engine (no account needed and nothing copied from third parties). Download as STL, open in 3D parts or request a print.",
     tp_observar: "What to look for:",
     lg_t: "Site (GIS)", lg_o_t: "What it is",
@@ -532,7 +595,10 @@ const stlDe = (T, nome) => new Uint8Array(PHYSIS3D.escreverSTL(T, nome));
 
 /* ════════ 1. Enviar arquivo: foto → CAD 2D → 3D (sistema/physis-imagem-3d.js + motor PHYSIS3D, sem mudar) ════════ */
 const RX_IMG = /\.(png|jpe?g|webp)$/i, RX_MALHA = /\.(stl|obj|3mf)$/i, RX_SVG = /\.svg$/i, RX_PDF = /\.pdf$/i, RX_CAD = /\.(dxf|ifc)$/i, RX_STEP = /\.(step|stp|iges|igs)$/i;
-const PAR_PADRAO = { auto: true, limiar: 128, inverter: false, suavizar: 1, areaMin: 20, fundo: true, maior: false, res: 120, largura: 60, altura: 3, base: 0 };   // pontos de partida da tela, ajustáveis
+const PAR_PADRAO = { auto: true, limiar: 128, inverter: false, suavizar: 1, areaMin: 20, fundo: true, maior: false, res: 120, largura: 60, altura: 3, base: 0,
+  // modo desenho técnico (dona, 21/11/2026): lê traços, não manchas
+  modo: "foto", resDesenho: 1000, suavizarDesenho: 0, operacao: "extrudar", segmentos: 64, lado: "auto", padrao: 1, manterTexto: false, manterHachura: false,
+  recorte: null, cota: null, eixo: null, centro: null };   // pontos de partida da tela, ajustáveis
 const SVG_FORMAS = ["path", "rect", "circle", "ellipse", "polygon", "polyline", "line"];
 const SVG_ATRIBUTOS = ["d", "x", "y", "width", "height", "rx", "ry", "cx", "cy", "r", "points", "x1", "y1", "x2", "y2", "transform", "stroke-width", "fill-rule"];
 function tipoDe(f) {
@@ -592,29 +658,12 @@ async function imagemDe(f, fonte) {
   try { im.src = url; await im.decode(); } finally { setTimeout(() => URL.revokeObjectURL(url), 1000); }
   return { img: im, w: im.naturalWidth, h: im.naturalHeight };
 }
-function processarArquivo() {
-  const a = lab.arq; if (!a || !a.img) return;
-  const p = a.par, I = window.PhysisImagem3D;
-  a.r = null;
-  try {
-    if (!I || !window.PHYSIS3D) throw new Error(t("sem_modulos"));
-    const asp = a.w / a.h, nx = asp >= 1 ? p.res : Math.max(2, Math.round(p.res * asp)), ny = asp >= 1 ? Math.max(2, Math.round(p.res / asp)) : p.res;
-    const cv = document.createElement("canvas"); cv.width = nx; cv.height = ny;
-    const cx = cv.getContext("2d"); cx.clearRect(0, 0, nx, ny); cx.drawImage(a.img, 0, 0, nx, ny);
-    const pf = I.processarFoto(cx.getImageData(0, 0, nx, ny).data, nx, ny, { limiar: p.auto ? null : p.limiar, inverter: p.inverter, suavizar: p.suavizar, areaMin: p.areaMin, fundo: p.fundo, maior: p.maior });
-    if (p.auto) p.limiar = Math.round(pf.limiar);
-    const cel = p.largura / nx, tol = 0.5 + 0.25 * p.suavizar;
-    const lacos = a.svg ? lacosDoSvg(a.svg, p.largura) : I.contornos(pf.M, nx, ny, cel, tol);
-    const T = I.relevo(pf.M, nx, ny, cel, p.altura, p.base);
-    a.r = { nx, ny, cel, lacos, T, med: PHYSIS3D.medir(T), larg: nx * cel, alt: ny * cel, celulas: pf.M.reduce((s, v) => s + v, 0), otsu: pf.otsu, M: pf.M };
-  } catch (e) { a.r = { erro: String(e && e.message || e) }; }
-}
 async function receberArquivo(f) {
   if (!f) return { texto: t("escolha_arquivo"), erro: true };
   if (f.size > ARQ_MAX) return { texto: t("grande"), erro: true };
   const fonte = tipoDe(f), base = (f.name || "arquivo").replace(/\.[^.]+$/, "");
   if (lab.arq && lab.arq.url) URL.revokeObjectURL(lab.arq.url);
-  lab.arq = { nome: f.name, base, tipo: f.type || "", tamanho: f.size, fonte, arquivo: f, par: Object.assign({}, PAR_PADRAO), r: null };
+  lab.arq = { nome: f.name, base, tipo: f.type || "", tamanho: f.size, fonte, arquivo: f, par: Object.assign({}, PAR_PADRAO), r: null, tipos: {} }; lab.clique = null; lab.marca1 = null;
   proj.arquivos.push({ nome: String(f.name).slice(0, 160), tipo: String(f.type || "").slice(0, 80), tamanho: f.size, fonte, recebido_em: agora() });
   if (proj.arquivos.length > 200) proj.arquivos.splice(0, proj.arquivos.length - 200);
   registrarPasso("arquivo", f.name);
@@ -627,18 +676,149 @@ async function receberArquivo(f) {
   }
   return { texto: t(fonte === "malha" ? "ar_malha_rec" : fonte === "pdf" ? "ar_pdf_rec" : "ar_registrado") };
 }
+/* recorte (em pixels da imagem) e a área desenhada na grade: k = células por pixel */
+function janela(a) {
+  const c = a.par.recorte, x = c ? Math.max(0, Math.min(a.w - 1, Math.round(c.x))) : 0, y = c ? Math.max(0, Math.min(a.h - 1, Math.round(c.y))) : 0;
+  const w = c ? Math.max(4, Math.min(a.w - x, Math.round(c.w))) : a.w, h = c ? Math.max(4, Math.min(a.h - y, Math.round(c.h))) : a.h;
+  return { x, y, w, h };
+}
+function processarArquivo() {
+  const a = lab.arq; if (!a || !a.img) return;
+  const p = a.par, I = window.PhysisImagem3D;
+  a.r = null;
+  try {
+    if (!I || !window.PHYSIS3D) throw new Error(t("sem_modulos"));
+    const J = janela(a), desenho = p.modo === "desenho" && !a.svg, res = desenho ? p.resDesenho : p.res;
+    // desenho técnico: lê na resolução da própria imagem (traço fino some se diminuir); só reduz o que passar da resolução pedida
+    const k = desenho ? Math.min(1, res / Math.max(J.w, J.h)) : res / Math.max(J.w, J.h), nx = Math.max(2, Math.round(J.w * k)), ny = Math.max(2, Math.round(J.h * k));
+    const cv = document.createElement("canvas"); cv.width = nx; cv.height = ny;
+    const cx = cv.getContext("2d"); cx.fillStyle = "white"; cx.fillRect(0, 0, nx, ny); cx.drawImage(a.img, J.x, J.y, J.w, J.h, 0, 0, nx, ny);
+    const dados = cx.getImageData(0, 0, nx, ny).data;
+    // escala: pela cota (2 pontos e o valor em mm) ou pela largura final digitada
+    const cota = p.cota && p.cota.mm > 0 ? Math.hypot(p.cota.q[0] - p.cota.p[0], p.cota.q[1] - p.cota.p[1]) : 0;
+    const cel = cota > 0 ? p.cota.mm / (cota * k) : p.largura / nx;
+    const mm = q => [(q[0] - J.x) * k * cel, (ny - (q[1] - J.y) * k) * cel];
+    if (!desenho) {
+      const pf = I.processarFoto(dados, nx, ny, { limiar: p.auto ? null : p.limiar, inverter: p.inverter, suavizar: p.suavizar, areaMin: p.areaMin, fundo: p.fundo, maior: p.maior });
+      if (p.auto) p.limiar = Math.round(pf.limiar);
+      const tol = 0.5 + 0.25 * p.suavizar, lacos = a.svg ? lacosDoSvg(a.svg, p.largura) : I.contornos(pf.M, nx, ny, cel, tol);
+      const T = I.relevo(pf.M, nx, ny, cel, p.altura, p.base);
+      a.r = { modo: "foto", nx, ny, cel, lacos, T, med: PHYSIS3D.medir(T), larg: nx * cel, alt: ny * cel, celulas: pf.M.reduce((s, v) => s + v, 0), otsu: pf.otsu, J, k };
+      return;
+    }
+    // desenho técnico: traços, regiões, contornos com tipo; depois extrudar ou revolucionar
+    const D = I.lerDesenho(dados, nx, ny, { limiar: p.auto ? null : p.limiar, inverter: p.inverter, suavizar: p.suavizarDesenho, manterTexto: p.manterTexto, manterHachura: p.manterHachura });
+    if (p.auto) p.limiar = Math.round(D.limiar);
+    const conts = [];
+    D.regioes.forEach(g => I.lacosDaRegiao(D, g.id, nx, ny, cel, 1).forEach((l, i) => {
+      const chave = "r" + g.id + "-" + i, padrao = g.tipo === "corpo" ? l.tipo : "ignorado";
+      conts.push({ chave, regiao: g.id, tipo: a.tipos[chave] || padrao, padrao, motivo: g.motivo || "", prims: l.prims, laco: l.laco, hachurada: g.hachurada, area: g.area }); }));
+    const eixo = p.eixo ? { p: mm(p.eixo.p), q: mm(p.eixo.q) } : D.eixo ? { p: [D.eixo.p[0] * cel, (ny - D.eixo.p[1]) * cel], q: [D.eixo.q[0] * cel, (ny - D.eixo.q[1]) * cel] } : null;
+    const circ = conts.filter(c => c.tipo !== "ignorado" && c.prims.length === 1 && c.prims[0].tipo === "circulo").sort((x, y) => y.prims[0].r - x.prims[0].r)[0];
+    const centro = p.centro ? mm(p.centro) : circ ? [circ.prims[0].cx * cel, circ.prims[0].cy * cel] : [nx * cel / 2, ny * cel / 2];
+    const de = tp => conts.filter(c => c.tipo === tp).map(c => c.laco), perfis = de("perfil"), padroes = de("padrao"), furos = de("furo");
+    let corpos = [];
+    if (p.operacao === "revolucionar") {
+      if (!eixo) throw new Error(t("dt_sem_eixo"));
+      let lado = p.lado === "-1" ? -1 : 1;
+      if (p.lado === "auto") { const h = conts.find(c => c.hachurada && c.tipo === "perfil"); if (h) { const L = Math.hypot(eixo.q[0] - eixo.p[0], eixo.q[1] - eixo.p[1]) || 1;
+        let ux = (eixo.q[0] - eixo.p[0]) / L, uy = (eixo.q[1] - eixo.p[1]) / L; if (uy < 0 || (uy === 0 && ux < 0)) { ux = -ux; uy = -uy; }
+        const cxm = h.laco.reduce((s, q) => s + q[0], 0) / h.laco.length, cym = h.laco.reduce((s, q) => s + q[1], 0) / h.laco.length;
+        lado = ((cxm - eixo.p[0]) * uy - (cym - eixo.p[1]) * ux) >= 0 ? 1 : -1; } }
+      corpos = [I.revolver(perfis.concat(padroes, furos), eixo, p.segmentos, lado)];
+      a.ladoUsado = lado;
+    } else {
+      if (perfis.length) corpos.push(I.extrudar(perfis.concat(furos), p.altura));
+      if (padroes.length) corpos = corpos.concat(I.padraoCircular(I.extrudar(padroes, p.altura), p.padrao, centro));
+    }
+    if (!corpos.length) throw new Error(t("dt_sem_perfil"));
+    const T = I.juntar(corpos), lacos = conts.filter(c => c.tipo !== "ignorado").map(c => c.laco);
+    a.r = { modo: "desenho", D, nx, ny, cel, conts, lacos, eixo, centro, corpos, T, med: PHYSIS3D.medir(T), larg: nx * cel, alt: ny * cel, J, k, porCota: cota > 0 };
+  } catch (e) { a.r = { erro: String(e && e.message || e) }; }
+}
 function lerParametros() {
   const a = lab.arq, v = id => (document.getElementById(id) || {}).value, ch = id => !!(document.getElementById(id) || {}).checked, lim = (x, a_, b) => Math.max(a_, Math.min(b, x));
-  const auto = ch("ar-auto"), lmanual = Math.round(numL(v("ar-limiar"), a.par.limiar));
-  a.par = { auto, limiar: lim(lmanual, 0, 255), inverter: ch("ar-inverter"), suavizar: lim(Math.round(numL(v("ar-suav"), a.par.suavizar)), 0, 5),
-    areaMin: lim(Math.round(numL(v("ar-ruido"), a.par.areaMin)), 0, 100000), fundo: ch("ar-fundo"), maior: ch("ar-maior"),
-    res: lim(Math.round(numL(v("ar-res"), a.par.res)), 10, 250), largura: lim(numL(v("ar-largura"), a.par.largura), 1, 1000),
-    altura: lim(numL(v("ar-altura"), a.par.altura), 0, 500), base: lim(numL(v("ar-base"), a.par.base), 0, 100) };
+  const P = a.par, num = (id, d) => numL(v(id), d), existe = id => !!document.getElementById(id);
+  P.auto = ch("ar-auto"); P.limiar = lim(Math.round(num("ar-limiar", P.limiar)), 0, 255); P.inverter = ch("ar-inverter");
+  P.largura = lim(num("ar-largura", P.largura), 0.1, 10000); P.altura = lim(num("ar-altura", P.altura), 0, 5000);
+  if (P.modo === "desenho") {
+    if (existe("dt-suav")) P.suavizarDesenho = lim(Math.round(num("dt-suav", P.suavizarDesenho)), 0, 3);
+    if (existe("dt-res")) P.resDesenho = lim(Math.round(num("dt-res", P.resDesenho)), 100, 1200);
+    if (existe("dt-seg")) P.segmentos = lim(Math.round(num("dt-seg", P.segmentos)), 6, 512);
+    if (existe("dt-padrao")) P.padrao = lim(Math.round(num("dt-padrao", P.padrao)), 1, 360);
+    if (existe("dt-op")) P.operacao = v("dt-op"); if (existe("dt-lado")) P.lado = v("dt-lado");
+    P.manterTexto = ch("dt-texto"); P.manterHachura = ch("dt-hachura");
+  } else {
+    P.suavizar = lim(Math.round(num("ar-suav", P.suavizar)), 0, 5); P.areaMin = lim(Math.round(num("ar-ruido", P.areaMin)), 0, 100000);
+    P.fundo = ch("ar-fundo"); P.maior = ch("ar-maior"); P.res = lim(Math.round(num("ar-res", P.res)), 10, 250); P.base = lim(num("ar-base", P.base), 0, 100);
+  }
+  // pontos digitados (teclado): recorte, cota, eixo e centro, em pixels da imagem
+  const pts = (ids) => ids.map(id => num(id, NaN));
+  if (existe("dt-rx")) { const [x, y, w, h] = pts(["dt-rx", "dt-ry", "dt-rw", "dt-rh"]); P.recorte = [x, y, w, h].every(isFinite) && w > 3 && h > 3 ? { x, y, w, h } : null; }
+  if (existe("dt-c1x")) { const [x1, y1, x2, y2, m] = pts(["dt-c1x", "dt-c1y", "dt-c2x", "dt-c2y", "dt-cmm"]);
+    P.cota = [x1, y1, x2, y2].every(isFinite) && Math.hypot(x2 - x1, y2 - y1) > 0 ? { p: [x1, y1], q: [x2, y2], mm: isFinite(m) && m > 0 ? m : 0 } : null; }
+  if (existe("dt-e1x")) { const [x1, y1, x2, y2] = pts(["dt-e1x", "dt-e1y", "dt-e2x", "dt-e2y"]); P.eixo = [x1, y1, x2, y2].every(isFinite) && Math.hypot(x2 - x1, y2 - y1) > 0 ? { p: [x1, y1], q: [x2, y2] } : null; }
+  if (existe("dt-ox")) { const [x, y] = pts(["dt-ox", "dt-oy"]); P.centro = [x, y].every(isFinite) ? [x, y] : null; }
+  document.querySelectorAll("[data-lab-tipo]").forEach(s => { a.tipos[s.getAttribute("data-lab-tipo")] = s.value; });
 }
+/* CAD 2D: no modo foto, o contorno; no desenho técnico, cada contorno com o seu tipo, os traços lidos, o que foi ignorado,
+   o eixo e o centro */
 function previa2d(r) {
-  const d = r.lacos.map(l => "M" + l.map(p => (+p[0]).toFixed(3) + " " + (r.alt - p[1]).toFixed(3)).join(" L") + (l.length > 2 ? " Z" : "")).join(" ");
-  return `<svg viewBox="0 0 ${r.larg.toFixed(3)} ${r.alt.toFixed(3)}" role="img" aria-label="${escL(t("ar_cad"))}: ${r.lacos.length} ${escL(t("ar_contornos"))}, ${nf(r.larg, 1)} × ${nf(r.alt, 1)} mm" class="lab-cad">
-    <path d="${d}" fill="currentColor" fill-opacity="0.25" fill-rule="evenodd" stroke="currentColor" stroke-width="${(r.larg / 250).toFixed(3)}"/></svg>`;
+  const H = r.alt, cam = l => "M" + l.map(p => (+p[0]).toFixed(3) + " " + (H - p[1]).toFixed(3)).join(" L") + (l.length > 2 ? " Z" : ""), w = (r.larg / 300).toFixed(3);
+  if (r.modo !== "desenho") return `<svg viewBox="0 0 ${r.larg.toFixed(3)} ${H.toFixed(3)}" role="img" aria-label="${escL(t("ar_cad"))}: ${r.lacos.length} ${escL(t("ar_contornos"))}, ${nf(r.larg, 1)} × ${nf(H, 1)} mm" class="lab-cad">
+    <path d="${r.lacos.map(cam).join(" ")}" fill="currentColor" fill-opacity="0.25" fill-rule="evenodd" stroke="currentColor" stroke-width="${w}"/></svg>`;
+  const c = r.cel, ign = r.D.ignorados.map(x => `<rect x="${(x.x0 * c).toFixed(2)}" y="${(x.y0 * c).toFixed(2)}" width="${((x.x1 - x.x0 + 1) * c).toFixed(2)}" height="${((x.y1 - x.y0 + 1) * c).toFixed(2)}" class="dt-ign"/>`).join("");
+  const tr = r.D.tracos.map(l => `<polyline points="${l.map(p => (p[0] * c).toFixed(2) + "," + (p[1] * c).toFixed(2)).join(" ")}" class="dt-traco"/>`).join("");
+  const ordem = { ignorado: 0, perfil: 1, padrao: 2, furo: 3 };
+  const cs = r.conts.map((x, i) => [x, i]).sort((u, v) => ordem[u[0].tipo] - ordem[v[0].tipo]).map(([x, i]) => `<path d="${cam(x.laco)}" class="dt-${x.tipo}"><title>${i + 1}: ${escL(t("dt_tipos")[x.tipo])}</title></path>`).join("");
+  const ex = r.eixo ? `<line x1="${r.eixo.p[0].toFixed(2)}" y1="${(H - r.eixo.p[1]).toFixed(2)}" x2="${r.eixo.q[0].toFixed(2)}" y2="${(H - r.eixo.q[1]).toFixed(2)}" class="dt-eixo"/>` : "";
+  const ce = r.centro ? `<circle cx="${r.centro[0].toFixed(2)}" cy="${(H - r.centro[1]).toFixed(2)}" r="${(r.larg / 80).toFixed(2)}" class="dt-centro"/>` : "";
+  return `<svg viewBox="0 0 ${r.larg.toFixed(3)} ${H.toFixed(3)}" role="img" style="--w:${w}" aria-label="${escL(t("ar_cad"))}: ${escL(resumoContornos(r))}" class="lab-cad dt">${ign}${tr}${cs}${ex}${ce}</svg>`;
+}
+function resumoContornos(r) {
+  const n = tp => r.conts.filter(x => x.tipo === tp).length, ig = {}; r.D.ignorados.forEach(x => { ig[x.tipo] = (ig[x.tipo] || 0) + 1; });
+  return r.conts.length + " " + t("ar_contornos") + ": " + ["perfil", "padrao", "furo", "ignorado"].map(tp => n(tp) + " " + t("dt_tipos")[tp]).join(", ")
+    + " · " + t("dt_ignorados") + ": " + Object.keys(ig).map(k => ig[k] + " " + (t("dt_ign")[k] || k)).join(", ");
+}
+/* a foto com o recorte, a cota, o eixo e o centro desenhados por cima; clicar ou arrastar marca, conforme o botão escolhido */
+function fotoComMarcas(a) {
+  const p = a.par, J = janela(a), lin = (q, cls) => q ? `<line x1="${q.p[0]}" y1="${q.p[1]}" x2="${q.q[0]}" y2="${q.q[1]}" class="${cls}"/>` : "";
+  const ponto = (x, y, cls) => `<circle cx="${x}" cy="${y}" r="${Math.max(a.w, a.h) / 120}" class="${cls}"/>`;
+  return `<div class="lab-foto-marca"><img src="${escL(a.url)}" alt="${escL(t("ar_foto_alt"))}: ${escL(a.nome)}" class="lab-foto">
+    <svg viewBox="0 0 ${a.w} ${a.h}" preserveAspectRatio="none" class="lab-marcas${lab.clique ? " ativo" : ""}" id="ar-marcas" aria-hidden="true" style="--w:${Math.max(a.w, a.h) / 300}">
+      ${p.recorte ? `<rect x="${J.x}" y="${J.y}" width="${J.w}" height="${J.h}" class="dt-recorte"/>` : ""}${lin(p.cota, "dt-cota")}${p.cota ? ponto(p.cota.p[0], p.cota.p[1], "dt-cota") + ponto(p.cota.q[0], p.cota.q[1], "dt-cota") : ""}
+      ${lin(p.eixo, "dt-eixo")}${p.centro ? ponto(p.centro[0], p.centro[1], "dt-centro") : ""}${lab.marca1 ? ponto(lab.marca1[0], lab.marca1[1], "dt-cota") : ""}</svg></div>`;
+}
+function painelDesenho(a, desenho) {
+  const p = a.par, f = (id, rot, val) => campo(id, rot, val === "" || val == null ? "" : String(Math.round(val * 100) / 100), ' data-lab-par="1"');
+  const botoesClique = (desenho ? ["recorte", "cota", "eixo", "centro"] : ["recorte", "cota"]).map(k => `<button type="button" class="botao${lab.clique === k ? "" : " sec"}" id="dt-m-${k}" data-lab="dt-clique" data-k="${k}" aria-pressed="${lab.clique === k}">${escL(t("dt_marcar")[k])}</button>`).join("");
+  const c = p.recorte || {}, co = p.cota || { p: [], q: [] }, e = p.eixo || { p: [], q: [] }, o = p.centro || [];
+  return `<fieldset><legend>${escL(t("dt_marcas"))}</legend><p class="t2 pq">${escL(t("dt_marcas_d"))}</p><div class="acoes" role="group" aria-label="${escL(t("dt_marcas"))}">${botoesClique}
+      <button type="button" class="botao sec" id="dt-inteira" data-lab="dt-inteira">${escL(t("dt_inteira"))}</button></div>
+    <p class="t2 pq" role="status" id="dt-clique-msg">${lab.clique ? escL(t("dt_clique_dica")[lab.clique]) : ""}</p>
+    <details><summary>${escL(t("dt_teclado"))}</summary><div class="campos">
+      ${f("dt-rx", t("dt_rx"), c.x)}${f("dt-ry", t("dt_ry"), c.y)}${f("dt-rw", t("dt_rw"), c.w)}${f("dt-rh", t("dt_rh"), c.h)}
+      ${f("dt-c1x", t("dt_c1x"), co.p[0])}${f("dt-c1y", t("dt_c1y"), co.p[1])}${f("dt-c2x", t("dt_c2x"), co.q[0])}${f("dt-c2y", t("dt_c2y"), co.q[1])}
+      ${desenho ? f("dt-e1x", t("dt_e1x"), e.p[0]) + f("dt-e1y", t("dt_e1y"), e.p[1]) + f("dt-e2x", t("dt_e2x"), e.q[0]) + f("dt-e2y", t("dt_e2y"), e.q[1])
+        + f("dt-ox", t("dt_ox"), o[0]) + f("dt-oy", t("dt_oy"), o[1]) : ""}</div></details>
+    ${campo("dt-cmm", t("dt_cmm"), p.cota && p.cota.mm ? nf(p.cota.mm, 2) : "", ' data-lab-par="1" aria-describedby="dt-cmm-d"')}<p class="t2 pq" id="dt-cmm-d">${escL(t("dt_cmm_d"))}</p></fieldset>
+  ${desenho ? `<fieldset><legend>${escL(t("dt_op"))}</legend><div class="campos">
+    <div><label for="dt-op">${escL(t("dt_op"))}</label><select id="dt-op" data-lab-par="1">${["extrudar", "revolucionar"].map(k => `<option value="${k}"${p.operacao === k ? " selected" : ""}>${escL(t("dt_ops")[k])}</option>`).join("")}</select></div>
+    ${p.operacao === "revolucionar" ? `${campo("dt-seg", t("dt_seg"), p.segmentos, ' data-lab-par="1"')}<div><label for="dt-lado">${escL(t("dt_lado"))}</label><select id="dt-lado" data-lab-par="1">${["auto", "1", "-1"].map(k => `<option value="${k}"${p.lado === k ? " selected" : ""}>${escL(t("dt_lados")[k])}</option>`).join("")}</select></div>`
+      : `${campo("dt-padrao", t("dt_padrao"), p.padrao, ' data-lab-par="1" aria-describedby="dt-padrao-d"')}`}
+    ${campo("dt-res", t("dt_res"), p.resDesenho, ' data-lab-par="1"')}${campo("dt-suav", t("dt_suav"), p.suavizarDesenho, ' data-lab-par="1"')}</div>
+    ${p.operacao === "revolucionar" ? "" : `<p class="t2 pq" id="dt-padrao-d">${escL(t("dt_padrao_d"))}</p>`}
+    <label class="opcao"><input type="checkbox" id="dt-texto" data-lab-par="1"${p.manterTexto ? " checked" : ""}> ${escL(t("dt_manter_texto"))}</label>
+    <label class="opcao"><input type="checkbox" id="dt-hachura" data-lab-par="1"${p.manterHachura ? " checked" : ""}> ${escL(t("dt_manter_hachura"))}</label></fieldset>` : ""}`;
+}
+function tabelaContornos(r) {
+  if (!r.conts.length) return `<p class="t2">${escL(t("dt_nenhum"))}</p>`;
+  const prim = x => { const n = tp => x.prims.filter(q => q.tipo === tp).length; return x.prims.length === 1 && x.prims[0].tipo === "circulo" ? t("dt_circulo") + " Ø" + nf(2 * x.prims[0].r * r.cel, 2) + " mm"
+      : n("reta") + " " + t("dt_retas") + (n("arco") ? ", " + n("arco") + " " + t("dt_arcos") : ""); };
+  return `<div class="rolagem"><table><caption>${escL(resumoContornos(r))}</caption><thead><tr><th scope="col">#</th><th scope="col">${escL(t("dt_tipo"))}</th><th scope="col">${escL(t("dt_forma"))}</th><th scope="col">${escL(t("dt_motivo"))}</th></tr></thead><tbody>
+    ${r.conts.map((x, i) => `<tr><th scope="row">${i + 1}</th><td><label class="so-leitor" for="dt-t-${x.chave}">${escL(t("dt_tipo"))} ${i + 1}</label><select id="dt-t-${x.chave}" data-lab-tipo="${x.chave}" data-lab-par="1">
+      ${["perfil", "padrao", "furo", "ignorado"].map(tp => `<option value="${tp}"${x.tipo === tp ? " selected" : ""}>${escL(t("dt_tipos")[tp])}</option>`).join("")}</select></td>
+      <td>${escL(prim(x))}</td><td>${escL(x.tipo === "ignorado" ? (t("dt_motivos")[x.motivo] || t("dt_motivos").manual) : x.hachurada ? t("dt_motivos").hachurada : "")}</td></tr>`).join("")}</tbody></table></div>`;
 }
 function telaArquivo() {
   const a = lab.arq, ck = (id, rot, v) => `<label class="opcao"><input type="checkbox" id="${id}" data-lab-par="1"${v ? " checked" : ""}> ${escL(rot)}</label>`;
@@ -657,24 +837,31 @@ function telaArquivo() {
     <div class="acoes"><button class="botao" type="button" id="ar-abrir-bim" data-lab="arq-bim">${escL(t("ar_abrir_bim"))}</button></div></section>`;
   if (a.fonte === "step") return h + `<section class="cartao" aria-labelledby="ar-s-h"><h3 id="ar-s-h">${escL(a.nome)}</h3><p class="faixa" role="note">${escL(t("ar_step_txt"))}</p></section>`;
   if (a.fonte === "outro") return h + `<section class="cartao" aria-labelledby="ar-x-h"><h3 id="ar-x-h">${escL(a.nome)}</h3><p>${escL(t("ar_outro_txt"))}</p></section>`;
-  const p = a.par, r = a.r || {};
-  h += `<section class="cartao" aria-labelledby="ar-e-h"><h3 id="ar-e-h">${escL(t("ar_ajustar"))}: ${escL(a.nome)}</h3>
+  const p = a.par, r = a.r || {}, desenho = p.modo === "desenho" && !a.svg;
+  const modos = a.svg ? "" : `<div class="acoes" role="group" aria-label="${escL(t("dt_modo"))}">${["foto", "desenho"].map(k => `<button type="button" class="botao${(desenho ? "desenho" : "foto") === k ? "" : " sec"}" id="dt-modo-${k}" data-lab="dt-modo" data-k="${k}" aria-pressed="${(desenho ? "desenho" : "foto") === k}">${escL(t(k === "foto" ? "dt_modo_foto" : "dt_modo_desenho"))}</button>`).join("")}</div>
+    <p class="t2 pq">${escL(t(desenho ? "dt_modo_desenho_d" : "dt_modo_foto_d"))}</p>`;
+  h += `<section class="cartao" aria-labelledby="ar-e-h"><h3 id="ar-e-h">${escL(t("ar_ajustar"))}: ${escL(a.nome)}</h3>${modos}
     <form id="ar-form" novalidate>${ck("ar-auto", t("ar_auto"), p.auto)}<div class="campos">
-      ${f("limiar", t("ar_limiar"), p.limiar, t("ar_limiar_d"))}${f("suav", t("ar_suav"), p.suavizar, t("ar_suav_d"))}${f("ruido", t("ar_ruido"), p.areaMin, t("ar_ruido_d"))}
-      ${f("res", t("ar_res"), p.res, "")}${f("largura", t("ar_largura"), nf(p.largura, 1), "")}${f("altura", t("ar_altura"), nf(p.altura, 1), "")}${f("base", t("ar_base"), nf(p.base, 1), "")}</div>
-      ${ck("ar-inverter", t("ar_inverter"), p.inverter)}${ck("ar-fundo", t("ar_fundo"), p.fundo)}${ck("ar-maior", t("ar_maior"), p.maior)}
-      <div class="acoes"><button class="botao sec" type="submit" id="ar-atualizar">${escL(t("ar_atualizar"))}</button></div></form>
-    ${a.svg ? `<p class="t2 pq">${escL(t("ar_svg_nota"))}</p>` : ""}</section>`;
-  if (r.erro) return h + `<p class="faixa erro" role="alert">${escL(r.erro)}</p>`;
+      ${f("limiar", t("ar_limiar"), p.limiar, t("ar_limiar_d"))}${desenho ? "" : f("suav", t("ar_suav"), p.suavizar, t("ar_suav_d")) + f("ruido", t("ar_ruido"), p.areaMin, t("ar_ruido_d")) + f("res", t("ar_res"), p.res, "")}
+      ${f("largura", t("ar_largura"), nf(p.largura, 1), p.cota && p.cota.mm ? t("dt_escala_cota") : "")}${f("altura", t("ar_altura"), nf(p.altura, 1), "")}${desenho ? "" : f("base", t("ar_base"), nf(p.base, 1), "")}</div>
+      ${ck("ar-inverter", t("ar_inverter"), p.inverter)}${desenho ? "" : ck("ar-fundo", t("ar_fundo"), p.fundo) + ck("ar-maior", t("ar_maior"), p.maior)}
+      ${a.svg ? "" : painelDesenho(a, desenho)}
+      <div class="acoes"><button class="botao sec" type="submit" id="ar-atualizar">${escL(t("ar_atualizar"))}</button>
+        ${desenho ? `<button class="botao sec" type="button" id="dt-voltar" data-lab="dt-modo" data-k="foto">${escL(t("dt_voltar_foto"))}</button>` : ""}</div></form>
+    ${a.svg ? `<p class="t2 pq">${escL(t("ar_svg_nota"))}</p>` : ""}
+    ${desenho ? `<p class="faixa" role="note">${escL(t("dt_fase2"))}</p>` : ""}</section>`;
+  if (r.erro) return h + `<p class="faixa erro" role="alert">${escL(r.erro)}</p>` + (a.url ? `<section class="cartao" aria-labelledby="ar-f-h"><h3 id="ar-f-h">${escL(t("ar_foto"))}</h3>${fotoComMarcas(a)}</section>` : "");
   if (!r.T) return h;
   const m = r.med;
   h += `<section class="cartao" aria-labelledby="ar-r-h"><h3 id="ar-r-h">${escL(t("ar_lado"))}</h3>
     <div class="lab-lado">
-      <figure><figcaption>${escL(t("ar_foto"))}</figcaption>${a.url ? `<img src="${escL(a.url)}" alt="${escL(t("ar_foto_alt"))}: ${escL(a.nome)}" class="lab-foto">` : ""}</figure>
-      <figure><figcaption>${escL(t("ar_cad"))} · ${r.lacos.length} ${escL(t("ar_contornos"))}${a.svg ? "" : " · " + escL(t("ar_otsu")) + " " + Math.round(p.limiar)}</figcaption>${previa2d(r)}</figure>
+      <figure><figcaption>${escL(t("ar_foto"))}</figcaption>${a.url ? fotoComMarcas(a) : ""}</figure>
+      <figure><figcaption>${escL(t("ar_cad"))} · ${r.modo === "desenho" ? escL(r.conts.filter(x => x.tipo !== "ignorado").length + " " + t("ar_contornos")) : r.lacos.length + " " + escL(t("ar_contornos"))}${a.svg ? "" : " · " + escL(t("ar_otsu")) + " " + Math.round(p.limiar)}</figcaption>${previa2d(r)}</figure>
       <figure><figcaption>${escL(t("ar_3d"))}</figcaption><div id="ar-vista" class="lab-vista-lugar"></div></figure></div>
+    ${r.modo === "desenho" ? `<p><strong>${escL(resumoContornos(r))}</strong></p>${tabelaContornos(r)}
+      <p class="t2 pq">${escL(t(r.porCota ? "dt_escala_cota" : "dt_escala_largura"))} · ${nf(r.cel, 4)} mm/${escL(t("dt_celula"))}${r.eixo ? " · " + escL(t(lab.arq.par.eixo ? "dt_eixo_ok" : "dt_eixo_achado")) : ""}${r.corpos ? " · " + r.corpos.length + " " + escL(t("dt_corpos")) : ""}</p>` : ""}
     ${tabela(t("ar_3d"), [[t("tamanho"), m.tamanho.map(v => nf(v, 1)).join(" × ") + " mm"], [t("volume"), nf(m.volume_mm3 / 1000, 2) + " cm³"],
-      [t("triangulos"), nf(m.triangulos, 0)], [t("ar_celulas"), nf(r.celulas, 0) + " " + t("ar_de") + " " + nf(r.nx * r.ny, 0) + " (" + r.nx + " × " + r.ny + ", " + nf(r.cel, 3) + " mm " + t("ar_cada") + ")"],
+      [t("triangulos"), nf(m.triangulos, 0)], r.modo === "desenho" ? [t("dt_corpos"), String(r.corpos.length)] : [t("ar_celulas"), nf(r.celulas, 0) + " " + t("ar_de") + " " + nf(r.nx * r.ny, 0) + " (" + r.nx + " × " + r.ny + ", " + nf(r.cel, 3) + " mm " + t("ar_cada") + ")"],
       [t("malha"), escL(t(m.arestas && m.arestas.fechada ? "fechada" : "aberta"))]])}
     <p class="t2">${escL(t("ar_vista_dica"))}</p>
     <div class="acoes"><button class="botao" type="button" id="ar-imp" data-lab="arq-imp">${escL(t("pedir_impressao"))}</button>
@@ -1341,6 +1528,9 @@ async function acao(a, b) {
   if (a === "gal-ver") { const id = +b.getAttribute("data-id"); if (lab.gal.abertas[id]) { delete lab.gal.abertas[id]; return; }
     const j = lab.gal.abertas[id] = await getJ("/api/publico/3d/pecas/" + id);
     if (j.ok && j.peca) { registrarPasso("galeria", j.peca.nome); gravarProjeto(""); } return; }
+  if (a === "dt-modo" && lab.arq) { lab.arq.par.modo = b.getAttribute("data-k") === "desenho" ? "desenho" : "foto"; lab.clique = null; lab.marca1 = null; processarArquivo(); return; }
+  if (a === "dt-clique" && lab.arq) { const k = b.getAttribute("data-k"); lab.clique = lab.clique === k ? null : k; lab.marca1 = null; return; }
+  if (a === "dt-inteira" && lab.arq) { lab.arq.par.recorte = null; lab.clique = null; processarArquivo(); return; }
   if (a === "arq-malha" && lab.arq && lab.arq.arquivo) { abrirEmPecas(lab.arq.arquivo, t("ar_malha_t")); return "fica"; }
   if (a === "arq-malha-imp" && lab.arq && lab.arq.arquivo) { const f = lab.arq.arquivo, buf = await f.arrayBuffer();
     if (/\.obj$/i.test(f.name)) pedirImpressaoDe(lab.arq.base + ".stl", stlDe(PHYSIS3D.lerMalha(buf, f.name), lab.arq.base), t("abas").arquivo);
@@ -1354,6 +1544,13 @@ async function acao(a, b) {
     if (a === "arq-3mf") baixar(nome + ".3mf", PHYSIS3D.escrever3MF(r.T), "model/3mf");
     if (a === "arq-enviar") { abrirEmPecas(new File([stlDe(r.T, nome)], nome + ".stl", { type: "model/stl" }), t("ar_t")); return "fica"; }
     if (a === "arq-imp") { pedirImpressaoDe(nome + ".stl", stlDe(r.T, nome), t("ar_t")); return "fica"; }
+    if (a === "arq-editar" && r.modo === "desenho") { const E = editorBim(), P = lab.arq.par, de = tp => r.conts.filter(c => c.tipo === tp).map(c => c.laco);
+      lab.lote = true;
+      try { if (P.operacao === "revolucionar") E.adicionar({ nome, tipo: "malha", T: r.T, origem: "desenho" }, true);
+        else { if (de("perfil").length) E.adicionar({ nome, tipo: "perfil", lacos: de("perfil").concat(de("furo")), altura: P.altura, origem: "desenho" }, true);
+          r.corpos.slice(de("perfil").length ? 1 : 0).forEach((T, i) => E.adicionar({ nome: nome + " · " + (i + 1), tipo: "malha", T, origem: "desenho" }, true)); } }
+      finally { lab.lote = false; }
+      E._enq = false; guardarBimNoProjeto(); registrarPasso("edificacao", nome); irPara("edificacao"); return "fica"; }
     if (a === "arq-editar") { const E = editorBim(), alt = lab.arq.par.altura + lab.arq.par.base;
       if (r.lacos.length && !lab.arq.par.base) E.adicionar({ nome, tipo: "perfil", lacos: r.lacos, altura: lab.arq.par.altura, origem: "imagem" });
       else E.adicionar({ nome, tipo: "malha", T: r.T, origem: "imagem" });
@@ -1421,6 +1618,31 @@ document.addEventListener("change", async ev => {
     if (arq === "projeto") lab.proj = m; else lab.lugar = m;
   }
   desenhar(); focar(id);
+});
+/* marcas sobre a foto (Enviar arquivo): o ponto vem em pixels da imagem */
+function pontoNaFoto(ev) { const sv = document.getElementById("ar-marcas"), a = lab.arq; if (!sv || !a) return null; const b = sv.getBoundingClientRect();
+  return [Math.round((ev.clientX - b.left) / b.width * a.w), Math.round((ev.clientY - b.top) / b.height * a.h)]; }
+let arrasto = null;
+document.addEventListener("pointerdown", ev => {
+  if (!lab.clique || !ev.target || !ev.target.closest || !ev.target.closest("#ar-marcas")) return;
+  ev.preventDefault(); const q = pontoNaFoto(ev); if (!q) return;
+  if (lab.clique === "recorte") { arrasto = q; return; }
+  const P = lab.arq.par;
+  if (lab.clique === "centro") { P.centro = q; lab.clique = null; processarArquivo(); desenhar(); focar("dt-m-centro"); return; }
+  if (!lab.marca1) { lab.marca1 = q; desenhar(); return; }
+  if (lab.clique === "cota") { P.cota = { p: lab.marca1, q, mm: P.cota && P.cota.mm ? P.cota.mm : 0 }; lab.marca1 = null; lab.clique = null; processarArquivo(); desenhar(); focar("dt-cmm"); return; }
+  if (lab.clique === "eixo") { P.eixo = { p: lab.marca1, q }; lab.marca1 = null; lab.clique = null; processarArquivo(); desenhar(); focar("dt-m-eixo"); }
+});
+document.addEventListener("pointermove", ev => {
+  if (!arrasto) return; const q = pontoNaFoto(ev), sv = document.getElementById("ar-marcas"); if (!q || !sv) return;
+  let r = sv.querySelector("rect.dt-recorte"); if (!r) { r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("class", "dt-recorte"); sv.appendChild(r); }
+  r.setAttribute("x", Math.min(q[0], arrasto[0])); r.setAttribute("y", Math.min(q[1], arrasto[1])); r.setAttribute("width", Math.abs(q[0] - arrasto[0])); r.setAttribute("height", Math.abs(q[1] - arrasto[1]));
+});
+document.addEventListener("pointerup", ev => {
+  if (!arrasto) return; const q = pontoNaFoto(ev) || arrasto, a0 = arrasto; arrasto = null;
+  const w = Math.abs(q[0] - a0[0]), h = Math.abs(q[1] - a0[1]);
+  if (w > 3 && h > 3) { lab.arq.par.recorte = { x: Math.min(q[0], a0[0]), y: Math.min(q[1], a0[1]), w, h }; lab.arq.par.eixo = null; lab.arq.par.centro = null; lab.arq.tipos = {}; }
+  lab.clique = null; processarArquivo(); desenhar(); focar("dt-m-recorte");
 });
 document.addEventListener("submit", async ev => {
   const fm = ev.target; if (!fm || !fm.id) return;

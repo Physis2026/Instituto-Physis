@@ -443,6 +443,295 @@ function escreverIfc(objetos, nomeProjeto) {
 const CORES_PECA = [["verde", "Verde profundo", "Deep green", "#0B3D2E"], ["laranja", "Laranja", "Orange", "#F97316"], ["terracota", "Terracota", "Terracotta", "#BB6B4A"],
   ["creme", "Creme", "Cream", "#F4F1EA"], ["areia", "Areia", "Sand", "#D9D3C2"], ["carvao", "Carvão", "Charcoal", "#1B1F23"], ["oliva", "Verde-oliva", "Olive green", "#4A5A47"]];
 
+/* ════════ modo "desenho técnico": ler traços (não manchas), regiões, revolução e padrão circular (dona, 21/11/2026) ════════
+   Coordenadas da grade: x para a direita, y para baixo (como a imagem). Em mm: X = x·cel, Y = (ny − y)·cel (y para cima). */
+/* componentes ligadas da tinta (vizinhança de 8), com caixa e área */
+function rotular8(M, nx, ny) {
+  const rot = new Int32Array(nx * ny).fill(-1), comps = [], pilha = [];
+  for (let k = 0; k < nx * ny; k++) {
+    if (!M[k] || rot[k] >= 0) continue;
+    const c = { id: comps.length, area: 0, x0: nx, y0: ny, x1: -1, y1: -1 }; comps.push(c); rot[k] = c.id; pilha.push(k);
+    while (pilha.length) {
+      const q = pilha.pop(), i = q % nx, j = (q - i) / nx; c.area++;
+      if (i < c.x0) c.x0 = i; if (i > c.x1) c.x1 = i; if (j < c.y0) c.y0 = j; if (j > c.y1) c.y1 = j;
+      for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+        const a = i + di, b = j + dj; if (a < 0 || b < 0 || a >= nx || b >= ny) continue; const w = b * nx + a;
+        if (M[w] && rot[w] < 0) { rot[w] = c.id; pilha.push(w); } }
+    }
+  }
+  return { rot, comps };
+}
+/* largura típica do traço: mediana dos trechos de tinta na horizontal e na vertical */
+function larguraTraco(M, nx, ny) {
+  const corridas = [];
+  for (let j = 0; j < ny; j++) { let n = 0; for (let i = 0; i <= nx; i++) { if (i < nx && M[j * nx + i]) n++; else if (n) { corridas.push(n); n = 0; } } }
+  for (let i = 0; i < nx; i++) { let n = 0; for (let j = 0; j <= ny; j++) { if (j < ny && M[j * nx + i]) n++; else if (n) { corridas.push(n); n = 0; } } }
+  if (!corridas.length) return 1;
+  corridas.sort((a, b) => a - b); return Math.max(1, corridas[Math.floor(corridas.length / 2)]);
+}
+/* erosão e dilatação por um quadrado de lado 2r+1 (separáveis) */
+function morfo(M, nx, ny, r, dilatar) {
+  if (!(r > 0)) return Uint8Array.from(M);
+  const A = new Uint8Array(nx * ny), B = new Uint8Array(nx * ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    let v = dilatar ? 0 : 1;
+    for (let d = -r; d <= r; d++) { const x = i + d, m = x >= 0 && x < nx ? M[j * nx + x] : 0; if (dilatar ? m : !m) { v = dilatar ? 1 : 0; break; } }
+    A[j * nx + i] = v; }
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    let v = dilatar ? 0 : 1;
+    for (let d = -r; d <= r; d++) { const y = j + d, m = y >= 0 && y < ny ? A[y * nx + i] : 0; if (dilatar ? m : !m) { v = dilatar ? 1 : 0; break; } }
+    B[j * nx + i] = v; }
+  return B;
+}
+/* afinamento de Zhang e Suen (1984): o traço vira uma linha de 1 célula, o "esqueleto" */
+function afinar(M, nx, ny) {
+  const S = Uint8Array.from(M), p = (i, j) => (i >= 0 && j >= 0 && i < nx && j < ny) ? S[j * nx + i] : 0;
+  let mudou = true, guarda = 0;
+  while (mudou && guarda++ < 200) {
+    mudou = false;
+    for (let passo = 0; passo < 2; passo++) {
+      const tirar = [];
+      for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+        if (!S[j * nx + i]) continue;
+        const v = [p(i, j - 1), p(i + 1, j - 1), p(i + 1, j), p(i + 1, j + 1), p(i, j + 1), p(i - 1, j + 1), p(i - 1, j), p(i - 1, j - 1)];
+        const B = v.reduce((s, x) => s + x, 0); if (B < 2 || B > 6) continue;
+        let A = 0; for (let k = 0; k < 8; k++) if (!v[k] && v[(k + 1) % 8]) A++; if (A !== 1) continue;
+        if (passo === 0 ? (v[0] * v[2] * v[4] || v[2] * v[4] * v[6]) : (v[0] * v[2] * v[6] || v[0] * v[4] * v[6])) continue;
+        tirar.push(j * nx + i);
+      }
+      if (tirar.length) { mudou = true; tirar.forEach(k => { S[k] = 0; }); }
+    }
+  }
+  return S;
+}
+/* esqueleto → linhas (de ponta ou cruzamento até ponta ou cruzamento; laços fechados soltos também) */
+function tracarEsqueleto(S, nx, ny) {
+  const viz = k => { const i = k % nx, j = (k - i) / nx, o = []; for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+    if (!di && !dj) continue; const a = i + di, b = j + dj; if (a >= 0 && b >= 0 && a < nx && b < ny && S[b * nx + a]) o.push(b * nx + a); } return o; };
+  const grau = new Uint8Array(nx * ny); for (let k = 0; k < nx * ny; k++) if (S[k]) grau[k] = viz(k).length;
+  const usada = new Set(), chave = (a, b) => a < b ? a + "," + b : b + "," + a, linhas = [], pt = k => [k % nx + 0.5, Math.floor(k / nx) + 0.5];
+  const seguir = (ini, prox) => { const l = [ini]; let ant = ini, at = prox; usada.add(chave(ini, prox));
+    while (true) { l.push(at); if (grau[at] !== 2) break; const n = viz(at).filter(w => w !== ant && !usada.has(chave(at, w))); if (!n.length) break;
+      usada.add(chave(at, n[0])); ant = at; at = n[0]; if (at === ini) { l.push(at); break; } }
+    return l; };
+  for (let k = 0; k < nx * ny; k++) if (S[k] && grau[k] !== 2) viz(k).forEach(w => { if (!usada.has(chave(k, w))) linhas.push(seguir(k, w)); });
+  for (let k = 0; k < nx * ny; k++) if (S[k] && grau[k] === 2) viz(k).forEach(w => { if (!usada.has(chave(k, w))) linhas.push(seguir(k, w)); });
+  return linhas.filter(l => l.length >= 2).map(l => l.map(pt));
+}
+/* círculo por mínimos quadrados (Kåsa): centro, raio e resíduo médio */
+function ajustarCirculo(pts) {
+  const n = pts.length; if (n < 3) return null;
+  let sx = 0, sy = 0; pts.forEach(p => { sx += p[0]; sy += p[1]; }); const mx = sx / n, my = sy / n;
+  let suu = 0, svv = 0, suv = 0, suuu = 0, svvv = 0, suvv = 0, svuu = 0;
+  pts.forEach(p => { const u = p[0] - mx, v = p[1] - my; suu += u * u; svv += v * v; suv += u * v; suuu += u * u * u; svvv += v * v * v; suvv += u * v * v; svuu += v * u * u; });
+  const det = suu * svv - suv * suv; if (Math.abs(det) < 1e-12) return null;
+  const b1 = (suuu + suvv) / 2, b2 = (svvv + svuu) / 2, uc = (b1 * svv - b2 * suv) / det, vc = (suu * b2 - suv * b1) / det;
+  const r = Math.sqrt(uc * uc + vc * vc + (suu + svv) / n), cx = uc + mx, cy = vc + my;
+  let rms = 0; pts.forEach(p => { const d = Math.hypot(p[0] - cx, p[1] - cy) - r; rms += d * d; });
+  return { cx, cy, r, rms: Math.sqrt(rms / n) };
+}
+/* um laço vira primitivas exatas: círculo inteiro (se couber) ou trechos retos e arcos (Douglas-Peucker + ajuste de arco) */
+function primitivas(l, tol) {
+  tol = tol || 1;
+  const c = l.length >= 8 ? ajustarCirculo(l) : null;
+  if (c && c.r > 3 * tol && c.rms < Math.max(0.35 * tol, 0.02 * c.r)) {
+    const n = Math.max(24, Math.min(128, Math.round(2 * Math.PI * c.r / tol))), pts = [];
+    for (let i = 0; i < n; i++) { const a = 2 * Math.PI * i / n; pts.push([c.cx + c.r * Math.cos(a), c.cy + c.r * Math.sin(a)]); }
+    return { pts, prims: [{ tipo: "circulo", cx: c.cx, cy: c.cy, r: c.r }] };
+  }
+  const s = simplificarLaco(l, tol), prims = [], out = [];
+  let ext = 0; s.forEach(p => s.forEach(q => { ext = Math.max(ext, Math.hypot(p[0] - q[0], p[1] - q[1])); }));
+  const varredura = (ca, tr) => { let tot = 0, a = Math.atan2(tr[0][1] - ca.cy, tr[0][0] - ca.cx);
+    for (let k = 1; k < tr.length; k++) { const b = Math.atan2(tr[k][1] - ca.cy, tr[k][0] - ca.cx); let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; tot += d; a = b; }
+    return tot; };
+  // trechos com 5 ou mais vértices seguidos que cabem num arco (raio menor que a peça, 30° ou mais) viram um arco exato
+  let i = 0;
+  while (i < s.length) {
+    let j = i + 4, melhor = null;
+    while (j < s.length) { const tr = s.slice(i, j + 1), ca = ajustarCirculo(tr);
+      if (ca && ca.rms < 0.35 * tol && ca.r < ext && Math.abs(varredura(ca, tr)) >= Math.PI / 6) { melhor = { j, ca, tr }; j++; } else break; }
+    if (melhor) {
+      const { ca, tr } = melhor, a0 = Math.atan2(tr[0][1] - ca.cy, tr[0][0] - ca.cx), da = varredura(ca, tr), n = Math.max(4, Math.ceil(Math.abs(da) * ca.r / tol));
+      for (let k = 0; k < n; k++) { const a = a0 + da * k / n; out.push([ca.cx + ca.r * Math.cos(a), ca.cy + ca.r * Math.sin(a)]); }
+      prims.push({ tipo: "arco", cx: ca.cx, cy: ca.cy, r: ca.r }); i = melhor.j;
+    } else { out.push(s[i]); prims.push({ tipo: "reta" }); i++; }
+  }
+  return { pts: out.length >= 3 ? out : s, prims };
+}
+/* recorte de um laço por um semiplano (Sutherland–Hodgman): fica o lado com f(p) ≥ 0 */
+function recortarLaco(l, f) {
+  const out = [];
+  for (let i = 0; i < l.length; i++) {
+    const a = l[i], b = l[(i + 1) % l.length], fa = f(a), fb = f(b);
+    if (fa >= 0) out.push(a);
+    if ((fa >= 0) !== (fb >= 0)) { const t = fa / (fa - fb); out.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]); }
+  }
+  return out.length >= 3 ? out : null;
+}
+/* lê uma vista de desenho técnico: traços, texto, cotas e hachuras; devolve as regiões (perfil, furo, ignorado) em células */
+function lerDesenho(rgba, nx, ny, op) {
+  op = op || {};
+  const g = suavizar(cinza(rgba, nx * ny), nx, ny, op.suavizar || 0), auto = otsu(g), L = op.limiar == null || op.limiar === "" ? auto : +op.limiar;
+  const M = new Uint8Array(nx * ny); for (let k = 0; k < nx * ny; k++) { const escuro = g[k] < L; M[k] = (op.inverter ? !escuro : escuro) ? 1 : 0; }
+  const s = larguraTraco(M, nx, ny), lado = Math.min(nx, ny), textoMax = op.textoMax || Math.max(6 * s, Math.round(0.045 * lado));
+  const ign = [];                                       // o que foi ignorado (para mostrar e poder reincluir)
+  // 1. texto, setas soltas e traços curtos (componentes pequenos e isolados)
+  const R = rotular8(M, nx, ny), M2 = Uint8Array.from(M), pequeno = [];
+  R.comps.forEach(c => { const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+    if (Math.max(w, h) <= textoMax) { const alongado = Math.max(w, h) >= 3 * Math.min(w, h) && Math.min(w, h) <= 2 * s;
+      c.tipo = alongado ? "traco_curto" : "texto"; pequeno.push(c); } });
+  if (!op.manterTexto) { const marca = new Uint8Array(R.comps.length); pequeno.forEach(c => { marca[c.id] = 1; ign.push({ tipo: c.tipo, x0: c.x0, y0: c.y0, x1: c.x1, y1: c.y1 }); });
+    for (let k = 0; k < nx * ny; k++) if (M2[k] && marca[R.rot[k]]) M2[k] = 0; }
+  // 2. hachuras: no esqueleto, trechos retos curtos e paralelos, em diagonal
+  const esq = afinar(M2, nx, ny), linhas = tracarEsqueleto(esq, nx, ny), cand = [];
+  linhas.forEach(l => { const a = l[0], b = l[l.length - 1], comp = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (comp < 3 * s || comp > 0.5 * lado) return;
+    let desvio = 0; l.forEach(p => { desvio = Math.max(desvio, Math.abs((b[1] - a[1]) * (p[0] - a[0]) - (b[0] - a[0]) * (p[1] - a[1])) / comp); });
+    if (desvio > Math.max(1.5, 0.6 * s)) return;
+    let ang = Math.atan2(-(b[1] - a[1]), b[0] - a[0]) * 180 / Math.PI; ang = ((ang % 180) + 180) % 180;
+    if ((ang >= 20 && ang <= 70) || (ang >= 110 && ang <= 160)) cand.push({ l, ang, meio: l[Math.floor(l.length / 2)] }); });
+  const hach = op.manterHachura ? [] : cand.filter(c => cand.filter(o => Math.abs(o.ang - c.ang) <= 8).length >= 4);
+  const M3 = Uint8Array.from(M2), rH = Math.ceil(s / 2) + 1, ponta = 1.5 * s + 2;
+  hach.forEach(c => { const a = c.l[0], b = c.l[c.l.length - 1]; let x0 = nx, y0 = ny, x1 = 0, y1 = 0;
+    c.l.forEach(p => { if (Math.hypot(p[0] - a[0], p[1] - a[1]) < ponta || Math.hypot(p[0] - b[0], p[1] - b[1]) < ponta) return;
+      const i = Math.floor(p[0]), j = Math.floor(p[1]); x0 = Math.min(x0, i); y0 = Math.min(y0, j); x1 = Math.max(x1, i); y1 = Math.max(y1, j);
+      for (let dj = -rH; dj <= rH; dj++) for (let di = -rH; di <= rH; di++) { const u = i + di, v = j + dj; if (u >= 0 && v >= 0 && u < nx && v < ny) M3[v * nx + u] = 0; } });
+    if (x1 >= x0) ign.push({ tipo: "hachura", x0, y0, x1, y1 }); });
+  // 3. regiões fechadas (fundo cercado de tinta), com a profundidade de cada uma (dentro de quantos contornos está)
+  const fundo = componentes(M3, nx, ny, 0), nR = fundo.tam.length, prof = new Int32Array(nR).fill(-1), hachDentro = new Int32Array(nR);
+  hach.forEach(c => { const i = Math.floor(c.meio[0]), j = Math.floor(c.meio[1]), r = fundo.rot[j * nx + i]; if (r >= 0) hachDentro[r]++; });
+  // por região: primeiro pixel, área, borda (perímetro) e momentos, numa passada só
+  const prim = new Int32Array(nR).fill(-1), area = new Float64Array(nR), per = new Float64Array(nR), sx = new Float64Array(nR), sy = new Float64Array(nR),
+    sxx = new Float64Array(nR), syy = new Float64Array(nR), sxy = new Float64Array(nR);
+  for (let k = 0; k < nx * ny; k++) { const r = fundo.rot[k]; if (r < 0) continue; if (prim[r] < 0) prim[r] = k; const i = k % nx, j = (k - i) / nx;
+    area[r]++; sx[r] += i; sy[r] += j; sxx[r] += i * i; syy[r] += j * j; sxy[r] += i * j;
+    if (i === 0 || j === 0 || i === nx - 1 || j === ny - 1 || M3[k - 1] || M3[k + 1] || M3[k - nx] || M3[k + nx]) per[r]++; }
+  const pai = r => { const k = prim[r];
+    let i = k % nx; const j = (k - i) / nx; while (i > 0 && fundo.rot[j * nx + i] === r) i--; while (i > 0 && M3[j * nx + i]) i--; return i >= 0 ? fundo.rot[j * nx + i] : -1; };
+  const profDe = (r, n) => { if (prof[r] >= 0) return prof[r]; if (fundo.borda[r] || n > 40) return (prof[r] = 0); const p = pai(r); return (prof[r] = p < 0 || p === r ? 1 : profDe(p, n + 1) + 1); };
+  const material = new Uint8Array(nR);
+  // fresta entre duas linhas de hachura: fina (espessura ≈ 2·área/perímetro) e em diagonal — é material, não furo
+  // espaçamento típico da hachura: distância entre linhas vizinhas, medida na normal (mediana)
+  let passoH = 3 * s;
+  if (hach.length >= 4) { const th = hach[0].ang * Math.PI / 180, nxh = Math.sin(th), nyh = Math.cos(th);
+    const pr = hach.filter(c => Math.abs(c.ang - hach[0].ang) <= 8).map(c => c.meio[0] * nxh + c.meio[1] * nyh).sort((u, v) => u - v), ds = [];
+    for (let i = 1; i < pr.length; i++) if (pr[i] - pr[i - 1] > 1) ds.push(pr[i] - pr[i - 1]);
+    if (ds.length) { ds.sort((u, v) => u - v); passoH = Math.max(passoH, 1.5 * ds[Math.floor(ds.length / 2)]); } }
+  const fresta = r => { const n = area[r]; if (n < 2 || hach.length < 4) return false; const esp = 2 * n / Math.max(1, per[r]);
+    const mx = sx[r] / n, my = sy[r] / n, a_ = sxx[r] / n - mx * mx, b_ = syy[r] / n - my * my, c_ = sxy[r] / n - mx * my;
+    const l1 = (a_ + b_) / 2 + Math.sqrt(((a_ - b_) / 2) ** 2 + c_ * c_), l2 = (a_ + b_) / 2 - Math.sqrt(((a_ - b_) / 2) ** 2 + c_ * c_);
+    let ang = Math.atan2(-(l1 - a_), c_ || 1e-12) * 180 / Math.PI; ang = ((ang % 180) + 180) % 180;
+    const diag = (ang >= 20 && ang <= 70) || (ang >= 110 && ang <= 160);
+    return esp <= passoH && l1 > 4 * Math.max(l2, 0.25) && diag; };
+  for (let r = 0; r < nR; r++) { if (fundo.borda[r]) continue; const d = profDe(r, 0); material[r] = hachDentro[r] >= 2 || fresta(r) || (d % 2 === 1) ? 1 : 0; }
+  // seção hachurada manda: dentro dela, o que não é hachura continua furo só se for grande
+  const F = new Uint8Array(nx * ny);
+  for (let k = 0; k < nx * ny; k++) { if (M3[k]) F[k] = 1; else { const r = fundo.rot[k]; if (r >= 0 && !fundo.borda[r] && material[r]) F[k] = 1; } }
+  // 4. linhas soltas (cotas, linhas de chamada, de centro) somem na abertura; volta meia espessura de traço para o meio da linha
+  const rA = Math.ceil(s) + (op.abertura || 0), aberto = morfo(morfo(F, nx, ny, rA, false), nx, ny, rA, true), meio = Math.floor(s / 2);
+  const Fin = meio > 0 ? morfo(aberto, nx, ny, meio, false) : aberto;
+  // 5. regiões finais: cada componente vira um corpo, com os seus furos; o pequeno demais e o quadro de notas são ignorados
+  const reg = componentes(Fin, nx, ny, 1), areaMin = op.areaMin || Math.max(4 * s * s * 4, Math.round(0.002 * nx * ny)), regioes = [];
+  reg.tam.forEach((area, id) => {
+    let x0 = nx, y0 = ny, x1 = 0, y1 = 0; for (let k = 0; k < nx * ny; k++) if (reg.rot[k] === id) { const i = k % nx, j = (k - i) / nx; if (i < x0) x0 = i; if (i > x1) x1 = i; if (j < y0) y0 = j; if (j > y1) y1 = j; }
+    const textos = pequeno.filter(c => c.tipo === "texto" && c.x0 >= x0 && c.x1 <= x1 && c.y0 >= y0 && c.y1 <= y1).length;
+    let tipo = "corpo", motivo = "";
+    if (area < areaMin) { tipo = "ignorado"; motivo = "cota"; }
+    else if (textos >= 3 && !hach.some(c => c.meio[0] >= x0 && c.meio[0] <= x1 + 1 && c.meio[1] >= y0 && c.meio[1] <= y1 + 1)) { tipo = "ignorado"; motivo = "texto"; }
+    regioes.push({ id, area, x0, y0, x1, y1, tipo, motivo, hachurada: hach.some(c => reg.rot[Math.floor(c.meio[1]) * nx + Math.floor(c.meio[0])] === id || (c.meio[0] >= x0 && c.meio[0] <= x1 + 1 && c.meio[1] >= y0 && c.meio[1] <= y1 + 1)) });
+  });
+  // 6. linha de centro: traços curtos alinhados (traço e ponto) na vertical ou na horizontal
+  let eixo = null; const tr = pequeno.filter(c => c.tipo === "traco_curto" || (c.x1 - c.x0 <= 2 * s || c.y1 - c.y0 <= 2 * s));
+  const grupos = {}; tr.forEach(c => { const v = c.y1 - c.y0 > c.x1 - c.x0, k = (v ? "v" : "h") + Math.round(((v ? c.x0 + c.x1 : c.y0 + c.y1) / 2) / Math.max(2, s)); (grupos[k] = grupos[k] || []).push(c); });
+  Object.keys(grupos).forEach(k => { const gs = grupos[k]; if (gs.length < 3) return; const v = k[0] === "v";
+    const ini = Math.min(...gs.map(c => v ? c.y0 : c.x0)), fim = Math.max(...gs.map(c => v ? c.y1 : c.x1)); if (fim - ini < 0.3 * (v ? ny : nx)) return;
+    const pos = gs.reduce((a, c) => a + (v ? (c.x0 + c.x1 + 1) / 2 : (c.y0 + c.y1 + 1) / 2), 0) / gs.length;
+    if (!eixo || gs.length > eixo.n) eixo = { n: gs.length, p: v ? [pos, ini] : [ini, pos], q: v ? [pos, fim + 1] : [fim + 1, pos] }; });
+  return { M: Fin, rot: reg.rot, regioes, ignorados: ign, tracos: linhas, hachuras: hach.length, textos: pequeno.filter(c => c.tipo === "texto").length,
+    traco: s, limiar: L, otsu: auto, eixo: eixo ? { p: eixo.p, q: eixo.q } : null };
+}
+/* laços (em células) de uma região, já em mm, com primitivas ajustadas; outer = perfil, inner = furo */
+function lacosDaRegiao(D, id, nx, ny, cel, tol) {
+  const Mr = new Uint8Array(nx * ny); for (let k = 0; k < nx * ny; k++) if (D.rot[k] === id) Mr[k] = 1;
+  return contornos(Mr, nx, ny, 1, 0.5).map(l => { const p = primitivas(l, tol || 1);
+    return { tipo: area2(p.pts) >= 0 ? "perfil" : "furo", prims: p.prims, laco: p.pts.map(q => [q[0] * cel, q[1] * cel]) }; });
+}
+/* revolução: laços no plano do desenho (mm, y para cima) giram em volta do eixo p–q; n segmentos. O lado: +1 = à direita do eixo
+   (ou abaixo, se o eixo for horizontal), −1 = o outro
+   (o outro lado é cortado, como numa meia-seção). Z da peça = ao longo do eixo. */
+function revolver(lacos, eixo, n, lado) {
+  n = Math.max(6, Math.min(512, Math.round(n || 64))); lado = lado < 0 ? -1 : 1;
+  const [px, py] = eixo.p, [qx, qy] = eixo.q, L = Math.hypot(qx - px, qy - py); if (!(L > 0)) throw new Error("eixo sem comprimento");
+  let ux = (qx - px) / L, uy = (qy - py) / L; if (uy < -1e-9 || (Math.abs(uy) <= 1e-9 && ux < 0)) { ux = -ux; uy = -uy; }
+  const rz = p => [lado * ((p[0] - px) * uy - (p[1] - py) * ux), (p[0] - px) * ux + (p[1] - py) * uy];
+  const out = [];
+  lacos.forEach(l => {
+    const rl = recortarLaco(l.map(rz), p => p[0]); if (!rl) return;
+    const lim = rl.map(p => [Math.max(0, p[0]), p[1]]);
+    for (let i = 0; i < lim.length; i++) { const a = lim[i], b = lim[(i + 1) % lim.length]; if (a[0] < 1e-9 && b[0] < 1e-9) continue;
+      for (let k = 0; k < n; k++) { const t0 = 2 * Math.PI * k / n, t1 = 2 * Math.PI * (k + 1) / n, P = (p, t) => [p[0] * Math.cos(t), p[0] * Math.sin(t), p[1]];
+        const A0 = P(a, t0), B0 = P(b, t0), B1 = P(b, t1), A1 = P(a, t1);
+        if (a[0] > 1e-9) out.push(...A0, ...B0, ...A1); if (b[0] > 1e-9) out.push(...B0, ...B1, ...A1); } }
+  });
+  if (!out.length) throw new Error("o perfil não tem nada do lado escolhido do eixo");
+  const T = new Float32Array(out); let v = 0;
+  for (let i = 0; i < T.length; i += 9) v += T[i] * (T[i + 4] * T[i + 8] - T[i + 5] * T[i + 7]) - T[i + 1] * (T[i + 3] * T[i + 8] - T[i + 5] * T[i + 6]) + T[i + 2] * (T[i + 3] * T[i + 7] - T[i + 4] * T[i + 6]);
+  if (v < 0) for (let i = 0; i < T.length; i += 9) for (let k = 0; k < 3; k++) { const x = T[i + 3 + k]; T[i + 3 + k] = T[i + 6 + k]; T[i + 6 + k] = x; }
+  const zmin = caixaDe(T).min[2]; for (let i = 2; i < T.length; i += 3) T[i] -= zmin;
+  return T;
+}
+/* padrão circular: n cópias de T em volta do eixo vertical que passa por centro (mm); devolve a lista dos n corpos */
+function padraoCircular(T, n, centro) {
+  n = Math.max(1, Math.min(360, Math.round(n || 1))); const c = centro || [0, 0], lista = [];
+  for (let k = 0; k < n; k++) lista.push(transformar(T, [0, 0, 0], [0, 0, 360 * k / n], 1, [c[0], c[1], 0]));
+  return lista;
+}
+/* quantos corpos separados há numa malha (vértices ligados por triângulos) */
+function corpos(T) {
+  const id = new Map(), pai = [], ch = i => T[i].toFixed(4) + "," + T[i + 1].toFixed(4) + "," + T[i + 2].toFixed(4);
+  const raiz = a => { while (pai[a] !== a) a = pai[a] = pai[pai[a]]; return a; };
+  const no = i => { const c = ch(i); let v = id.get(c); if (v == null) { v = pai.length; pai.push(v); id.set(c, v); } return v; };
+  for (let i = 0; i < T.length; i += 9) { const a = raiz(no(i)), b = raiz(no(i + 3)), c = raiz(no(i + 6)); pai[b] = a; pai[raiz(c)] = a; }
+  return new Set(pai.map((_, i) => raiz(i))).size;
+}
+/* folha sintética de desenho técnico para os testes: meia-seção de uma bucha com flange (cotas conhecidas, hachura a 45°,
+   linha de centro de traço e ponto, linhas de cota com setas e textos) e um quadro de notas. pxmm = pixels por mm. */
+function folhaSintetica(doc, pxmm) {
+  pxmm = pxmm || 6; const W = 900, H = 600, cv = doc.createElement("canvas"); cv.width = W; cv.height = H; const c = cv.getContext("2d");
+  c.fillStyle = "#FFFFFF"; c.fillRect(0, 0, W, H); c.strokeStyle = "#000000"; c.fillStyle = "#000000"; c.lineWidth = 2;
+  // bucha: furo Ø20 (r 10), cubo Ø36 (r 18) com 30 de altura, flange Ø60 (r 30) com 8 de espessura (z de 0 a 38)
+  const B = { ri: 10, ro: 18, rf: 30, hf: 8, hh: 30 }, ex = 260, base = 480, X = r => ex + r * pxmm, Y = z => base - z * pxmm;
+  const perfil = [[B.ri, 0], [B.rf, 0], [B.rf, B.hf], [B.ro, B.hf], [B.ro, B.hf + B.hh], [B.ri, B.hf + B.hh]];
+  c.beginPath(); perfil.forEach((p, i) => (i ? c.lineTo : c.moveTo).call(c, X(p[0]), Y(p[1]))); c.closePath(); c.stroke();
+  c.save(); c.beginPath(); perfil.forEach((p, i) => (i ? c.lineTo : c.moveTo).call(c, X(p[0]), Y(p[1]))); c.closePath(); c.clip(); c.lineWidth = 1.5;
+  for (let d = -400; d < 400; d += 12) { c.beginPath(); c.moveTo(ex + d, base + 50); c.lineTo(ex + d + 400, base - 350); c.stroke(); }
+  c.restore(); c.lineWidth = 2;
+  // outra metade em vista (sem hachura) e a linha de centro (traço e ponto)
+  c.beginPath(); perfil.forEach((p, i) => (i ? c.lineTo : c.moveTo).call(c, ex - p[0] * pxmm, Y(p[1]))); c.closePath(); c.stroke();
+  c.lineWidth = 1.5; for (let y = Y(B.hf + B.hh) - 30; y < base + 30; y += 22) { c.beginPath(); c.moveTo(ex, y); c.lineTo(ex, y + 12); c.stroke(); c.beginPath(); c.moveTo(ex, y + 16); c.lineTo(ex, y + 18); c.stroke(); }
+  // cotas: linhas com setas e números
+  const cota = (x0, y0, x1, y1, txt) => { c.lineWidth = 1; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+    [[x0, y0, 1], [x1, y1, -1]].forEach(([x, y, s]) => { const a = Math.atan2(y1 - y0, x1 - x0); c.beginPath(); c.moveTo(x, y);
+      c.lineTo(x + s * 10 * Math.cos(a) - 4 * Math.sin(a), y + s * 10 * Math.sin(a) + 4 * Math.cos(a)); c.lineTo(x + s * 10 * Math.cos(a) + 4 * Math.sin(a), y + s * 10 * Math.sin(a) - 4 * Math.cos(a)); c.closePath(); c.fill(); });
+    c.font = "16px sans-serif"; c.fillText(txt, (x0 + x1) / 2 - 14, (y0 + y1) / 2 - 6); };
+  cota(X(-B.rf), base + 40, X(B.rf), base + 40, "Ø60"); cota(X(B.rf) + 40, Y(0), X(B.rf) + 40, Y(B.hf + B.hh), "38"); cota(X(-B.ro), Y(B.hf + B.hh) - 40, X(B.ro), Y(B.hf + B.hh) - 40, "Ø36");
+  // quadro de notas
+  c.lineWidth = 2; c.strokeRect(620, 60, 250, 140); c.font = "15px sans-serif";
+  ["NOTAS:", "1. MATERIAL: PLA RECICLADO", "2. COTAS EM mm", "3. TOLERANCIA GERAL 0,2"].forEach((s, i) => c.fillText(s, 632, 88 + 26 * i));
+  c.font = "18px sans-serif"; c.fillText("PECA 1 - BUCHA COM FLANGE", 40, 40);
+  return { cv, W, H, pxmm, bucha: B, eixoPx: { p: [ex, Y(B.hf + B.hh) - 30], q: [ex, base + 30] }, recorte: { x: 40, y: 100, w: 560, h: 480 },
+    volume: Math.PI * (B.rf * B.rf - B.ri * B.ri) * B.hf + Math.PI * (B.ro * B.ro - B.ri * B.ri) * B.hh };
+}
+/* roda a leitura da folha sintética (no navegador) e confere a revolução */
+function testeFolha(doc) {
+  const F = folhaSintetica(doc, 6), r = F.recorte, cx = F.cv.getContext("2d"), im = cx.getImageData(r.x, r.y, r.w, r.h);
+  const D = lerDesenho(im.data, r.w, r.h, {}), cel = 1 / F.pxmm, corposR = D.regioes.filter(g => g.tipo === "corpo");
+  const ex = F.eixoPx.p[0] - r.x, eixo = { p: [ex * cel, (r.h - (F.eixoPx.p[1] - r.y)) * cel], q: [ex * cel, (r.h - (F.eixoPx.q[1] - r.y)) * cel] };
+  const lacos = []; corposR.forEach(g => lacosDaRegiao(D, g.id, r.w, r.h, cel, 1).forEach(l => lacos.push(l.laco)));
+  const T = revolver(lacos, eixo, 128, 1);
+  return { D, corpos: corposR.length, T, volumeEsperado: F.volume, eixoDetectado: D.eixo, F };
+}
+
 /* ════════ peças de teste de impressão (geradas aqui; nada copiado de terceiros) ════════ */
 function caixa(out, x0, y0, z0, dx, dy, dz) {
   const x1 = x0 + dx, y1 = y0 + dy, z1 = z0 + dz;
@@ -564,10 +853,34 @@ function autoteste() {
   const z3 = escrever3MFMontagem([{ nome: "a", T: c1.T, cor: "#0B3D2E" }, { nome: "b", T: c3.T, cor: "#F97316" }]);
   ok("3MF da montagem é ZIP com duas peças", z3[0] === 0x50 && z3[1] === 0x4B && new TextDecoder().decode(z3).split("<object ").length === 3);
   const ifc = escreverIfc([{ nome: "Caixa", T: c1.T }], "teste");
+  // desenho técnico: folha sintética com a meia-seção de uma bucha de cotas conhecidas (só no navegador, com canvas)
+  if (typeof document !== "undefined" && document.createElement && P && P.medir) {
+    try { const tf = testeFolha(document), mf = P.medir(tf.T), erro = Math.abs(mf.volume_mm3 - tf.volumeEsperado) / tf.volumeEsperado;
+      ok("desenho técnico: texto, cotas e quadro de notas não viram corpo", tf.D.regioes.filter(g => g.tipo === "corpo").length === 2, JSON.stringify(tf.D.regioes.map(g => g.tipo + ":" + g.motivo + ":" + g.area)));
+      ok("desenho técnico: a hachura é lida como hachura", tf.D.hachuras >= 4, tf.D.hachuras);
+      ok("desenho técnico: linha de centro achada", !!tf.eixoDetectado && Math.abs(tf.eixoDetectado.p[0] - (tf.F.eixoPx.p[0] - tf.F.recorte.x)) <= 3, JSON.stringify(tf.eixoDetectado));
+      ok("revolução da meia-seção: malha fechada", mf.arestas.fechada && mf.volume_sinal === 1, JSON.stringify(mf.arestas));
+      ok("revolução da meia-seção: volume a ±2 % do analítico", erro <= 0.02, mf.volume_mm3.toFixed(1) + " × " + tf.volumeEsperado.toFixed(1) + " (" + (100 * erro).toFixed(2) + " %)");
+      // a folha inteira: o quadro de notas e o título são texto; as setas e as cotas, pequenas demais; ficam só as duas metades da bucha
+      const F2 = tf.F, D2 = lerDesenho(F2.cv.getContext("2d").getImageData(0, 0, F2.W, F2.H).data, F2.W, F2.H, {});
+      ok("desenho técnico: na folha inteira, notas e cotas ficam de fora", D2.regioes.filter(g => g.tipo === "corpo").length === 2 && D2.regioes.some(g => g.motivo === "texto"),
+        JSON.stringify(D2.regioes.map(g => g.tipo + ":" + g.motivo)));
+      ok("desenho técnico: os textos são reconhecidos e ignorados", D2.textos >= 20, D2.textos);
+    } catch (e) { ok("desenho técnico: a folha sintética roda", false, e && e.message); }
+  }
+  const pa = extrudar(PRIM.retangulo(4, 20).map(l => l.map(p => [p[0], p[1] + 20])), 5), pad = padraoCircular(pa, 6, [0, 0]);
+  ok("padrão circular de 6: 6 corpos", pad.length === 6 && corpos(juntar(pad)) === 6, corpos(juntar(pad)));
+  if (P && P.medir) ok("padrão circular: volume 6 vezes o de uma pá", Math.abs(P.medir(juntar(pad)).volume_mm3 - 6 * 4 * 20 * 5) < 1e-2);
+  const rv = revolver([[[10, 0], [20, 0], [20, 10], [10, 10]]], { p: [0, 0], q: [0, 10] }, 256, 1);
+  if (P && P.medir) ok("revolução de um retângulo: tubo π(20² − 10²)·10 a 0,1 %", Math.abs(P.medir(rv).volume_mm3 - Math.PI * 300 * 10) / (Math.PI * 3000) < 0.001, P.medir(rv).volume_mm3);
+  const cf = ajustarCirculo(PRIM.circulo(30, 40)[0].map(p => [p[0] + 5, p[1] - 3]));
+  ok("círculo por mínimos quadrados: centro e raio", Math.abs(cf.cx - 5) < 1e-6 && Math.abs(cf.cy + 3) < 1e-6 && Math.abs(cf.r - 15) < 1e-6);
   ok("IFC4 com IfcTriangulatedFaceSet", /FILE_SCHEMA\(\('IFC4'\)\)/.test(ifc) && ifc.indexOf("IFCTRIANGULATEDFACESET") > 0 && ifc.indexOf("IFCBUILDINGELEMENTPROXY") > 0);
   return r;
 }
 
 window.PhysisImagem3D = { mascara, contornos, svg, dxf, relevo, campoDeAlturas, testes, autoteste, cinza, suavizar, otsu, limpar, processarFoto,
-  extrudar, PRIM, lerDxf, caixaDe, transformar, juntar, colisoes, escrever3MFMontagem, escreverIfc, CORES_PECA, versao: "physis-imagem-3d-0.2" };
+  extrudar, PRIM, lerDxf, caixaDe, transformar, juntar, colisoes, escrever3MFMontagem, escreverIfc, CORES_PECA,
+  rotular8, larguraTraco, morfo, afinar, tracarEsqueleto, ajustarCirculo, primitivas, recortarLaco, lerDesenho, lacosDaRegiao, revolver,
+  padraoCircular, corpos, folhaSintetica, testeFolha, versao: "physis-imagem-3d-0.3" };
 })();

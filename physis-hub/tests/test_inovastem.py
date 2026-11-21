@@ -1051,5 +1051,107 @@ class EnviarArquivoEImagem3D(unittest.TestCase):
         self.assertNotRegex(fora, r"Planejador|Planner")
 
 
+
+
+class DesenhoTecnicoNaTela(unittest.TestCase):
+    """A tela do modo desenho técnico (Enviar arquivo): recorte, escala pela cota, eixo, centro, tipos dos contornos, operações,
+    "Voltar ao modo foto", Fase 2 marcada e as funções do módulo que ela usa."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.h = ler(AQUI / "web" / "inovastem-lab.html")
+        cls.js = re.search(r'<script id="lab-inovastem">\n(.*?)</script>', cls.h, re.S).group(1)
+        cls.mod = ler(RAIZ / "sistema" / "physis-imagem-3d.js")
+
+    def test_funcoes_do_modulo(self):
+        for f in ("lerDesenho", "afinar", "tracarEsqueleto", "ajustarCirculo", "primitivas", "lacosDaRegiao", "revolver", "padraoCircular", "corpos", "folhaSintetica"):
+            self.assertRegex(self.mod, rf"function {f}\(", f)
+            self.assertRegex(re.search(r"\nwindow\.PhysisImagem3D = \{(.*?)\};", self.mod, re.S).group(1), rf"\b{f}\b", f)
+        self.assertIn("Zhang", self.mod)
+        self.assertIn("Kåsa", self.mod)
+
+    def test_tela(self):
+        for k in ("I.lerDesenho(", "I.revolver(", "I.padraoCircular(", "I.lacosDaRegiao(", "data-lab-tipo", 'data-lab="dt-modo"', '["foto", "desenho"].map(k =>',
+                  'id="ar-marcas"', '"dt-clique"', '"dt-inteira"', "dt-cmm", "dt-op", "dt-seg", "dt-padrao", "dt-lado", "dt-texto", "dt-hachura", "pointerdown"):
+            self.assertIn(k, self.js, k)
+        self.assertRegex(self.js, r'dt_marcar: \{ recorte: "[^"]+", cota: "[^"]+", eixo: "[^"]+", centro: "[^"]+" \}')
+        for campo in ("dt-rx", "dt-ry", "dt-rw", "dt-rh", "dt-c1x", "dt-c2y", "dt-e1x", "dt-e2y", "dt-ox", "dt-oy"):
+            self.assertIn(campo, self.js, campo)
+        self.assertIn("Voltar ao modo foto", self.js)
+        self.assertIn("Back to photo mode", self.js)
+        self.assertIn("COLMAP", self.js)
+        self.assertIn("TripoSR", self.js)
+        self.assertRegex(self.js, r"dt_fase2: \"[^\"]*\[MARCADOR\]")
+        css = re.search(r"<style>\n(.*?)</style>", self.h, re.S).group(1)
+        for c in (".dt-perfil", ".dt-furo", ".dt-ignorado", ".dt-padrao", ".lab-marcas.ativo"):
+            self.assertIn(c, css, c)
+
+
+def _navegador():
+    """Edge, Chrome ou Chromium para rodar o autoteste do módulo no navegador, sem tela (PHYSIS_NAVEGADOR troca)."""
+    import shutil
+    cands = [os.environ.get("PHYSIS_NAVEGADOR", ""), r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+             r"C:\Program Files\Microsoft\Edge\Application\msedge.exe", r"C:\Program Files\Google\Chrome\Application\chrome.exe"]
+    cands += [shutil.which(n) or "" for n in ("msedge", "google-chrome", "chromium", "chromium-browser", "chrome")]
+    return next((c for c in cands if c and Path(c).is_file()), None)
+
+
+class DesenhoTecnicoNoNavegador(unittest.TestCase):
+    """Modo desenho técnico (dona, 21/11/2026): roda PhysisImagem3D.autoteste() num navegador sem tela, com o motor do Physis 3D.
+    Folha sintética com a meia-seção de uma bucha de cotas conhecidas → revolução fechada a ±2 % do volume analítico;
+    texto, cotas e quadro de notas não viram contorno; padrão circular de 6 → 6 corpos."""
+
+    @classmethod
+    def setUpClass(cls):
+        import html
+        import subprocess
+        nav = _navegador()
+        if not nav:
+            raise unittest.SkipTest("sem Edge, Chrome ou Chromium nesta máquina")
+        cls.tmp = tempfile.TemporaryDirectory()
+        pagina = Path(cls.tmp.name) / "autoteste.html"
+        sis = RAIZ / "sistema"
+        pagina.write_text('<!doctype html><html><head><meta charset="utf-8"></head><body><pre id="r">rodando</pre><script>'
+                          + ler(sis / "physis-3d.js") + "</script><script>" + ler(sis / "physis-imagem-3d.js") + "</script><script>"
+                          + 'try{document.getElementById("r").textContent="RES:"+JSON.stringify(PhysisImagem3D.autoteste());}'
+                          + 'catch(e){document.getElementById("r").textContent="ERRO:"+e.message;}</script></body></html>', encoding="utf-8")
+        cmd = [nav, "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check", f"--user-data-dir={Path(cls.tmp.name) / 'perfil'}",
+               "--virtual-time-budget=30000", "--dump-dom", pagina.resolve().as_uri()]
+        try:
+            saida = subprocess.run(cmd, capture_output=True, timeout=180).stdout.decode("utf-8", errors="replace")
+        except (OSError, subprocess.TimeoutExpired) as e:
+            raise unittest.SkipTest(f"o navegador não rodou: {e}")
+        m = re.search(r'<pre id="r">(.*?)</pre>', saida, re.S)
+        texto = html.unescape(m.group(1)) if m else ""
+        if not texto.startswith("RES:"):
+            raise AssertionError("autoteste não rodou: " + texto[:300])
+        cls.res = json.loads(texto[4:])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def item(self, trecho):
+        x = [r for r in self.res if trecho in r["nome"]]
+        self.assertTrue(x, "falta o item do autoteste: " + trecho)
+        return x[0]
+
+    def test_tudo_passa(self):
+        falhas = [f'{r["nome"]}: {r["info"]}' for r in self.res if not r["ok"]]
+        self.assertEqual(falhas, [])
+
+    def test_revolucao_da_meia_secao_a_2_por_cento(self):
+        r = self.item("volume a ±2 % do analítico")
+        self.assertTrue(r["ok"], r["info"])
+        self.assertTrue(self.item("revolução da meia-seção: malha fechada")["ok"])
+
+    def test_texto_e_cotas_nao_viram_contorno(self):
+        for k in ("texto, cotas e quadro de notas não viram corpo", "na folha inteira, notas e cotas ficam de fora", "a hachura é lida como hachura"):
+            self.assertTrue(self.item(k)["ok"], k)
+
+    def test_padrao_circular_de_6(self):
+        self.assertTrue(self.item("padrão circular de 6: 6 corpos")["ok"])
+
+
 if __name__ == "__main__":
     unittest.main()

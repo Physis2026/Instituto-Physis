@@ -213,6 +213,22 @@ ul.lista-limpa li{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
 #lab .lab-item.sel,#lab .lab-item[aria-pressed=true]{background:var(--acao);border-color:var(--acao);color:var(--sobre-acao)}
 #lab .lab-mini{min-height:44px;padding:4px 8px;font-size:.85rem}
 .lab-pronto{border-left:6px solid var(--semente)}
+.lab-foto-marca{position:relative;line-height:0}
+.lab-foto-marca .lab-foto{max-height:none;object-fit:fill}
+.lab-marcas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;touch-action:none}
+.lab-marcas.ativo{pointer-events:auto;cursor:crosshair;outline:3px dashed var(--semente);outline-offset:-3px}
+.lab-marcas *,.lab-cad.dt *{vector-effect:non-scaling-stroke;stroke-width:1.5px}
+.dt-recorte{fill:none;stroke:var(--semente);stroke-dasharray:6 4}
+.dt-cota{stroke:var(--sobrancelha);fill:var(--sobrancelha)}
+.dt-eixo{stroke:var(--sobrancelha);stroke-dasharray:10 4 2 4;fill:none}
+.dt-centro{fill:none;stroke:var(--sobrancelha)}
+.dt-perfil{fill:currentColor;fill-opacity:.28;stroke:currentColor}
+.dt-padrao{fill:var(--semente);fill-opacity:.4;stroke:var(--semente)}
+.dt-furo{fill:var(--sup);stroke:currentColor;stroke-dasharray:4 2}
+.dt-ignorado{fill:none;stroke:var(--borda-campo);stroke-dasharray:2 3}
+.dt-ign{fill:none;stroke:var(--borda-campo);stroke-dasharray:2 2}
+.dt-traco{fill:none;stroke:var(--tinta2);opacity:.45}
+.lab-cad.dt{background:var(--sup)}
 </style>
 <script type="application/json" id="base-3d-premissas">{"versao": 1, "atualizado": "2026-11-15", "_leia": "Physis 3D (EM DESENVOLVIMENTO). Perfis de plástico reciclado para impressão 3D, no mesmo formato de sistema/physis-premissas.json. Proposta para entrar na base de premissas (e no mapa de variáveis) quando o mapa estiver pronto; até lá a tela e o servidor leem este arquivo. TODOS os valores estão 'conferir': são valores típicos da literatura para o polímero VIRGEM; o reciclado varia por lote. Antes de usar num projeto, troque pelos da folha de dados do fornecedor do filamento ou pelo ensaio da própria oficina (torre de temperatura, cubo de calibração).", "regra": "Valores de referência não são únicos: a base de dados é por projeto. Cada projeto guarda as suas premissas; aqui fica o padrão técnico sugerido, as opções aceitas e a fonte de cada uma. Quem muda o valor de um projeto registra o motivo.", "premissas": [{"id": "impressao3d.material.rpetg", "grandeza": "Perfil de impressão do rPET/PETG reciclado (densidade, temperaturas e contração)", "valor_padrao": {"nome": "rPET / PETG reciclado", "densidade_g_cm3": 1.27, "bico_c": 240, "bico_faixa_c": [230, 250], "mesa_c": 75, "mesa_faixa_c": [70, 85], "contracao_pct": 0.4, "contracao_faixa_pct": [0.2, 0.6], "diametro_mm": 1.75}, "unidade": "g/cm³; °C; % de contração linear; mm", "opcoes": [], "fonte": "[CONFERIR] valores típicos de literatura e de fabricantes para PETG virgem; PET de garrafa tem densidade maior (cerca de 1,33 a 1,38 g/cm³). Trocar pela folha de dados do filamento reciclado usado.", "status": "conferir", "nota": "Reciclado de garrafa (PET) seca mal e cristaliza; secar antes de imprimir. Contração é de ordem de grandeza: medir no cubo de calibração."}, {"id": "impressao3d.material.rpp", "grandeza": "Perfil de impressão do rPP (polipropileno reciclado)", "valor_padrao": {"nome": "rPP (polipropileno reciclado)", "densidade_g_cm3": 0.9, "bico_c": 230, "bico_faixa_c": [210, 250], "mesa_c": 90, "mesa_faixa_c": [80, 100], "contracao_pct": 1.8, "contracao_faixa_pct": [1.0, 2.5], "diametro_mm": 1.75}, "unidade": "g/cm³; °C; % de contração linear; mm", "opcoes": [], "fonte": "[CONFERIR] valores típicos de literatura para PP virgem (densidade 0,89 a 0,91 g/cm³; contração de moldagem de 1 a 2,5 %). Trocar pela folha de dados do filamento reciclado usado.", "status": "conferir", "nota": "PP adere mal à maioria das mesas e empena muito: mesa com fita de PP ou adesivo próprio; câmara fechada ajuda."}, {"id": "impressao3d.material.rhdpe", "grandeza": "Perfil de impressão do rHDPE (polietileno de alta densidade reciclado)", "valor_padrao": {"nome": "rHDPE (PEAD reciclado)", "densidade_g_cm3": 0.95, "bico_c": 240, "bico_faixa_c": [220, 260], "mesa_c": 100, "mesa_faixa_c": [90, 110], "contracao_pct": 2.5, "contracao_faixa_pct": [1.5, 4.0], "diametro_mm": 1.75}, "unidade": "g/cm³; °C; % de contração linear; mm", "opcoes": [], "fonte": "[CONFERIR] valores típicos de literatura para PEAD virgem (densidade 0,94 a 0,97 g/cm³; contração de moldagem de 1,5 a 4 %). Poucos dados publicados para impressão FDM. Trocar pelo ensaio da oficina.", "status": "conferir", "nota": "O mais difícil dos cinco: empenamento forte. Peças pequenas, borda (brim) larga e mesa de PP/PE."}, {"id": "impressao3d.material.rabs", "grandeza": "Perfil de impressão do rABS (ABS reciclado)", "valor_padrao": {"nome": "rABS (ABS reciclado)", "densidade_g_cm3": 1.04, "bico_c": 240, "bico_faixa_c": [230, 255], "mesa_c": 100, "mesa_faixa_c": [95, 110], "contracao_pct": 0.6, "contracao_faixa_pct": [0.4, 0.8], "diametro_mm": 1.75}, "unidade": "g/cm³; °C; % de contração linear; mm", "opcoes": [], "fonte": "[CONFERIR] valores típicos de literatura e de fabricantes para ABS virgem (densidade 1,03 a 1,06 g/cm³). Trocar pela folha de dados do filamento reciclado usado.", "status": "conferir", "nota": "Solta vapores (estireno): imprimir com ventilação ou exaustão. Câmara fechada reduz a separação de camadas."}, {"id": "impressao3d.material.rpla", "grandeza": "Perfil de impressão do PLA reciclado", "valor_padrao": {"nome": "PLA reciclado", "densidade_g_cm3": 1.24, "bico_c": 205, "bico_faixa_c": [190, 220], "mesa_c": 60, "mesa_faixa_c": [50, 65], "contracao_pct": 0.3, "contracao_faixa_pct": [0.2, 0.5], "diametro_mm": 1.75}, "unidade": "g/cm³; °C; % de contração linear; mm", "opcoes": [], "fonte": "[CONFERIR] valores típicos de literatura e de fabricantes para PLA virgem (densidade 1,21 a 1,25 g/cm³). PLA reciclado perde massa molar a cada ciclo: a faixa de bico costuma cair. Trocar pela folha de dados do filamento reciclado usado.", "status": "conferir", "nota": "Mais fácil de imprimir; PLA não é reciclável junto com PET na coleta comum."}]}</script>
 </head>
@@ -2845,6 +2861,295 @@ function escreverIfc(objetos, nomeProjeto) {
 const CORES_PECA = [["verde", "Verde profundo", "Deep green", "#0B3D2E"], ["laranja", "Laranja", "Orange", "#F97316"], ["terracota", "Terracota", "Terracotta", "#BB6B4A"],
   ["creme", "Creme", "Cream", "#F4F1EA"], ["areia", "Areia", "Sand", "#D9D3C2"], ["carvao", "Carvão", "Charcoal", "#1B1F23"], ["oliva", "Verde-oliva", "Olive green", "#4A5A47"]];
 
+/* ════════ modo "desenho técnico": ler traços (não manchas), regiões, revolução e padrão circular (dona, 21/11/2026) ════════
+   Coordenadas da grade: x para a direita, y para baixo (como a imagem). Em mm: X = x·cel, Y = (ny − y)·cel (y para cima). */
+/* componentes ligadas da tinta (vizinhança de 8), com caixa e área */
+function rotular8(M, nx, ny) {
+  const rot = new Int32Array(nx * ny).fill(-1), comps = [], pilha = [];
+  for (let k = 0; k < nx * ny; k++) {
+    if (!M[k] || rot[k] >= 0) continue;
+    const c = { id: comps.length, area: 0, x0: nx, y0: ny, x1: -1, y1: -1 }; comps.push(c); rot[k] = c.id; pilha.push(k);
+    while (pilha.length) {
+      const q = pilha.pop(), i = q % nx, j = (q - i) / nx; c.area++;
+      if (i < c.x0) c.x0 = i; if (i > c.x1) c.x1 = i; if (j < c.y0) c.y0 = j; if (j > c.y1) c.y1 = j;
+      for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+        const a = i + di, b = j + dj; if (a < 0 || b < 0 || a >= nx || b >= ny) continue; const w = b * nx + a;
+        if (M[w] && rot[w] < 0) { rot[w] = c.id; pilha.push(w); } }
+    }
+  }
+  return { rot, comps };
+}
+/* largura típica do traço: mediana dos trechos de tinta na horizontal e na vertical */
+function larguraTraco(M, nx, ny) {
+  const corridas = [];
+  for (let j = 0; j < ny; j++) { let n = 0; for (let i = 0; i <= nx; i++) { if (i < nx && M[j * nx + i]) n++; else if (n) { corridas.push(n); n = 0; } } }
+  for (let i = 0; i < nx; i++) { let n = 0; for (let j = 0; j <= ny; j++) { if (j < ny && M[j * nx + i]) n++; else if (n) { corridas.push(n); n = 0; } } }
+  if (!corridas.length) return 1;
+  corridas.sort((a, b) => a - b); return Math.max(1, corridas[Math.floor(corridas.length / 2)]);
+}
+/* erosão e dilatação por um quadrado de lado 2r+1 (separáveis) */
+function morfo(M, nx, ny, r, dilatar) {
+  if (!(r > 0)) return Uint8Array.from(M);
+  const A = new Uint8Array(nx * ny), B = new Uint8Array(nx * ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    let v = dilatar ? 0 : 1;
+    for (let d = -r; d <= r; d++) { const x = i + d, m = x >= 0 && x < nx ? M[j * nx + x] : 0; if (dilatar ? m : !m) { v = dilatar ? 1 : 0; break; } }
+    A[j * nx + i] = v; }
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    let v = dilatar ? 0 : 1;
+    for (let d = -r; d <= r; d++) { const y = j + d, m = y >= 0 && y < ny ? A[y * nx + i] : 0; if (dilatar ? m : !m) { v = dilatar ? 1 : 0; break; } }
+    B[j * nx + i] = v; }
+  return B;
+}
+/* afinamento de Zhang e Suen (1984): o traço vira uma linha de 1 célula, o "esqueleto" */
+function afinar(M, nx, ny) {
+  const S = Uint8Array.from(M), p = (i, j) => (i >= 0 && j >= 0 && i < nx && j < ny) ? S[j * nx + i] : 0;
+  let mudou = true, guarda = 0;
+  while (mudou && guarda++ < 200) {
+    mudou = false;
+    for (let passo = 0; passo < 2; passo++) {
+      const tirar = [];
+      for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+        if (!S[j * nx + i]) continue;
+        const v = [p(i, j - 1), p(i + 1, j - 1), p(i + 1, j), p(i + 1, j + 1), p(i, j + 1), p(i - 1, j + 1), p(i - 1, j), p(i - 1, j - 1)];
+        const B = v.reduce((s, x) => s + x, 0); if (B < 2 || B > 6) continue;
+        let A = 0; for (let k = 0; k < 8; k++) if (!v[k] && v[(k + 1) % 8]) A++; if (A !== 1) continue;
+        if (passo === 0 ? (v[0] * v[2] * v[4] || v[2] * v[4] * v[6]) : (v[0] * v[2] * v[6] || v[0] * v[4] * v[6])) continue;
+        tirar.push(j * nx + i);
+      }
+      if (tirar.length) { mudou = true; tirar.forEach(k => { S[k] = 0; }); }
+    }
+  }
+  return S;
+}
+/* esqueleto → linhas (de ponta ou cruzamento até ponta ou cruzamento; laços fechados soltos também) */
+function tracarEsqueleto(S, nx, ny) {
+  const viz = k => { const i = k % nx, j = (k - i) / nx, o = []; for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+    if (!di && !dj) continue; const a = i + di, b = j + dj; if (a >= 0 && b >= 0 && a < nx && b < ny && S[b * nx + a]) o.push(b * nx + a); } return o; };
+  const grau = new Uint8Array(nx * ny); for (let k = 0; k < nx * ny; k++) if (S[k]) grau[k] = viz(k).length;
+  const usada = new Set(), chave = (a, b) => a < b ? a + "," + b : b + "," + a, linhas = [], pt = k => [k % nx + 0.5, Math.floor(k / nx) + 0.5];
+  const seguir = (ini, prox) => { const l = [ini]; let ant = ini, at = prox; usada.add(chave(ini, prox));
+    while (true) { l.push(at); if (grau[at] !== 2) break; const n = viz(at).filter(w => w !== ant && !usada.has(chave(at, w))); if (!n.length) break;
+      usada.add(chave(at, n[0])); ant = at; at = n[0]; if (at === ini) { l.push(at); break; } }
+    return l; };
+  for (let k = 0; k < nx * ny; k++) if (S[k] && grau[k] !== 2) viz(k).forEach(w => { if (!usada.has(chave(k, w))) linhas.push(seguir(k, w)); });
+  for (let k = 0; k < nx * ny; k++) if (S[k] && grau[k] === 2) viz(k).forEach(w => { if (!usada.has(chave(k, w))) linhas.push(seguir(k, w)); });
+  return linhas.filter(l => l.length >= 2).map(l => l.map(pt));
+}
+/* círculo por mínimos quadrados (Kåsa): centro, raio e resíduo médio */
+function ajustarCirculo(pts) {
+  const n = pts.length; if (n < 3) return null;
+  let sx = 0, sy = 0; pts.forEach(p => { sx += p[0]; sy += p[1]; }); const mx = sx / n, my = sy / n;
+  let suu = 0, svv = 0, suv = 0, suuu = 0, svvv = 0, suvv = 0, svuu = 0;
+  pts.forEach(p => { const u = p[0] - mx, v = p[1] - my; suu += u * u; svv += v * v; suv += u * v; suuu += u * u * u; svvv += v * v * v; suvv += u * v * v; svuu += v * u * u; });
+  const det = suu * svv - suv * suv; if (Math.abs(det) < 1e-12) return null;
+  const b1 = (suuu + suvv) / 2, b2 = (svvv + svuu) / 2, uc = (b1 * svv - b2 * suv) / det, vc = (suu * b2 - suv * b1) / det;
+  const r = Math.sqrt(uc * uc + vc * vc + (suu + svv) / n), cx = uc + mx, cy = vc + my;
+  let rms = 0; pts.forEach(p => { const d = Math.hypot(p[0] - cx, p[1] - cy) - r; rms += d * d; });
+  return { cx, cy, r, rms: Math.sqrt(rms / n) };
+}
+/* um laço vira primitivas exatas: círculo inteiro (se couber) ou trechos retos e arcos (Douglas-Peucker + ajuste de arco) */
+function primitivas(l, tol) {
+  tol = tol || 1;
+  const c = l.length >= 8 ? ajustarCirculo(l) : null;
+  if (c && c.r > 3 * tol && c.rms < Math.max(0.35 * tol, 0.02 * c.r)) {
+    const n = Math.max(24, Math.min(128, Math.round(2 * Math.PI * c.r / tol))), pts = [];
+    for (let i = 0; i < n; i++) { const a = 2 * Math.PI * i / n; pts.push([c.cx + c.r * Math.cos(a), c.cy + c.r * Math.sin(a)]); }
+    return { pts, prims: [{ tipo: "circulo", cx: c.cx, cy: c.cy, r: c.r }] };
+  }
+  const s = simplificarLaco(l, tol), prims = [], out = [];
+  let ext = 0; s.forEach(p => s.forEach(q => { ext = Math.max(ext, Math.hypot(p[0] - q[0], p[1] - q[1])); }));
+  const varredura = (ca, tr) => { let tot = 0, a = Math.atan2(tr[0][1] - ca.cy, tr[0][0] - ca.cx);
+    for (let k = 1; k < tr.length; k++) { const b = Math.atan2(tr[k][1] - ca.cy, tr[k][0] - ca.cx); let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; tot += d; a = b; }
+    return tot; };
+  // trechos com 5 ou mais vértices seguidos que cabem num arco (raio menor que a peça, 30° ou mais) viram um arco exato
+  let i = 0;
+  while (i < s.length) {
+    let j = i + 4, melhor = null;
+    while (j < s.length) { const tr = s.slice(i, j + 1), ca = ajustarCirculo(tr);
+      if (ca && ca.rms < 0.35 * tol && ca.r < ext && Math.abs(varredura(ca, tr)) >= Math.PI / 6) { melhor = { j, ca, tr }; j++; } else break; }
+    if (melhor) {
+      const { ca, tr } = melhor, a0 = Math.atan2(tr[0][1] - ca.cy, tr[0][0] - ca.cx), da = varredura(ca, tr), n = Math.max(4, Math.ceil(Math.abs(da) * ca.r / tol));
+      for (let k = 0; k < n; k++) { const a = a0 + da * k / n; out.push([ca.cx + ca.r * Math.cos(a), ca.cy + ca.r * Math.sin(a)]); }
+      prims.push({ tipo: "arco", cx: ca.cx, cy: ca.cy, r: ca.r }); i = melhor.j;
+    } else { out.push(s[i]); prims.push({ tipo: "reta" }); i++; }
+  }
+  return { pts: out.length >= 3 ? out : s, prims };
+}
+/* recorte de um laço por um semiplano (Sutherland–Hodgman): fica o lado com f(p) ≥ 0 */
+function recortarLaco(l, f) {
+  const out = [];
+  for (let i = 0; i < l.length; i++) {
+    const a = l[i], b = l[(i + 1) % l.length], fa = f(a), fb = f(b);
+    if (fa >= 0) out.push(a);
+    if ((fa >= 0) !== (fb >= 0)) { const t = fa / (fa - fb); out.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]); }
+  }
+  return out.length >= 3 ? out : null;
+}
+/* lê uma vista de desenho técnico: traços, texto, cotas e hachuras; devolve as regiões (perfil, furo, ignorado) em células */
+function lerDesenho(rgba, nx, ny, op) {
+  op = op || {};
+  const g = suavizar(cinza(rgba, nx * ny), nx, ny, op.suavizar || 0), auto = otsu(g), L = op.limiar == null || op.limiar === "" ? auto : +op.limiar;
+  const M = new Uint8Array(nx * ny); for (let k = 0; k < nx * ny; k++) { const escuro = g[k] < L; M[k] = (op.inverter ? !escuro : escuro) ? 1 : 0; }
+  const s = larguraTraco(M, nx, ny), lado = Math.min(nx, ny), textoMax = op.textoMax || Math.max(6 * s, Math.round(0.045 * lado));
+  const ign = [];                                       // o que foi ignorado (para mostrar e poder reincluir)
+  // 1. texto, setas soltas e traços curtos (componentes pequenos e isolados)
+  const R = rotular8(M, nx, ny), M2 = Uint8Array.from(M), pequeno = [];
+  R.comps.forEach(c => { const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+    if (Math.max(w, h) <= textoMax) { const alongado = Math.max(w, h) >= 3 * Math.min(w, h) && Math.min(w, h) <= 2 * s;
+      c.tipo = alongado ? "traco_curto" : "texto"; pequeno.push(c); } });
+  if (!op.manterTexto) { const marca = new Uint8Array(R.comps.length); pequeno.forEach(c => { marca[c.id] = 1; ign.push({ tipo: c.tipo, x0: c.x0, y0: c.y0, x1: c.x1, y1: c.y1 }); });
+    for (let k = 0; k < nx * ny; k++) if (M2[k] && marca[R.rot[k]]) M2[k] = 0; }
+  // 2. hachuras: no esqueleto, trechos retos curtos e paralelos, em diagonal
+  const esq = afinar(M2, nx, ny), linhas = tracarEsqueleto(esq, nx, ny), cand = [];
+  linhas.forEach(l => { const a = l[0], b = l[l.length - 1], comp = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (comp < 3 * s || comp > 0.5 * lado) return;
+    let desvio = 0; l.forEach(p => { desvio = Math.max(desvio, Math.abs((b[1] - a[1]) * (p[0] - a[0]) - (b[0] - a[0]) * (p[1] - a[1])) / comp); });
+    if (desvio > Math.max(1.5, 0.6 * s)) return;
+    let ang = Math.atan2(-(b[1] - a[1]), b[0] - a[0]) * 180 / Math.PI; ang = ((ang % 180) + 180) % 180;
+    if ((ang >= 20 && ang <= 70) || (ang >= 110 && ang <= 160)) cand.push({ l, ang, meio: l[Math.floor(l.length / 2)] }); });
+  const hach = op.manterHachura ? [] : cand.filter(c => cand.filter(o => Math.abs(o.ang - c.ang) <= 8).length >= 4);
+  const M3 = Uint8Array.from(M2), rH = Math.ceil(s / 2) + 1, ponta = 1.5 * s + 2;
+  hach.forEach(c => { const a = c.l[0], b = c.l[c.l.length - 1]; let x0 = nx, y0 = ny, x1 = 0, y1 = 0;
+    c.l.forEach(p => { if (Math.hypot(p[0] - a[0], p[1] - a[1]) < ponta || Math.hypot(p[0] - b[0], p[1] - b[1]) < ponta) return;
+      const i = Math.floor(p[0]), j = Math.floor(p[1]); x0 = Math.min(x0, i); y0 = Math.min(y0, j); x1 = Math.max(x1, i); y1 = Math.max(y1, j);
+      for (let dj = -rH; dj <= rH; dj++) for (let di = -rH; di <= rH; di++) { const u = i + di, v = j + dj; if (u >= 0 && v >= 0 && u < nx && v < ny) M3[v * nx + u] = 0; } });
+    if (x1 >= x0) ign.push({ tipo: "hachura", x0, y0, x1, y1 }); });
+  // 3. regiões fechadas (fundo cercado de tinta), com a profundidade de cada uma (dentro de quantos contornos está)
+  const fundo = componentes(M3, nx, ny, 0), nR = fundo.tam.length, prof = new Int32Array(nR).fill(-1), hachDentro = new Int32Array(nR);
+  hach.forEach(c => { const i = Math.floor(c.meio[0]), j = Math.floor(c.meio[1]), r = fundo.rot[j * nx + i]; if (r >= 0) hachDentro[r]++; });
+  // por região: primeiro pixel, área, borda (perímetro) e momentos, numa passada só
+  const prim = new Int32Array(nR).fill(-1), area = new Float64Array(nR), per = new Float64Array(nR), sx = new Float64Array(nR), sy = new Float64Array(nR),
+    sxx = new Float64Array(nR), syy = new Float64Array(nR), sxy = new Float64Array(nR);
+  for (let k = 0; k < nx * ny; k++) { const r = fundo.rot[k]; if (r < 0) continue; if (prim[r] < 0) prim[r] = k; const i = k % nx, j = (k - i) / nx;
+    area[r]++; sx[r] += i; sy[r] += j; sxx[r] += i * i; syy[r] += j * j; sxy[r] += i * j;
+    if (i === 0 || j === 0 || i === nx - 1 || j === ny - 1 || M3[k - 1] || M3[k + 1] || M3[k - nx] || M3[k + nx]) per[r]++; }
+  const pai = r => { const k = prim[r];
+    let i = k % nx; const j = (k - i) / nx; while (i > 0 && fundo.rot[j * nx + i] === r) i--; while (i > 0 && M3[j * nx + i]) i--; return i >= 0 ? fundo.rot[j * nx + i] : -1; };
+  const profDe = (r, n) => { if (prof[r] >= 0) return prof[r]; if (fundo.borda[r] || n > 40) return (prof[r] = 0); const p = pai(r); return (prof[r] = p < 0 || p === r ? 1 : profDe(p, n + 1) + 1); };
+  const material = new Uint8Array(nR);
+  // fresta entre duas linhas de hachura: fina (espessura ≈ 2·área/perímetro) e em diagonal — é material, não furo
+  // espaçamento típico da hachura: distância entre linhas vizinhas, medida na normal (mediana)
+  let passoH = 3 * s;
+  if (hach.length >= 4) { const th = hach[0].ang * Math.PI / 180, nxh = Math.sin(th), nyh = Math.cos(th);
+    const pr = hach.filter(c => Math.abs(c.ang - hach[0].ang) <= 8).map(c => c.meio[0] * nxh + c.meio[1] * nyh).sort((u, v) => u - v), ds = [];
+    for (let i = 1; i < pr.length; i++) if (pr[i] - pr[i - 1] > 1) ds.push(pr[i] - pr[i - 1]);
+    if (ds.length) { ds.sort((u, v) => u - v); passoH = Math.max(passoH, 1.5 * ds[Math.floor(ds.length / 2)]); } }
+  const fresta = r => { const n = area[r]; if (n < 2 || hach.length < 4) return false; const esp = 2 * n / Math.max(1, per[r]);
+    const mx = sx[r] / n, my = sy[r] / n, a_ = sxx[r] / n - mx * mx, b_ = syy[r] / n - my * my, c_ = sxy[r] / n - mx * my;
+    const l1 = (a_ + b_) / 2 + Math.sqrt(((a_ - b_) / 2) ** 2 + c_ * c_), l2 = (a_ + b_) / 2 - Math.sqrt(((a_ - b_) / 2) ** 2 + c_ * c_);
+    let ang = Math.atan2(-(l1 - a_), c_ || 1e-12) * 180 / Math.PI; ang = ((ang % 180) + 180) % 180;
+    const diag = (ang >= 20 && ang <= 70) || (ang >= 110 && ang <= 160);
+    return esp <= passoH && l1 > 4 * Math.max(l2, 0.25) && diag; };
+  for (let r = 0; r < nR; r++) { if (fundo.borda[r]) continue; const d = profDe(r, 0); material[r] = hachDentro[r] >= 2 || fresta(r) || (d % 2 === 1) ? 1 : 0; }
+  // seção hachurada manda: dentro dela, o que não é hachura continua furo só se for grande
+  const F = new Uint8Array(nx * ny);
+  for (let k = 0; k < nx * ny; k++) { if (M3[k]) F[k] = 1; else { const r = fundo.rot[k]; if (r >= 0 && !fundo.borda[r] && material[r]) F[k] = 1; } }
+  // 4. linhas soltas (cotas, linhas de chamada, de centro) somem na abertura; volta meia espessura de traço para o meio da linha
+  const rA = Math.ceil(s) + (op.abertura || 0), aberto = morfo(morfo(F, nx, ny, rA, false), nx, ny, rA, true), meio = Math.floor(s / 2);
+  const Fin = meio > 0 ? morfo(aberto, nx, ny, meio, false) : aberto;
+  // 5. regiões finais: cada componente vira um corpo, com os seus furos; o pequeno demais e o quadro de notas são ignorados
+  const reg = componentes(Fin, nx, ny, 1), areaMin = op.areaMin || Math.max(4 * s * s * 4, Math.round(0.002 * nx * ny)), regioes = [];
+  reg.tam.forEach((area, id) => {
+    let x0 = nx, y0 = ny, x1 = 0, y1 = 0; for (let k = 0; k < nx * ny; k++) if (reg.rot[k] === id) { const i = k % nx, j = (k - i) / nx; if (i < x0) x0 = i; if (i > x1) x1 = i; if (j < y0) y0 = j; if (j > y1) y1 = j; }
+    const textos = pequeno.filter(c => c.tipo === "texto" && c.x0 >= x0 && c.x1 <= x1 && c.y0 >= y0 && c.y1 <= y1).length;
+    let tipo = "corpo", motivo = "";
+    if (area < areaMin) { tipo = "ignorado"; motivo = "cota"; }
+    else if (textos >= 3 && !hach.some(c => c.meio[0] >= x0 && c.meio[0] <= x1 + 1 && c.meio[1] >= y0 && c.meio[1] <= y1 + 1)) { tipo = "ignorado"; motivo = "texto"; }
+    regioes.push({ id, area, x0, y0, x1, y1, tipo, motivo, hachurada: hach.some(c => reg.rot[Math.floor(c.meio[1]) * nx + Math.floor(c.meio[0])] === id || (c.meio[0] >= x0 && c.meio[0] <= x1 + 1 && c.meio[1] >= y0 && c.meio[1] <= y1 + 1)) });
+  });
+  // 6. linha de centro: traços curtos alinhados (traço e ponto) na vertical ou na horizontal
+  let eixo = null; const tr = pequeno.filter(c => c.tipo === "traco_curto" || (c.x1 - c.x0 <= 2 * s || c.y1 - c.y0 <= 2 * s));
+  const grupos = {}; tr.forEach(c => { const v = c.y1 - c.y0 > c.x1 - c.x0, k = (v ? "v" : "h") + Math.round(((v ? c.x0 + c.x1 : c.y0 + c.y1) / 2) / Math.max(2, s)); (grupos[k] = grupos[k] || []).push(c); });
+  Object.keys(grupos).forEach(k => { const gs = grupos[k]; if (gs.length < 3) return; const v = k[0] === "v";
+    const ini = Math.min(...gs.map(c => v ? c.y0 : c.x0)), fim = Math.max(...gs.map(c => v ? c.y1 : c.x1)); if (fim - ini < 0.3 * (v ? ny : nx)) return;
+    const pos = gs.reduce((a, c) => a + (v ? (c.x0 + c.x1 + 1) / 2 : (c.y0 + c.y1 + 1) / 2), 0) / gs.length;
+    if (!eixo || gs.length > eixo.n) eixo = { n: gs.length, p: v ? [pos, ini] : [ini, pos], q: v ? [pos, fim + 1] : [fim + 1, pos] }; });
+  return { M: Fin, rot: reg.rot, regioes, ignorados: ign, tracos: linhas, hachuras: hach.length, textos: pequeno.filter(c => c.tipo === "texto").length,
+    traco: s, limiar: L, otsu: auto, eixo: eixo ? { p: eixo.p, q: eixo.q } : null };
+}
+/* laços (em células) de uma região, já em mm, com primitivas ajustadas; outer = perfil, inner = furo */
+function lacosDaRegiao(D, id, nx, ny, cel, tol) {
+  const Mr = new Uint8Array(nx * ny); for (let k = 0; k < nx * ny; k++) if (D.rot[k] === id) Mr[k] = 1;
+  return contornos(Mr, nx, ny, 1, 0.5).map(l => { const p = primitivas(l, tol || 1);
+    return { tipo: area2(p.pts) >= 0 ? "perfil" : "furo", prims: p.prims, laco: p.pts.map(q => [q[0] * cel, q[1] * cel]) }; });
+}
+/* revolução: laços no plano do desenho (mm, y para cima) giram em volta do eixo p–q; n segmentos. O lado: +1 = à direita do eixo
+   (ou abaixo, se o eixo for horizontal), −1 = o outro
+   (o outro lado é cortado, como numa meia-seção). Z da peça = ao longo do eixo. */
+function revolver(lacos, eixo, n, lado) {
+  n = Math.max(6, Math.min(512, Math.round(n || 64))); lado = lado < 0 ? -1 : 1;
+  const [px, py] = eixo.p, [qx, qy] = eixo.q, L = Math.hypot(qx - px, qy - py); if (!(L > 0)) throw new Error("eixo sem comprimento");
+  let ux = (qx - px) / L, uy = (qy - py) / L; if (uy < -1e-9 || (Math.abs(uy) <= 1e-9 && ux < 0)) { ux = -ux; uy = -uy; }
+  const rz = p => [lado * ((p[0] - px) * uy - (p[1] - py) * ux), (p[0] - px) * ux + (p[1] - py) * uy];
+  const out = [];
+  lacos.forEach(l => {
+    const rl = recortarLaco(l.map(rz), p => p[0]); if (!rl) return;
+    const lim = rl.map(p => [Math.max(0, p[0]), p[1]]);
+    for (let i = 0; i < lim.length; i++) { const a = lim[i], b = lim[(i + 1) % lim.length]; if (a[0] < 1e-9 && b[0] < 1e-9) continue;
+      for (let k = 0; k < n; k++) { const t0 = 2 * Math.PI * k / n, t1 = 2 * Math.PI * (k + 1) / n, P = (p, t) => [p[0] * Math.cos(t), p[0] * Math.sin(t), p[1]];
+        const A0 = P(a, t0), B0 = P(b, t0), B1 = P(b, t1), A1 = P(a, t1);
+        if (a[0] > 1e-9) out.push(...A0, ...B0, ...A1); if (b[0] > 1e-9) out.push(...B0, ...B1, ...A1); } }
+  });
+  if (!out.length) throw new Error("o perfil não tem nada do lado escolhido do eixo");
+  const T = new Float32Array(out); let v = 0;
+  for (let i = 0; i < T.length; i += 9) v += T[i] * (T[i + 4] * T[i + 8] - T[i + 5] * T[i + 7]) - T[i + 1] * (T[i + 3] * T[i + 8] - T[i + 5] * T[i + 6]) + T[i + 2] * (T[i + 3] * T[i + 7] - T[i + 4] * T[i + 6]);
+  if (v < 0) for (let i = 0; i < T.length; i += 9) for (let k = 0; k < 3; k++) { const x = T[i + 3 + k]; T[i + 3 + k] = T[i + 6 + k]; T[i + 6 + k] = x; }
+  const zmin = caixaDe(T).min[2]; for (let i = 2; i < T.length; i += 3) T[i] -= zmin;
+  return T;
+}
+/* padrão circular: n cópias de T em volta do eixo vertical que passa por centro (mm); devolve a lista dos n corpos */
+function padraoCircular(T, n, centro) {
+  n = Math.max(1, Math.min(360, Math.round(n || 1))); const c = centro || [0, 0], lista = [];
+  for (let k = 0; k < n; k++) lista.push(transformar(T, [0, 0, 0], [0, 0, 360 * k / n], 1, [c[0], c[1], 0]));
+  return lista;
+}
+/* quantos corpos separados há numa malha (vértices ligados por triângulos) */
+function corpos(T) {
+  const id = new Map(), pai = [], ch = i => T[i].toFixed(4) + "," + T[i + 1].toFixed(4) + "," + T[i + 2].toFixed(4);
+  const raiz = a => { while (pai[a] !== a) a = pai[a] = pai[pai[a]]; return a; };
+  const no = i => { const c = ch(i); let v = id.get(c); if (v == null) { v = pai.length; pai.push(v); id.set(c, v); } return v; };
+  for (let i = 0; i < T.length; i += 9) { const a = raiz(no(i)), b = raiz(no(i + 3)), c = raiz(no(i + 6)); pai[b] = a; pai[raiz(c)] = a; }
+  return new Set(pai.map((_, i) => raiz(i))).size;
+}
+/* folha sintética de desenho técnico para os testes: meia-seção de uma bucha com flange (cotas conhecidas, hachura a 45°,
+   linha de centro de traço e ponto, linhas de cota com setas e textos) e um quadro de notas. pxmm = pixels por mm. */
+function folhaSintetica(doc, pxmm) {
+  pxmm = pxmm || 6; const W = 900, H = 600, cv = doc.createElement("canvas"); cv.width = W; cv.height = H; const c = cv.getContext("2d");
+  c.fillStyle = "#FFFFFF"; c.fillRect(0, 0, W, H); c.strokeStyle = "#000000"; c.fillStyle = "#000000"; c.lineWidth = 2;
+  // bucha: furo Ø20 (r 10), cubo Ø36 (r 18) com 30 de altura, flange Ø60 (r 30) com 8 de espessura (z de 0 a 38)
+  const B = { ri: 10, ro: 18, rf: 30, hf: 8, hh: 30 }, ex = 260, base = 480, X = r => ex + r * pxmm, Y = z => base - z * pxmm;
+  const perfil = [[B.ri, 0], [B.rf, 0], [B.rf, B.hf], [B.ro, B.hf], [B.ro, B.hf + B.hh], [B.ri, B.hf + B.hh]];
+  c.beginPath(); perfil.forEach((p, i) => (i ? c.lineTo : c.moveTo).call(c, X(p[0]), Y(p[1]))); c.closePath(); c.stroke();
+  c.save(); c.beginPath(); perfil.forEach((p, i) => (i ? c.lineTo : c.moveTo).call(c, X(p[0]), Y(p[1]))); c.closePath(); c.clip(); c.lineWidth = 1.5;
+  for (let d = -400; d < 400; d += 12) { c.beginPath(); c.moveTo(ex + d, base + 50); c.lineTo(ex + d + 400, base - 350); c.stroke(); }
+  c.restore(); c.lineWidth = 2;
+  // outra metade em vista (sem hachura) e a linha de centro (traço e ponto)
+  c.beginPath(); perfil.forEach((p, i) => (i ? c.lineTo : c.moveTo).call(c, ex - p[0] * pxmm, Y(p[1]))); c.closePath(); c.stroke();
+  c.lineWidth = 1.5; for (let y = Y(B.hf + B.hh) - 30; y < base + 30; y += 22) { c.beginPath(); c.moveTo(ex, y); c.lineTo(ex, y + 12); c.stroke(); c.beginPath(); c.moveTo(ex, y + 16); c.lineTo(ex, y + 18); c.stroke(); }
+  // cotas: linhas com setas e números
+  const cota = (x0, y0, x1, y1, txt) => { c.lineWidth = 1; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+    [[x0, y0, 1], [x1, y1, -1]].forEach(([x, y, s]) => { const a = Math.atan2(y1 - y0, x1 - x0); c.beginPath(); c.moveTo(x, y);
+      c.lineTo(x + s * 10 * Math.cos(a) - 4 * Math.sin(a), y + s * 10 * Math.sin(a) + 4 * Math.cos(a)); c.lineTo(x + s * 10 * Math.cos(a) + 4 * Math.sin(a), y + s * 10 * Math.sin(a) - 4 * Math.cos(a)); c.closePath(); c.fill(); });
+    c.font = "16px sans-serif"; c.fillText(txt, (x0 + x1) / 2 - 14, (y0 + y1) / 2 - 6); };
+  cota(X(-B.rf), base + 40, X(B.rf), base + 40, "Ø60"); cota(X(B.rf) + 40, Y(0), X(B.rf) + 40, Y(B.hf + B.hh), "38"); cota(X(-B.ro), Y(B.hf + B.hh) - 40, X(B.ro), Y(B.hf + B.hh) - 40, "Ø36");
+  // quadro de notas
+  c.lineWidth = 2; c.strokeRect(620, 60, 250, 140); c.font = "15px sans-serif";
+  ["NOTAS:", "1. MATERIAL: PLA RECICLADO", "2. COTAS EM mm", "3. TOLERANCIA GERAL 0,2"].forEach((s, i) => c.fillText(s, 632, 88 + 26 * i));
+  c.font = "18px sans-serif"; c.fillText("PECA 1 - BUCHA COM FLANGE", 40, 40);
+  return { cv, W, H, pxmm, bucha: B, eixoPx: { p: [ex, Y(B.hf + B.hh) - 30], q: [ex, base + 30] }, recorte: { x: 40, y: 100, w: 560, h: 480 },
+    volume: Math.PI * (B.rf * B.rf - B.ri * B.ri) * B.hf + Math.PI * (B.ro * B.ro - B.ri * B.ri) * B.hh };
+}
+/* roda a leitura da folha sintética (no navegador) e confere a revolução */
+function testeFolha(doc) {
+  const F = folhaSintetica(doc, 6), r = F.recorte, cx = F.cv.getContext("2d"), im = cx.getImageData(r.x, r.y, r.w, r.h);
+  const D = lerDesenho(im.data, r.w, r.h, {}), cel = 1 / F.pxmm, corposR = D.regioes.filter(g => g.tipo === "corpo");
+  const ex = F.eixoPx.p[0] - r.x, eixo = { p: [ex * cel, (r.h - (F.eixoPx.p[1] - r.y)) * cel], q: [ex * cel, (r.h - (F.eixoPx.q[1] - r.y)) * cel] };
+  const lacos = []; corposR.forEach(g => lacosDaRegiao(D, g.id, r.w, r.h, cel, 1).forEach(l => lacos.push(l.laco)));
+  const T = revolver(lacos, eixo, 128, 1);
+  return { D, corpos: corposR.length, T, volumeEsperado: F.volume, eixoDetectado: D.eixo, F };
+}
+
 /* ════════ peças de teste de impressão (geradas aqui; nada copiado de terceiros) ════════ */
 function caixa(out, x0, y0, z0, dx, dy, dz) {
   const x1 = x0 + dx, y1 = y0 + dy, z1 = z0 + dz;
@@ -2966,12 +3271,36 @@ function autoteste() {
   const z3 = escrever3MFMontagem([{ nome: "a", T: c1.T, cor: "#0B3D2E" }, { nome: "b", T: c3.T, cor: "#F97316" }]);
   ok("3MF da montagem é ZIP com duas peças", z3[0] === 0x50 && z3[1] === 0x4B && new TextDecoder().decode(z3).split("<object ").length === 3);
   const ifc = escreverIfc([{ nome: "Caixa", T: c1.T }], "teste");
+  // desenho técnico: folha sintética com a meia-seção de uma bucha de cotas conhecidas (só no navegador, com canvas)
+  if (typeof document !== "undefined" && document.createElement && P && P.medir) {
+    try { const tf = testeFolha(document), mf = P.medir(tf.T), erro = Math.abs(mf.volume_mm3 - tf.volumeEsperado) / tf.volumeEsperado;
+      ok("desenho técnico: texto, cotas e quadro de notas não viram corpo", tf.D.regioes.filter(g => g.tipo === "corpo").length === 2, JSON.stringify(tf.D.regioes.map(g => g.tipo + ":" + g.motivo + ":" + g.area)));
+      ok("desenho técnico: a hachura é lida como hachura", tf.D.hachuras >= 4, tf.D.hachuras);
+      ok("desenho técnico: linha de centro achada", !!tf.eixoDetectado && Math.abs(tf.eixoDetectado.p[0] - (tf.F.eixoPx.p[0] - tf.F.recorte.x)) <= 3, JSON.stringify(tf.eixoDetectado));
+      ok("revolução da meia-seção: malha fechada", mf.arestas.fechada && mf.volume_sinal === 1, JSON.stringify(mf.arestas));
+      ok("revolução da meia-seção: volume a ±2 % do analítico", erro <= 0.02, mf.volume_mm3.toFixed(1) + " × " + tf.volumeEsperado.toFixed(1) + " (" + (100 * erro).toFixed(2) + " %)");
+      // a folha inteira: o quadro de notas e o título são texto; as setas e as cotas, pequenas demais; ficam só as duas metades da bucha
+      const F2 = tf.F, D2 = lerDesenho(F2.cv.getContext("2d").getImageData(0, 0, F2.W, F2.H).data, F2.W, F2.H, {});
+      ok("desenho técnico: na folha inteira, notas e cotas ficam de fora", D2.regioes.filter(g => g.tipo === "corpo").length === 2 && D2.regioes.some(g => g.motivo === "texto"),
+        JSON.stringify(D2.regioes.map(g => g.tipo + ":" + g.motivo)));
+      ok("desenho técnico: os textos são reconhecidos e ignorados", D2.textos >= 20, D2.textos);
+    } catch (e) { ok("desenho técnico: a folha sintética roda", false, e && e.message); }
+  }
+  const pa = extrudar(PRIM.retangulo(4, 20).map(l => l.map(p => [p[0], p[1] + 20])), 5), pad = padraoCircular(pa, 6, [0, 0]);
+  ok("padrão circular de 6: 6 corpos", pad.length === 6 && corpos(juntar(pad)) === 6, corpos(juntar(pad)));
+  if (P && P.medir) ok("padrão circular: volume 6 vezes o de uma pá", Math.abs(P.medir(juntar(pad)).volume_mm3 - 6 * 4 * 20 * 5) < 1e-2);
+  const rv = revolver([[[10, 0], [20, 0], [20, 10], [10, 10]]], { p: [0, 0], q: [0, 10] }, 256, 1);
+  if (P && P.medir) ok("revolução de um retângulo: tubo π(20² − 10²)·10 a 0,1 %", Math.abs(P.medir(rv).volume_mm3 - Math.PI * 300 * 10) / (Math.PI * 3000) < 0.001, P.medir(rv).volume_mm3);
+  const cf = ajustarCirculo(PRIM.circulo(30, 40)[0].map(p => [p[0] + 5, p[1] - 3]));
+  ok("círculo por mínimos quadrados: centro e raio", Math.abs(cf.cx - 5) < 1e-6 && Math.abs(cf.cy + 3) < 1e-6 && Math.abs(cf.r - 15) < 1e-6);
   ok("IFC4 com IfcTriangulatedFaceSet", /FILE_SCHEMA\(\('IFC4'\)\)/.test(ifc) && ifc.indexOf("IFCTRIANGULATEDFACESET") > 0 && ifc.indexOf("IFCBUILDINGELEMENTPROXY") > 0);
   return r;
 }
 
 window.PhysisImagem3D = { mascara, contornos, svg, dxf, relevo, campoDeAlturas, testes, autoteste, cinza, suavizar, otsu, limpar, processarFoto,
-  extrudar, PRIM, lerDxf, caixaDe, transformar, juntar, colisoes, escrever3MFMontagem, escreverIfc, CORES_PECA, versao: "physis-imagem-3d-0.2" };
+  extrudar, PRIM, lerDxf, caixaDe, transformar, juntar, colisoes, escrever3MFMontagem, escreverIfc, CORES_PECA,
+  rotular8, larguraTraco, morfo, afinar, tracarEsqueleto, ajustarCirculo, primitivas, recortarLaco, lerDesenho, lacosDaRegiao, revolver,
+  padraoCircular, corpos, folhaSintetica, testeFolha, versao: "physis-imagem-3d-0.3" };
 })();
 </script>
 <script id="lab-modelagem">
@@ -3316,6 +3645,30 @@ const T = {
     ar_lado: "Foto, CAD 2D e 3D", ar_foto: "Foto", ar_foto_alt: "A imagem enviada", ar_cad: "CAD 2D", ar_3d: "3D (girar: arrastar ou setas; aproximar: roda ou + e −)",
     ar_contornos: "contornos", ar_celulas: "Células de material", ar_de: "de", ar_cada: "cada", ar_otsu: "limiar usado", ar_vista_dica: "Para editar a forma com as ferramentas, use \"Editar em Modelos BIM\".",
     ar_editar_bim: "Editar em Modelos BIM (CAD e IFC)",
+    // desenho técnico (dona, 21/11/2026)
+    dt_modo: "Modo de leitura", dt_modo_foto: "Modo foto (silhueta)", dt_modo_desenho: "Modo desenho técnico (traços)", dt_voltar_foto: "Voltar ao modo foto",
+    dt_modo_foto_d: "Foto de uma peça: a mancha escura vira a silhueta, que é extrudada.",
+    dt_modo_desenho_d: "Folha de desenho técnico: lê os traços finos, fecha as regiões e ignora texto, setas, cotas e hachura. Recorte uma vista de cada vez.",
+    dt_marcas: "Marcar na imagem", dt_marcas_d: "Escolha o que marcar e arraste ou clique sobre a foto. Pelo teclado, use as coordenadas logo abaixo.",
+    dt_marcar: { recorte: "Recortar uma vista", cota: "Escala pela cota (2 pontos)", eixo: "Eixo de revolução (2 pontos)", centro: "Centro do padrão" },
+    dt_clique_dica: { recorte: "Arraste um retângulo sobre a vista que quer ler.", cota: "Clique nas duas pontas de uma cota; depois digite o valor em mm.",
+      eixo: "Clique em dois pontos da linha de centro.", centro: "Clique no centro do padrão circular." },
+    dt_inteira: "Usar a imagem inteira", dt_teclado: "Coordenadas pelo teclado (pixels da imagem)",
+    dt_rx: "Recorte: x", dt_ry: "Recorte: y", dt_rw: "Recorte: largura", dt_rh: "Recorte: altura", dt_c1x: "Cota, ponto 1: x", dt_c1y: "Cota, ponto 1: y",
+    dt_c2x: "Cota, ponto 2: x", dt_c2y: "Cota, ponto 2: y", dt_e1x: "Eixo, ponto 1: x", dt_e1y: "Eixo, ponto 1: y", dt_e2x: "Eixo, ponto 2: x", dt_e2y: "Eixo, ponto 2: y",
+    dt_ox: "Centro: x", dt_oy: "Centro: y", dt_cmm: "Valor da cota (mm)", dt_cmm_d: "Com a cota marcada e o valor digitado, a escala vem dela (e não da largura final).",
+    dt_op: "Operação", dt_ops: { extrudar: "Extrudar", revolucionar: "Revolucionar (meia-seção em volta do eixo)" }, dt_seg: "Segmentos da revolução (6 a 512)",
+    dt_lado: "Lado do perfil", dt_lados: { auto: "Automático (o lado com hachura)", "1": "À direita do eixo (ou abaixo)", "-1": "À esquerda do eixo (ou acima)" },
+    dt_padrao: "Padrão circular: cópias (1 = sem padrão)", dt_padrao_d: "Os contornos do tipo \"perfil no padrão\" são extrudados e repetidos em volta do centro (por exemplo, uma pá do rotor e 6 cópias).",
+    dt_res: "Resolução da leitura (células na maior medida, 100 a 1200)", dt_suav: "Suavização (0 a 3)",
+    dt_manter_texto: "Reincluir textos e traços curtos", dt_manter_hachura: "Reincluir hachuras como traço",
+    dt_tipos: { perfil: "perfil", padrao: "perfil no padrão", furo: "furo", ignorado: "ignorado" }, dt_ignorados: "ignorados",
+    dt_ign: { texto: "textos e setas", traco_curto: "traços curtos", hachura: "hachuras" }, dt_nenhum: "Nenhum contorno fechado nesta vista.",
+    dt_tipo: "Tipo", dt_forma: "Forma", dt_motivo: "Por quê", dt_circulo: "círculo", dt_retas: "retas", dt_arcos: "arcos",
+    dt_motivos: { cota: "pequeno demais (seta ou cota)", texto: "quadro de texto", manual: "escolha sua", hachurada: "seção hachurada" },
+    dt_sem_eixo: "Para revolucionar, marque o eixo (2 pontos) ou use uma vista com a linha de centro.", dt_sem_perfil: "Nenhum contorno do tipo perfil: escolha o tipo na tabela de contornos.",
+    dt_escala_cota: "Escala pela cota marcada", dt_escala_largura: "Escala pela largura final digitada", dt_celula: "célula", dt_eixo_ok: "eixo marcado", dt_eixo_achado: "linha de centro achada no desenho", dt_corpos: "corpos",
+    dt_fase2: "Fase 2 (servidor, dezembro): fotos reais de peças por fotogrametria (COLMAP ou Meshroom) e IA de uma foto (TripoSR ou Depth Anything), depois de conferir a placa de vídeo do servidor e as licenças [MARCADOR].",
     // peças de teste
     tp_t: "Arquivos de teste para impressão", tp_txt: "Gerados aqui mesmo, pelo motor do Physis 3D (sem conta e sem nada copiado de terceiros). Baixe em STL, abra em Peças 3D ou peça a impressão.",
     tp_observar: "O que observar:",
@@ -3450,6 +3803,29 @@ const T = {
     ar_lado: "Photo, 2D CAD and 3D", ar_foto: "Photo", ar_foto_alt: "The uploaded image", ar_cad: "2D CAD", ar_3d: "3D (rotate: drag or arrow keys; zoom: wheel or + and −)",
     ar_contornos: "outlines", ar_celulas: "Material cells", ar_de: "of", ar_cada: "each", ar_otsu: "threshold used", ar_vista_dica: "To edit the shape with the tools, use \"Edit in BIM models\".",
     ar_editar_bim: "Edit in BIM models (CAD and IFC)",
+    dt_modo: "Reading mode", dt_modo_foto: "Photo mode (silhouette)", dt_modo_desenho: "Technical drawing mode (lines)", dt_voltar_foto: "Back to photo mode",
+    dt_modo_foto_d: "Photo of a part: the dark blob becomes the silhouette, which is extruded.",
+    dt_modo_desenho_d: "Technical drawing sheet: reads the thin lines, closes the regions and ignores text, arrows, dimensions and hatching. Crop one view at a time.",
+    dt_marcas: "Mark on the image", dt_marcas_d: "Choose what to mark and drag or click on the photo. With the keyboard, use the coordinates just below.",
+    dt_marcar: { recorte: "Crop one view", cota: "Scale from a dimension (2 points)", eixo: "Revolution axis (2 points)", centro: "Pattern centre" },
+    dt_clique_dica: { recorte: "Drag a rectangle over the view you want to read.", cota: "Click both ends of a dimension; then type its value in mm.",
+      eixo: "Click two points on the centre line.", centro: "Click the centre of the circular pattern." },
+    dt_inteira: "Use the whole image", dt_teclado: "Coordinates by keyboard (image pixels)",
+    dt_rx: "Crop: x", dt_ry: "Crop: y", dt_rw: "Crop: width", dt_rh: "Crop: height", dt_c1x: "Dimension, point 1: x", dt_c1y: "Dimension, point 1: y",
+    dt_c2x: "Dimension, point 2: x", dt_c2y: "Dimension, point 2: y", dt_e1x: "Axis, point 1: x", dt_e1y: "Axis, point 1: y", dt_e2x: "Axis, point 2: x", dt_e2y: "Axis, point 2: y",
+    dt_ox: "Centre: x", dt_oy: "Centre: y", dt_cmm: "Dimension value (mm)", dt_cmm_d: "With the dimension marked and its value typed, the scale comes from it (not from the final width).",
+    dt_op: "Operation", dt_ops: { extrudar: "Extrude", revolucionar: "Revolve (half-section around the axis)" }, dt_seg: "Revolution segments (6 to 512)",
+    dt_lado: "Profile side", dt_lados: { auto: "Automatic (the hatched side)", "1": "Right of the axis (or below)", "-1": "Left of the axis (or above)" },
+    dt_padrao: "Circular pattern: copies (1 = no pattern)", dt_padrao_d: "Outlines of type \"profile in pattern\" are extruded and repeated around the centre (for example, one rotor blade and 6 copies).",
+    dt_res: "Reading resolution (cells along the largest side, 100 to 1200)", dt_suav: "Smoothing (0 to 3)",
+    dt_manter_texto: "Include texts and short lines again", dt_manter_hachura: "Include hatching again as lines",
+    dt_tipos: { perfil: "profile", padrao: "profile in pattern", furo: "hole", ignorado: "ignored" }, dt_ignorados: "ignored",
+    dt_ign: { texto: "texts and arrows", traco_curto: "short lines", hachura: "hatching" }, dt_nenhum: "No closed outline in this view.",
+    dt_tipo: "Type", dt_forma: "Shape", dt_motivo: "Why", dt_circulo: "circle", dt_retas: "lines", dt_arcos: "arcs",
+    dt_motivos: { cota: "too small (arrow or dimension)", texto: "text block", manual: "your choice", hachurada: "hatched section" },
+    dt_sem_eixo: "To revolve, mark the axis (2 points) or use a view with a centre line.", dt_sem_perfil: "No outline of type profile: choose the type in the outline table.",
+    dt_escala_cota: "Scale from the marked dimension", dt_escala_largura: "Scale from the typed final width", dt_celula: "cell", dt_eixo_ok: "axis marked", dt_eixo_achado: "centre line found in the drawing", dt_corpos: "bodies",
+    dt_fase2: "Phase 2 (server, December): real photos of parts through photogrammetry (COLMAP or Meshroom) and single-photo AI (TripoSR or Depth Anything), after checking the server graphics card and the licences [MARCADOR].",
     tp_t: "Test print files", tp_txt: "Generated right here by the Physis 3D engine (no account needed and nothing copied from third parties). Download as STL, open in 3D parts or request a print.",
     tp_observar: "What to look for:",
     lg_t: "Site (GIS)", lg_o_t: "What it is",
@@ -3665,7 +4041,10 @@ const stlDe = (T, nome) => new Uint8Array(PHYSIS3D.escreverSTL(T, nome));
 
 /* ════════ 1. Enviar arquivo: foto → CAD 2D → 3D (sistema/physis-imagem-3d.js + motor PHYSIS3D, sem mudar) ════════ */
 const RX_IMG = /\.(png|jpe?g|webp)$/i, RX_MALHA = /\.(stl|obj|3mf)$/i, RX_SVG = /\.svg$/i, RX_PDF = /\.pdf$/i, RX_CAD = /\.(dxf|ifc)$/i, RX_STEP = /\.(step|stp|iges|igs)$/i;
-const PAR_PADRAO = { auto: true, limiar: 128, inverter: false, suavizar: 1, areaMin: 20, fundo: true, maior: false, res: 120, largura: 60, altura: 3, base: 0 };   // pontos de partida da tela, ajustáveis
+const PAR_PADRAO = { auto: true, limiar: 128, inverter: false, suavizar: 1, areaMin: 20, fundo: true, maior: false, res: 120, largura: 60, altura: 3, base: 0,
+  // modo desenho técnico (dona, 21/11/2026): lê traços, não manchas
+  modo: "foto", resDesenho: 1000, suavizarDesenho: 0, operacao: "extrudar", segmentos: 64, lado: "auto", padrao: 1, manterTexto: false, manterHachura: false,
+  recorte: null, cota: null, eixo: null, centro: null };   // pontos de partida da tela, ajustáveis
 const SVG_FORMAS = ["path", "rect", "circle", "ellipse", "polygon", "polyline", "line"];
 const SVG_ATRIBUTOS = ["d", "x", "y", "width", "height", "rx", "ry", "cx", "cy", "r", "points", "x1", "y1", "x2", "y2", "transform", "stroke-width", "fill-rule"];
 function tipoDe(f) {
@@ -3725,29 +4104,12 @@ async function imagemDe(f, fonte) {
   try { im.src = url; await im.decode(); } finally { setTimeout(() => URL.revokeObjectURL(url), 1000); }
   return { img: im, w: im.naturalWidth, h: im.naturalHeight };
 }
-function processarArquivo() {
-  const a = lab.arq; if (!a || !a.img) return;
-  const p = a.par, I = window.PhysisImagem3D;
-  a.r = null;
-  try {
-    if (!I || !window.PHYSIS3D) throw new Error(t("sem_modulos"));
-    const asp = a.w / a.h, nx = asp >= 1 ? p.res : Math.max(2, Math.round(p.res * asp)), ny = asp >= 1 ? Math.max(2, Math.round(p.res / asp)) : p.res;
-    const cv = document.createElement("canvas"); cv.width = nx; cv.height = ny;
-    const cx = cv.getContext("2d"); cx.clearRect(0, 0, nx, ny); cx.drawImage(a.img, 0, 0, nx, ny);
-    const pf = I.processarFoto(cx.getImageData(0, 0, nx, ny).data, nx, ny, { limiar: p.auto ? null : p.limiar, inverter: p.inverter, suavizar: p.suavizar, areaMin: p.areaMin, fundo: p.fundo, maior: p.maior });
-    if (p.auto) p.limiar = Math.round(pf.limiar);
-    const cel = p.largura / nx, tol = 0.5 + 0.25 * p.suavizar;
-    const lacos = a.svg ? lacosDoSvg(a.svg, p.largura) : I.contornos(pf.M, nx, ny, cel, tol);
-    const T = I.relevo(pf.M, nx, ny, cel, p.altura, p.base);
-    a.r = { nx, ny, cel, lacos, T, med: PHYSIS3D.medir(T), larg: nx * cel, alt: ny * cel, celulas: pf.M.reduce((s, v) => s + v, 0), otsu: pf.otsu, M: pf.M };
-  } catch (e) { a.r = { erro: String(e && e.message || e) }; }
-}
 async function receberArquivo(f) {
   if (!f) return { texto: t("escolha_arquivo"), erro: true };
   if (f.size > ARQ_MAX) return { texto: t("grande"), erro: true };
   const fonte = tipoDe(f), base = (f.name || "arquivo").replace(/\.[^.]+$/, "");
   if (lab.arq && lab.arq.url) URL.revokeObjectURL(lab.arq.url);
-  lab.arq = { nome: f.name, base, tipo: f.type || "", tamanho: f.size, fonte, arquivo: f, par: Object.assign({}, PAR_PADRAO), r: null };
+  lab.arq = { nome: f.name, base, tipo: f.type || "", tamanho: f.size, fonte, arquivo: f, par: Object.assign({}, PAR_PADRAO), r: null, tipos: {} }; lab.clique = null; lab.marca1 = null;
   proj.arquivos.push({ nome: String(f.name).slice(0, 160), tipo: String(f.type || "").slice(0, 80), tamanho: f.size, fonte, recebido_em: agora() });
   if (proj.arquivos.length > 200) proj.arquivos.splice(0, proj.arquivos.length - 200);
   registrarPasso("arquivo", f.name);
@@ -3760,18 +4122,149 @@ async function receberArquivo(f) {
   }
   return { texto: t(fonte === "malha" ? "ar_malha_rec" : fonte === "pdf" ? "ar_pdf_rec" : "ar_registrado") };
 }
+/* recorte (em pixels da imagem) e a área desenhada na grade: k = células por pixel */
+function janela(a) {
+  const c = a.par.recorte, x = c ? Math.max(0, Math.min(a.w - 1, Math.round(c.x))) : 0, y = c ? Math.max(0, Math.min(a.h - 1, Math.round(c.y))) : 0;
+  const w = c ? Math.max(4, Math.min(a.w - x, Math.round(c.w))) : a.w, h = c ? Math.max(4, Math.min(a.h - y, Math.round(c.h))) : a.h;
+  return { x, y, w, h };
+}
+function processarArquivo() {
+  const a = lab.arq; if (!a || !a.img) return;
+  const p = a.par, I = window.PhysisImagem3D;
+  a.r = null;
+  try {
+    if (!I || !window.PHYSIS3D) throw new Error(t("sem_modulos"));
+    const J = janela(a), desenho = p.modo === "desenho" && !a.svg, res = desenho ? p.resDesenho : p.res;
+    // desenho técnico: lê na resolução da própria imagem (traço fino some se diminuir); só reduz o que passar da resolução pedida
+    const k = desenho ? Math.min(1, res / Math.max(J.w, J.h)) : res / Math.max(J.w, J.h), nx = Math.max(2, Math.round(J.w * k)), ny = Math.max(2, Math.round(J.h * k));
+    const cv = document.createElement("canvas"); cv.width = nx; cv.height = ny;
+    const cx = cv.getContext("2d"); cx.fillStyle = "white"; cx.fillRect(0, 0, nx, ny); cx.drawImage(a.img, J.x, J.y, J.w, J.h, 0, 0, nx, ny);
+    const dados = cx.getImageData(0, 0, nx, ny).data;
+    // escala: pela cota (2 pontos e o valor em mm) ou pela largura final digitada
+    const cota = p.cota && p.cota.mm > 0 ? Math.hypot(p.cota.q[0] - p.cota.p[0], p.cota.q[1] - p.cota.p[1]) : 0;
+    const cel = cota > 0 ? p.cota.mm / (cota * k) : p.largura / nx;
+    const mm = q => [(q[0] - J.x) * k * cel, (ny - (q[1] - J.y) * k) * cel];
+    if (!desenho) {
+      const pf = I.processarFoto(dados, nx, ny, { limiar: p.auto ? null : p.limiar, inverter: p.inverter, suavizar: p.suavizar, areaMin: p.areaMin, fundo: p.fundo, maior: p.maior });
+      if (p.auto) p.limiar = Math.round(pf.limiar);
+      const tol = 0.5 + 0.25 * p.suavizar, lacos = a.svg ? lacosDoSvg(a.svg, p.largura) : I.contornos(pf.M, nx, ny, cel, tol);
+      const T = I.relevo(pf.M, nx, ny, cel, p.altura, p.base);
+      a.r = { modo: "foto", nx, ny, cel, lacos, T, med: PHYSIS3D.medir(T), larg: nx * cel, alt: ny * cel, celulas: pf.M.reduce((s, v) => s + v, 0), otsu: pf.otsu, J, k };
+      return;
+    }
+    // desenho técnico: traços, regiões, contornos com tipo; depois extrudar ou revolucionar
+    const D = I.lerDesenho(dados, nx, ny, { limiar: p.auto ? null : p.limiar, inverter: p.inverter, suavizar: p.suavizarDesenho, manterTexto: p.manterTexto, manterHachura: p.manterHachura });
+    if (p.auto) p.limiar = Math.round(D.limiar);
+    const conts = [];
+    D.regioes.forEach(g => I.lacosDaRegiao(D, g.id, nx, ny, cel, 1).forEach((l, i) => {
+      const chave = "r" + g.id + "-" + i, padrao = g.tipo === "corpo" ? l.tipo : "ignorado";
+      conts.push({ chave, regiao: g.id, tipo: a.tipos[chave] || padrao, padrao, motivo: g.motivo || "", prims: l.prims, laco: l.laco, hachurada: g.hachurada, area: g.area }); }));
+    const eixo = p.eixo ? { p: mm(p.eixo.p), q: mm(p.eixo.q) } : D.eixo ? { p: [D.eixo.p[0] * cel, (ny - D.eixo.p[1]) * cel], q: [D.eixo.q[0] * cel, (ny - D.eixo.q[1]) * cel] } : null;
+    const circ = conts.filter(c => c.tipo !== "ignorado" && c.prims.length === 1 && c.prims[0].tipo === "circulo").sort((x, y) => y.prims[0].r - x.prims[0].r)[0];
+    const centro = p.centro ? mm(p.centro) : circ ? [circ.prims[0].cx * cel, circ.prims[0].cy * cel] : [nx * cel / 2, ny * cel / 2];
+    const de = tp => conts.filter(c => c.tipo === tp).map(c => c.laco), perfis = de("perfil"), padroes = de("padrao"), furos = de("furo");
+    let corpos = [];
+    if (p.operacao === "revolucionar") {
+      if (!eixo) throw new Error(t("dt_sem_eixo"));
+      let lado = p.lado === "-1" ? -1 : 1;
+      if (p.lado === "auto") { const h = conts.find(c => c.hachurada && c.tipo === "perfil"); if (h) { const L = Math.hypot(eixo.q[0] - eixo.p[0], eixo.q[1] - eixo.p[1]) || 1;
+        let ux = (eixo.q[0] - eixo.p[0]) / L, uy = (eixo.q[1] - eixo.p[1]) / L; if (uy < 0 || (uy === 0 && ux < 0)) { ux = -ux; uy = -uy; }
+        const cxm = h.laco.reduce((s, q) => s + q[0], 0) / h.laco.length, cym = h.laco.reduce((s, q) => s + q[1], 0) / h.laco.length;
+        lado = ((cxm - eixo.p[0]) * uy - (cym - eixo.p[1]) * ux) >= 0 ? 1 : -1; } }
+      corpos = [I.revolver(perfis.concat(padroes, furos), eixo, p.segmentos, lado)];
+      a.ladoUsado = lado;
+    } else {
+      if (perfis.length) corpos.push(I.extrudar(perfis.concat(furos), p.altura));
+      if (padroes.length) corpos = corpos.concat(I.padraoCircular(I.extrudar(padroes, p.altura), p.padrao, centro));
+    }
+    if (!corpos.length) throw new Error(t("dt_sem_perfil"));
+    const T = I.juntar(corpos), lacos = conts.filter(c => c.tipo !== "ignorado").map(c => c.laco);
+    a.r = { modo: "desenho", D, nx, ny, cel, conts, lacos, eixo, centro, corpos, T, med: PHYSIS3D.medir(T), larg: nx * cel, alt: ny * cel, J, k, porCota: cota > 0 };
+  } catch (e) { a.r = { erro: String(e && e.message || e) }; }
+}
 function lerParametros() {
   const a = lab.arq, v = id => (document.getElementById(id) || {}).value, ch = id => !!(document.getElementById(id) || {}).checked, lim = (x, a_, b) => Math.max(a_, Math.min(b, x));
-  const auto = ch("ar-auto"), lmanual = Math.round(numL(v("ar-limiar"), a.par.limiar));
-  a.par = { auto, limiar: lim(lmanual, 0, 255), inverter: ch("ar-inverter"), suavizar: lim(Math.round(numL(v("ar-suav"), a.par.suavizar)), 0, 5),
-    areaMin: lim(Math.round(numL(v("ar-ruido"), a.par.areaMin)), 0, 100000), fundo: ch("ar-fundo"), maior: ch("ar-maior"),
-    res: lim(Math.round(numL(v("ar-res"), a.par.res)), 10, 250), largura: lim(numL(v("ar-largura"), a.par.largura), 1, 1000),
-    altura: lim(numL(v("ar-altura"), a.par.altura), 0, 500), base: lim(numL(v("ar-base"), a.par.base), 0, 100) };
+  const P = a.par, num = (id, d) => numL(v(id), d), existe = id => !!document.getElementById(id);
+  P.auto = ch("ar-auto"); P.limiar = lim(Math.round(num("ar-limiar", P.limiar)), 0, 255); P.inverter = ch("ar-inverter");
+  P.largura = lim(num("ar-largura", P.largura), 0.1, 10000); P.altura = lim(num("ar-altura", P.altura), 0, 5000);
+  if (P.modo === "desenho") {
+    if (existe("dt-suav")) P.suavizarDesenho = lim(Math.round(num("dt-suav", P.suavizarDesenho)), 0, 3);
+    if (existe("dt-res")) P.resDesenho = lim(Math.round(num("dt-res", P.resDesenho)), 100, 1200);
+    if (existe("dt-seg")) P.segmentos = lim(Math.round(num("dt-seg", P.segmentos)), 6, 512);
+    if (existe("dt-padrao")) P.padrao = lim(Math.round(num("dt-padrao", P.padrao)), 1, 360);
+    if (existe("dt-op")) P.operacao = v("dt-op"); if (existe("dt-lado")) P.lado = v("dt-lado");
+    P.manterTexto = ch("dt-texto"); P.manterHachura = ch("dt-hachura");
+  } else {
+    P.suavizar = lim(Math.round(num("ar-suav", P.suavizar)), 0, 5); P.areaMin = lim(Math.round(num("ar-ruido", P.areaMin)), 0, 100000);
+    P.fundo = ch("ar-fundo"); P.maior = ch("ar-maior"); P.res = lim(Math.round(num("ar-res", P.res)), 10, 250); P.base = lim(num("ar-base", P.base), 0, 100);
+  }
+  // pontos digitados (teclado): recorte, cota, eixo e centro, em pixels da imagem
+  const pts = (ids) => ids.map(id => num(id, NaN));
+  if (existe("dt-rx")) { const [x, y, w, h] = pts(["dt-rx", "dt-ry", "dt-rw", "dt-rh"]); P.recorte = [x, y, w, h].every(isFinite) && w > 3 && h > 3 ? { x, y, w, h } : null; }
+  if (existe("dt-c1x")) { const [x1, y1, x2, y2, m] = pts(["dt-c1x", "dt-c1y", "dt-c2x", "dt-c2y", "dt-cmm"]);
+    P.cota = [x1, y1, x2, y2].every(isFinite) && Math.hypot(x2 - x1, y2 - y1) > 0 ? { p: [x1, y1], q: [x2, y2], mm: isFinite(m) && m > 0 ? m : 0 } : null; }
+  if (existe("dt-e1x")) { const [x1, y1, x2, y2] = pts(["dt-e1x", "dt-e1y", "dt-e2x", "dt-e2y"]); P.eixo = [x1, y1, x2, y2].every(isFinite) && Math.hypot(x2 - x1, y2 - y1) > 0 ? { p: [x1, y1], q: [x2, y2] } : null; }
+  if (existe("dt-ox")) { const [x, y] = pts(["dt-ox", "dt-oy"]); P.centro = [x, y].every(isFinite) ? [x, y] : null; }
+  document.querySelectorAll("[data-lab-tipo]").forEach(s => { a.tipos[s.getAttribute("data-lab-tipo")] = s.value; });
 }
+/* CAD 2D: no modo foto, o contorno; no desenho técnico, cada contorno com o seu tipo, os traços lidos, o que foi ignorado,
+   o eixo e o centro */
 function previa2d(r) {
-  const d = r.lacos.map(l => "M" + l.map(p => (+p[0]).toFixed(3) + " " + (r.alt - p[1]).toFixed(3)).join(" L") + (l.length > 2 ? " Z" : "")).join(" ");
-  return `<svg viewBox="0 0 ${r.larg.toFixed(3)} ${r.alt.toFixed(3)}" role="img" aria-label="${escL(t("ar_cad"))}: ${r.lacos.length} ${escL(t("ar_contornos"))}, ${nf(r.larg, 1)} × ${nf(r.alt, 1)} mm" class="lab-cad">
-    <path d="${d}" fill="currentColor" fill-opacity="0.25" fill-rule="evenodd" stroke="currentColor" stroke-width="${(r.larg / 250).toFixed(3)}"/></svg>`;
+  const H = r.alt, cam = l => "M" + l.map(p => (+p[0]).toFixed(3) + " " + (H - p[1]).toFixed(3)).join(" L") + (l.length > 2 ? " Z" : ""), w = (r.larg / 300).toFixed(3);
+  if (r.modo !== "desenho") return `<svg viewBox="0 0 ${r.larg.toFixed(3)} ${H.toFixed(3)}" role="img" aria-label="${escL(t("ar_cad"))}: ${r.lacos.length} ${escL(t("ar_contornos"))}, ${nf(r.larg, 1)} × ${nf(H, 1)} mm" class="lab-cad">
+    <path d="${r.lacos.map(cam).join(" ")}" fill="currentColor" fill-opacity="0.25" fill-rule="evenodd" stroke="currentColor" stroke-width="${w}"/></svg>`;
+  const c = r.cel, ign = r.D.ignorados.map(x => `<rect x="${(x.x0 * c).toFixed(2)}" y="${(x.y0 * c).toFixed(2)}" width="${((x.x1 - x.x0 + 1) * c).toFixed(2)}" height="${((x.y1 - x.y0 + 1) * c).toFixed(2)}" class="dt-ign"/>`).join("");
+  const tr = r.D.tracos.map(l => `<polyline points="${l.map(p => (p[0] * c).toFixed(2) + "," + (p[1] * c).toFixed(2)).join(" ")}" class="dt-traco"/>`).join("");
+  const ordem = { ignorado: 0, perfil: 1, padrao: 2, furo: 3 };
+  const cs = r.conts.map((x, i) => [x, i]).sort((u, v) => ordem[u[0].tipo] - ordem[v[0].tipo]).map(([x, i]) => `<path d="${cam(x.laco)}" class="dt-${x.tipo}"><title>${i + 1}: ${escL(t("dt_tipos")[x.tipo])}</title></path>`).join("");
+  const ex = r.eixo ? `<line x1="${r.eixo.p[0].toFixed(2)}" y1="${(H - r.eixo.p[1]).toFixed(2)}" x2="${r.eixo.q[0].toFixed(2)}" y2="${(H - r.eixo.q[1]).toFixed(2)}" class="dt-eixo"/>` : "";
+  const ce = r.centro ? `<circle cx="${r.centro[0].toFixed(2)}" cy="${(H - r.centro[1]).toFixed(2)}" r="${(r.larg / 80).toFixed(2)}" class="dt-centro"/>` : "";
+  return `<svg viewBox="0 0 ${r.larg.toFixed(3)} ${H.toFixed(3)}" role="img" style="--w:${w}" aria-label="${escL(t("ar_cad"))}: ${escL(resumoContornos(r))}" class="lab-cad dt">${ign}${tr}${cs}${ex}${ce}</svg>`;
+}
+function resumoContornos(r) {
+  const n = tp => r.conts.filter(x => x.tipo === tp).length, ig = {}; r.D.ignorados.forEach(x => { ig[x.tipo] = (ig[x.tipo] || 0) + 1; });
+  return r.conts.length + " " + t("ar_contornos") + ": " + ["perfil", "padrao", "furo", "ignorado"].map(tp => n(tp) + " " + t("dt_tipos")[tp]).join(", ")
+    + " · " + t("dt_ignorados") + ": " + Object.keys(ig).map(k => ig[k] + " " + (t("dt_ign")[k] || k)).join(", ");
+}
+/* a foto com o recorte, a cota, o eixo e o centro desenhados por cima; clicar ou arrastar marca, conforme o botão escolhido */
+function fotoComMarcas(a) {
+  const p = a.par, J = janela(a), lin = (q, cls) => q ? `<line x1="${q.p[0]}" y1="${q.p[1]}" x2="${q.q[0]}" y2="${q.q[1]}" class="${cls}"/>` : "";
+  const ponto = (x, y, cls) => `<circle cx="${x}" cy="${y}" r="${Math.max(a.w, a.h) / 120}" class="${cls}"/>`;
+  return `<div class="lab-foto-marca"><img src="${escL(a.url)}" alt="${escL(t("ar_foto_alt"))}: ${escL(a.nome)}" class="lab-foto">
+    <svg viewBox="0 0 ${a.w} ${a.h}" preserveAspectRatio="none" class="lab-marcas${lab.clique ? " ativo" : ""}" id="ar-marcas" aria-hidden="true" style="--w:${Math.max(a.w, a.h) / 300}">
+      ${p.recorte ? `<rect x="${J.x}" y="${J.y}" width="${J.w}" height="${J.h}" class="dt-recorte"/>` : ""}${lin(p.cota, "dt-cota")}${p.cota ? ponto(p.cota.p[0], p.cota.p[1], "dt-cota") + ponto(p.cota.q[0], p.cota.q[1], "dt-cota") : ""}
+      ${lin(p.eixo, "dt-eixo")}${p.centro ? ponto(p.centro[0], p.centro[1], "dt-centro") : ""}${lab.marca1 ? ponto(lab.marca1[0], lab.marca1[1], "dt-cota") : ""}</svg></div>`;
+}
+function painelDesenho(a, desenho) {
+  const p = a.par, f = (id, rot, val) => campo(id, rot, val === "" || val == null ? "" : String(Math.round(val * 100) / 100), ' data-lab-par="1"');
+  const botoesClique = (desenho ? ["recorte", "cota", "eixo", "centro"] : ["recorte", "cota"]).map(k => `<button type="button" class="botao${lab.clique === k ? "" : " sec"}" id="dt-m-${k}" data-lab="dt-clique" data-k="${k}" aria-pressed="${lab.clique === k}">${escL(t("dt_marcar")[k])}</button>`).join("");
+  const c = p.recorte || {}, co = p.cota || { p: [], q: [] }, e = p.eixo || { p: [], q: [] }, o = p.centro || [];
+  return `<fieldset><legend>${escL(t("dt_marcas"))}</legend><p class="t2 pq">${escL(t("dt_marcas_d"))}</p><div class="acoes" role="group" aria-label="${escL(t("dt_marcas"))}">${botoesClique}
+      <button type="button" class="botao sec" id="dt-inteira" data-lab="dt-inteira">${escL(t("dt_inteira"))}</button></div>
+    <p class="t2 pq" role="status" id="dt-clique-msg">${lab.clique ? escL(t("dt_clique_dica")[lab.clique]) : ""}</p>
+    <details><summary>${escL(t("dt_teclado"))}</summary><div class="campos">
+      ${f("dt-rx", t("dt_rx"), c.x)}${f("dt-ry", t("dt_ry"), c.y)}${f("dt-rw", t("dt_rw"), c.w)}${f("dt-rh", t("dt_rh"), c.h)}
+      ${f("dt-c1x", t("dt_c1x"), co.p[0])}${f("dt-c1y", t("dt_c1y"), co.p[1])}${f("dt-c2x", t("dt_c2x"), co.q[0])}${f("dt-c2y", t("dt_c2y"), co.q[1])}
+      ${desenho ? f("dt-e1x", t("dt_e1x"), e.p[0]) + f("dt-e1y", t("dt_e1y"), e.p[1]) + f("dt-e2x", t("dt_e2x"), e.q[0]) + f("dt-e2y", t("dt_e2y"), e.q[1])
+        + f("dt-ox", t("dt_ox"), o[0]) + f("dt-oy", t("dt_oy"), o[1]) : ""}</div></details>
+    ${campo("dt-cmm", t("dt_cmm"), p.cota && p.cota.mm ? nf(p.cota.mm, 2) : "", ' data-lab-par="1" aria-describedby="dt-cmm-d"')}<p class="t2 pq" id="dt-cmm-d">${escL(t("dt_cmm_d"))}</p></fieldset>
+  ${desenho ? `<fieldset><legend>${escL(t("dt_op"))}</legend><div class="campos">
+    <div><label for="dt-op">${escL(t("dt_op"))}</label><select id="dt-op" data-lab-par="1">${["extrudar", "revolucionar"].map(k => `<option value="${k}"${p.operacao === k ? " selected" : ""}>${escL(t("dt_ops")[k])}</option>`).join("")}</select></div>
+    ${p.operacao === "revolucionar" ? `${campo("dt-seg", t("dt_seg"), p.segmentos, ' data-lab-par="1"')}<div><label for="dt-lado">${escL(t("dt_lado"))}</label><select id="dt-lado" data-lab-par="1">${["auto", "1", "-1"].map(k => `<option value="${k}"${p.lado === k ? " selected" : ""}>${escL(t("dt_lados")[k])}</option>`).join("")}</select></div>`
+      : `${campo("dt-padrao", t("dt_padrao"), p.padrao, ' data-lab-par="1" aria-describedby="dt-padrao-d"')}`}
+    ${campo("dt-res", t("dt_res"), p.resDesenho, ' data-lab-par="1"')}${campo("dt-suav", t("dt_suav"), p.suavizarDesenho, ' data-lab-par="1"')}</div>
+    ${p.operacao === "revolucionar" ? "" : `<p class="t2 pq" id="dt-padrao-d">${escL(t("dt_padrao_d"))}</p>`}
+    <label class="opcao"><input type="checkbox" id="dt-texto" data-lab-par="1"${p.manterTexto ? " checked" : ""}> ${escL(t("dt_manter_texto"))}</label>
+    <label class="opcao"><input type="checkbox" id="dt-hachura" data-lab-par="1"${p.manterHachura ? " checked" : ""}> ${escL(t("dt_manter_hachura"))}</label></fieldset>` : ""}`;
+}
+function tabelaContornos(r) {
+  if (!r.conts.length) return `<p class="t2">${escL(t("dt_nenhum"))}</p>`;
+  const prim = x => { const n = tp => x.prims.filter(q => q.tipo === tp).length; return x.prims.length === 1 && x.prims[0].tipo === "circulo" ? t("dt_circulo") + " Ø" + nf(2 * x.prims[0].r * r.cel, 2) + " mm"
+      : n("reta") + " " + t("dt_retas") + (n("arco") ? ", " + n("arco") + " " + t("dt_arcos") : ""); };
+  return `<div class="rolagem"><table><caption>${escL(resumoContornos(r))}</caption><thead><tr><th scope="col">#</th><th scope="col">${escL(t("dt_tipo"))}</th><th scope="col">${escL(t("dt_forma"))}</th><th scope="col">${escL(t("dt_motivo"))}</th></tr></thead><tbody>
+    ${r.conts.map((x, i) => `<tr><th scope="row">${i + 1}</th><td><label class="so-leitor" for="dt-t-${x.chave}">${escL(t("dt_tipo"))} ${i + 1}</label><select id="dt-t-${x.chave}" data-lab-tipo="${x.chave}" data-lab-par="1">
+      ${["perfil", "padrao", "furo", "ignorado"].map(tp => `<option value="${tp}"${x.tipo === tp ? " selected" : ""}>${escL(t("dt_tipos")[tp])}</option>`).join("")}</select></td>
+      <td>${escL(prim(x))}</td><td>${escL(x.tipo === "ignorado" ? (t("dt_motivos")[x.motivo] || t("dt_motivos").manual) : x.hachurada ? t("dt_motivos").hachurada : "")}</td></tr>`).join("")}</tbody></table></div>`;
 }
 function telaArquivo() {
   const a = lab.arq, ck = (id, rot, v) => `<label class="opcao"><input type="checkbox" id="${id}" data-lab-par="1"${v ? " checked" : ""}> ${escL(rot)}</label>`;
@@ -3790,24 +4283,31 @@ function telaArquivo() {
     <div class="acoes"><button class="botao" type="button" id="ar-abrir-bim" data-lab="arq-bim">${escL(t("ar_abrir_bim"))}</button></div></section>`;
   if (a.fonte === "step") return h + `<section class="cartao" aria-labelledby="ar-s-h"><h3 id="ar-s-h">${escL(a.nome)}</h3><p class="faixa" role="note">${escL(t("ar_step_txt"))}</p></section>`;
   if (a.fonte === "outro") return h + `<section class="cartao" aria-labelledby="ar-x-h"><h3 id="ar-x-h">${escL(a.nome)}</h3><p>${escL(t("ar_outro_txt"))}</p></section>`;
-  const p = a.par, r = a.r || {};
-  h += `<section class="cartao" aria-labelledby="ar-e-h"><h3 id="ar-e-h">${escL(t("ar_ajustar"))}: ${escL(a.nome)}</h3>
+  const p = a.par, r = a.r || {}, desenho = p.modo === "desenho" && !a.svg;
+  const modos = a.svg ? "" : `<div class="acoes" role="group" aria-label="${escL(t("dt_modo"))}">${["foto", "desenho"].map(k => `<button type="button" class="botao${(desenho ? "desenho" : "foto") === k ? "" : " sec"}" id="dt-modo-${k}" data-lab="dt-modo" data-k="${k}" aria-pressed="${(desenho ? "desenho" : "foto") === k}">${escL(t(k === "foto" ? "dt_modo_foto" : "dt_modo_desenho"))}</button>`).join("")}</div>
+    <p class="t2 pq">${escL(t(desenho ? "dt_modo_desenho_d" : "dt_modo_foto_d"))}</p>`;
+  h += `<section class="cartao" aria-labelledby="ar-e-h"><h3 id="ar-e-h">${escL(t("ar_ajustar"))}: ${escL(a.nome)}</h3>${modos}
     <form id="ar-form" novalidate>${ck("ar-auto", t("ar_auto"), p.auto)}<div class="campos">
-      ${f("limiar", t("ar_limiar"), p.limiar, t("ar_limiar_d"))}${f("suav", t("ar_suav"), p.suavizar, t("ar_suav_d"))}${f("ruido", t("ar_ruido"), p.areaMin, t("ar_ruido_d"))}
-      ${f("res", t("ar_res"), p.res, "")}${f("largura", t("ar_largura"), nf(p.largura, 1), "")}${f("altura", t("ar_altura"), nf(p.altura, 1), "")}${f("base", t("ar_base"), nf(p.base, 1), "")}</div>
-      ${ck("ar-inverter", t("ar_inverter"), p.inverter)}${ck("ar-fundo", t("ar_fundo"), p.fundo)}${ck("ar-maior", t("ar_maior"), p.maior)}
-      <div class="acoes"><button class="botao sec" type="submit" id="ar-atualizar">${escL(t("ar_atualizar"))}</button></div></form>
-    ${a.svg ? `<p class="t2 pq">${escL(t("ar_svg_nota"))}</p>` : ""}</section>`;
-  if (r.erro) return h + `<p class="faixa erro" role="alert">${escL(r.erro)}</p>`;
+      ${f("limiar", t("ar_limiar"), p.limiar, t("ar_limiar_d"))}${desenho ? "" : f("suav", t("ar_suav"), p.suavizar, t("ar_suav_d")) + f("ruido", t("ar_ruido"), p.areaMin, t("ar_ruido_d")) + f("res", t("ar_res"), p.res, "")}
+      ${f("largura", t("ar_largura"), nf(p.largura, 1), p.cota && p.cota.mm ? t("dt_escala_cota") : "")}${f("altura", t("ar_altura"), nf(p.altura, 1), "")}${desenho ? "" : f("base", t("ar_base"), nf(p.base, 1), "")}</div>
+      ${ck("ar-inverter", t("ar_inverter"), p.inverter)}${desenho ? "" : ck("ar-fundo", t("ar_fundo"), p.fundo) + ck("ar-maior", t("ar_maior"), p.maior)}
+      ${a.svg ? "" : painelDesenho(a, desenho)}
+      <div class="acoes"><button class="botao sec" type="submit" id="ar-atualizar">${escL(t("ar_atualizar"))}</button>
+        ${desenho ? `<button class="botao sec" type="button" id="dt-voltar" data-lab="dt-modo" data-k="foto">${escL(t("dt_voltar_foto"))}</button>` : ""}</div></form>
+    ${a.svg ? `<p class="t2 pq">${escL(t("ar_svg_nota"))}</p>` : ""}
+    ${desenho ? `<p class="faixa" role="note">${escL(t("dt_fase2"))}</p>` : ""}</section>`;
+  if (r.erro) return h + `<p class="faixa erro" role="alert">${escL(r.erro)}</p>` + (a.url ? `<section class="cartao" aria-labelledby="ar-f-h"><h3 id="ar-f-h">${escL(t("ar_foto"))}</h3>${fotoComMarcas(a)}</section>` : "");
   if (!r.T) return h;
   const m = r.med;
   h += `<section class="cartao" aria-labelledby="ar-r-h"><h3 id="ar-r-h">${escL(t("ar_lado"))}</h3>
     <div class="lab-lado">
-      <figure><figcaption>${escL(t("ar_foto"))}</figcaption>${a.url ? `<img src="${escL(a.url)}" alt="${escL(t("ar_foto_alt"))}: ${escL(a.nome)}" class="lab-foto">` : ""}</figure>
-      <figure><figcaption>${escL(t("ar_cad"))} · ${r.lacos.length} ${escL(t("ar_contornos"))}${a.svg ? "" : " · " + escL(t("ar_otsu")) + " " + Math.round(p.limiar)}</figcaption>${previa2d(r)}</figure>
+      <figure><figcaption>${escL(t("ar_foto"))}</figcaption>${a.url ? fotoComMarcas(a) : ""}</figure>
+      <figure><figcaption>${escL(t("ar_cad"))} · ${r.modo === "desenho" ? escL(r.conts.filter(x => x.tipo !== "ignorado").length + " " + t("ar_contornos")) : r.lacos.length + " " + escL(t("ar_contornos"))}${a.svg ? "" : " · " + escL(t("ar_otsu")) + " " + Math.round(p.limiar)}</figcaption>${previa2d(r)}</figure>
       <figure><figcaption>${escL(t("ar_3d"))}</figcaption><div id="ar-vista" class="lab-vista-lugar"></div></figure></div>
+    ${r.modo === "desenho" ? `<p><strong>${escL(resumoContornos(r))}</strong></p>${tabelaContornos(r)}
+      <p class="t2 pq">${escL(t(r.porCota ? "dt_escala_cota" : "dt_escala_largura"))} · ${nf(r.cel, 4)} mm/${escL(t("dt_celula"))}${r.eixo ? " · " + escL(t(lab.arq.par.eixo ? "dt_eixo_ok" : "dt_eixo_achado")) : ""}${r.corpos ? " · " + r.corpos.length + " " + escL(t("dt_corpos")) : ""}</p>` : ""}
     ${tabela(t("ar_3d"), [[t("tamanho"), m.tamanho.map(v => nf(v, 1)).join(" × ") + " mm"], [t("volume"), nf(m.volume_mm3 / 1000, 2) + " cm³"],
-      [t("triangulos"), nf(m.triangulos, 0)], [t("ar_celulas"), nf(r.celulas, 0) + " " + t("ar_de") + " " + nf(r.nx * r.ny, 0) + " (" + r.nx + " × " + r.ny + ", " + nf(r.cel, 3) + " mm " + t("ar_cada") + ")"],
+      [t("triangulos"), nf(m.triangulos, 0)], r.modo === "desenho" ? [t("dt_corpos"), String(r.corpos.length)] : [t("ar_celulas"), nf(r.celulas, 0) + " " + t("ar_de") + " " + nf(r.nx * r.ny, 0) + " (" + r.nx + " × " + r.ny + ", " + nf(r.cel, 3) + " mm " + t("ar_cada") + ")"],
       [t("malha"), escL(t(m.arestas && m.arestas.fechada ? "fechada" : "aberta"))]])}
     <p class="t2">${escL(t("ar_vista_dica"))}</p>
     <div class="acoes"><button class="botao" type="button" id="ar-imp" data-lab="arq-imp">${escL(t("pedir_impressao"))}</button>
@@ -4474,6 +4974,9 @@ async function acao(a, b) {
   if (a === "gal-ver") { const id = +b.getAttribute("data-id"); if (lab.gal.abertas[id]) { delete lab.gal.abertas[id]; return; }
     const j = lab.gal.abertas[id] = await getJ("/api/publico/3d/pecas/" + id);
     if (j.ok && j.peca) { registrarPasso("galeria", j.peca.nome); gravarProjeto(""); } return; }
+  if (a === "dt-modo" && lab.arq) { lab.arq.par.modo = b.getAttribute("data-k") === "desenho" ? "desenho" : "foto"; lab.clique = null; lab.marca1 = null; processarArquivo(); return; }
+  if (a === "dt-clique" && lab.arq) { const k = b.getAttribute("data-k"); lab.clique = lab.clique === k ? null : k; lab.marca1 = null; return; }
+  if (a === "dt-inteira" && lab.arq) { lab.arq.par.recorte = null; lab.clique = null; processarArquivo(); return; }
   if (a === "arq-malha" && lab.arq && lab.arq.arquivo) { abrirEmPecas(lab.arq.arquivo, t("ar_malha_t")); return "fica"; }
   if (a === "arq-malha-imp" && lab.arq && lab.arq.arquivo) { const f = lab.arq.arquivo, buf = await f.arrayBuffer();
     if (/\.obj$/i.test(f.name)) pedirImpressaoDe(lab.arq.base + ".stl", stlDe(PHYSIS3D.lerMalha(buf, f.name), lab.arq.base), t("abas").arquivo);
@@ -4487,6 +4990,13 @@ async function acao(a, b) {
     if (a === "arq-3mf") baixar(nome + ".3mf", PHYSIS3D.escrever3MF(r.T), "model/3mf");
     if (a === "arq-enviar") { abrirEmPecas(new File([stlDe(r.T, nome)], nome + ".stl", { type: "model/stl" }), t("ar_t")); return "fica"; }
     if (a === "arq-imp") { pedirImpressaoDe(nome + ".stl", stlDe(r.T, nome), t("ar_t")); return "fica"; }
+    if (a === "arq-editar" && r.modo === "desenho") { const E = editorBim(), P = lab.arq.par, de = tp => r.conts.filter(c => c.tipo === tp).map(c => c.laco);
+      lab.lote = true;
+      try { if (P.operacao === "revolucionar") E.adicionar({ nome, tipo: "malha", T: r.T, origem: "desenho" }, true);
+        else { if (de("perfil").length) E.adicionar({ nome, tipo: "perfil", lacos: de("perfil").concat(de("furo")), altura: P.altura, origem: "desenho" }, true);
+          r.corpos.slice(de("perfil").length ? 1 : 0).forEach((T, i) => E.adicionar({ nome: nome + " · " + (i + 1), tipo: "malha", T, origem: "desenho" }, true)); } }
+      finally { lab.lote = false; }
+      E._enq = false; guardarBimNoProjeto(); registrarPasso("edificacao", nome); irPara("edificacao"); return "fica"; }
     if (a === "arq-editar") { const E = editorBim(), alt = lab.arq.par.altura + lab.arq.par.base;
       if (r.lacos.length && !lab.arq.par.base) E.adicionar({ nome, tipo: "perfil", lacos: r.lacos, altura: lab.arq.par.altura, origem: "imagem" });
       else E.adicionar({ nome, tipo: "malha", T: r.T, origem: "imagem" });
@@ -4554,6 +5064,31 @@ document.addEventListener("change", async ev => {
     if (arq === "projeto") lab.proj = m; else lab.lugar = m;
   }
   desenhar(); focar(id);
+});
+/* marcas sobre a foto (Enviar arquivo): o ponto vem em pixels da imagem */
+function pontoNaFoto(ev) { const sv = document.getElementById("ar-marcas"), a = lab.arq; if (!sv || !a) return null; const b = sv.getBoundingClientRect();
+  return [Math.round((ev.clientX - b.left) / b.width * a.w), Math.round((ev.clientY - b.top) / b.height * a.h)]; }
+let arrasto = null;
+document.addEventListener("pointerdown", ev => {
+  if (!lab.clique || !ev.target || !ev.target.closest || !ev.target.closest("#ar-marcas")) return;
+  ev.preventDefault(); const q = pontoNaFoto(ev); if (!q) return;
+  if (lab.clique === "recorte") { arrasto = q; return; }
+  const P = lab.arq.par;
+  if (lab.clique === "centro") { P.centro = q; lab.clique = null; processarArquivo(); desenhar(); focar("dt-m-centro"); return; }
+  if (!lab.marca1) { lab.marca1 = q; desenhar(); return; }
+  if (lab.clique === "cota") { P.cota = { p: lab.marca1, q, mm: P.cota && P.cota.mm ? P.cota.mm : 0 }; lab.marca1 = null; lab.clique = null; processarArquivo(); desenhar(); focar("dt-cmm"); return; }
+  if (lab.clique === "eixo") { P.eixo = { p: lab.marca1, q }; lab.marca1 = null; lab.clique = null; processarArquivo(); desenhar(); focar("dt-m-eixo"); }
+});
+document.addEventListener("pointermove", ev => {
+  if (!arrasto) return; const q = pontoNaFoto(ev), sv = document.getElementById("ar-marcas"); if (!q || !sv) return;
+  let r = sv.querySelector("rect.dt-recorte"); if (!r) { r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("class", "dt-recorte"); sv.appendChild(r); }
+  r.setAttribute("x", Math.min(q[0], arrasto[0])); r.setAttribute("y", Math.min(q[1], arrasto[1])); r.setAttribute("width", Math.abs(q[0] - arrasto[0])); r.setAttribute("height", Math.abs(q[1] - arrasto[1]));
+});
+document.addEventListener("pointerup", ev => {
+  if (!arrasto) return; const q = pontoNaFoto(ev) || arrasto, a0 = arrasto; arrasto = null;
+  const w = Math.abs(q[0] - a0[0]), h = Math.abs(q[1] - a0[1]);
+  if (w > 3 && h > 3) { lab.arq.par.recorte = { x: Math.min(q[0], a0[0]), y: Math.min(q[1], a0[1]), w, h }; lab.arq.par.eixo = null; lab.arq.par.centro = null; lab.arq.tipos = {}; }
+  lab.clique = null; processarArquivo(); desenhar(); focar("dt-m-recorte");
 });
 document.addEventListener("submit", async ev => {
   const fm = ev.target; if (!fm || !fm.id) return;
