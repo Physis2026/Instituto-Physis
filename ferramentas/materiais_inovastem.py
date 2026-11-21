@@ -31,20 +31,22 @@ SAIDA.mkdir(parents=True, exist_ok=True)
 FAIXA = "Rascunho v0 · para aprovação da direção · não publicar"
 
 
+LOGOS_V2 = Path.home() / "OneDrive - Physis Engineering" / "Documents" / "Casa Physis" / "Identidade_Visual" / "Logos_vazadas_v2_aprovadas"
+
+
 def logos_do_site() -> tuple[Path, Path]:
-    """Os mesmos recortes do guia que o site usa (WebP embutido), regravados em PNG dentro de um SVG para o LibreOffice."""
-    import re
-    html = GUIA.read_text(encoding="utf-8")
-    webp = re.findall(r'src="data:image/webp;base64,([A-Za-z0-9+/=]+)"', html)[:2]
+    """Logos vazadas v2 aprovadas (20/11/2026, sem fundo), em PNG dentro de um SVG para o LibreOffice; sem redesenho."""
     try:
         from PIL import Image
     except ImportError:
         sys.exit("precisa do Pillow (pip install pillow) para regravar o logo em PNG")
     out = []
-    for nome, dado in zip(("clara", "escura"), webp):
-        im = Image.open(io.BytesIO(base64.b64decode(dado))).convert("RGB")
+    for nome in ("clara", "escura"):
+        im = Image.open(LOGOS_V2 / f"inovastem_{nome}.png").convert("RGBA")
+        im = im.crop(im.getchannel("A").getbbox())
+        im = im.resize((round(im.width * 480 / im.height), 480), Image.LANCZOS)
         b = io.BytesIO(); im.save(b, "PNG")
-        svg = (f'<?xml version="1.0" encoding="UTF-8"?>\n<!-- InovaSTEM {nome}: recorte fiel do guia de identidade (19/11/2026), sem alteração -->\n'
+        svg = (f'<?xml version="1.0" encoding="UTF-8"?>\n<!-- InovaSTEM {nome}: logo vazada v2 aprovada (20/11/2026), sem alteração -->\n'
                f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {im.width} {im.height}" '
                f'width="{im.width}" height="{im.height}"><image width="{im.width}" height="{im.height}" '
                f'xlink:href="data:image/png;base64,{base64.b64encode(b.getvalue()).decode()}"/></svg>')
@@ -124,14 +126,14 @@ def gerar():
     t.p("A InovaSTEM é uma rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos; a InovaSTEM "
         "Delas forma e acolhe mulheres em STEM. A cota Amigo é só para pessoa física; empresas a partir de R$ 1.000.")
     t.h1("Cotas")
-    t.tabela(["Cota", "Para quem", "Faixa anual", "Contrapartidas"],
-             [["Amigo", "Só pessoa física", "R$ 750", "[MARCADOR: contrapartidas da cota Amigo]"],
-              ["Apoiador", "Empresas e organizações", "R$ 1.000 a R$ 4.999", "Nome no site e no relatório anual, certificado de apoio, eventos abertos"],
-              ["Parceiro", "Empresas e organizações", "R$ 5.000 a R$ 14.999", "Logo nos materiais, grupo de trabalho, relatório de impacto"],
-              ["Patrocinador", "Empresas e organizações", "R$ 15.000 a R$ 29.999", "Desafio real ou trilha associada à marca, fala em evento, relatório dedicado"],
-              ["Patrocinador master", "Empresas e organizações", "R$ 30.000 a R$ 50.000", "Convite para o comitê, co-branding, prioridade em desafios e projetos, destaque na mostra anual"]],
+    t.tabela(["Cota", "Para quem", "Valor", "Contrapartidas"],
+             [["Amigo", "Só pessoa física", "R$ 500", "[MARCADOR: contrapartidas da cota Amigo]"],
+              ["Apoiador", "Empresas e organizações", "R$ 1.000", "Nome no site e no relatório anual, certificado de apoio, eventos abertos"],
+              ["Parceiros", "Empresas e organizações", "R$ 2.500", "Logo nos materiais, grupo de trabalho, relatório de impacto"],
+              ["Patrocinador", "Empresas e organizações", "R$ 5.000", "Desafio real ou trilha associada à marca, fala em evento, relatório dedicado"],
+              ["Patrocinador master", "Empresas e organizações", "A partir de R$ 10.000", "Convite para o comitê, co-branding, prioridade em desafios e projetos, destaque na mostra anual"]],
              [3.2, 3.6, 3.6, 6.6])
-    t.nota("Valores do Caderno de Patrocínio v2, em revisão [CONFERIR].")
+    t.nota("Valores definidos pela direção em 20/11/2026; periodicidade e contrapartidas de cada cota [CONFERIR].")
     t.h1("Regras")
     t.lista(["Patrocínio não compra decisões nem dá acesso a dados pessoais.",
              "Toda cota de empresa vem com um compromisso de entrevistas ou vagas de estágio para as egressas [CONFERIR].",

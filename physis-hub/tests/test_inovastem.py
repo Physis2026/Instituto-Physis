@@ -433,8 +433,11 @@ class Pagina(unittest.TestCase):
                      "/api/publico/comunidade", "/api/publico/3d/pecas", "/laboratorio", "/plataforma/", "X-Physis-CSRF"):
             self.assertIn(rota, self.js, rota)
         self.assertIn("Março de 2027", self.js)
-        self.assertIn('["Amigo","Só pessoa física","R$ 750"', self.js)
-        self.assertIn("R$ 1.000 a R$ 4.999", self.js)
+        # cotas da dona (20/11/2026): Amigo 500 (só pessoa física), Apoiador 1.000, Parceiros 2.500, Patrocinador 5.000, master 10.000+
+        self.assertIn('["Amigo","Só pessoa física","R$ 500"', self.js)
+        for v in ('"R$ 1.000"', '"R$ 2.500"', '"R$ 5.000"', '"A partir de R$ 10.000"'):
+            self.assertIn(v, self.js, v)
+        self.assertNotIn("R$ 750", self.h)
         self.assertIn("uma iniciativa da Physis Engineering", self.h)
         self.assertIn("Versão beta · em revisão jurídica", self.js)
         self.assertIn("jovens, cis e trans", self.js)
