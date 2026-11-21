@@ -69,7 +69,8 @@ ESQUEMAS = {
                      "prazo": (_S, 10, False), "aceite": (bool, None, False)},
     "ino_moderar": {"id": (int, 10**12, True), "decisao": (_S, 10, True), "motivo": (_S, 400, False)},
     "ino_remover": {"email": (_S, 160, True)},
-    "ino_impressao": {"peca": (int, 10**12, True), "material": (_S, 20, False), "observacao": (_S, 1000, False)},
+    "ino_impressao": {"peca": (int, 10**12, False), "arquivo": (_S, 64, False), "material": (_S, 20, False),
+                      "observacao": (_S, 1000, False)},
     "ino_impressao_estado": {"id": (int, 10**12, True), "estado": (_S, 20, True), "motivo": (_S, 400, False)},
 }
 
@@ -90,7 +91,14 @@ CREATE TABLE IF NOT EXISTS ino_impressao (
   arquivo_nome TEXT NOT NULL, material TEXT NOT NULL DEFAULT '', observacao TEXT NOT NULL DEFAULT '', estado TEXT NOT NULL,
   motivo TEXT NOT NULL DEFAULT '', pedido_por TEXT NOT NULL, criado REAL NOT NULL, atualizado REAL NOT NULL);
 CREATE INDEX IF NOT EXISTS ino_impressao_quem ON ino_impressao(pedido_por);
+CREATE TABLE IF NOT EXISTS ino_impressao_arquivo (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, sha256 TEXT NOT NULL, nome TEXT NOT NULL, formato TEXT NOT NULL, bytes INTEGER NOT NULL,
+  triangulos INTEGER NOT NULL, dono TEXT NOT NULL, criado REAL NOT NULL);
+CREATE INDEX IF NOT EXISTS ino_impressao_arquivo_dono ON ino_impressao_arquivo(dono, sha256);
 """
+# Fila de impressão: arquivo gerado no laboratório (STL ou 3MF), guardado à parte da biblioteca, privado de quem enviou
+ARQ_IMPRESSAO_MAX = 20 * 1024 * 1024          # o mesmo limite de arquivo da Modelagem 3D e do Mapeamento
+FORMATOS_IMPRESSAO = ("stl", "3mf")
 
 
 def _texto(v, n: int) -> str:
@@ -117,14 +125,19 @@ def config_de(instancia: dict) -> dict:
 
 
 class InovaSTEM:
-    def __init__(self, hub, instancia: dict | None = None, pasta_materiais: Path | None = None, relogio=None, impressao3d=None):
+    def __init__(self, hub, instancia: dict | None = None, pasta_materiais: Path | None = None, relogio=None, impressao3d=None,
+                 pasta_impressao: Path | None = None):
         self.hub = hub
         self._impressao3d = impressao3d          # módulo do Physis 3D (ou função que o devolve): peças e arquivos
         self.cfg = config_de(instancia or {})
         self.pasta_materiais = Path(pasta_materiais) if pasta_materiais else None
         self.relogio = relogio or hub.relogio
+        self.pasta_impressao = Path(pasta_impressao) if pasta_impressao else None
         with hub._trava:
             hub._db.executescript(ESQUEMA)
+            colunas = {r[1] for r in hub._db.execute("PRAGMA table_info(ino_impressao)")}
+            if "origem" not in colunas:       # bancos criados antes de 21/11/2026
+                hub._db.execute("ALTER TABLE ino_impressao ADD COLUMN origem TEXT NOT NULL DEFAULT 'biblioteca'")
             hub._db.commit()
 
     @property
@@ -307,26 +320,109 @@ class InovaSTEM:
         m = self._impressao3d
         return m() if callable(m) and not hasattr(m, "_ler_peca") else m
 
-    COLS_IMP = ("id", "peca", "revisao", "arquivo_sha256", "arquivo_nome", "material", "observacao", "estado", "motivo", "criado", "atualizado")
+    COLS_IMP = ("id", "peca", "revisao", "arquivo_sha256", "arquivo_nome", "material", "observacao", "estado", "motivo", "criado",
+                "atualizado", "origem")
 
     def _itens_impressao(self, onde: str, args: tuple, equipe: bool) -> list:
         i3d = self._i3d()
         itens = []
         for r in self._db.execute("SELECT " + ",".join(self.COLS_IMP) + ", pedido_por FROM ino_impressao" + onde, args).fetchall():
             x = dict(zip(self.COLS_IMP, r))
-            p = i3d._ler_peca(x["peca"]) if i3d else None
-            x["peca_nome"] = p["nome"] if p else ""
-            x["arquivo_url"] = "/api/3d/arquivo/" + x["arquivo_sha256"]
+            if x["origem"] == "laboratorio":       # arquivo gerado no laboratório: baixa pela rota da própria fila
+                x["peca_nome"] = x["arquivo_nome"]
+                x["arquivo_url"] = f"/api/inovastem/impressao/{x['id']}/arquivo"
+            else:
+                p = i3d._ler_peca(x["peca"]) if i3d else None
+                x["peca_nome"] = p["nome"] if p else ""
+                x["arquivo_url"] = "/api/3d/arquivo/" + x["arquivo_sha256"]
             x["proximos"] = list(PASSOS_IMPRESSAO.get(x["estado"], ()))
             if equipe:          # a equipe vê o nome público de quem pediu (o do Physis 3D), nunca o e-mail
                 x["nome_publico"] = i3d._nome(r[-1]) if i3d else "Participante"
             itens.append(x)
         return itens
 
-    def pedir_impressao(self, d: dict, quem: dict) -> dict:
-        """Participante com conta pede a impressão da última revisão de uma peça que ele pode ver (dele ou publicada)."""
+    # ── arquivo gerado no laboratório (STL ou 3MF) para a fila ───────────────────────────────────
+    def _arquivo_impressao(self, sha: str, fmt: str) -> Path | None:
+        if not self.pasta_impressao or not re.fullmatch(r"[0-9a-f]{64}", sha or "") or fmt not in FORMATOS_IMPRESSAO:
+            return None
+        return self.pasta_impressao / f"{sha}.{fmt}"
+
+    def enviar_arquivo_impressao(self, dados: bytes, nome: str, quem: dict) -> dict:
+        """Guarda um STL ou 3MF do laboratório, privado de quem enviou (só ele e a equipe baixam). O tipo é conferido pelos
+        bytes (malha lida pelo leitor do Physis 3D; 3MF começa como ZIP); limite de 20 MB."""
+        import hashlib
         if not quem or not quem.get("usuario"):
             return {"ok": False, "erro": "entre com a sua conta para pedir impressão", "codigo": 401}
+        if not self.pasta_impressao:
+            return {"ok": False, "erro": "a fila não tem pasta de arquivos nesta instalação", "codigo": 503}
+        if not dados or len(dados) > ARQ_IMPRESSAO_MAX:
+            return {"ok": False, "erro": "arquivo vazio ou maior que 20 MB", "codigo": 413 if dados else 400}
+        nome = re.sub(r"[^A-Za-z0-9._ -]", "_", str(nome or "").replace("\\", "/").rsplit("/", 1)[-1])[:120].strip() or "peca.stl"
+        fmt = nome.rsplit(".", 1)[-1].lower() if "." in nome else ""
+        if fmt not in FORMATOS_IMPRESSAO:
+            return {"ok": False, "erro": "a fila recebe STL ou 3MF"}
+        if fmt == "3mf" and not dados.startswith(b"PK\x03\x04"):
+            return {"ok": False, "erro": "o arquivo não é um 3MF (os bytes não são de um pacote ZIP)"}
+        try:
+            tris = impressao3d_mod.ler_malha(dados, nome)
+        except Exception:                      # qualquer falha do leitor = não é uma malha que dê para imprimir
+            return {"ok": False, "erro": "não consegui ler a malha: confira se o arquivo é mesmo " + fmt.upper()}
+        if not tris:
+            return {"ok": False, "erro": "a malha está vazia"}
+        sha = hashlib.sha256(dados).hexdigest()
+        alvo = self._arquivo_impressao(sha, fmt)
+        alvo.parent.mkdir(parents=True, exist_ok=True)
+        if not alvo.is_file():
+            tmp = alvo.with_suffix(".tmp")
+            tmp.write_bytes(dados)
+            tmp.replace(alvo)
+        with self.hub._trava:
+            ja = self._db.execute("SELECT id FROM ino_impressao_arquivo WHERE dono=? AND sha256=?", (quem["usuario"], sha)).fetchone()
+            if not ja:
+                self._db.execute("INSERT INTO ino_impressao_arquivo(sha256,nome,formato,bytes,triangulos,dono,criado) VALUES(?,?,?,?,?,?,?)",
+                                 (sha, nome, fmt, len(dados), len(tris), quem["usuario"], self.relogio()))
+                self._db.commit()
+        # registro encadeado: só o formato, o tamanho e o resumo (nunca a conta nem o nome do arquivo)
+        self.hub.registrar("inovastem", "participante", {"o_que": "arquivo para impressão", "formato": fmt, "bytes": len(dados), "sha256": sha})
+        return {"ok": True, "arquivo": sha, "nome": nome, "formato": fmt, "triangulos": len(tris)}
+
+    def baixar_arquivo_impressao(self, ident: int, quem: dict) -> tuple[str, str, bytes] | None:
+        """(nome, tipo, bytes) do arquivo do laboratório de um pedido: só quem pediu e a equipe."""
+        if not quem:
+            return None
+        r = self._db.execute("SELECT arquivo_sha256, arquivo_nome, pedido_por, origem FROM ino_impressao WHERE id=?", (int(ident),)).fetchone()
+        if not r or r[3] != "laboratorio" or not (_eh_equipe(quem) or r[2] == quem.get("usuario")):
+            return None
+        fmt = r[1].rsplit(".", 1)[-1].lower()
+        alvo = self._arquivo_impressao(r[0], fmt)
+        if not alvo or not alvo.is_file():
+            return None
+        return r[1], {"stl": "model/stl", "3mf": "model/3mf"}[fmt], alvo.read_bytes()
+
+    def pedir_impressao(self, d: dict, quem: dict) -> dict:
+        """Participante com conta pede a impressão da última revisão de uma peça que ele pode ver (dele ou publicada), ou de um
+        arquivo STL/3MF que ele mesmo enviou do laboratório (campo "arquivo" = resumo SHA-256 devolvido pelo envio)."""
+        if not quem or not quem.get("usuario"):
+            return {"ok": False, "erro": "entre com a sua conta para pedir impressão", "codigo": 401}
+        mat = _texto(d.get("material"), 20)
+        if mat not in MATERIAIS_IMPRESSAO:
+            return {"ok": False, "erro": "material: " + ", ".join(m for m in MATERIAIS_IMPRESSAO if m) + " (ou em branco: a equipe escolhe)"}
+        if d.get("arquivo"):
+            a = self._db.execute("SELECT sha256, nome FROM ino_impressao_arquivo WHERE dono=? AND sha256=?",
+                                 (quem["usuario"], str(d.get("arquivo"))[:64])).fetchone()
+            if not a:
+                return {"ok": False, "erro": "arquivo não encontrado: envie o arquivo de novo", "codigo": 404}
+            agora = self.relogio()
+            with self.hub._trava:
+                ident = self._db.execute(
+                    "INSERT INTO ino_impressao(peca,revisao,arquivo_sha256,arquivo_nome,material,observacao,estado,pedido_por,criado,atualizado,origem)"
+                    " VALUES(0,0,?,?,?,?,?,?,?,?,'laboratorio')", (a[0], a[1], mat, _texto(d.get("observacao"), 1000), "pendente",
+                                                                  quem["usuario"], agora, agora)).lastrowid
+                self._db.commit()
+            self.hub.registrar("inovastem", "participante", {"o_que": "impressão pedida", "id": ident, "origem": "laboratorio"})
+            return {"ok": True, "id": ident, "estado": "pendente"}
+        if not d.get("peca"):
+            return {"ok": False, "erro": "escolha a peça da biblioteca ou envie o arquivo gerado no laboratório"}
         i3d = self._i3d()
         if i3d is None:
             return {"ok": False, "erro": "a biblioteca do Physis 3D não está ligada nesta instalação", "codigo": 503}
@@ -337,9 +433,6 @@ class InovaSTEM:
                                (p["id"],)).fetchone()
         if not rev:
             return {"ok": False, "erro": "a peça ainda não tem arquivo: envie uma revisão no Physis 3D (Peças 3D → Biblioteca)"}
-        mat = _texto(d.get("material"), 20)
-        if mat not in MATERIAIS_IMPRESSAO:
-            return {"ok": False, "erro": "material: " + ", ".join(m for m in MATERIAIS_IMPRESSAO if m) + " (ou em branco: a equipe escolhe)"}
         agora = self.relogio()
         with self.hub._trava:
             ident = self._db.execute(
@@ -386,4 +479,4 @@ class InovaSTEM:
         return {"ok": True, "estado": novo}
 
 
-__all__ = ["InovaSTEM", "ESQUEMAS", "AREAS", "VERSAO_AVISO", "ESTADOS_IMPRESSAO", "PASSOS_IMPRESSAO", "config_de", "link_whatsapp"]
+__all__ = ["InovaSTEM", "ESQUEMAS", "AREAS", "VERSAO_AVISO", "ESTADOS_IMPRESSAO", "PASSOS_IMPRESSAO", "ARQ_IMPRESSAO_MAX", "config_de", "link_whatsapp"]

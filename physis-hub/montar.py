@@ -39,6 +39,8 @@ LEIA_MATERIAIS = ("Materiais para download do site da InovaSTEM (docs/INOVASTEM.
 LICENCA_PADRAO = "Licença Physis de Uso e Adaptação (minuta em revisão jurídica)"
 VENDOR_ARQUIVOS = ("maplibre-gl.js", "maplibre-gl.css", "pmtiles.js", "web-ifc-api-iife.js", "web-ifc.wasm", "three.min.js",
                    "LEIA-ME.md", "LICENSE-maplibre-gl.txt", "LICENSE-three.txt")
+# o que o laboratório da InovaSTEM (/laboratorio) carrega de /vendor/ (igual a ferramentas/montar_lab_inovastem.VENDOR_LAB)
+VENDOR_LAB = ("three.min.js", "web-ifc-api-iife.js", "web-ifc.wasm")
 # demonstrações públicas (demos/, servidas em /demo/<nome>/): só no pacote do servidor da Physis (o site)
 DEMOS_ARQUIVOS = ("physis-demo-sustainkit.html", "physis-demo-scada.html", "physis-demo-monitoramento.html",
                   "physis-demo-planejador.html", "physis-demo-cliente.html")
@@ -179,6 +181,12 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
         shutil.copy2(AQUI / "web" / "inovastem.html", pasta / "web" / "inovastem.html")
         if (AQUI / "web" / "inovastem-lab.html").is_file():   # Laboratório (/laboratorio): Simulação e Physis 3D
             shutil.copy2(AQUI / "web" / "inovastem-lab.html", pasta / "web" / "inovastem-lab.html")
+            # Modelagem 3D: vista 3D (three.js, MIT) e leitor IFC (web-ifc, MPL-2.0), entregues pelo servidor em /vendor/
+            (pasta / "web" / "vendor").mkdir(exist_ok=True)
+            for arq in VENDOR_LAB + ("LEIA-ME.md", "LICENSE-three.txt"):
+                origem = next((p for p in (AQUI.parent / "vendor" / arq, AQUI / "web" / "vendor" / arq) if p.is_file()), None)
+                if origem:
+                    shutil.copy2(origem, pasta / "web" / "vendor" / arq)
         if (AQUI / "web" / "fontes").is_dir():      # Josefin Sans e Lora (OFL), servidas em /fontes/
             shutil.copytree(AQUI / "web" / "fontes", pasta / "web" / "fontes")
         (pasta / "materiais").mkdir()

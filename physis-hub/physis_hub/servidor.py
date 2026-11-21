@@ -836,7 +836,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                        # InovaSTEM (D94): interesse, desafios e projetos abertos, materiais, WhatsApp opcional
                                        "inovastem": lambda: inovastem_mod.InovaSTEM(
                                            hub, instancia, pasta_materiais=Path(banco_da_instancia(instancia)).resolve().parent / "materiais",
-                                           impressao3d=lambda: modulo("impressao3d")),     # fila de impressão: peças do Physis 3D
+                                           impressao3d=lambda: modulo("impressao3d"),      # fila de impressão: peças do Physis 3D
+                                           # e arquivos STL/3MF gerados no laboratório (privados de quem enviou)
+                                           pasta_impressao=Path(os.environ.get("PHYSIS_IMPRESSAO_PASTA")
+                                                                or Path(banco_da_instancia(instancia)).resolve().parent / "impressao_lab")),
                                        "fornecedores": lambda: fornecedores_mod.Fornecedores(
                                            hub, pasta=fornecedores_mod.pasta_padrao(banco_da_instancia(instancia))),
                                        # intercâmbio com plataformas parceiras (docs/INTERCAMBIO.md): chave só no arquivo do servidor
@@ -869,6 +872,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             # A liberação vale só para essa página; o resto da plataforma continua sem eval.
             eh_planejador = urlparse(getattr(self, "path", "") or "").path in ("/planejador", "/planejador/",
                                                                               "/demo/planejador", "/demo/planejador/")
+            # Modelagem 3D da InovaSTEM (/laboratorio, só na instalação inovastem; dona, 21/11/2026): o mesmo web-ifc abre o
+            # IFC com geometria no navegador e precisa do mesmo 'unsafe-eval'. Vale só para essa página; o resto segue sem eval.
+            eh_planejador = eh_planejador or (instancia.get("instalacao") == "inovastem"
+                                              and urlparse(getattr(self, "path", "") or "").path in ("/laboratorio", "/laboratorio/"))
             self.send_header("Content-Security-Policy", csp_planejador if eh_planejador else csp)
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
@@ -1103,6 +1110,15 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     if qi2:
                         r = ino.minhas_impressoes(qi2)
                         self._json(r.pop("codigo", 200), r)
+                elif re.fullmatch(r"/api/inovastem/impressao/\d{1,12}/arquivo", p):    # arquivo do laboratório: quem pediu e a equipe
+                    qi2 = self._exigir(seg.CLIENTE)
+                    if qi2:
+                        a = ino.baixar_arquivo_impressao(int(p.split("/")[4]), qi2)
+                        if a is None:
+                            self._json(404, {"ok": False, "erro": "arquivo não encontrado"})
+                        else:
+                            self._enviar_bytes(a[2], a[1], {"Content-Disposition": "attachment; filename*=UTF-8''" + quote(a[0]),
+                                                            "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
                 elif p == "/api/inovastem/impressao/fila":            # fila de impressão: a equipe vê todos os pedidos
                     qi2 = self._exigir(seg.EQUIPE)
                     if qi2:
@@ -1288,6 +1304,21 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     self._json(*r)
                     return True
                 return False
+            # InovaSTEM: STL ou 3MF gerado no laboratório para a fila de impressão (corpo cru até 20 MB; nome em X-Physis-Nome)
+            if p == "/api/inovastem/impressao/arquivo":
+                if instancia.get("instalacao") != "inovastem":
+                    self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                    return True
+                qa = self._exigir(seg.CLIENTE)
+                if not qa or self._limitado("arquivo"):
+                    return True
+                corpo = self._corpo_grande(inovastem_mod.ARQ_IMPRESSAO_MAX)
+                if corpo is None:
+                    self._recusar_corpo("arquivo vazio ou grande demais (máximo 20 MB)")
+                    return True
+                r = modulo("inovastem").enviar_arquivo_impressao(corpo, unquote(self.headers.get("X-Physis-Nome") or ""), qa)
+                self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
+                return True
             # Fornecedores: só a equipe grava (CSV até 1 MB e arquivo até 20 MB); apagar pede senha recente
             if p.startswith("/api/fornecedores"):
                 qf = self._exigir(seg.EQUIPE)

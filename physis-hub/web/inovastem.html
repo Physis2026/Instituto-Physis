@@ -240,15 +240,15 @@ const T = {
     for_cats:{geral:"Geral", inovastem:"Rede InovaSTEM", modelagem:"Modelagem 3D", desafios:"Desafios e projetos", hackathon:"Hackathon", eventos:"Eventos e oportunidades"},
     for_escolha:"Escolha o fórum",
     // modelagem
-    mod_t:"Modelagem 3D (Physis 3D)", mod_intro:"A bancada de desenvolvimento da InovaSTEM, aberta a modelagens de qualquer assunto: oito subabas que leem e gravam um projeto comum, num fluxo que vai do arquivo enviado até a galeria (enviar arquivo, lugar ou edificação, peças 3D, simulação, fila de impressão e galeria). Tudo roda no seu navegador.",
+    mod_t:"Modelagem 3D (Physis 3D)", mod_intro:"A bancada de desenvolvimento da InovaSTEM, aberta a modelagens de qualquer assunto: oito subabas que leem e gravam um projeto comum, num fluxo que vai do arquivo enviado até a galeria (enviar arquivo, lugar ou modelos BIM, montagens, peças 3D, simulação, fila de impressão e galeria); todo caminho termina em pedir impressão. Tudo roda no seu navegador.",
     mod_projeto:"Projeto comum: lugar, edificação, peças e resultados ficam guardados no seu navegador e você exporta ou importa o arquivo do projeto quando quiser.",
     mod_cols:["Subaba","O que faz","Situação"],
-    mod_linhas:[["arquivo","1. Enviar arquivo","Qualquer arquivo. Imagem (PNG, JPG, WebP) e SVG viram CAD 2D (SVG e DXF) e modelo 3D (STL e 3MF), ajustáveis antes de ir para Peças 3D. Malhas STL, OBJ e 3MF vão direto para Peças 3D. Arquivos de teste de impressão para baixar.","dev"],
+    mod_linhas:[["arquivo","1. Enviar arquivo","Qualquer arquivo. Foto ou imagem (PNG, JPG, WebP) vira CAD 2D (contorno vetorizado em SVG e DXF, com limiar automático, suavização e limpeza de ruído e de fundo) e modelo 3D (STL e 3MF), lado a lado e ajustáveis. Malhas vão para Peças 3D. Arquivos de teste de impressão para baixar.","dev"],
                 ["lugar","2. Lugar (GIS)","Leva para o projeto o arquivo do lugar (terreno, edificações e superfícies) exportado pelo Mapeamento.","dev"],
-                ["edificacao","3. Edificação (BIM)","Lê o modelo IFC e leva o resumo (pavimentos e elementos por tipo) para o projeto.","dev"],
-                ["pecas","4. Peças 3D","Abre STL, OBJ e 3MF, mede, ajusta e fatia peças de plástico reciclado.","dev"],
-                ["simulacao","5. Simulação","Um bloco por fenômeno: calor, estrutura, ventilação, terreno e água, incerteza, biogás e otimização QUBO, com exemplos e limites de validade.","ok"],
-                ["escaneamento","6. Escaneamento","Modelos do CrealityScan: exporte em STL ou OBJ e abra em Peças 3D.","dev"],
+                ["edificacao","3. Modelos BIM (CAD e IFC)","Abre IFC com geometria 3D e DXF 2D no navegador e modela com ferramentas (selecionar, mover, girar, escalar, empurrar/puxar, linha, retângulo, círculo, medir) e formas paramétricas; sai em SVG, DXF, STL, 3MF e IFC.","dev"],
+                ["montagem","4. Montagens","Junta várias peças (posição, giro, material e cor), confere colisões simples e exporta o conjunto em STL ou 3MF; mostra os programas de CAD e simulação já mapeados.","dev"],
+                ["pecas","5. Peças 3D","Abre STL, OBJ e 3MF, mede, ajusta e fatia peças de plástico reciclado.","dev"],
+                ["simulacao","6. Simulação","Um bloco por fenômeno: calor, estrutura, ventilação, terreno e água, incerteza, biogás e otimização QUBO, com exemplos e limites de validade.","ok"],
                 ["fila","7. Fila de impressão","Com conta, peça a impressão de uma peça; a equipe aprova e acompanha a situação.","dev"],
                 ["galeria","8. Galeria","Peças publicadas pela comunidade, com licença aberta e memorial.","dev"]],
     mod_abrir_lab:"Abrir a Modelagem 3D",
@@ -377,15 +377,15 @@ const T = {
     for_regras_t:"Community rules", for_regras:["Always be respectful. No harassment, discrimination or hate speech.","Do not post personal data, yours or anyone else's (phone, address, documents).","Credit what is not yours and respect licences.","When in doubt, ask: everyone here is learning."],
     for_cats:{geral:"General", inovastem:"InovaSTEM Network", modelagem:"3D modelling", desafios:"Challenges and projects", hackathon:"Hackathon", eventos:"Events and opportunities"},
     for_escolha:"Choose the forum",
-    mod_t:"3D modelling (Physis 3D)", mod_intro:"InovaSTEM's development bench, open to modelling on any subject: eight sub-tabs that read and write one shared project, in a flow that goes from the uploaded file to the gallery (upload a file, site or building, 3D parts, simulation, print queue and gallery). Everything runs in your browser.",
+    mod_t:"3D modelling (Physis 3D)", mod_intro:"InovaSTEM's development bench, open to modelling on any subject: eight sub-tabs that read and write one shared project, in a flow that goes from the uploaded file to the gallery (upload a file, site or BIM models, assemblies, 3D parts, simulation, print queue and gallery); every path ends in a print request. Everything runs in your browser.",
     mod_projeto:"Shared project: site, building, parts and results are kept in your browser, and you can export or import the project file whenever you want.",
     mod_cols:["Sub-tab","What it does","Status"],
-    mod_linhas:[["arquivo","1. Upload a file","Any file. Images (PNG, JPG, WebP) and SVG become 2D CAD (SVG and DXF) and a 3D model (STL and 3MF), adjustable before going to 3D parts. STL, OBJ and 3MF meshes go straight to 3D parts. Test print files to download.","dev"],
+    mod_linhas:[["arquivo","1. Upload a file","Any file. A photo or image (PNG, JPG, WebP) becomes 2D CAD (vectorised outline in SVG and DXF, with automatic threshold, smoothing and noise and background removal) and a 3D model (STL and 3MF), side by side and adjustable. Meshes go to 3D parts. Test print files to download.","dev"],
                 ["lugar","2. Site (GIS)","Brings the site file (terrain, buildings and surfaces) exported by Mapping into the project.","dev"],
-                ["edificacao","3. Building (BIM)","Reads the IFC model and brings the summary (storeys and elements by type) into the project.","dev"],
-                ["pecas","4. 3D parts","Opens STL, OBJ and 3MF; measures, adjusts and slices recycled-plastic parts.","dev"],
-                ["simulacao","5. Simulation","One block per phenomenon: heat, structure, ventilation, terrain and water, uncertainty, biogas and QUBO optimisation, with examples and validity limits.","ok"],
-                ["escaneamento","6. Scanning","CrealityScan models: export as STL or OBJ and open them in 3D parts.","dev"],
+                ["edificacao","3. BIM models (CAD and IFC)","Opens IFC with 3D geometry and 2D DXF in the browser and models with tools (select, move, rotate, scale, push/pull, line, rectangle, circle, measure) and parametric shapes; outputs SVG, DXF, STL, 3MF and IFC.","dev"],
+                ["montagem","4. Assemblies","Puts several parts together (position, rotation, material and colour), checks simple collisions and exports the whole as STL or 3MF; lists the CAD and simulation programs already mapped.","dev"],
+                ["pecas","5. 3D parts","Opens STL, OBJ and 3MF; measures, adjusts and slices recycled-plastic parts.","dev"],
+                ["simulacao","6. Simulation","One block per phenomenon: heat, structure, ventilation, terrain and water, uncertainty, biogas and QUBO optimisation, with examples and validity limits.","ok"],
                 ["fila","7. Print queue","With an account, request a print of a part; the team approves it and tracks its status.","dev"],
                 ["galeria","8. Gallery","Parts published by the community, with an open licence and development log.","dev"]],
     mod_abrir_lab:"Open 3D modelling",
@@ -755,6 +755,19 @@ const TELAS = { delas_entrar: telaDelasEntrar, inicio: telaInicio, delas: telaDe
                 hackathon: telaHackathon, materiais: telaMateriais, participar: telaParticipar,
                 termos: () => telaJuridico("termos"), privacidade: () => telaJuridico("privacidade") };
 
+// Na tela roxa o tema escuro é roxo: o rótulo da barra perde o "(verde)" (dona, 21/11/2026). O módulo comum não muda.
+function escuroDelas(delas) {
+  requestAnimationFrame(() => {
+    const alvos = [document.querySelector('#pp-tema option[value="escuro"]'), document.querySelector("#pp-tema-escuro + span"),
+                   document.querySelector("#pp-c-conforto + span .pp-d")].filter(Boolean);
+    alvos.forEach(el => {
+      const no = el.matches(".pp-d") ? el : (el.firstChild && el.firstChild.nodeType === 3 ? el.firstChild : el);
+      if (no.textContent !== el.dataset.ppPosto) el.dataset.ppOrig = no.textContent;   // o módulo reescreveu (troca de idioma)
+      const orig = el.dataset.ppOrig;
+      no.textContent = el.dataset.ppPosto = delas ? orig.replace(/ \((verde|green)\)/i, "").replace("Tema escuro (verde)", "Tema escuro").replace("Green background", "Dark theme") : orig;
+    });
+  });
+}
 let LOGO_INOVA = null;
 function cabecalho() {
   // na tela da Delas, o cabeçalho é dela (logo e frase); nas outras, o da InovaSTEM (dona, 20/11/2026)
@@ -765,6 +778,7 @@ function cabecalho() {
 }
 function desenhar() {
   document.body.classList.toggle("aba-delas", aba === "delas" || aba === "delas_entrar");
+  escuroDelas(aba === "delas" || aba === "delas_entrar");
   aplicarIdioma(); desenharAbas(); rodape(); cabecalho();
   $("corpo").innerHTML = TELAS[aba]();
   ligar();
