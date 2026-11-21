@@ -12,7 +12,7 @@
 :root{
   color-scheme:light;
   --verde:#33512F;--escuro:#1C2B21;--fundo:#F4F6F1;--sup:#FFFFFF;--linha:#C9D2C4;--tinta2:#4A4F44;--marca:#4B7547;
-  --inst:#2F7D5B;--inst-f:#F4F1EA;--inst-t:#1A4D2E;
+  --inst:#4A8A5A;--inst-f:#DCEBD8;--inst-t:#1F4A1C;   /* Instituto, tipo C do guia de identidade (20/11/2026); sem azul */
   --ok-f:#DCEBD8;--ok-t:#1F4A1C;--al-f:#F5E2D7;--al-t:#7A2214;--at-f:#F6EAD0;--at-t:#8A6410;
   --titulo:Fraunces,Georgia,"Times New Roman",serif;
   --fonte:Lexend,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
@@ -21,7 +21,7 @@
 html[data-tema="escuro"]{
   color-scheme:dark;
   --verde:#B9CDB3;--escuro:#EEF2EA;--fundo:#1C2B21;--sup:#2A3829;--linha:#4A5A47;--tinta2:#D9D3C2;--marca:#A8BFA0;
-  --inst:#8FB183;--inst-f:#1A4D2E;--inst-t:#F4F1EA;
+  --inst:#8FB183;--inst-f:#1F4A1C;--inst-t:#DCEBD8;
   --ok-f:#1F4A1C;--ok-t:#DCEBD8;--al-f:#5C2B2E;--al-t:#FF8A80;--at-f:#33372E;--at-t:#E5D5AE;
   --sobre-verde:#1C2B21;--suave:#33372E;--campo:#1C2B21;--borda-campo:#8A9182;
 }
@@ -113,26 +113,25 @@ const T = {
   pt: {
     pular:"Pular para o conteúdo", titulo:"Instituto Physis", sub:"Pesquisa, formação e projetos sociais em sustentabilidade, com a Rede InovaSTEM.",
     nav:"Seções do site", carregando:"Carregando…", sem_hub:"Não foi possível falar com o servidor. Tente de novo em instantes.",
-    abas:{inicio:"Início", inovastem:"Rede InovaSTEM", delas:"InovaSTEM Delas", p3d:"Physis 3D", parcerias:"Parcerias e projetos",
-          eventos:"Eventos", longo:"Longo prazo", participar:"Participar"},
+    abas:{inicio:"Início", participar:"Parcerias, projetos e eventos", inovastem:"InovaSTEM", delas:"InovaSTEM Delas", gsa:"Global South Alliance"},
     marcador:"[MARCADOR]", conferir:"[CONFERIR]", funciona:"Funciona", em_dev:"Em desenvolvimento", planejado:"Planejado",
     // início
     ini_missao_t:"Missão", ini_missao:"Inovação sustentável acessível em todos os níveis, com prioridade para mulheres, redes de mulheres e cotas sociais.",
     ini_frentes_t:"O que fazemos",
     ini_frentes:[["Pesquisa aplicada","Energia, água, construção, soluções baseadas na natureza, carbono e economia circular."],
-                 ["Rede InovaSTEM","Trilhas de formação, mentoria e eventos, com a área InovaSTEM Delas para mulheres."],
-                 ["Physis 3D","Filamento de plástico reciclado, peças impressas, biblioteca aberta e fórum."],
+                 ["InovaSTEM","Plataforma aberta de troca, parcerias e desafios de modelagem com códigos abertos, com o Physis 3D."],
+                 ["InovaSTEM Delas","Formação, acolhimento e rede de apoio a mulheres e meninas em STEM."],
                  ["Laboratório vivo","As oficinas e os testes acontecem na Casa Physis, em Petrópolis (RJ)."]],
     ini_aberto_t:"Plataforma aberta", ini_aberto:"Tudo o que está publicado aqui pode ser lido sem conta. Para escrever no fórum, publicar peças ou propor projetos, faça o seu cadastro: o que você publica aparece depois da moderação da equipe.",
     ini_horizonte:"Horizonte do plano: 2027–2031.",
     // InovaSTEM
-    ino_t:"Rede InovaSTEM", ino_intro:"Rede de suporte e articulação em ciência, tecnologia, engenharia e matemática: trilhas aplicadas, mentoria, eventos e projetos, aberta a todas as pessoas, com prioridade para mulheres.",
+    ino_t:"InovaSTEM", ino_intro:"Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos. Aberta a todas as pessoas, com prioridade para mulheres e jovens de comunidades sub-representadas. O Physis 3D faz parte da InovaSTEM.",
     ino_trilhas_t:"Trilhas do piloto", ino_trilhas:[["T1 · Energia, IoT e dados",""],["T2 · Construção sustentável e soluções baseadas na natureza",""]],
     ino_piloto:"Turma piloto no 2º semestre de 2027, com 20 a 25 participantes e meta de 80% de conclusão.",
     ino_cotas_t:"Cotas do Suporte InovaSTEM", ino_cotas:"Pelo menos 50% das vagas para mulheres e pelo menos 10% para pessoas com deficiência.",
     ino_forum:"Fórum da Rede InovaSTEM",
     // Delas
-    del_t:"InovaSTEM Delas", del_intro:"Área dedicada a mulheres (cis e trans) em STEM: acolhimento entre pares, rodas de conversa, mentoria e oportunidades.",
+    del_t:"InovaSTEM Delas", del_intro:"Formar, acolher e fortalecer mulheres em STEM, com redes de apoio entre pares, mentoria e projetos aplicados à sustentabilidade. Para mulheres e meninas (cis e trans), a partir de 16 anos com autorização do responsável.",
     del_acesso_t:"Como entrar", del_acesso:"A entrada é por autodeclaração, no cadastro ou depois, em Participar. Não pedimos documento. Só você e a direção do Instituto sabem que você se declarou.",
     del_cotas_t:"Reservas das turmas (proposta)", del_cotas:["Pelo menos 50% para mulheres negras, indígenas ou quilombolas.","Pelo menos 10% para mulheres com deficiência.","Pelo menos 30% para baixa renda ou escola pública.","As reservas podem se somar na mesma pessoa."],
     del_fechado:"O fórum da InovaSTEM Delas abre para quem se autodeclarou. Entre na sua conta e marque a autodeclaração em Participar.",
@@ -174,14 +173,11 @@ const T = {
                ["Feiras e eventos de outras redes","Feiras de inovação e sustentabilidade e eventos de redes de mulheres em STEM."],
                ["Desafios abertos e chamadas","Desafios de inovação aberta, prêmios e chamadas para mulheres em STEM."]],
     eve_forum:"Fórum de eventos e oportunidades",
-    // longo prazo
-    lon_t:"Longo prazo", lon_intro:"Plano de 2027 a 2031. Datas e metas são do plano em revisão e podem mudar.",
-    lon_cols:["Ano","Marco"],
-    lon_linhas:[["2027","Instituto constituído como instituição científica e tecnológica, com política de inovação"],["2027","Turma piloto da Rede InovaSTEM (trilhas T1 e T2)"],["2027","Hackathon online de segurança cibernética da InovaSTEM"],
-                ["2028","Centro de apoio a pessoas autistas (clínico ou socioassistencial, a definir)"],["2031","Rede InovaSTEM consolidada, com a InovaSTEM Delas"]],
-    lon_mapa_t:"Atividades a mapear", lon_mapa:["Residências e imersões na Casa Physis","Bolsas e prêmios para grupos prioritários","Mentoria contínua e rede de egressas","Desafios com empresas e universidades","Cursos abertos a distância","Intercâmbio com redes de outros países"],
     // participar
-    par2_t:"Participar", par2_intro:"Com conta você escreve no fórum, publica peças no Physis 3D e propõe parcerias. Ler continua aberto, sem conta.",
+    par2_t:"Participar", par2_intro:"Com conta você escreve nos fóruns, publica peças no Physis 3D, propõe parcerias e projetos e sugere eventos. Ler continua aberto, sem conta.",
+    gsa_t:"Global South Alliance", gsa_intro:"Conectar organizações do Sul Global para cocriar e compartilhar soluções verificáveis de transição justa.",
+    gsa_visao_t:"Visão 2031", gsa_visao:"Ser uma aliança ativa entre América Latina, África e Europa, em que o Sul Global lidera a agenda de soluções.",
+    gsa_situacao_t:"Situação", gsa_situacao:"O acordo é assinado agora pela Physis Engineering e passa ao Instituto Physis por cessão, depois do CNPJ do Instituto (previsto para fevereiro de 2027).",
     cad_t:"Cadastro", cad_nome:"Nome completo", cad_email:"E-mail (será o seu usuário)", cad_senha:"Senha (12 caracteres ou mais)", cad_pub:"Nome público (aparece no que você publicar; pode ser apelido)",
     cad_idade:"Idade", cad_maior:"Tenho 18 anos ou mais", cad_menor:"Tenho menos de 18 anos",
     cad_resp_nome:"Nome do responsável legal", cad_resp_email:"E-mail do responsável legal",
@@ -198,28 +194,28 @@ const T = {
     resposta:"Responder", resposta_enviar:"Enviar resposta",
     mod_t:"Moderação (equipe)", mod_vazio:"Nada esperando moderação.", mod_aprovar:"Aprovar", mod_recusar:"Recusar", mod_motivo:"Motivo da recusa",
     mod_tipos:{topico:"Tópico",mensagem:"Resposta",menor:"Autorização de menor",evento:"Evento ou oportunidade",p3d_peca:"Peça 3D",p3d_topico:"Tópico 3D",p3d_mensagem:"Mensagem 3D"},
+    rodape_entidade:"Instituto Physis (em constituição) · CNPJ a partir de fev/2027",
     rodape_contato:"Contato: [MARCADOR]", rodape_codigo:"Software aberto, hospedado pelo próprio Instituto."
   },
   en: {
     pular:"Skip to content", titulo:"Instituto Physis", sub:"Research, training and social projects in sustainability, with the InovaSTEM Network.",
     nav:"Site sections", carregando:"Loading…", sem_hub:"Could not reach the server. Please try again shortly.",
-    abas:{inicio:"Home", inovastem:"InovaSTEM Network", delas:"InovaSTEM Delas", p3d:"Physis 3D", parcerias:"Partnerships and projects",
-          eventos:"Events", longo:"Long term", participar:"Join"},
+    abas:{inicio:"Home", participar:"Partnerships, projects and events", inovastem:"InovaSTEM", delas:"InovaSTEM Delas", gsa:"Global South Alliance"},
     marcador:"[MARCADOR]", conferir:"[CONFERIR]", funciona:"Working", em_dev:"In development", planejado:"Planned",
     ini_missao_t:"Mission", ini_missao:"Sustainable innovation accessible at every level, with priority for women, women's networks and social quotas.",
     ini_frentes_t:"What we do",
     ini_frentes:[["Applied research","Energy, water, construction, nature-based solutions, carbon and circular economy."],
-                 ["InovaSTEM Network","Training tracks, mentoring and events, with the InovaSTEM Delas area for women."],
-                 ["Physis 3D","Recycled-plastic filament, printed parts, an open library and a forum."],
+                 ["InovaSTEM","An open platform for exchange, partnerships and modelling challenges with open code, including Physis 3D."],
+                 ["InovaSTEM Delas","Training, support and a peer network for women and girls in STEM."],
                  ["Living lab","Workshops and tests take place at Casa Physis, in Petrópolis (RJ), Brazil."]],
     ini_aberto_t:"Open platform", ini_aberto:"Everything published here can be read without an account. To post in the forum, publish parts or propose projects, sign up: what you publish appears after the team's moderation.",
     ini_horizonte:"Plan horizon: 2027–2031.",
-    ino_t:"InovaSTEM Network", ino_intro:"A support and articulation network in science, technology, engineering and mathematics: applied tracks, mentoring, events and projects, open to everyone, with priority for women.",
+    ino_t:"InovaSTEM", ino_intro:"Connecting people, organisations and projects to share information, build partnerships and solve modelling challenges with open code. Open to everyone, with priority for women and young people from under-represented communities. Physis 3D is part of InovaSTEM.",
     ino_trilhas_t:"Pilot tracks", ino_trilhas:[["T1 · Energy, IoT and data",""],["T2 · Sustainable construction and nature-based solutions",""]],
     ino_piloto:"Pilot cohort in the second half of 2027, with 20 to 25 participants and an 80% completion target.",
     ino_cotas_t:"InovaSTEM Support quotas", ino_cotas:"At least 50% of places for women and at least 10% for people with disabilities.",
     ino_forum:"InovaSTEM Network forum",
-    del_t:"InovaSTEM Delas", del_intro:"A space for women (cis and trans) in STEM: peer support, conversation circles, mentoring and opportunities.",
+    del_t:"InovaSTEM Delas", del_intro:"Training, supporting and strengthening women in STEM through peer networks, mentoring and projects applied to sustainability. For women and girls (cis and trans), from age 16 with a guardian's authorisation.",
     del_acesso_t:"How to join", del_acesso:"Access is by self-declaration, at sign-up or later, under Join. No document is required. Only you and the Institute's board know that you declared.",
     del_cotas_t:"Cohort reservations (proposal)", del_cotas:["At least 50% for Black, Indigenous or quilombola women.","At least 10% for women with disabilities.","At least 30% for low-income people or public-school graduates.","Reservations can add up for the same person."],
     del_fechado:"The InovaSTEM Delas forum opens to those who self-declared. Sign in and tick the self-declaration under Join.",
@@ -258,12 +254,10 @@ const T = {
                ["Fairs and other networks' events","Innovation and sustainability fairs and events of women-in-STEM networks."],
                ["Open challenges and calls","Open innovation challenges, awards and calls for women in STEM."]],
     eve_forum:"Events and opportunities forum",
-    lon_t:"Long term", lon_intro:"Plan from 2027 to 2031. Dates and targets come from the plan under review and may change.",
-    lon_cols:["Year","Milestone"],
-    lon_linhas:[["2027","Institute set up as a science and technology institution, with an innovation policy"],["2027","InovaSTEM Network pilot cohort (tracks T1 and T2)"],["2027","InovaSTEM online cybersecurity hackathon"],
-                ["2028","Support centre for autistic people (clinical or social care, to be defined)"],["2031","InovaSTEM Network consolidated, with InovaSTEM Delas"]],
-    lon_mapa_t:"Activities to map", lon_mapa:["Residencies and immersions at Casa Physis","Grants and awards for priority groups","Ongoing mentoring and an alumnae network","Challenges with companies and universities","Open online courses","Exchange with networks in other countries"],
-    par2_t:"Join", par2_intro:"With an account you can post in the forum, publish parts in Physis 3D and propose partnerships. Reading stays open, without an account.",
+    par2_t:"Join", par2_intro:"With an account you can post in the forums, publish parts in Physis 3D, propose partnerships and projects and suggest events. Reading stays open, without an account.",
+    gsa_t:"Global South Alliance", gsa_intro:"Connecting organisations of the Global South to co-create and share verifiable just-transition solutions.",
+    gsa_visao_t:"Vision 2031", gsa_visao:"An active alliance between Latin America, Africa and Europe, in which the Global South leads the solutions agenda.",
+    gsa_situacao_t:"Status", gsa_situacao:"The agreement is signed now by Physis Engineering and moves to Instituto Physis by assignment once the Institute is registered (expected February 2027).",
     cad_t:"Sign up", cad_nome:"Full name", cad_email:"E-mail (your username)", cad_senha:"Password (12 characters or more)", cad_pub:"Public name (shown on what you publish; can be a nickname)",
     cad_idade:"Age", cad_maior:"I am 18 or older", cad_menor:"I am under 18",
     cad_resp_nome:"Legal guardian's name", cad_resp_email:"Legal guardian's e-mail",
@@ -280,13 +274,16 @@ const T = {
     resposta:"Reply", resposta_enviar:"Send reply",
     mod_t:"Moderation (team)", mod_vazio:"Nothing awaiting moderation.", mod_aprovar:"Approve", mod_recusar:"Reject", mod_motivo:"Reason for rejection",
     mod_tipos:{topico:"Topic",mensagem:"Reply",menor:"Minor's authorisation",evento:"Event or opportunity",p3d_peca:"3D part",p3d_topico:"3D topic",p3d_mensagem:"3D message"},
+    rodape_entidade:"Instituto Physis (being incorporated) · Brazilian company registration (CNPJ) from Feb/2027",
     rodape_contato:"Contact: [MARCADOR]", rodape_codigo:"Open-source software, hosted by the Institute itself."
   }
 };
 let lang = "pt";
 try { lang = (localStorage.getItem("physis-idioma") === "en") ? "en" : "pt"; } catch (e) {}
-const ABAS = ["inicio", "inovastem", "delas", "p3d", "parcerias", "eventos", "longo", "participar"];
-const CAT_DA_ABA = { inovastem:"inovastem", delas:"delas", p3d:null, parcerias:"parcerias", eventos:"eventos" };
+const ABAS = ["inicio", "participar", "inovastem", "delas", "gsa"];
+// endereços antigos (antes de 20/11/2026) continuam funcionando
+const ANTIGAS = { p3d:"inovastem", parcerias:"participar", eventos:"participar", longo:"inicio" };
+const CAT_DA_ABA = { inovastem:"inovastem", delas:"delas", participar:"parcerias" };
 const TIPOS_AGENDA = ["hackathon_seg_quantum", "modelos_gemeo", "feiras_redes", "desafios_chamadas", "instituto"];   // agenda.py
 let tipoAgenda = "";
 let inst = null, eu = null, aba = "inicio", topicoAberto = null;
@@ -316,7 +313,8 @@ function desenharAbas() {
 }
 
 function rodape() {
-  $("rodape").innerHTML = `<p>${esc(t("rodape_contato"))} · ${esc(t("rodape_codigo"))}</p>
+  // 20/11/2026 (dona, pg:d4ab27a71ee6): sem CNPJ ainda; rodapé com a situação, privacidade, termos e contato
+  $("rodape").innerHTML = `<p><strong>${esc(t("rodape_entidade"))}</strong></p><p>${esc(t("rodape_contato"))} · ${esc(t("rodape_codigo"))}</p>
     <ul><li><a href="/termos">${esc(t("termos"))}</a></li><li><a href="/privacidade">${esc(t("privacidade"))}</a></li>
     <li><a href="/acessibilidade">${esc(t("acessibilidade"))}</a></li><li><a href="/plataforma/">${esc(t("entrar_plataforma"))}</a></li></ul>`;
 }
@@ -333,14 +331,15 @@ function telaInicio() {
 
 function telaInovastem() {
   return cartao(t("ino_t"), `<p>${esc(t("ino_intro"))}</p>`, "inst")
-    + cartao(t("ino_trilhas_t"), lista(t("ino_trilhas").map(x => x[0])) + `<p>${esc(t("ino_piloto"))} <span class="selo info">${esc(t("conferir"))}</span></p>`)
     + cartao(t("ino_cotas_t"), `<p>${esc(t("ino_cotas"))} <span class="selo info">${esc(t("conferir"))}</span></p>`)
-    + `<section class="cartao" id="forum"></section>`;
+    + `<section class="cartao" id="forum"></section>`
+    + telaP3d();
 }
 
 function telaDelas() {
   return cartao(t("del_t"), `<p>${esc(t("del_intro"))}</p>`, "inst")
     + cartao(t("del_acesso_t"), `<p>${esc(t("del_acesso"))}</p>`)
+    + cartao(t("ino_trilhas_t"), lista(t("ino_trilhas").map(x => x[0])) + `<p>${esc(t("ino_piloto"))} <span class="selo info">${esc(t("conferir"))}</span></p>`)
     + cartao(t("del_cotas_t"), lista(t("del_cotas")))
     + `<section class="cartao" id="forum"></section>`;
 }
@@ -354,10 +353,15 @@ function telaP3d() {
     + `<section class="cartao" id="forum3d"></section>`;
 }
 
+function telaGsa() {
+  return cartao(t("gsa_t"), `<p>${esc(t("gsa_intro"))}</p>`, "inst")
+    + cartao(t("gsa_visao_t"), `<p>${esc(t("gsa_visao"))}</p>`)
+    + cartao(t("gsa_situacao_t"), `<p>${esc(t("gsa_situacao"))}</p><span class="selo dev">${esc(t("planejado"))}</span>`);
+}
+
 function telaParcerias() {
   return cartao(t("par_t"), `<p>${esc(t("par_intro"))}</p>`, "inst")
-    + cartao(t("par_passos_t"), `<ol class="lista">${t("par_passos").map(x => `<li>${esc(x)}</li>`).join("")}</ol>`)
-    + `<section class="cartao" id="forum"></section>`;
+    + cartao(t("par_passos_t"), `<ol class="lista">${t("par_passos").map(x => `<li>${esc(x)}</li>`).join("")}</ol>`);
 }
 
 function telaEventos() {
@@ -369,7 +373,7 @@ function telaEventos() {
     + `<section><h2>${esc(t("eve_tipos_t"))}</h2><div class="grade">${t("eve_tipos").map(([a, b]) => `<div class="cartao"><h3>${esc(a)}</h3><p>${esc(b)}</p></div>`).join("")}</div></section>`
     + `<section class="cartao" id="agenda"><h2>${esc(t("eve_agenda"))}</h2>${filtro}<div id="agenda-lista"><p>${esc(t("carregando"))}</p></div></section>`
     + (eu && (eu.equipe || eu.pode_publicar) ? `<section class="cartao" id="agenda-form"></section>` : "")
-    + `<section class="cartao" id="forum"></section>`;
+    + `<section class="cartao" id="forum-eventos"></section>`;
 }
 
 function formAgenda() {
@@ -420,12 +424,6 @@ async function agenda() {
     : `<p>${esc(t("eve_vazio"))}</p>`;
 }
 
-function telaLongo() {
-  return cartao(t("lon_t"), `<p>${esc(t("lon_intro"))}</p><div class="rolagem"><table><caption>${esc(t("lon_t"))}</caption><thead><tr>${t("lon_cols").map(c => `<th scope="col">${esc(c)}</th>`).join("")}</tr></thead>
-       <tbody>${t("lon_linhas").map(l => `<tr><td>${esc(l[0])}</td><td>${esc(l[1])}</td></tr>`).join("")}</tbody></table></div>`, "inst")
-    + cartao(t("lon_mapa_t"), lista(t("lon_mapa")) + `<span class="selo dev">${esc(t("planejado"))}</span>`);
-}
-
 function telaParticipar() {
   let h = cartao(t("par2_t"), `<p>${esc(t("par2_intro"))}</p>`, "inst");
   if (eu && eu.participante) {
@@ -461,8 +459,8 @@ function telaParticipar() {
   return h;
 }
 
-const TELAS = { inicio: telaInicio, inovastem: telaInovastem, delas: telaDelas, p3d: telaP3d, parcerias: telaParcerias,
-                eventos: telaEventos, longo: telaLongo, participar: telaParticipar };
+const telaParticiparTudo = () => telaParcerias() + telaEventos() + telaParticipar() + `<section class="cartao" id="forum"></section>`;
+const TELAS = { inicio: telaInicio, participar: telaParticiparTudo, inovastem: telaInovastem, delas: telaDelas, gsa: telaGsa };
 
 function desenhar() {
   aplicarIdioma(); desenharAbas(); rodape();
@@ -550,13 +548,14 @@ async function moderacao() {
 
 function ligar() {
   if (CAT_DA_ABA[aba]) forum(CAT_DA_ABA[aba]);
-  if (aba === "eventos") {
+  if (aba === "participar") {
+    forum("eventos", "forum-eventos");
     agenda(); formAgenda();
     document.querySelectorAll("[data-tipo]").forEach(b => b.onclick = () => { tipoAgenda = b.getAttribute("data-tipo");
       document.querySelectorAll("[data-tipo]").forEach(o => { const sim = o.getAttribute("data-tipo") === tipoAgenda;
         o.className = "botao" + (sim ? "" : " sec"); o.setAttribute("aria-pressed", String(sim)); }); agenda(); });
   }
-  if (aba === "p3d") { biblioteca(); forum3d(); }
+  if (aba === "inovastem") { biblioteca(); forum3d(); }
   if (aba === "participar") {
     moderacao();
     const f = $("cad");
@@ -589,7 +588,7 @@ async function carregarEu() {
 }
 
 function irPara() {
-  const h = (location.hash || "#inicio").slice(1);
+  const h0 = (location.hash || "#inicio").slice(1), h = ANTIGAS[h0] || h0;
   aba = ABAS.includes(h) ? h : "inicio";
   topicoAberto = null;
   desenhar();

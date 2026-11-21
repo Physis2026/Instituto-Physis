@@ -137,19 +137,28 @@ class Pagina(unittest.TestCase):
         bloco = re.search(r"const T = \{(.*?)\n\};", self.js, re.S).group(1)
         pt, en = bloco.split("\n  en: {", 1)
         self.assertEqual(chaves(pt) - {"pt"}, chaves(en))
-        for k in ("p3d_linhas", "lon_linhas", "eve_tipos", "ini_frentes", "del_cotas", "lon_mapa", "par_passos", "ino_trilhas", "p3d_cols"):
+        for k in ("p3d_linhas", "eve_tipos", "ini_frentes", "del_cotas", "par_passos", "ino_trilhas", "p3d_cols"):
             self.assertEqual(itens(pt, k), itens(en, k), k)
             self.assertGreater(itens(pt, k), 0, k)
 
     def test_abas_pedidas(self):
-        for aba in ("inicio", "inovastem", "delas", "p3d", "parcerias", "eventos", "longo", "participar"):
-            self.assertIn(f'"{aba}"', self.js)
-        for tela in ("telaInicio", "telaInovastem", "telaDelas", "telaP3d", "telaParcerias", "telaEventos", "telaLongo", "telaParticipar"):
+        # 20/11/2026 (dona): Início > Parcerias, projetos e eventos (Participar) > InovaSTEM (com o Physis 3D) > Delas > Global South Alliance;
+        # Longo prazo saiu; endereços antigos (#p3d, #parcerias, #eventos, #longo) levam à aba nova
+        ordem = re.search(r"const ABAS = \[(.*?)\];", self.js).group(1)
+        self.assertEqual(re.findall(r'"(\w+)"', ordem), ["inicio", "participar", "inovastem", "delas", "gsa"])
+        for tela in ("telaInicio", "telaInovastem", "telaDelas", "telaP3d", "telaParcerias", "telaEventos", "telaParticipar", "telaGsa"):
             self.assertIn(f"function {tela}(", self.js)
+        self.assertNotIn("telaLongo", self.js)
+        antigas = re.search(r"const ANTIGAS = \{(.*?)\};", self.js).group(1)
+        for velha in ("p3d", "parcerias", "eventos", "longo"):
+            self.assertIn(f"{velha}:", antigas)
 
     def test_conteudo_segue_as_decisoes(self):
-        for nome in ("Global South", "AWPI", "S2 Services", "Fundo Elas", "Petrobras", "FINEP", "FAPERJ", "Serratec", "GIZ"):
+        for nome in ("AWPI", "S2 Services", "Fundo Elas", "Petrobras", "FINEP", "FAPERJ", "Serratec", "GIZ"):
             self.assertNotIn(nome, self.h, nome)
+        # 20/11/2026: a dona pediu a aba Global South Alliance; ela diz que o acordo passa ao Instituto só por cessão, depois do CNPJ (D67)
+        self.assertIn("Global South Alliance", self.js)
+        self.assertIn("passa ao Instituto Physis por cessão", self.js)
         self.assertNotRegex(self.h, r"2027\s*[–-]\s*2032")
         self.assertIn("2027–2031", self.js)
         self.assertIn("[CONFERIR]", self.js)
@@ -173,8 +182,17 @@ class Pacote(unittest.TestCase):
                 self.assertTrue(any(n.endswith("/web/site.html") for n in nomes))
                 inst = json.loads(z.read(next(n for n in nomes if n.endswith("/instancia.json"))).decode("utf-8"))
                 self.assertTrue(inst["cadastro_aberto"] and inst["moderacao_previa"])
+                # LEIA-ME do pacote (achado na versão de teste de 19/11/2026): senha mínima e banco certos, site em "/"
+                leia = z.read(next(n for n in nomes if n.endswith("/LEIA-ME.md"))).decode("utf-8")
+                from physis_hub import seguranca as seg
+                self.assertIn(f"pelo menos {seg.SENHA_MIN} caracteres", leia)
+                self.assertIn("`physis-instituto.db`", leia)
+                self.assertIn("/plataforma/", leia)
             with zipfile.ZipFile(zp) as z:
                 self.assertFalse(any(n.endswith("/web/site.html") for n in z.namelist()))
+                leia = z.read(next(n for n in z.namelist() if n.endswith("/LEIA-ME.md"))).decode("utf-8")
+                self.assertIn("`physis-hub.db`", leia)
+                self.assertNotIn("/plataforma/", leia)
 
 
 if __name__ == "__main__":

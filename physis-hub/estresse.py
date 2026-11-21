@@ -2,7 +2,7 @@
 """Teste de estresse do Physis Hub, sem hardware.
 
 Sobe o hub numa porta local e o ataca pela mesma rota que o Receptor V6 usa.
-Uso: python3 estresse.py [--ciclos 200] [--porta 0]
+Uso: python3 estresse.py [--ciclos 200] [--porta 0]  (0 = porta livre escolhida pelo sistema)
 Sai com codigo 0 se todos os cenarios passarem.
 """
 from __future__ import annotations

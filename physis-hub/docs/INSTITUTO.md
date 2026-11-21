@@ -98,7 +98,7 @@ Instituto com a conta da Physis, e vice-versa. Faça a cópia de segurança dos 
 - Nome jurídico: "Instituto Physis" (D62 do Physis M&V), a confirmar depois do registro e do CNPJ (previsto para
   fev/2027, kit de abertura 17). E-mail e WhatsApp de suporte (na ficha estão como `[MARCADOR]`; enquanto isso, o suporte
   registra o chamado mas não envia e-mail, porque o endereço não é válido).
-- Cores da marca (hoje dois azuis da `PALETA.md`, `#2C5A6E` e `#1C3550`, a aprovar) e o texto do logo: esperam o sistema
+- Cores da marca: verde `#4A8A5A` e `#1F4A1C` (tipo C do guia de identidade, 20/11/2026; sem azul; logos aguardam a D43) e o texto do logo: esperam o sistema
   de marcas do M&V (D43).
 - Endereço público: subdomínio da Physis (D64), domínio exato a confirmar; conta de e-mail (SMTP) do Instituto.
 - Gestão: o Instituto terá a **sua própria** Gestão (cópia da Gestão Physis, com banco e tarefas próprios: Fase 0 pelo

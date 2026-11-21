@@ -21,9 +21,20 @@ Nenhuma cor fora desta lista deve ser usada.
 | Pronto | `#1F4A1C` sobre `#DCEBD8` |
 | Fundo verde (opção) | `#1C2B21`, `#2A3829`, texto `#EEF2EA` |
 
+## Guia de identidade (decisão da dona de 19–20/11/2026)
+
+Telas claras do Instituto Physis = **tipo C**; telas escuras = **tipo A** (verde profundo). As paletas não têm azul: o azul de "Informação"
+acima serve só aos avisos das telas da plataforma, nunca à marca. `#4A8A5A` não serve para texto pequeno (contraste 3,8:1): rótulo em
+`#1F4A1C` sobre `#DCEBD8`.
+
+| Tipo | Fundo | Superfície | Linha | Texto | Texto 2 | Destaque | Botão |
+|---|---|---|---|---|---|---|---|
+| C · claro Instituto | `#F4F6F1` | `#FFFFFF` | `#C9D2C4` | `#1B1F23` | `#4A4F44` | `#4A8A5A` (rótulos grandes), `#1F4A1C` (texto pequeno), `#F97316` (números grandes) | `#C2410C` + `#FFFFFF` |
+| A · escuro verde | `#0B3D2E` | `#0F4535` | `#2F5E4E` | `#F4F1EA` | `#C3D0BD` | `#F97316` | `#C2410C` + `#FFFFFF` |
+
 ## Lista completa
 
-`#000000` `#14180F` `#1C2B21` `#1C3550` `#1F4A1C` `#2A1215` `#2A3829` `#2C5A6E` `#33372E` `#33512F` `#3A4A38` `#3D6E8F` `#4A4F44` `#4A5A47` `#4B7547` `#546A7B` `#5A6154` `#5C2B2E` `#5C3F00` `#5F6659` `#6D7466` `#7A2214` `#7FA874` `#7FA9C4` `#8A6110` `#8A6410` `#8A6A1F` `#8A8270` `#8A9182` `#8A9284` `#8FB183` `#A63A28` `#A85432` `#A8BFA0` `#B07A10` `#B8D0E0` `#B9A97F` `#B9CDB3` `#C08A1E` `#C3D0BD` `#C9A227` `#C9B98F` `#C9D2C4` `#C9D3C4` `#CDDCC4` `#D6DBCF` `#D9D3C2` `#DBE7F1` `#DCEBD8` `#E2E9DC` `#E2EADB` `#E3C4BD` `#E3E8DE` `#E5D5AE` `#E6EBE1` `#E7EDE3` `#E9E6DB` `#ECE0BD` `#EDF2E9` `#EEF2EA` `#EEF4EA` `#EFE8D6` `#EFE9F6` `#F1F3EC` `#F4F6F1` `#F5E2D7` `#F6EAD0` `#F6EEDC` `#F7F8F4` `#F7F9F4` `#F8FAF6` `#FAF9F5` `#FCF2F0` `#FF8A80` `#FFF6DF` `#FFFFFF` `#1A4D2E` `#2F7D5B` `#4A8A5A` `#F4F1EA` `#BB6B4A` `#D9A58C` `#0B3D2E` `#1B1F23` `#C2410C` `#F97316` `#FFF7ED` `#0F4535` `#2F5E4E` `#B07A12`
+`#000000` `#0B3D2E` `#0F4535` `#14180F` `#1A4D2E` `#1B1F23` `#1C2B21` `#1C3550` `#1F4A1C` `#2A1215` `#2A3829` `#2C5A6E` `#2F5E4E` `#2F7D5B` `#33372E` `#33512F` `#3A4A38` `#3D6E8F` `#4A4F44` `#4A5A47` `#4A8A5A` `#4B7547` `#546A7B` `#5A6154` `#5C2B2E` `#5C3F00` `#5F6659` `#6D7466` `#7A2214` `#7FA874` `#7FA9C4` `#8A6110` `#8A6410` `#8A6A1F` `#8A8270` `#8A9182` `#8A9284` `#8FB183` `#A63A28` `#A85432` `#A8BFA0` `#B07A10` `#B07A12` `#B8D0E0` `#B9A97F` `#B9CDB3` `#BB6B4A` `#C08A1E` `#C2410C` `#C3D0BD` `#C9A227` `#C9B98F` `#C9D2C4` `#C9D3C4` `#CDDCC4` `#D6DBCF` `#D9A58C` `#D9D3C2` `#DBE7F1` `#DCEBD8` `#E2E9DC` `#E2EADB` `#E3C4BD` `#E3E8DE` `#E5D5AE` `#E6EBE1` `#E7EDE3` `#E9E6DB` `#ECE0BD` `#EDF2E9` `#EEF2EA` `#EEF4EA` `#EFE8D6` `#EFE9F6` `#F1F3EC` `#F4F1EA` `#F4F6F1` `#F5E2D7` `#F6EAD0` `#F6EEDC` `#F7F8F4` `#F7F9F4` `#F8FAF6` `#F97316` `#FAF9F5` `#FCF2F0` `#FF8A80` `#FFF6DF` `#FFF7ED` `#FFFFFF`
 
 ## Família Physis: InovaSTEM e InovaSTEM Delas (Guia de Identidade de 19/11/2026)
 
