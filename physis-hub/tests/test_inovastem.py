@@ -13,7 +13,7 @@ Protege:
    (claro e escuro), sem internet, sem eval, ids fixos únicos, PT e EN com as mesmas chaves, abas pedidas, sem a marca do
    Instituto, sem "open source" (D92), hackathon em março de 2027, Amigo só pessoa física.
 6. Pacote inovastem: leva o site, a pasta de materiais e a configuração; o do Instituto não leva o site da InovaSTEM.
-7. Modelagem 3D (dona, 20/11/2026): fila de impressão (papéis, sessão e CSRF, estados, recusa com motivo, registro sem dado
+7. Modelagem Physis 3D (dona, 20/11/2026): fila de impressão (papéis, sessão e CSRF, estados, recusa com motivo, registro sem dado
    pessoal, só na instalação inovastem); /laboratorio com as 8 subabas na ordem (Enviar arquivo primeiro) e com role/aria de
    abas, fluxo visível e passos no projeto comum inovastem-projeto/1, um bloco por fenômeno pelo motor da simulação,
    sistema/physis-imagem-3d.js (imagem → CAD 2D e 3D; peças de teste) copiado igual, gerador em dia; site em PT e EN.
@@ -197,7 +197,7 @@ class Rotas(unittest.TestCase):
             return e.code, (json.loads(b) if b.strip().startswith(b"{") else {})
 
     def test_sem_planejador(self):
-        # dona, 20/11/2026: Planejador e Modelagem 3D são ferramentas relacionadas, mas separadas
+        # dona, 20/11/2026: Planejador e Modelagem Physis 3D são ferramentas relacionadas, mas separadas
         self.assertEqual(self.pedir("GET", "/planejador")[0], 404)
 
     def test_paginas(self):
@@ -524,7 +524,7 @@ class Pacote(unittest.TestCase):
                 self.assertIn(f"pelo menos {seg.SENHA_MIN} caracteres", leia)
                 self.assertIn("`physis-inovastem.db`", leia)
                 self.assertIn("/laboratorio", leia)
-                for arq in ("three.min.js", "web-ifc-api-iife.js", "web-ifc.wasm", "LICENSE-three.txt"):   # Modelagem 3D: /vendor/
+                for arq in ("three.min.js", "web-ifc-api-iife.js", "web-ifc.wasm", "LICENSE-three.txt"):   # Modelagem Physis 3D: /vendor/
                     self.assertTrue(any(n.endswith("/web/vendor/" + arq) for n in nomes), arq)
             # com o Planejador, o nome da instalação não pode ser trocado pelo último arquivo de vendor/ (defeito de 19/11)
             plan = Path(tmp) / "planejador.html"
@@ -547,7 +547,7 @@ class Pacote(unittest.TestCase):
         self.assertNotIn("Instituto", f["marca"]["logo_texto"])
 
 
-# ── Modelagem 3D (Physis 3D), estrutura aprovada pela dona em 20/11/2026 ──────────────────────────────────────────────
+# ── Modelagem Physis 3D, estrutura aprovada pela dona em 20/11/2026 ──────────────────────────────────────────────
 STL_1 = (b"\0" * 80) + (1).to_bytes(4, "little") + (b"\0" * 12) + b"".join(
     v.to_bytes(4, "little") for v in [0, 0, 0, 0x3F800000, 0, 0, 0, 0x3F800000, 0]) + b"\0\0"      # um triângulo
 
@@ -815,7 +815,7 @@ class FilaImpressaoRotas(unittest.TestCase):
 
 
 class Modelagem3D(unittest.TestCase):
-    """/laboratorio = Modelagem 3D (Physis 3D): 8 subabas, projeto comum, simulação por fenômeno, fila e galeria."""
+    """/laboratorio = Modelagem Physis 3D: 8 subabas, projeto comum, simulação por fenômeno, fila e galeria."""
 
     @classmethod
     def setUpClass(cls):
@@ -920,7 +920,7 @@ class Modelagem3D(unittest.TestCase):
         for k in ("fluxo", "fi_como", "si_cols", "fi_cols", "mo_prog_cols"):
             self.assertEqual(_n_itens(pt.replace(": [", ":["), k), _n_itens(en.replace(": [", ":["), k), k)
         # vocabulário do inglês do site; Delas em inglês é "Hers"
-        for termo in ('nav_delas: "InovaSTEM Hers"', 'nav_desafios: "Challenges and projects"', 'nav_forum: "Forum"', 'nav_modelagem: "3D modelling"',
+        for termo in ('nav_delas: "InovaSTEM Hers"', 'nav_desafios: "Challenges and projects"', 'nav_forum: "Forum"', 'nav_modelagem: "Physis 3D modelling"',
                       'nav_materiais: "Materials"', 'inscreva: "Join"'):
             self.assertIn(termo, en, termo)
         # o HTML fixo (menu, pular, rodapé, subabas) troca de língua ao vivo
@@ -929,7 +929,7 @@ class Modelagem3D(unittest.TestCase):
         self.assertIn('idioma:{ atual:() => lang, definir:v =>', self.h)
         self.assertIn('document.documentElement.lang = lang === "en" ? "en" : "pt-BR"', self.js)
         site = ler(PAGINA)
-        for termo in ('delas:"InovaSTEM Hers"', 'desafios:"Challenges and projects"', 'forum:"Forum"', 'modelagem:"3D modelling"', 'materiais:"Materials"', 'participar:"Join"'):
+        for termo in ('delas:"InovaSTEM Hers"', 'desafios:"Challenges and projects"', 'forum:"Forum"', 'modelagem:"Physis 3D modelling"', 'materiais:"Materials"', 'participar:"Join"'):
             self.assertIn(termo, site, "o site usa o mesmo inglês: " + termo)
 
     def test_modelos_bim_e_montagens(self):
@@ -987,7 +987,7 @@ class Modelagem3D(unittest.TestCase):
         for lingua in (pt, en):
             linhas = re.search(r"mod_linhas:\[(.*?)\]\],", lingua, re.S).group(1)
             self.assertEqual(re.findall(r'\["([a-z]+)",', linhas), [k for k, _ in self.lab.SUBABAS])
-        self.assertIn('modelagem:"Modelagem 3D"', pt)
+        self.assertIn('modelagem:"Modelagem Physis 3D"', pt)
         self.assertIn('href="/laboratorio#${esc(l[0])}"', js)
         self.assertNotIn("Modelagem online", site)
 

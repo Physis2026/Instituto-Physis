@@ -1,7 +1,7 @@
-"""Monta physis-hub/web/inovastem-lab.html: a Modelagem 3D (Physis 3D) da InovaSTEM, servida em /laboratorio, rodando no
+"""Monta physis-hub/web/inovastem-lab.html: a Modelagem Physis 3D da InovaSTEM, servida em /laboratorio, rodando no
 navegador, sem internet (D94; estrutura aprovada pela dona em 20/11/2026, com os acréscimos do mesmo dia).
 
-A Modelagem 3D é a bancada de desenvolvimento da InovaSTEM, aberta a qualquer assunto. O Planejador é outra ferramenta
+A Modelagem Physis 3D é a bancada de desenvolvimento da InovaSTEM, aberta a qualquer assunto. O Planejador é outra ferramenta
 (relacionada, mas separada; dona, 20/11/2026) e não aparece no site da InovaSTEM.
 Oito subabas, nesta ordem (hash da página), que leem e gravam um PROJETO COMUM (JSON "inovastem-projeto/1" no navegador,
 com Exportar/Importar arquivo; seções lugar, edificacao, montagem, pecas, resultados, arquivos e passos). Fluxo visível
@@ -62,7 +62,7 @@ SUBABAS = [("arquivo", "Enviar arquivo"), ("lugar", "Lugar (GIS)"), ("edificacao
            ("pecas", "Peças 3D"), ("simulacao", "Simulação"), ("fila", "Fila de impressão"), ("galeria", "Galeria")]
 ESQUEMA_PROJETO = "inovastem-projeto/1"
 
-CASCA_CSS = """/* Modelagem 3D (casca do laboratório): classes que os motores usam (cartao, faixa in/al/at, t2), nas cores do guia */
+CASCA_CSS = """/* Modelagem Physis 3D (casca do laboratório): classes que os motores usam (cartao, faixa in/al/at, t2), nas cores do guia */
 .faixa.in{background:var(--suave);color:var(--texto)}
 .faixa.al{background:var(--al-f);color:var(--al-t)}
 .faixa.at{background:var(--at-f);color:var(--at-t)}
@@ -127,7 +127,7 @@ ul.lista-limpa li{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
 """
 
 CASCA_JS = r""""use strict";
-/* Casca da Modelagem 3D (Physis 3D): subabas em fluxo, projeto comum (inovastem-projeto/1), enviar arquivo (foto → CAD 2D →
+/* Casca da Modelagem Physis 3D: subabas em fluxo, projeto comum (inovastem-projeto/1), enviar arquivo (foto → CAD 2D →
    3D), modelos BIM (CAD e IFC) com modelagem direta, montagens, peças 3D, simulação por fenômeno, fila de impressão e
    galeria, em português e inglês (função t com a chave, como o site). Gerada por ferramentas/montar_lab_inovastem.py. Os motores
    (SIMULACAO, telaPhysis3D) não mudam: a casca só chama as funções deles e troca as cores do desenho para as do guia. */
@@ -141,11 +141,11 @@ const ARQ_MAX = 20 * 1024 * 1024;                           // o mesmo limite do
 const T = {
   pt: {
     pular: "Pular para o conteúdo", endosso_a: "uma iniciativa", endosso_b: "", nav: "Seções do site", nav_delas: "InovaSTEM Delas", nav_desafios: "Desafios e projetos",
-    nav_forum: "Fórum", nav_modelagem: "Modelagem 3D", nav_hackathon: "Hackathon", nav_materiais: "Materiais", inscreva: "Inscreva-se",
-    sub: "Modelagem 3D (Physis 3D) · roda no seu navegador", beta: "versão beta", titulo: "Modelagem 3D (Physis 3D)",
-    intro: "A bancada de desenvolvimento da InovaSTEM, aberta a modelagens de qualquer assunto: subabas que leem e gravam um projeto comum, num fluxo do arquivo até a fila de impressão e a galeria.",
+    nav_forum: "Fórum", nav_modelagem: "Modelagem Physis 3D", nav_hackathon: "Hackathon", nav_materiais: "Materiais", inscreva: "Inscreva-se",
+    sub: "Modelagem Physis 3D · roda no seu navegador", beta: "versão beta", titulo: "Modelagem Physis 3D",
+    intro: "O laboratório aberto da InovaSTEM para modelar qualquer coisa: peças mecânicas, edificações, terrenos ou protótipos. Transforme uma ideia, uma foto ou um arquivo em modelo 3D, direto no navegador e com códigos abertos: envie o arquivo, ajuste a geometria, monte as peças, teste numa simulação e mande imprimir. Cada etapa grava no mesmo projeto, em formatos abertos (SVG, DXF, STL, 3MF e IFC), para a rede aprender, melhorar e reaproveitar o que foi feito; o resultado pode ir para a galeria.",
     faixa: "Em desenvolvimento (Fase 1). Pré-dimensionamento para aprender e testar ideias: não aprova projeto, não substitui norma nem ensaio. Os exemplos usam dados fictícios. O que você abre ou envia aqui fica no seu computador; só vai para o servidor da InovaSTEM quando você pede (pedir impressão, enviar peça à Biblioteca).",
-    abas_rot: "Subabas da Modelagem 3D", proj_rot: "Projeto comum",
+    abas_rot: "Subabas da Modelagem Physis 3D", proj_rot: "Projeto comum",
     rodape_realiza: "InovaSTEM · uma iniciativa PHYSIS", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ) · Contato: [MARCADOR]",
     rodape_beta: "Versão beta: termos e aviso de privacidade em revisão jurídica.", termos: "Termos de uso (beta)", privacidade: "Privacidade (beta)", acessibilidade: "Acessibilidade",
     abas: { arquivo: "Enviar arquivo", lugar: "Lugar (GIS)", edificacao: "Modelos BIM (CAD e IFC)", montagem: "Montagens", pecas: "Peças 3D", simulacao: "Simulação", fila: "Fila de impressão", galeria: "Galeria" },
@@ -155,7 +155,7 @@ const T = {
     proj_exportar: "Exportar o projeto (.json)", proj_importar: "Importar um projeto (.json)", proj_limpar: "Começar outro projeto", proj_confirmar: "Confirmar: apagar o projeto deste navegador",
     proj_confirmar_msg: "Clique de novo para confirmar: o projeto deste navegador será apagado (exporte antes, se quiser guardar).", proj_novo: "Projeto novo começado.",
     proj_baixado: "Arquivo do projeto baixado.", proj_importado: "Projeto importado:", proj_nao: "Este arquivo não é um projeto", proj_falha_guardar: "Atenção: não deu para guardar neste navegador (espaço cheio ou navegação privada). Exporte o arquivo do projeto para não perder.",
-    fluxo_rot: "Fluxo da Modelagem 3D", ainda_nao: "ainda não", ou: "ou",
+    fluxo_rot: "Fluxo da Modelagem Physis 3D", ainda_nao: "ainda não", ou: "ou",
     fluxo: [["arquivo", "Enviar arquivo", ""], ["lugar", "Lugar ou Modelos BIM", "se for território, edificação ou peça mecânica"], ["montagem", "Montagens", "se tiver várias peças"],
             ["pecas", "Peças 3D", ""], ["simulacao", "Simulação", ""], ["fila", "Fila de impressão", ""], ["galeria", "Galeria", ""]],
     // comuns
@@ -278,11 +278,11 @@ const T = {
   },
   en: {
     pular: "Skip to content", endosso_a: "a", endosso_b: "initiative", nav: "Site sections", nav_delas: "InovaSTEM Hers", nav_desafios: "Challenges and projects",
-    nav_forum: "Forum", nav_modelagem: "3D modelling", nav_hackathon: "Hackathon", nav_materiais: "Materials", inscreva: "Join",
-    sub: "3D modelling (Physis 3D) · runs in your browser", beta: "beta version", titulo: "3D modelling (Physis 3D)",
-    intro: "InovaSTEM's development bench, open to modelling on any subject: sub-tabs that read and write one shared project, in a flow from the file to the print queue and the gallery.",
+    nav_forum: "Forum", nav_modelagem: "Physis 3D modelling", nav_hackathon: "Hackathon", nav_materiais: "Materials", inscreva: "Join",
+    sub: "Physis 3D modelling · runs in your browser", beta: "beta version", titulo: "Physis 3D modelling",
+    intro: "InovaSTEM's open lab for modelling anything: mechanical parts, buildings, terrain or prototypes. Turn an idea, a photo or a file into a 3D model, right in the browser and with open code: upload the file, adjust the geometry, assemble the parts, test it in a simulation and send it to print. Every step is saved in the same project, in open formats (SVG, DXF, STL, 3MF and IFC), so the network can learn from, improve and reuse what was made; the result can go to the gallery.",
     faixa: "In development (Phase 1). Preliminary sizing to learn and test ideas: it does not approve designs and does not replace standards or tests. Examples use fictitious data. What you open or upload here stays on your computer; it only goes to the InovaSTEM server when you ask (print request, sending a part to the Library).",
-    abas_rot: "3D modelling sub-tabs", proj_rot: "Shared project",
+    abas_rot: "Physis 3D modelling sub-tabs", proj_rot: "Shared project",
     rodape_realiza: "InovaSTEM · a PHYSIS initiative", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ), Brazil · Contact: [MARCADOR]",
     rodape_beta: "Beta version: terms and privacy notice under legal review.", termos: "Terms of use (beta)", privacidade: "Privacy (beta)", acessibilidade: "Accessibility",
     abas: { arquivo: "Upload a file", lugar: "Site (GIS)", edificacao: "BIM models (CAD and IFC)", montagem: "Assemblies", pecas: "3D parts", simulacao: "Simulation", fila: "Print queue", galeria: "Gallery" },
@@ -291,7 +291,7 @@ const T = {
     proj_exportar: "Export the project (.json)", proj_importar: "Import a project (.json)", proj_limpar: "Start another project", proj_confirmar: "Confirm: delete the project from this browser",
     proj_confirmar_msg: "Click again to confirm: the project in this browser will be deleted (export it first if you want to keep it).", proj_novo: "New project started.",
     proj_baixado: "Project file downloaded.", proj_importado: "Project imported:", proj_nao: "This file is not a project", proj_falha_guardar: "Warning: it could not be saved in this browser (storage full or private browsing). Export the project file so you do not lose it.",
-    fluxo_rot: "3D modelling flow", ainda_nao: "not yet", ou: "or",
+    fluxo_rot: "Physis 3D modelling flow", ainda_nao: "not yet", ou: "or",
     fluxo: [["arquivo", "Upload a file", ""], ["lugar", "Site or BIM models", "for land, buildings or mechanical parts"], ["montagem", "Assemblies", "if there are several parts"],
             ["pecas", "3D parts", ""], ["simulacao", "Simulation", ""], ["fila", "Print queue", ""], ["galeria", "Gallery", ""]],
     escolha_arquivo: "Choose a file.", grande: "File too large (20 MB maximum).", json_invalido: "The file is not valid JSON.", sem_hub: "No connection to the InovaSTEM server.",
@@ -1475,8 +1475,8 @@ def montar() -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>InovaSTEM · Modelagem 3D</title>
-<meta name="description" content="Modelagem 3D (Physis 3D) da InovaSTEM, aberta a qualquer assunto: enviar arquivo (foto para CAD 2D e 3D), lugar (GIS), modelos BIM (CAD e IFC), montagens, peças 3D, simulação por fenômeno, fila de impressão e galeria, com um projeto comum, no navegador. Versão beta.">
+<title>InovaSTEM · Modelagem Physis 3D</title>
+<meta name="description" content="Modelagem Physis 3D da InovaSTEM, aberta a qualquer assunto: enviar arquivo (foto para CAD 2D e 3D), lugar (GIS), modelos BIM (CAD e IFC), montagens, peças 3D, simulação por fenômeno, fila de impressão e galeria, com um projeto comum, no navegador. Versão beta.">
 <!-- GERADO por ferramentas/montar_lab_inovastem.py. Não edite aqui: edite os originais e rode o gerador. -->
 <script>(function(){{var r=document.documentElement,t=null,p=null;try{{p=JSON.parse(localStorage.getItem("physis-pref")||"null");t=p&&p.tema||localStorage.getItem("physis-pref-tema");}}catch(e){{}}if(t!=="claro"&&t!=="escuro"){{try{{t=matchMedia("(prefers-color-scheme: dark)").matches?"escuro":"claro";}}catch(e){{t="claro";}}}}r.setAttribute("data-tema",t);}})();</script>
 <style>
@@ -1493,18 +1493,18 @@ def montar() -> str:
       {logo.replace('href="#inicio"', 'href="/"')}
       <nav class="abas" aria-label="Seções do site" data-t-rot="nav"><ul>
         <li><a href="/#delas" class="delas" data-t="nav_delas">InovaSTEM Delas</a></li><li><a href="/#desafios" data-t="nav_desafios">Desafios e projetos</a></li>
-        <li><a href="/#forum" data-t="nav_forum">Fórum</a></li><li><a href="/#modelagem" aria-current="page" data-t="nav_modelagem">Modelagem 3D</a></li>
+        <li><a href="/#forum" data-t="nav_forum">Fórum</a></li><li><a href="/#modelagem" aria-current="page" data-t="nav_modelagem">Modelagem Physis 3D</a></li>
         <li><a href="/#hackathon" data-t="nav_hackathon">Hackathon</a></li><li><a href="/#materiais" data-t="nav_materiais">Materiais</a></li></ul></nav>
       <a class="botao" href="/#participar" data-t="inscreva">Inscreva-se</a>
     </div>
-    <p class="sub"><span data-t="sub">Modelagem 3D (Physis 3D) · roda no seu navegador</span> <span class="beta" data-t="beta">versão beta</span></p>
+    <p class="sub"><span data-t="sub">Modelagem Physis 3D · roda no seu navegador</span> <span class="beta" data-t="beta">versão beta</span></p>
   </div>
 </header>
 <main id="conteudo" class="in" tabindex="-1">
-  <h2 class="lab-intro" data-t="titulo">Modelagem 3D (Physis 3D)</h2>
+  <h2 class="lab-intro" data-t="titulo">Modelagem Physis 3D</h2>
   <p data-t="intro">A bancada de desenvolvimento da InovaSTEM, aberta a modelagens de qualquer assunto: subabas que leem e gravam um projeto comum, num fluxo do arquivo até a fila de impressão e a galeria.</p>
   <section class="lab-projeto" id="lab-proj" aria-label="Projeto comum" data-t-rot="proj_rot"></section>
-  <div class="lab-abas" id="lab-abas" role="tablist" aria-label="Subabas da Modelagem 3D" data-t-rot="abas_rot">
+  <div class="lab-abas" id="lab-abas" role="tablist" aria-label="Subabas da Modelagem Physis 3D" data-t-rot="abas_rot">
     {abas}
   </div>
   <p class="faixa" role="note" data-t="faixa">Em desenvolvimento (Fase 1). Pré-dimensionamento para aprender e testar ideias: não aprova projeto, não substitui norma nem ensaio. Os exemplos usam dados fictícios. O que você abre ou envia aqui fica no seu computador; só vai para o servidor da InovaSTEM quando você pede (pedir impressão, enviar peça à Biblioteca).</p>
