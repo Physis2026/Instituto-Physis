@@ -3666,6 +3666,7 @@ const T = {
     dt_ign: { texto: "textos e setas", traco_curto: "traços curtos", hachura: "hachuras" }, dt_nenhum: "Nenhum contorno fechado nesta vista.",
     dt_tipo: "Tipo", dt_forma: "Forma", dt_motivo: "Por quê", dt_circulo: "círculo", dt_retas: "retas", dt_arcos: "arcos",
     dt_motivos: { cota: "pequeno demais (seta ou cota)", texto: "quadro de texto", manual: "escolha sua", hachurada: "seção hachurada" },
+    dt_ampliada: "Imagem de baixa resolução: o recorte foi ampliado ×{f} antes da leitura. Se der, envie o arquivo original (PDF ou PNG maior).",
     dt_sem_eixo: "Para revolucionar, marque o eixo (2 pontos) ou use uma vista com a linha de centro.", dt_sem_perfil: "Nenhum contorno do tipo perfil: escolha o tipo na tabela de contornos.",
     dt_escala_cota: "Escala pela cota marcada", dt_escala_largura: "Escala pela largura final digitada", dt_celula: "célula", dt_eixo_ok: "eixo marcado", dt_eixo_achado: "linha de centro achada no desenho", dt_corpos: "corpos",
     dt_fase2: "Fase 2 (servidor, dezembro): fotos reais de peças por fotogrametria (COLMAP ou Meshroom) e IA de uma foto (TripoSR ou Depth Anything), depois de conferir a placa de vídeo do servidor e as licenças [MARCADOR].",
@@ -3714,6 +3715,8 @@ const T = {
     mo_o: "Junte várias peças numa montagem: posição, giro, material e cor por peça; confira colisões simples (pelas caixas de cada peça) e exporte o conjunto em STL ou em 3MF (uma peça por objeto, com a cor), ou peça a impressão.",
     mo_add_t: "Acrescentar peça", mo_de_proj: "Peça guardada no projeto", mo_de_aberta: "A peça aberta em Peças 3D", mo_de_bim: "O modelo de Modelos BIM (visível)", mo_de_teste: "Peça de teste",
     mo_de_arq: "Arquivo de malha (STL, OBJ ou 3MF)", mo_add: "Acrescentar", mo_sem_geo: "sem a geometria neste navegador (abra de novo em Peças 3D e guarde)", mo_nenhuma: "Nenhuma peça na montagem ainda.",
+    mo_restaurada: "Montagem recuperada deste navegador: {n} peças.", mo_grande: "Montagem grande demais para guardar neste navegador (mais de 150 MB de malha): exporte o 3MF para não perder.",
+    mo_sem_banco: "Este navegador não deixou guardar a montagem (janela anônima ou sem espaço): exporte o 3MF para não perder.",
     mo_lista: "Peças da montagem", mo_material: "Material", mo_cor: "Cor", mo_col_t: "Colisões (pelas caixas)", mo_col_ok: "Nenhuma peça cruza a caixa de outra.", mo_col: "cruzam as caixas",
     mo_col_nota: "Conferência simples, pelas caixas que envolvem cada peça: uma peça curva ou vazada pode aparecer cruzando sem cruzar de verdade.",
     mo_exp_t: "Exportar a montagem", mo_prog_t: "Programas de modelagem mecânica e de simulação mapeados",
@@ -3823,6 +3826,7 @@ const T = {
     dt_ign: { texto: "texts and arrows", traco_curto: "short lines", hachura: "hatching" }, dt_nenhum: "No closed outline in this view.",
     dt_tipo: "Type", dt_forma: "Shape", dt_motivo: "Why", dt_circulo: "circle", dt_retas: "lines", dt_arcos: "arcs",
     dt_motivos: { cota: "too small (arrow or dimension)", texto: "text block", manual: "your choice", hachurada: "hatched section" },
+    dt_ampliada: "Low-resolution image: the crop was enlarged ×{f} before reading. If you can, upload the original file (PDF or a larger PNG).",
     dt_sem_eixo: "To revolve, mark the axis (2 points) or use a view with a centre line.", dt_sem_perfil: "No outline of type profile: choose the type in the outline table.",
     dt_escala_cota: "Scale from the marked dimension", dt_escala_largura: "Scale from the typed final width", dt_celula: "cell", dt_eixo_ok: "axis marked", dt_eixo_achado: "centre line found in the drawing", dt_corpos: "bodies",
     dt_fase2: "Phase 2 (server, December): real photos of parts through photogrammetry (COLMAP or Meshroom) and single-photo AI (TripoSR or Depth Anything), after checking the server graphics card and the licences [MARCADOR].",
@@ -3867,6 +3871,8 @@ const T = {
     mo_o: "Put several parts together in an assembly: position, rotation, material and colour per part; check simple collisions (by each part's box) and export the whole as STL or 3MF (one object per part, with its colour), or request a print.",
     mo_add_t: "Add a part", mo_de_proj: "Part saved in the project", mo_de_aberta: "The part open in 3D parts", mo_de_bim: "The BIM models model (visible)", mo_de_teste: "Test part",
     mo_de_arq: "Mesh file (STL, OBJ or 3MF)", mo_add: "Add", mo_sem_geo: "without its geometry in this browser (open it again in 3D parts and save)", mo_nenhuma: "No parts in the assembly yet.",
+    mo_restaurada: "Assembly recovered from this browser: {n} parts.", mo_grande: "Assembly too large to keep in this browser (over 150 MB of mesh): export the 3MF so you do not lose it.",
+    mo_sem_banco: "This browser did not allow saving the assembly (private window or no space): export the 3MF so you do not lose it.",
     mo_lista: "Assembly parts", mo_material: "Material", mo_cor: "Colour", mo_col_t: "Collisions (by boxes)", mo_col_ok: "No part crosses another part's box.", mo_col: "boxes cross",
     mo_col_nota: "A simple check, using the box around each part: a curved or hollow part may show as crossing without really crossing.",
     mo_exp_t: "Export the assembly", mo_prog_t: "Mechanical modelling and simulation programs already mapped",
@@ -4474,10 +4480,18 @@ function processarArquivo() {
     if (!I || !window.PHYSIS3D) throw new Error(t("sem_modulos"));
     const J = janela(a), desenho = p.modo === "desenho" && !a.svg, res = desenho ? p.resDesenho : p.res;
     // desenho técnico: lê na resolução da própria imagem (traço fino some se diminuir); só reduz o que passar da resolução pedida
-    const k = desenho ? Math.min(1, res / Math.max(J.w, J.h)) : res / Math.max(J.w, J.h), nx = Math.max(2, Math.round(J.w * k)), ny = Math.max(2, Math.round(J.h * k));
-    const cv = document.createElement("canvas"); cv.width = nx; cv.height = ny;
-    const cx = cv.getContext("2d"); cx.fillStyle = "white"; cx.fillRect(0, 0, nx, ny); cx.drawImage(a.img, J.x, J.y, J.w, J.h, 0, 0, nx, ny);
-    const dados = cx.getImageData(0, 0, nx, ny).data;
+    let k = desenho ? Math.min(1, res / Math.max(J.w, J.h)) : res / Math.max(J.w, J.h), nx = Math.max(2, Math.round(J.w * k)), ny = Math.max(2, Math.round(J.h * k));
+    const ler = () => { const cv = document.createElement("canvas"); cv.width = nx; cv.height = ny;
+      const cx = cv.getContext("2d"); cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = "high";
+      cx.fillStyle = "white"; cx.fillRect(0, 0, nx, ny); cx.drawImage(a.img, J.x, J.y, J.w, J.h, 0, 0, nx, ny); return cx.getImageData(0, 0, nx, ny).data; };
+    let dados = ler(), ampliada = 1;
+    // baixa resolução (dona, 21/11/2026): traço com menos de 3 px some na leitura; amplia o recorte (até ×3, lado até 2400 px)
+    if (desenho && I.larguraTraco && I.cinza && I.otsu) {
+      const g = I.cinza(dados, nx * ny), L = p.auto ? I.otsu(g) : p.limiar, M = new Uint8Array(nx * ny);
+      for (let q = 0; q < nx * ny; q++) M[q] = (g[q] < L) !== !!p.inverter ? 1 : 0;
+      const s0 = I.larguraTraco(M, nx, ny), f = Math.min(3, Math.ceil(3 / Math.max(1, s0)), Math.floor(2400 / Math.max(nx, ny)));
+      if (s0 < 3 && f > 1) { k *= f; nx = Math.max(2, Math.round(J.w * k)); ny = Math.max(2, Math.round(J.h * k)); dados = ler(); ampliada = f; }
+    }
     // escala: pela cota (2 pontos e o valor em mm) ou pela largura final digitada
     const cota = p.cota && p.cota.mm > 0 ? Math.hypot(p.cota.q[0] - p.cota.p[0], p.cota.q[1] - p.cota.p[1]) : 0;
     const cel = cota > 0 ? p.cota.mm / (cota * k) : p.largura / nx;
@@ -4517,7 +4531,7 @@ function processarArquivo() {
     }
     if (!corpos.length) throw new Error(t("dt_sem_perfil"));
     const T = I.juntar(corpos), lacos = conts.filter(c => c.tipo !== "ignorado").map(c => c.laco);
-    a.r = { modo: "desenho", D, nx, ny, cel, conts, lacos, eixo, centro, corpos, T, med: PHYSIS3D.medir(T), larg: nx * cel, alt: ny * cel, J, k, porCota: cota > 0 };
+    a.r = { modo: "desenho", D, nx, ny, cel, conts, lacos, eixo, centro, corpos, T, med: PHYSIS3D.medir(T), larg: nx * cel, alt: ny * cel, J, k, porCota: cota > 0, ampliada };
   } catch (e) { a.r = { erro: String(e && e.message || e) }; }
 }
 function lerParametros() {
@@ -4643,6 +4657,7 @@ function telaArquivo() {
       <figure><figcaption>${escL(t("ar_cad"))} · ${r.modo === "desenho" ? escL(r.conts.filter(x => x.tipo !== "ignorado").length + " " + t("ar_contornos")) : r.lacos.length + " " + escL(t("ar_contornos"))}${a.svg ? "" : " · " + escL(t("ar_otsu")) + " " + Math.round(p.limiar)}</figcaption>${previa2d(r)}</figure>
       <figure><figcaption>${escL(t("ar_3d"))}</figcaption><div id="ar-vista" class="lab-vista-lugar"></div></figure></div>
     ${r.modo === "desenho" ? `<p><strong>${escL(resumoContornos(r))}</strong></p>${tabelaContornos(r)}
+      ${r.ampliada > 1 ? `<p class="faixa at" role="status">${escL(t("dt_ampliada").replace("{f}", r.ampliada))}</p>` : ""}
       <p class="t2 pq">${escL(t(r.porCota ? "dt_escala_cota" : "dt_escala_largura"))} · ${nf(r.cel, 4)} mm/${escL(t("dt_celula"))}${r.eixo ? " · " + escL(t(lab.arq.par.eixo ? "dt_eixo_ok" : "dt_eixo_achado")) : ""}${r.corpos ? " · " + r.corpos.length + " " + escL(t("dt_corpos")) : ""}</p>` : ""}
     ${tabela(t("ar_3d"), [[t("tamanho"), m.tamanho.map(v => nf(v, 1)).join(" × ") + " mm"], [t("volume"), nf(m.volume_mm3 / 1000, 2) + " cm³"],
       [t("triangulos"), nf(m.triangulos, 0)], r.modo === "desenho" ? [t("dt_corpos"), String(r.corpos.length)] : [t("ar_celulas"), nf(r.celulas, 0) + " " + t("ar_de") + " " + nf(r.nx * r.ny, 0) + " (" + r.nx + " × " + r.ny + ", " + nf(r.cel, 3) + " mm " + t("ar_cada") + ")"],
@@ -4885,13 +4900,52 @@ function exportarDe(E, fmt, pre, nomeBase) {
 /* ════════ 4. Montagens ════════ */
 function editorMo() {
   if (!edMo) edMo = window.PhysisModelagem.editor({ rotulo: t("mo_t"), ferramentas: ["selecionar", "mover", "girar", "escalar"],
-    aoMudar: () => { if (lab.lote) return; guardarMoNoProjeto(); if (abaLab === "montagem") desenharSemVista(); } });
+    aoMudar: () => { if (lab.lote) return; guardarMoNoProjeto(); guardarMoMalhas(); if (abaLab === "montagem") desenharSemVista(); } });
   return edMo;
 }
 function montagemAdd(item) {
   const E = editorMo(), c = window.PhysisImagem3D.caixaDe(item.T), dx = E.objetos.length ? (window.PhysisImagem3D.caixaDe(E.conjunto()).max[0] + 10 - c.min[0]) : 0;
   E.adicionar({ nome: item.nome, tipo: "malha", T: item.T, origem: item.origem || "", cor: item.cor || window.PhysisImagem3D.CORES_PECA[E.objetos.length % 7][3], material: item.material || "", pos: [dx, 0, -c.min[2]] });
   E._enq = false;
+}
+/* montagem guardada neste navegador (dona, 21/11/2026): as malhas não cabem no JSON do projeto, então vão para o IndexedDB
+   (só neste computador; nada vai para o servidor). Limite de 150 MB de malha; acima disso, avisa e pede o 3MF. */
+const MO_BANCO = "inovastem-lab", MO_LIMITE_BYTES = 150e6;
+function moBanco() {
+  return new Promise((ok, falha) => {
+    if (!window.indexedDB) { falha(new Error("indexedDB")); return; }
+    const r = indexedDB.open(MO_BANCO, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("montagem");
+    r.onsuccess = () => ok(r.result); r.onerror = () => falha(r.error || new Error("indexedDB"));
+  });
+}
+let moGuardarRel = null;
+function guardarMoMalhas() {
+  clearTimeout(moGuardarRel);
+  moGuardarRel = setTimeout(async () => {
+    if (!edMo) return;
+    const objs = edMo.objetos.filter(o => o.tipo === "malha" && o.T && o.T.length).map(o => ({ nome: o.nome, origem: o.origem || "", T: o.T,
+      pos: o.pos, rot: o.rot, esc: o.esc, cor: o.cor, material: o.material || "", visivel: o.visivel !== false }));
+    const bytes = objs.reduce((n, o) => n + o.T.length * 4, 0);
+    if (bytes > MO_LIMITE_BYTES) { lab.moMsg = { texto: t("mo_grande"), erro: true }; if (abaLab === "montagem") desenharSemVista(); return; }
+    try { const db = await moBanco(); db.transaction("montagem", "readwrite").objectStore("montagem").put({ objs, quando: agora() }, "atual"); }
+    catch (e) { lab.moMsg = { texto: t("mo_sem_banco"), erro: true }; if (abaLab === "montagem") desenharSemVista(); }
+  }, 400);
+}
+async function restaurarMontagem() {
+  try {
+    if (!window.PhysisModelagem) return;
+    const db = await moBanco();
+    const v = await new Promise(ok => { const q = db.transaction("montagem").objectStore("montagem").get("atual"); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); });
+    if (!v || !Array.isArray(v.objs) || !v.objs.length) return;
+    const E = editorMo(); if (E.objetos.length) return;
+    lab.lote = true;
+    try { v.objs.forEach(o => E.adicionar(Object.assign({ tipo: "malha" }, o, { T: o.T instanceof Float32Array ? o.T : Float32Array.from(o.T || []) }), true)); }
+    finally { lab.lote = false; }
+    E.sel = null; guardarMoNoProjeto();
+    lab.moMsg = { texto: t("mo_restaurada").replace("{n}", v.objs.length) };
+    if (desenhado) desenhar();
+  } catch (e) { /* sem IndexedDB (janela anônima, por exemplo): a montagem começa vazia, como antes */ }
 }
 function montagemItens() { const E = editorMo(); return E.solidos().map(o => ({ nome: o.nome, T: E.mundo(o), cor: o.cor, material: o.material ? nomeMat(o.material) : o.nome })); }
 function guardarMoNoProjeto() { if (!edMo) return; proj.montagem = { itens: edMo.objetos.map(o => ({ nome: o.nome, origem: o.origem, pos: o.pos, rot: o.rot, esc: o.esc, cor: o.cor, material: o.material || "" })), atualizado: agora() }; gravarProjeto(""); }
@@ -5491,7 +5545,7 @@ proj = lerProjeto();
 window.addEventListener("hashchange", irLab);
 irLab();
 if (proj.edificacao && proj.edificacao.objetos && window.PhysisModelagem) { editorBim().deJson(proj.edificacao.objetos); }
-if (proj.montagem && proj.montagem.itens && proj.montagem.itens.length) { /* as malhas da montagem não ficam no JSON: a lista volta vazia (exporte o 3MF para guardar) */ }
+restaurarMontagem();   // as malhas da montagem voltam do IndexedDB deste navegador
 </script>
 <script id="physis-preferencias">
 /* physis-preferencias.js v3 · Preferências de leitura e acessibilidade das telas da Physis

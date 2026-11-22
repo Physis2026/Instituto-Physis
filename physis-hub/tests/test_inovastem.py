@@ -1231,5 +1231,71 @@ class InglesNoNavegador(unittest.TestCase):
         self.assertEqual(self.sobra, {}, json.dumps(self.sobra, ensure_ascii=False, indent=1)[:6000])
 
 
+BAIXA_RES = r"""
+(async function () {
+  const espera = ms => new Promise(r => setTimeout(r, ms)), out = {};
+  try {
+    for (const pxmm of [6, 3]) {
+      const F = PhysisImagem3D.folhaSintetica(document, pxmm);
+      // a folha entra como canvas (fonte de imagem válida para o drawImage), sem esperar decodificar arquivo
+      lab.arq = { nome: "folha-" + pxmm + ".png", base: "folha", tipo: "image/png", tamanho: 0, fonte: "imagem", par: Object.assign({}, PAR_PADRAO), r: null, tipos: {},
+                  img: F.cv, w: F.cv.width, h: F.cv.height };
+      const P = lab.arq.par, ex = F.eixoPx.p[0], ey = (F.eixoPx.p[1] + F.eixoPx.q[1]) / 2;
+      P.modo = "desenho"; P.recorte = F.recorte; P.operacao = "revolucionar"; P.lado = "auto";
+      P.eixo = { p: F.eixoPx.p, q: F.eixoPx.q }; P.cota = { p: [ex, ey], q: [ex + F.bucha.rf * F.pxmm, ey], mm: F.bucha.rf };
+      processarArquivo();
+      const r = lab.arq.r;
+      out[pxmm] = r && r.med ? { volume: r.med.volume_mm3, esperado: F.volume, ampliada: r.ampliada } : { erro: r && r.erro };
+    }
+    document.getElementById("r-br").textContent = "RES:" + JSON.stringify(out);
+  } catch (e) { document.getElementById("r-br").textContent = "ERRO:" + (e && e.stack || e); }
+})();
+"""
+
+
+class DesenhoBaixaResolucao(unittest.TestCase):
+    """Folha sintética a 3 px/mm (metade da resolução): o laboratório amplia o recorte antes de ler e a revolução fica
+    dentro de ±3 % do volume analítico; a 6 px/mm continua dentro de ±2 % (dona, 21/11/2026)."""
+
+    @classmethod
+    def setUpClass(cls):
+        import html
+        import subprocess
+        nav = _navegador()
+        if not nav:
+            raise unittest.SkipTest("sem Edge, Chrome ou Chromium nesta máquina")
+        cls.tmp = tempfile.TemporaryDirectory()
+        pagina = Path(cls.tmp.name) / "lab-br.html"
+        h = ler(AQUI / "web" / "inovastem-lab.html").replace("</body>", '<pre id="r-br">rodando</pre><script>' + BAIXA_RES + "</script></body>", 1)
+        pagina.write_text(h, encoding="utf-8")
+        cmd = [nav, "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check", f"--user-data-dir={Path(cls.tmp.name) / 'perfil'}",
+               "--virtual-time-budget=60000", "--dump-dom", pagina.resolve().as_uri()]
+        try:
+            saida = subprocess.run(cmd, capture_output=True, timeout=240).stdout.decode("utf-8", errors="replace")
+        except (OSError, subprocess.TimeoutExpired) as e:
+            raise unittest.SkipTest(f"o navegador não rodou: {e}")
+        m = re.search(r'<pre id="r-br">(.*?)</pre>', saida, re.S)
+        texto = html.unescape(m.group(1)) if m else ""
+        if not texto.startswith("RES:"):
+            raise AssertionError("o teste não rodou: " + texto[:500])
+        cls.res = json.loads(texto[4:])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def erro(self, pxmm):
+        r = self.res[str(pxmm)]
+        self.assertNotIn("erro", r, r)
+        return abs(r["volume"] - r["esperado"]) / r["esperado"]
+
+    def test_resolucao_normal(self):
+        self.assertLess(self.erro(6), 0.02, self.res)
+
+    def test_baixa_resolucao_amplia_e_acerta(self):
+        self.assertGreater(self.res["3"]["ampliada"], 1, self.res)
+        self.assertLess(self.erro(3), 0.03, self.res)
+
+
 if __name__ == "__main__":
     unittest.main()
