@@ -1125,7 +1125,28 @@ def _navegador():
     cands = [os.environ.get("PHYSIS_NAVEGADOR", ""), r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
              r"C:\Program Files\Microsoft\Edge\Application\msedge.exe", r"C:\Program Files\Google\Chrome\Application\chrome.exe"]
     cands += [shutil.which(n) or "" for n in ("msedge", "google-chrome", "chromium", "chromium-browser", "chrome")]
-    return next((c for c in cands if c and Path(c).is_file()), None)
+    nav = next((c for c in cands if c and Path(c).is_file()), None)
+    return nav if nav and _navegador_responde(nav) else None
+
+
+_NAV_OK: dict = {}
+
+
+def _navegador_responde(nav: str) -> bool:
+    """O navegador sem tela roda JavaScript numa página mínima? (22/11/2026: com atualização do Edge pendente ele devolve
+    vazio até para isto; aí os testes de navegador são pulados com o motivo, em vez de acusar defeito que não é do código)."""
+    if nav not in _NAV_OK:
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmp:
+            pg = Path(tmp) / "ok.html"
+            pg.write_text('<!doctype html><pre id="r">x</pre><script>document.getElementById("r").textContent="NAV-OK"</script>', encoding="utf-8")
+            try:
+                out = subprocess.run([nav, "--headless=new", "--disable-gpu", "--no-first-run", f"--user-data-dir={Path(tmp) / 'p'}",
+                                      "--dump-dom", pg.resolve().as_uri()], capture_output=True, timeout=90).stdout
+            except (OSError, subprocess.TimeoutExpired):
+                out = b""
+        _NAV_OK[nav] = b"NAV-OK" in out
+    return _NAV_OK[nav]
 
 
 class DesenhoTecnicoNoNavegador(unittest.TestCase):
@@ -1139,7 +1160,7 @@ class DesenhoTecnicoNoNavegador(unittest.TestCase):
         import subprocess
         nav = _navegador()
         if not nav:
-            raise unittest.SkipTest("sem Edge, Chrome ou Chromium nesta máquina")
+            raise unittest.SkipTest("sem navegador sem tela que responda nesta máquina (Edge, Chrome ou Chromium; atualização do Edge pendente também impede)")
         cls.tmp = tempfile.TemporaryDirectory()
         pagina = Path(cls.tmp.name) / "autoteste.html"
         sis = RAIZ / "sistema"
@@ -1236,7 +1257,7 @@ class InglesNoNavegador(unittest.TestCase):
         import subprocess
         nav = _navegador()
         if not nav:
-            raise unittest.SkipTest("sem Edge, Chrome ou Chromium nesta máquina")
+            raise unittest.SkipTest("sem navegador sem tela que responda nesta máquina (Edge, Chrome ou Chromium; atualização do Edge pendente também impede)")
         cls.tmp = tempfile.TemporaryDirectory()
         pagina = Path(cls.tmp.name) / "lab-en.html"
         h = ler(AQUI / "web" / "inovastem-lab.html")
@@ -1295,7 +1316,7 @@ class DesenhoBaixaResolucao(unittest.TestCase):
         import subprocess
         nav = _navegador()
         if not nav:
-            raise unittest.SkipTest("sem Edge, Chrome ou Chromium nesta máquina")
+            raise unittest.SkipTest("sem navegador sem tela que responda nesta máquina (Edge, Chrome ou Chromium; atualização do Edge pendente também impede)")
         cls.tmp = tempfile.TemporaryDirectory()
         pagina = Path(cls.tmp.name) / "lab-br.html"
         h = ler(AQUI / "web" / "inovastem-lab.html").replace("</body>", '<pre id="r-br">rodando</pre><script>' + BAIXA_RES + "</script></body>", 1)
