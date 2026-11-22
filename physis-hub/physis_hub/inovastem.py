@@ -17,7 +17,7 @@ este módulo traz só o que é próprio da InovaSTEM:
 - Fila de impressão (Modelagem 3D, aprovada pela dona em 20/11/2026): participante com conta pede a impressão de uma peça
   da biblioteca do Physis 3D (id da peça, material, observação); a equipe aprova ou recusa (com motivo) e muda a situação
   (pendente → aprovada → imprimindo → pronta, ou recusada). O arquivo da peça é baixado pela rota do Physis 3D
-  (/api/3d/arquivo/<sha256>) e aberto LOCALMENTE no CrealityPrint ou no HALOT; o servidor e o navegador não chamam
+  (/api/3d/arquivo/<sha256>) e aberto LOCALMENTE no fatiador da impressora (filamento ou resina); o servidor e o navegador não chamam
   nenhum programa. O registro encadeado guarda só números e situações, nunca a conta de quem pediu.
 """
 from __future__ import annotations

@@ -308,8 +308,15 @@ const T = {
     // 7. fila
     fi_t: "Fila de impressão", fi_como_t: "Como funciona",
     fi_como: ["Com a sua conta, peça a impressão: de uma peça da Biblioteca do Physis 3D (sua ou publicada) ou de um arquivo gerado aqui no laboratório (STL ou 3MF de Enviar arquivo, Modelos BIM, Montagens ou Peças 3D).",
-      "A equipe aprova ou recusa (sempre com motivo) e muda a situação: pendente, aprovada, imprimindo, pronta.", "Na oficina, a equipe baixa o arquivo e abre no próprio computador, no CrealityPrint ou no HALOT."],
-    fi_nada: "Nada é instalado nem chamado pelo navegador: o arquivo só é baixado; quem abre o CrealityPrint ou o HALOT é a pessoa, no computador dela.",
+      "A equipe aprova ou recusa (sempre com motivo) e muda a situação: pendente, aprovada, imprimindo, pronta.", "Na oficina, a equipe baixa o arquivo e abre no fatiador da impressora (filamento ou resina), no próprio computador."],
+    im_t: "Conferência para imprimir (qualquer impressora)", im_fechada: "Malha fechada: cada aresta em exatamente 2 triângulos.",
+    im_aberta: "Malha com {n} arestas com problema: o fatiador pode recusar. Corrija em Modelos BIM ou no programa de origem.",
+    im_mesa: "Peça apoiada na mesa (z = 0), em mm.", im_apoiou: "(ajustado aqui: a peça flutuava)", im_tam: "Tamanho: {x} × {y} × {z} mm.",
+    im_sem_balanco: "Sem saliência acima de 45°: imprime sem suporte.", im_balanco: "Saliência acima de 45° em {p} % da área: pode precisar de suporte; tente girar a peça.",
+    im_grande: "Maior que a mesa de {l} mm: divida em partes com encaixe.", im_dividir: "Dividir para a mesa (até {l} mm, com encaixe)",
+    im_dividido: "Dividida em {n} partes, com {p} pinos de encaixe (furo com folga de 0,2 mm). Cortes sem encaixe (parede fina demais, colar): {s}.",
+    im_baixar_partes: "Baixar as partes (3MF)", im_sem_conf: "Não deu para conferir este arquivo aqui: a equipe confere no fatiador antes de imprimir.",
+    fi_nada: "Nada é instalado nem chamado pelo navegador: o arquivo só é baixado; quem abre o fatiador da impressora é a pessoa, no computador dela.",
     fi_impressoras: "Impressoras da oficina: [MARCADOR: modelos exatos das impressoras]. Materiais: os perfis de plástico reciclado do Physis 3D (valores \"conferir\").",
     fi_entre_t: "Entre com a sua conta", fi_entre: "Para pedir impressão, entre com a sua conta ou crie uma em Participar. O arquivo preparado continua aqui enquanto a página estiver aberta.",
     fi_entrar: "Entrar ou criar conta", fi_ja_entrei: "Já entrei: atualizar", fi_arq_t: "Arquivo do laboratório pronto para a fila", fi_arq_de: "vindo de", fi_arq_priv: "O arquivo vai só para o servidor da InovaSTEM, fica privado (só você e a equipe baixam), com limite de 20 MB; o servidor confere se é mesmo uma malha STL ou 3MF.",
@@ -461,8 +468,15 @@ const T = {
     si_reposto: "Example input restored.", si_sem_ex: "Examples not loaded.",
     fi_t: "Print queue", fi_como_t: "How it works",
     fi_como: ["With your account, request a print: of a part from the Physis 3D Library (yours or published) or of a file generated here in the lab (STL or 3MF from Upload a file, BIM models, Assemblies or 3D parts).",
-      "The team approves or rejects it (always with a reason) and updates its status: pending, approved, printing, ready.", "In the workshop, the team downloads the file and opens it on its own computer, in CrealityPrint or HALOT."],
-    fi_nada: "Nothing is installed or launched by the browser: the file is only downloaded; whoever opens CrealityPrint or HALOT does it on their own computer.",
+      "The team approves or rejects it (always with a reason) and updates its status: pending, approved, printing, ready.", "In the workshop, the team downloads the file and opens it in the printer's slicer (filament or resin), on its own computer."],
+    im_t: "Print check (any printer)", im_fechada: "Closed mesh: every edge in exactly 2 triangles.",
+    im_aberta: "Mesh with {n} problem edges: the slicer may refuse it. Fix it in BIM models or in the source program.",
+    im_mesa: "Part resting on the bed (z = 0), in mm.", im_apoiou: "(adjusted here: the part was floating)", im_tam: "Size: {x} × {y} × {z} mm.",
+    im_sem_balanco: "No overhang beyond 45°: prints without supports.", im_balanco: "Overhang beyond 45° on {p} % of the area: it may need supports; try rotating the part.",
+    im_grande: "Larger than the {l} mm bed: split it into parts with joints.", im_dividir: "Split for the bed (up to {l} mm, with joints)",
+    im_dividido: "Split into {n} parts with {p} alignment pins (hole with 0.2 mm clearance). Cuts without a joint (wall too thin, glue): {s}.",
+    im_baixar_partes: "Download the parts (3MF)", im_sem_conf: "This file could not be checked here: the team checks it in the slicer before printing.",
+    fi_nada: "Nothing is installed or launched by the browser: the file is only downloaded; whoever opens the printer's slicer does it on their own computer.",
     fi_impressoras: "Workshop printers: [MARCADOR: exact printer models]. Materials: the Physis 3D recycled-plastic profiles (values to be checked).",
     fi_entre_t: "Sign in with your account", fi_entre: "To request a print, sign in or create an account under Join. The prepared file stays here while the page is open.",
     fi_entrar: "Sign in or create an account", fi_ja_entrei: "I have signed in: refresh", fi_arq_t: "Lab file ready for the queue", fi_arq_de: "from", fi_arq_priv: "The file goes only to the InovaSTEM server and stays private (only you and the team can download it), with a 20 MB limit; the server checks that it really is an STL or 3MF mesh.",
@@ -604,13 +618,47 @@ function fluxoHtml() {
 function irPara(aba) { abaLab = aba; try { history.pushState(null, "", "#" + aba); } catch (e) {} aoEntrar(); desenhar(); }
 
 /* ════════ caminho único para a fila: qualquer STL/3MF gerado aqui vira "Pedir impressão" ════════ */
+function confImpressaoHtml(A) {
+  const c = A.conf, nfs = v => nf(v, 0);
+  if (!c) return `<p class="faixa at" role="note">${escL(t("im_sem_conf"))}</p>`;
+  const li = (ok, txt) => `<li>${ok ? "✓" : "⚠"} ${escL(txt)}</li>`, d = A.divisao;
+  return `<h4>${escL(t("im_t"))}</h4><ul class="lista">
+    ${li(c.fechada, c.fechada ? t("im_fechada") : t("im_aberta").replace("{n}", c.abertas + c.ruins))}
+    ${li(c.apoiada, t("im_mesa") + (A.apoiou ? " " + t("im_apoiou") : ""))}
+    ${li(!c.grande, t("im_tam").replace("{x}", nfs(c.tamanho[0])).replace("{y}", nfs(c.tamanho[1])).replace("{z}", nfs(c.tamanho[2])))}
+    ${li(c.balanco < 0.005, c.balanco < 0.005 ? t("im_sem_balanco") : t("im_balanco").replace("{p}", nf(100 * c.balanco, 0)))}</ul>
+    ${d ? `<p class="faixa in" role="status">${escL(t("im_dividido").replace("{n}", d.partes).replace("{p}", d.pinos).replace("{s}", d.semEncaixe))}</p>
+      <div class="acoes"><button class="botao sec" type="button" id="fa-partes" data-lab="fila-baixar-partes">${escL(t("im_baixar_partes"))}</button></div>`
+      : c.grande && A.T ? `<p class="faixa at" role="note">${escL(t("im_grande").replace("{l}", MESA_MM))}</p>
+      <div class="acoes"><button class="botao sec" type="button" id="fa-dividir" data-lab="fila-dividir">${escL(t("im_dividir").replace("{l}", MESA_MM))}</button></div>` : ""}`;
+}
+async function dividirFilaArq() {
+  const A = lab.filaArq, I = window.PhysisImagem3D; if (!A || !A.T) return;
+  const d = I.dividirParaMesa(A.T, { limite: MESA_MM }), base = A.nome.replace(/\.[^.]+$/, "");
+  const itens = d.partes.map((q, i) => ({ nome: base + "-parte-" + (i + 1), T: q.T, cor: I.CORES_PECA[i % I.CORES_PECA.length][3], material: "" }));
+  const z = I.escrever3MFMontagem(itens), bytes = z instanceof Blob ? new Uint8Array(await z.arrayBuffer()) : new Uint8Array(z.buffer || z);
+  const cs = d.partes.map(q => q.conf), conf = { fechada: cs.every(c => c.fechada), abertas: cs.reduce((n, c) => n + c.abertas, 0), ruins: cs.reduce((n, c) => n + c.ruins, 0),
+    apoiada: cs.every(c => c.apoiada), tamanho: [0, 1, 2].map(k => Math.max(...cs.map(c => c.tamanho[k]))), balanco: Math.max(...cs.map(c => c.balanco)), grande: cs.some(c => c.grande) };
+  lab.filaArq = { nome: base + "-partes.3mf", bytes, origem: A.origem, tamanho: bytes.length, T: null, conf, apoiou: false,
+                  divisao: { partes: d.partes.length, pinos: d.pinos, semEncaixe: d.semEncaixe } };
+  registrarPasso("fila", t("im_dividido").replace("{n}", d.partes.length).replace("{p}", d.pinos).replace("{s}", d.semEncaixe));
+}
 function pedirImpressaoDe(nome, dados, origem) {
-  const bytes = dados instanceof Uint8Array ? dados : new Uint8Array(dados);
-  lab.filaArq = { nome, bytes, origem, tamanho: bytes.length };
+  let bytes = dados instanceof Uint8Array ? dados : new Uint8Array(dados), T = null, conf = null, apoiou = false;
+  const I = window.PhysisImagem3D;
+  try {
+    T = PHYSIS3D.lerMalha(bytes.slice().buffer, nome); conf = I.conferirImpressao(T, MESA_MM);
+    if (!conf.apoiada && /\.stl$/i.test(nome)) { T = I.apoiarNaMesa(T); bytes = new Uint8Array(PHYSIS3D.escreverSTL(T, nome.replace(/\.stl$/i, "")));
+      conf = I.conferirImpressao(T, MESA_MM); apoiou = true; }
+  } catch (e) { T = null; conf = null; }
+  lab.filaArq = { nome, bytes, origem, tamanho: bytes.length, T, conf, apoiou, divisao: null };
   lab.filaMsg = null; registrarPasso("fila", (origem || "") + ": " + nome); gravarProjeto("");
   irPara("fila"); focar("fi-arq-h");
 }
-const stlDe = (T, nome) => new Uint8Array(PHYSIS3D.escreverSTL(T, nome));
+/* qualquer impressora (dona, 22/11/2026): STL binário em mm, malha conferida, peça apoiada na mesa (z = 0) */
+const MESA_MM = 200;
+const stlMesa = (T, nome) => PHYSIS3D.escreverSTL(window.PhysisImagem3D.apoiarNaMesa(T), nome);
+const stlDe = (T, nome) => new Uint8Array(stlMesa(T, nome));
 
 /* ════════ 1. Enviar arquivo: foto → CAD 2D → 3D (sistema/physis-imagem-3d.js + motor PHYSIS3D, sem mudar) ════════ */
 const RX_IMG = /\.(png|jpe?g|webp)$/i, RX_MALHA = /\.(stl|obj|3mf)$/i, RX_SVG = /\.svg$/i, RX_PDF = /\.pdf$/i, RX_CAD = /\.(dxf|ifc)$/i, RX_STEP = /\.(step|stp|iges|igs)$/i;
@@ -1120,7 +1168,7 @@ function exportarDe(E, fmt, pre, nomeBase) {
   if (fmt === "ifc") { baixar(nome + ".ifc", I.escreverIfc(sol.map(o => ({ nome: o.nome, descricao: o.ifcTipo || o.origem || "", T: E.mundo(o) })), nome), "application/x-step"); return { texto: t("baixado") }; }
   if (fmt === "montagem") { sol.forEach(o => montagemAdd({ nome: o.nome, T: E.mundo(o), origem: "bim", cor: o.cor })); irPara("montagem"); return "fica"; }
   const T = E.conjunto(ids);
-  if (fmt === "stl") { baixar(nome + ".stl", PHYSIS3D.escreverSTL(T, nome), "model/stl"); return { texto: t("baixado") }; }
+  if (fmt === "stl") { baixar(nome + ".stl", stlMesa(T, nome), "model/stl"); return { texto: t("baixado") }; }
   if (fmt === "3mf") { baixar(nome + ".3mf", pre === "mo" ? I.escrever3MFMontagem(montagemItens()) : PHYSIS3D.escrever3MF(T), "model/3mf"); return { texto: t("baixado") }; }
   if (fmt === "pecas") { abrirEmPecas(new File([stlDe(T, nome)], nome + ".stl", { type: "model/stl" }), t("abas")[pre === "mo" ? "montagem" : "edificacao"]); return "fica"; }
   if (fmt === "imp") { if (pre === "mo") pedirImpressaoDe(nome + ".3mf", I.escrever3MFMontagem(montagemItens()), t("abas").montagem); else pedirImpressaoDe(nome + ".stl", stlDe(T, nome), t("abas").edificacao); return "fica"; }
@@ -1448,7 +1496,7 @@ function telaFila() {
   const mats = (f && f.minhas && f.minhas.materiais) || ["rpetg", "rpp", "rhdpe", "rabs", "rpla"];
   const matSel = id => `<label for="${id}">${escL(t("fi_material"))}</label><select id="${id}"><option value="">${escL(t("fi_equipe_escolhe"))}</option>${mats.map(m => `<option value="${escL(m)}">${escL(nomeMat(m))}</option>`).join("")}</select>`;
   if (A) h += `<section class="cartao lab-pronto" aria-labelledby="fi-arq-h"><h3 id="fi-arq-h" tabindex="-1">${escL(t("fi_arq_t"))}</h3>
-    <p><strong>${escL(A.nome)}</strong> · ${nf(A.tamanho / 1024, 0)} kB · ${escL(t("fi_arq_de"))} ${escL(A.origem || "")}</p><p class="t2 pq">${escL(t("fi_arq_priv"))}</p>
+    <p><strong>${escL(A.nome)}</strong> · ${nf(A.tamanho / 1024, 0)} kB · ${escL(t("fi_arq_de"))} ${escL(A.origem || "")}</p><p class="t2 pq">${escL(t("fi_arq_priv"))}</p>${confImpressaoHtml(A)}
     ${f && f.inst && f.inst.autenticado ? `<form id="fila-arq-form" novalidate>${matSel("fa-mat")}<label for="fa-obs">${escL(t("fi_obs"))}</label><textarea id="fa-obs" maxlength="1000" rows="3"></textarea>
       <div class="acoes"><button class="botao" type="submit" id="fa-enviar">${escL(t("fi_arq_pedir"))}</button><button class="botao sec" type="button" id="fa-descartar" data-lab="fila-descartar">${escL(t("fi_arq_descartar"))}</button></div></form>` : ""}
     </section>`;
@@ -1632,6 +1680,8 @@ async function acao(a, b) {
   if (a === "sim-guardar" && fen) { estSim(fen).st.msg = guardarResultado(fen); return; }
   if (a === "fila-recarregar") { await carregarFila(); return; }
   if (a === "fila-descartar") { lab.filaArq = null; return; }
+  if (a === "fila-dividir") { await dividirFilaArq(); focar("fi-arq-h"); return; }
+  if (a === "fila-baixar-partes" && lab.filaArq) { baixar(lab.filaArq.nome, lab.filaArq.bytes, "model/3mf"); return; }
   if (a === "fila-estado") {
     const id = +b.getAttribute("data-id"), estado = b.getAttribute("data-estado"), mot = document.getElementById("fe-mot-" + id);
     const r = await postJ("/api/inovastem/impressao/estado", { id, estado, motivo: mot ? mot.value : "" });
@@ -1653,7 +1703,7 @@ async function acao(a, b) {
     const r = lab.arq.r, nome = lab.arq.base;
     if (a === "arq-svg") baixar(nome + "-cad.svg", PhysisImagem3D.svg(r.lacos, r.larg, r.alt), "image/svg+xml");
     if (a === "arq-dxf") baixar(nome + "-cad.dxf", PhysisImagem3D.dxf(r.lacos), "application/dxf");
-    if (a === "arq-stl") baixar(nome + ".stl", PHYSIS3D.escreverSTL(r.T, nome), "model/stl");
+    if (a === "arq-stl") baixar(nome + ".stl", stlMesa(r.T, nome), "model/stl");
     if (a === "arq-3mf") baixar(nome + ".3mf", PHYSIS3D.escrever3MF(r.T), "model/3mf");
     if (a === "arq-enviar") { abrirEmPecas(new File([stlDe(r.T, nome)], nome + ".stl", { type: "model/stl" }), t("ar_t")); return "fica"; }
     if (a === "arq-imp") { pedirImpressaoDe(nome + ".stl", stlDe(r.T, nome), t("ar_t")); return "fica"; }
@@ -1671,7 +1721,7 @@ async function acao(a, b) {
     lab.arqMsg = { texto: t("baixado") }; return;
   }
   if (a === "teste-baixar" || a === "teste-abrir" || a === "teste-imp") { const tp = testesProntos().filter(x => x.id === b.getAttribute("data-id"))[0]; if (!tp) return;
-    if (a === "teste-baixar") { baixar(tp.id + ".stl", PHYSIS3D.escreverSTL(tp.T, tp.id), "model/stl"); return; }
+    if (a === "teste-baixar") { baixar(tp.id + ".stl", stlMesa(tp.T, tp.id), "model/stl"); return; }
     if (a === "teste-imp") { pedirImpressaoDe(tp.id + ".stl", stlDe(tp.T, tp.id), t("tp_t")); return "fica"; }
     abrirEmPecas(new File([stlDe(tp.T, tp.id)], tp.id + ".stl", { type: "model/stl" }), t("tp_t")); return "fica"; }
   // ferramentas e painéis dos editores (Modelos BIM: bim-*, Montagens: mo-*)

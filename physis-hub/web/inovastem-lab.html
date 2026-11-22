@@ -3113,6 +3113,181 @@ function corpos(T) {
   for (let i = 0; i < T.length; i += 9) { const a = raiz(no(i)), b = raiz(no(i + 3)), c = raiz(no(i + 6)); pai[b] = a; pai[raiz(c)] = a; }
   return new Set(pai.map((_, i) => raiz(i))).size;
 }
+/* ════════ impressão em qualquer impressora (dona, 22/11/2026): apoiar na mesa e dividir com encaixe ════════
+   "somente garantir que todas as impressoras consigam imprimir os documentos gerados": STL binário em mm, malha fechada,
+   peça apoiada em z = 0 e, acima do limite da mesa (200 mm por padrão), dividida em planos com encaixe de pino e furo.
+   Só geometria: nada de marca de impressora nem de fatiador. */
+function apoiarNaMesa(T) {
+  if (!T || !T.length) return T;
+  let zmin = Infinity; for (let i = 2; i < T.length; i += 3) if (T[i] < zmin) zmin = T[i];
+  if (!isFinite(zmin) || Math.abs(zmin) < 1e-9) return T;
+  const U = Float32Array.from(T); for (let i = 2; i < U.length; i += 3) U[i] -= zmin; return U;
+}
+/* arestas: cada aresta em exatamente 2 triângulos, em sentidos opostos (o que todo fatiador espera) */
+/* vértices numa grade de 0,001 mm: fecha costuras de quase-duplicados (revolução, escala em float) antes de cortar e conferir */
+function soldar(T) { const U = new Float32Array(T.length); for (let i = 0; i < T.length; i++) U[i] = Math.round(T[i] * 1000) / 1000; return U; }
+function arestas(T) {
+  const r = x => Math.round(x * 1000), k = i => r(T[i]) + "," + r(T[i + 1]) + "," + r(T[i + 2]), m = new Map();
+  for (let i = 0; i < T.length; i += 9) { const v = [k(i), k(i + 3), k(i + 6)];
+    for (let j = 0; j < 3; j++) { const a = v[j], b = v[(j + 1) % 3]; if (a === b) continue; const s = a < b ? a + "|" + b : b + "|" + a;
+      const e = m.get(s) || [0, 0]; e[a < b ? 0 : 1]++; m.set(s, e); } }
+  let abertas = 0, ruins = 0; m.forEach(([p, q]) => { if (p + q === 1) abertas++; else if (p !== 1 || q !== 1) ruins++; });
+  return { total: m.size, abertas, ruins, fechada: abertas === 0 && ruins === 0 };
+}
+/* conferência para imprimir: malha fechada, apoiada, tamanho e quanto da área fica em balanço acima de 45° */
+function conferirImpressao(T, limite) {
+  limite = limite || 200;
+  const c = caixaDe(T), tam = [c.max[0] - c.min[0], c.max[1] - c.min[1], c.max[2] - c.min[2]], a = arestas(T);
+  let area = 0, bal = 0; const cos45 = Math.cos(Math.PI / 4);
+  for (let i = 0; i < T.length; i += 9) {
+    const ux = T[i + 3] - T[i], uy = T[i + 4] - T[i + 1], uz = T[i + 5] - T[i + 2], vx = T[i + 6] - T[i], vy = T[i + 7] - T[i + 1], vz = T[i + 8] - T[i + 2];
+    const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx, s = Math.hypot(nx, ny, nz); if (!(s > 0)) continue;
+    area += s / 2; const zb = Math.min(T[i + 2], T[i + 5], T[i + 8]) - c.min[2];
+    if (nz / s < -cos45 - 1e-9 && zb > 0.05) bal += s / 2;          // virada para baixo, mais deitada que 45°, fora da mesa
+  }
+  return { fechada: a.fechada, abertas: a.abertas, ruins: a.ruins, tamanho: tam, apoiada: Math.abs(c.min[2]) < 1e-6,
+           balanco: area > 0 ? bal / area : 0, grande: Math.max(tam[0], tam[1], tam[2]) > limite + 1e-6, limite };
+}
+/* corta a malha no plano eixo = c: a parte de baixo, a de cima e os segmentos do corte (em 2D, nos outros dois eixos, em ordem cíclica) */
+const EIXOS_2D = [[1, 2], [2, 0], [0, 1]];
+function cortarPlano(T, ax, c) {
+  const baixo = [], cima = [], segs = [], [u, v] = EIXOS_2D[ax];
+  const ponto = (P, Q) => { const a = P[ax] - c, b = Q[ax] - c; const [A, B, ta, tb] = (P[0] < Q[0] || (P[0] === Q[0] && (P[1] < Q[1] || (P[1] === Q[1] && P[2] <= Q[2])))) ? [P, Q, a, b] : [Q, P, b, a];
+    const t = ta / (ta - tb); const r = [A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, A[2] + (B[2] - A[2]) * t]; r[ax] = c; return r; };
+  const pol = (out, L) => { for (let k = 1; k + 1 < L.length; k++) out.push(...L[0], ...L[k], ...L[k + 1]); };
+  for (let i = 0; i < T.length; i += 9) {
+    const V = [[T[i], T[i + 1], T[i + 2]], [T[i + 3], T[i + 4], T[i + 5]], [T[i + 6], T[i + 7], T[i + 8]]], d = V.map(p => p[ax] - c);
+    if (d[0] <= 0 && d[1] <= 0 && d[2] <= 0) { baixo.push(...V[0], ...V[1], ...V[2]); continue; }
+    if (d[0] >= 0 && d[1] >= 0 && d[2] >= 0) { cima.push(...V[0], ...V[1], ...V[2]); continue; }
+    const B = [], C = [], X = [];
+    for (let j = 0; j < 3; j++) { const P = V[j], Q = V[(j + 1) % 3], dp = d[j], dq = d[(j + 1) % 3];
+      if (dp <= 0) B.push(P); if (dp >= 0) C.push(P);
+      if ((dp < 0 && dq > 0) || (dp > 0 && dq < 0)) { const r = ponto(P, Q); B.push(r); C.push(r); X.push(r); } }
+    pol(baixo, B); pol(cima, C);
+    if (X.length === 2) segs.push([[X[0][u], X[0][v]], [X[1][u], X[1][v]]]);
+  }
+  return { baixo, cima, segs };
+}
+/* segmentos do corte → laços fechados (2D) */
+function lacosDosSegmentos(segs) {
+  const ch = p => p[0].toFixed(5) + "," + p[1].toFixed(5), viz = new Map(), pt = new Map();
+  segs.forEach(([a, b]) => { const ka = ch(a), kb = ch(b); if (ka === kb) return; pt.set(ka, a); pt.set(kb, b);
+    (viz.get(ka) || viz.set(ka, []).get(ka)).push(kb); (viz.get(kb) || viz.set(kb, []).get(kb)).push(ka); });
+  const usado = new Set(), lacos = [], ar = (a, b) => (a < b ? a + "|" + b : b + "|" + a);
+  viz.forEach((_, ini) => {
+    const l = [ini]; let ant = null, atual = ini;
+    for (let guarda = 0; guarda < 1e6; guarda++) {
+      const prox = (viz.get(atual) || []).find(n => n !== ant && !usado.has(ar(atual, n)));
+      if (!prox) break; usado.add(ar(atual, prox)); if (prox === ini) { lacos.push(l.map(k => pt.get(k))); break; }
+      l.push(prox); ant = atual; atual = prox;
+    }
+  });
+  return lacos.filter(l => l.length >= 3);
+}
+/* tampa (laços com furos) no plano eixo = c; normal para +eixo (sentido 1) ou -eixo (-1) */
+function tampa(out, grupos, ax, c, sentido) {
+  const [u, v] = EIXOS_2D[ax], P3 = p => { const r = [0, 0, 0]; r[u] = p[0]; r[v] = p[1]; r[ax] = c; return r; };
+  grupos.forEach(g => orelhas(costurar(g.l, g.furos)).forEach(([a, b, d]) => {
+    const A = P3(a), B = P3(b), D = P3(d); if (sentido > 0) out.push(...A, ...B, ...D); else out.push(...A, ...D, ...B); }));
+}
+/* ponto dentro da malha fechada (raio inclinado, conta cruzamentos) */
+function dentroMalha(T, p) {
+  const d = [0.5773, 0.6131, 0.5397]; let n = 0;
+  for (let i = 0; i < T.length; i += 9) {
+    const ax = T[i], ay = T[i + 1], az = T[i + 2], e1 = [T[i + 3] - ax, T[i + 4] - ay, T[i + 5] - az], e2 = [T[i + 6] - ax, T[i + 7] - ay, T[i + 8] - az];
+    const h = [d[1] * e2[2] - d[2] * e2[1], d[2] * e2[0] - d[0] * e2[2], d[0] * e2[1] - d[1] * e2[0]], det = e1[0] * h[0] + e1[1] * h[1] + e1[2] * h[2];
+    if (Math.abs(det) < 1e-12) continue; const f = 1 / det, s = [p[0] - ax, p[1] - ay, p[2] - az], uu = f * (s[0] * h[0] + s[1] * h[1] + s[2] * h[2]);
+    if (uu < 0 || uu > 1) continue; const q = [s[1] * e1[2] - s[2] * e1[1], s[2] * e1[0] - s[0] * e1[2], s[0] * e1[1] - s[1] * e1[0]], vv = f * (d[0] * q[0] + d[1] * q[1] + d[2] * q[2]);
+    if (vv < 0 || uu + vv > 1) continue; if (f * (e2[0] * q[0] + e2[1] * q[1] + e2[2] * q[2]) > 1e-9) n++;
+  }
+  return n % 2 === 1;
+}
+/* círculo (2D) com n lados; sentido horário = furo na tampa */
+const circ2 = (cx, cy, r, n, horario) => { const l = []; for (let k = 0; k < n; k++) { const a = 2 * Math.PI * k / n * (horario ? -1 : 1); l.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return l; };
+/* parede de cilindro entre z0 e z1 no eixo ax; fora = normal para fora do eixo do cilindro (pino) ou para dentro (furo) */
+function paredeCil(out, ax, l, z0, z1, fora) {
+  const [u, v] = EIXOS_2D[ax], P3 = (p, z) => { const r = [0, 0, 0]; r[u] = p[0]; r[v] = p[1]; r[ax] = z; return r; };
+  for (let k = 0; k < l.length; k++) { const p = l[k], q = l[(k + 1) % l.length], a = P3(p, z0), b = P3(q, z0), c = P3(q, z1), d = P3(p, z1);
+    if (fora) out.push(...a, ...b, ...c, ...a, ...c, ...d); else out.push(...a, ...c, ...b, ...a, ...d, ...c); }
+}
+/* lugares para o pino: dentro do maior contorno, longe das bordas e dos furos; o furo correspondente cabe inteiro na parte de cima */
+function lugaresDoPino(grupos, r, cima, ax, c, prof) {
+  if (!grupos.length) return [];
+  const g = grupos.slice().sort((a, b) => Math.abs(area2(b.l)) - Math.abs(area2(a.l)))[0], todos = [g.l].concat(g.furos);
+  const distBorda = p => { let m = Infinity; todos.forEach(l => l.forEach((a, i) => { const b = l[(i + 1) % l.length], dx = b[0] - a[0], dy = b[1] - a[1], L = dx * dx + dy * dy;
+    const t = L > 0 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L)) : 0; m = Math.min(m, Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dy)); })); return m; };
+  const [u, v] = EIXOS_2D[ax], noMaterial = (p, z) => { const q = [0, 0, 0]; q[u] = p[0]; q[v] = p[1]; q[ax] = z; return dentroMalha(cima, q); };
+  const xs = g.l.map(p => p[0]), ys = g.l.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), cand = [];
+  for (let i = 1; i < 12; i++) for (let j = 1; j < 12; j++) { const p = [x0 + (x1 - x0) * i / 12, y0 + (y1 - y0) * j / 12];
+    if (!dentro(p, g.l) || g.furos.some(f => dentro(p, f))) continue; const db = distBorda(p); if (db < r + 2) continue;
+    // o furo (com folga) tem de ficar inteiro dentro do material da parte de cima, até o fundo
+    const ok = [0.4, prof * 0.5, prof + 0.4].every(z => [[0, 0], [r + 1, 0], [-(r + 1), 0], [0, r + 1], [0, -(r + 1)]].every(([a, b]) => noMaterial([p[0] + a, p[1] + b], c + z)));
+    if (ok) cand.push({ p, db }); }
+  if (!cand.length) return [];
+  cand.sort((a, b) => b.db - a.db);
+  const um = cand[0].p; let dois = null, melhor = 0;
+  cand.forEach(q => { const d = Math.hypot(q.p[0] - um[0], q.p[1] - um[1]); if (d > melhor && d > 4 * r) { melhor = d; dois = q.p; } });
+  return dois ? [um, dois] : [um];
+}
+/* corta a parte em c e põe o encaixe: pino na de baixo (sai pela tampa) e furo com folga na de cima */
+function cortarComEncaixe(T, ax, c, op) {
+  const folga = op.folga, n = 32;
+  const { baixo, cima, segs } = cortarPlano(T, ax, c), grupos = agrupar(lacosDosSegmentos(segs));
+  // pino de 6 mm; em parede fina, 4 mm e depois 3 mm (Ø × altura); sem lugar seguro, o corte fica sem encaixe (colar)
+  let r = op.raio, h = op.altura, pinos = [];
+  if (op.encaixe !== false) for (const [rr, hh] of [[op.raio, op.altura], [2, 5], [1.5, 4]]) {
+    if (rr > op.raio) continue; pinos = lugaresDoPino(grupos, rr + folga, Float32Array.from(cima), ax, c, hh + 0.5); if (pinos.length) { r = rr; h = hh; break; } }
+  const gB = grupos.map(g => ({ l: g.l, furos: g.furos.slice() })), gC = grupos.map(g => ({ l: g.l, furos: g.furos.slice() }));
+  pinos.forEach(p => {
+    const dono = (gs) => gs.find(g => dentro(p, g.l)) || gs[0];
+    const lb = circ2(p[0], p[1], r, n, true), lc = circ2(p[0], p[1], r + folga, n, true);
+    dono(gB).furos.push(lb); dono(gC).furos.push(lc);
+    paredeCil(baixo, ax, lb.slice().reverse(), c, c + h, true);           // pino: parede para fora e topo
+    tampa(baixo, [{ l: lb.slice().reverse(), furos: [] }], ax, c + h, 1);
+    paredeCil(cima, ax, lc.slice().reverse(), c, c + h + 0.5, false);     // furo: parede para dentro e fundo virado para o furo
+    tampa(cima, [{ l: lc.slice().reverse(), furos: [] }], ax, c + h + 0.5, -1);
+  });
+  tampa(baixo, gB, ax, c, 1); tampa(cima, gC, ax, c, -1);
+  return { baixo: new Float32Array(baixo), cima: new Float32Array(cima), pinos: pinos.length, raio: pinos.length ? r : 0, laços: grupos.length };
+}
+/* solda feita: tira os triângulos com vértice repetido (lascas de corte perto de outro corte); os vizinhos fecham a malha */
+function semDegenerados(T) {
+  const o = [], igual = (i, j) => T[i] === T[j] && T[i + 1] === T[j + 1] && T[i + 2] === T[j + 2];
+  for (let i = 0; i < T.length; i += 9) { if (igual(i, i + 3) || igual(i + 3, i + 6) || igual(i, i + 6)) continue; for (let k = 0; k < 9; k++) o.push(T[i + k]); }
+  return new Float32Array(o);
+}
+/* divide em planos até cada parte caber no limite (mm), com encaixe em cada corte; as partes vão para a mesa (z = 0), lado a lado */
+function dividirParaMesa(T, op) {
+  op = Object.assign({ limite: 200, raio: 3, altura: 6, folga: 0.2, encaixe: true, vao: 10, afastar: 0.3 }, op || {});
+  let partes = [{ T: soldar(T), nome: "parte" }], cortes = 0, pinos = 0, semEncaixe = 0;
+  for (let ax = 0; ax < 3; ax++) {
+    const novas = [];
+    partes.forEach(pt => {
+      const cx = caixaDe(pt.T), L = cx.max[ax] - cx.min[ax]; if (L <= op.limite + 1e-6) { novas.push(pt); return; }
+      // o pino sai pela tampa: cada parte precisa caber com ele (limite menos a altura do pino e 1 mm de sobra)
+      // o plano anda no máximo ±janela em volta do ideal (para longe dos vértices): também entra na conta do limite
+      const janela = 5, util = (op.encaixe === false ? op.limite : op.limite - op.altura - 1) - 2 * janela, k = Math.ceil(L / Math.max(util, op.limite / 2));
+      let resto = pt.T;
+      for (let i = 1; i < k; i++) {
+        // no meio do maior vão entre vértices perto do ideal: longe deles, o corte não vira fatia fina (tangente a furo, costura)
+        const ideal = cx.min[ax] + L * i / k, zs = [ideal - janela, ideal + janela];
+        for (let j = ax; j < resto.length; j += 3) { const z = resto[j]; if (z > ideal - janela && z < ideal + janela) zs.push(z); }
+        zs.sort((x, y) => x - y); let c = ideal, vao = -1;
+        for (let j = 1; j < zs.length; j++) { const g = zs[j] - zs[j - 1], m = (zs[j] + zs[j - 1]) / 2; if (g - Math.abs(m - ideal) * 0.02 > vao) { vao = g - Math.abs(m - ideal) * 0.02; c = m; } }
+        const r = cortarComEncaixe(resto, ax, c, op); cortes++; pinos += r.pinos; if (!r.pinos) semEncaixe++;
+        novas.push({ T: r.baixo, nome: "parte" }); resto = r.cima;
+      }
+      novas.push({ T: resto, nome: "parte" });
+    });
+    partes = novas;
+  }
+  // cada parte na mesa (z = 0), lado a lado no eixo x com um vão entre elas
+  partes = partes.filter(pt => pt.T.length >= 9 * 4);   // fatia sem peça (canto vazio da caixa) não vira parte
+  let x = 0; partes = partes.map((pt, i) => { const cx = caixaDe(pt.T), U = semDegenerados(soldar(pt.T));
+    for (let j = 0; j < U.length; j += 3) { U[j] += x - cx.min[0]; U[j + 2] -= cx.min[2]; } x += cx.max[0] - cx.min[0] + op.vao;
+    return { T: U, nome: "parte-" + (i + 1), conf: conferirImpressao(U, op.limite) }; });
+  return { partes, cortes, pinos, semEncaixe, limite: op.limite };
+}
 /* folha sintética de desenho técnico para os testes: meia-seção de uma bucha com flange (cotas conhecidas, hachura a 45°,
    linha de centro de traço e ponto, linhas de cota com setas e textos) e um quadro de notas. pxmm = pixels por mm. */
 function folhaSintetica(doc, pxmm) {
@@ -3295,13 +3470,26 @@ function autoteste() {
   const cf = ajustarCirculo(PRIM.circulo(30, 40)[0].map(p => [p[0] + 5, p[1] - 3]));
   ok("círculo por mínimos quadrados: centro e raio", Math.abs(cf.cx - 5) < 1e-6 && Math.abs(cf.cy + 3) < 1e-6 && Math.abs(cf.r - 15) < 1e-6);
   ok("IFC4 com IfcTriangulatedFaceSet", /FILE_SCHEMA\(\('IFC4'\)\)/.test(ifc) && ifc.indexOf("IFCTRIANGULATEDFACESET") > 0 && ifc.indexOf("IFCBUILDINGELEMENTPROXY") > 0);
+  // qualquer impressora (dona, 22/11/2026): apoiar na mesa, conferir a malha e dividir acima de 200 mm com encaixe
+  { const fl = transformar(extrudar(PRIM.retangulo(30, 20), 10), [0, 0, 25], [0, 0, 0], 1, [0, 0, 0]), ap = apoiarNaMesa(fl);
+    ok("peça flutuando vai para a mesa (z mínimo = 0)", Math.abs(caixaDe(ap).min[2]) < 1e-9 && !conferirImpressao(fl).apoiada && conferirImpressao(ap).apoiada); }
+  { const cx = extrudar(PRIM.retangulo(20, 20), 20), furado = cx.slice(9), c1 = conferirImpressao(cx), c2 = conferirImpressao(furado);
+    ok("conferência acusa malha aberta (sem um triângulo)", c1.fechada && !c2.fechada && c2.abertas === 3); }
+  { const barra = extrudar(PRIM.retangulo(300, 40), 40), d = dividirParaMesa(barra), v = d.partes.reduce((n, q) => n + (P ? P.medir(q.T).volume_mm3 : 0), 0);
+    ok("barra de 300 mm: 2 partes até 200 mm, fechadas, apoiadas, com pinos", d.partes.length === 2 && d.pinos >= 1 && d.partes.every(q => q.conf.fechada && q.conf.apoiada && !q.conf.grande));
+    ok("divisão conserva o volume (±0,1 %)", !P || Math.abs(v - 300 * 40 * 40) / (300 * 40 * 40) < 0.001, v); }
+  { const tf = testeFolha(document), grande = transformar(tf.T, [0, 0, 0], [0, 0, 0], 6, [0, 0, 0]), d = dividirParaMesa(grande, { limite: 100 });
+    ok("bucha revolucionada de 360 mm em partes de até 100 mm: todas fechadas, dentro do limite; encaixe em pelo menos 90 % dos cortes", d.partes.length >= 30 && d.partes.every(q => q.conf.fechada && !q.conf.grande && q.T.length > 0) && d.semEncaixe <= 0.1 * d.cortes, d.partes.length + " partes, " + d.semEncaixe + " cortes sem encaixe (canto fino)"); }
+  { const tubo = extrudar(PRIM.circulo(80, 48).concat([PRIM.circulo(60, 48)[0].reverse()]), 450), d = dividirParaMesa(tubo);
+    ok("tubo de parede de 10 mm: pino menor no encaixe", d.pinos >= 2 && d.semEncaixe === 0 && d.partes.every(q => q.conf.fechada)); }
   return r;
 }
 
 window.PhysisImagem3D = { mascara, contornos, svg, dxf, relevo, campoDeAlturas, testes, autoteste, cinza, suavizar, otsu, limpar, processarFoto,
   extrudar, PRIM, lerDxf, caixaDe, transformar, juntar, colisoes, escrever3MFMontagem, escreverIfc, CORES_PECA,
   rotular8, larguraTraco, morfo, afinar, tracarEsqueleto, ajustarCirculo, primitivas, recortarLaco, lerDesenho, lacosDaRegiao, revolver,
-  padraoCircular, corpos, folhaSintetica, testeFolha, versao: "physis-imagem-3d-0.3" };
+  padraoCircular, corpos, folhaSintetica, testeFolha, apoiarNaMesa, soldar, arestas, conferirImpressao, cortarPlano, dentroMalha, dividirParaMesa,
+  versao: "physis-imagem-3d-0.4" };
 })();
 </script>
 <script id="lab-modelagem">
@@ -3745,8 +3933,15 @@ const T = {
     // 7. fila
     fi_t: "Fila de impressão", fi_como_t: "Como funciona",
     fi_como: ["Com a sua conta, peça a impressão: de uma peça da Biblioteca do Physis 3D (sua ou publicada) ou de um arquivo gerado aqui no laboratório (STL ou 3MF de Enviar arquivo, Modelos BIM, Montagens ou Peças 3D).",
-      "A equipe aprova ou recusa (sempre com motivo) e muda a situação: pendente, aprovada, imprimindo, pronta.", "Na oficina, a equipe baixa o arquivo e abre no próprio computador, no CrealityPrint ou no HALOT."],
-    fi_nada: "Nada é instalado nem chamado pelo navegador: o arquivo só é baixado; quem abre o CrealityPrint ou o HALOT é a pessoa, no computador dela.",
+      "A equipe aprova ou recusa (sempre com motivo) e muda a situação: pendente, aprovada, imprimindo, pronta.", "Na oficina, a equipe baixa o arquivo e abre no fatiador da impressora (filamento ou resina), no próprio computador."],
+    im_t: "Conferência para imprimir (qualquer impressora)", im_fechada: "Malha fechada: cada aresta em exatamente 2 triângulos.",
+    im_aberta: "Malha com {n} arestas com problema: o fatiador pode recusar. Corrija em Modelos BIM ou no programa de origem.",
+    im_mesa: "Peça apoiada na mesa (z = 0), em mm.", im_apoiou: "(ajustado aqui: a peça flutuava)", im_tam: "Tamanho: {x} × {y} × {z} mm.",
+    im_sem_balanco: "Sem saliência acima de 45°: imprime sem suporte.", im_balanco: "Saliência acima de 45° em {p} % da área: pode precisar de suporte; tente girar a peça.",
+    im_grande: "Maior que a mesa de {l} mm: divida em partes com encaixe.", im_dividir: "Dividir para a mesa (até {l} mm, com encaixe)",
+    im_dividido: "Dividida em {n} partes, com {p} pinos de encaixe (furo com folga de 0,2 mm). Cortes sem encaixe (parede fina demais, colar): {s}.",
+    im_baixar_partes: "Baixar as partes (3MF)", im_sem_conf: "Não deu para conferir este arquivo aqui: a equipe confere no fatiador antes de imprimir.",
+    fi_nada: "Nada é instalado nem chamado pelo navegador: o arquivo só é baixado; quem abre o fatiador da impressora é a pessoa, no computador dela.",
     fi_impressoras: "Impressoras da oficina: [MARCADOR: modelos exatos das impressoras]. Materiais: os perfis de plástico reciclado do Physis 3D (valores \"conferir\").",
     fi_entre_t: "Entre com a sua conta", fi_entre: "Para pedir impressão, entre com a sua conta ou crie uma em Participar. O arquivo preparado continua aqui enquanto a página estiver aberta.",
     fi_entrar: "Entrar ou criar conta", fi_ja_entrei: "Já entrei: atualizar", fi_arq_t: "Arquivo do laboratório pronto para a fila", fi_arq_de: "vindo de", fi_arq_priv: "O arquivo vai só para o servidor da InovaSTEM, fica privado (só você e a equipe baixam), com limite de 20 MB; o servidor confere se é mesmo uma malha STL ou 3MF.",
@@ -3898,8 +4093,15 @@ const T = {
     si_reposto: "Example input restored.", si_sem_ex: "Examples not loaded.",
     fi_t: "Print queue", fi_como_t: "How it works",
     fi_como: ["With your account, request a print: of a part from the Physis 3D Library (yours or published) or of a file generated here in the lab (STL or 3MF from Upload a file, BIM models, Assemblies or 3D parts).",
-      "The team approves or rejects it (always with a reason) and updates its status: pending, approved, printing, ready.", "In the workshop, the team downloads the file and opens it on its own computer, in CrealityPrint or HALOT."],
-    fi_nada: "Nothing is installed or launched by the browser: the file is only downloaded; whoever opens CrealityPrint or HALOT does it on their own computer.",
+      "The team approves or rejects it (always with a reason) and updates its status: pending, approved, printing, ready.", "In the workshop, the team downloads the file and opens it in the printer's slicer (filament or resin), on its own computer."],
+    im_t: "Print check (any printer)", im_fechada: "Closed mesh: every edge in exactly 2 triangles.",
+    im_aberta: "Mesh with {n} problem edges: the slicer may refuse it. Fix it in BIM models or in the source program.",
+    im_mesa: "Part resting on the bed (z = 0), in mm.", im_apoiou: "(adjusted here: the part was floating)", im_tam: "Size: {x} × {y} × {z} mm.",
+    im_sem_balanco: "No overhang beyond 45°: prints without supports.", im_balanco: "Overhang beyond 45° on {p} % of the area: it may need supports; try rotating the part.",
+    im_grande: "Larger than the {l} mm bed: split it into parts with joints.", im_dividir: "Split for the bed (up to {l} mm, with joints)",
+    im_dividido: "Split into {n} parts with {p} alignment pins (hole with 0.2 mm clearance). Cuts without a joint (wall too thin, glue): {s}.",
+    im_baixar_partes: "Download the parts (3MF)", im_sem_conf: "This file could not be checked here: the team checks it in the slicer before printing.",
+    fi_nada: "Nothing is installed or launched by the browser: the file is only downloaded; whoever opens the printer's slicer does it on their own computer.",
     fi_impressoras: "Workshop printers: [MARCADOR: exact printer models]. Materials: the Physis 3D recycled-plastic profiles (values to be checked).",
     fi_entre_t: "Sign in with your account", fi_entre: "To request a print, sign in or create an account under Join. The prepared file stays here while the page is open.",
     fi_entrar: "Sign in or create an account", fi_ja_entrei: "I have signed in: refresh", fi_arq_t: "Lab file ready for the queue", fi_arq_de: "from", fi_arq_priv: "The file goes only to the InovaSTEM server and stays private (only you and the team can download it), with a 20 MB limit; the server checks that it really is an STL or 3MF mesh.",
@@ -4376,13 +4578,47 @@ function fluxoHtml() {
 function irPara(aba) { abaLab = aba; try { history.pushState(null, "", "#" + aba); } catch (e) {} aoEntrar(); desenhar(); }
 
 /* ════════ caminho único para a fila: qualquer STL/3MF gerado aqui vira "Pedir impressão" ════════ */
+function confImpressaoHtml(A) {
+  const c = A.conf, nfs = v => nf(v, 0);
+  if (!c) return `<p class="faixa at" role="note">${escL(t("im_sem_conf"))}</p>`;
+  const li = (ok, txt) => `<li>${ok ? "✓" : "⚠"} ${escL(txt)}</li>`, d = A.divisao;
+  return `<h4>${escL(t("im_t"))}</h4><ul class="lista">
+    ${li(c.fechada, c.fechada ? t("im_fechada") : t("im_aberta").replace("{n}", c.abertas + c.ruins))}
+    ${li(c.apoiada, t("im_mesa") + (A.apoiou ? " " + t("im_apoiou") : ""))}
+    ${li(!c.grande, t("im_tam").replace("{x}", nfs(c.tamanho[0])).replace("{y}", nfs(c.tamanho[1])).replace("{z}", nfs(c.tamanho[2])))}
+    ${li(c.balanco < 0.005, c.balanco < 0.005 ? t("im_sem_balanco") : t("im_balanco").replace("{p}", nf(100 * c.balanco, 0)))}</ul>
+    ${d ? `<p class="faixa in" role="status">${escL(t("im_dividido").replace("{n}", d.partes).replace("{p}", d.pinos).replace("{s}", d.semEncaixe))}</p>
+      <div class="acoes"><button class="botao sec" type="button" id="fa-partes" data-lab="fila-baixar-partes">${escL(t("im_baixar_partes"))}</button></div>`
+      : c.grande && A.T ? `<p class="faixa at" role="note">${escL(t("im_grande").replace("{l}", MESA_MM))}</p>
+      <div class="acoes"><button class="botao sec" type="button" id="fa-dividir" data-lab="fila-dividir">${escL(t("im_dividir").replace("{l}", MESA_MM))}</button></div>` : ""}`;
+}
+async function dividirFilaArq() {
+  const A = lab.filaArq, I = window.PhysisImagem3D; if (!A || !A.T) return;
+  const d = I.dividirParaMesa(A.T, { limite: MESA_MM }), base = A.nome.replace(/\.[^.]+$/, "");
+  const itens = d.partes.map((q, i) => ({ nome: base + "-parte-" + (i + 1), T: q.T, cor: I.CORES_PECA[i % I.CORES_PECA.length][3], material: "" }));
+  const z = I.escrever3MFMontagem(itens), bytes = z instanceof Blob ? new Uint8Array(await z.arrayBuffer()) : new Uint8Array(z.buffer || z);
+  const cs = d.partes.map(q => q.conf), conf = { fechada: cs.every(c => c.fechada), abertas: cs.reduce((n, c) => n + c.abertas, 0), ruins: cs.reduce((n, c) => n + c.ruins, 0),
+    apoiada: cs.every(c => c.apoiada), tamanho: [0, 1, 2].map(k => Math.max(...cs.map(c => c.tamanho[k]))), balanco: Math.max(...cs.map(c => c.balanco)), grande: cs.some(c => c.grande) };
+  lab.filaArq = { nome: base + "-partes.3mf", bytes, origem: A.origem, tamanho: bytes.length, T: null, conf, apoiou: false,
+                  divisao: { partes: d.partes.length, pinos: d.pinos, semEncaixe: d.semEncaixe } };
+  registrarPasso("fila", t("im_dividido").replace("{n}", d.partes.length).replace("{p}", d.pinos).replace("{s}", d.semEncaixe));
+}
 function pedirImpressaoDe(nome, dados, origem) {
-  const bytes = dados instanceof Uint8Array ? dados : new Uint8Array(dados);
-  lab.filaArq = { nome, bytes, origem, tamanho: bytes.length };
+  let bytes = dados instanceof Uint8Array ? dados : new Uint8Array(dados), T = null, conf = null, apoiou = false;
+  const I = window.PhysisImagem3D;
+  try {
+    T = PHYSIS3D.lerMalha(bytes.slice().buffer, nome); conf = I.conferirImpressao(T, MESA_MM);
+    if (!conf.apoiada && /\.stl$/i.test(nome)) { T = I.apoiarNaMesa(T); bytes = new Uint8Array(PHYSIS3D.escreverSTL(T, nome.replace(/\.stl$/i, "")));
+      conf = I.conferirImpressao(T, MESA_MM); apoiou = true; }
+  } catch (e) { T = null; conf = null; }
+  lab.filaArq = { nome, bytes, origem, tamanho: bytes.length, T, conf, apoiou, divisao: null };
   lab.filaMsg = null; registrarPasso("fila", (origem || "") + ": " + nome); gravarProjeto("");
   irPara("fila"); focar("fi-arq-h");
 }
-const stlDe = (T, nome) => new Uint8Array(PHYSIS3D.escreverSTL(T, nome));
+/* qualquer impressora (dona, 22/11/2026): STL binário em mm, malha conferida, peça apoiada na mesa (z = 0) */
+const MESA_MM = 200;
+const stlMesa = (T, nome) => PHYSIS3D.escreverSTL(window.PhysisImagem3D.apoiarNaMesa(T), nome);
+const stlDe = (T, nome) => new Uint8Array(stlMesa(T, nome));
 
 /* ════════ 1. Enviar arquivo: foto → CAD 2D → 3D (sistema/physis-imagem-3d.js + motor PHYSIS3D, sem mudar) ════════ */
 const RX_IMG = /\.(png|jpe?g|webp)$/i, RX_MALHA = /\.(stl|obj|3mf)$/i, RX_SVG = /\.svg$/i, RX_PDF = /\.pdf$/i, RX_CAD = /\.(dxf|ifc)$/i, RX_STEP = /\.(step|stp|iges|igs)$/i;
@@ -4892,7 +5128,7 @@ function exportarDe(E, fmt, pre, nomeBase) {
   if (fmt === "ifc") { baixar(nome + ".ifc", I.escreverIfc(sol.map(o => ({ nome: o.nome, descricao: o.ifcTipo || o.origem || "", T: E.mundo(o) })), nome), "application/x-step"); return { texto: t("baixado") }; }
   if (fmt === "montagem") { sol.forEach(o => montagemAdd({ nome: o.nome, T: E.mundo(o), origem: "bim", cor: o.cor })); irPara("montagem"); return "fica"; }
   const T = E.conjunto(ids);
-  if (fmt === "stl") { baixar(nome + ".stl", PHYSIS3D.escreverSTL(T, nome), "model/stl"); return { texto: t("baixado") }; }
+  if (fmt === "stl") { baixar(nome + ".stl", stlMesa(T, nome), "model/stl"); return { texto: t("baixado") }; }
   if (fmt === "3mf") { baixar(nome + ".3mf", pre === "mo" ? I.escrever3MFMontagem(montagemItens()) : PHYSIS3D.escrever3MF(T), "model/3mf"); return { texto: t("baixado") }; }
   if (fmt === "pecas") { abrirEmPecas(new File([stlDe(T, nome)], nome + ".stl", { type: "model/stl" }), t("abas")[pre === "mo" ? "montagem" : "edificacao"]); return "fica"; }
   if (fmt === "imp") { if (pre === "mo") pedirImpressaoDe(nome + ".3mf", I.escrever3MFMontagem(montagemItens()), t("abas").montagem); else pedirImpressaoDe(nome + ".stl", stlDe(T, nome), t("abas").edificacao); return "fica"; }
@@ -5220,7 +5456,7 @@ function telaFila() {
   const mats = (f && f.minhas && f.minhas.materiais) || ["rpetg", "rpp", "rhdpe", "rabs", "rpla"];
   const matSel = id => `<label for="${id}">${escL(t("fi_material"))}</label><select id="${id}"><option value="">${escL(t("fi_equipe_escolhe"))}</option>${mats.map(m => `<option value="${escL(m)}">${escL(nomeMat(m))}</option>`).join("")}</select>`;
   if (A) h += `<section class="cartao lab-pronto" aria-labelledby="fi-arq-h"><h3 id="fi-arq-h" tabindex="-1">${escL(t("fi_arq_t"))}</h3>
-    <p><strong>${escL(A.nome)}</strong> · ${nf(A.tamanho / 1024, 0)} kB · ${escL(t("fi_arq_de"))} ${escL(A.origem || "")}</p><p class="t2 pq">${escL(t("fi_arq_priv"))}</p>
+    <p><strong>${escL(A.nome)}</strong> · ${nf(A.tamanho / 1024, 0)} kB · ${escL(t("fi_arq_de"))} ${escL(A.origem || "")}</p><p class="t2 pq">${escL(t("fi_arq_priv"))}</p>${confImpressaoHtml(A)}
     ${f && f.inst && f.inst.autenticado ? `<form id="fila-arq-form" novalidate>${matSel("fa-mat")}<label for="fa-obs">${escL(t("fi_obs"))}</label><textarea id="fa-obs" maxlength="1000" rows="3"></textarea>
       <div class="acoes"><button class="botao" type="submit" id="fa-enviar">${escL(t("fi_arq_pedir"))}</button><button class="botao sec" type="button" id="fa-descartar" data-lab="fila-descartar">${escL(t("fi_arq_descartar"))}</button></div></form>` : ""}
     </section>`;
@@ -5404,6 +5640,8 @@ async function acao(a, b) {
   if (a === "sim-guardar" && fen) { estSim(fen).st.msg = guardarResultado(fen); return; }
   if (a === "fila-recarregar") { await carregarFila(); return; }
   if (a === "fila-descartar") { lab.filaArq = null; return; }
+  if (a === "fila-dividir") { await dividirFilaArq(); focar("fi-arq-h"); return; }
+  if (a === "fila-baixar-partes" && lab.filaArq) { baixar(lab.filaArq.nome, lab.filaArq.bytes, "model/3mf"); return; }
   if (a === "fila-estado") {
     const id = +b.getAttribute("data-id"), estado = b.getAttribute("data-estado"), mot = document.getElementById("fe-mot-" + id);
     const r = await postJ("/api/inovastem/impressao/estado", { id, estado, motivo: mot ? mot.value : "" });
@@ -5425,7 +5663,7 @@ async function acao(a, b) {
     const r = lab.arq.r, nome = lab.arq.base;
     if (a === "arq-svg") baixar(nome + "-cad.svg", PhysisImagem3D.svg(r.lacos, r.larg, r.alt), "image/svg+xml");
     if (a === "arq-dxf") baixar(nome + "-cad.dxf", PhysisImagem3D.dxf(r.lacos), "application/dxf");
-    if (a === "arq-stl") baixar(nome + ".stl", PHYSIS3D.escreverSTL(r.T, nome), "model/stl");
+    if (a === "arq-stl") baixar(nome + ".stl", stlMesa(r.T, nome), "model/stl");
     if (a === "arq-3mf") baixar(nome + ".3mf", PHYSIS3D.escrever3MF(r.T), "model/3mf");
     if (a === "arq-enviar") { abrirEmPecas(new File([stlDe(r.T, nome)], nome + ".stl", { type: "model/stl" }), t("ar_t")); return "fica"; }
     if (a === "arq-imp") { pedirImpressaoDe(nome + ".stl", stlDe(r.T, nome), t("ar_t")); return "fica"; }
@@ -5443,7 +5681,7 @@ async function acao(a, b) {
     lab.arqMsg = { texto: t("baixado") }; return;
   }
   if (a === "teste-baixar" || a === "teste-abrir" || a === "teste-imp") { const tp = testesProntos().filter(x => x.id === b.getAttribute("data-id"))[0]; if (!tp) return;
-    if (a === "teste-baixar") { baixar(tp.id + ".stl", PHYSIS3D.escreverSTL(tp.T, tp.id), "model/stl"); return; }
+    if (a === "teste-baixar") { baixar(tp.id + ".stl", stlMesa(tp.T, tp.id), "model/stl"); return; }
     if (a === "teste-imp") { pedirImpressaoDe(tp.id + ".stl", stlDe(tp.T, tp.id), t("tp_t")); return "fica"; }
     abrirEmPecas(new File([stlDe(tp.T, tp.id)], tp.id + ".stl", { type: "model/stl" }), t("tp_t")); return "fica"; }
   // ferramentas e painéis dos editores (Modelos BIM: bim-*, Montagens: mo-*)

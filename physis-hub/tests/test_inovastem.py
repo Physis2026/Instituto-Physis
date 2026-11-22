@@ -476,6 +476,26 @@ class Laboratorio(unittest.TestCase):
             m = re.search(rf'<script id="{ident}">\n(.*?)</script>', self.h, re.S)
             self.assertEqual(m.group(1), ler(arq).replace("\r\n", "\n"), ident)
 
+    def test_qualquer_impressora_sem_marcas(self):
+        # dona, 22/11/2026: "retirar menção direta com creality ou outros do sistema, somente garantir que todas as impressoras
+        # consigam imprimir os documentos gerados"
+        marcas = r"(?i)creality|halot|anycubic|elegoo|bambu ?lab|flashforge|formlabs|chitubox"
+        for arq in ("web/inovastem.html", "web/inovastem-lab.html", "physis_hub/inovastem.py", "docs/INOVASTEM.md"):
+            self.assertNotRegex((AQUI / arq).read_text(encoding="utf-8"), marcas, arq)
+        self.assertIn("fatiador da impressora", self.h)
+        # todo STL que sai do laboratório vai apoiado na mesa (z = 0), binário, em mm; nada de escreverSTL direto num download
+        self.assertIn("const stlMesa = (T, nome) => PHYSIS3D.escreverSTL(window.PhysisImagem3D.apoiarNaMesa(T), nome);", self.h)
+        casca = re.search(r'<script id="lab-inovastem">\n(.*?)</script>', self.h, re.S).group(1)
+        self.assertNotRegex(casca, r"baixar\([^;]*PHYSIS3D\.escreverSTL\(")
+        # a fila confere a malha (fechada, apoiada, tamanho, saliência) e divide acima da mesa de 200 mm com encaixe
+        for k in ("const MESA_MM = 200;", "function confImpressaoHtml(A)", 'data-lab="fila-dividir"', "I.dividirParaMesa(A.T, { limite: MESA_MM })",
+                  "I.conferirImpressao(T, MESA_MM)", "im_dividido:", "im_balanco:"):
+            self.assertIn(k, self.h, k)
+        mod = (AQUI.parent / "sistema" / "physis-imagem-3d.js").read_text(encoding="utf-8")
+        for k in ("function dividirParaMesa(", "function conferirImpressao(", "function apoiarNaMesa(", "function cortarComEncaixe(",
+                  "barra de 300 mm: 2 partes até 200 mm, fechadas, apoiadas, com pinos", "divisão conserva o volume"):
+            self.assertIn(k, mod, k)
+
     def test_bot_de_modelagem_pela_fonte(self):
         # dona, 22/11/2026 ("Sim, pela fonte"): o bot entra pelo gerador, cópia exata do original, no topo da página
         # (fora das subabas), troca de idioma com a página e o sincronizar regera o laboratório quando um original muda
@@ -763,7 +783,7 @@ class FilaImpressaoRotas(unittest.TestCase):
         self.assertEqual(st, 409, r)
         st, r = self.pedir("POST", "/api/inovastem/impressao/estado", {"id": iid, "estado": "aprovada"}, self.dir)
         self.assertEqual((st, r.get("estado")), (200, "aprovada"), r)
-        # o arquivo baixa pela rota do Physis 3D, com sessão (para abrir localmente no CrealityPrint ou no HALOT)
+        # o arquivo baixa pela rota do Physis 3D, com sessão (para abrir localmente no fatiador da impressora)
         item = next(x for x in f["itens"] if x["id"] == iid)
         req = urllib.request.Request(f"http://127.0.0.1:{self.porta}{item['arquivo_url']}", headers={"Cookie": self.dir[0]})
         with urllib.request.urlopen(req, timeout=30) as resp:
@@ -928,7 +948,7 @@ class Modelagem3D(unittest.TestCase):
         for rota in ("/api/inovastem/impressao/minhas", "/api/inovastem/impressao/fila", "/api/inovastem/impressao/estado",
                      '"/api/inovastem/impressao"', "/api/publico/3d/pecas", "/api/publico/3d/arquivo/", "/api/3d/pecas", "X-Physis-CSRF"):
             self.assertIn(rota, self.js, rota)
-        for k in ("CrealityPrint", "HALOT", "Nada é instalado nem chamado pelo navegador", "[MARCADOR: modelos exatos das impressoras]",
+        for k in ("fatiador da impressora", "Nada é instalado nem chamado pelo navegador", "[MARCADOR: modelos exatos das impressoras]",
                   "Todos os direitos reservados", "moderação", "STL", "OBJ", "/api/inovastem/impressao/arquivo", "X-Physis-Nome"):
             self.assertIn(k, self.js, k)
         from physis_hub import impressao3d as m3

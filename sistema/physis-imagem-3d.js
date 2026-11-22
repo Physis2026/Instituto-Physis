@@ -694,6 +694,181 @@ function corpos(T) {
   for (let i = 0; i < T.length; i += 9) { const a = raiz(no(i)), b = raiz(no(i + 3)), c = raiz(no(i + 6)); pai[b] = a; pai[raiz(c)] = a; }
   return new Set(pai.map((_, i) => raiz(i))).size;
 }
+/* ════════ impressão em qualquer impressora (dona, 22/11/2026): apoiar na mesa e dividir com encaixe ════════
+   "somente garantir que todas as impressoras consigam imprimir os documentos gerados": STL binário em mm, malha fechada,
+   peça apoiada em z = 0 e, acima do limite da mesa (200 mm por padrão), dividida em planos com encaixe de pino e furo.
+   Só geometria: nada de marca de impressora nem de fatiador. */
+function apoiarNaMesa(T) {
+  if (!T || !T.length) return T;
+  let zmin = Infinity; for (let i = 2; i < T.length; i += 3) if (T[i] < zmin) zmin = T[i];
+  if (!isFinite(zmin) || Math.abs(zmin) < 1e-9) return T;
+  const U = Float32Array.from(T); for (let i = 2; i < U.length; i += 3) U[i] -= zmin; return U;
+}
+/* arestas: cada aresta em exatamente 2 triângulos, em sentidos opostos (o que todo fatiador espera) */
+/* vértices numa grade de 0,001 mm: fecha costuras de quase-duplicados (revolução, escala em float) antes de cortar e conferir */
+function soldar(T) { const U = new Float32Array(T.length); for (let i = 0; i < T.length; i++) U[i] = Math.round(T[i] * 1000) / 1000; return U; }
+function arestas(T) {
+  const r = x => Math.round(x * 1000), k = i => r(T[i]) + "," + r(T[i + 1]) + "," + r(T[i + 2]), m = new Map();
+  for (let i = 0; i < T.length; i += 9) { const v = [k(i), k(i + 3), k(i + 6)];
+    for (let j = 0; j < 3; j++) { const a = v[j], b = v[(j + 1) % 3]; if (a === b) continue; const s = a < b ? a + "|" + b : b + "|" + a;
+      const e = m.get(s) || [0, 0]; e[a < b ? 0 : 1]++; m.set(s, e); } }
+  let abertas = 0, ruins = 0; m.forEach(([p, q]) => { if (p + q === 1) abertas++; else if (p !== 1 || q !== 1) ruins++; });
+  return { total: m.size, abertas, ruins, fechada: abertas === 0 && ruins === 0 };
+}
+/* conferência para imprimir: malha fechada, apoiada, tamanho e quanto da área fica em balanço acima de 45° */
+function conferirImpressao(T, limite) {
+  limite = limite || 200;
+  const c = caixaDe(T), tam = [c.max[0] - c.min[0], c.max[1] - c.min[1], c.max[2] - c.min[2]], a = arestas(T);
+  let area = 0, bal = 0; const cos45 = Math.cos(Math.PI / 4);
+  for (let i = 0; i < T.length; i += 9) {
+    const ux = T[i + 3] - T[i], uy = T[i + 4] - T[i + 1], uz = T[i + 5] - T[i + 2], vx = T[i + 6] - T[i], vy = T[i + 7] - T[i + 1], vz = T[i + 8] - T[i + 2];
+    const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx, s = Math.hypot(nx, ny, nz); if (!(s > 0)) continue;
+    area += s / 2; const zb = Math.min(T[i + 2], T[i + 5], T[i + 8]) - c.min[2];
+    if (nz / s < -cos45 - 1e-9 && zb > 0.05) bal += s / 2;          // virada para baixo, mais deitada que 45°, fora da mesa
+  }
+  return { fechada: a.fechada, abertas: a.abertas, ruins: a.ruins, tamanho: tam, apoiada: Math.abs(c.min[2]) < 1e-6,
+           balanco: area > 0 ? bal / area : 0, grande: Math.max(tam[0], tam[1], tam[2]) > limite + 1e-6, limite };
+}
+/* corta a malha no plano eixo = c: a parte de baixo, a de cima e os segmentos do corte (em 2D, nos outros dois eixos, em ordem cíclica) */
+const EIXOS_2D = [[1, 2], [2, 0], [0, 1]];
+function cortarPlano(T, ax, c) {
+  const baixo = [], cima = [], segs = [], [u, v] = EIXOS_2D[ax];
+  const ponto = (P, Q) => { const a = P[ax] - c, b = Q[ax] - c; const [A, B, ta, tb] = (P[0] < Q[0] || (P[0] === Q[0] && (P[1] < Q[1] || (P[1] === Q[1] && P[2] <= Q[2])))) ? [P, Q, a, b] : [Q, P, b, a];
+    const t = ta / (ta - tb); const r = [A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, A[2] + (B[2] - A[2]) * t]; r[ax] = c; return r; };
+  const pol = (out, L) => { for (let k = 1; k + 1 < L.length; k++) out.push(...L[0], ...L[k], ...L[k + 1]); };
+  for (let i = 0; i < T.length; i += 9) {
+    const V = [[T[i], T[i + 1], T[i + 2]], [T[i + 3], T[i + 4], T[i + 5]], [T[i + 6], T[i + 7], T[i + 8]]], d = V.map(p => p[ax] - c);
+    if (d[0] <= 0 && d[1] <= 0 && d[2] <= 0) { baixo.push(...V[0], ...V[1], ...V[2]); continue; }
+    if (d[0] >= 0 && d[1] >= 0 && d[2] >= 0) { cima.push(...V[0], ...V[1], ...V[2]); continue; }
+    const B = [], C = [], X = [];
+    for (let j = 0; j < 3; j++) { const P = V[j], Q = V[(j + 1) % 3], dp = d[j], dq = d[(j + 1) % 3];
+      if (dp <= 0) B.push(P); if (dp >= 0) C.push(P);
+      if ((dp < 0 && dq > 0) || (dp > 0 && dq < 0)) { const r = ponto(P, Q); B.push(r); C.push(r); X.push(r); } }
+    pol(baixo, B); pol(cima, C);
+    if (X.length === 2) segs.push([[X[0][u], X[0][v]], [X[1][u], X[1][v]]]);
+  }
+  return { baixo, cima, segs };
+}
+/* segmentos do corte → laços fechados (2D) */
+function lacosDosSegmentos(segs) {
+  const ch = p => p[0].toFixed(5) + "," + p[1].toFixed(5), viz = new Map(), pt = new Map();
+  segs.forEach(([a, b]) => { const ka = ch(a), kb = ch(b); if (ka === kb) return; pt.set(ka, a); pt.set(kb, b);
+    (viz.get(ka) || viz.set(ka, []).get(ka)).push(kb); (viz.get(kb) || viz.set(kb, []).get(kb)).push(ka); });
+  const usado = new Set(), lacos = [], ar = (a, b) => (a < b ? a + "|" + b : b + "|" + a);
+  viz.forEach((_, ini) => {
+    const l = [ini]; let ant = null, atual = ini;
+    for (let guarda = 0; guarda < 1e6; guarda++) {
+      const prox = (viz.get(atual) || []).find(n => n !== ant && !usado.has(ar(atual, n)));
+      if (!prox) break; usado.add(ar(atual, prox)); if (prox === ini) { lacos.push(l.map(k => pt.get(k))); break; }
+      l.push(prox); ant = atual; atual = prox;
+    }
+  });
+  return lacos.filter(l => l.length >= 3);
+}
+/* tampa (laços com furos) no plano eixo = c; normal para +eixo (sentido 1) ou -eixo (-1) */
+function tampa(out, grupos, ax, c, sentido) {
+  const [u, v] = EIXOS_2D[ax], P3 = p => { const r = [0, 0, 0]; r[u] = p[0]; r[v] = p[1]; r[ax] = c; return r; };
+  grupos.forEach(g => orelhas(costurar(g.l, g.furos)).forEach(([a, b, d]) => {
+    const A = P3(a), B = P3(b), D = P3(d); if (sentido > 0) out.push(...A, ...B, ...D); else out.push(...A, ...D, ...B); }));
+}
+/* ponto dentro da malha fechada (raio inclinado, conta cruzamentos) */
+function dentroMalha(T, p) {
+  const d = [0.5773, 0.6131, 0.5397]; let n = 0;
+  for (let i = 0; i < T.length; i += 9) {
+    const ax = T[i], ay = T[i + 1], az = T[i + 2], e1 = [T[i + 3] - ax, T[i + 4] - ay, T[i + 5] - az], e2 = [T[i + 6] - ax, T[i + 7] - ay, T[i + 8] - az];
+    const h = [d[1] * e2[2] - d[2] * e2[1], d[2] * e2[0] - d[0] * e2[2], d[0] * e2[1] - d[1] * e2[0]], det = e1[0] * h[0] + e1[1] * h[1] + e1[2] * h[2];
+    if (Math.abs(det) < 1e-12) continue; const f = 1 / det, s = [p[0] - ax, p[1] - ay, p[2] - az], uu = f * (s[0] * h[0] + s[1] * h[1] + s[2] * h[2]);
+    if (uu < 0 || uu > 1) continue; const q = [s[1] * e1[2] - s[2] * e1[1], s[2] * e1[0] - s[0] * e1[2], s[0] * e1[1] - s[1] * e1[0]], vv = f * (d[0] * q[0] + d[1] * q[1] + d[2] * q[2]);
+    if (vv < 0 || uu + vv > 1) continue; if (f * (e2[0] * q[0] + e2[1] * q[1] + e2[2] * q[2]) > 1e-9) n++;
+  }
+  return n % 2 === 1;
+}
+/* círculo (2D) com n lados; sentido horário = furo na tampa */
+const circ2 = (cx, cy, r, n, horario) => { const l = []; for (let k = 0; k < n; k++) { const a = 2 * Math.PI * k / n * (horario ? -1 : 1); l.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } return l; };
+/* parede de cilindro entre z0 e z1 no eixo ax; fora = normal para fora do eixo do cilindro (pino) ou para dentro (furo) */
+function paredeCil(out, ax, l, z0, z1, fora) {
+  const [u, v] = EIXOS_2D[ax], P3 = (p, z) => { const r = [0, 0, 0]; r[u] = p[0]; r[v] = p[1]; r[ax] = z; return r; };
+  for (let k = 0; k < l.length; k++) { const p = l[k], q = l[(k + 1) % l.length], a = P3(p, z0), b = P3(q, z0), c = P3(q, z1), d = P3(p, z1);
+    if (fora) out.push(...a, ...b, ...c, ...a, ...c, ...d); else out.push(...a, ...c, ...b, ...a, ...d, ...c); }
+}
+/* lugares para o pino: dentro do maior contorno, longe das bordas e dos furos; o furo correspondente cabe inteiro na parte de cima */
+function lugaresDoPino(grupos, r, cima, ax, c, prof) {
+  if (!grupos.length) return [];
+  const g = grupos.slice().sort((a, b) => Math.abs(area2(b.l)) - Math.abs(area2(a.l)))[0], todos = [g.l].concat(g.furos);
+  const distBorda = p => { let m = Infinity; todos.forEach(l => l.forEach((a, i) => { const b = l[(i + 1) % l.length], dx = b[0] - a[0], dy = b[1] - a[1], L = dx * dx + dy * dy;
+    const t = L > 0 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L)) : 0; m = Math.min(m, Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dy)); })); return m; };
+  const [u, v] = EIXOS_2D[ax], noMaterial = (p, z) => { const q = [0, 0, 0]; q[u] = p[0]; q[v] = p[1]; q[ax] = z; return dentroMalha(cima, q); };
+  const xs = g.l.map(p => p[0]), ys = g.l.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), cand = [];
+  for (let i = 1; i < 12; i++) for (let j = 1; j < 12; j++) { const p = [x0 + (x1 - x0) * i / 12, y0 + (y1 - y0) * j / 12];
+    if (!dentro(p, g.l) || g.furos.some(f => dentro(p, f))) continue; const db = distBorda(p); if (db < r + 2) continue;
+    // o furo (com folga) tem de ficar inteiro dentro do material da parte de cima, até o fundo
+    const ok = [0.4, prof * 0.5, prof + 0.4].every(z => [[0, 0], [r + 1, 0], [-(r + 1), 0], [0, r + 1], [0, -(r + 1)]].every(([a, b]) => noMaterial([p[0] + a, p[1] + b], c + z)));
+    if (ok) cand.push({ p, db }); }
+  if (!cand.length) return [];
+  cand.sort((a, b) => b.db - a.db);
+  const um = cand[0].p; let dois = null, melhor = 0;
+  cand.forEach(q => { const d = Math.hypot(q.p[0] - um[0], q.p[1] - um[1]); if (d > melhor && d > 4 * r) { melhor = d; dois = q.p; } });
+  return dois ? [um, dois] : [um];
+}
+/* corta a parte em c e põe o encaixe: pino na de baixo (sai pela tampa) e furo com folga na de cima */
+function cortarComEncaixe(T, ax, c, op) {
+  const folga = op.folga, n = 32;
+  const { baixo, cima, segs } = cortarPlano(T, ax, c), grupos = agrupar(lacosDosSegmentos(segs));
+  // pino de 6 mm; em parede fina, 4 mm e depois 3 mm (Ø × altura); sem lugar seguro, o corte fica sem encaixe (colar)
+  let r = op.raio, h = op.altura, pinos = [];
+  if (op.encaixe !== false) for (const [rr, hh] of [[op.raio, op.altura], [2, 5], [1.5, 4]]) {
+    if (rr > op.raio) continue; pinos = lugaresDoPino(grupos, rr + folga, Float32Array.from(cima), ax, c, hh + 0.5); if (pinos.length) { r = rr; h = hh; break; } }
+  const gB = grupos.map(g => ({ l: g.l, furos: g.furos.slice() })), gC = grupos.map(g => ({ l: g.l, furos: g.furos.slice() }));
+  pinos.forEach(p => {
+    const dono = (gs) => gs.find(g => dentro(p, g.l)) || gs[0];
+    const lb = circ2(p[0], p[1], r, n, true), lc = circ2(p[0], p[1], r + folga, n, true);
+    dono(gB).furos.push(lb); dono(gC).furos.push(lc);
+    paredeCil(baixo, ax, lb.slice().reverse(), c, c + h, true);           // pino: parede para fora e topo
+    tampa(baixo, [{ l: lb.slice().reverse(), furos: [] }], ax, c + h, 1);
+    paredeCil(cima, ax, lc.slice().reverse(), c, c + h + 0.5, false);     // furo: parede para dentro e fundo virado para o furo
+    tampa(cima, [{ l: lc.slice().reverse(), furos: [] }], ax, c + h + 0.5, -1);
+  });
+  tampa(baixo, gB, ax, c, 1); tampa(cima, gC, ax, c, -1);
+  return { baixo: new Float32Array(baixo), cima: new Float32Array(cima), pinos: pinos.length, raio: pinos.length ? r : 0, laços: grupos.length };
+}
+/* solda feita: tira os triângulos com vértice repetido (lascas de corte perto de outro corte); os vizinhos fecham a malha */
+function semDegenerados(T) {
+  const o = [], igual = (i, j) => T[i] === T[j] && T[i + 1] === T[j + 1] && T[i + 2] === T[j + 2];
+  for (let i = 0; i < T.length; i += 9) { if (igual(i, i + 3) || igual(i + 3, i + 6) || igual(i, i + 6)) continue; for (let k = 0; k < 9; k++) o.push(T[i + k]); }
+  return new Float32Array(o);
+}
+/* divide em planos até cada parte caber no limite (mm), com encaixe em cada corte; as partes vão para a mesa (z = 0), lado a lado */
+function dividirParaMesa(T, op) {
+  op = Object.assign({ limite: 200, raio: 3, altura: 6, folga: 0.2, encaixe: true, vao: 10, afastar: 0.3 }, op || {});
+  let partes = [{ T: soldar(T), nome: "parte" }], cortes = 0, pinos = 0, semEncaixe = 0;
+  for (let ax = 0; ax < 3; ax++) {
+    const novas = [];
+    partes.forEach(pt => {
+      const cx = caixaDe(pt.T), L = cx.max[ax] - cx.min[ax]; if (L <= op.limite + 1e-6) { novas.push(pt); return; }
+      // o pino sai pela tampa: cada parte precisa caber com ele (limite menos a altura do pino e 1 mm de sobra)
+      // o plano anda no máximo ±janela em volta do ideal (para longe dos vértices): também entra na conta do limite
+      const janela = 5, util = (op.encaixe === false ? op.limite : op.limite - op.altura - 1) - 2 * janela, k = Math.ceil(L / Math.max(util, op.limite / 2));
+      let resto = pt.T;
+      for (let i = 1; i < k; i++) {
+        // no meio do maior vão entre vértices perto do ideal: longe deles, o corte não vira fatia fina (tangente a furo, costura)
+        const ideal = cx.min[ax] + L * i / k, zs = [ideal - janela, ideal + janela];
+        for (let j = ax; j < resto.length; j += 3) { const z = resto[j]; if (z > ideal - janela && z < ideal + janela) zs.push(z); }
+        zs.sort((x, y) => x - y); let c = ideal, vao = -1;
+        for (let j = 1; j < zs.length; j++) { const g = zs[j] - zs[j - 1], m = (zs[j] + zs[j - 1]) / 2; if (g - Math.abs(m - ideal) * 0.02 > vao) { vao = g - Math.abs(m - ideal) * 0.02; c = m; } }
+        const r = cortarComEncaixe(resto, ax, c, op); cortes++; pinos += r.pinos; if (!r.pinos) semEncaixe++;
+        novas.push({ T: r.baixo, nome: "parte" }); resto = r.cima;
+      }
+      novas.push({ T: resto, nome: "parte" });
+    });
+    partes = novas;
+  }
+  // cada parte na mesa (z = 0), lado a lado no eixo x com um vão entre elas
+  partes = partes.filter(pt => pt.T.length >= 9 * 4);   // fatia sem peça (canto vazio da caixa) não vira parte
+  let x = 0; partes = partes.map((pt, i) => { const cx = caixaDe(pt.T), U = semDegenerados(soldar(pt.T));
+    for (let j = 0; j < U.length; j += 3) { U[j] += x - cx.min[0]; U[j + 2] -= cx.min[2]; } x += cx.max[0] - cx.min[0] + op.vao;
+    return { T: U, nome: "parte-" + (i + 1), conf: conferirImpressao(U, op.limite) }; });
+  return { partes, cortes, pinos, semEncaixe, limite: op.limite };
+}
 /* folha sintética de desenho técnico para os testes: meia-seção de uma bucha com flange (cotas conhecidas, hachura a 45°,
    linha de centro de traço e ponto, linhas de cota com setas e textos) e um quadro de notas. pxmm = pixels por mm. */
 function folhaSintetica(doc, pxmm) {
@@ -876,11 +1051,24 @@ function autoteste() {
   const cf = ajustarCirculo(PRIM.circulo(30, 40)[0].map(p => [p[0] + 5, p[1] - 3]));
   ok("círculo por mínimos quadrados: centro e raio", Math.abs(cf.cx - 5) < 1e-6 && Math.abs(cf.cy + 3) < 1e-6 && Math.abs(cf.r - 15) < 1e-6);
   ok("IFC4 com IfcTriangulatedFaceSet", /FILE_SCHEMA\(\('IFC4'\)\)/.test(ifc) && ifc.indexOf("IFCTRIANGULATEDFACESET") > 0 && ifc.indexOf("IFCBUILDINGELEMENTPROXY") > 0);
+  // qualquer impressora (dona, 22/11/2026): apoiar na mesa, conferir a malha e dividir acima de 200 mm com encaixe
+  { const fl = transformar(extrudar(PRIM.retangulo(30, 20), 10), [0, 0, 25], [0, 0, 0], 1, [0, 0, 0]), ap = apoiarNaMesa(fl);
+    ok("peça flutuando vai para a mesa (z mínimo = 0)", Math.abs(caixaDe(ap).min[2]) < 1e-9 && !conferirImpressao(fl).apoiada && conferirImpressao(ap).apoiada); }
+  { const cx = extrudar(PRIM.retangulo(20, 20), 20), furado = cx.slice(9), c1 = conferirImpressao(cx), c2 = conferirImpressao(furado);
+    ok("conferência acusa malha aberta (sem um triângulo)", c1.fechada && !c2.fechada && c2.abertas === 3); }
+  { const barra = extrudar(PRIM.retangulo(300, 40), 40), d = dividirParaMesa(barra), v = d.partes.reduce((n, q) => n + (P ? P.medir(q.T).volume_mm3 : 0), 0);
+    ok("barra de 300 mm: 2 partes até 200 mm, fechadas, apoiadas, com pinos", d.partes.length === 2 && d.pinos >= 1 && d.partes.every(q => q.conf.fechada && q.conf.apoiada && !q.conf.grande));
+    ok("divisão conserva o volume (±0,1 %)", !P || Math.abs(v - 300 * 40 * 40) / (300 * 40 * 40) < 0.001, v); }
+  { const tf = testeFolha(document), grande = transformar(tf.T, [0, 0, 0], [0, 0, 0], 6, [0, 0, 0]), d = dividirParaMesa(grande, { limite: 100 });
+    ok("bucha revolucionada de 360 mm em partes de até 100 mm: todas fechadas, dentro do limite; encaixe em pelo menos 90 % dos cortes", d.partes.length >= 30 && d.partes.every(q => q.conf.fechada && !q.conf.grande && q.T.length > 0) && d.semEncaixe <= 0.1 * d.cortes, d.partes.length + " partes, " + d.semEncaixe + " cortes sem encaixe (canto fino)"); }
+  { const tubo = extrudar(PRIM.circulo(80, 48).concat([PRIM.circulo(60, 48)[0].reverse()]), 450), d = dividirParaMesa(tubo);
+    ok("tubo de parede de 10 mm: pino menor no encaixe", d.pinos >= 2 && d.semEncaixe === 0 && d.partes.every(q => q.conf.fechada)); }
   return r;
 }
 
 window.PhysisImagem3D = { mascara, contornos, svg, dxf, relevo, campoDeAlturas, testes, autoteste, cinza, suavizar, otsu, limpar, processarFoto,
   extrudar, PRIM, lerDxf, caixaDe, transformar, juntar, colisoes, escrever3MFMontagem, escreverIfc, CORES_PECA,
   rotular8, larguraTraco, morfo, afinar, tracarEsqueleto, ajustarCirculo, primitivas, recortarLaco, lerDesenho, lacosDaRegiao, revolver,
-  padraoCircular, corpos, folhaSintetica, testeFolha, versao: "physis-imagem-3d-0.3" };
+  padraoCircular, corpos, folhaSintetica, testeFolha, apoiarNaMesa, soldar, arestas, conferirImpressao, cortarPlano, dentroMalha, dividirParaMesa,
+  versao: "physis-imagem-3d-0.4" };
 })();
