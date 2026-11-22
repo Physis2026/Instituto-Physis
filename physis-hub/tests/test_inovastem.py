@@ -476,6 +476,20 @@ class Laboratorio(unittest.TestCase):
             m = re.search(rf'<script id="{ident}">\n(.*?)</script>', self.h, re.S)
             self.assertEqual(m.group(1), ler(arq).replace("\r\n", "\n"), ident)
 
+    def test_bot_de_modelagem_pela_fonte(self):
+        # dona, 22/11/2026 ("Sim, pela fonte"): o bot entra pelo gerador, cópia exata do original, no topo da página
+        # (fora das subabas), troca de idioma com a página e o sincronizar regera o laboratório quando um original muda
+        blocos = [i for i, _ in self.lab.BLOCOS]
+        if "physis-modelador" in blocos:     # só entra com os textos da InovaSTEM: nada de Planejador nem da fila interna do M&A
+            m = re.search(r'<script id="physis-modelador">\n(.*?)</script>', self.h, re.S).group(1)
+            self.assertNotRegex(m, r"Planejador|Planner|M&A|M&V|Claude")
+        self.assertEqual(self.h.count('<div data-physis-modelador="inovastem-3d"></div>'), 1)
+        self.assertLess(self.h.index('data-physis-modelador="inovastem-3d"'), self.h.index('id="lab-abas"'))
+        self.assertIn("function botIdioma()", self.h)
+        self.assertIn("botIdioma();", self.h)
+        sinc = (AQUI.parent / "ferramentas" / "sincronizar.py").read_text(encoding="utf-8")
+        self.assertIn("lab.montar()", sinc)
+
     def test_regras_da_tela(self):
         fora = re.sub(r"<script.*?</script>", "", self.h, flags=re.S)
         self.assertEqual(len(re.findall(r"<h1\b", fora)), 1)        # os h1 dos motores viram h2 ao desenhar

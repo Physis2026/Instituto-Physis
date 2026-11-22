@@ -49,6 +49,10 @@ SAIDA = WEB / "inovastem-lab.html"
 BLOCOS = [("lab-turbinas", SIS / "physis-turbinas.js"), ("lab-casos", SIS / "simulacao-exemplos" / "casos.js"),
           ("lab-simulacao", SIS / "physis-simulacao.js"), ("lab-3d", SIS / "physis-3d.js"),
           ("lab-imagem3d", SIS / "physis-imagem-3d.js"), ("lab-modelagem", SIS / "physis-modelagem.js")]
+# bot de modelagem (dona, 22/11/2026: "Sim, pela fonte"): o espaço e a troca de idioma já estão na página; o bloco entra aqui
+# — ("physis-modelador", SIS / "physis-modelador.js") — quando o original tiver os textos da InovaSTEM (sem Planejador e sem
+# a fila interna do M&A, que não cabem num site público). Até lá o espaço fica vazio.
+BOT_MODELAGEM = SIS / "physis-modelador.js"
 # bibliotecas grandes de vendor/ que o laboratório carrega do próprio servidor (/vendor/) quando a subaba precisa
 VENDOR_LAB = ("three.min.js", "web-ifc-api-iife.js", "web-ifc.wasm")
 
@@ -1535,8 +1539,20 @@ const observadorEn = typeof MutationObserver === "function" ? new MutationObserv
   alvos.forEach(a => { if (![...alvos].some(o => o !== a && o.contains(a))) traduzirDom(a); }); }) : null;
 const nomeCaso = c => lang === "en" && CASOS_EN[c.id] ? CASOS_EN[c.id][0] : c.nome;
 const descCaso = c => lang === "en" && CASOS_EN[c.id] ? CASOS_EN[c.id][1] : (c.descricao || "");
+/* bot de modelagem (physis-modelador.js): monta de novo na troca de idioma; carrega o three.js (prévia 3D) só quando
+   a pessoa chega perto do bot, para não pesar a página de quem não usa */
+function botIdioma() {
+  if (!window.PhysisModelador) return;
+  document.querySelectorAll("[data-physis-modelador]").forEach(el => {
+    if (el.getAttribute("data-pmd-lang") === lang) return;
+    el.removeAttribute("data-pmd-ok"); el.innerHTML = ""; el.setAttribute("data-pmd-lang", lang); window.PhysisModelador.montar(el);
+    if (!el._pmdThree) { el._pmdThree = true; const carregar = () => { if (window.PhysisModelagem && !window.THREE) window.PhysisModelagem.carregar(["three"]); };
+      el.addEventListener("focusin", carregar, { once: true }); el.addEventListener("pointerenter", carregar, { once: true }); }
+  });
+}
 function aplicarIdioma() {
   document.documentElement.lang = lang === "en" ? "en" : "pt-BR";
+  botIdioma();
   document.querySelectorAll("[data-t]").forEach(el => { const v = t(el.getAttribute("data-t")); if (typeof v === "string") el.textContent = v; });
   document.querySelectorAll("[data-t-rot]").forEach(el => { const v = t(el.getAttribute("data-t-rot")); if (typeof v === "string") el.setAttribute("aria-label", v); });
   SUBABAS.forEach(([k], i) => { const e = document.getElementById("tab-" + k); if (e) e.textContent = (i + 1) + ". " + t("abas")[k]; });
@@ -1825,6 +1841,7 @@ def montar() -> str:
 <main id="conteudo" class="in" tabindex="-1">
   <h2 class="lab-intro" data-t="titulo">Modelagem Physis 3D</h2>
   <p data-t="intro">A bancada de desenvolvimento da InovaSTEM, aberta a modelagens de qualquer assunto: subabas que leem e gravam um projeto comum, num fluxo do arquivo até a fila de impressão e a galeria.</p>
+  <div data-physis-modelador="inovastem-3d"></div>
   <section class="lab-projeto" id="lab-proj" aria-label="Projeto comum" data-t-rot="proj_rot"></section>
   <div class="lab-abas" id="lab-abas" role="tablist" aria-label="Subabas da Modelagem Physis 3D" data-t-rot="abas_rot">
     {abas}

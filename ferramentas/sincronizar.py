@@ -171,6 +171,18 @@ def _materiais():
     return m
 
 
+def _laboratorio():
+    """O gerador do laboratório da InovaSTEM, se este repositório tiver (o do Sistema Physis não tem)."""
+    g = RAIZ / "ferramentas" / "montar_lab_inovastem.py"
+    if not g.exists():
+        return None
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("montar_lab_inovastem", g)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
 def main() -> int:
     conferir = "--conferir" in sys.argv
     novo = ORIGEM.read_text(encoding="utf-8").replace("\r\n", "\n").rstrip("\n")
@@ -199,6 +211,16 @@ def main() -> int:
             diferentes.append(arq.relative_to(RAIZ))
             if not conferir:
                 arq.write_text(depois, encoding="utf-8", newline="\n")
+    # o laboratório da InovaSTEM é GERADO (montar_lab_inovastem.py) com cópias de motores, do bot de modelagem e da barra:
+    # quando um original muda, o laboratório é gerado de novo aqui (22/11/2026), nunca editado à mão
+    lab = _laboratorio()
+    if lab:
+        saida = lab.SAIDA
+        novo_lab = lab.montar()
+        if not saida.exists() or saida.read_text(encoding="utf-8") != novo_lab:
+            diferentes.append(saida.relative_to(RAIZ))
+            if not conferir:
+                saida.write_text(novo_lab, encoding="utf-8", newline="\n")
     for d in diferentes:
         print(("diferente: " if conferir else "atualizado: ") + str(d))
     if not diferentes:
