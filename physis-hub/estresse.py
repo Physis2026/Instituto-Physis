@@ -54,6 +54,8 @@ def main() -> int:
     pasta = tempfile.mkdtemp(prefix="physis-estresse-")
     banco = os.path.join(pasta, "hub.db")
     hub = Hub(banco, org="org-teste", lugar="estresse")
+    # o limitador por IP (seguranca.Limites) barraria o volume do teste; aqui o alvo é o hub, não o limitador
+    os.environ.setdefault("PHYSIS_LIMITE_DISPOSITIVO", "1000000/60")
     srv = iniciar(hub, a.porta, endereco="127.0.0.1")
     # 20/11/2026: com porta fixa (8791) o teste falhava quando outro programa já escutava nela (no Windows o bind
     # "funciona" e os pedidos caem no outro programa). Agora a porta vem do próprio servidor.

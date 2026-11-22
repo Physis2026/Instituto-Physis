@@ -34,18 +34,97 @@ MAX_CORPO = 64 * 1024 * 1024
 MAX_GCODE = 60 * 1024 * 1024
 
 # chaves do PrusaSlicer (formato .ini da versão 2.x) [CONFERIR com a versão instalada na imagem: prusa-slicer --help-fff]
+COSTURAS = {"alinhada": "aligned", "proxima": "nearest", "traseira": "rear", "aleatoria": "random"}
+PELE_FELPUDA = {"nenhuma": "none", "externa": "external", "todas": "all"}
+
+
+def _num(cfg: dict, k: str, padrao):
+    """Número finito do cfg; ausente/vazio = padrão; texto, NaN ou infinito = ValueError (em português)."""
+    v = cfg.get(k)
+    if v in (None, ""):
+        return padrao
+    try:
+        v = float(v)
+    except (TypeError, ValueError):
+        raise ValueError(f"{k}: valor não numérico") from None
+    if v != v or v in (float("inf"), float("-inf")):
+        raise ValueError(f"{k}: valor não finito")
+    return v
+
+
+def validar_cfg(cfg: dict) -> list[str]:
+    """Validação pré-exportação (ciclo de auditoria 2026-11-22). Erro = combinação impossível (ValueError);
+    devolve avisos de qualidade. Só relações físicas entre os próprios parâmetros; limites de fábrica de cada
+    impressora entram pelo perfil [MARCADOR: perfis aprovados pela Physis 3D]."""
+    avisos: list[str] = []
+    bico = _num(cfg, "bico_mm", 0.4)
+    h = _num(cfg, "altura_camada", 0.2)
+    lw = _num(cfg, "largura_linha", 0.45)
+    paredes = _num(cfg, "paredes", 2)
+    topo, fundo = _num(cfg, "camadas_topo", 4), _num(cfg, "camadas_fundo", 4)
+    if bico <= 0:
+        raise ValueError("bico_mm deve ser maior que zero")
+    if lw <= 0:
+        raise ValueError("largura_linha deve ser maior que zero")
+    if paredes < 0 or topo < 0 or fundo < 0 or paredes != int(paredes) or topo != int(topo) or fundo != int(fundo):
+        raise ValueError("paredes e camadas de topo e fundo: inteiros, zero ou mais")
+    if h > bico:
+        raise ValueError("altura de camada maior que o bico: o filamento não assenta")
+    if h > 0.8 * bico:
+        avisos.append("altura de camada acima de 80% do bico: pouca adesão entre camadas")
+    if lw < bico * 0.9 or lw > bico * 2:
+        avisos.append("largura de linha fora de 0,9 a 2 vezes o bico")
+    if paredes == 0:
+        avisos.append("sem paredes: a peça sai só com preenchimento")
+    if topo == 0 or fundo == 0:
+        avisos.append("sem camadas sólidas de topo ou de fundo: peça aberta")
+    elif topo * h < 0.6:
+        avisos.append("topo com menos de 0,6 mm: risco de buracos na superfície de cima")
+    for k in ("comp_xy", "comp_furo", "pe_elefante"):
+        v = _num(cfg, k, 0.0)
+        if abs(v) > bico / 2:
+            raise ValueError(f"{k}: compensação maior que metade do bico")
+    if _num(cfg, "pe_elefante", 0.0) < 0:
+        raise ValueError("pe_elefante: não pode ser negativa")
+    if _num(cfg, "comp_xy", 0.0) and _num(cfg, "comp_furo", 0.0):
+        avisos.append("compensação X/Y e de furo juntas: o furo recebe as duas; confira a medida final")
+    cost = cfg.get("costura")
+    if cost not in (None, "") and cost not in COSTURAS:
+        raise ValueError("costura: use " + ", ".join(COSTURAS))
+    pele = cfg.get("pele_felpuda")
+    if pele not in (None, "") and pele not in PELE_FELPUDA:
+        raise ValueError("pele_felpuda: use " + ", ".join(PELE_FELPUDA))
+    if pele in ("externa", "todas"):
+        esp, dist = _num(cfg, "pele_espessura", 0.3), _num(cfg, "pele_dist", 0.8)
+        if esp <= 0 or dist <= 0:
+            raise ValueError("pele felpuda: espessura e distância entre pontos maiores que zero")
+        parede_mm = max(paredes, 1) * lw
+        if esp >= parede_mm / 2:
+            raise ValueError("pele felpuda com espessura de metade da parede ou mais: fura a peça")
+        if dist < bico:
+            avisos.append("distância entre pontos da pele felpuda menor que o bico: textura irregular e G-code pesado")
+        if cost in (None, "", "alinhada"):
+            avisos.append("pele felpuda com costura alinhada: a costura fica visível; prefira traseira ou aleatória")
+    res = _num(cfg, "resolucao", 0.0)
+    if res < 0:
+        raise ValueError("resolucao: não pode ser negativa")
+    if res > bico / 4:
+        avisos.append("resolução acima de 1/4 do bico: perde detalhe em curvas")
+    return avisos
+
+
 def montar_ini(cfg: dict, mesa: str = "220x220") -> str:
     def num(k, padrao):
-        try:
-            v = float(cfg.get(k, padrao))
-        except (TypeError, ValueError):
-            v = padrao
-        return v
+        return _num(cfg, k, padrao)
     lx, _, ly = (mesa or "220x220").partition("x")
-    lx, ly = float(lx or 220), float(ly or 220)
+    try:
+        lx, ly = float(lx or 220), float(ly or 220)
+    except ValueError:
+        raise ValueError("mesa: use LARGURAxPROFUNDIDADE em mm, ex.: 220x220") from None
     h = num("altura_camada", 0.2)
     if not 0.04 <= h <= 1.0:
         raise ValueError("altura de camada fora de 0,04 a 1 mm")
+    validar_cfg(cfg)
     linhas = {
         "layer_height": h, "first_layer_height": h,
         "perimeters": int(num("paredes", 2)), "top_solid_layers": int(num("camadas_topo", 4)), "bottom_solid_layers": int(num("camadas_fundo", 4)),
@@ -61,6 +140,18 @@ def montar_ini(cfg: dict, mesa: str = "220x220") -> str:
                      ("first_layer_bed_temperature", "mesa_c")):
         if cfg.get(k) not in (None, ""):
             linhas[k_ini] = int(num(k, 0))
+    # acabamento e precisão: só entram quando pedidos (sem pedido, vale o padrão do PrusaSlicer, como antes)
+    for k_ini, k in (("xy_size_compensation", "comp_xy"), ("xy_inner_size_compensation", "comp_furo"),   # [CONFERIR] interna: PrusaSlicer ≥ 2.x
+                     ("elefant_foot_compensation", "pe_elefante"), ("resolution", "resolucao")):
+        if cfg.get(k) not in (None, ""):
+            linhas[k_ini] = num(k, 0.0)
+    if cfg.get("costura") not in (None, ""):
+        linhas["seam_position"] = COSTURAS[cfg["costura"]]
+    if cfg.get("pele_felpuda") not in (None, ""):
+        linhas["fuzzy_skin"] = PELE_FELPUDA[cfg["pele_felpuda"]]
+        if cfg["pele_felpuda"] != "nenhuma":
+            linhas["fuzzy_skin_thickness"] = num("pele_espessura", 0.3)
+            linhas["fuzzy_skin_point_dist"] = num("pele_dist", 0.8)
     return "".join(f"{k} = {v}\n" for k, v in linhas.items())
 
 
@@ -128,7 +219,8 @@ def fatiar(corpo: dict, executar=_executar) -> tuple[int, dict]:
         if saida.stat().st_size > MAX_GCODE:
             return 413, {"ok": False, "erro": "G-code grande demais"}
         gcode = saida.read_text(encoding="utf-8", errors="replace")
-    return 200, {"ok": True, "gcode": gcode, "estimativa": ler_estimativa(gcode), "ini": ini, "fatiador": "PrusaSlicer (AGPL-3.0)"}
+    return 200, {"ok": True, "gcode": gcode, "estimativa": ler_estimativa(gcode), "ini": ini, "fatiador": "PrusaSlicer (AGPL-3.0)",
+                 "avisos": validar_cfg(corpo.get("config") or {})}
 
 
 def criar_manipulador(chave: str | None, vagas: threading.Semaphore):
