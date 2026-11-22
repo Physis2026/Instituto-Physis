@@ -406,6 +406,11 @@ class Pagina(unittest.TestCase):
         self.assertNotIn("Formar mulheres e jovens", self.h)   # formação só na Delas (dona, 20/11/2026)
         self.assertNotIn("M&V aberto", self.h)
 
+    def test_cadastro_so_pede_email_quando_vale(self):
+        # sem servidor de e-mail a conta não precisa confirmar: a tela manda entrar logo abaixo (teste ponta a ponta, 21/11/2026)
+        self.assertIn('t(r.confirmar_email ? "cad_ok" : "cad_ok_entrar")', self.js)
+        self.assertIn("cad_ok_entrar:", self.js)
+
     def test_tema_escuro_da_delas_sem_verde(self):
         # dona, 21/11/2026: na tela roxa o rótulo do tema escuro é só "Escuro"/"Dark"; o módulo comum não muda
         self.assertIn('escuroDelas(aba === "delas" || aba === "delas_entrar");', self.js)
@@ -777,6 +782,33 @@ class FilaImpressaoRotas(unittest.TestCase):
             self.assertEqual((resp.status, resp.read()), (200, stl))
             self.assertIn("attachment", resp.headers["Content-Disposition"])
         self.assertEqual(self.pedir("GET", f"/api/inovastem/impressao/{p['id']}/arquivo")[0], 401)
+
+    def test_pedido_do_laboratorio_leva_material_e_nome_da_comunidade(self):
+        # teste ponta a ponta de 21/11/2026: material e observação chegam à equipe; quem só tem conta da comunidade aparece
+        # com o nome público dela (nunca o e-mail)
+        from physis_hub import impressao3d as m3
+        self.h._db.execute("CREATE TABLE IF NOT EXISTS com_participante(usuario TEXT PRIMARY KEY, nome_publico TEXT, removido INTEGER DEFAULT 0)")             if not self.h._db.execute("SELECT name FROM sqlite_master WHERE name='com_participante'").fetchone() else None
+        cols = [c[1] for c in self.h._db.execute("PRAGMA table_info(com_participante)")]
+        vals = {c: None for c in cols}
+        vals.update({"usuario": "par@f.example", "nome_publico": "Ana da Comunidade", "removido": 0})
+        for c in cols:   # colunas obrigatórias da tabela real ganham um valor neutro
+            if vals[c] is None:
+                vals[c] = 0 if c not in ("versao_termo", "responsavel_nome", "responsavel_email", "autorizado_por") else ""
+        self.h._db.execute(f"INSERT OR REPLACE INTO com_participante({','.join(cols)}) VALUES({','.join('?' * len(cols))})", [vals[c] for c in cols])
+        stl = m3.escrever_stl([[[0, 0, 0], [10, 0, 0], [0, 10, 0]], [[0, 0, 0], [0, 10, 0], [0, 0, 10]]])
+        cab = {"Content-Type": "application/octet-stream", "X-Physis-Nome": "cubo.stl", "Cookie": self.par[0], "X-Physis-CSRF": self.par[1]}
+        req = urllib.request.Request(f"http://127.0.0.1:{self.porta}/api/inovastem/impressao/arquivo", data=stl, method="POST", headers=cab)
+        with urllib.request.urlopen(req, timeout=30) as r:
+            arq = json.loads(r.read())["arquivo"]
+        st, p = self.pedir("POST", "/api/inovastem/impressao", {"arquivo": arq, "material": "rpla", "observacao": "cubo de calibração"}, self.par)
+        self.assertEqual(st, 200, p)
+        st, f = self.pedir("GET", "/api/inovastem/impressao/fila", s=self.dir)
+        item = next(x for x in f["itens"] if x["id"] == p["id"])
+        self.assertEqual((item["material"], item["observacao"], item["nome_publico"]), ("rpla", "cubo de calibração", "Ana da Comunidade"))
+        self.assertNotIn("par@f.example", json.dumps(f))
+        lab = (AQUI / "web" / "inovastem-lab.html").read_text(encoding="utf-8")
+        self.assertIn("const matPed = ", lab)        # o laboratório lê material e observação antes de redesenhar
+        self.assertIn("{ arquivo: up.arquivo, material: matPed, observacao: obsPed }", lab)
 
     def test_unsafe_eval_so_no_laboratorio(self):
         # web-ifc precisa de 'unsafe-eval' (21/11/2026): só em /laboratorio da instalação inovastem; o resto segue sem eval

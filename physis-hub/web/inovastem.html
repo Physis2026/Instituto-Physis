@@ -289,7 +289,7 @@ const T = {
     cad_t:"Conta da plataforma", cad_intro:"Para escrever no fórum, sugerir eventos e usar a ferramenta Physis 3D.",
     cad_nome:"Nome completo", cad_email:"E-mail (será o seu usuário)", cad_senha:"Senha (12 caracteres ou mais)", cad_pub:"Nome público (aparece no que você publicar; pode ser apelido)",
     cad_delas:"Autodeclaração (opcional): sou mulher (cis ou trans) e quero acessar a InovaSTEM Delas.",
-    cad_aceite:"Li e aceito os termos de uso (beta) e o aviso de privacidade (beta).", cad_enviar:"Criar conta", cad_ok:"Conta criada. Confira o seu e-mail e entre pela plataforma.",
+    cad_aceite:"Li e aceito os termos de uso (beta) e o aviso de privacidade (beta).", cad_enviar:"Criar conta", cad_ok:"Conta criada. Confira o seu e-mail e entre pela plataforma.", cad_ok_entrar:"Conta criada. Entre logo abaixo com o seu e-mail e a senha.",
     entrar_plataforma:"Entrar", area_equipe:"Área da equipe", ent_t:"Entrar na sua conta", ent_usuario:"E-mail", ent_senha:"Senha",
     ent_enviar:"Entrar", ent_erro:"E-mail ou senha não conferem.", sair_conta:"Sair da conta",
     eu_t:"Sua participação", eu_nome:"Nome público", eu_pode:"Pode publicar", eu_nao_pode:"Ainda não pode publicar",
@@ -423,7 +423,7 @@ const T = {
     cad_t:"Platform account", cad_intro:"To post in the forum, suggest events and use the Physis 3D tool.",
     cad_nome:"Full name", cad_email:"E-mail (your username)", cad_senha:"Password (12 characters or more)", cad_pub:"Public name (shown on what you publish; can be a nickname)",
     cad_delas:"Self-declaration (optional): I am a woman (cis or trans) and want to access InovaSTEM Hers.",
-    cad_aceite:"I have read and accept the terms of use (beta) and the privacy notice (beta).", cad_enviar:"Create account", cad_ok:"Account created. Check your e-mail and sign in through the platform.",
+    cad_aceite:"I have read and accept the terms of use (beta) and the privacy notice (beta).", cad_enviar:"Create account", cad_ok:"Account created. Check your e-mail and sign in through the platform.", cad_ok_entrar:"Account created. Sign in just below with your e-mail and password.",
     entrar_plataforma:"Sign in", area_equipe:"Team area", ent_t:"Sign in to your account", ent_usuario:"E-mail", ent_senha:"Password",
     ent_enviar:"Sign in", ent_erro:"E-mail or password do not match.", sair_conta:"Sign out",
     eu_t:"Your participation", eu_nome:"Public name", eu_pode:"Can publish", eu_nao_pode:"Cannot publish yet",
@@ -983,7 +983,7 @@ function ligar() {
                         maior_de_idade: maior, delas: $("cad-delas").checked, consentimento: { aceito: $("cad-aceite").checked, versao: (ino && ino.versao_aviso) || "1" } };
         if (!maior) { corpo.responsavel_nome = $("cad-resp-nome").value; corpo.responsavel_email = $("cad-resp-email").value; }
         const r = await pedir("/api/publico/cadastro", corpo);
-        $("cad-msg").textContent = r.ok ? t("cad_ok") + (r.pode_publicar ? "" : " " + t("int_menor_aviso")) : (r.erro || t("sem_hub"));
+        $("cad-msg").textContent = r.ok ? t(r.confirmar_email ? "cad_ok" : "cad_ok_entrar") + (r.pode_publicar ? "" : " " + t("int_menor_aviso")) : (r.erro || t("sem_hub"));
         $("cad-msg").className = "msg" + (r.ok ? "" : " erro");
         if (r.ok) { f.reset(); $("cad-resp").hidden = true; }
       };

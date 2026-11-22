@@ -82,6 +82,8 @@ class Comunidade(unittest.TestCase):
         self.assertEqual(st, 400, r)
         st, r = self.cadastro("ana@ex.example", nome_publico="Ana")
         self.assertEqual(st, 200, r)
+        # a tela só pede para conferir o e-mail quando a confirmação vale (há servidor de e-mail): 21/11/2026
+        self.assertEqual(r.get("confirmar_email"), seg.confirmacao_exigida())
         conta = next(c for c in self.h.contas() if c["usuario"] == "ana@ex.example")
         self.assertEqual(conta["papel"], seg.CLIENTE)
         st, r = self.cadastro("ana@ex.example")

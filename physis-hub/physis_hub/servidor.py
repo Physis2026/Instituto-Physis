@@ -1510,6 +1510,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if aceito:
                     seg.consentimento_registrar(hub, r["id"], r["usuario"], versao, True, self._ip())
                 self._mandar(seg.confirmar_enviar(hub, r["id"], url_publica))
+                r["confirmar_email"] = seg.confirmacao_exigida()   # a tela só pede para conferir o e-mail quando vale (21/11/2026)
                 self._json(200, r)
                 return True
             # InovaSTEM (D94): interesse e sugestão de projeto são públicos (limite por IP); o resto é da equipe

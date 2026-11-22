@@ -25,6 +25,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sqlite3
 from pathlib import Path
 
 from . import impressao3d as impressao3d_mod
@@ -320,6 +321,17 @@ class InovaSTEM:
         m = self._impressao3d
         return m() if callable(m) and not hasattr(m, "_ler_peca") else m
 
+    def _nome_publico(self, usuario: str, i3d=None) -> str:
+        """Nome público de quem pediu: o do Physis 3D; se não tiver, o da comunidade (conta criada no site); nunca o e-mail."""
+        p = i3d.participante(usuario) if i3d else None
+        if p and p.get("nome_publico") and not p.get("removido"):
+            return p["nome_publico"]
+        try:
+            r = self._db.execute("SELECT nome_publico FROM com_participante WHERE usuario=? AND NOT removido", (usuario,)).fetchone()
+        except sqlite3.Error:      # instalação sem a comunidade
+            r = None
+        return r[0] if r and r[0] else "Participante"
+
     COLS_IMP = ("id", "peca", "revisao", "arquivo_sha256", "arquivo_nome", "material", "observacao", "estado", "motivo", "criado",
                 "atualizado", "origem")
 
@@ -337,7 +349,7 @@ class InovaSTEM:
                 x["arquivo_url"] = "/api/3d/arquivo/" + x["arquivo_sha256"]
             x["proximos"] = list(PASSOS_IMPRESSAO.get(x["estado"], ()))
             if equipe:          # a equipe vê o nome público de quem pediu (o do Physis 3D), nunca o e-mail
-                x["nome_publico"] = i3d._nome(r[-1]) if i3d else "Participante"
+                x["nome_publico"] = self._nome_publico(r[-1], i3d)
             itens.append(x)
         return itens
 

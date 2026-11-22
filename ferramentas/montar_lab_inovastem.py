@@ -1748,11 +1748,13 @@ document.addEventListener("submit", async ev => {
   if (fm.id === "bim-sel-form" || fm.id === "mo-sel-form") { ev.preventDefault(); const pre = fm.id.split("-")[0]; aplicarSelecionado(pre === "bim" ? editorBim() : editorMo(), pre); desenhar(); focar(pre + "-aplicar"); return; }
   if (fm.id === "mo-add-form") { ev.preventDefault(); lab.moMsg = await acrescentarNaMontagem((document.getElementById("mo-fonte") || {}).value || ""); if (lab.moMsg && !lab.moMsg.erro) registrarPasso("montagem", lab.moMsg.texto); desenhar(); focar("mo-add"); return; }
   if (fm.id === "fila-arq-form") { ev.preventDefault(); const A = lab.filaArq; if (!A) return;
+    // lê material e observação ANTES de redesenhar ("enviando…" refaz o formulário e apagava os dois; achado no teste ponta a ponta de 21/11/2026)
+    const matPed = (document.getElementById("fa-mat") || {}).value || "", obsPed = (document.getElementById("fa-obs") || {}).value || "";
     if (A.tamanho > ARQ_MAX) { lab.filaMsg = { texto: t("grande"), erro: true }; desenhar(); return; }
     lab.filaMsg = { texto: t("fi_enviando") }; desenhar();
     const up = await postBytes("/api/inovastem/impressao/arquivo", A.bytes, A.nome);
     let r = up;
-    if (up.ok) r = await postJ("/api/inovastem/impressao", { arquivo: up.arquivo, material: (document.getElementById("fa-mat") || {}).value || "", observacao: (document.getElementById("fa-obs") || {}).value || "" });
+    if (up.ok) r = await postJ("/api/inovastem/impressao", { arquivo: up.arquivo, material: matPed, observacao: obsPed });
     lab.filaMsg = r.ok ? { texto: t("fi_pedido") + " " + r.id + " " + t("fi_enviado") } : { texto: r.erro || t("fi_nao_pediu"), erro: true };
     if (r.ok) { registrarPasso("fila", t("fi_pedido") + " " + r.id + ": " + A.nome); gravarProjeto(""); lab.filaArq = null; }
     await carregarFila(); desenhar(); focar(r.ok ? "fi-msg" : "fa-enviar"); return; }
