@@ -36,6 +36,7 @@ Uso (depois de mudar qualquer um dos arquivos acima):
 from __future__ import annotations
 
 import json
+import sys
 import re
 from pathlib import Path
 
@@ -61,6 +62,11 @@ CORES = {"#DBE7F1": "#F4F1EA", "#B8D0E0": "#D9D3C2", "#7FA9C4": "#8A9284", "#546
 SUBABAS = [("arquivo", "Enviar arquivo"), ("lugar", "Lugar (GIS)"), ("edificacao", "Modelos BIM (CAD e IFC)"), ("montagem", "Montagens"),
            ("pecas", "Peças 3D"), ("simulacao", "Simulação"), ("fila", "Fila de impressão"), ("galeria", "Galeria")]
 ESQUEMA_PROJETO = "inovastem-projeto/1"
+
+# Inglês dos motores (dona, 21/11/2026): o que o PHYSIS3D_I18N e o SIMULACAO_I18N ainda não traduziam. Só texto da tela;
+# nenhuma conta muda. Achado pela varredura em inglês (tests/test_inovastem.py, InglesNoNavegador).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lab_ingles import CASOS_EN, MOTOR_EN, MOTOR_EN_RX  # noqa: E402  (dicionário em arquivo próprio)
 
 CASCA_CSS = """/* Modelagem Physis 3D (casca do laboratório): classes que os motores usam (cartao, faixa in/al/at, t2), nas cores do guia */
 .faixa.in{background:var(--suave);color:var(--texto)}
@@ -466,6 +472,9 @@ const T = {
     ga_arquivos: "Files", ga_memorial: "Development log", ga_revisao: "Revision", ga_baixar: "download", ga_resultado: "result", ga_nao_abriu: "The part could not be opened."
   }
 };
+const MOTOR_EN = __MOTOR_EN__;
+const MOTOR_EN_RX = __MOTOR_EN_RX__;
+const CASOS_EN = __CASOS_EN__;
 let lang = "pt";
 try { lang = (localStorage.getItem("physis-idioma") === "en") ? "en" : "pt"; } catch (e) {}
 const t = k => T[lang][k] != null ? T[lang][k] : T.pt[k];
@@ -1290,7 +1299,7 @@ function rodarFen(f) {
     catch (x) { st.msg = { texto: String(x && x.message || x), erro: true }; return; }
   }
   const c2 = Object.assign({}, c, { entrada: e });
-  try { st.res = SIMULACAO.rodarCaso(c2); st.c2 = c2; st.msg = { texto: t("si_pronto") + " " + c.nome + (st.doLugar ? " " + t("si_do_lugar_msg") : "") + "." }; }
+  try { st.res = SIMULACAO.rodarCaso(c2); st.c2 = c2; st.msg = { texto: t("si_pronto") + " " + nomeCaso(c) + (st.doLugar ? " " + t("si_do_lugar_msg") : "") + "." }; }
   catch (x) { st.msg = { texto: (x && x.faltaDado ? "" : t("si_nao_rodou") + " ") + (x && x.message || x), erro: true }; }
 }
 function escalares(r) {
@@ -1337,8 +1346,8 @@ function blocoFen(f, n) {
   return `<section class="cartao lab-fen" id="fen-${f.id}" tabindex="-1" aria-labelledby="fen-${f.id}-h"><h3 id="fen-${f.id}-h">${n}. ${escL(x.nome)}</h3>
     <dl class="lab-ficha"><dt>${escL(t("si_faz"))}</dt><dd>${escL(x.faz)}</dd><dt>${escL(t("si_entra"))}</dt><dd>${escL(x.entra)}</dd><dt>${escL(t("si_sai"))}</dt><dd>${escL(x.sai)}</dd><dt>${escL(t("si_lim"))}</dt><dd>${escL(x.limites)}</dd></dl>
     <label for="sim-sel-${f.id}">${escL(t("si_exemplo"))}</label>
-    <select id="sim-sel-${f.id}" data-lab-sel="${f.id}">${cs.map(q => `<option value="${escL(q.id)}"${q.id === c.id ? " selected" : ""}>${escL(q.nome)}${q.exemplo ? "" : " " + escL(t("si_teste_conf"))}</option>`).join("")}</select>
-    <p class="t2 pq">${escL(c.descricao || "")} ${c.exemplo ? (/fictíci/i.test(c.descricao || "") ? "" : escL(t("si_ficticio"))) : escL(t("si_conf"))}</p>
+    <select id="sim-sel-${f.id}" data-lab-sel="${f.id}">${cs.map(q => `<option value="${escL(q.id)}"${q.id === c.id ? " selected" : ""}>${escL(nomeCaso(q))}${q.exemplo ? "" : " " + escL(t("si_teste_conf"))}</option>`).join("")}</select>
+    <p class="t2 pq">${escL(descCaso(c))} ${c.exemplo ? (/fictíci|fictitious/i.test(descCaso(c)) ? "" : escL(t("si_ficticio"))) : escL(t("si_conf"))}</p>
     ${temLugar ? `<label class="opcao"><input type="checkbox" id="sim-lugar-${f.id}" data-lab-chk="${f.id}"${st.usarLugar ? " checked" : ""}${terr && pode ? "" : " disabled"}> ${escL(t("si_usar_lugar"))}</label>
       <p class="t2 pq">${escL(t(terr ? (pode ? "si_lugar_troca" : "si_lugar_mais") : "si_sem_terreno"))}</p>` : ""}
     <details${st.aberta ? " open" : ""}><summary>${escL(t("si_entrada_t"))}</summary><label for="sim-ent-${f.id}">${escL(t("si_entrada"))}</label>
@@ -1440,6 +1449,38 @@ function telaGaleria() {
 
 /* ════════ desenho, idioma, subabas e eventos ════════ */
 const TELAS = { arquivo: telaArquivo, lugar: telaLugar, edificacao: telaBim, montagem: telaMontagem, pecas: telaPecas, simulacao: telaSimulacaoBlocos, fila: telaFila, galeria: telaGaleria };
+/* ════════ motores em inglês: dicionário aplicado sobre o texto que os motores escrevem (o cálculo não muda) ════════
+   PHYSIS3D_I18N (+ _RX) e SIMULACAO_I18N vêm dos motores; MOTOR_EN completa o que faltava; CASOS_EN traduz os casos da simulação. */
+let DIC_EN = null, RX_EN = null;
+function traduzirTexto(s, fundo) {
+  if ((fundo = fundo || 0) > 4) return null;   // grupos que voltam ao próprio texto não recursam sem fim
+  const k = String(s).replace(/\s+/g, " ").trim(); if (!k || !/[A-Za-zÀ-ÿ]/.test(k)) return null;
+  if (!DIC_EN) { DIC_EN = Object.assign({}, window.PHYSIS3D_I18N || {}, window.SIMULACAO_I18N || {}, MOTOR_EN); RX_EN = (window.PHYSIS3D_I18N_RX || []).concat(MOTOR_EN_RX).map(([a, r]) => [new RegExp(a), r]); }
+  if (Object.prototype.hasOwnProperty.call(DIC_EN, k)) return DIC_EN[k];
+  for (const [a, r] of RX_EN) { const m = k.match(a); if (m) return r.replace(/\$(\d)/g, (_, i) => { const v = m[+i] == null ? "" : m[+i]; return (v !== k && traduzirTexto(v, fundo + 1)) || v; }); }
+  return null;
+}
+/* número no formato do Brasil -> inglês: só tokens com vírgula decimal (1.000 sozinho é ambíguo e fica) */
+const numerosEn = s => s.replace(/\d{1,3}(?:\.\d{3})+,\d+|\d+,\d+/g, x => x.replace(/\./g, "\u0001").replace(",", ".").replace(/\u0001/g, ","));
+let traduzindo = false;
+function traduzirDom(raiz) {
+  if (lang !== "en" || !raiz || traduzindo) return;
+  traduzindo = true;
+  try {
+    const w = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT), ns = []; while (w.nextNode()) ns.push(w.currentNode);
+    ns.forEach(n => { const pe = n.parentElement; if (!pe || /^(SCRIPT|STYLE|TEXTAREA)$/.test(pe.tagName)) return;
+      let v = traduzirTexto(n.nodeValue); if (v == null && /\d,\d/.test(n.nodeValue)) v = numerosEn(n.nodeValue.trim()); if (v != null) { const m = n.nodeValue.match(/^(\s*)[\s\S]*?(\s*)$/), novo = m[1] + v + m[2]; if (novo !== n.nodeValue) n.nodeValue = novo; } });
+    raiz.querySelectorAll("[aria-label],[title],[placeholder],[alt]").forEach(el => ["aria-label", "title", "placeholder", "alt"].forEach(a => {
+      const v0 = el.getAttribute(a); if (v0) { const v = traduzirTexto(v0); if (v != null && v !== v0) el.setAttribute(a, v); } }));
+  } finally { traduzindo = false; }
+}
+/* o que o motor muda sozinho na tela (camada do fatiamento, avisos) também é traduzido */
+/* sem laço: só regrava o que muda (regravar o mesmo texto também dispara o observador) e junta os alvos de cada rodada */
+const observadorEn = typeof MutationObserver === "function" ? new MutationObserver(ms => { if (lang !== "en" || traduzindo) return;
+  const alvos = new Set(); ms.forEach(m => { const a = m.type === "characterData" ? m.target.parentElement : m.target; if (a) alvos.add(a); });
+  alvos.forEach(a => { if (![...alvos].some(o => o !== a && o.contains(a))) traduzirDom(a); }); }) : null;
+const nomeCaso = c => lang === "en" && CASOS_EN[c.id] ? CASOS_EN[c.id][0] : c.nome;
+const descCaso = c => lang === "en" && CASOS_EN[c.id] ? CASOS_EN[c.id][1] : (c.descricao || "");
 function aplicarIdioma() {
   document.documentElement.lang = lang === "en" ? "en" : "pt-BR";
   document.querySelectorAll("[data-t]").forEach(el => { const v = t(el.getAttribute("data-t")); if (typeof v === "string") el.textContent = v; });
@@ -1457,6 +1498,8 @@ function desenhar() {
   SUBABAS.forEach(([k]) => { const e = document.getElementById("tab-" + k), sim = k === abaLab; e.setAttribute("aria-selected", String(sim)); e.tabIndex = sim ? 0 : -1; });
   document.title = "InovaSTEM · " + t("nav_modelagem") + " · " + t("abas")[abaLab];
   desenhado = true;
+  traduzirDom(alvo);
+  if (observadorEn && !observadorEn._ligado) { observadorEn._ligado = true; observadorEn.observe(alvo, { childList: true, subtree: true, characterData: true }); }
   posDesenho();
 }
 /* depois do HTML: as vistas 3D voltam para o lugar delas (o mesmo canvas, sem perder nada) */
@@ -1688,7 +1731,8 @@ def montar() -> str:
     pref = ler(SIS / "physis-preferencias.js")
     prem3d = json.dumps(json.loads(ler(SIS / "physis-3d-premissas.json")), ensure_ascii=False)
     blocos = "\n".join(f'<script id="{i}">\n{ler(a)}</script>' for i, a in BLOCOS)
-    casca = (CASCA_JS.replace("__CORES__", json.dumps(CORES)).replace("__ESQ_PROJETO__", ESQUEMA_PROJETO)
+    casca = (CASCA_JS.replace("__CORES__", json.dumps(CORES)).replace("__MOTOR_EN__", json.dumps(MOTOR_EN, ensure_ascii=False, indent=0))
+             .replace("__MOTOR_EN_RX__", json.dumps(MOTOR_EN_RX, ensure_ascii=False)).replace("__CASOS_EN__", json.dumps(CASOS_EN, ensure_ascii=False, indent=0)).replace("__ESQ_PROJETO__", ESQUEMA_PROJETO)
              .replace("__SUBABAS__", json.dumps([list(s) for s in SUBABAS], ensure_ascii=False)))
     abas = "\n    ".join(f'<a role="tab" id="tab-{k}" href="#{k}" aria-controls="lab" aria-selected="{"true" if i == 0 else "false"}" '
                          f'tabindex="{0 if i == 0 else -1}">{i + 1}. {n}</a>' for i, (k, n) in enumerate(SUBABAS))

@@ -409,7 +409,7 @@ class Pagina(unittest.TestCase):
     def test_tema_escuro_da_delas_sem_verde(self):
         # dona, 21/11/2026: na tela roxa o rótulo do tema escuro é só "Escuro"/"Dark"; o módulo comum não muda
         self.assertIn('escuroDelas(aba === "delas" || aba === "delas_entrar");', self.js)
-        self.assertIn('replace(/ \((verde|green)\)/i, "")', self.js)
+        self.assertIn(r'replace(/ \((verde|green)\)/i, "")', self.js)
 
     def test_toda_chave_usada_existe(self):
         # botão vazio na Delas (20/11/2026): chave renomeada e ainda usada
@@ -1151,6 +1151,84 @@ class DesenhoTecnicoNoNavegador(unittest.TestCase):
 
     def test_padrao_circular_de_6(self):
         self.assertTrue(self.item("padrão circular de 6: 6 corpos")["ok"])
+
+
+
+VARREDURA_EN = r"""
+(async function () {
+  const espera = ms => new Promise(r => setTimeout(r, ms));
+  const PT = /[ãõáéíóúâêôçàÃÕÁÉÍÓÚÂÊÔÇÀ]|\b(não|você|para|com|peça|peças|simulação|uma|das|dos|ou|que|sem|até|mais|ainda|são|está|pelo|pela|nas|nos|cada|entre|sobre|depois|antes|também|aqui|isso|este|esta)\b/i;
+  const LIVRE = /\[(MARCADOR|CONFERIR)[^\]]*\]|Petrópolis|Português|InovaSTEM|PHYSIS|Physis|Kåsa|Zhang|Suen|Ø|°|×|²|³|·|—|–|…|→/g;
+  const sobra = {};
+  const olhar = (onde) => { const linhas = (document.getElementById("conteudo").innerText || "").split("\n").map(x => x.trim()).filter(Boolean);
+    linhas.forEach(l => { if (/^[{\[]"/.test(l)) return;   /* dado bruto em JSON (detalhes do cálculo) não é texto de tela */
+    const s = l.replace(LIVRE, " "); if (PT.test(s)) (sobra[onde] = sobra[onde] || new Set()).add(l.slice(0, 200)); }); };
+  try {
+    await espera(300);
+    for (const k of SUBABAS.map(s => s[0])) {
+      irPara(k); await espera(250); olhar(k);
+      if (k === "pecas") {
+        const x = document.getElementById("p3d-arquivo"), dt = new DataTransfer();
+        dt.items.add(new File([PHYSIS3D.escreverSTL(PHYSIS3D.cubo(20), "cubo")], "cubo.stl")); x.files = dt.files; x.dispatchEvent(new Event("change", { bubbles: true }));
+        await espera(600); olhar("pecas/modelo");
+        for (const sub of ["fatiar", "biblioteca", "forum", "metodo"]) { ui.p3dSub = sub; desenhar(); await espera(400); olhar("pecas/" + sub); }
+        ui.p3dSub = "modelo"; desenhar();
+      }
+      if (k === "simulacao") {
+        // todos os casos de cada fenômeno (35), não só o primeiro: escolhe no seletor, roda e olha
+        for (const sid of Array.from(document.querySelectorAll("[data-lab-sel]")).map(s => s.id)) {
+          const vals = Array.from(document.getElementById(sid).options).map(o => o.value);
+          for (const v of vals) {
+            const s = document.getElementById(sid); s.value = v; s.dispatchEvent(new Event("change", { bubbles: true })); await espera(120);
+            const b = document.getElementById(sid.replace("sim-sel-", "sim-rodar-")); if (b) { b.click(); await espera(200); }
+            olhar("simulacao/" + v);
+          }
+        }
+      }
+    }
+    const out = {}; Object.keys(sobra).forEach(k => { out[k] = Array.from(sobra[k]); });
+    document.getElementById("r-en").textContent = "RES:" + JSON.stringify(out);
+  } catch (e) { document.getElementById("r-en").textContent = "ERRO:" + (e && e.stack || e); }
+})();
+"""
+
+
+class InglesNoNavegador(unittest.TestCase):
+    """Com o idioma English, nenhuma subaba do laboratório pode mostrar texto em português (dona, 21/11/2026): percorre as
+    8 subabas num navegador sem tela, abre um cubo em Peças 3D (com as 5 partes do Physis 3D) e roda um exemplo de cada
+    fenômeno da Simulação. Exceções: nomes próprios e [MARCADOR]/[CONFERIR]."""
+
+    @classmethod
+    def setUpClass(cls):
+        import html
+        import subprocess
+        nav = _navegador()
+        if not nav:
+            raise unittest.SkipTest("sem Edge, Chrome ou Chromium nesta máquina")
+        cls.tmp = tempfile.TemporaryDirectory()
+        pagina = Path(cls.tmp.name) / "lab-en.html"
+        h = ler(AQUI / "web" / "inovastem-lab.html")
+        h = h.replace("<head>", '<head><script>try{localStorage.setItem("physis-idioma","en");}catch(e){}</script>', 1)
+        h = h.replace("</body>", '<pre id="r-en">rodando</pre><script>' + VARREDURA_EN + "</script></body>", 1)
+        pagina.write_text(h, encoding="utf-8")
+        cmd = [nav, "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check", f"--user-data-dir={Path(cls.tmp.name) / 'perfil'}",
+               "--virtual-time-budget=60000", "--dump-dom", pagina.resolve().as_uri()]
+        try:
+            saida = subprocess.run(cmd, capture_output=True, timeout=240).stdout.decode("utf-8", errors="replace")
+        except (OSError, subprocess.TimeoutExpired) as e:
+            raise unittest.SkipTest(f"o navegador não rodou: {e}")
+        m = re.search(r'<pre id="r-en">(.*?)</pre>', saida, re.S)
+        texto = html.unescape(m.group(1)) if m else ""
+        if not texto.startswith("RES:"):
+            raise AssertionError("a varredura não rodou: " + texto[:500])
+        cls.sobra = json.loads(texto[4:])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_nada_em_portugues(self):
+        self.assertEqual(self.sobra, {}, json.dumps(self.sobra, ensure_ascii=False, indent=1)[:6000])
 
 
 if __name__ == "__main__":
