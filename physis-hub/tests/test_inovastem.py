@@ -898,7 +898,7 @@ class Modelagem3D(unittest.TestCase):
     def test_oito_subabas_na_ordem_com_aria(self):
         # dona, 20 e 21/11/2026: "Enviar arquivo" primeiro; "Modelos BIM (CAD e IFC)" (chave edificacao) e logo depois
         # "Montagens"; "Escaneamento" saiu por enquanto
-        ordem = ["arquivo", "lugar", "edificacao", "montagem", "pecas", "simulacao", "fila", "galeria"]
+        ordem = ["arquivo", "lugar", "edificacao", "montagem", "pecas", "simulacao", "galeria"]   # 24/11/2026: fila dentro de Impressão 3D
         self.assertEqual(dict(self.lab.SUBABAS)["edificacao"], "Modelos BIM (CAD e IFC)")
         self.assertNotRegex(self.fora, r"(?i)escaneamento|crealityscan|scanning", "Escaneamento fora por enquanto")
         self.assertNotRegex(re.search(r"\nconst T = \{\n(.*?)\n\};\n", self.js, re.S).group(1), r"(?i)escaneamento|crealityscan|scanning")
@@ -932,8 +932,8 @@ class Modelagem3D(unittest.TestCase):
 
     def test_simulacao_um_bloco_por_fenomeno_pelo_motor(self):
         nomes = re.findall(r'\{ id: "([a-z]+)", prefixos: \[([^\]]+)\], pt: \{ nome: "([^"]+)"', self.js)
-        self.assertEqual([n for _, _, n in nomes], ["Calor", "Estrutura", "Ventilação e vento", "Terreno e água", "Incerteza", "Biogás", "Otimização QUBO"])
-        self.assertEqual(len(re.findall(r"\ben: \{ nome: ", self.js)), 7, "cada fenômeno em inglês")
+        self.assertEqual([n for _, _, n in nomes], ["Calor", "Estrutura", "Ventilação e vento", "Incerteza", "Biogás", "Otimização QUBO"])   # 24/11/2026: terreno é do Planejador
+        self.assertEqual(len(re.findall(r"\ben: \{ nome: ", self.js)), 6, "cada fenômeno em inglês")
         casos = json.loads(ler(RAIZ / "sistema" / "simulacao-exemplos" / "casos.json"))["casos"]
         for fid, pref, _ in nomes:
             p = re.findall(r'"([a-z]+\.)"', pref)
@@ -944,7 +944,7 @@ class Modelagem3D(unittest.TestCase):
         for f in ("rodarCaso", "desenhoCaso"):
             self.assertIn(f"SIMULACAO.{f}(", self.js)
             self.assertIn(f"{f}: {f}", motor, f"o motor exporta {f}")
-        self.assertIn("SIMULACAO.terreno.gradeDaGeometria(proj.lugar.dados)", self.js)
+        
         self.assertIn("telaPhysis3D()", self.js)
 
     def test_fila_e_galeria(self):
@@ -1034,7 +1034,8 @@ class Modelagem3D(unittest.TestCase):
         # Montagens: colisão por caixas e os programas mapeados nos documentos (o que falta é [MARCADOR])
         self.assertIn("PhysisImagem3D.colisoes(", self.js)
         progs = re.findall(r'^  \["([A-Za-z]+)", \[', re.search(r"const PROGRAMAS = \[(.*?)\]\]\];", self.js, re.S).group(1), re.M)
-        self.assertEqual(progs, ["FreeCAD", "CadQuery", "OpenSCAD", "Gmsh", "CalculiX", "OpenFOAM", "FEniCSx", "PrusaSlicer"])
+        self.assertEqual(progs[:8], ["FreeCAD", "CadQuery", "OpenSCAD", "Gmsh", "CalculiX", "OpenFOAM", "FEniCSx", "PrusaSlicer"])
+        self.assertNotIn("ORCA", self.js, "só software aberto (24/11/2026)")
         for lic in ("LGPL-2.1", "Apache-2.0", "GPL-2.0+", "GPL-3.0", "LGPL-3.0", "AGPL-3.0"):
             self.assertIn(lic, self.js, lic)
         self.assertIn("Fase 2, em servidor: em desenvolvimento", self.js)
@@ -1104,7 +1105,7 @@ class EnviarArquivoEImagem3D(unittest.TestCase):
         self.assertNotRegex(atrib, r'"on|href|style')
         self.assertIn('arquivos: [], passos: []', self.js)
         fluxo = re.findall(r'\["([a-z]+)", "[^"]+", "[^"]*"', re.search(r'fluxo: \[(.*?)\]\],', self.js, re.S).group(1))
-        self.assertEqual(fluxo, ["arquivo", "lugar", "montagem", "pecas", "simulacao", "fila", "galeria"])
+        self.assertEqual(fluxo, ["arquivo", "lugar", "montagem", "pecas", "simulacao", "galeria"])
         # foto → CAD 2D → 3D: escala de cinza, suavização, Otsu com ajuste manual, ruído e fundo; contorno + Douglas-Peucker
         for f in ("function cinza(", "function suavizar(", "function otsu(", "function limpar(", "function processarFoto(", "function contornos(", "function dp("):
             self.assertIn(f, self.mod, f)

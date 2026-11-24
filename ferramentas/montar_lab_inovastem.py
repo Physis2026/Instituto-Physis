@@ -65,7 +65,8 @@ CORES = {"#DBE7F1": "#F4F1EA", "#B8D0E0": "#D9D3C2", "#7FA9C4": "#8A9284", "#546
 # subabas (dona, 20 e 21/11/2026): "Enviar arquivo" primeiro; "Edificação" virou "Modelos BIM (CAD e IFC)" (a chave interna
 # continua "edificacao"); "Montagens" logo depois; "Escaneamento" saiu por enquanto (volta depois; #escaneamento abre Enviar arquivo)
 SUBABAS = [("arquivo", "Enviar arquivo"), ("lugar", "Lugar (GIS)"), ("edificacao", "Modelos BIM (CAD e IFC)"), ("montagem", "Montagens"),
-           ("pecas", "Peças 3D"), ("simulacao", "Simulação"), ("fila", "Fila de impressão"), ("galeria", "Galeria")]
+           ("pecas", "Impressão 3D"), ("simulacao", "Simulação"), ("galeria", "Galeria")]
+# 24/11/2026 (dona): UMA aba de impressão 3D (peça, parâmetros, filamentos, fatiamento, arquivos de teste e fila); as outras são de simulação
 ESQUEMA_PROJETO = "inovastem-projeto/1"
 
 # Inglês dos motores (dona, 21/11/2026): o que o PHYSIS3D_I18N e o SIMULACAO_I18N ainda não traduziam. Só texto da tela;
@@ -160,7 +161,7 @@ CASCA_JS = r""""use strict";
    (SIMULACAO, telaPhysis3D) não mudam: a casca só chama as funções deles e troca as cores do desenho para as do guia. */
 const CORES = __CORES__;
 const SUBABAS = __SUBABAS__;
-const ANTIGAS = { "3d": "pecas", "escaneamento": "arquivo" };          // endereços antigos (Escaneamento saiu em 21/11/2026)
+const ANTIGAS = { "3d": "pecas", "escaneamento": "arquivo", "fila": "pecas" };          // endereços antigos (Escaneamento saiu em 21/11/2026)
 const ESQ_PROJETO = "__ESQ_PROJETO__", ESQ_LUGAR = "physis-geometria-lugar/1", CHAVE_PROJ = "inovastem-projeto";
 const ARQ_MAX = 20 * 1024 * 1024;                           // o mesmo limite dos arquivos do Mapeamento e da fila (20 MB)
 
@@ -175,7 +176,7 @@ const T = {
     abas_rot: "Subabas da Modelagem Physis 3D", proj_rot: "Projeto comum",
     rodape_realiza: "InovaSTEM · uma iniciativa PHYSIS", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ) · Contato: [MARCADOR]",
     rodape_beta: "Versão beta: termos e aviso de privacidade em revisão jurídica.", termos: "Termos de uso (beta)", privacidade: "Privacidade (beta)", acessibilidade: "Acessibilidade",
-    abas: { arquivo: "Enviar arquivo", lugar: "Lugar (GIS)", edificacao: "Modelos BIM (CAD e IFC)", montagem: "Montagens", pecas: "Peças 3D", simulacao: "Simulação", fila: "Fila de impressão", galeria: "Galeria" },
+    abas: { arquivo: "Enviar arquivo", lugar: "Lugar (GIS)", edificacao: "Modelos BIM (CAD e IFC)", montagem: "Montagens", pecas: "Impressão 3D", simulacao: "Simulação", fila: "Fila de impressão", galeria: "Galeria" },
     // barra do projeto e fluxo
     proj_titulo: "Projeto comum", proj_guardado: "guardado neste navegador · atualizado em", vazio: "vazio", arquivos: "Arquivos", ultimo: "último",
     lugar: "Lugar", modelo_bim: "Modelo BIM", pecas: "Peças", montagem: "Montagem", resultados: "Resultados", de: "de", elementos: "elementos", objetos: "objetos", itens: "itens",
@@ -184,7 +185,7 @@ const T = {
     proj_baixado: "Arquivo do projeto baixado.", proj_importado: "Projeto importado:", proj_nao: "Este arquivo não é um projeto", proj_falha_guardar: "Atenção: não deu para guardar neste navegador (espaço cheio ou navegação privada). Exporte o arquivo do projeto para não perder.",
     fluxo_rot: "Fluxo da Modelagem Physis 3D", ainda_nao: "ainda não", ou: "ou",
     fluxo: [["arquivo", "Enviar arquivo", ""], ["lugar", "Lugar ou Modelos BIM", "se for território, edificação ou peça mecânica"], ["montagem", "Montagens", "se tiver várias peças"],
-            ["pecas", "Peças 3D", ""], ["simulacao", "Simulação", ""], ["fila", "Fila de impressão", ""], ["galeria", "Galeria", ""]],
+            ["pecas", "Impressão 3D", ""], ["simulacao", "Simulação", ""], ["galeria", "Galeria", ""]],
     // comuns
     escolha_arquivo: "Escolha um arquivo.", grande: "Arquivo grande demais (máximo 20 MB).", json_invalido: "O arquivo não é um JSON válido.", sem_hub: "Sem ligação com o servidor da InovaSTEM.",
     carregando: "Carregando…", lendo: "Lendo…", baixado: "Arquivo baixado.", tirar: "Tirar", acao: "Ação", nome: "Nome", tamanho: "Tamanho", volume: "Volume", triangulos: "Triângulos",
@@ -288,7 +289,7 @@ const T = {
     mo_prog_txt: "Programas abertos já mapeados nos documentos do sistema (docs/PHYSIS_3D.md, docs/SIMULACAO.md e o catálogo de software aberto). Nenhum deles roda dentro do navegador: os de servidor são a Fase 2.",
     mo_prog_cols: ["Programa", "O que faz", "Entrada e saída", "Licença", "Situação"], mo_sem_proj_geo: "As peças guardadas no projeto levam a geometria neste navegador (IndexedDB); o arquivo .json do projeto não leva a malha.",
     // 5. peças 3D
-    pc_t: "Peças 3D", pc_no_proj: "Peças no projeto",
+    pc_t: "Impressão 3D", pc_no_proj: "Peças no projeto",
     pc_txt: "Abra a peça no Physis 3D logo abaixo (STL, OBJ ou 3MF). Depois guarde no projeto comum (as medidas no projeto e a malha neste navegador), leve para a modelagem ou peça a impressão.",
     pc_guardar: "Guardar a peça aberta no projeto", pc_dica: "Abra um arquivo de peça primeiro.", pc_guardada: "Peça guardada no projeto:", pc_tirada: "Peça tirada do projeto.",
     pc_editar: "Editar em Modelos BIM (CAD e IFC)", pc_guardadas: "Peças guardadas no projeto", pc_biblioteca: "Biblioteca", pc_quando: "Guardada em", pc_aberto: "aberto no Physis 3D. Confira as medidas e guarde no projeto.",
@@ -346,7 +347,7 @@ const T = {
     abas_rot: "Physis 3D modelling sub-tabs", proj_rot: "Shared project",
     rodape_realiza: "InovaSTEM · a PHYSIS initiative", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ), Brazil · Contact: [MARCADOR]",
     rodape_beta: "Beta version: terms and privacy notice under legal review.", termos: "Terms of use (beta)", privacidade: "Privacy (beta)", acessibilidade: "Accessibility",
-    abas: { arquivo: "Upload a file", lugar: "Site (GIS)", edificacao: "BIM models (CAD and IFC)", montagem: "Assemblies", pecas: "3D parts", simulacao: "Simulation", fila: "Print queue", galeria: "Gallery" },
+    abas: { arquivo: "Upload a file", lugar: "Site (GIS)", edificacao: "BIM models (CAD and IFC)", montagem: "Assemblies", pecas: "3D printing", simulacao: "Simulation", fila: "Print queue", galeria: "Gallery" },
     proj_titulo: "Shared project", proj_guardado: "kept in this browser · updated on", vazio: "empty", arquivos: "Files", ultimo: "latest",
     lugar: "Site", modelo_bim: "BIM model", pecas: "Parts", montagem: "Assembly", resultados: "Results", de: "from", elementos: "elements", objetos: "objects", itens: "items",
     proj_exportar: "Export the project (.json)", proj_importar: "Import a project (.json)", proj_limpar: "Start another project", proj_confirmar: "Confirm: delete the project from this browser",
@@ -354,7 +355,7 @@ const T = {
     proj_baixado: "Project file downloaded.", proj_importado: "Project imported:", proj_nao: "This file is not a project", proj_falha_guardar: "Warning: it could not be saved in this browser (storage full or private browsing). Export the project file so you do not lose it.",
     fluxo_rot: "Physis 3D modelling flow", ainda_nao: "not yet", ou: "or",
     fluxo: [["arquivo", "Upload a file", ""], ["lugar", "Site or BIM models", "for land, buildings or mechanical parts"], ["montagem", "Assemblies", "if there are several parts"],
-            ["pecas", "3D parts", ""], ["simulacao", "Simulation", ""], ["fila", "Print queue", ""], ["galeria", "Gallery", ""]],
+            ["pecas", "3D printing", ""], ["simulacao", "Simulation", ""], ["galeria", "Gallery", ""]],
     escolha_arquivo: "Choose a file.", grande: "File too large (20 MB maximum).", json_invalido: "The file is not valid JSON.", sem_hub: "No connection to the InovaSTEM server.",
     carregando: "Loading…", lendo: "Reading…", baixado: "File downloaded.", tirar: "Remove", acao: "Action", nome: "Name", tamanho: "Size", volume: "Volume", triangulos: "Triangles",
     malha: "Mesh", fechada: "closed", aberta: "with open or non-manifold edges (check in 3D parts)", baixar_svg: "Download SVG", baixar_dxf: "Download DXF", baixar_stl: "Download STL",
@@ -450,7 +451,7 @@ const T = {
     mo_exp_t: "Export the assembly", mo_prog_t: "Mechanical modelling and simulation programs already mapped",
     mo_prog_txt: "Open programs already mapped in the system documents (docs/PHYSIS_3D.md, docs/SIMULACAO.md and the open software catalogue). None of them runs inside the browser: the server ones are Phase 2.",
     mo_prog_cols: ["Program", "What it does", "Input and output", "Licence", "Status"], mo_sem_proj_geo: "Parts saved in the project keep their geometry in this browser (IndexedDB); the project .json file does not carry the mesh.",
-    pc_t: "3D parts", pc_no_proj: "Parts in the project",
+    pc_t: "3D printing", pc_no_proj: "Parts in the project",
     pc_txt: "Open the part in Physis 3D just below (STL, OBJ or 3MF). Then save it in the shared project (measurements in the project and the mesh in this browser), take it to modelling or request a print.",
     pc_guardar: "Save the open part in the project", pc_dica: "Open a part file first.", pc_guardada: "Part saved in the project:", pc_tirada: "Part removed from the project.",
     pc_editar: "Edit in BIM models (CAD and IFC)", pc_guardadas: "Parts saved in the project", pc_biblioteca: "Library", pc_quando: "Saved on", pc_aberto: "opened in Physis 3D. Check the measurements and save it in the project.",
@@ -607,7 +608,7 @@ const ehEquipe = i => !!(i && (i.papel === "operador" || i.papel === "administra
 /* ════════ fluxo e passos do projeto ════════ */
 function registrarPasso(passo, detalhe) { proj.passos.push({ passo, detalhe: String(detalhe || "").slice(0, 200), quando: agora() }); if (proj.passos.length > 200) proj.passos.splice(0, proj.passos.length - 200); }
 function ultimoPasso(nomes) { for (let i = proj.passos.length - 1; i >= 0; i--) if (nomes.indexOf(proj.passos[i].passo) >= 0) return proj.passos[i]; return null; }
-const NOMES_FLUXO = { arquivo: ["arquivo"], lugar: ["lugar", "edificacao"], montagem: ["montagem"], pecas: ["pecas"], simulacao: ["simulacao"], fila: ["fila"], galeria: ["galeria"] };
+const NOMES_FLUXO = { arquivo: ["arquivo"], lugar: ["lugar", "edificacao"], montagem: ["montagem"], pecas: ["pecas", "fila"], simulacao: ["simulacao"], galeria: ["galeria"] };
 function fluxoHtml() {
   return `<nav aria-label="${escL(t("fluxo_rot"))}"><ol class="lab-fluxo">${t("fluxo").map(([k, nome, quandoUsar], i) => {
     const nomes = NOMES_FLUXO[k], u = ultimoPasso(nomes), atual = nomes.indexOf(abaLab) >= 0, cur = a => abaLab === a ? ' aria-current="step"' : "";
@@ -654,7 +655,7 @@ function pedirImpressaoDe(nome, dados, origem) {
   } catch (e) { T = null; conf = null; }
   lab.filaArq = { nome, bytes, origem, tamanho: bytes.length, T, conf, apoiou, divisao: null };
   lab.filaMsg = null; registrarPasso("fila", (origem || "") + ": " + nome); gravarProjeto("");
-  irPara("fila"); focar("fi-arq-h");
+  irPara("pecas"); focar("fi-arq-h");
 }
 /* qualquer impressora (dona, 22/11/2026): STL binário em mm, malha conferida, peça apoiada na mesa (z = 0) */
 const MESA_MM = 200;
@@ -903,7 +904,7 @@ function telaArquivo() {
   <section class="cartao" aria-labelledby="ar-o-h"><h3 id="ar-o-h">${escL(t("ar_passo_t"))}</h3><p>${escL(t("ar_intro"))}</p>
     <label for="ar-arq">${escL(t("ar_rot"))}</label><input id="ar-arq" type="file" data-lab-arq="enviar">
     ${msgHtml("ar-msg", lab.arqMsg)}</section>`;
-  if (!a) return h + cartaoTestes();
+  if (!a) return h;
   if (a.fonte === "malha") return h + `<section class="cartao" aria-labelledby="ar-m-h"><h3 id="ar-m-h">${escL(t("ar_malha_t"))}: ${escL(a.nome)}</h3><p>${escL(t("ar_malha_txt"))}</p>
     <div class="acoes"><button class="botao" type="button" id="ar-abrir-malha" data-lab="arq-malha">${escL(t("abrir_pecas"))}</button>
     <button class="botao sec" type="button" id="ar-imp-malha" data-lab="arq-malha-imp">${escL(t("pedir_impressao"))}</button></div></section>` + cartaoTestes();
@@ -946,7 +947,7 @@ function telaArquivo() {
       <button class="botao sec" type="button" id="ar-editar" data-lab="arq-editar">${escL(t("ar_editar_bim"))}</button>
       <button class="botao sec" type="button" id="ar-svg" data-lab="arq-svg">${escL(t("baixar_svg"))}</button><button class="botao sec" type="button" id="ar-dxf" data-lab="arq-dxf">${escL(t("baixar_dxf"))}</button>
       <button class="botao sec" type="button" id="ar-stl" data-lab="arq-stl">${escL(t("baixar_stl"))}</button><button class="botao sec" type="button" id="ar-3mf" data-lab="arq-3mf">${escL(t("baixar_3mf"))}</button></div></section>`;
-  return h + cartaoTestes();
+  return h;
 }
 /* vista 3D pequena do Enviar arquivo (three.js, carregada só quando precisa) */
 function posArquivo() {
@@ -1256,10 +1257,7 @@ function telaMontagem() {
   <section class="cartao" aria-labelledby="mo-c-h"><h3 id="mo-c-h">${escL(t("mo_col_t"))}</h3>
     ${col.length ? `<ul class="lista">${col.map(c => `<li>${escL(itens[c.a].nome)} × ${escL(itens[c.b].nome)}: ${escL(t("mo_col"))} (${nf(c.volume_mm3 / 1000, 2)} cm³)</li>`).join("")}</ul>` : `<p>${escL(t("mo_col_ok"))}</p>`}
     <p class="t2 pq">${escL(t("mo_col_nota"))}</p></section>
-  <section class="cartao" aria-labelledby="mo-e-h"><h3 id="mo-e-h">${escL(t("mo_exp_t"))}</h3>${exportarBotoes("mo", "")}</section>
-  <section class="cartao" aria-labelledby="mo-p-h"><h3 id="mo-p-h">${escL(t("mo_prog_t"))}</h3><p>${escL(t("mo_prog_txt"))}</p>
-    <div class="rolagem"><table><caption>${escL(t("mo_prog_t"))}</caption><thead><tr>${t("mo_prog_cols").map(c => `<th scope="col">${escL(c)}</th>`).join("")}</tr></thead>
-    <tbody>${PROGRAMAS.map(p => `<tr><th scope="row">${escL(p[0])}</th>${p.slice(1).map(c => `<td>${escL(lang === "en" ? c[1] : c[0])}</td>`).join("")}</tr>`).join("")}</tbody></table></div></section>`;
+  <section class="cartao" aria-labelledby="mo-e-h"><h3 id="mo-e-h">${escL(t("mo_exp_t"))}</h3>${exportarBotoes("mo", "")}</section>`;
 }
 /* programas mapeados nos documentos (docs/PHYSIS_3D.md, docs/SIMULACAO.md, Sistema Physis/23b_Catalogo_Software_Aberto.md); o que não está neles é [MARCADOR] */
 const EM_DEV = ["Fase 2, em servidor: em desenvolvimento", "Phase 2, on the server: in development"];
@@ -1271,7 +1269,20 @@ const PROGRAMAS = [
   ["CalculiX", ["Elementos finitos: tração, compressão, flexão, flambagem e calor", "Finite elements: tension, compression, bending, buckling and heat"], ["Entrada no formato tipo Abaqus; saída [MARCADOR]", "Abaqus-like input format; output [MARCADOR]"], ["GPL-2.0+", "GPL-2.0+"], EM_DEV],
   ["OpenFOAM", ["Escoamento (CFD), pressão e calor em fluidos", "Flow (CFD), pressure and heat in fluids"], ["[MARCADOR]", "[MARCADOR]"], ["GPL-3.0", "GPL-3.0"], EM_DEV],
   ["FEniCSx", ["Equações (PDE) escritas em Python e resolvidas por elementos finitos", "Equations (PDEs) written in Python and solved by finite elements"], ["[MARCADOR]", "[MARCADOR]"], ["LGPL-3.0 (partes MIT)", "LGPL-3.0 (parts MIT)"], EM_DEV],
-  ["PrusaSlicer", ["Fatiador: transforma a peça em G-code (serviço fatiador do servidor)", "Slicer: turns the part into G-code (server slicer service)"], ["Entrada: STL; saída: G-code", "Input: STL; output: G-code"], ["AGPL-3.0", "AGPL-3.0"], ["Serviço em contêiner escrito, ainda não construído: em desenvolvimento", "Container service written, not built yet: in development"]]];
+  ["PrusaSlicer", ["Fatiador: transforma a peça em G-code (serviço fatiador do servidor)", "Slicer: turns the part into G-code (server slicer service)"], ["Entrada: STL; saída: G-code", "Input: STL; output: G-code"], ["AGPL-3.0", "AGPL-3.0"], ["Serviço em contêiner escrito, ainda não construído: em desenvolvimento", "Container service written, not built yet: in development"]],
+  ["Bonsai (antigo BlenderBIM)", ["BIM/IFC no Blender: cortes, plantas e documentação", "BIM/IFC in Blender: sections, plans and documentation"], ["IFC", "IFC"], ["GPL-3.0", "GPL-3.0"], ["Instalar no servidor: bonsaibim.org [CONFERIR]", "Install on the server: bonsaibim.org [CONFERIR]"]],
+  ["Salome-Meca / Code_Aster", ["Mecânica estrutural avançada com pré e pós", "Advanced structural mechanics with pre and post"], ["[MARCADOR]", "[MARCADOR]"], ["GPL", "GPL"], ["Instalar no servidor: code-aster.org [CONFERIR]", "Install on the server: code-aster.org [CONFERIR]"]],
+  ["Elmer FEM", ["Multifísica: fluidos, estrutura, eletromagnetismo e calor", "Multiphysics: fluids, structures, electromagnetics and heat"], ["[MARCADOR]", "[MARCADOR]"], ["GPL", "GPL"], ["Instalar no servidor: elmerfem.org [CONFERIR]", "Install on the server: elmerfem.org [CONFERIR]"]],
+  ["openEMS", ["Eletromagnetismo 3D (FDTD): antenas e sensores", "3D electromagnetics (FDTD): antennas and sensors"], ["[MARCADOR]", "[MARCADOR]"], ["GPL", "GPL"], ["Instalar no servidor: openems.de [CONFERIR]", "Install on the server: openems.de [CONFERIR]"]],
+  ["Gazebo", ["Robótica, sensores e sistemas autônomos", "Robotics, sensors and autonomous systems"], ["[MARCADOR]", "[MARCADOR]"], ["Apache-2.0", "Apache-2.0"], ["Instalar no servidor: gazebosim.org [CONFERIR]", "Install on the server: gazebosim.org [CONFERIR]"]],
+  ["LAMMPS", ["Dinâmica molecular de materiais", "Molecular dynamics of materials"], ["[MARCADOR]", "[MARCADOR]"], ["GPL", "GPL"], ["Instalar no servidor: lammps.org [CONFERIR]", "Install on the server: lammps.org [CONFERIR]"]],
+  ["Avogadro", ["Editor e visualizador molecular", "Molecular editor and viewer"], ["[MARCADOR]", "[MARCADOR]"], ["BSD", "BSD"], ["Instalar no servidor: two.avogadro.cc [CONFERIR]", "Install on the server: two.avogadro.cc [CONFERIR]"]],
+  ["Psi4", ["Química quântica ab initio", "Ab initio quantum chemistry"], ["[MARCADOR]", "[MARCADOR]"], ["LGPL", "LGPL"], ["Instalar no servidor: psicode.org [CONFERIR]", "Install on the server: psicode.org [CONFERIR]"]],
+  ["RDKit", ["Quimioinformática (Python)", "Cheminformatics (Python)"], ["[MARCADOR]", "[MARCADOR]"], ["BSD", "BSD"], ["Instalar no servidor: rdkit.org [CONFERIR]", "Install on the server: rdkit.org [CONFERIR]"]],
+  ["GROMACS", ["Dinâmica molecular de biomoléculas", "Molecular dynamics of biomolecules"], ["[MARCADOR]", "[MARCADOR]"], ["LGPL", "LGPL"], ["Instalar no servidor: gromacs.org [CONFERIR]", "Install on the server: gromacs.org [CONFERIR]"]],
+  ["COPASI", ["Redes bioquímicas e vias metabólicas", "Biochemical networks and metabolic pathways"], ["[MARCADOR]", "[MARCADOR]"], ["Artistic-2.0", "Artistic-2.0"], ["Instalar no servidor: copasi.org [CONFERIR]", "Install on the server: copasi.org [CONFERIR]"]],
+  ["CellBlender (MCell)", ["Processos celulares e difusão molecular (Blender)", "Cell processes and molecular diffusion (Blender)"], ["[MARCADOR]", "[MARCADOR]"], ["GPL/MIT", "GPL/MIT"], ["Instalar no servidor: mcell.org [CONFERIR]", "Install on the server: mcell.org [CONFERIR]"]],
+  ["OpenSim", ["Modelagem musculoesquelética e movimento", "Musculoskeletal modelling and motion"], ["[MARCADOR]", "[MARCADOR]"], ["Apache-2.0", "Apache-2.0"], ["Instalar no servidor: simtk.org/projects/opensim [CONFERIR]", "Install on the server: simtk.org/projects/opensim [CONFERIR]"]]];
 async function acrescentarNaMontagem(fonte) {
   if (fonte === "aberta") { const st = (typeof ui !== "undefined" && ui.p3d) || {}; if (!st.T) return { texto: t("pc_dica"), erro: true };
     montagemAdd({ nome: String(st.nome || "peça"), T: st.T, origem: "pecas" }); return { texto: String(st.nome || "") }; }
@@ -1343,15 +1354,6 @@ const FEN = [
     entra: "Openings, heights and temperatures; section grid and obstacle; wind series and turbine curve.",
     sai: "Flow rate and air changes per hour; qualitative velocity field; energy from the series and from the fitted Weibull.",
     limites: "Assumed discharge and pressure coefficients. The LBM flow is qualitative (Phase 1): it shows wakes and acceleration, never a design number." } },
-  { id: "terreno", prefixos: ["terreno."], pt: { nome: "Terreno e água",
-    faz: "Declividade e aspecto, caminho da água (D8) e acumulação, enxurrada de um evento (SCS-CN), perda de solo (USLE) e visada.",
-    entra: "Grade de cotas (a do exemplo ou o terreno do lugar do projeto, contrato physis-geometria-lugar/1); chuva e CN por uso do solo; R, K, C e P digitados na USLE.",
-    sai: "Acumulação de fluxo, volume de enxurrada acumulado, perda de solo por célula e células visíveis.",
-    limites: "Evento isolado e bacias pequenas no SCS-CN (sem vazão de pico nem hidrograma); fatores da USLE digitados. Cada resultado traz o limite do motor." },
-    en: { nome: "Terrain and water", faz: "Slope and aspect, water path (D8) and accumulation, runoff from one event (SCS-CN), soil loss (USLE) and line of sight.",
-    entra: "Height grid (the example's or the project site's terrain, physis-geometria-lugar/1 contract); rainfall and CN by land use; typed R, K, C and P for USLE.",
-    sai: "Flow accumulation, accumulated runoff volume, soil loss per cell and visible cells.",
-    limites: "Single event and small catchments for SCS-CN (no peak flow or hydrograph); typed USLE factors. Each result carries the engine's limit." } },
   { id: "incerteza", prefixos: ["incerteza."], pt: { nome: "Incerteza",
     faz: "Monte Carlo: sorteia as entradas (normal, uniforme, triangular, lognormal) e mostra a média e os percentis do resultado.",
     entra: "Cada entrada com a sua distribuição; o modelo (carbono, solar, payback ou biogás); número de sorteios e semente.",
@@ -1466,12 +1468,38 @@ function blocoFen(f, n) {
     ${msgHtml("sim-msg-" + f.id, st.msg)}
     <div class="lab-res">${res}</div></section>`;
 }
+/* 24/11/2026 (dona): Simulação por área; impressão 3D fica só na aba Impressão 3D */
+const AREAS_SIM = { mecanica: ["Mecânica e engenharia (CAD, CAE, CFD)", "Mechanics and engineering (CAD, CAE, CFD)"], fisica: ["Física (multifísica e eletromagnetismo)", "Physics (multiphysics and electromagnetics)"],
+  quimica: ["Química (quântica e molecular)", "Chemistry (quantum and molecular)"], biologia: ["Biologia e bioinformática", "Biology and bioinformatics"], comuns: ["Incerteza e otimização", "Uncertainty and optimisation"] };
+const FEN_AREA = { mecanica: ["estrutura"], fisica: ["calor", "ventilacao"], quimica: [], biologia: ["biogas"], comuns: ["incerteza", "qubo"] };
+const AREA_PROG = { mecanica: ["FreeCAD", "CadQuery", "OpenSCAD", "Gmsh", "CalculiX", "OpenFOAM", "Salome-Meca / Code_Aster", "Bonsai (antigo BlenderBIM)"],
+  fisica: ["Elmer FEM", "openEMS", "Gazebo", "LAMMPS", "FEniCSx"], quimica: ["Avogadro", "Psi4", "RDKit"], biologia: ["GROMACS", "COPASI", "CellBlender (MCell)", "OpenSim"] };
+function preverModelagem(txt) {
+  const M = window.PhysisModelador, L = lang === "en" ? "en" : "pt";
+  if (!M || !M.entender) return { txt, perg: [], an: [] };
+  let q = M.entender(txt, false); if (["netzero", "avac", "dutos"].indexOf(q) >= 0) q = "";
+  return { txt, perg: M.perguntas(q, txt, L), an: q ? M.analises(q, L) : [] };
+}
 function telaSimulacaoBlocos() {
   const guardados = proj.resultados.map((r, i) => `<tr><th scope="row">${escL(r.nome)}</th><td>${escL(r.fenomeno_nome)}</td><td>${escL(t(r.exemplo_dados_ficticios ? "si_ex" : "si_bench"))}${r.entrada_mudada ? ", " + escL(t("si_mudada")) : ""}${r.terreno_do_lugar ? ", " + escL(t("si_do_lugar")) : ""}</td>
       <td>${escL(quando(r.guardado_em))}</td><td><button class="botao sec" type="button" id="res-tirar-${i}" data-lab="res-tirar" data-i="${i}" aria-label="${escL(t("tirar"))}: ${escL(r.nome)}">${escL(t("tirar"))}</button></td></tr>`).join("");
+  const en = lang === "en", P = lab.prev || null, num = {}; FEN.forEach((f, i) => { num[f.id] = i + 1; });
+  const area = (k, ids) => { const fs = FEN.filter(f => ids.indexOf(f.id) >= 0), pr = PROGRAMAS.filter(p => (AREA_PROG[k] || []).indexOf(p[0]) >= 0);
+    return `<section class="cartao" aria-labelledby="si-a-${k}"><h3 id="si-a-${k}">${escL(AREAS_SIM[k][en ? 1 : 0])}</h3>
+      ${pr.length ? `<p class="t2">${escL(en ? "Open programs for this area (on the server):" : "Programas abertos desta área (no servidor):")} ${pr.map(p => escL(p[0])).join(" · ")}</p>` : ""}</section>
+      ${fs.map(f => blocoFen(f, num[f.id])).join("")}`; };
   return `<h2>${escL(t("si_t"))}</h2><p>${escL(t("si_txt"))}</p><p class="faixa" role="note">${escL(t("si_faixa"))}</p>
+  <section class="cartao" aria-labelledby="si-prev-h"><h3 id="si-prev-h">${escL(en ? "Modelling forecast" : "Previsão da modelagem")}</h3>
+    <p>${escL(en ? "Describe the object: the bot lists the analyses it needs and the program for each, or asks what is missing." : "Descreva o objeto: o bot lista as análises que ele pede e o programa de cada uma, ou pergunta o que falta.")}</p>
+    <label for="si-prev-txt">${escL(en ? "Object" : "Objeto")}</label><textarea id="si-prev-txt" rows="2" maxlength="600">${escL(P ? P.txt : "")}</textarea>
+    <div class="acoes"><button class="botao" type="button" id="si-prev-b" data-lab="sim-prever">${escL(en ? "Forecast" : "Prever")}</button></div>
+    ${P ? (P.perg.length ? `<p><strong>${escL(en ? "To model without guessing, answer:" : "Para modelar sem supor, responda:")}</strong></p><ol class="lista">${P.perg.map(x => `<li>${escL(x)}</li>`).join("")}</ol>` : "")
+      + (P.an.length ? `<ul class="lista">${P.an.map(a => `<li>${escL(a[0])} · <span class="t2">${escL(a[1])}</span></li>`).join("")}</ul>` : "") : ""}</section>
   <ul class="lab-indice" aria-label="${escL(t("si_ir"))}">${FEN.map((f, i) => `<li><button class="botao sec" type="button" id="sim-ir-${f.id}" data-lab="sim-ir" data-fen="${f.id}">${i + 1}. ${escL(fx(f).nome)}</button></li>`).join("")}</ul>
-  ${FEN.map((f, i) => blocoFen(f, i + 1)).join("")}
+  ${Object.keys(AREAS_SIM).map(k => area(k, FEN_AREA[k] || [])).join("")}
+  <section class="cartao" aria-labelledby="mo-p-h"><h3 id="mo-p-h">${escL(t("mo_prog_t"))}</h3><p>${escL(t("mo_prog_txt"))}</p>
+    <div class="rolagem"><table><caption>${escL(t("mo_prog_t"))}</caption><thead><tr>${t("mo_prog_cols").map(c => `<th scope="col">${escL(c)}</th>`).join("")}</tr></thead>
+    <tbody>${PROGRAMAS.map(p => `<tr><th scope="row">${escL(p[0])}</th>${p.slice(1).map(c => `<td>${escL(lang === "en" ? c[1] : c[0])}</td>`).join("")}</tr>`).join("")}</tbody></table></div></section>
   <section class="cartao" aria-labelledby="sim-proj-h"><h3 id="sim-proj-h">${escL(t("si_guardados"))}</h3>
     ${proj.resultados.length ? `<div class="rolagem"><table><caption>${escL(t("si_guardados"))}</caption><thead><tr>${t("si_cols").map(c => `<th scope="col">${escL(c)}</th>`).join("")}</tr></thead><tbody>${guardados}</tbody></table></div>` : `<p class="t2">${escL(t("si_nenhum"))}</p>`}</section>`;
 }
@@ -1555,7 +1583,8 @@ function telaGaleria() {
 }
 
 /* ════════ desenho, idioma, subabas e eventos ════════ */
-const TELAS = { arquivo: telaArquivo, lugar: telaLugar, edificacao: telaBim, montagem: telaMontagem, pecas: telaPecas, simulacao: telaSimulacaoBlocos, fila: telaFila, galeria: telaGaleria };
+const TELAS = { arquivo: telaArquivo, lugar: telaLugar, edificacao: telaBim, montagem: telaMontagem, pecas: telaImpressao, simulacao: telaSimulacaoBlocos, galeria: telaGaleria };
+function telaImpressao() { return telaPecas() + telaFila(); }
 /* ════════ motores em inglês: dicionário aplicado sobre o texto que os motores escrevem (o cálculo não muda) ════════
    PHYSIS3D_I18N (+ _RX) e SIMULACAO_I18N vêm dos motores; MOTOR_EN completa o que faltava; CASOS_EN traduz os casos da simulação. */
 let DIC_EN = null, RX_EN = null;
@@ -1640,7 +1669,7 @@ function desenharSemVista() {
 window.__p3dDesenhar = desenhar;
 function focar(id) { const e = id && document.getElementById(id); if (e && !e.disabled) e.focus(); else document.getElementById("lab").focus(); }
 function aoEntrar() {
-  if (abaLab === "fila") carregarFila().then(() => { if (abaLab === "fila") { desenhar(); if (lab.filaArq) focar("fi-arq-h"); } });
+  if (abaLab === "pecas") carregarFila().then(() => { if (abaLab === "pecas") { desenhar(); if (lab.filaArq) focar("fi-arq-h"); } });
   if (abaLab === "galeria" && (!lab.gal || !lab.gal.j || !lab.gal.j.ok)) carregarGaleria().then(() => { if (abaLab === "galeria") desenhar(); });
   if ((abaLab === "edificacao" || abaLab === "montagem" || abaLab === "arquivo") && window.PhysisModelagem) window.PhysisModelagem.carregar(["three"]).then(() => { if (desenhado) posDesenho(); }).catch(() => {});
 }
@@ -1683,6 +1712,7 @@ async function acao(a, b) {
   if (a === "sim-rodar" && fen) { rodarFen(fen); return; }
   if (a === "sim-repor" && fen) { const st = estSim(fen).st; st.entrada = null; st.res = null; st.c2 = null; st.aberta = false; st.msg = { texto: t("si_reposto") }; return; }
   if (a === "sim-guardar" && fen) { estSim(fen).st.msg = guardarResultado(fen); return; }
+  if (a === "sim-prever") { const el = document.getElementById("si-prev-txt"); lab.prev = preverModelagem(el ? el.value.trim() : ""); return; }
   if (a === "fila-recarregar") { await carregarFila(); return; }
   if (a === "fila-descartar") { lab.filaArq = null; return; }
   if (a === "fila-dividir") { await dividirFilaArq(); focar("fi-arq-h"); return; }
