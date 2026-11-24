@@ -500,9 +500,12 @@ class Laboratorio(unittest.TestCase):
         # dona, 22/11/2026 ("Sim, pela fonte"): o bot entra pelo gerador, cópia exata do original, no topo da página
         # (fora das subabas), troca de idioma com a página e o sincronizar regera o laboratório quando um original muda
         blocos = [i for i, _ in self.lab.BLOCOS]
-        if "physis-modelador" in blocos:     # só entra com os textos da InovaSTEM: nada de Planejador nem da fila interna do M&A
-            m = re.search(r'<script id="physis-modelador">\n(.*?)</script>', self.h, re.S).group(1)
-            self.assertNotRegex(m, r"Planejador|Planner|M&A|M&V|Claude")
+        for ident in ("explica-inovastem", "physis-explica", "physis-modelador"):   # os dois bots (22/11/2026)
+            self.assertIn(ident, blocos)
+            m = re.search(rf'<script id="{ident}">\n(.*?)</script>', self.h, re.S).group(1)
+            self.assertNotRegex(m, r"Planejador|Planner|M&A|M&V|Claude", ident)    # site público: sem nomes internos
+        self.assertEqual(self.h.count('<div data-physis-explica="inovastem-lab"></div>'), 1)
+        self.assertIn("window.PhysisExplica.montar(el)", self.h)
         self.assertEqual(self.h.count('<div data-physis-modelador="inovastem-3d"></div>'), 1)
         self.assertLess(self.h.index('data-physis-modelador="inovastem-3d"'), self.h.index('id="lab-abas"'))
         self.assertIn("function botIdioma()", self.h)

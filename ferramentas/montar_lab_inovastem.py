@@ -48,10 +48,11 @@ SAIDA = WEB / "inovastem-lab.html"
 # blocos copiados sem mudar nada: (id do <script>, arquivo)
 BLOCOS = [("lab-turbinas", SIS / "physis-turbinas.js"), ("lab-casos", SIS / "simulacao-exemplos" / "casos.js"),
           ("lab-simulacao", SIS / "physis-simulacao.js"), ("lab-3d", SIS / "physis-3d.js"),
-          ("lab-imagem3d", SIS / "physis-imagem-3d.js"), ("lab-modelagem", SIS / "physis-modelagem.js")]
-# bot de modelagem (dona, 22/11/2026: "Sim, pela fonte"): o espaço e a troca de idioma já estão na página; o bloco entra aqui
-# — ("physis-modelador", SIS / "physis-modelador.js") — quando o original tiver os textos da InovaSTEM (sem Planejador e sem
-# a fila interna do M&A, que não cabem num site público). Até lá o espaço fica vazio.
+          ("lab-imagem3d", SIS / "physis-imagem-3d.js"), ("lab-modelagem", SIS / "physis-modelagem.js"),
+          # bots, cópias exatas dos originais (dona, 22/11/2026: "Sim, pela fonte" e "Sim, criar"); com data-*="inovastem…" eles
+          # entram no modo público: sem nomes internos, sem fila interna e sem mandar coordenadas a terceiros
+          ("explica-inovastem", SIS / "explica-inovastem.js"), ("physis-explica", SIS / "physis-explica.js"),
+          ("physis-modelador", SIS / "physis-modelador.js")]
 BOT_MODELAGEM = SIS / "physis-modelador.js"
 # bibliotecas grandes de vendor/ que o laboratório carrega do próprio servidor (/vendor/) quando a subaba precisa
 VENDOR_LAB = ("three.min.js", "web-ifc-api-iife.js", "web-ifc.wasm")
@@ -1590,6 +1591,10 @@ const descCaso = c => lang === "en" && CASOS_EN[c.id] ? CASOS_EN[c.id][1] : (c.d
 /* bot de modelagem (physis-modelador.js): monta de novo na troca de idioma; carrega o three.js (prévia 3D) só quando
    a pessoa chega perto do bot, para não pesar a página de quem não usa */
 function botIdioma() {
+  if (window.PhysisExplica) document.querySelectorAll("[data-physis-explica]").forEach(el => {
+    if (el.getAttribute("data-pex-lang") === lang) return;
+    el.removeAttribute("data-pex-ok"); el.innerHTML = ""; el.setAttribute("data-pex-lang", lang); window.PhysisExplica.montar(el);
+  });
   if (!window.PhysisModelador) return;
   document.querySelectorAll("[data-physis-modelador]").forEach(el => {
     if (el.getAttribute("data-pmd-lang") === lang) return;
@@ -1891,6 +1896,7 @@ def montar() -> str:
 <main id="conteudo" class="in" tabindex="-1">
   <h2 class="lab-intro" data-t="titulo">Modelagem Physis 3D</h2>
   <p data-t="intro">A bancada de desenvolvimento da InovaSTEM, aberta a modelagens de qualquer assunto: subabas que leem e gravam um projeto comum, num fluxo do arquivo até a fila de impressão e a galeria.</p>
+  <div data-physis-explica="inovastem-lab"></div>
   <div data-physis-modelador="inovastem-3d"></div>
   <section class="lab-projeto" id="lab-proj" aria-label="Projeto comum" data-t-rot="proj_rot"></section>
   <div class="lab-abas" id="lab-abas" role="tablist" aria-label="Subabas da Modelagem Physis 3D" data-t-rot="abas_rot">
