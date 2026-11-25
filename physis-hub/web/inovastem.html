@@ -291,6 +291,10 @@ const T = {
     cad_aceite:"Li e aceito os termos de uso (beta) e o aviso de privacidade (beta).", cad_enviar:"Criar conta", cad_ok:"Conta criada. Confira o seu e-mail e entre pela plataforma.", cad_ok_entrar:"Conta criada. Entre logo abaixo com o seu e-mail e a senha.",
     entrar_plataforma:"Entrar", area_equipe:"Área da equipe", ent_t:"Entrar na sua conta", ent_usuario:"E-mail", ent_senha:"Senha",
     ent_enviar:"Entrar", ent_erro:"E-mail ou senha não conferem.", sair_conta:"Sair da conta",
+    ins_t:"Inscrição (uma vez só)", ins_intro:"Uma inscrição só: conta, nome público e os tópicos que você quer acompanhar. Nas próximas vezes, é só entrar com o e-mail e a senha.",
+    ins_enviar:"Fazer a minha inscrição", ins_ok:"Inscrição feita. Você já está dentro.", ins_ja:"Este e-mail já tem inscrição: entre com a sua senha logo acima.",
+    ins_nova:"Ainda não tenho inscrição", abrir_lab:"Abrir a minha plataforma (laboratório)", ins_topicos:"Tópicos que você quer acompanhar",
+    ins_completar:"Complete a sua inscrição (nome público e tópicos). É uma vez só.", ins_completar_enviar:"Salvar a inscrição",
     eu_t:"Sua participação", eu_nome:"Nome público", eu_pode:"Pode publicar", eu_nao_pode:"Ainda não pode publicar",
     eu_delas:"Acesso à InovaSTEM Delas (autodeclaração)", eu_delas_salvar:"Salvar autodeclaração", eu_sair:"Sair da comunidade",
     eu_sair_aviso:"Ao sair, o seu nome público vira 'Participante removido' e os dados do responsável e a autodeclaração são apagados.",
@@ -424,6 +428,10 @@ const T = {
     cad_aceite:"I have read and accept the terms of use (beta) and the privacy notice (beta).", cad_enviar:"Create account", cad_ok:"Account created. Check your e-mail and sign in through the platform.", cad_ok_entrar:"Account created. Sign in just below with your e-mail and password.",
     entrar_plataforma:"Sign in", area_equipe:"Team area", ent_t:"Sign in to your account", ent_usuario:"E-mail", ent_senha:"Password",
     ent_enviar:"Sign in", ent_erro:"E-mail or password do not match.", sair_conta:"Sign out",
+    ins_t:"Sign-up (just once)", ins_intro:"One sign-up only: account, public name and the topics you want to follow. Next time, just sign in with your e-mail and password.",
+    ins_enviar:"Sign me up", ins_ok:"Signed up. You are in.", ins_ja:"This e-mail is already signed up: sign in with your password above.",
+    ins_nova:"I am not signed up yet", abrir_lab:"Open my platform (lab)", ins_topicos:"Topics you want to follow",
+    ins_completar:"Complete your sign-up (public name and topics). Just once.", ins_completar_enviar:"Save my sign-up",
     eu_t:"Your participation", eu_nome:"Public name", eu_pode:"Can publish", eu_nao_pode:"Cannot publish yet",
     eu_delas:"Access to InovaSTEM Hers (self-declaration)", eu_delas_salvar:"Save self-declaration", eu_sair:"Leave the community",
     eu_sair_aviso:"When you leave, your public name becomes 'Participante removido' and the guardian's data and the self-declaration are deleted.",
@@ -634,79 +642,54 @@ function telaMateriais() {
 }
 
 function telaParticipar() {
+  /* 25/11/2026 (dona): uma inscrição só (conta + nome público + tópicos); na segunda vez, só o login.
+     Quem já se inscreveu ou entrou neste navegador (ino-inscrito) vê só a entrada; o formulário fica atrás de "Ainda não tenho inscrição". */
   const areas = ino ? ino.areas : [];
   const gen = t("int_gen_opc");
-  let h = cartao(t("par_t"), `<p>${esc(t("par_intro"))}</p>`, "marca");
-  h += cartao(t("int_t"), `<p class="t2">${esc(t("int_intro"))}</p><form id="int" novalidate>
-      <div class="progresso"><p id="int-passo-txt">${esc(t("passo").replace("{n}", 1))}</p>
-        <div class="barra" role="progressbar" aria-labelledby="int-passo-txt" aria-valuemin="1" aria-valuemax="2" aria-valuenow="1" id="int-prog"><span id="int-barra"></span></div></div>
-      <div id="int-p1">
-        <div class="campos">
-          <div><label for="int-nome">${esc(t("int_nome"))}</label><input type="text" id="int-nome" autocomplete="nickname" required maxlength="120"></div>
-          <div><label for="int-email">${esc(t("int_email"))}</label><input type="email" id="int-email" autocomplete="email" required maxlength="160"></div>
-        </div>
-        <fieldset><legend>${esc(t("int_areas"))}</legend>${areas.map(a => `<label class="opcao"><input type="checkbox" name="area" value="${esc(a.id)}"${a.id === areaPre ? " checked" : ""}>${esc(lang === "en" ? a.nome_en : a.nome)}</label>`).join("")}</fieldset>
-        <div class="acoes"><button class="botao" type="button" id="int-seguir">${esc(t("continuar"))}</button></div>
-      </div>
-      <div id="int-p2" hidden>
-        <fieldset><legend>${esc(t("int_idade"))}</legend><p class="t2 pq">${esc(t("int_idade_min"))}</p>
-          <label class="opcao"><input type="radio" name="int-idade" value="maior" checked>${esc(t("int_maior"))}</label>
-          <label class="opcao"><input type="radio" name="int-idade" value="menor">${esc(t("int_menor"))}</label>
-          <div id="int-resp" hidden><p class="t2 pq">${esc(t("int_menor_aviso"))}</p><div class="campos">
-            <div><label for="int-resp-nome">${esc(t("int_resp_nome"))}</label><input type="text" id="int-resp-nome" maxlength="120"></div>
-            <div><label for="int-resp-email">${esc(t("int_resp_email"))}</label><input type="email" id="int-resp-email" maxlength="160"></div></div></div>
-        </fieldset>
-        <div class="campos">
-          <div><label for="int-genero">${esc(t("int_genero"))}</label><select id="int-genero" aria-describedby="int-gen-nota">
-            ${["", "feminino", "masculino", "nao_informar"].map(g => `<option value="${g}">${esc(gen[g])}</option>`).join("")}</select></div>
-          <div><label for="int-cidade">${esc(t("int_cidade"))}</label><input type="text" id="int-cidade" autocomplete="address-level2" maxlength="80"></div>
-          <div><label for="int-inst">${esc(t("int_inst"))}</label><input type="text" id="int-inst" autocomplete="organization" maxlength="120"></div>
-        </div>
-        <p class="nota-delas" id="int-gen-nota">${esc(t("int_gen_nota"))}</p>
-        <div class="acoes">${botaoCompartilhar(t("compartilhar"), "comp-part")}</div>
-        <div id="int-delas" class="nota-delas" hidden><p>${esc(t("int_delas_convite"))} <a href="#delas">${esc(t("int_delas_ver"))}</a></p>
-          <label class="opcao"><input type="checkbox" id="int-delas-quero">${esc(t("int_delas_quero"))}</label></div>
-        <label class="opcao"><input type="checkbox" id="int-aceite" required>${esc(t("int_aceite"))} <a href="#privacidade">${esc(t("abas").privacidade)}</a></label>
-        <div class="acoes"><button class="botao sec" type="button" id="int-voltar">${esc(t("voltar_passo"))}</button>
-          <button class="botao" type="submit">${esc(t("int_enviar"))}</button></div>
-      </div>
-      <p class="msg" id="int-msg" role="status"></p><p class="msg" id="comp-msg" role="status"></p></form>`);
-  if (eu && eu.participante) {
-    const p = eu.participante;
-    h += cartao(t("eu_t"), `<p>${esc(t("eu_nome"))}: <strong>${esc(p.nome_publico)}</strong></p>
-      <p>${esc(eu.pode_publicar ? t("eu_pode") : t("eu_nao_pode"))}${eu.motivo ? ": " + esc(eu.motivo) : ""}</p>
-      <label class="opcao"><input type="checkbox" id="eu-delas"${p.delas ? " checked" : ""}>${esc(t("eu_delas"))}</label>
-      <div class="acoes"><button class="botao" type="button" id="eu-delas-salvar">${esc(t("eu_delas_salvar"))}</button>
-      <button class="botao sec" type="button" id="eu-sair">${esc(t("eu_sair"))}</button></div>
-      <p class="t2 pq">${esc(t("eu_sair_aviso"))}</p><p class="msg" id="eu-msg" role="status"></p>`);
-  } else if (!inst || !inst.autenticado) {
-    h += cartao(t("cad_t"), `<p class="t2">${esc(t("cad_intro"))}</p><form id="cad" novalidate>
-      <div class="campos">
-        <div><label for="cad-nome">${esc(t("cad_nome"))}</label><input type="text" id="cad-nome" autocomplete="name" required maxlength="120"></div>
-        <div><label for="cad-email">${esc(t("cad_email"))}</label><input type="email" id="cad-email" autocomplete="email" required maxlength="160"></div>
-        <div><label for="cad-senha">${esc(t("cad_senha"))}</label><input type="password" id="cad-senha" autocomplete="new-password" required minlength="12"></div>
-        <div><label for="cad-pub">${esc(t("cad_pub"))}</label><input type="text" id="cad-pub" required maxlength="80"></div>
-      </div>
-      <fieldset><legend>${esc(t("int_idade"))}</legend><p class="t2 pq">${esc(t("int_idade_min"))}</p>
-        <label class="opcao"><input type="radio" name="idade" value="maior" checked>${esc(t("int_maior"))}</label>
-        <label class="opcao"><input type="radio" name="idade" value="menor">${esc(t("int_menor"))}</label>
-        <div id="cad-resp" hidden><div class="campos">
-          <div><label for="cad-resp-nome">${esc(t("int_resp_nome"))}</label><input type="text" id="cad-resp-nome" maxlength="120"></div>
-          <div><label for="cad-resp-email">${esc(t("int_resp_email"))}</label><input type="email" id="cad-resp-email" maxlength="160"></div></div></div>
-      </fieldset>
-      <label class="opcao"><input type="checkbox" id="cad-delas">${esc(t("cad_delas"))}</label>
-      <label class="opcao"><input type="checkbox" id="cad-aceite" required>${esc(t("cad_aceite"))}</label>
-      <p class="pq"><a href="#termos">${esc(t("abas").termos)}</a> · <a href="#privacidade">${esc(t("abas").privacidade)}</a></p>
-      <div class="acoes"><button class="botao" type="submit">${esc(t("cad_enviar"))}</button><a class="botao sec" href="#ent-f">${esc(t("entrar_plataforma"))}</a></div>
-      <p class="msg" id="cad-msg" role="status"></p></form>`);
-  }
-  if (!inst || !inst.autenticado) {
+  const topicos = nm => `<fieldset><legend>${esc(t("ins_topicos"))}</legend>${areas.map(a => `<label class="opcao"><input type="checkbox" name="${nm}" value="${esc(a.id)}"${a.id === areaPre ? " checked" : ""}>${esc(lang === "en" ? a.nome_en : a.nome)}</label>`).join("")}</fieldset>`;
+  let h = "";
+  if (inst && inst.autenticado) {
+    const p = eu && eu.participante;
+    h += cartao(t("eu_t"), (p ? `<p>${esc(t("eu_nome"))}: <strong>${esc(p.nome_publico)}</strong> · ${esc(eu.pode_publicar ? t("eu_pode") : t("eu_nao_pode"))}${eu.motivo ? ": " + esc(eu.motivo) : ""}</p>
+        <label class="opcao"><input type="checkbox" id="eu-delas"${p.delas ? " checked" : ""}>${esc(t("eu_delas"))}</label>
+        <div class="acoes"><button class="botao sec" type="button" id="eu-delas-salvar">${esc(t("eu_delas_salvar"))}</button></div>`
+      : (eu && eu.equipe ? "" : `<form id="comp-f"><p>${esc(t("ins_completar"))}</p><div class="campos"><div><label for="comp-pub">${esc(t("cad_pub"))}</label><input type="text" id="comp-pub" required maxlength="80"></div></div>
+        ${topicos("comp-area")}<div class="acoes"><button class="botao" type="submit">${esc(t("ins_completar_enviar"))}</button></div></form>`))
+      + `<div class="acoes"><a class="botao" href="/laboratorio">${esc(t("abrir_lab"))}</a><button class="botao sec" type="button" id="sair-conta">${esc(t("sair_conta"))}</button>
+        ${p ? `<button class="botao sec" type="button" id="eu-sair">${esc(t("eu_sair"))}</button>` : ""}</div><p class="msg" id="eu-msg" role="status"></p>`, "marca");
+  } else {
+    const ja = (() => { try { return localStorage.getItem("ino-inscrito") === "1"; } catch (e) { return false; } })();
     h += cartao(t("ent_t"), `<form id="ent-f"><div class="campos">
         <div><label for="ent-usuario">${esc(t("ent_usuario"))}</label><input type="email" id="ent-usuario" autocomplete="username" required maxlength="160"></div>
         <div><label for="ent-senha">${esc(t("ent_senha"))}</label><input type="password" id="ent-senha" autocomplete="current-password" required></div></div>
-        <div class="acoes"><button class="botao" type="submit">${esc(t("ent_enviar"))}</button></div><p class="msg" id="ent-msg" role="status"></p></form>`);
-  } else {
-    h += `<div class="acoes"><button class="botao sec" type="button" id="sair-conta">${esc(t("sair_conta"))}</button></div>`;
+        <div class="acoes"><button class="botao" type="submit">${esc(t("ent_enviar"))}</button>${ja ? `<button class="botao sec" type="button" id="ins-mostrar" aria-expanded="false" aria-controls="ins-cartao">${esc(t("ins_nova"))}</button>` : ""}</div>
+        <p class="msg" id="ent-msg" role="status"></p></form>`, "marca");
+    h += `<section class="cartao" id="ins-cartao"${ja ? " hidden" : ""}><h2>${esc(t("ins_t"))}</h2><p class="t2">${esc(t("ins_intro"))}</p><form id="ins" novalidate>
+      <div class="campos">
+        <div><label for="ins-nome">${esc(t("cad_nome"))}</label><input type="text" id="ins-nome" autocomplete="name" required maxlength="120"></div>
+        <div><label for="ins-email">${esc(t("cad_email"))}</label><input type="email" id="ins-email" autocomplete="email" required maxlength="160"></div>
+        <div><label for="ins-senha">${esc(t("cad_senha"))}</label><input type="password" id="ins-senha" autocomplete="new-password" required minlength="12"></div>
+        <div><label for="ins-pub">${esc(t("cad_pub"))}</label><input type="text" id="ins-pub" required maxlength="80"></div>
+      </div>
+      ${topicos("ins-area")}
+      <fieldset><legend>${esc(t("int_idade"))}</legend><p class="t2 pq">${esc(t("int_idade_min"))}</p>
+        <label class="opcao"><input type="radio" name="ins-idade" value="maior" checked>${esc(t("int_maior"))}</label>
+        <label class="opcao"><input type="radio" name="ins-idade" value="menor">${esc(t("int_menor"))}</label>
+        <div id="ins-resp" hidden><p class="t2 pq">${esc(t("int_menor_aviso"))}</p><div class="campos">
+          <div><label for="ins-resp-nome">${esc(t("int_resp_nome"))}</label><input type="text" id="ins-resp-nome" maxlength="120"></div>
+          <div><label for="ins-resp-email">${esc(t("int_resp_email"))}</label><input type="email" id="ins-resp-email" maxlength="160"></div></div></div>
+      </fieldset>
+      <div class="campos">
+        <div><label for="ins-genero">${esc(t("int_genero"))}</label><select id="ins-genero" aria-describedby="ins-gen-nota">${["", "feminino", "masculino", "nao_informar"].map(g => `<option value="${g}">${esc(gen[g])}</option>`).join("")}</select></div>
+        <div><label for="ins-cidade">${esc(t("int_cidade"))}</label><input type="text" id="ins-cidade" autocomplete="address-level2" maxlength="80"></div>
+        <div><label for="ins-inst">${esc(t("int_inst"))}</label><input type="text" id="ins-inst" autocomplete="organization" maxlength="120"></div>
+      </div>
+      <p class="nota-delas" id="ins-gen-nota">${esc(t("int_gen_nota"))}</p>
+      <label class="opcao"><input type="checkbox" id="ins-delas">${esc(t("cad_delas"))}</label>
+      <label class="opcao"><input type="checkbox" id="ins-aceite" required>${esc(t("cad_aceite"))}</label>
+      <p class="pq"><a href="#termos">${esc(t("abas").termos)}</a> · <a href="#privacidade">${esc(t("abas").privacidade)}</a></p>
+      <div class="acoes"><button class="botao" type="submit">${esc(t("ins_enviar"))}</button></div>
+      <p class="msg" id="ins-msg" role="status"></p></form></section>`;
   }
   if (eu && eu.equipe) {
     h += `<section class="cartao" id="moderacao"><h2>${esc(t("eq_mod_t"))}</h2><p>${esc(t("carregando"))}</p></section>`
@@ -942,50 +925,42 @@ function ligar() {
   }
   if (aba === "participar") {
     moderacao(); filaIno(); interesses();
-    const fi = $("int");
-    const irPasso = n => {
-      passoInt = n;
-      $("int-p1").hidden = n !== 1; $("int-p2").hidden = n !== 2;
-      $("int-barra").className = n === 2 ? "p2" : ""; $("int-prog").setAttribute("aria-valuenow", String(n));
-      $("int-passo-txt").textContent = t("passo").replace("{n}", n);
-      (n === 2 ? fi.querySelector('input[name="int-idade"]') : $("int-nome")).focus();
-    };
-    $("int-seguir").onclick = () => {
-      const ok = $("int-nome").value.trim().length >= 2 && /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test($("int-email").value.trim());
-      $("int-msg").textContent = ok ? "" : t("passo1_falta"); $("int-msg").className = "msg" + (ok ? "" : " erro");
-      if (ok) irPasso(2); else (($("int-nome").value.trim().length < 2) ? $("int-nome") : $("int-email")).focus();
-    };
-    $("int-voltar").onclick = () => irPasso(1);
-    fi.querySelectorAll('input[name="int-idade"]').forEach(r => r.onchange = () => { $("int-resp").hidden = fi.querySelector('input[name="int-idade"]:checked').value !== "menor"; });
-    $("int-genero").onchange = () => { $("int-delas").hidden = $("int-genero").value !== "feminino"; };
-    fi.onsubmit = async ev => {
-      ev.preventDefault();
-      const maior = fi.querySelector('input[name="int-idade"]:checked').value === "maior";
-      const corpo = { nome: $("int-nome").value, email: $("int-email").value, areas: [...fi.querySelectorAll('input[name="area"]:checked')].map(x => x.value),
-                      cidade: $("int-cidade").value, instituicao: $("int-inst").value, genero: $("int-genero").value,
-                      quero_delas: $("int-genero").value === "feminino" && $("int-delas-quero").checked, maior_de_idade: maior,
-                      aceite: $("int-aceite").checked, versao: (ino && ino.versao_aviso) || "" };
-      if (!maior) { corpo.responsavel_nome = $("int-resp-nome").value; corpo.responsavel_email = $("int-resp-email").value; }
-      const r = await pedir("/api/publico/inovastem/interesse", corpo);
-      $("int-msg").textContent = r.ok ? t("int_ok") + (r.delas ? t("int_ok_delas") : "") : (r.erro || t("sem_hub"));
-      $("int-msg").className = "msg" + (r.ok ? "" : " erro");
-      if (r.ok) { fi.reset(); $("int-resp").hidden = true; $("int-delas").hidden = true; areaPre = ""; irPasso(1); $("int-msg").textContent = t("int_ok") + (r.delas ? t("int_ok_delas") : ""); }
-    };
-    const f = $("cad");
-    if (f) {
-      f.querySelectorAll('input[name="idade"]').forEach(r => r.onchange = () => { $("cad-resp").hidden = f.querySelector('input[name="idade"]:checked').value !== "menor"; });
-      f.onsubmit = async ev => {
+    const marcar = () => { try { localStorage.setItem("ino-inscrito", "1"); } catch (e) {} };
+    const mostrar = $("ins-mostrar");
+    if (mostrar) mostrar.onclick = () => { const c = $("ins-cartao"); c.hidden = !c.hidden; mostrar.setAttribute("aria-expanded", String(!c.hidden)); if (!c.hidden) $("ins-nome").focus(); };
+    const fi = $("ins");
+    if (fi) {
+      fi.querySelectorAll('input[name="ins-idade"]').forEach(r => r.onchange = () => { $("ins-resp").hidden = fi.querySelector('input[name="ins-idade"]:checked').value !== "menor"; });
+      fi.onsubmit = async ev => {
         ev.preventDefault();
-        const maior = f.querySelector('input[name="idade"]:checked').value === "maior";
-        const corpo = { nome: $("cad-nome").value, usuario: $("cad-email").value, senha: $("cad-senha").value, nome_publico: $("cad-pub").value,
-                        maior_de_idade: maior, delas: $("cad-delas").checked, consentimento: { aceito: $("cad-aceite").checked, versao: (ino && ino.versao_aviso) || "1" } };
-        if (!maior) { corpo.responsavel_nome = $("cad-resp-nome").value; corpo.responsavel_email = $("cad-resp-email").value; }
-        const r = await pedir("/api/publico/cadastro", corpo);
-        $("cad-msg").textContent = r.ok ? t(r.confirmar_email ? "cad_ok" : "cad_ok_entrar") + (r.pode_publicar ? "" : " " + t("int_menor_aviso")) : (r.erro || t("sem_hub"));
-        $("cad-msg").className = "msg" + (r.ok ? "" : " erro");
-        if (r.ok) { f.reset(); $("cad-resp").hidden = true; }
+        const msg = (txt, erro) => { $("ins-msg").textContent = txt; $("ins-msg").className = "msg" + (erro ? " erro" : ""); };
+        const maior = fi.querySelector('input[name="ins-idade"]:checked').value === "maior";
+        const email = $("ins-email").value.trim().toLowerCase(), senha = $("ins-senha").value;
+        const resp = maior ? {} : { responsavel_nome: $("ins-resp-nome").value, responsavel_email: $("ins-resp-email").value };
+        const r = await pedir("/api/publico/cadastro", Object.assign({ nome: $("ins-nome").value, usuario: email, senha, nome_publico: $("ins-pub").value,
+          maior_de_idade: maior, delas: $("ins-delas").checked, consentimento: { aceito: $("ins-aceite").checked, versao: (ino && ino.versao_aviso) || "1" } }, resp));
+        if (!r.ok) {
+          if (/j[aá] existe/i.test(r.erro || "")) { msg(t("ins_ja"), true); marcar(); $("ent-usuario").value = email; $("ent-senha").focus(); return; }
+          msg(r.erro || t("sem_hub"), true); return; }
+        /* tópicos: o registro de interesse (um por e-mail; uma segunda vez só atualiza) */
+        await pedir("/api/publico/inovastem/interesse", Object.assign({ nome: $("ins-nome").value, email,
+          areas: [...fi.querySelectorAll('input[name="ins-area"]:checked')].map(x => x.value), cidade: $("ins-cidade").value, instituicao: $("ins-inst").value,
+          genero: $("ins-genero").value, quero_delas: $("ins-delas").checked && $("ins-genero").value === "feminino", maior_de_idade: maior,
+          aceite: $("ins-aceite").checked, versao: (ino && ino.versao_aviso) || "" }, resp));
+        marcar();
+        const e = await pedir("/api/conta/entrar", { usuario: email, senha });
+        if (!e.ok) { msg(t(r.confirmar_email ? "cad_ok" : "cad_ok_entrar"), false); $("ent-usuario").value = email; return; }
+        inst = await pedir("/api/instancia"); await carregarEu(); desenhar(); const m = $("eu-msg"); if (m) m.textContent = t("ins_ok");
       };
     }
+    const fc = $("comp-f");
+    if (fc) fc.onsubmit = async ev => {
+      ev.preventDefault();
+      const r = await pedir("/api/comunidade/participante", { nome_publico: $("comp-pub").value });
+      const area = [...fc.querySelectorAll('input[name="comp-area"]:checked')].map(x => x.value);
+      if (r.ok && area.length && inst && inst.usuario) await pedir("/api/publico/inovastem/interesse", { nome: inst.nome || "", email: inst.usuario, areas: area, aceite: true, maior_de_idade: true, versao: (ino && ino.versao_aviso) || "" });
+      $("eu-msg").textContent = r.ok ? "✓" : (r.erro || t("sem_hub")); if (r.ok) { marcar(); await carregarEu(); desenhar(); }
+    };
     const ds = $("eu-delas-salvar");
     if (ds) ds.onclick = async () => { const r = await pedir("/api/comunidade/delas", { autodeclaro: $("eu-delas").checked });
       $("eu-msg").textContent = r.ok ? "✓" : (r.erro || t("sem_hub")); if (r.ok) await carregarEu(); };
@@ -997,6 +972,7 @@ function ligar() {
       ev.preventDefault();
       const r = await pedir("/api/conta/entrar", { usuario: $("ent-usuario").value, senha: $("ent-senha").value });
       if (!r.ok) { $("ent-msg").textContent = r._status === 429 ? (r.erro || t("sem_hub")) : t("ent_erro"); $("ent-msg").className = "msg erro"; return; }
+      try { localStorage.setItem("ino-inscrito", "1"); } catch (e) {}
       inst = await pedir("/api/instancia"); await carregarEu(); desenhar();
     };
     const sc = $("sair-conta");

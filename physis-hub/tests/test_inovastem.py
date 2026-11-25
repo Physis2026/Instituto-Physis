@@ -398,8 +398,11 @@ class Pagina(unittest.TestCase):
         menu = re.search(r"const MENU = \[(.*?)\]", self.js).group(1)
         self.assertLessEqual(menu.count(","), 5, "guia: menu de até 6 itens")
         self.assertIn('id="cta" href="#participar"', self.h)
-        for k in ("int-p1", "int-p2", 'role="progressbar"', "int-seguir"):
+        # 25/11/2026 (dona): inscrição única (conta + nome público + tópicos); na segunda vez, só o login
+        for k in ('id="ins-cartao"', 'id="ins"', "ins-area", "ino-inscrito", "ins-mostrar", 'id="ent-f"', "/api/publico/cadastro",
+                  "/api/publico/inovastem/interesse", "/api/conta/entrar", 'href="/laboratorio"'):
             self.assertIn(k, self.js, k)
+        self.assertNotIn('id="int"', self.js, "o cadastro de interesse separado saiu: tudo numa inscrição só")
         # missões recomendadas do doc 37 (D92) no ecossistema; "M&V aberto" fora até a licença
         self.assertIn("Acelerar a transição justa com engenharia de precisão e dados verificáveis", self.js)
         self.assertIn("Conectar pessoas, organizações e projetos para trocar informações, formar parcerias e resolver desafios de modelagem com códigos abertos", self.js)

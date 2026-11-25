@@ -1867,6 +1867,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             return {"org": hub.org, "lugar": hub.lugar, "modulos": instancia.get("modulos"),
                     "exige_login": exige_login, "tem_conta": hub.tem_conta(), "autenticado": bool(q),
                     "nome": q["nome"] if q else None, "papel": q["papel"] if q else None,
+                    "usuario": q["usuario"] if q else None,     # o próprio e-mail (só para quem está dentro): inscrição única da InovaSTEM
                     "licenca": instancia.get("licenca"), "sustainkit": (WEB / "sustainkit.html").exists(),
                     "supervisao": (WEB / "supervisao.html").exists(), "gestao": (WEB / "gestao.html").exists(),
                     "planejador": (WEB / "planejador.html").exists(), "pesquisa": bool(instancia.get("pesquisa")),
