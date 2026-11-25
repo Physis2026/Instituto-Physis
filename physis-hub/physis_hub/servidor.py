@@ -1177,6 +1177,11 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if self._exigir(seg.CLIENTE) and not self._limitado("cep"):
                     self._json(*cep_srv.consultar(unquote(p.rsplit("/", 1)[-1])[:12]))
                 return True
+            # Programas abertos instalados neste servidor (ferramentas_simulacao.py): só nome, área e instalado sim/não, sem caminhos
+            if p == "/api/ferramentas/simulacao":
+                from . import ferramentas_simulacao as fs_mod
+                self._json(200, {"ok": True, "ferramentas": [{k: x[k] for k in ("id", "nome", "area", "licenca", "instalado")} for x in fs_mod.situacao()]})
+                return True
             # Mapeamento: catálogo e camadas abertas sem login; contexto e arquivos do cliente com sessão
             if p.startswith("/api/mapeamento/"):
                 aberto = p.rstrip("/") in ("/api/mapeamento/camadas", "/api/mapeamento/camada")

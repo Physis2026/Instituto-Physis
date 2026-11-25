@@ -172,7 +172,7 @@ const T = {
     nav_forum: "Fórum", nav_modelagem: "Modelagem Physis 3D", nav_hackathon: "Hackathon", nav_materiais: "Materiais", inscreva: "Inscreva-se",
     sub: "Modelagem Physis 3D · roda no seu navegador", beta: "versão beta", titulo: "Modelagem Physis 3D",
     intro: "O laboratório aberto da InovaSTEM para modelar qualquer coisa: peças mecânicas, edificações, terrenos ou protótipos. Transforme uma ideia, uma foto ou um arquivo em modelo 3D, direto no navegador e com códigos abertos: envie o arquivo, ajuste a geometria, monte as peças, teste numa simulação e mande imprimir. Cada etapa grava no mesmo projeto, em formatos abertos (SVG, DXF, STL, 3MF e IFC), para a rede aprender, melhorar e reaproveitar o que foi feito; o resultado pode ir para a galeria.",
-    faixa: "Em desenvolvimento (Fase 1). Pré-dimensionamento para aprender e testar ideias: não aprova projeto, não substitui norma nem ensaio. Os exemplos usam dados fictícios. O que você abre ou envia aqui fica no seu computador; só vai para o servidor da InovaSTEM quando você pede (pedir impressão, enviar peça à Biblioteca).",
+    faixa: "Fase 1. Pré-dimensionamento para aprender e testar ideias: não aprova projeto, não substitui norma nem ensaio. Os exemplos usam dados fictícios. O que você abre ou envia aqui fica no seu computador; só vai para o servidor da InovaSTEM quando você pede (pedir impressão, enviar peça à Biblioteca).",
     abas_rot: "Subabas da Modelagem Physis 3D", proj_rot: "Projeto comum",
     rodape_realiza: "InovaSTEM · uma iniciativa PHYSIS", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ) · Contato: [MARCADOR]",
     rodape_beta: "Versão beta: termos e aviso de privacidade em revisão jurídica.", termos: "Termos de uso (beta)", privacidade: "Privacidade (beta)", acessibilidade: "Acessibilidade",
@@ -343,7 +343,7 @@ const T = {
     nav_forum: "Forum", nav_modelagem: "Physis 3D modelling", nav_hackathon: "Hackathon", nav_materiais: "Materials", inscreva: "Join",
     sub: "Physis 3D modelling · runs in your browser", beta: "beta version", titulo: "Physis 3D modelling",
     intro: "InovaSTEM's open lab for modelling anything: mechanical parts, buildings, terrain or prototypes. Turn an idea, a photo or a file into a 3D model, right in the browser and with open code: upload the file, adjust the geometry, assemble the parts, test it in a simulation and send it to print. Every step is saved in the same project, in open formats (SVG, DXF, STL, 3MF and IFC), so the network can learn from, improve and reuse what was made; the result can go to the gallery.",
-    faixa: "In development (Phase 1). Preliminary sizing to learn and test ideas: it does not approve designs and does not replace standards or tests. Examples use fictitious data. What you open or upload here stays on your computer; it only goes to the InovaSTEM server when you ask (print request, sending a part to the Library).",
+    faixa: "Phase 1. Preliminary sizing to learn and test ideas: it does not approve designs and does not replace standards or tests. Examples use fictitious data. What you open or upload here stays on your computer; it only goes to the InovaSTEM server when you ask (print request, sending a part to the Library).",
     abas_rot: "Physis 3D modelling sub-tabs", proj_rot: "Shared project",
     rodape_realiza: "InovaSTEM · a PHYSIS initiative", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ), Brazil · Contact: [MARCADOR]",
     rodape_beta: "Beta version: terms and privacy notice under legal review.", termos: "Terms of use (beta)", privacidade: "Privacy (beta)", acessibilidade: "Accessibility",
@@ -1261,6 +1261,17 @@ function telaMontagem() {
 }
 /* programas mapeados nos documentos (docs/PHYSIS_3D.md, docs/SIMULACAO.md, Sistema Physis/23b_Catalogo_Software_Aberto.md); o que não está neles é [MARCADOR] */
 const EM_DEV = ["Fase 2, em servidor: em desenvolvimento", "Phase 2, on the server: in development"];
+/* situação real no servidor da InovaSTEM (GET /api/ferramentas/simulacao, só nomes e instalado sim/não; 25/11/2026) */
+const ID_PROG = { "FreeCAD": "freecad", "CalculiX": "calculix", "OpenFOAM": "openfoam", "Bonsai (antigo BlenderBIM)": "bonsai", "Salome-Meca / Code_Aster": "code_aster",
+  "Elmer FEM": "elmer", "openEMS": "openems", "Gazebo": "gazebo", "LAMMPS": "lammps", "Avogadro": "avogadro", "Psi4": "psi4", "RDKit": "rdkit",
+  "GROMACS": "gromacs", "COPASI": "copasi", "CellBlender (MCell)": "cellblender", "OpenSim": "opensim" };
+let FERR = null;
+function ferramentasServidor() { if (FERR !== null) return FERR; FERR = {};
+  fetch("/api/ferramentas/simulacao", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(j => { if (j && j.ok) { FERR = {}; (j.ferramentas || []).forEach(x => { FERR[x.id] = !!x.instalado; }); if (abaLab === "simulacao") desenhar(); } }).catch(() => {});
+  return FERR; }
+function situacaoProg(p) { const id = ID_PROG[p[0]], f = ferramentasServidor();
+  if (id && f[id] === true) return lang === "en" ? "Installed on the Physis server" : "Instalado no servidor da Physis";
+  return lang === "en" ? p[4][1] : p[4][0]; }
 const PROGRAMAS = [
   ["FreeCAD", ["CAD 3D paramétrico; a bancada BIM faz paredes e lajes", "Parametric 3D CAD; the BIM workbench makes walls and slabs"], ["Saída: STEP e IFC (catálogo); outros formatos [MARCADOR]", "Output: STEP and IFC (catalogue); other formats [MARCADOR]"], ["LGPL-2.1", "LGPL-2.1"], ["Mapeado no catálogo; não ligado ao laboratório: em desenvolvimento", "Mapped in the catalogue; not connected to the lab: in development"]],
   ["CadQuery", ["CAD por código Python (B-rep do OpenCascade)", "CAD as Python code (OpenCascade B-rep)"], ["[MARCADOR]", "[MARCADOR]"], ["Apache-2.0", "Apache-2.0"], ["Mapeado no catálogo; não ligado ao laboratório: em desenvolvimento", "Mapped in the catalogue; not connected to the lab: in development"]],
@@ -1499,7 +1510,7 @@ function telaSimulacaoBlocos() {
   ${Object.keys(AREAS_SIM).map(k => area(k, FEN_AREA[k] || [])).join("")}
   <section class="cartao" aria-labelledby="mo-p-h"><h3 id="mo-p-h">${escL(t("mo_prog_t"))}</h3><p>${escL(t("mo_prog_txt"))}</p>
     <div class="rolagem"><table><caption>${escL(t("mo_prog_t"))}</caption><thead><tr>${t("mo_prog_cols").map(c => `<th scope="col">${escL(c)}</th>`).join("")}</tr></thead>
-    <tbody>${PROGRAMAS.map(p => `<tr><th scope="row">${escL(p[0])}</th>${p.slice(1).map(c => `<td>${escL(lang === "en" ? c[1] : c[0])}</td>`).join("")}</tr>`).join("")}</tbody></table></div></section>
+    <tbody>${PROGRAMAS.map(p => `<tr><th scope="row">${escL(p[0])}</th>${p.slice(1, 4).map(c => `<td>${escL(lang === "en" ? c[1] : c[0])}</td>`).join("")}<td>${escL(situacaoProg(p))}</td></tr>`).join("")}</tbody></table></div></section>
   <section class="cartao" aria-labelledby="sim-proj-h"><h3 id="sim-proj-h">${escL(t("si_guardados"))}</h3>
     ${proj.resultados.length ? `<div class="rolagem"><table><caption>${escL(t("si_guardados"))}</caption><thead><tr>${t("si_cols").map(c => `<th scope="col">${escL(c)}</th>`).join("")}</tr></thead><tbody>${guardados}</tbody></table></div>` : `<p class="t2">${escL(t("si_nenhum"))}</p>`}</section>`;
 }
@@ -1932,7 +1943,7 @@ def montar() -> str:
   <div class="lab-abas" id="lab-abas" role="tablist" aria-label="Subabas da Modelagem Physis 3D" data-t-rot="abas_rot">
     {abas}
   </div>
-  <p class="faixa" role="note" data-t="faixa">Em desenvolvimento (Fase 1). Pré-dimensionamento para aprender e testar ideias: não aprova projeto, não substitui norma nem ensaio. Os exemplos usam dados fictícios. O que você abre ou envia aqui fica no seu computador; só vai para o servidor da InovaSTEM quando você pede (pedir impressão, enviar peça à Biblioteca).</p>
+  <p class="faixa" role="note" data-t="faixa">Fase 1. Pré-dimensionamento para aprender e testar ideias: não aprova projeto, não substitui norma nem ensaio. Os exemplos usam dados fictícios. O que você abre ou envia aqui fica no seu computador; só vai para o servidor da InovaSTEM quando você pede (pedir impressão, enviar peça à Biblioteca).</p>
   <div id="lab" role="tabpanel" tabindex="0" aria-labelledby="tab-arquivo"></div>
 </main>
 <footer><div class="in"><p><strong data-t="rodape_realiza">InovaSTEM · uma iniciativa PHYSIS</strong> · <span data-t="rodape_entidade">Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ) · Contato: [MARCADOR]</span></p>
