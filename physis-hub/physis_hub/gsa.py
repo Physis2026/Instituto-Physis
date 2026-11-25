@@ -8,6 +8,7 @@ editais, parceiros, indicadores, convites e contas) — ver web/gsa.html.
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 from pathlib import Path
@@ -38,7 +39,7 @@ def _t(v, n):
 
 def pasta_docs() -> Path | None:
     p = os.environ.get("PHYSIS_GSA_DOCS", "").strip()
-    return Path(p) if p else None
+    return Path(p) if p else _pasta_auto()
 
 
 class GSA:
@@ -131,3 +132,184 @@ class GSA:
         if p.resolve() not in alvo.parents or not alvo.is_file() or alvo.suffix.lower() not in DOCS_EXT:
             return None
         return alvo.name, alvo.read_bytes()
+
+
+# ── Versão básica da GSA (25/11/2026: "somente versão básica com os itens indicados") ───────────────────────────────────
+# Um registro por item, num só lugar: projetos, tarefas (com alerta de prazo), financeiro, propostas e editais, parceiros
+# (com o ponto no mapa) e marketing. Membros = contas e convites do próprio servidor; indicadores = contas sobre estes itens.
+TIPOS = {
+    "projeto": {"titulo": 160, "descricao": 4000, "responsavel": 120, "inicio": 10, "fim": 10, "situacao": 20},
+    "tarefa": {"titulo": 160, "projeto": 160, "responsavel": 120, "prazo": 10, "situacao": 20},
+    "financeiro": {"descricao": 200, "tipo_lancamento": 10, "valor": 20, "data": 10, "projeto": 160, "categoria": 60},
+    "edital": {"titulo": 200, "orgao": 160, "link": 400, "prazo": 10, "valor": 40, "situacao": 20, "responsavel": 120},
+    "parceiro": {"nome": 160, "tipo": 60, "pais": 60, "cidade": 80, "lat": 12, "lon": 12, "contato": 160, "site": 300},
+    "marketing": {"titulo": 160, "canal": 60, "data": 10, "situacao": 20, "texto": 4000},
+}
+OBRIGATORIO = {"projeto": "titulo", "tarefa": "titulo", "financeiro": "descricao", "edital": "titulo", "parceiro": "nome", "marketing": "titulo"}
+SITUACOES = {"projeto": ("ideia", "em andamento", "pausado", "concluido"), "tarefa": ("a fazer", "fazendo", "feita"),
+             "edital": ("mapeado", "preparando", "enviado", "aprovado", "recusado"), "marketing": ("rascunho", "agendado", "publicado")}
+_DATA = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+ESQUEMAS["gsa_item"] = {"id": (int, 10**12, False), "tipo": (_S, 20, True), "dados": (dict, 20, True)}
+ESQUEMAS["gsa_apagar"] = {"id": (int, 10**12, True)}
+ESQUEMAS["gsa_convidar"] = {"email": (_S, 160, True), "nome": (_S, 120, False), "papel": (_S, 20, False)}
+ESQUEMA_ITENS = """
+CREATE TABLE IF NOT EXISTS gsa_item (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT NOT NULL, dados TEXT NOT NULL, criado REAL NOT NULL, atualizado REAL NOT NULL,
+  por TEXT NOT NULL, apagado INTEGER NOT NULL DEFAULT 0);
+CREATE INDEX IF NOT EXISTS gsa_item_tipo ON gsa_item(tipo, apagado);
+"""
+
+
+def _validar_item(tipo: str, dados: dict) -> tuple[dict | None, str | None]:
+    if tipo not in TIPOS:
+        return None, "tipo: " + ", ".join(TIPOS)
+    out = {}
+    for k, n in TIPOS[tipo].items():
+        v = _t(dados.get(k), n) if k not in ("descricao", "texto") else str(dados.get(k) or "")[:n]
+        if v:
+            out[k] = v
+    if not out.get(OBRIGATORIO[tipo]):
+        return None, f"preencha: {OBRIGATORIO[tipo]}"
+    for k in ("inicio", "fim", "prazo", "data"):
+        if out.get(k) and not _DATA.fullmatch(out[k]):
+            return None, f"{k} no formato AAAA-MM-DD"
+    if tipo in SITUACOES and out.get("situacao") and out["situacao"] not in SITUACOES[tipo]:
+        return None, "situação: " + ", ".join(SITUACOES[tipo])
+    if tipo == "financeiro":
+        if out.get("tipo_lancamento") not in ("entrada", "saida"):
+            return None, "lançamento: entrada ou saida"
+        try:
+            out["valor"] = round(float(str(out.get("valor", "")).replace(".", "").replace(",", ".") if "," in str(out.get("valor", "")) else out.get("valor", "")), 2)
+        except ValueError:
+            return None, "valor em reais (ex.: 1.234,56)"
+    if tipo == "parceiro":
+        for k, lim in (("lat", 90), ("lon", 180)):
+            if out.get(k):
+                try:
+                    x = float(str(out[k]).replace(",", "."))
+                except ValueError:
+                    return None, f"{k} inválida"
+                if abs(x) > lim:
+                    return None, f"{k} fora da faixa"
+                out[k] = x
+    if out.get("link") and not re.match(r"https?://", out["link"]):
+        return None, "link começa com https://"
+    if out.get("site") and not re.match(r"https?://", out["site"]):
+        return None, "site começa com https://"
+    return out, None
+
+
+def _instalar_itens(self):
+    with self.hub._trava:
+        self.hub._db.executescript(ESQUEMA_ITENS)
+        self.hub._db.commit()
+
+
+def _itens(self, tipo: str) -> dict:
+    if tipo not in TIPOS:
+        return {"ok": False, "erro": "tipo desconhecido", "codigo": 404}
+    rows = self._db.execute("SELECT id, dados, criado, atualizado, por FROM gsa_item WHERE tipo=? AND apagado=0 ORDER BY atualizado DESC LIMIT 1000", (tipo,))
+    return {"ok": True, "tipo": tipo, "campos": list(TIPOS[tipo]), "situacoes": list(SITUACOES.get(tipo, ())),
+            "itens": [dict(json.loads(d), id=i, criado=c, atualizado=a, por=p) for i, d, c, a, p in rows]}
+
+
+def _salvar(self, d: dict, quem: dict) -> dict:
+    tipo = _t(d.get("tipo"), 20)
+    dados, erro = _validar_item(tipo, d.get("dados") or {})
+    if erro:
+        return {"ok": False, "erro": erro}
+    if tipo == "financeiro" and not seg.pode(quem, seg.DIRECAO):
+        return {"ok": False, "erro": "lançamentos financeiros: só a direção", "codigo": 403}
+    agora, txt = self.hub.relogio(), json.dumps(dados, ensure_ascii=False)
+    with self.hub._trava:
+        if d.get("id"):
+            r = self._db.execute("UPDATE gsa_item SET dados=?, atualizado=?, por=? WHERE id=? AND tipo=? AND apagado=0",
+                                 (txt, agora, quem["usuario"], int(d["id"]), tipo))
+            if not r.rowcount:
+                return {"ok": False, "erro": "item não encontrado", "codigo": 404}
+            ident = int(d["id"])
+        else:
+            ident = self._db.execute("INSERT INTO gsa_item(tipo,dados,criado,atualizado,por) VALUES(?,?,?,?,?)",
+                                     (tipo, txt, agora, agora, quem["usuario"])).lastrowid
+        self._db.commit()
+    self.hub.registrar("gsa", quem["usuario"], {"o_que": tipo, "id": ident})
+    return {"ok": True, "id": ident}
+
+
+def _apagar(self, d: dict, quem: dict) -> dict:
+    with self.hub._trava:
+        r = self._db.execute("SELECT tipo FROM gsa_item WHERE id=? AND apagado=0", (int(d["id"]),)).fetchone()
+        if not r:
+            return {"ok": False, "erro": "item não encontrado", "codigo": 404}
+        if r[0] == "financeiro" and not seg.pode(quem, seg.DIRECAO):
+            return {"ok": False, "erro": "só a direção", "codigo": 403}
+        self._db.execute("UPDATE gsa_item SET apagado=1, atualizado=?, por=? WHERE id=?", (self.hub.relogio(), quem["usuario"], int(d["id"])))
+        self._db.commit()
+    self.hub.registrar("gsa", quem["usuario"], {"o_que": "apagado", "id": int(d["id"])})
+    return {"ok": True}
+
+
+def _indicadores(self, hoje: str | None = None) -> dict:
+    import time as _time
+    hoje = hoje or _time.strftime("%Y-%m-%d", _time.localtime(self.hub.relogio()))
+    todos = {t: _itens(self, t)["itens"] for t in TIPOS}
+    tar = todos["tarefa"]
+    atrasadas = [x for x in tar if x.get("prazo") and x["prazo"] < hoje and x.get("situacao") != "feita"]
+    semana = [x for x in tar if x.get("prazo") and hoje <= x["prazo"] <= _data_mais(hoje, 7) and x.get("situacao") != "feita"]
+    editais = [x for x in todos["edital"] if x.get("prazo") and hoje <= x["prazo"] <= _data_mais(hoje, 30) and x.get("situacao") in ("mapeado", "preparando", None)]
+    ent = sum(x.get("valor", 0) for x in todos["financeiro"] if x.get("tipo_lancamento") == "entrada")
+    sai = sum(x.get("valor", 0) for x in todos["financeiro"] if x.get("tipo_lancamento") == "saida")
+    pend = self._db.execute("SELECT COUNT(*) FROM gsa_pedido WHERE estado='pendente'").fetchone()[0]
+    alertas = ([f"Tarefa atrasada: {x['titulo']} (prazo {x['prazo']})" for x in atrasadas]
+               + [f"Tarefa vence em até 7 dias: {x['titulo']} ({x['prazo']})" for x in semana]
+               + [f"Edital fecha em até 30 dias: {x['titulo']} ({x['prazo']})" for x in editais]
+               + ([f"{pend} pedido(s) de acesso aguardando a direção"] if pend else []))
+    return {"ok": True, "hoje": hoje, "membros": len(self.hub.contas()), "pedidos_pendentes": pend,
+            "projetos": {s: sum(1 for x in todos["projeto"] if (x.get("situacao") or "ideia") == s) for s in SITUACOES["projeto"]},
+            "tarefas": {"total": len(tar), "feitas": sum(1 for x in tar if x.get("situacao") == "feita"), "atrasadas": len(atrasadas)},
+            "editais": {s: sum(1 for x in todos["edital"] if (x.get("situacao") or "mapeado") == s) for s in SITUACOES["edital"]},
+            "financeiro": {"entradas": round(ent, 2), "saidas": round(sai, 2), "saldo": round(ent - sai, 2)},
+            "parceiros": len(todos["parceiro"]), "marketing": {s: sum(1 for x in todos["marketing"] if (x.get("situacao") or "rascunho") == s) for s in SITUACOES["marketing"]},
+            "alertas": alertas}
+
+
+def _data_mais(d: str, dias: int) -> str:
+    import datetime as _dt
+    return (_dt.date.fromisoformat(d) + _dt.timedelta(days=dias)).isoformat()
+
+
+def _membros(self) -> dict:
+    return {"ok": True, "contas": [{k: c[k] for k in ("nome", "usuario", "papel", "ativa")} for c in self.hub.contas()],
+            "convites": seg.convite_listar(self.hub)}
+
+
+def _convidar(self, d: dict, quem: dict) -> dict:
+    c = seg.convite_criar(self.hub, d["email"], d.get("papel") or seg.EQUIPE, "", d.get("nome") or "", quem["usuario"], self.base)
+    if not c.get("ok"):
+        return c
+    m = self._db.execute("SELECT corpo FROM email_saida WHERE ref=? ORDER BY id DESC LIMIT 1", (c["ref"],)).fetchone()
+    return {"ok": True, "convite": c["id"], "texto_convite": m[0] if m else ""}
+
+
+GSA.instalar_itens, GSA.itens, GSA.salvar, GSA.apagar = _instalar_itens, _itens, _salvar, _apagar
+GSA.indicadores, GSA.membros, GSA.convidar = _indicadores, _membros, _convidar
+_init_antigo = GSA.__init__
+
+
+def _init_novo(self, hub, base_url: str = ""):
+    _init_antigo(self, hub, base_url)
+    self.instalar_itens()
+
+
+GSA.__init__ = _init_novo
+
+
+def _pasta_auto() -> Path | None:
+    """Sem PHYSIS_GSA_DOCS: procura a pasta "Global South Alliance" (ou "Global Sourh Alliance") nos Documentos do OneDrive."""
+    bases = [Path(os.environ[v]) / "Documents" for v in ("OneDriveCommercial", "OneDrive") if os.environ.get(v)]
+    bases += [Path.home() / "OneDrive - Physis Engineering" / "Documents", Path.home() / "Documents"]
+    for b in bases:
+        for n in ("Global South Alliance", "Global Sourh Alliance"):
+            if (b / n).is_dir():
+                return b / n
+    return None

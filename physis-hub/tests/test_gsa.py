@@ -44,9 +44,26 @@ class GSA(unittest.TestCase):
 
     def test_pagina(self):
         h = (Path(__file__).resolve().parents[1] / "web" / "gsa.html").read_text(encoding="utf-8")
-        for k in ("/api/publico/gsa/pedido", "/api/gsa/decidir", "/api/gsa/documentos", "/gestao/", "/plataforma/", "Mapa de parceiros", "Marketing"):
+        for k in ("/api/publico/gsa/pedido", "/api/gsa/decidir", "/api/gsa/documentos", "/api/gsa/itens", "/api/gsa/indicadores", "/api/gsa/membros",
+                  "Membros", "Projetos", "Tarefas", "Financeiro", "Propostas e editais", "Mapa de parceiros", "Painel de indicadores", "Marketing"):
             self.assertIn(k, h)
         self.assertEqual(h.count("<h1"), 1)
+        self.assertNotIn("/gestao/", h, "versão básica: sem a Gestão da Physis")
+
+    def test_itens_alertas_e_financeiro(self):
+        self.assertFalse(self.g.salvar({"tipo": "tarefa", "dados": {}}, EQ)["ok"])
+        self.assertFalse(self.g.salvar({"tipo": "tarefa", "dados": {"titulo": "x", "prazo": "25/11/2026"}}, EQ)["ok"])
+        self.assertTrue(self.g.salvar({"tipo": "tarefa", "dados": {"titulo": "Relatório", "prazo": "2026-11-20", "situacao": "a fazer"}}, EQ)["ok"])
+        self.assertTrue(self.g.salvar({"tipo": "edital", "dados": {"titulo": "Chamada X", "prazo": "2026-12-10", "link": "https://exemplo.org"}}, EQ)["ok"])
+        self.assertEqual(self.g.salvar({"tipo": "financeiro", "dados": {"descricao": "Doação", "tipo_lancamento": "entrada", "valor": "1.500,00"}}, EQ).get("codigo"), 403)
+        self.assertTrue(self.g.salvar({"tipo": "financeiro", "dados": {"descricao": "Doação", "tipo_lancamento": "entrada", "valor": "1.500,00"}}, DIR)["ok"])
+        self.assertTrue(self.g.salvar({"tipo": "parceiro", "dados": {"nome": "ONG Sul", "lat": "-22,5", "lon": "-43,2"}}, EQ)["ok"])
+        i = self.g.indicadores("2026-11-25")
+        self.assertEqual(i["financeiro"]["saldo"], 1500.0)
+        self.assertEqual(i["tarefas"]["atrasadas"], 1)
+        self.assertTrue(any("Edital fecha" in a for a in i["alertas"]))
+        pid = self.g.itens("parceiro")["itens"][0]["id"]
+        self.assertTrue(self.g.apagar({"id": pid}, EQ)["ok"]); self.assertEqual(self.g.itens("parceiro")["itens"], [])
 
 if __name__ == "__main__":
     unittest.main()

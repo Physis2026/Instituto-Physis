@@ -1104,6 +1104,12 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     if qg:
                         r = g.pedidos(qg)
                         self._json(r.pop("codigo", 200), r)
+                elif p in ("/api/gsa/itens", "/api/gsa/indicadores", "/api/gsa/membros"):
+                    qg = self._exigir(seg.DIRECAO if p.endswith("/membros") else seg.EQUIPE)
+                    if qg:
+                        r = (g.itens((q.get("tipo") or [""])[0][:20]) if p.endswith("/itens") else g.indicadores() if p.endswith("/indicadores")
+                             else g.membros())
+                        self._json(r.pop("codigo", 200), r)
                 elif p == "/api/gsa/documentos":
                     qg = self._exigir(seg.EQUIPE)
                     if qg:
@@ -1549,6 +1555,20 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 self._json(200, r)
                 return True
             # GSA: pedido de acesso público (limite por IP); decidir só a direção
+            if p in ("/api/gsa/item", "/api/gsa/item/apagar", "/api/gsa/convidar"):
+                if instancia.get("instalacao") != "gsa":
+                    self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                    return True
+                qg = self._exigir(seg.DIRECAO if p.endswith("/convidar") else seg.EQUIPE)
+                if not qg:
+                    return True
+                d = self._ler(corpo, {"/api/gsa/item": "gsa_item", "/api/gsa/item/apagar": "gsa_apagar", "/api/gsa/convidar": "gsa_convidar"}[p])
+                if d is None:
+                    return True
+                g = modulo("gsa")
+                r = g.salvar(d, qg) if p == "/api/gsa/item" else g.apagar(d, qg) if p.endswith("/apagar") else g.convidar(d, qg)
+                self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
+                return True
             if p in ("/api/publico/gsa/pedido", "/api/gsa/decidir"):
                 if instancia.get("instalacao") != "gsa":
                     self._json(404, {"ok": False, "erro": "rota desconhecida"})

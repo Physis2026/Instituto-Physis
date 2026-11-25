@@ -84,11 +84,8 @@
       "lugar": "gestao-interna",
       "instalacao": "gsa",
       "banco": "physis-gsa.db",
-      "gestao_interna": true,
-      "modulos": [
-        "gestao"
-      ],
-      "projeto": "Plataforma de gestão interna da Global South Alliance (25/11/2026): membros, projetos, alerta de tarefas, financeiro, propostas e editais, mapa de parceiros, indicadores e marketing; base do Instituto Physis; só convidados ou pedido aceito pela direção. Site público depois. Porta 8705; endereço [MARCADOR: gsa.physisengineering.com?]."
+      "modulos": [],
+      "projeto": "Plataforma de gestão interna da Global South Alliance (25/11/2026): membros, projetos, alerta de tarefas, financeiro, propostas e editais, mapa de parceiros, indicadores e marketing; versão básica própria (sem a Gestão da Physis); base do Instituto Physis; só convidados ou pedido aceito pela direção. Site público depois. Porta 8705; endereço gsa.physisengineering.com."
     }
   ]
 }

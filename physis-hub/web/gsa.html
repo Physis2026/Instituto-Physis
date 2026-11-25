@@ -36,15 +36,14 @@ async function pedir(url, corpo) {
   if (corpo !== undefined) { op.method = "POST"; op.headers["Content-Type"] = "application/json"; op.body = JSON.stringify(corpo); if (csrf) op.headers["X-Physis-CSRF"] = csrf; }
   try { const r = await fetch(url, op); const j = await r.json().catch(() => ({})); j._status = r.status; return j; } catch (e) { return { ok: false, erro: "O servidor não respondeu." }; }
 }
-const MODULOS = [
-  ["Membros", "Convidar pessoas, ver quem tem conta e o papel de cada uma (Minha conta → Convites).", "/plataforma/"],
-  ["Projetos", "Projetos da aliança, com etapas e responsáveis (Gestão interna → Projetos).", "/gestao/"],
-  ["Alerta de tarefas", "Tarefas, prazos e alertas de atraso (Gestão interna → Tarefas e Alertas).", "/gestao/"],
-  ["Financeiro", "Totais, entradas e saídas (Gestão interna → Totais). Detalhamento financeiro da GSA: em construção.", "/gestao/"],
-  ["Propostas e editais", "Editais, prazos e propostas em preparação.", "/gestao/"],
-  ["Mapa de parceiros", "Organizações parceiras e profissionais no mapa.", "/plataforma/"],
-  ["Painel de indicadores", "Indicadores da plataforma e dos projetos.", "/plataforma/"],
-  ["Marketing", "Calendário e textos de divulgação: hoje no M&A da Physis (só no servidor interno); integração à GSA em construção.", ""]];
+/* Versão básica (25/11/2026): só os itens indicados pela direção, sem a Gestão da Physis */
+const ABAS = [["painel", "Painel de indicadores"], ["membros", "Membros"], ["projeto", "Projetos"], ["tarefa", "Tarefas"], ["financeiro", "Financeiro"],
+  ["edital", "Propostas e editais"], ["parceiro", "Mapa de parceiros"], ["marketing", "Marketing"], ["docs", "Documentos base"]];
+const ROT = { titulo:"Título", descricao:"Descrição", responsavel:"Responsável", inicio:"Início (AAAA-MM-DD)", fim:"Fim (AAAA-MM-DD)", situacao:"Situação",
+  projeto:"Projeto", prazo:"Prazo (AAAA-MM-DD)", tipo_lancamento:"Lançamento", valor:"Valor (R$)", data:"Data (AAAA-MM-DD)", categoria:"Categoria",
+  orgao:"Órgão", link:"Link (https://)", nome:"Nome", tipo:"Tipo", pais:"País", cidade:"Cidade", lat:"Latitude", lon:"Longitude", contato:"Contato",
+  site:"Site (https://)", canal:"Canal", texto:"Texto" };
+let aba = "painel", edit = null;
 function telaFora() {
   return `<section class="cartao"><h2>Entrar</h2><form id="ent">
       <label for="ent-u">E-mail</label><input id="ent-u" type="email" autocomplete="username" required maxlength="160">
@@ -61,12 +60,60 @@ function telaFora() {
       <button class="botao" type="submit">Enviar pedido</button><p class="msg" id="p-msg" role="status"></p></form></section>`;
 }
 function telaDentro() {
-  const dir = inst.papel === "administrador";
-  return `<section class="cartao"><h2>Olá, ${esc(inst.nome || "")}</h2><p class="t2">Papel: ${esc(inst.papel)}.</p>
-      <button class="botao sec" type="button" id="sair">Sair</button></section>
-    <div class="grade">${MODULOS.map(([n, d, l]) => `<section class="cartao"><h2>${esc(n)}</h2><p>${esc(d)}</p>${l ? `<a class="botao" href="${l}">Abrir</a>` : ""}</section>`).join("")}</div>
-    <section class="cartao" id="docs"><h2>Documentos base</h2><p>Carregando…</p></section>
-    ${dir ? '<section class="cartao" id="pedidos"><h2>Pedidos de acesso</h2><p>Carregando…</p></section>' : ""}`;
+  return `<section class="cartao"><p>Olá, ${esc(inst.nome || "")} · ${esc(inst.papel)} <button class="botao sec" type="button" id="sair">Sair</button></p>
+    <nav aria-label="Partes da GSA"><ul style="list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:4px">${ABAS.map(([k, n]) => `<li><button type="button" class="botao${k === aba ? "" : " sec"}" data-aba="${k}" aria-pressed="${k === aba}">${esc(n)}</button></li>`).join("")}</ul></nav></section>
+    <div id="tela"><p>Carregando…</p></div>`;
+}
+const fmt = v => Number(v || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+async function telaAba() {
+  const a = $("tela"); if (!a) return;
+  if (aba === "docs") { a.innerHTML = '<section class="cartao" id="docs"><h2>Documentos base</h2><p>Carregando…</p></section>'; return docs(); }
+  if (aba === "painel") {
+    const j = await pedir("/api/gsa/indicadores"); if (!j.ok) { a.innerHTML = "<p class='erro'>" + esc(j.erro || "") + "</p>"; return; }
+    const kv = o => "<ul>" + Object.entries(o).map(([k, v]) => `<li>${esc(k)}: <strong>${esc(v)}</strong></li>`).join("") + "</ul>";
+    a.innerHTML = `<section class="cartao" role="status"><h2>Alertas</h2>${j.alertas.length ? "<ul>" + j.alertas.map(x => `<li>${esc(x)}</li>`).join("") + "</ul>" : "<p>Nenhum alerta.</p>"}</section>
+      <div class="grade"><section class="cartao"><h2>Membros</h2><p><strong>${j.membros}</strong> com conta · ${j.pedidos_pendentes} pedido(s) pendente(s)</p></section>
+      <section class="cartao"><h2>Projetos</h2>${kv(j.projetos)}</section><section class="cartao"><h2>Tarefas</h2>${kv(j.tarefas)}</section>
+      <section class="cartao"><h2>Editais</h2>${kv(j.editais)}</section>
+      <section class="cartao"><h2>Financeiro</h2><p>Entradas R$ ${fmt(j.financeiro.entradas)} · Saídas R$ ${fmt(j.financeiro.saidas)} · <strong>Saldo R$ ${fmt(j.financeiro.saldo)}</strong></p></section>
+      <section class="cartao"><h2>Parceiros</h2><p><strong>${j.parceiros}</strong></p></section><section class="cartao"><h2>Marketing</h2>${kv(j.marketing)}</section></div>`;
+    return;
+  }
+  if (aba === "membros") {
+    if (inst.papel !== "administrador") { a.innerHTML = "<section class='cartao'><h2>Membros</h2><p>Só a direção vê e convida membros.</p></section>"; return; }
+    const j = await pedir("/api/gsa/membros");
+    a.innerHTML = `<section class="cartao"><h2>Membros</h2><table><thead><tr><th scope="col">Nome</th><th scope="col">E-mail</th><th scope="col">Papel</th><th scope="col">Ativa</th></tr></thead><tbody>
+      ${(j.contas || []).map(c => `<tr><td>${esc(c.nome)}</td><td>${esc(c.usuario)}</td><td>${esc(c.papel)}</td><td>${c.ativa ? "sim" : "não"}</td></tr>`).join("")}</tbody></table></section>
+      <section class="cartao"><h2>Convidar</h2><form id="conv-f"><label for="cv-n">Nome</label><input id="cv-n" maxlength="120">
+      <label for="cv-e">E-mail</label><input id="cv-e" type="email" required maxlength="160">
+      <label for="cv-p">Papel</label><select id="cv-p"><option value="operador">Membro (equipe)</option><option value="administrador">Direção</option></select>
+      <button class="botao" type="submit">Criar convite</button></form><div id="conv" role="status"></div>
+      <h3>Convites</h3><ul>${(j.convites || []).map(c => `<li>${esc(c.email)} · ${esc(c.estado)}</li>`).join("") || "<li>nenhum</li>"}</ul></section>
+      <section class="cartao" id="pedidos"><h2>Pedidos de acesso</h2><p>Carregando…</p></section>`;
+    return pedidos();
+  }
+  const j = await pedir("/api/gsa/itens?tipo=" + aba);
+  if (!j.ok) { a.innerHTML = "<p class='erro'>" + esc(j.erro || "") + "</p>"; return; }
+  const nome = ABAS.find(x => x[0] === aba)[1], cur = edit ? j.itens.find(x => x.id === edit) || {} : {};
+  const campo = k => k === "situacao" ? `<label for="f-${k}">${ROT[k]}</label><select id="f-${k}">${j.situacoes.map(s => `<option${cur[k] === s ? " selected" : ""}>${s}</option>`).join("")}</select>`
+    : k === "tipo_lancamento" ? `<label for="f-${k}">${ROT[k]}</label><select id="f-${k}"><option value="entrada"${cur[k] === "entrada" ? " selected" : ""}>entrada</option><option value="saida"${cur[k] === "saida" ? " selected" : ""}>saída</option></select>`
+    : (k === "descricao" || k === "texto") ? `<label for="f-${k}">${ROT[k]}</label><textarea id="f-${k}" rows="3">${esc(cur[k] || "")}</textarea>`
+    : `<label for="f-${k}">${ROT[k] || k}</label><input id="f-${k}" value="${esc(cur[k] == null ? "" : cur[k])}">`;
+  const col = j.campos.slice(0, 4);
+  const mapa = aba === "parceiro" ? mapaParceiros(j.itens) : "";
+  a.innerHTML = `<section class="cartao"><h2>${esc(nome)}</h2>${mapa}${j.itens.length ? `<table><thead><tr>${col.map(k => `<th scope="col">${esc(ROT[k] || k)}</th>`).join("")}<th scope="col"><span class="t2">Ações</span></th></tr></thead><tbody>
+      ${j.itens.map(x => `<tr>${col.map(k => `<td>${k === "valor" ? "R$ " + fmt(x[k]) : esc(x[k] == null ? "" : x[k])}</td>`).join("")}<td><button class="botao sec" type="button" data-editar="${x.id}">Editar</button><button class="botao sec" type="button" data-apagar="${x.id}">Apagar</button></td></tr>`).join("")}</tbody></table>` : "<p>Nada cadastrado ainda.</p>"}</section>
+    <section class="cartao"><h2>${edit ? "Editar" : "Novo"}</h2><form id="item-f">${j.campos.map(campo).join("")}
+      <button class="botao" type="submit">Salvar</button>${edit ? '<button class="botao sec" type="button" id="cancelar">Cancelar</button>' : ""}<p class="msg" id="item-msg" role="status"></p></form></section>`;
+}
+/* mapa simples dos parceiros com coordenadas (sem internet: pontos sobre uma grade de longitude e latitude) */
+function mapaParceiros(itens) {
+  const p = itens.filter(x => typeof x.lat === "number" && typeof x.lon === "number");
+  if (!p.length) return "<p class='t2'>Mapa: informe latitude e longitude dos parceiros para vê-los aqui.</p>";
+  const X = lon => (lon + 180) / 360 * 720, Y = lat => (90 - lat) / 180 * 360;
+  return `<svg viewBox="0 0 720 360" role="img" aria-label="Mapa dos parceiros: ${p.length} ponto(s)" style="width:100%;max-width:720px;background:var(--fundo);border:1px solid var(--linha);border-radius:8px">
+    ${[-60, -30, 0, 30, 60].map(l => `<line x1="0" x2="720" y1="${Y(l)}" y2="${Y(l)}" stroke="currentColor" stroke-opacity=".15"/>`).join("")}
+    ${p.map(x => `<circle cx="${X(x.lon)}" cy="${Y(x.lat)}" r="5" fill="#C2410C"><title>${esc(x.nome)}${x.cidade ? " · " + esc(x.cidade) : ""}</title></circle>`).join("")}</svg>`;
 }
 async function docs() {
   const a = $("docs"); if (!a) return;
@@ -86,7 +133,7 @@ async function pedidos() {
 }
 function desenhar() {
   $("conteudo").innerHTML = inst && inst.autenticado ? telaDentro() : telaFora();
-  if (inst && inst.autenticado) { docs(); pedidos(); }
+  if (inst && inst.autenticado) telaAba();
 }
 document.addEventListener("submit", async ev => {
   ev.preventDefault();
@@ -94,6 +141,18 @@ document.addEventListener("submit", async ev => {
     const r = await pedir("/api/conta/entrar", { usuario: $("ent-u").value.trim().toLowerCase(), senha: $("ent-s").value });
     if (!r.ok) { $("ent-msg").textContent = r.erro || "E-mail ou senha não conferem."; $("ent-msg").className = "msg erro"; return; }
     csrf = r.csrf || null; inst = await pedir("/api/instancia"); desenhar();
+  }
+  if (ev.target.id === "item-f") {
+    const j = await pedir("/api/gsa/itens?tipo=" + aba), dados = {};
+    j.campos.forEach(k => { const e = $("f-" + k); if (e && e.value !== "") dados[k] = e.value; });
+    const r = await pedir("/api/gsa/item", Object.assign({ tipo: aba, dados }, edit ? { id: edit } : {}));
+    if (!r.ok) { $("item-msg").textContent = r.erro || "Não salvou."; $("item-msg").className = "msg erro"; return; }
+    edit = null; telaAba(); return;
+  }
+  if (ev.target.id === "conv-f") {
+    const r = await pedir("/api/gsa/convidar", { nome: $("cv-n").value, email: $("cv-e").value.trim().toLowerCase(), papel: $("cv-p").value });
+    $("conv").innerHTML = r.ok ? "<p>Convite criado. Se o e-mail não sair sozinho, mande este texto:</p><pre>" + esc(r.texto_convite) + "</pre>" : "<p class='erro'>" + esc(r.erro || "") + "</p>";
+    return;
   }
   if (ev.target.id === "ped") {
     const r = await pedir("/api/publico/gsa/pedido", { nome: $("p-nome").value, email: $("p-email").value, organizacao: $("p-org").value,
@@ -104,6 +163,10 @@ document.addEventListener("submit", async ev => {
 });
 document.addEventListener("click", async ev => {
   const b = ev.target.closest && ev.target.closest("button"); if (!b) return;
+  if (b.dataset.aba) { aba = b.dataset.aba; edit = null; desenhar(); const n = document.querySelector('[data-aba="' + aba + '"]'); if (n) n.focus(); return; }
+  if (b.dataset.editar) { edit = +b.dataset.editar; telaAba(); return; }
+  if (b.id === "cancelar") { edit = null; telaAba(); return; }
+  if (b.dataset.apagar) { if (!confirm("Apagar este item?")) return; const r = await pedir("/api/gsa/item/apagar", { id: +b.dataset.apagar }); if (!r.ok) alert(r.erro || ""); telaAba(); return; }
   if (b.id === "sair") { await pedir("/api/conta/sair", {}); csrf = null; inst = await pedir("/api/instancia"); desenhar(); return; }
   if (b.dataset.dec) {
     const motivo = b.dataset.dec === "recusar" ? prompt("Motivo da recusa:") : "";
