@@ -536,7 +536,16 @@ class Laboratorio(unittest.TestCase):
         h = Hub(org="ino-lab")
         srv = servidor.iniciar(h, 0, endereco="127.0.0.1", instancia={"login": True, "instalacao": "inovastem"})
         try:
-            with urllib.request.urlopen(f"http://127.0.0.1:{srv.server_address[1]}/laboratorio", timeout=30) as r:
+            base = f"http://127.0.0.1:{srv.server_address[1]}"
+            # sem conta: volta para o site, onde estão o cadastro e a entrada (dona, 25/11/2026)
+            with urllib.request.urlopen(base + "/laboratorio", timeout=30) as r:
+                self.assertNotIn('id="lab-inovastem"', r.read().decode("utf-8"))
+            senha = "Senha-Forte-2026-xyz!"
+            h.criar_conta("Dona", "dona@x.org", senha)
+            req = urllib.request.Request(base + "/api/conta/entrar", json.dumps({"usuario": "dona@x.org", "senha": senha}).encode(),
+                                         {"Content-Type": "application/json"}, method="POST")
+            ck = urllib.request.urlopen(req, timeout=30).headers.get("Set-Cookie").split(";")[0]
+            with urllib.request.urlopen(urllib.request.Request(base + "/laboratorio", headers={"Cookie": ck}), timeout=30) as r:
                 self.assertIn('id="lab-inovastem"', r.read().decode("utf-8"))
         finally:
             srv.shutdown()
@@ -849,7 +858,8 @@ class FilaImpressaoRotas(unittest.TestCase):
 
     def test_unsafe_eval_so_no_laboratorio(self):
         # web-ifc precisa de 'unsafe-eval' (21/11/2026): só em /laboratorio da instalação inovastem; o resto segue sem eval
-        with urllib.request.urlopen(f"http://127.0.0.1:{self.porta}/laboratorio", timeout=30) as r:
+        req = urllib.request.Request(f"http://127.0.0.1:{self.porta}/laboratorio", headers={"Cookie": self.par[0]})
+        with urllib.request.urlopen(req, timeout=30) as r:
             self.assertIn("'unsafe-eval'", r.headers["Content-Security-Policy"])
         with urllib.request.urlopen(f"http://127.0.0.1:{self.porta}/", timeout=30) as r:
             self.assertNotIn("'unsafe-eval'", r.headers["Content-Security-Policy"])

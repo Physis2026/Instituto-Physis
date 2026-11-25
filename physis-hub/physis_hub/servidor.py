@@ -2232,7 +2232,15 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     # o Planejador é outra ferramenta (relacionada, mas separada): não faz parte do site da InovaSTEM
                     return self._json(404, {"ok": False, "erro": "o Planejador não faz parte da InovaSTEM"})
                 if u.path in ("/laboratorio", "/laboratorio/") and (WEB / "inovastem-lab.html").exists():
-                    # Laboratório: Simulação (Fase 1) e Physis 3D no navegador, sem conta (ferramentas/montar_lab_inovastem.py)
+                    # Laboratório (Modelagem Physis 3D e Simulação): site público, mas a plataforma de cada pessoa é com conta
+                    # (dona, 25/11/2026): sem sessão, volta para a página com o cadastro e a entrada
+                    if not self._quem():
+                        self.send_response(302)
+                        self.send_header("Location", "/#participar")
+                        self.send_header("Cache-Control", "no-store")
+                        self.send_header("Content-Length", "0")
+                        self.end_headers()
+                        return True
                     return self._enviar_bytes((WEB / "inovastem-lab.html").read_bytes(), "text/html; charset=utf-8",
                                               {"Cache-Control": "no-cache"})
                 if u.path in ("/fontes/JosefinSans.ttf", "/fontes/Lora.ttf") and (WEB / u.path.lstrip("/")).is_file():
