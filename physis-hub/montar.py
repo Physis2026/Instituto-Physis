@@ -31,7 +31,8 @@ MODULOS = ("monitoramento", "agua", "zonas", "animais", "coleiras", "comedouros"
            "frota")         # Frota e combustível (em desenvolvimento, 18/11/2026)
 # instalação: "physis" (padrão: plataforma de cliente ou servidor da Physis) ou "instituto" (Instituto Physis:
 # pesquisa, cursos e projetos sociais; mesmo código, banco, marca, suporte e catálogo próprios; docs/INSTITUTO.md)
-INSTALACOES = ("physis", "instituto", "inovastem")   # inovastem: site e living lab da InovaSTEM (D94, docs/INOVASTEM.md)
+INSTALACOES = ("physis", "instituto", "inovastem", "gsa")   # gsa: Global South Alliance, gestão interna (25/11/2026)
+INSTALACOES_ = INSTALACOES   # inovastem: site e living lab da InovaSTEM (D94, docs/INOVASTEM.md)
 LEIA_MATERIAIS = ("Materiais para download do site da InovaSTEM (docs/INOVASTEM.md).\n"
                   "Ponha aqui só arquivos aprovados pela direção, em PDF ou ODF (.pdf, .odt, .odp, .ods), e liste cada um no\n"
                   "instancia.json, em inovastem.materiais: {\"titulo\": ..., \"arquivo\": ..., \"grupo\": ...}.\n"
@@ -177,6 +178,8 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
     if instalacao == "instituto" and (AQUI / "web" / "site.html").is_file():
         shutil.copy2(AQUI / "web" / "site.html", pasta / "web" / "site.html")
     # site da InovaSTEM (D94): só no pacote inovastem, com a pasta de materiais (a direção põe e lista cada arquivo)
+    if instalacao == "gsa":            # GSA: entrada (login ou pedido de acesso) e atalhos da gestão interna
+        shutil.copy2(AQUI / "web" / "gsa.html", pasta / "web" / "gsa.html")
     if instalacao == "inovastem":
         shutil.copy2(AQUI / "web" / "inovastem.html", pasta / "web" / "inovastem.html")
         if (AQUI / "web" / "inovastem-lab.html").is_file():   # Laboratório (/laboratorio): Simulação e Physis 3D
@@ -275,7 +278,7 @@ def montar(org: str, lugar: str, modulos: list[str], saida: Path, sustainkit: Pa
           if "sustainkit" in modulos else "")
     # 19/11/2026: o mínimo de senha e o nome do banco vêm do próprio sistema (antes o texto dizia 10 e physis-hub.db sempre)
     from physis_hub import seguranca as _seg
-    eh_inst = instalacao in ("instituto", "inovastem")
+    eh_inst = instalacao in ("instituto", "inovastem", "gsa")
     inst_txt = ("\nNo Instituto Physis, `/` é o **site público** (leitura aberta, cadastro da comunidade e moderação) e a\n"
                 "**plataforma** da equipe fica em `/plataforma/`. Detalhes em `docs/COMUNIDADE.md` e `docs/INSTITUTO.md`.\n"
                 if instalacao == "instituto" else
@@ -311,7 +314,7 @@ def main() -> None:
     ap.add_argument("--nome", default="", help="nome do cliente para a tela")
     ap.add_argument("--licenca", default=LICENCA_PADRAO)
     ap.add_argument("--saida", type=Path, default=Path("entregas"))
-    ap.add_argument("--instalacao", default="physis", choices=INSTALACOES, help="instituto = Instituto Physis (docs/INSTITUTO.md); inovastem = InovaSTEM (docs/INOVASTEM.md)")
+    ap.add_argument("--instalacao", default="physis", choices=INSTALACOES, help="instituto = Instituto Physis (docs/INSTITUTO.md); inovastem = InovaSTEM (docs/INOVASTEM.md); gsa = Global South Alliance (docs/GSA.md)")
     ap.add_argument("--banco", default="", help="nome do arquivo do banco (padrão do instituto: physis-instituto.db)")
     ap.add_argument("--suporte-email", default="", help="e-mail de suporte desta instalação")
     ap.add_argument("--suporte-whatsapp", default="", help="WhatsApp de suporte desta instalação")

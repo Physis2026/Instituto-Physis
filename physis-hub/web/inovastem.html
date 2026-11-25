@@ -300,6 +300,7 @@ const T = {
     ins_enviar:"Fazer a minha inscrição", ins_ok:"Inscrição feita. Você já está dentro.", ins_ja:"Este e-mail já tem inscrição: entre com a sua senha logo acima.",
     ins_nova:"Ainda não tenho inscrição", abrir_lab:"Abrir a minha plataforma (laboratório)", ins_topicos:"Tópicos que você quer acompanhar",
     ins_completar:"Complete a sua inscrição (nome público e tópicos). É uma vez só.", ins_completar_enviar:"Salvar a inscrição",
+    del_dentro_t:"Delas · a sua plataforma", del_dentro:"Você está na Delas. Abra a plataforma, siga os tópicos no fórum ou ajuste a sua participação.", del_dentro_nao:"Você está dentro da InovaSTEM. Para participar da Delas, confirme abaixo (autodeclaração).", del_aderir:"Entrar na Delas",
     eu_t:"Sua participação", eu_nome:"Nome público", eu_pode:"Pode publicar", eu_nao_pode:"Ainda não pode publicar",
     eu_delas:"Acesso à InovaSTEM Delas (autodeclaração)", eu_delas_salvar:"Salvar autodeclaração", eu_sair:"Sair da comunidade",
     eu_sair_aviso:"Ao sair, o seu nome público vira 'Participante removido' e os dados do responsável e a autodeclaração são apagados.",
@@ -437,6 +438,7 @@ const T = {
     ins_enviar:"Sign me up", ins_ok:"Signed up. You are in.", ins_ja:"This e-mail is already signed up: sign in with your password above.",
     ins_nova:"I am not signed up yet", abrir_lab:"Open my platform (lab)", ins_topicos:"Topics you want to follow",
     ins_completar:"Complete your sign-up (public name and topics). Just once.", ins_completar_enviar:"Save my sign-up",
+    del_dentro_t:"Delas · your platform", del_dentro:"You are in Delas. Open the platform, follow the topics in the forum or adjust your participation.", del_dentro_nao:"You are in InovaSTEM. To join Delas, confirm below (self-declaration).", del_aderir:"Join Delas",
     eu_t:"Your participation", eu_nome:"Public name", eu_pode:"Can publish", eu_nao_pode:"Cannot publish yet",
     eu_delas:"Access to InovaSTEM Hers (self-declaration)", eu_delas_salvar:"Save self-declaration", eu_sair:"Leave the community",
     eu_sair_aviso:"When you leave, your public name becomes 'Participante removido' and the guardian's data and the self-declaration are deleted.",
@@ -542,12 +544,19 @@ function telaInicio() {
 }
 
 function telaDelas() {
-  return cartao(t("del_t"), `<div class="logo-delas"><img class="so-claro" src="${LOGO_DELAS[0]}" alt="${esc(t("delas_logo_alt"))}" width="94" height="120">
+  /* 25/11/2026 (dona): logada, a Delas vira a plataforma (laboratório, fórum, sua participação), não o convite para entrar */
+  const dentro = inst && inst.autenticado, ehDelas = !!(eu && eu.participante && eu.participante.delas);
+  const cta = dentro ? `<a class="botao delas" href="/laboratorio">${esc(t("abrir_lab"))}</a>` : `<a class="botao delas" href="#delas_entrar">${esc(t("ini_chamar"))}</a>`;
+  const topo = dentro ? cartao(t("del_dentro_t"), `<p>${esc(ehDelas ? t("del_dentro") : t("del_dentro_nao"))}</p>
+      <div class="acoes"><a class="botao delas" href="/laboratorio">${esc(t("abrir_lab"))}</a><a class="botao sec" href="#forum">${esc(t("abas").forum)}</a>
+      ${ehDelas ? "" : `<button class="botao delas" type="button" id="del-aderir">${esc(t("del_aderir"))}</button>`}<a class="botao sec" href="#participar">${esc(t("eu_t"))}</a></div>
+      <p class="msg" id="del-msg" role="status"></p>`, "delas") : "";
+  return topo + cartao(t("del_t"), `<div class="logo-delas"><img class="so-claro" src="${LOGO_DELAS[0]}" alt="${esc(t("delas_logo_alt"))}" width="94" height="120">
       <img class="so-escuro" src="${LOGO_DELAS[1]}" alt="${esc(t("delas_logo_alt"))}" width="94" height="120"></div><p><strong>${esc(t("del_missao"))}</strong></p>
-      <div class="acoes"><a class="botao delas" href="#delas_entrar">${esc(t("ini_chamar"))}</a>${botaoCompartilhar(t("del_convidar"), "comp-delas")}</div>
+      <div class="acoes">${cta}${botaoCompartilhar(t("del_convidar"), "comp-delas")}</div>
       <p class="msg" id="comp-msg" role="status"></p>`, "delas")
     + `<section><h2>${esc(t("ini_duas_t"))}</h2><div class="grade"><div class="cartao delas"><h3>${esc(t("ini_duas")[1][0])}</h3><p>${esc(t("ini_duas")[1][1])}</p>
-       <div class="acoes"><a class="botao delas" href="#delas_entrar">${esc(t("ini_chamar"))}</a></div></div>
+       <div class="acoes">${cta}</div></div>
        <div class="cartao marca"><h3>${esc(t("ini_duas")[0][0])}</h3><p>${esc(t("ini_duas")[0][1])}</p>
        <div class="acoes"><a class="botao sec" href="/laboratorio">${esc(t("mod_abrir_lab"))}</a><a class="botao sec" href="#desafios">${esc(t("abas").desafios)}</a></div></div></div></section>`
     + cartao(t("del_dif_t"), `<p>${esc(t("del_dif"))}</p>`)
@@ -1006,6 +1015,9 @@ async function carregarAvisos() {
   avisos = null;
   if (eu && eu.equipe) { const j = await pedir("/api/inovastem/avisos"); if (j.ok) avisos = j; }
 }
+document.addEventListener("click", async ev => { if (!ev.target || ev.target.id !== "del-aderir") return;
+  const r = await pedir("/api/comunidade/delas", { autodeclaro: true });
+  if (r.ok) { await carregarEu(); desenhar(); } else { const m = $("del-msg"); if (m) m.textContent = r.erro || t("sem_hub"); } });
 document.addEventListener("click", async ev => { if (!ev.target || ev.target.id !== "avisos-visto") return;
   await pedir("/api/inovastem/avisos/visto", {}); await carregarAvisos(); desenhar(); });
 

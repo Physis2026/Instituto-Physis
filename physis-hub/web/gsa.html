@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GSA · Global South Alliance · gestão interna</title>
+<!-- GSA (25/11/2026): por enquanto só a GESTÃO INTERNA, com base no Instituto Physis; o site público vem depois.
+     Entra só quem foi convidado ou quem pediu acesso e teve o pedido aceito pela direção. Sem internet: só rotas deste servidor. -->
+<style>
+:root{color-scheme:light;--fundo:#F4F1EA;--sup:#FFFFFF;--texto:#1B1F23;--t2:#4A4F44;--titulo:#33512F;--acao:#0B3D2E;--sobre-acao:#F4F1EA;--linha:#D9D3C2;--erro:#7A2214}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--fundo:#0B3D2E;--sup:#0F4535;--texto:#F4F1EA;--t2:#C3D0BD;--titulo:#F4F1EA;--acao:#F4F1EA;--sobre-acao:#0B3D2E;--linha:#2F5E4E;--erro:#D9A58C}}
+*{box-sizing:border-box}body{margin:0;background:var(--fundo);color:var(--texto);font:16px/1.5 Georgia,"Times New Roman",serif}
+main{max-width:980px;margin:0 auto;padding:16px}h1{font-family:Fraunces,Georgia,serif;color:var(--titulo);font-size:1.7rem;margin:.4em 0}
+h2{color:var(--titulo);font-size:1.2rem;margin:.2em 0 .5em}.cartao{background:var(--sup);border:1px solid var(--linha);border-radius:12px;padding:16px;margin:12px 0}
+.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.t2{color:var(--t2)}
+label{display:block;margin:.5em 0 .2em}input,textarea,select{width:100%;min-height:44px;padding:8px;border:1px solid var(--t2);border-radius:8px;background:var(--sup);color:var(--texto);font:inherit}
+.botao{display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border-radius:8px;border:2px solid var(--acao);background:var(--acao);color:var(--sobre-acao);font:inherit;text-decoration:none;cursor:pointer;margin:4px 6px 4px 0}
+.botao.sec{background:transparent;color:var(--acao)}:focus-visible{outline:3px solid #C2410C;outline-offset:2px}
+.msg{min-height:1.2em}.erro{color:var(--erro)}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid var(--linha);padding:6px;text-align:left;vertical-align:top}
+pre{white-space:pre-wrap;background:var(--fundo);padding:8px;border-radius:8px}
+</style>
+</head>
+<body>
+<main id="principal" tabindex="-1">
+<h1>GSA · Global South Alliance</h1>
+<p class="t2">Plataforma de gestão interna. Entra só quem foi convidado ou teve o pedido de acesso aceito pela direção.</p>
+<div id="conteudo" aria-live="polite"><p>Carregando…</p></div>
+</main>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+let inst = null, csrf = null;
+async function pedir(url, corpo) {
+  const op = { credentials: "same-origin", headers: {} };
+  if (corpo !== undefined) { op.method = "POST"; op.headers["Content-Type"] = "application/json"; op.body = JSON.stringify(corpo); if (csrf) op.headers["X-Physis-CSRF"] = csrf; }
+  try { const r = await fetch(url, op); const j = await r.json().catch(() => ({})); j._status = r.status; return j; } catch (e) { return { ok: false, erro: "O servidor não respondeu." }; }
+}
+const MODULOS = [
+  ["Membros", "Convidar pessoas, ver quem tem conta e o papel de cada uma (Minha conta → Convites).", "/plataforma/"],
+  ["Projetos", "Projetos da aliança, com etapas e responsáveis (Gestão interna → Projetos).", "/gestao/"],
+  ["Alerta de tarefas", "Tarefas, prazos e alertas de atraso (Gestão interna → Tarefas e Alertas).", "/gestao/"],
+  ["Financeiro", "Totais, entradas e saídas (Gestão interna → Totais). Detalhamento financeiro da GSA: em construção.", "/gestao/"],
+  ["Propostas e editais", "Editais, prazos e propostas em preparação.", "/gestao/"],
+  ["Mapa de parceiros", "Organizações parceiras e profissionais no mapa.", "/plataforma/"],
+  ["Painel de indicadores", "Indicadores da plataforma e dos projetos.", "/plataforma/"],
+  ["Marketing", "Calendário e textos de divulgação: hoje no M&A da Physis (só no servidor interno); integração à GSA em construção.", ""]];
+function telaFora() {
+  return `<section class="cartao"><h2>Entrar</h2><form id="ent">
+      <label for="ent-u">E-mail</label><input id="ent-u" type="email" autocomplete="username" required maxlength="160">
+      <label for="ent-s">Senha</label><input id="ent-s" type="password" autocomplete="current-password" required>
+      <button class="botao" type="submit">Entrar</button><p class="msg" id="ent-msg" role="status"></p></form></section>
+    <section class="cartao"><h2>Pedir acesso</h2><p class="t2">O pedido vai para a direção da GSA. Se for aceito, você recebe um convite para criar a sua senha.</p>
+      <form id="ped" novalidate>
+      <label for="p-nome">Nome</label><input id="p-nome" autocomplete="name" required maxlength="120">
+      <label for="p-email">E-mail</label><input id="p-email" type="email" autocomplete="email" required maxlength="160">
+      <label for="p-org">Organização</label><input id="p-org" autocomplete="organization" maxlength="160">
+      <label for="p-pais">País</label><input id="p-pais" autocomplete="country-name" maxlength="60">
+      <label for="p-mot">Por que quer participar</label><textarea id="p-mot" maxlength="1000" rows="3"></textarea>
+      <label><input id="p-aceite" type="checkbox" style="width:auto;min-height:auto"> Concordo que meus dados sejam usados só para a direção decidir o acesso (apagados em até 90 dias se o pedido for recusado).</label>
+      <button class="botao" type="submit">Enviar pedido</button><p class="msg" id="p-msg" role="status"></p></form></section>`;
+}
+function telaDentro() {
+  const dir = inst.papel === "administrador";
+  return `<section class="cartao"><h2>Olá, ${esc(inst.nome || "")}</h2><p class="t2">Papel: ${esc(inst.papel)}.</p>
+      <button class="botao sec" type="button" id="sair">Sair</button></section>
+    <div class="grade">${MODULOS.map(([n, d, l]) => `<section class="cartao"><h2>${esc(n)}</h2><p>${esc(d)}</p>${l ? `<a class="botao" href="${l}">Abrir</a>` : ""}</section>`).join("")}</div>
+    <section class="cartao" id="docs"><h2>Documentos base</h2><p>Carregando…</p></section>
+    ${dir ? '<section class="cartao" id="pedidos"><h2>Pedidos de acesso</h2><p>Carregando…</p></section>' : ""}`;
+}
+async function docs() {
+  const a = $("docs"); if (!a) return;
+  const j = await pedir("/api/gsa/documentos");
+  a.innerHTML = "<h2>Documentos base</h2>" + (j.aviso ? `<p class="t2">${esc(j.aviso)}</p>` : "") + ((j.itens || []).length
+    ? "<ul>" + j.itens.map(x => `<li><a href="/api/gsa/documento?c=${encodeURIComponent(x.caminho)}">${esc(x.caminho)}</a> · ${x.tamanho_kb} kB</li>`).join("") + "</ul>"
+    : (j.aviso ? "" : "<p>Nenhum documento na pasta.</p>"));
+}
+async function pedidos() {
+  const a = $("pedidos"); if (!a) return;
+  const j = await pedir("/api/gsa/pedidos");
+  if (!j.ok) { a.innerHTML = "<h2>Pedidos de acesso</h2><p class='erro'>" + esc(j.erro || "") + "</p>"; return; }
+  a.innerHTML = "<h2>Pedidos de acesso</h2>" + (j.itens.length ? `<table><caption class="t2">Pendentes primeiro</caption><thead><tr><th scope="col">Pessoa</th><th scope="col">Organização</th><th scope="col">Motivo</th><th scope="col">Situação</th></tr></thead><tbody>`
+    + j.itens.map(x => `<tr><td>${esc(x.nome)}<br><span class="t2">${esc(x.email)}</span></td><td>${esc(x.organizacao)} ${esc(x.pais)}</td><td>${esc(x.motivo)}</td>
+      <td>${x.estado === "pendente" ? `<button class="botao" type="button" data-dec="aprovar" data-id="${x.id}" aria-label="Aprovar ${esc(x.nome)}">Aprovar</button><button class="botao sec" type="button" data-dec="recusar" data-id="${x.id}" aria-label="Recusar ${esc(x.nome)}">Recusar</button>` : esc(x.estado)}</td></tr>`).join("")
+    + "</tbody></table>" : "<p>Nenhum pedido.</p>") + '<div id="conv" role="status"></div>';
+}
+function desenhar() {
+  $("conteudo").innerHTML = inst && inst.autenticado ? telaDentro() : telaFora();
+  if (inst && inst.autenticado) { docs(); pedidos(); }
+}
+document.addEventListener("submit", async ev => {
+  ev.preventDefault();
+  if (ev.target.id === "ent") {
+    const r = await pedir("/api/conta/entrar", { usuario: $("ent-u").value.trim().toLowerCase(), senha: $("ent-s").value });
+    if (!r.ok) { $("ent-msg").textContent = r.erro || "E-mail ou senha não conferem."; $("ent-msg").className = "msg erro"; return; }
+    csrf = r.csrf || null; inst = await pedir("/api/instancia"); desenhar();
+  }
+  if (ev.target.id === "ped") {
+    const r = await pedir("/api/publico/gsa/pedido", { nome: $("p-nome").value, email: $("p-email").value, organizacao: $("p-org").value,
+      pais: $("p-pais").value, motivo: $("p-mot").value, aceite: $("p-aceite").checked });
+    $("p-msg").textContent = r.ok ? (r.ja_tem_conta ? "Você já tem conta: entre com a sua senha." : "Pedido enviado. A direção vai responder pelo e-mail informado.") : (r.erro || "Não foi possível enviar.");
+    $("p-msg").className = "msg" + (r.ok ? "" : " erro"); if (r.ok) ev.target.reset();
+  }
+});
+document.addEventListener("click", async ev => {
+  const b = ev.target.closest && ev.target.closest("button"); if (!b) return;
+  if (b.id === "sair") { await pedir("/api/conta/sair", {}); csrf = null; inst = await pedir("/api/instancia"); desenhar(); return; }
+  if (b.dataset.dec) {
+    const motivo = b.dataset.dec === "recusar" ? prompt("Motivo da recusa:") : "";
+    if (b.dataset.dec === "recusar" && !motivo) return;
+    const r = await pedir("/api/gsa/decidir", { id: +b.dataset.id, decisao: b.dataset.dec, motivo: motivo || "" });
+    await pedidos();
+    const c = $("conv"); if (c) c.innerHTML = r.ok ? (r.texto_convite ? "<p>Convite criado. Se o e-mail não sair sozinho, mande este texto à pessoa:</p><pre>" + esc(r.texto_convite) + "</pre>" : "<p>Feito.</p>") : "<p class='erro'>" + esc(r.erro || "") + "</p>";
+  }
+});
+(async () => { inst = await pedir("/api/instancia"); csrf = inst && inst.csrf || null; desenhar(); })();
+</script>
+</body>
+</html>

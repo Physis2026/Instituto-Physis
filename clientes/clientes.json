@@ -77,6 +77,18 @@
       },
       "projeto": "Site e plataforma da InovaSTEM como living lab online (D94, prioridade 0): teste em 24/11/2026, lançamento em 26/11/2026. Instalação própria (banco, porta 8702, marca e subdomínio inovastem.physisengineering.com), sob a Physis Engineering até o CNPJ do Instituto; sem a marca do Instituto (docs/INOVASTEM.md).",
       "confirmar": "Confirmar com a direção: link do grupo de WhatsApp (até 25/11), equipe de moderação, e-mail de contato, DNS do subdomínio (Eric) e os materiais aprovados para download."
+    },
+    {
+      "org": "gsa",
+      "nome": "GSA · Global South Alliance",
+      "lugar": "gestao-interna",
+      "instalacao": "gsa",
+      "banco": "physis-gsa.db",
+      "gestao_interna": true,
+      "modulos": [
+        "gestao"
+      ],
+      "projeto": "Plataforma de gestão interna da Global South Alliance (25/11/2026): membros, projetos, alerta de tarefas, financeiro, propostas e editais, mapa de parceiros, indicadores e marketing; base do Instituto Physis; só convidados ou pedido aceito pela direção. Site público depois. Porta 8705; endereço [MARCADOR: gsa.physisengineering.com?]."
     }
   ]
 }

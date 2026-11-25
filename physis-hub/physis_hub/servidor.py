@@ -83,6 +83,7 @@ from . import intercambio as intercambio_mod
 from . import comunidade as comunidade_mod
 from . import agenda as agenda_mod
 from . import inovastem as inovastem_mod
+from . import gsa as gsa_mod
 from . import mapeamento as mapeamento_mod
 from . import simulacao as simulacao_mod
 from . import cep as cep_mod
@@ -568,6 +569,8 @@ for _k, _v in comunidade_mod.ESQUEMAS.items():      # comunidade aberta do Insti
     seg.ESQUEMAS.setdefault(_k, _v)
 for _k, _v in agenda_mod.ESQUEMAS.items():          # agenda de eventos e oportunidades (docs/COMUNIDADE.md)
     seg.ESQUEMAS.setdefault(_k, _v)
+for _k, _v in gsa_mod.ESQUEMAS.items():              # GSA · gestão interna (25/11/2026)
+    seg.ESQUEMAS.setdefault(_k, _v)
 for _k, _v in inovastem_mod.ESQUEMAS.items():       # InovaSTEM living lab (D94, docs/INOVASTEM.md)
     seg.ESQUEMAS.setdefault(_k, _v)
 for _k, _v in frota_mod.ESQUEMAS.items():                 # frota e combustível (docs/FROTA.md, em desenvolvimento)
@@ -840,6 +843,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                                            # e arquivos STL/3MF gerados no laboratório (privados de quem enviou)
                                            pasta_impressao=Path(os.environ.get("PHYSIS_IMPRESSAO_PASTA")
                                                                 or Path(banco_da_instancia(instancia)).resolve().parent / "impressao_lab")),
+                                       "gsa": lambda: gsa_mod.GSA(hub, url_publica),
                                        "fornecedores": lambda: fornecedores_mod.Fornecedores(
                                            hub, pasta=fornecedores_mod.pasta_padrao(banco_da_instancia(instancia))),
                                        # intercâmbio com plataformas parceiras (docs/INTERCAMBIO.md): chave só no arquivo do servidor
@@ -1088,6 +1092,32 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 return True
             if p.startswith("/api/publico/comunidade/"):
                 self._json(*modulo("comunidade").rota("GET", p, None, None, q))
+                return True
+            # GSA (25/11/2026): documentos base para quem tem conta; fila de pedidos de acesso só a direção
+            if p.startswith("/api/gsa/"):
+                if instancia.get("instalacao") != "gsa":
+                    self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                    return True
+                g = modulo("gsa")
+                if p == "/api/gsa/pedidos":
+                    qg = self._exigir(seg.DIRECAO)
+                    if qg:
+                        r = g.pedidos(qg)
+                        self._json(r.pop("codigo", 200), r)
+                elif p == "/api/gsa/documentos":
+                    qg = self._exigir(seg.EQUIPE)
+                    if qg:
+                        self._json(200, g.documentos(qg))
+                elif p == "/api/gsa/documento":
+                    if self._exigir(seg.EQUIPE):
+                        a = g.arquivo(unquote((q.get("c") or [""])[0])[:400])
+                        if not a:
+                            self._json(404, {"ok": False, "erro": "documento não encontrado"})
+                        else:
+                            self._enviar_bytes(a[1], "application/octet-stream", {"Content-Disposition": "attachment; filename*=UTF-8''" + quote(a[0]),
+                                                                                   "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
+                else:
+                    self._json(404, {"ok": False, "erro": "rota desconhecida"})
                 return True
             # InovaSTEM (D94, docs/INOVASTEM.md): só na instalação inovastem
             if p.startswith("/api/publico/inovastem") or p.startswith("/api/inovastem/"):
@@ -1517,6 +1547,28 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 self._mandar(seg.confirmar_enviar(hub, r["id"], url_publica))
                 r["confirmar_email"] = seg.confirmacao_exigida()   # a tela só pede para conferir o e-mail quando vale (21/11/2026)
                 self._json(200, r)
+                return True
+            # GSA: pedido de acesso público (limite por IP); decidir só a direção
+            if p in ("/api/publico/gsa/pedido", "/api/gsa/decidir"):
+                if instancia.get("instalacao") != "gsa":
+                    self._json(404, {"ok": False, "erro": "rota desconhecida"})
+                    return True
+                if p == "/api/publico/gsa/pedido":
+                    if self._limitado("entrar"):
+                        return True
+                    d = self._ler(corpo, "gsa_pedido")
+                    if d is None:
+                        return True
+                    r = modulo("gsa").pedir(d)
+                else:
+                    qg = self._exigir(seg.DIRECAO)
+                    if not qg:
+                        return True
+                    d = self._ler(corpo, "gsa_decidir")
+                    if d is None:
+                        return True
+                    r = modulo("gsa").decidir(d, qg)
+                self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
                 return True
             # InovaSTEM (D94): interesse e sugestão de projeto são públicos (limite por IP); o resto é da equipe
             if p.startswith("/api/publico/inovastem/") or p.startswith("/api/inovastem/"):
@@ -2220,6 +2272,12 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
             if instancia.get("instalacao") == "instituto" and (WEB / "site.html").exists():
                 if u.path in ("/", "/inicio", "/inicio/"):
                     return self._arquivo(WEB / "site.html", "text/html; charset=utf-8")
+                if u.path in ("/plataforma", "/plataforma/"):
+                    return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
+            # GSA · Global South Alliance (25/11/2026): por enquanto só a gestão interna; "/" é a entrada (login ou pedido de acesso)
+            if instancia.get("instalacao") == "gsa" and (WEB / "gsa.html").exists():
+                if u.path in ("/", "/inicio", "/inicio/"):
+                    return self._enviar_bytes((WEB / "gsa.html").read_bytes(), "text/html; charset=utf-8", {"Cache-Control": "no-cache"})
                 if u.path in ("/plataforma", "/plataforma/"):
                     return self._arquivo(WEB / "painel.html", "text/html; charset=utf-8")
             # Site da InovaSTEM (D94, docs/INOVASTEM.md): público em "/", plataforma em /plataforma/, termos e aviso beta no
