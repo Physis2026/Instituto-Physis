@@ -1959,6 +1959,10 @@ def montar() -> str:
 PxPref.iniciar({{ lugar:"#pp-lugar", conteudo:"#conteudo", tela:"lab-inovastem", aoMudar: () => desenhar(),
   idioma:{{ atual:() => lang, definir:v => {{ lang = v === "en" ? "en" : "pt"; try {{ localStorage.setItem("physis-idioma", lang); }} catch (e) {{}} desenhar(); }} }} }});
 </script>
+<script>/* plataforma feminina (Delas, 25/11/2026): lilás para quem se inscreveu na Delas */
+fetch("/api/comunidade/eu", {{ credentials: "same-origin" }}).then(r => r.json()).then(j => {{
+  if (j && j.participante && j.participante.delas) document.documentElement.classList.add("plataforma-delas"); }}).catch(() => {{}});
+</script>
 </body>
 </html>
 """

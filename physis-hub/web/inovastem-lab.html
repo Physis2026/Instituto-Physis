@@ -32,6 +32,11 @@
   --titulo:"Josefin Sans","Century Gothic",Futura,"Segoe UI",system-ui,sans-serif;
   --fonte:Lora,Georgia,"Times New Roman",serif;
 }
+/* 25/11/2026 (dona): plataformas plataforma-delass em lilás (Delas). Só cores da Delas que já estão na paleta. */
+html.plataforma-delas{--fundo:#EDE9FE;--titulo-cor:#7C3AED;--link:#7C3AED;--acao:#7C3AED;--sec:#7C3AED;--sobrancelha:#7C3AED;--numero:#7C3AED;
+  --faixa:#3D2A5C;--rodape:#3D2A5C;--linha:#C4B5FD;--suave:#EDE9FE}
+html.plataforma-delas[data-tema="escuro"]{--fundo:#2B2143;--sup:#3D2A5C;--campo:#2B2143;--titulo-cor:#C4B5FD;--link:#C4B5FD;--sec:#C4B5FD;
+  --sobrancelha:#C4B5FD;--faixa:#3D2A5C;--rodape:#3D2A5C;--linha:#3D2A5C;--suave:#2B2143}
 html[data-tema="escuro"]{
   color-scheme:dark;
   --fundo:#0B3D2E;--sup:#0F4535;--campo:#0B3D2E;--texto:#F4F1EA;--tinta2:#C3D0BD;--titulo-cor:#F4F1EA;--link:#F4F1EA;
@@ -7419,6 +7424,10 @@ restaurarMontagem();   // as malhas da montagem voltam do IndexedDB deste navega
 <script id="pp-site">
 PxPref.iniciar({ lugar:"#pp-lugar", conteudo:"#conteudo", tela:"lab-inovastem", aoMudar: () => desenhar(),
   idioma:{ atual:() => lang, definir:v => { lang = v === "en" ? "en" : "pt"; try { localStorage.setItem("physis-idioma", lang); } catch (e) {} desenhar(); } } });
+</script>
+<script>/* plataforma feminina (Delas, 25/11/2026): lilás para quem se inscreveu na Delas */
+fetch("/api/comunidade/eu", { credentials: "same-origin" }).then(r => r.json()).then(j => {
+  if (j && j.participante && j.participante.delas) document.documentElement.classList.add("plataforma-delas"); }).catch(() => {});
 </script>
 </body>
 </html>

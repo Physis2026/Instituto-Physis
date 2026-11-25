@@ -34,6 +34,11 @@
   --titulo:"Josefin Sans","Century Gothic",Futura,"Segoe UI",system-ui,sans-serif;
   --fonte:Lora,Georgia,"Times New Roman",serif;
 }
+/* 25/11/2026 (dona): plataformas plataforma-delass em lilás (Delas). Só cores da Delas que já estão na paleta. */
+html.plataforma-delas{--fundo:#EDE9FE;--titulo-cor:#7C3AED;--link:#7C3AED;--acao:#7C3AED;--sec:#7C3AED;--sobrancelha:#7C3AED;--numero:#7C3AED;
+  --faixa:#3D2A5C;--rodape:#3D2A5C;--linha:#C4B5FD;--suave:#EDE9FE}
+html.plataforma-delas[data-tema="escuro"]{--fundo:#2B2143;--sup:#3D2A5C;--campo:#2B2143;--titulo-cor:#C4B5FD;--link:#C4B5FD;--sec:#C4B5FD;
+  --sobrancelha:#C4B5FD;--faixa:#3D2A5C;--rodape:#3D2A5C;--linha:#3D2A5C;--suave:#2B2143}
 html[data-tema="escuro"]{
   color-scheme:dark;
   --fundo:#0B3D2E;--sup:#0F4535;--campo:#0B3D2E;--texto:#F4F1EA;--tinta2:#C3D0BD;--titulo-cor:#F4F1EA;--link:#F4F1EA;
@@ -213,7 +218,7 @@ const T = {
     ini_duas:[["InovaSTEM", "Aberta a todas as pessoas e organizações: troca de informações, parcerias e desafios de modelagem com códigos abertos."], ["InovaSTEM Delas", "Rede dedicada a mulheres (jovens, cis e trans) que lideram em STEM: formação, acolhimento entre pares, rodas de conversa e mentoria."]],
     ini_chamar:"Quero participar", ini_whats:"Entrar no grupo de WhatsApp", ini_whats_nota:"O grupo de WhatsApp é opcional. O fórum da plataforma continua sendo o canal principal.",
     ini_whats_falta:"Link do grupo de WhatsApp: em breve.",
-    ini_physis_t:"Quem realiza", ini_physis:"A InovaSTEM é uma iniciativa da Physis Engineering, empresa de engenharia de sustentabilidade de Petrópolis (RJ), com liderança feminina. Esta é a versão beta da plataforma: tudo pode mudar com as sugestões de quem participa.",
+    ini_physis_t:"Quem realiza", ini_physis:"A InovaSTEM é uma iniciativa da Physis Engineering, empresa de engenharia de sustentabilidade de Petrópolis (RJ), com liderança plataforma-delas. Esta é a versão beta da plataforma: tudo pode mudar com as sugestões de quem participa.",
     compartilhar:"Compartilhar a InovaSTEM", compartilhado:"Link copiado. Obrigada por compartilhar!", compartilhar_txt:"Conheça a InovaSTEM: rede aberta de troca de informações, parcerias e desafios de modelagem com códigos abertos.",
     // Delas
     del_t:"InovaSTEM Delas", del_missao:"Formar, acolher e fortalecer mulheres em STEM, com redes de apoio entre pares, mentoria e projetos aplicados à sustentabilidade.",
@@ -641,7 +646,7 @@ function telaMateriais() {
     + cartao(t("mat_docs_t"), docs);
 }
 
-function telaParticipar() {
+function telaParticipar(delas) {
   /* 25/11/2026 (dona): uma inscrição só (conta + nome público + tópicos); na segunda vez, só o login.
      Quem já se inscreveu ou entrou neste navegador (ino-inscrito) vê só a entrada; o formulário fica atrás de "Ainda não tenho inscrição". */
   const areas = ino ? ino.areas : [];
@@ -659,12 +664,13 @@ function telaParticipar() {
         ${p ? `<button class="botao sec" type="button" id="eu-sair">${esc(t("eu_sair"))}</button>` : ""}</div><p class="msg" id="eu-msg" role="status"></p>`, "marca");
   } else {
     const ja = (() => { try { return localStorage.getItem("ino-inscrito") === "1"; } catch (e) { return false; } })();
+    if (delas) h += cartao(t("pd_t"), `<p>${esc(t("pd_intro"))}</p>`, "delas");
     h += cartao(t("ent_t"), `<form id="ent-f"><div class="campos">
         <div><label for="ent-usuario">${esc(t("ent_usuario"))}</label><input type="email" id="ent-usuario" autocomplete="username" required maxlength="160"></div>
         <div><label for="ent-senha">${esc(t("ent_senha"))}</label><input type="password" id="ent-senha" autocomplete="current-password" required></div></div>
         <div class="acoes"><button class="botao" type="submit">${esc(t("ent_enviar"))}</button>${ja ? `<button class="botao sec" type="button" id="ins-mostrar" aria-expanded="false" aria-controls="ins-cartao">${esc(t("ins_nova"))}</button>` : ""}</div>
-        <p class="msg" id="ent-msg" role="status"></p></form>`, "marca");
-    h += `<section class="cartao" id="ins-cartao"${ja ? " hidden" : ""}><h2>${esc(t("ins_t"))}</h2><p class="t2">${esc(t("ins_intro"))}</p><form id="ins" novalidate>
+        <p class="msg" id="ent-msg" role="status"></p></form>`, delas ? "delas" : "marca");
+    h += `<section class="cartao${delas ? " delas" : ""}" id="ins-cartao"${ja ? " hidden" : ""}><h2>${esc(t("ins_t"))}</h2><p class="t2">${esc(t("ins_intro"))}</p><form id="ins" novalidate>
       <div class="campos">
         <div><label for="ins-nome">${esc(t("cad_nome"))}</label><input type="text" id="ins-nome" autocomplete="name" required maxlength="120"></div>
         <div><label for="ins-email">${esc(t("cad_email"))}</label><input type="email" id="ins-email" autocomplete="email" required maxlength="160"></div>
@@ -680,15 +686,15 @@ function telaParticipar() {
           <div><label for="ins-resp-email">${esc(t("int_resp_email"))}</label><input type="email" id="ins-resp-email" maxlength="160"></div></div></div>
       </fieldset>
       <div class="campos">
-        <div><label for="ins-genero">${esc(t("int_genero"))}</label><select id="ins-genero" aria-describedby="ins-gen-nota">${["", "feminino", "masculino", "nao_informar"].map(g => `<option value="${g}">${esc(gen[g])}</option>`).join("")}</select></div>
+        <div><label for="ins-genero">${esc(t("int_genero"))}</label><select id="ins-genero" aria-describedby="ins-gen-nota">${["", "feminino", "masculino", "nao_informar"].map(g => `<option value="${g}"${delas && g === "feminino" ? " selected" : ""}>${esc(gen[g])}</option>`).join("")}</select></div>
         <div><label for="ins-cidade">${esc(t("int_cidade"))}</label><input type="text" id="ins-cidade" autocomplete="address-level2" maxlength="80"></div>
         <div><label for="ins-inst">${esc(t("int_inst"))}</label><input type="text" id="ins-inst" autocomplete="organization" maxlength="120"></div>
       </div>
       <p class="nota-delas" id="ins-gen-nota">${esc(t("int_gen_nota"))}</p>
-      <label class="opcao"><input type="checkbox" id="ins-delas">${esc(t("cad_delas"))}</label>
+      <label class="opcao"><input type="checkbox" id="ins-delas"${delas ? " checked" : ""}>${esc(t("cad_delas"))}</label>
       <label class="opcao"><input type="checkbox" id="ins-aceite" required>${esc(t("cad_aceite"))}</label>
       <p class="pq"><a href="#termos">${esc(t("abas").termos)}</a> · <a href="#privacidade">${esc(t("abas").privacidade)}</a></p>
-      <div class="acoes"><button class="botao" type="submit">${esc(t("ins_enviar"))}</button></div>
+      <div class="acoes"><button class="botao${delas ? " delas" : ""}" type="submit">${esc(delas ? t("pd_enviar") : t("ins_enviar"))}</button></div>
       <p class="msg" id="ins-msg" role="status"></p></form></section>`;
   }
   if (eu && eu.equipe) {
@@ -732,7 +738,7 @@ function telaDelasEntrar() {
       <p class="msg" id="pd-msg" role="status"></p><p class="t2 pq">${esc(t("pd_conta"))}</p></form>`, "delas");
 }
 
-const TELAS = { delas_entrar: telaDelasEntrar, inicio: telaInicio, delas: telaDelas, desafios: telaDesafios, forum: telaForum, modelagem: telaModelagem,
+const TELAS = { delas_entrar: () => telaParticipar(true), inicio: telaInicio, delas: telaDelas, desafios: telaDesafios, forum: telaForum, modelagem: telaModelagem,
                 hackathon: telaHackathon, materiais: telaMateriais, participar: telaParticipar,
                 termos: () => telaJuridico("termos"), privacidade: () => telaJuridico("privacidade") };
 
@@ -906,7 +912,7 @@ function ligar() {
       if (r.ok) { fd.reset(); propostas(); }
     };
   }
-  if (aba === "delas_entrar") {
+  if (aba === "delas_entrar" && $("pd")) {      /* formulário antigo da Delas (só interesse): substituído pela inscrição única */
     const fp = $("pd");
     fp.querySelectorAll('input[name="pd-idade"]').forEach(r => r.onchange = () => { $("pd-resp").hidden = fp.querySelector('input[name="pd-idade"]:checked').value !== "menor"; });
     fp.onsubmit = async ev => {
@@ -923,7 +929,7 @@ function ligar() {
       if (r.ok) { fp.reset(); $("pd-resp").hidden = true; }
     };
   }
-  if (aba === "participar") {
+  if (aba === "participar" || aba === "delas_entrar") {
     moderacao(); filaIno(); interesses();
     const marcar = () => { try { localStorage.setItem("ino-inscrito", "1"); } catch (e) {} };
     const mostrar = $("ins-mostrar");
@@ -985,8 +991,8 @@ function ligar() {
 }
 
 async function carregarEu() {
-  eu = null;
-  if (inst && inst.autenticado) { const j = await pedir("/api/comunidade/eu"); if (j.ok) eu = j; }
+  eu = null; document.documentElement.classList.remove("plataforma-delas");
+  if (inst && inst.autenticado) { const j = await pedir("/api/comunidade/eu"); if (j.ok) { eu = j; if (j.participante && j.participante.delas) document.documentElement.classList.add("plataforma-delas"); } }
 }
 
 function irPara() {
@@ -1923,6 +1929,10 @@ iniciar();
 <script id="pp-site">
 PxPref.iniciar({ lugar:"#pp-lugar", conteudo:"#conteudo", tela:"site-inovastem",
   idioma:{ atual:() => lang, definir:v => { lang = v === "en" ? "en" : "pt"; try { localStorage.setItem("physis-idioma", lang); } catch (e){} desenhar(); } } });
+</script>
+<script>/* plataforma plataforma-delas (Delas): lilás para quem se inscreveu na Delas */
+fetch("/api/comunidade/eu", { credentials: "same-origin" }).then(r => r.json()).then(j => {
+  if (j && j.participante && j.participante.delas) document.documentElement.classList.add("plataforma-delas"); }).catch(() => {});
 </script>
 </body>
 </html>
