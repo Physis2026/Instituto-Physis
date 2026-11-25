@@ -1100,10 +1100,10 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 elif p == "/api/publico/inovastem/propostas":
                     r = ino.propostas((q.get("tipo") or [""])[0][:20])
                     self._json(r.pop("codigo", 200), r)
-                elif p in ("/api/inovastem/fila", "/api/inovastem/interesses"):
+                elif p in ("/api/inovastem/fila", "/api/inovastem/interesses", "/api/inovastem/avisos"):
                     qi2 = self._exigir(seg.EQUIPE)
                     if qi2:
-                        r = ino.fila(qi2) if p.endswith("/fila") else ino.interesses(qi2)
+                        r = ino.fila(qi2) if p.endswith("/fila") else ino.avisos(qi2) if p.endswith("/avisos") else ino.interesses(qi2)
                         self._json(r.pop("codigo", 200), r)
                 elif p == "/api/inovastem/impressao/minhas":          # fila de impressão: os pedidos de quem tem conta
                     qi2 = self._exigir(seg.CLIENTE)
@@ -1545,7 +1545,8 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                     self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
                     return True
                 equipe_ino = {"/api/inovastem/desafio": "ino_proposta", "/api/inovastem/moderar": "ino_moderar",
-                              "/api/inovastem/remover": "ino_remover", "/api/inovastem/impressao/estado": "ino_impressao_estado"}
+                              "/api/inovastem/remover": "ino_remover", "/api/inovastem/impressao/estado": "ino_impressao_estado",
+                              "/api/inovastem/avisos/visto": "vazio"}
                 if p not in equipe_ino:
                     self._json(404, {"ok": False, "erro": "rota desconhecida"})
                     return True
@@ -1556,6 +1557,7 @@ def criar_manipulador(hub: Hub, token: str | None, instancia: dict | None = None
                 if d is None:
                     return True
                 r = (ino.publicar_desafio(d, qi2) if p.endswith("/desafio") else ino.moderar(d, qi2) if p.endswith("/moderar")
+                     else ino.avisos_vistos(qi2) if p.endswith("/avisos/visto")
                      else ino.mudar_impressao(d, qi2) if p.endswith("/impressao/estado") else ino.remover_interesse(d, qi2))
                 self._json(r.pop("codigo", 200 if r.get("ok") else 400), r)
                 return True

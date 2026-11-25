@@ -94,17 +94,22 @@ class Propostas(unittest.TestCase):
     def test_moderacao_e_privacidade(self):
         self.assertFalse(self.i.sugerir_projeto(dict(self.sug, aceite=False))["ok"])
         self.assertFalse(self.i.sugerir_projeto(dict(self.sug, email=""))["ok"])
+        # 25/11/2026 (dona): o projeto aparece na hora; a equipe é avisada e pode apagar pelo site
         r = self.i.sugerir_projeto(self.sug)
-        self.assertEqual(r["estado"], "pendente")
-        self.assertEqual(self.i.propostas()["itens"], [], "pendente não aparece")
-        self.assertFalse(self.i.moderar({"id": r["id"], "decisao": "aprovar"}, CLIENTE)["ok"])
-        self.assertFalse(self.i.moderar({"id": r["id"], "decisao": "recusar"}, EQUIPE)["ok"], "recusa pede motivo")
-        self.assertTrue(self.i.moderar({"id": r["id"], "decisao": "aprovar"}, EQUIPE)["ok"])
+        self.assertEqual(r["estado"], "publicado")
         pub = self.i.propostas("projeto")
         self.assertEqual([x["titulo"] for x in pub["itens"]], ["Mapa de hortas urbanas"])
         self.assertNotIn("eva@x.example", json.dumps(pub))
         self.assertNotIn("Eva", json.dumps(pub))
-        self.assertEqual(self.i.moderar({"id": r["id"], "decisao": "aprovar"}, EQUIPE).get("codigo"), 409)
+        av = self.i.avisos(EQUIPE)
+        self.assertEqual(av["novos"], 1); self.assertIn("Mapa de hortas urbanas", av["itens"][0]["texto"])
+        self.assertNotIn("eva@x.example", json.dumps(av))
+        self.assertEqual(self.i.avisos(CLIENTE).get("codigo"), 403)
+        self.i.avisos_vistos(EQUIPE)
+        self.assertEqual(self.i.avisos(EQUIPE)["novos"], 0)
+        self.assertFalse(self.i.moderar({"id": r["id"], "decisao": "apagar"}, CLIENTE)["ok"])
+        self.assertTrue(self.i.moderar({"id": r["id"], "decisao": "apagar"}, EQUIPE)["ok"])
+        self.assertEqual(self.i.propostas("projeto")["itens"], [])
 
     def test_desafio_so_equipe(self):
         d = {"titulo": "Desafio do telhado verde", "descricao": "Reduzir a temperatura do telhado da oficina com SbN.", "prazo": "2027-02-28"}
@@ -120,7 +125,7 @@ class Propostas(unittest.TestCase):
         r = self.i.remover_interesse({"email": "ANA@x.example"}, EQUIPE)
         self.assertEqual((r["interesses"], r["propostas"]), (1, 1))
         self.assertEqual(self.i.interesses(EQUIPE)["total"], 0)
-        self.assertEqual(self.i.fila(EQUIPE)["itens"][0]["email"], "")
+        self.assertEqual(self.i._db.execute("SELECT email FROM ino_proposta").fetchone()[0], "")
 
 
 class MateriaisEWhatsApp(unittest.TestCase):
@@ -235,12 +240,15 @@ class Rotas(unittest.TestCase):
         self.assertEqual(st, 200, r)
         self.assertEqual(self.pedir("GET", "/api/inovastem/fila")[0], 401)
         self.assertEqual(self.pedir("POST", "/api/inovastem/moderar", {"id": r["id"], "decisao": "aprovar"})[0], 401)
-        st, f = self.pedir("GET", "/api/inovastem/fila", s=self.dir)
-        self.assertEqual(len(f["itens"]), 1)
-        st, m = self.pedir("POST", "/api/inovastem/moderar", {"id": r["id"], "decisao": "aprovar"}, self.dir)
-        self.assertEqual(st, 200, m)
+        st, av = self.pedir("GET", "/api/inovastem/avisos", s=self.dir)
+        self.assertEqual(st, 200, av); self.assertGreaterEqual(av["novos"], 1)
         st, pub = self.pedir("GET", "/api/publico/inovastem/propostas?tipo=projeto")
         self.assertEqual(len(pub["itens"]), 1)
+        st, m = self.pedir("POST", "/api/inovastem/moderar", {"id": r["id"], "decisao": "apagar"}, self.dir)
+        self.assertEqual(st, 200, m)
+        self.assertEqual(len(self.pedir("GET", "/api/publico/inovastem/propostas?tipo=projeto")[1]["itens"]), 0)
+        st, v = self.pedir("POST", "/api/inovastem/avisos/visto", {}, self.dir)
+        self.assertEqual(st, 200, v)
         self.assertNotIn("z@x.example", json.dumps(pub))
         st, lst = self.pedir("GET", "/api/inovastem/interesses", s=self.dir)
         self.assertEqual(lst["total"], 1)

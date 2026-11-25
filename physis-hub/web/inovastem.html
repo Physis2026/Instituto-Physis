@@ -236,7 +236,7 @@ const T = {
     sug_titulo:"Título do projeto", sug_desc:"O que o projeto resolve, para quem e como (pelo menos 20 letras)", sug_area:"Área", sug_area_nenhuma:"Sem área definida",
     sug_org:"Organização ou grupo (opcional; aparece no site)", sug_nome:"Seu nome (opcional; não aparece no site)", sug_email:"Seu e-mail (para a equipe responder)",
     sug_aceite:"Li o aviso de privacidade (beta) e concordo com o uso do meu e-mail para a resposta da equipe.", sug_enviar:"Enviar para moderação",
-    sug_ok:"Recebido! A equipe avalia e publica depois da moderação.",
+    sug_ok:"Publicado! O seu projeto já aparece na lista.", apagar:"Apagar", apagar_conf:"Apagar este item do site?", avisos_t:"Avisos novos", avisos_ver:"ver e marcar como visto", avisos_pend:"aguardando moderação",
     des_criar_t:"Publicar um desafio (equipe)", des_prazo_campo:"Prazo (AAAA-MM-DD, opcional)", des_publicar:"Publicar desafio",
     des_forum:"Fórum de desafios e projetos",
     // fórum
@@ -378,7 +378,7 @@ const T = {
     sug_titulo:"Project title", sug_desc:"What the project solves, for whom and how (at least 20 letters)", sug_area:"Area", sug_area_nenhuma:"No area defined",
     sug_org:"Organisation or group (optional; shown on the site)", sug_nome:"Your name (optional; not shown on the site)", sug_email:"Your e-mail (for the team to reply)",
     sug_aceite:"I have read the privacy notice (beta) and agree to my e-mail being used for the team's reply.", sug_enviar:"Send for moderation",
-    sug_ok:"Received! The team reviews it and publishes after moderation.",
+    sug_ok:"Published! Your project is already on the list.", apagar:"Delete", apagar_conf:"Delete this item from the site?", avisos_t:"New notices", avisos_ver:"see and mark as seen", avisos_pend:"waiting for moderation",
     des_criar_t:"Publish a challenge (team)", des_prazo_campo:"Deadline (YYYY-MM-DD, optional)", des_publicar:"Publish challenge",
     des_forum:"Challenges and projects forum",
     for_t:"Forum", for_intro:"Open to read. To post, create your account under Join. Everything posted is reviewed by the moderation team before it appears.",
@@ -588,9 +588,11 @@ async function propostas() {
     if (!alvo) continue;
     const j = await pedir("/api/publico/inovastem/propostas?tipo=" + tipo);
     if (!j.ok) { alvo.innerHTML = `<h2>${esc(tit)}</h2><p class="faixa erro">${esc(t("sem_hub"))}</p>`; continue; }
+    alvo.onclick = async ev => { const b = ev.target.closest && ev.target.closest("[data-apagar]"); if (!b || !confirm(t("apagar_conf"))) return;
+      const r = await pedir("/api/inovastem/moderar", { id: +b.getAttribute("data-apagar"), decisao: "apagar" }); if (r.ok) propostas(); else alert(r.erro || t("sem_hub")); };
     alvo.innerHTML = `<h2>${esc(tit)}</h2>` + (j.itens.length ? j.itens.map(x => `<div class="item"><h3>${esc(x.titulo)}</h3>
         <span class="t2 pq">${[x.area ? `${esc(t("des_area"))}: ${esc(lang === "en" ? x.area_nome_en : x.area_nome)}` : "", x.organizacao ? `${esc(t("des_org"))}: ${esc(x.organizacao)}` : "",
-          x.prazo ? `${esc(t("des_prazo"))}: ${esc(x.prazo)}` : ""].filter(Boolean).join(" · ")}</span><p>${esc(x.descricao)}</p></div>`).join("") : `<p>${esc(vazio)}</p>`);
+          x.prazo ? `${esc(t("des_prazo"))}: ${esc(x.prazo)}` : ""].filter(Boolean).join(" · ")}</span><p>${esc(x.descricao)}</p>${eu && eu.equipe ? `<button class="botao sec" type="button" data-apagar="${x.id}" aria-label="${esc(t("apagar") + ": " + x.titulo)}">${esc(t("apagar"))}</button>` : ""}</div>`).join("") : `<p>${esc(vazio)}</p>`);
   }
 }
 
@@ -767,7 +769,7 @@ function desenhar() {
   document.body.classList.toggle("aba-delas", aba === "delas" || aba === "delas_entrar");
   escuroDelas(aba === "delas" || aba === "delas_entrar");
   aplicarIdioma(); desenharAbas(); rodape(); cabecalho();
-  $("corpo").innerHTML = TELAS[aba]();
+  $("corpo").innerHTML = avisosEquipe() + TELAS[aba]();
   ligar();
 }
 
@@ -901,7 +903,7 @@ function ligar() {
       const r = await pedir("/api/publico/inovastem/projeto", { titulo: $("sug-tit").value, descricao: $("sug-desc").value, area: $("sug-area").value,
         organizacao: $("sug-org").value, nome: $("sug-nome").value, email: $("sug-email").value, aceite: $("sug-aceite").checked });
       $("sug-msg").textContent = r.ok ? t("sug_ok") : (r.erro || t("sem_hub")); $("sug-msg").className = "msg" + (r.ok ? "" : " erro");
-      if (r.ok) f.reset();
+      if (r.ok) { f.reset(); propostas(); }
     };
     const fd = $("des-f");
     if (fd) fd.onsubmit = async ev => {
@@ -990,9 +992,27 @@ function ligar() {
   }
 }
 
+/* avisos para a equipe (25/11/2026): tudo o que chegou (projetos, desafios, cadastros, pedidos de impressão, fórum) desde a
+   última vez que a pessoa marcou como visto; aparece no alto de qualquer aba */
+let avisos = null;
+function avisosEquipe() {
+  if (!eu || !eu.equipe || !avisos || (!avisos.novos && !avisos.pendentes_moderacao)) return "";
+  return `<section class="cartao" id="avisos" role="status"><h2>${esc(t("avisos_t"))} (${avisos.novos})</h2>
+    ${avisos.itens.length ? `<ul class="lista">${avisos.itens.slice(0, 8).map(x => `<li>${esc(x.texto)}</li>`).join("")}</ul>` : ""}
+    ${avisos.pendentes_moderacao ? `<p>${avisos.pendentes_moderacao} ${esc(t("avisos_pend"))} · <a href="#participar">${esc(t("abas").participar)}</a></p>` : ""}
+    <div class="acoes"><button class="botao sec" type="button" id="avisos-visto">${esc(t("avisos_ver"))}</button></div></section>`;
+}
+async function carregarAvisos() {
+  avisos = null;
+  if (eu && eu.equipe) { const j = await pedir("/api/inovastem/avisos"); if (j.ok) avisos = j; }
+}
+document.addEventListener("click", async ev => { if (!ev.target || ev.target.id !== "avisos-visto") return;
+  await pedir("/api/inovastem/avisos/visto", {}); await carregarAvisos(); desenhar(); });
+
 async function carregarEu() {
   eu = null; document.documentElement.classList.remove("plataforma-delas");
   if (inst && inst.autenticado) { const j = await pedir("/api/comunidade/eu"); if (j.ok) { eu = j; if (j.participante && j.participante.delas) document.documentElement.classList.add("plataforma-delas"); } }
+  await carregarAvisos();
 }
 
 function irPara() {

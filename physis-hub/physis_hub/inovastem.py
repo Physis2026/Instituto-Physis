@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS ino_interesse (
   quero_delas INTEGER NOT NULL DEFAULT 0, maior INTEGER NOT NULL DEFAULT 1, responsavel_nome TEXT NOT NULL DEFAULT '',
   responsavel_email TEXT NOT NULL DEFAULT '', versao_aviso TEXT NOT NULL, criado REAL NOT NULL, atualizado REAL NOT NULL);
 CREATE UNIQUE INDEX IF NOT EXISTS ino_interesse_email ON ino_interesse(email);
+CREATE TABLE IF NOT EXISTS ino_visto (usuario TEXT PRIMARY KEY, quando REAL NOT NULL);
 CREATE TABLE IF NOT EXISTS ino_proposta (
   id INTEGER PRIMARY KEY AUTOINCREMENT, tipo TEXT NOT NULL, titulo TEXT NOT NULL, descricao TEXT NOT NULL,
   area TEXT NOT NULL DEFAULT '', organizacao TEXT NOT NULL DEFAULT '', nome TEXT NOT NULL DEFAULT '',
@@ -253,7 +254,8 @@ class InovaSTEM:
         return {"ok": True, "id": ident, "estado": estado}
 
     def sugerir_projeto(self, d: dict) -> dict:
-        return self._proposta(d, "projeto", "pendente", "")
+        # 25/11/2026 (dona): o projeto aparece na hora na aba; a equipe apaga pelo site (decisão "apagar") e é avisada (avisos)
+        return self._proposta(d, "projeto", "publicado", "")
 
     # ── equipe ─────────────────────────────────────────────────────────────────────────────────
     def publicar_desafio(self, d: dict, quem: dict) -> dict:
@@ -272,9 +274,9 @@ class InovaSTEM:
         if not _eh_equipe(quem):
             return {"ok": False, "erro": "só a equipe modera", "codigo": 403}
         dec = _texto(d.get("decisao"), 10)
-        novo = {"aprovar": "publicado", "recusar": "recusado", "encerrar": "encerrado"}.get(dec)
+        novo = {"aprovar": "publicado", "recusar": "recusado", "encerrar": "encerrado", "apagar": "removido"}.get(dec)
         if not novo:
-            return {"ok": False, "erro": "decisao: aprovar, recusar ou encerrar"}
+            return {"ok": False, "erro": "decisao: aprovar, recusar, encerrar ou apagar"}
         motivo = _texto(d.get("motivo"), 400)
         if novo == "recusado" and len(motivo) < 3:
             return {"ok": False, "erro": "Escreva o motivo da recusa."}
@@ -282,13 +284,49 @@ class InovaSTEM:
             r = self._db.execute("SELECT estado FROM ino_proposta WHERE id=?", (int(d.get("id") or 0),)).fetchone()
             if not r:
                 return {"ok": False, "erro": "não encontrado", "codigo": 404}
-            if novo != "encerrado" and r[0] != "pendente":
+            if novo not in ("encerrado", "removido") and r[0] != "pendente":
                 return {"ok": False, "erro": "já moderado", "codigo": 409}
             self._db.execute("UPDATE ino_proposta SET estado=?, motivo=?, moderado_por=?, moderado_em=? WHERE id=?",
                              (novo, motivo, quem["usuario"], self.relogio(), int(d["id"])))
             self._db.commit()
         self.hub.registrar("inovastem", quem["usuario"], {"o_que": "moderação", "id": int(d["id"]), "estado": novo})
         return {"ok": True, "estado": novo}
+
+    def avisos(self, quem: dict) -> dict:
+        """O que chegou desde a última vez que esta pessoa da equipe olhou (sem e-mail nem dado pessoal na lista)."""
+        if not _eh_equipe(quem):
+            return {"ok": False, "erro": "só a equipe", "codigo": 403}
+        r = self._db.execute("SELECT quando FROM ino_visto WHERE usuario=?", (quem["usuario"],)).fetchone()
+        desde = r[0] if r else 0.0
+        itens = []
+        for tipo, tit, q in (("proposta", None, "SELECT tipo, titulo, criado FROM ino_proposta WHERE criado>? AND estado<>'removido'"),
+                             ("interesse", "Novo cadastro de interesse", "SELECT '', '', criado FROM ino_interesse WHERE criado>?"),
+                             ("impressao", "Novo pedido de impressão", "SELECT '', arquivo_nome, criado FROM ino_impressao WHERE criado>?"),
+                             ("forum", "Novo tópico no fórum", "SELECT '', titulo, criado FROM com_topico WHERE criado>?"),
+                             ("mensagem", "Nova mensagem no fórum", "SELECT '', substr(texto,1,80), criado FROM com_mensagem WHERE criado>?")):
+            try:
+                for a, b, c in self._db.execute(q, (desde,)):
+                    rot = ({"desafio": "Novo desafio", "projeto": "Novo projeto"}.get(a, "Nova proposta") if tipo == "proposta" else tit)
+                    itens.append({"tipo": tipo, "texto": rot + (": " + b if b else ""), "quando": c})
+            except Exception:  # noqa: BLE001 — tabela de outro módulo ainda não criada
+                pass
+        itens.sort(key=lambda x: -x["quando"])
+        pend = 0
+        for q in ("SELECT COUNT(*) FROM com_topico WHERE estado='pendente'", "SELECT COUNT(*) FROM com_mensagem WHERE estado='pendente'",
+                  "SELECT COUNT(*) FROM ino_proposta WHERE estado='pendente'", "SELECT COUNT(*) FROM ino_impressao WHERE estado='pendente'"):
+            try:
+                pend += self._db.execute(q).fetchone()[0]
+            except Exception:  # noqa: BLE001
+                pass
+        return {"ok": True, "novos": len(itens), "itens": itens[:100], "pendentes_moderacao": pend, "desde": desde}
+
+    def avisos_vistos(self, quem: dict) -> dict:
+        if not _eh_equipe(quem):
+            return {"ok": False, "erro": "só a equipe", "codigo": 403}
+        with self.hub._trava:
+            self._db.execute("INSERT OR REPLACE INTO ino_visto(usuario, quando) VALUES(?,?)", (quem["usuario"], self.relogio()))
+            self._db.commit()
+        return {"ok": True}
 
     def interesses(self, quem: dict) -> dict:
         """Lista para a equipe (dado pessoal: só com sessão da equipe). O gênero só aparece como convite Delas."""
