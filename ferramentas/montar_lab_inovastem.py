@@ -65,9 +65,12 @@ CORES = {"#DBE7F1": "#F4F1EA", "#B8D0E0": "#D9D3C2", "#7FA9C4": "#8A9284", "#546
 # subabas (dona, 20 e 21/11/2026): "Enviar arquivo" primeiro; "Edificação" virou "Modelos BIM (CAD e IFC)" (a chave interna
 # continua "edificacao"); "Montagens" logo depois; "Escaneamento" saiu por enquanto (volta depois; #escaneamento abre Enviar arquivo)
 # 26/11/2026 (dona): três etapas que valem sozinhas: modelagem gráfica > modelagem mecânica > impressão 3D, e o gêmeo digital
-SUBABAS = [("arquivo", "Enviar arquivo"), ("lugar", "Lugar (GIS)"), ("edificacao", "Modelos BIM (CAD e IFC)"), ("montagem", "Montagens"),
-           ("simulacao", "Simulação"), ("pecas", "Impressão 3D"), ("galeria", "Galeria"), ("gemeo", "Gêmeo digital")]
-GRUPOS_LAB = {"arquivo": ("grafica", "Modelagem gráfica"), "montagem": ("mecanica", "Modelagem mecânica"), "pecas": ("impressao", "Impressão 3D"), "gemeo": ("gemeo", "Gêmeo digital")}
+SUBABAS = [("arquivo", "Enviar arquivo"), ("lugar", "Lugar (GIS)"), ("edificacao", "Modelos BIM (CAD e IFC)"), ("gemeo", "Gêmeo digital"),
+           ("montagem", "Montagens"), ("simulacao", "Simulação"), ("pecas", "Peças e fila de impressão"), ("galeria", "Galeria")]
+# 26/11/2026 (dona): TRÊS subabas (modelagem gráfica > modelagem mecânica > impressão 3D), cada uma com as suas partes; as duas
+# primeiras servem sozinhas, sem imprimir nada. O gêmeo digital fica na modelagem gráfica.
+GRUPOS3 = [("grafica", "Modelagem gráfica", ["arquivo", "lugar", "edificacao", "gemeo"]), ("mecanica", "Modelagem mecânica", ["montagem", "simulacao"]),
+           ("impressao", "Impressão 3D", ["pecas", "galeria"])]
 # 24/11/2026 (dona): UMA aba de impressão 3D (peça, parâmetros, filamentos, fatiamento, arquivos de teste e fila); as outras são de simulação
 ESQUEMA_PROJETO = "inovastem-projeto/1"
 
@@ -76,7 +79,8 @@ ESQUEMA_PROJETO = "inovastem-projeto/1"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lab_ingles import CASOS_EN, MOTOR_EN, MOTOR_EN_RX  # noqa: E402  (dicionário em arquivo próprio)
 
-CASCA_CSS = """.lab-grupo{display:block;width:100%;font-weight:700;font-size:.85rem;margin:.5rem 0 .1rem;opacity:.85}
+CASCA_CSS = """.lab-partes{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}.lab-partes a{display:inline-flex;align-items:center;min-height:44px;padding:4px 12px;border-radius:999px;border:1px solid var(--sec);color:var(--sec);text-decoration:none;font-weight:600}.lab-partes a[aria-current=page]{background:var(--sec);color:var(--fundo)}
+.lab-grupo{display:block;width:100%;font-weight:700;font-size:.85rem;margin:.5rem 0 .1rem;opacity:.85}
 /* Modelagem Physis 3D (casca do laboratório): classes que os motores usam (cartao, faixa in/al/at, t2), nas cores do guia */
 .faixa.in{background:var(--suave);color:var(--texto)}
 .faixa.al{background:var(--al-f);color:var(--al-t)}
@@ -164,6 +168,7 @@ CASCA_JS = r""""use strict";
    (SIMULACAO, telaPhysis3D) não mudam: a casca só chama as funções deles e troca as cores do desenho para as do guia. */
 const CORES = __CORES__;
 const SUBABAS = __SUBABAS__;
+const GRUPOS3 = __GRUPOS3__, grupoDe = k => (GRUPOS3.find(g => g[2].indexOf(k) >= 0) || GRUPOS3[0]);
 const ANTIGAS = { "3d": "pecas", "escaneamento": "arquivo", "fila": "pecas" };          // endereços antigos (Escaneamento saiu em 21/11/2026)
 const ESQ_PROJETO = "__ESQ_PROJETO__", ESQ_LUGAR = "physis-geometria-lugar/1", CHAVE_PROJ = "inovastem-projeto";
 const ARQ_MAX = 20 * 1024 * 1024;                           // o mesmo limite dos arquivos do Mapeamento e da fila (20 MB)
@@ -180,7 +185,7 @@ const T = {
     rodape_realiza: "InovaSTEM · uma iniciativa PHYSIS", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ) · Contato: [MARCADOR]",
     rodape_beta: "Versão beta: termos e aviso de privacidade em revisão jurídica.", termos: "Termos de uso (beta)", privacidade: "Privacidade (beta)", acessibilidade: "Acessibilidade",
     grupos: { grafica: "Modelagem gráfica", mecanica: "Modelagem mecânica", impressao: "Impressão 3D", gemeo: "Gêmeo digital" },
-    abas: { gemeo: "Gêmeo digital", arquivo: "Enviar arquivo", lugar: "Lugar (GIS)", edificacao: "Modelos BIM (CAD e IFC)", montagem: "Montagens", pecas: "Impressão 3D", simulacao: "Simulação", fila: "Fila de impressão", galeria: "Galeria" },
+    abas: { gemeo: "Gêmeo digital", arquivo: "Enviar arquivo", lugar: "Lugar (GIS)", edificacao: "Modelos BIM (CAD e IFC)", montagem: "Montagens", pecas: "Peças e fila de impressão", simulacao: "Simulação", fila: "Fila de impressão", galeria: "Galeria" },
     // barra do projeto e fluxo
     proj_titulo: "Projeto comum", proj_guardado: "guardado neste navegador · atualizado em", vazio: "vazio", arquivos: "Arquivos", ultimo: "último",
     lugar: "Lugar", modelo_bim: "Modelo BIM", pecas: "Peças", montagem: "Montagem", resultados: "Resultados", de: "de", elementos: "elementos", objetos: "objetos", itens: "itens",
@@ -352,7 +357,7 @@ const T = {
     rodape_realiza: "InovaSTEM · a PHYSIS initiative", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ), Brazil · Contact: [MARCADOR]",
     rodape_beta: "Beta version: terms and privacy notice under legal review.", termos: "Terms of use (beta)", privacidade: "Privacy (beta)", acessibilidade: "Accessibility",
     grupos: { grafica: "Graphic modeling", mecanica: "Mechanical modeling", impressao: "3D printing", gemeo: "Digital twin" },
-    abas: { gemeo: "Digital twin", arquivo: "Upload a file", lugar: "Site (GIS)", edificacao: "BIM models (CAD and IFC)", montagem: "Assemblies", pecas: "3D printing", simulacao: "Simulation", fila: "Print queue", galeria: "Gallery" },
+    abas: { gemeo: "Digital twin", arquivo: "Upload a file", lugar: "Site (GIS)", edificacao: "BIM models (CAD and IFC)", montagem: "Assemblies", pecas: "Parts and print queue", simulacao: "Simulation", fila: "Print queue", galeria: "Gallery" },
     proj_titulo: "Shared project", proj_guardado: "kept in this browser · updated on", vazio: "empty", arquivos: "Files", ultimo: "latest",
     lugar: "Site", modelo_bim: "BIM model", pecas: "Parts", montagem: "Assembly", resultados: "Results", de: "from", elementos: "elements", objetos: "objects", itens: "items",
     proj_exportar: "Export the project (.json)", proj_importar: "Import a project (.json)", proj_limpar: "Start another project", proj_confirmar: "Confirm: delete the project from this browser",
@@ -1677,7 +1682,8 @@ function aplicarIdioma() {
   botIdioma();
   document.querySelectorAll("[data-t]").forEach(el => { const v = t(el.getAttribute("data-t")); if (typeof v === "string") el.textContent = v; });
   document.querySelectorAll("[data-t-rot]").forEach(el => { const v = t(el.getAttribute("data-t-rot")); if (typeof v === "string") el.setAttribute("aria-label", v); });
-  SUBABAS.forEach(([k], i) => { const e = document.getElementById("tab-" + k); if (e) e.textContent = (i + 1) + ". " + t("abas")[k]; });
+  GRUPOS3.forEach(([g, , ks]) => { const e = document.getElementById("tab-g-" + g), gn = t("grupos"); if (e && gn && gn[g]) e.textContent = gn[g];
+    ks.forEach((k, j) => { const p = document.getElementById("tab-" + k); if (p) p.textContent = (j + 1) + ". " + t("abas")[k]; }); });
   document.querySelectorAll(".lab-grupo[data-g]").forEach(e => { const g = t("grupos"); if (g && g[e.dataset.g]) e.textContent = g[e.dataset.g]; });
 }
 function desenhar() {
@@ -1686,9 +1692,11 @@ function desenhar() {
   let h = (TELAS[abaLab] || telaArquivo)();
   h = h.replace(/<h1(\s[^>]*)?>/g, "<h2$1>").replace(/<\/h1>/g, "</h2>");      // um título só por tela: o logo
   alvo.innerHTML = recolorir(h);
-  alvo.setAttribute("aria-labelledby", "tab-" + abaLab);
+  alvo.setAttribute("aria-labelledby", "tab-g-" + grupoDe(abaLab)[0]);
   document.getElementById("lab-proj").innerHTML = barraProjeto();
-  SUBABAS.forEach(([k]) => { const e = document.getElementById("tab-" + k), sim = k === abaLab; e.setAttribute("aria-selected", String(sim)); e.tabIndex = sim ? 0 : -1; });
+  const gAtual = grupoDe(abaLab)[0];
+  GRUPOS3.forEach(([g]) => { const e = document.getElementById("tab-g-" + g), sim = g === gAtual; e.setAttribute("aria-selected", String(sim)); e.tabIndex = sim ? 0 : -1; });
+  SUBABAS.forEach(([k]) => { const e = document.getElementById("tab-" + k); if (!e) return; e.hidden = grupoDe(k)[0] !== gAtual; if (k === abaLab) e.setAttribute("aria-current", "page"); else e.removeAttribute("aria-current"); });
   document.title = "InovaSTEM · " + t("nav_modelagem") + " · " + t("abas")[abaLab];
   desenhado = true;
   traduzirDom(alvo);
@@ -1724,13 +1732,13 @@ function irLab() {
   aoEntrar(); desenhar();
 }
 document.getElementById("lab-abas").addEventListener("keydown", ev => {
-  const i = SUBABAS.findIndex(s => s[0] === abaLab), n = SUBABAS.length;
+  const i = GRUPOS3.findIndex(g => g[0] === grupoDe(abaLab)[0]), n = GRUPOS3.length;
   const novo = ev.key === "ArrowRight" ? (i + 1) % n : ev.key === "ArrowLeft" ? (i - 1 + n) % n : ev.key === "Home" ? 0 : ev.key === "End" ? n - 1 : ev.key === " " ? i : null;
   if (novo == null) return;
   ev.preventDefault();
-  const k = SUBABAS[novo][0];
+  const k = GRUPOS3[novo][2][0];
   if (location.hash !== "#" + k) location.hash = "#" + k;
-  focar("tab-" + k);
+  focar("tab-g-" + GRUPOS3[novo][0]);
 });
 async function acao(a, b) {
   const fen = FEN.filter(f => f.id === b.getAttribute("data-fen"))[0];
@@ -1933,10 +1941,12 @@ def montar() -> str:
     blocos = "\n".join(f'<script id="{i}">\n{ler(a)}</script>' for i, a in BLOCOS)
     casca = (CASCA_JS.replace("__CORES__", json.dumps(CORES)).replace("__MOTOR_EN__", json.dumps(MOTOR_EN, ensure_ascii=False, indent=0))
              .replace("__MOTOR_EN_RX__", json.dumps(MOTOR_EN_RX, ensure_ascii=False)).replace("__CASOS_EN__", json.dumps(CASOS_EN, ensure_ascii=False, indent=0)).replace("__ESQ_PROJETO__", ESQUEMA_PROJETO)
-             .replace("__SUBABAS__", json.dumps([list(s) for s in SUBABAS], ensure_ascii=False)))
-    grupo = lambda k: (f'<span class="lab-grupo" data-g="{GRUPOS_LAB[k][0]}" aria-hidden="true">{GRUPOS_LAB[k][1]}</span>' if k in GRUPOS_LAB else "")
-    abas = "\n    ".join(grupo(k) + f'<a role="tab" id="tab-{k}" href="#{k}" aria-controls="lab" aria-selected="{"true" if i == 0 else "false"}" '
-                         f'tabindex="{0 if i == 0 else -1}">{i + 1}. {n}</a>' for i, (k, n) in enumerate(SUBABAS))
+             .replace("__SUBABAS__", json.dumps([list(s) for s in SUBABAS], ensure_ascii=False)).replace("__GRUPOS3__", json.dumps([[g, n, ks] for g, n, ks in GRUPOS3], ensure_ascii=False)))
+    nomes = dict(SUBABAS)
+    abas = "\n    ".join(f'<a role="tab" id="tab-g-{g}" href="#{ks[0]}" aria-controls="lab" aria-selected="{"true" if i == 0 else "false"}" '
+                         f'tabindex="{0 if i == 0 else -1}">{n}</a>' for i, (g, n, ks) in enumerate(GRUPOS3))
+    partes = "\n    ".join(f'<a id="tab-{k}" href="#{k}" data-grupo="{g}"{"" if i == 0 else " hidden"}>{j + 1}. {nomes[k]}</a>'
+                           for i, (g, _, ks) in enumerate(GRUPOS3) for j, k in enumerate(ks))
     return f"""<!doctype html>
 <html lang="pt-BR">
 <head>
@@ -1976,8 +1986,11 @@ def montar() -> str:
   <div class="lab-abas" id="lab-abas" role="tablist" aria-label="Subabas da Modelagem Physis 3D" data-t-rot="abas_rot">
     {abas}
   </div>
+  <div class="lab-partes" id="lab-partes" role="group" aria-label="Partes da subaba">
+    {partes}
+  </div>
   <p class="faixa" role="note" data-t="faixa">Fase 1. Pré-dimensionamento para aprender e testar ideias: não aprova projeto, não substitui norma nem ensaio. Os exemplos usam dados fictícios. O que você abre ou envia aqui fica no seu computador; só vai para o servidor da InovaSTEM quando você pede (pedir impressão, enviar peça à Biblioteca).</p>
-  <div id="lab" role="tabpanel" tabindex="0" aria-labelledby="tab-arquivo"></div>
+  <div id="lab" role="tabpanel" tabindex="0" aria-labelledby="tab-g-grafica"></div>
 </main>
 <footer><div class="in"><p><strong data-t="rodape_realiza">InovaSTEM · uma iniciativa PHYSIS</strong> · <span data-t="rodape_entidade">Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ) · Contato: [MARCADOR]</span></p>
   <p data-t="rodape_beta">Versão beta: termos e aviso de privacidade em revisão jurídica.</p>

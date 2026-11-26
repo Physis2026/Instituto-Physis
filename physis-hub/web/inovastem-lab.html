@@ -156,6 +156,7 @@ footer ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;padding:0;mar
 footer a{display:inline-flex;align-items:center;min-height:44px}
 @media (max-width:760px){#menu-bt{display:inline-flex;margin-left:auto}#cta{margin-left:0}#abas{display:none}#abas.aberto{display:block}#abas ul{flex-direction:column}h1.logo img{height:56px}}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+.lab-partes{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}.lab-partes a{display:inline-flex;align-items:center;min-height:44px;padding:4px 12px;border-radius:999px;border:1px solid var(--sec);color:var(--sec);text-decoration:none;font-weight:600}.lab-partes a[aria-current=page]{background:var(--sec);color:var(--fundo)}
 .lab-grupo{display:block;width:100%;font-weight:700;font-size:.85rem;margin:.5rem 0 .1rem;opacity:.85}
 /* Modelagem Physis 3D (casca do laboratório): classes que os motores usam (cartao, faixa in/al/at, t2), nas cores do guia */
 .faixa.in{background:var(--suave);color:var(--texto)}
@@ -264,17 +265,22 @@ ul.lista-limpa li{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
   <div data-physis-modelador="inovastem-3d"></div>
   <section class="lab-projeto" id="lab-proj" aria-label="Projeto comum" data-t-rot="proj_rot"></section>
   <div class="lab-abas" id="lab-abas" role="tablist" aria-label="Subabas da Modelagem Physis 3D" data-t-rot="abas_rot">
-    <span class="lab-grupo" data-g="grafica" aria-hidden="true">Modelagem gráfica</span><a role="tab" id="tab-arquivo" href="#arquivo" aria-controls="lab" aria-selected="true" tabindex="0">1. Enviar arquivo</a>
-    <a role="tab" id="tab-lugar" href="#lugar" aria-controls="lab" aria-selected="false" tabindex="-1">2. Lugar (GIS)</a>
-    <a role="tab" id="tab-edificacao" href="#edificacao" aria-controls="lab" aria-selected="false" tabindex="-1">3. Modelos BIM (CAD e IFC)</a>
-    <span class="lab-grupo" data-g="mecanica" aria-hidden="true">Modelagem mecânica</span><a role="tab" id="tab-montagem" href="#montagem" aria-controls="lab" aria-selected="false" tabindex="-1">4. Montagens</a>
-    <a role="tab" id="tab-simulacao" href="#simulacao" aria-controls="lab" aria-selected="false" tabindex="-1">5. Simulação</a>
-    <span class="lab-grupo" data-g="impressao" aria-hidden="true">Impressão 3D</span><a role="tab" id="tab-pecas" href="#pecas" aria-controls="lab" aria-selected="false" tabindex="-1">6. Impressão 3D</a>
-    <a role="tab" id="tab-galeria" href="#galeria" aria-controls="lab" aria-selected="false" tabindex="-1">7. Galeria</a>
-    <span class="lab-grupo" data-g="gemeo" aria-hidden="true">Gêmeo digital</span><a role="tab" id="tab-gemeo" href="#gemeo" aria-controls="lab" aria-selected="false" tabindex="-1">8. Gêmeo digital</a>
+    <a role="tab" id="tab-g-grafica" href="#arquivo" aria-controls="lab" aria-selected="true" tabindex="0">Modelagem gráfica</a>
+    <a role="tab" id="tab-g-mecanica" href="#montagem" aria-controls="lab" aria-selected="false" tabindex="-1">Modelagem mecânica</a>
+    <a role="tab" id="tab-g-impressao" href="#pecas" aria-controls="lab" aria-selected="false" tabindex="-1">Impressão 3D</a>
+  </div>
+  <div class="lab-partes" id="lab-partes" role="group" aria-label="Partes da subaba">
+    <a id="tab-arquivo" href="#arquivo" data-grupo="grafica">1. Enviar arquivo</a>
+    <a id="tab-lugar" href="#lugar" data-grupo="grafica">2. Lugar (GIS)</a>
+    <a id="tab-edificacao" href="#edificacao" data-grupo="grafica">3. Modelos BIM (CAD e IFC)</a>
+    <a id="tab-gemeo" href="#gemeo" data-grupo="grafica">4. Gêmeo digital</a>
+    <a id="tab-montagem" href="#montagem" data-grupo="mecanica" hidden>1. Montagens</a>
+    <a id="tab-simulacao" href="#simulacao" data-grupo="mecanica" hidden>2. Simulação</a>
+    <a id="tab-pecas" href="#pecas" data-grupo="impressao" hidden>1. Peças e fila de impressão</a>
+    <a id="tab-galeria" href="#galeria" data-grupo="impressao" hidden>2. Galeria</a>
   </div>
   <p class="faixa" role="note" data-t="faixa">Fase 1. Pré-dimensionamento para aprender e testar ideias: não aprova projeto, não substitui norma nem ensaio. Os exemplos usam dados fictícios. O que você abre ou envia aqui fica no seu computador; só vai para o servidor da InovaSTEM quando você pede (pedir impressão, enviar peça à Biblioteca).</p>
-  <div id="lab" role="tabpanel" tabindex="0" aria-labelledby="tab-arquivo"></div>
+  <div id="lab" role="tabpanel" tabindex="0" aria-labelledby="tab-g-grafica"></div>
 </main>
 <footer><div class="in"><p><strong data-t="rodape_realiza">InovaSTEM · uma iniciativa PHYSIS</strong> · <span data-t="rodape_entidade">Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ) · Contato: [MARCADOR]</span></p>
   <p data-t="rodape_beta">Versão beta: termos e aviso de privacidade em revisão jurídica.</p>
@@ -4523,7 +4529,8 @@ window.PhysisModelagem = { carregar, lerIfc, editor, Vista, FERRAMENTAS, versao:
    galeria, em português e inglês (função t com a chave, como o site). Gerada por ferramentas/montar_lab_inovastem.py. Os motores
    (SIMULACAO, telaPhysis3D) não mudam: a casca só chama as funções deles e troca as cores do desenho para as do guia. */
 const CORES = {"#DBE7F1": "#F4F1EA", "#B8D0E0": "#D9D3C2", "#7FA9C4": "#8A9284", "#546A7B": "#4A5A47", "#3D6E8F": "#4A5A47", "#2C5A6E": "#0B3D2E", "#1C3550": "#1B1F23", "#7A2214": "#C2410C", "#A63A28": "#C2410C", "#A85432": "#C2410C", "#C9A227": "#F97316", "#C08A1E": "#C2410C"};
-const SUBABAS = [["arquivo", "Enviar arquivo"], ["lugar", "Lugar (GIS)"], ["edificacao", "Modelos BIM (CAD e IFC)"], ["montagem", "Montagens"], ["simulacao", "Simulação"], ["pecas", "Impressão 3D"], ["galeria", "Galeria"], ["gemeo", "Gêmeo digital"]];
+const SUBABAS = [["arquivo", "Enviar arquivo"], ["lugar", "Lugar (GIS)"], ["edificacao", "Modelos BIM (CAD e IFC)"], ["gemeo", "Gêmeo digital"], ["montagem", "Montagens"], ["simulacao", "Simulação"], ["pecas", "Peças e fila de impressão"], ["galeria", "Galeria"]];
+const GRUPOS3 = [["grafica", "Modelagem gráfica", ["arquivo", "lugar", "edificacao", "gemeo"]], ["mecanica", "Modelagem mecânica", ["montagem", "simulacao"]], ["impressao", "Impressão 3D", ["pecas", "galeria"]]], grupoDe = k => (GRUPOS3.find(g => g[2].indexOf(k) >= 0) || GRUPOS3[0]);
 const ANTIGAS = { "3d": "pecas", "escaneamento": "arquivo", "fila": "pecas" };          // endereços antigos (Escaneamento saiu em 21/11/2026)
 const ESQ_PROJETO = "inovastem-projeto/1", ESQ_LUGAR = "physis-geometria-lugar/1", CHAVE_PROJ = "inovastem-projeto";
 const ARQ_MAX = 20 * 1024 * 1024;                           // o mesmo limite dos arquivos do Mapeamento e da fila (20 MB)
@@ -4540,7 +4547,7 @@ const T = {
     rodape_realiza: "InovaSTEM · uma iniciativa PHYSIS", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ) · Contato: [MARCADOR]",
     rodape_beta: "Versão beta: termos e aviso de privacidade em revisão jurídica.", termos: "Termos de uso (beta)", privacidade: "Privacidade (beta)", acessibilidade: "Acessibilidade",
     grupos: { grafica: "Modelagem gráfica", mecanica: "Modelagem mecânica", impressao: "Impressão 3D", gemeo: "Gêmeo digital" },
-    abas: { gemeo: "Gêmeo digital", arquivo: "Enviar arquivo", lugar: "Lugar (GIS)", edificacao: "Modelos BIM (CAD e IFC)", montagem: "Montagens", pecas: "Impressão 3D", simulacao: "Simulação", fila: "Fila de impressão", galeria: "Galeria" },
+    abas: { gemeo: "Gêmeo digital", arquivo: "Enviar arquivo", lugar: "Lugar (GIS)", edificacao: "Modelos BIM (CAD e IFC)", montagem: "Montagens", pecas: "Peças e fila de impressão", simulacao: "Simulação", fila: "Fila de impressão", galeria: "Galeria" },
     // barra do projeto e fluxo
     proj_titulo: "Projeto comum", proj_guardado: "guardado neste navegador · atualizado em", vazio: "vazio", arquivos: "Arquivos", ultimo: "último",
     lugar: "Lugar", modelo_bim: "Modelo BIM", pecas: "Peças", montagem: "Montagem", resultados: "Resultados", de: "de", elementos: "elementos", objetos: "objetos", itens: "itens",
@@ -4712,7 +4719,7 @@ const T = {
     rodape_realiza: "InovaSTEM · a PHYSIS initiative", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ), Brazil · Contact: [MARCADOR]",
     rodape_beta: "Beta version: terms and privacy notice under legal review.", termos: "Terms of use (beta)", privacidade: "Privacy (beta)", acessibilidade: "Accessibility",
     grupos: { grafica: "Graphic modeling", mecanica: "Mechanical modeling", impressao: "3D printing", gemeo: "Digital twin" },
-    abas: { gemeo: "Digital twin", arquivo: "Upload a file", lugar: "Site (GIS)", edificacao: "BIM models (CAD and IFC)", montagem: "Assemblies", pecas: "3D printing", simulacao: "Simulation", fila: "Print queue", galeria: "Gallery" },
+    abas: { gemeo: "Digital twin", arquivo: "Upload a file", lugar: "Site (GIS)", edificacao: "BIM models (CAD and IFC)", montagem: "Assemblies", pecas: "Parts and print queue", simulacao: "Simulation", fila: "Print queue", galeria: "Gallery" },
     proj_titulo: "Shared project", proj_guardado: "kept in this browser · updated on", vazio: "empty", arquivos: "Files", ultimo: "latest",
     lugar: "Site", modelo_bim: "BIM model", pecas: "Parts", montagem: "Assembly", resultados: "Results", de: "from", elementos: "elements", objetos: "objects", itens: "items",
     proj_exportar: "Export the project (.json)", proj_importar: "Import a project (.json)", proj_limpar: "Start another project", proj_confirmar: "Confirm: delete the project from this browser",
@@ -6372,7 +6379,8 @@ function aplicarIdioma() {
   botIdioma();
   document.querySelectorAll("[data-t]").forEach(el => { const v = t(el.getAttribute("data-t")); if (typeof v === "string") el.textContent = v; });
   document.querySelectorAll("[data-t-rot]").forEach(el => { const v = t(el.getAttribute("data-t-rot")); if (typeof v === "string") el.setAttribute("aria-label", v); });
-  SUBABAS.forEach(([k], i) => { const e = document.getElementById("tab-" + k); if (e) e.textContent = (i + 1) + ". " + t("abas")[k]; });
+  GRUPOS3.forEach(([g, , ks]) => { const e = document.getElementById("tab-g-" + g), gn = t("grupos"); if (e && gn && gn[g]) e.textContent = gn[g];
+    ks.forEach((k, j) => { const p = document.getElementById("tab-" + k); if (p) p.textContent = (j + 1) + ". " + t("abas")[k]; }); });
   document.querySelectorAll(".lab-grupo[data-g]").forEach(e => { const g = t("grupos"); if (g && g[e.dataset.g]) e.textContent = g[e.dataset.g]; });
 }
 function desenhar() {
@@ -6381,9 +6389,11 @@ function desenhar() {
   let h = (TELAS[abaLab] || telaArquivo)();
   h = h.replace(/<h1(\s[^>]*)?>/g, "<h2$1>").replace(/<\/h1>/g, "</h2>");      // um título só por tela: o logo
   alvo.innerHTML = recolorir(h);
-  alvo.setAttribute("aria-labelledby", "tab-" + abaLab);
+  alvo.setAttribute("aria-labelledby", "tab-g-" + grupoDe(abaLab)[0]);
   document.getElementById("lab-proj").innerHTML = barraProjeto();
-  SUBABAS.forEach(([k]) => { const e = document.getElementById("tab-" + k), sim = k === abaLab; e.setAttribute("aria-selected", String(sim)); e.tabIndex = sim ? 0 : -1; });
+  const gAtual = grupoDe(abaLab)[0];
+  GRUPOS3.forEach(([g]) => { const e = document.getElementById("tab-g-" + g), sim = g === gAtual; e.setAttribute("aria-selected", String(sim)); e.tabIndex = sim ? 0 : -1; });
+  SUBABAS.forEach(([k]) => { const e = document.getElementById("tab-" + k); if (!e) return; e.hidden = grupoDe(k)[0] !== gAtual; if (k === abaLab) e.setAttribute("aria-current", "page"); else e.removeAttribute("aria-current"); });
   document.title = "InovaSTEM · " + t("nav_modelagem") + " · " + t("abas")[abaLab];
   desenhado = true;
   traduzirDom(alvo);
@@ -6419,13 +6429,13 @@ function irLab() {
   aoEntrar(); desenhar();
 }
 document.getElementById("lab-abas").addEventListener("keydown", ev => {
-  const i = SUBABAS.findIndex(s => s[0] === abaLab), n = SUBABAS.length;
+  const i = GRUPOS3.findIndex(g => g[0] === grupoDe(abaLab)[0]), n = GRUPOS3.length;
   const novo = ev.key === "ArrowRight" ? (i + 1) % n : ev.key === "ArrowLeft" ? (i - 1 + n) % n : ev.key === "Home" ? 0 : ev.key === "End" ? n - 1 : ev.key === " " ? i : null;
   if (novo == null) return;
   ev.preventDefault();
-  const k = SUBABAS[novo][0];
+  const k = GRUPOS3[novo][2][0];
   if (location.hash !== "#" + k) location.hash = "#" + k;
-  focar("tab-" + k);
+  focar("tab-g-" + GRUPOS3[novo][0]);
 });
 async function acao(a, b) {
   const fen = FEN.filter(f => f.id === b.getAttribute("data-fen"))[0];

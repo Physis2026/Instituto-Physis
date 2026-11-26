@@ -38,6 +38,7 @@ ALVOS = [
     RAIZ / "physis-hub" / "web" / "documento.html",
     RAIZ / "physis-hub" / "web" / "municipio.html",
     RAIZ / "physis-hub" / "web" / "site.html",           # site do Instituto e da Rede InovaSTEM (19/11/2026)
+    RAIZ / "physis-hub" / "web" / "gsa.html",             # GSA (26/11/2026)
     RAIZ / "physis-hub" / "web" / "inovastem.html",      # site e living lab da InovaSTEM (D94, 19/11/2026)
     RAIZ / "app-nativo" / "site" / "baixar.html",
 ]
@@ -76,6 +77,7 @@ BLOCOS = {
     "pc-ponte": RAIZ / "sistema" / "physis-ponte-cliente.js",      # ponte da plataforma com o servidor (dados do cliente)
     # contas comuns (Lei 14.300, plano inclinado, baterias, cisterna, calhas, aquecimento solar) com a base de premissas
     "physis-calc-comum": RAIZ / "sistema" / "physis-calc-comum.js",
+    "physis-paginas": RAIZ / "sistema" / "physis-paginas.js",   # páginas de 20 itens (26/11/2026)
 }
 # Nome antigo do bloco de preferências (px-preferencias v1, a segunda implementação que existia até 15/11/2026):
 # vira o bloco do módulo único na primeira rodada.

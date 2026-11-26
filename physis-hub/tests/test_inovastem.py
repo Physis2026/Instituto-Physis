@@ -919,13 +919,14 @@ class Modelagem3D(unittest.TestCase):
     def test_oito_subabas_na_ordem_com_aria(self):
         # dona, 20 e 21/11/2026: "Enviar arquivo" primeiro; "Modelos BIM (CAD e IFC)" (chave edificacao) e logo depois
         # "Montagens"; "Escaneamento" saiu por enquanto
-        ordem = ["arquivo", "lugar", "edificacao", "montagem", "simulacao", "pecas", "galeria", "gemeo"]   # 26/11/2026: gráfica > mecânica > impressão 3D + gêmeo
+        ordem = ["arquivo", "lugar", "edificacao", "gemeo", "montagem", "simulacao", "pecas", "galeria"]   # 26/11/2026: 3 subabas (gráfica > mecânica > impressão 3D), gêmeo na gráfica
         self.assertEqual(dict(self.lab.SUBABAS)["edificacao"], "Modelos BIM (CAD e IFC)")
         self.assertNotRegex(self.fora, r"(?i)escaneamento|crealityscan|scanning", "Escaneamento fora por enquanto")
         self.assertNotRegex(re.search(r"\nconst T = \{\n(.*?)\n\};\n", self.js, re.S).group(1), r"(?i)escaneamento|crealityscan|scanning")
         self.assertIn('"escaneamento": "arquivo"', self.js, "o endereço antigo abre Enviar arquivo")
         self.assertEqual([k for k, _ in self.lab.SUBABAS], ordem)
-        self.assertEqual(re.findall(r'<a role="tab" id="tab-([a-z]+)" href="#\1" aria-controls="lab"', self.fora), ordem)
+        self.assertEqual(re.findall(r'<a id="tab-([a-z]+)" href="#\1" data-grupo=', self.fora), ordem)            # partes
+        self.assertEqual(re.findall(r'<a role="tab" id="tab-g-([a-z]+)"', self.fora), ["grafica", "mecanica", "impressao"])   # 3 subabas
         self.assertEqual(self.fora.count('role="tablist"'), 1)
         self.assertIn('id="lab" role="tabpanel"', self.fora)
         self.assertEqual(self.fora.count('aria-selected="true"'), 1)
