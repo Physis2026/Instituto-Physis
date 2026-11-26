@@ -919,7 +919,7 @@ class Modelagem3D(unittest.TestCase):
     def test_oito_subabas_na_ordem_com_aria(self):
         # dona, 20 e 21/11/2026: "Enviar arquivo" primeiro; "Modelos BIM (CAD e IFC)" (chave edificacao) e logo depois
         # "Montagens"; "Escaneamento" saiu por enquanto
-        ordem = ["arquivo", "lugar", "edificacao", "montagem", "pecas", "simulacao", "galeria"]   # 24/11/2026: fila dentro de Impressão 3D
+        ordem = ["arquivo", "lugar", "edificacao", "montagem", "simulacao", "pecas", "galeria", "gemeo"]   # 26/11/2026: gráfica > mecânica > impressão 3D + gêmeo
         self.assertEqual(dict(self.lab.SUBABAS)["edificacao"], "Modelos BIM (CAD e IFC)")
         self.assertNotRegex(self.fora, r"(?i)escaneamento|crealityscan|scanning", "Escaneamento fora por enquanto")
         self.assertNotRegex(re.search(r"\nconst T = \{\n(.*?)\n\};\n", self.js, re.S).group(1), r"(?i)escaneamento|crealityscan|scanning")
@@ -1126,7 +1126,7 @@ class EnviarArquivoEImagem3D(unittest.TestCase):
         self.assertNotRegex(atrib, r'"on|href|style')
         self.assertIn('arquivos: [], passos: []', self.js)
         fluxo = re.findall(r'\["([a-z]+)", "[^"]+", "[^"]*"', re.search(r'fluxo: \[(.*?)\]\],', self.js, re.S).group(1))
-        self.assertEqual(fluxo, ["arquivo", "lugar", "montagem", "pecas", "simulacao", "galeria"])
+        self.assertEqual(fluxo, ["arquivo", "lugar", "montagem", "simulacao", "pecas", "galeria", "gemeo"])
         # foto → CAD 2D → 3D: escala de cinza, suavização, Otsu com ajuste manual, ruído e fundo; contorno + Douglas-Peucker
         for f in ("function cinza(", "function suavizar(", "function otsu(", "function limpar(", "function processarFoto(", "function contornos(", "function dp("):
             self.assertIn(f, self.mod, f)

@@ -64,8 +64,10 @@ CORES = {"#DBE7F1": "#F4F1EA", "#B8D0E0": "#D9D3C2", "#7FA9C4": "#8A9284", "#546
 
 # subabas (dona, 20 e 21/11/2026): "Enviar arquivo" primeiro; "Edificação" virou "Modelos BIM (CAD e IFC)" (a chave interna
 # continua "edificacao"); "Montagens" logo depois; "Escaneamento" saiu por enquanto (volta depois; #escaneamento abre Enviar arquivo)
+# 26/11/2026 (dona): três etapas que valem sozinhas: modelagem gráfica > modelagem mecânica > impressão 3D, e o gêmeo digital
 SUBABAS = [("arquivo", "Enviar arquivo"), ("lugar", "Lugar (GIS)"), ("edificacao", "Modelos BIM (CAD e IFC)"), ("montagem", "Montagens"),
-           ("pecas", "Impressão 3D"), ("simulacao", "Simulação"), ("galeria", "Galeria")]
+           ("simulacao", "Simulação"), ("pecas", "Impressão 3D"), ("galeria", "Galeria"), ("gemeo", "Gêmeo digital")]
+GRUPOS_LAB = {"arquivo": ("grafica", "Modelagem gráfica"), "montagem": ("mecanica", "Modelagem mecânica"), "pecas": ("impressao", "Impressão 3D"), "gemeo": ("gemeo", "Gêmeo digital")}
 # 24/11/2026 (dona): UMA aba de impressão 3D (peça, parâmetros, filamentos, fatiamento, arquivos de teste e fila); as outras são de simulação
 ESQUEMA_PROJETO = "inovastem-projeto/1"
 
@@ -74,7 +76,8 @@ ESQUEMA_PROJETO = "inovastem-projeto/1"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lab_ingles import CASOS_EN, MOTOR_EN, MOTOR_EN_RX  # noqa: E402  (dicionário em arquivo próprio)
 
-CASCA_CSS = """/* Modelagem Physis 3D (casca do laboratório): classes que os motores usam (cartao, faixa in/al/at, t2), nas cores do guia */
+CASCA_CSS = """.lab-grupo{display:block;width:100%;font-weight:700;font-size:.85rem;margin:.5rem 0 .1rem;opacity:.85}
+/* Modelagem Physis 3D (casca do laboratório): classes que os motores usam (cartao, faixa in/al/at, t2), nas cores do guia */
 .faixa.in{background:var(--suave);color:var(--texto)}
 .faixa.al{background:var(--al-f);color:var(--al-t)}
 .faixa.at{background:var(--at-f);color:var(--at-t)}
@@ -176,7 +179,8 @@ const T = {
     abas_rot: "Subabas da Modelagem Physis 3D", proj_rot: "Projeto comum",
     rodape_realiza: "InovaSTEM · uma iniciativa PHYSIS", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ) · Contato: [MARCADOR]",
     rodape_beta: "Versão beta: termos e aviso de privacidade em revisão jurídica.", termos: "Termos de uso (beta)", privacidade: "Privacidade (beta)", acessibilidade: "Acessibilidade",
-    abas: { arquivo: "Enviar arquivo", lugar: "Lugar (GIS)", edificacao: "Modelos BIM (CAD e IFC)", montagem: "Montagens", pecas: "Impressão 3D", simulacao: "Simulação", fila: "Fila de impressão", galeria: "Galeria" },
+    grupos: { grafica: "Modelagem gráfica", mecanica: "Modelagem mecânica", impressao: "Impressão 3D", gemeo: "Gêmeo digital" },
+    abas: { gemeo: "Gêmeo digital", arquivo: "Enviar arquivo", lugar: "Lugar (GIS)", edificacao: "Modelos BIM (CAD e IFC)", montagem: "Montagens", pecas: "Impressão 3D", simulacao: "Simulação", fila: "Fila de impressão", galeria: "Galeria" },
     // barra do projeto e fluxo
     proj_titulo: "Projeto comum", proj_guardado: "guardado neste navegador · atualizado em", vazio: "vazio", arquivos: "Arquivos", ultimo: "último",
     lugar: "Lugar", modelo_bim: "Modelo BIM", pecas: "Peças", montagem: "Montagem", resultados: "Resultados", de: "de", elementos: "elementos", objetos: "objetos", itens: "itens",
@@ -185,7 +189,7 @@ const T = {
     proj_baixado: "Arquivo do projeto baixado.", proj_importado: "Projeto importado:", proj_nao: "Este arquivo não é um projeto", proj_falha_guardar: "Atenção: não deu para guardar neste navegador (espaço cheio ou navegação privada). Exporte o arquivo do projeto para não perder.",
     fluxo_rot: "Fluxo da Modelagem Physis 3D", ainda_nao: "ainda não", ou: "ou",
     fluxo: [["arquivo", "Enviar arquivo", ""], ["lugar", "Lugar ou Modelos BIM", "se for território, edificação ou peça mecânica"], ["montagem", "Montagens", "se tiver várias peças"],
-            ["pecas", "Impressão 3D", ""], ["simulacao", "Simulação", ""], ["galeria", "Galeria", ""]],
+            ["simulacao", "Simulação", ""], ["pecas", "Impressão 3D", ""], ["galeria", "Galeria", ""], ["gemeo", "Gêmeo digital", "opcional"]],
     // comuns
     escolha_arquivo: "Escolha um arquivo.", grande: "Arquivo grande demais (máximo 20 MB).", json_invalido: "O arquivo não é um JSON válido.", sem_hub: "Sem ligação com o servidor da InovaSTEM.",
     carregando: "Carregando…", lendo: "Lendo…", baixado: "Arquivo baixado.", tirar: "Tirar", acao: "Ação", nome: "Nome", tamanho: "Tamanho", volume: "Volume", triangulos: "Triângulos",
@@ -347,7 +351,8 @@ const T = {
     abas_rot: "Physis 3D modelling sub-tabs", proj_rot: "Shared project",
     rodape_realiza: "InovaSTEM · a PHYSIS initiative", rodape_entidade: "Physis Engineering · CNPJ [MARCADOR] · Petrópolis (RJ), Brazil · Contact: [MARCADOR]",
     rodape_beta: "Beta version: terms and privacy notice under legal review.", termos: "Terms of use (beta)", privacidade: "Privacy (beta)", acessibilidade: "Accessibility",
-    abas: { arquivo: "Upload a file", lugar: "Site (GIS)", edificacao: "BIM models (CAD and IFC)", montagem: "Assemblies", pecas: "3D printing", simulacao: "Simulation", fila: "Print queue", galeria: "Gallery" },
+    grupos: { grafica: "Graphic modeling", mecanica: "Mechanical modeling", impressao: "3D printing", gemeo: "Digital twin" },
+    abas: { gemeo: "Digital twin", arquivo: "Upload a file", lugar: "Site (GIS)", edificacao: "BIM models (CAD and IFC)", montagem: "Assemblies", pecas: "3D printing", simulacao: "Simulation", fila: "Print queue", galeria: "Gallery" },
     proj_titulo: "Shared project", proj_guardado: "kept in this browser · updated on", vazio: "empty", arquivos: "Files", ultimo: "latest",
     lugar: "Site", modelo_bim: "BIM model", pecas: "Parts", montagem: "Assembly", resultados: "Results", de: "from", elementos: "elements", objetos: "objects", itens: "items",
     proj_exportar: "Export the project (.json)", proj_importar: "Import a project (.json)", proj_limpar: "Start another project", proj_confirmar: "Confirm: delete the project from this browser",
@@ -355,7 +360,7 @@ const T = {
     proj_baixado: "Project file downloaded.", proj_importado: "Project imported:", proj_nao: "This file is not a project", proj_falha_guardar: "Warning: it could not be saved in this browser (storage full or private browsing). Export the project file so you do not lose it.",
     fluxo_rot: "Physis 3D modelling flow", ainda_nao: "not yet", ou: "or",
     fluxo: [["arquivo", "Upload a file", ""], ["lugar", "Site or BIM models", "for land, buildings or mechanical parts"], ["montagem", "Assemblies", "if there are several parts"],
-            ["pecas", "3D printing", ""], ["simulacao", "Simulation", ""], ["galeria", "Gallery", ""]],
+            ["simulacao", "Simulation", ""], ["pecas", "3D printing", ""], ["galeria", "Gallery", ""], ["gemeo", "Digital twin", "optional"]],
     escolha_arquivo: "Choose a file.", grande: "File too large (20 MB maximum).", json_invalido: "The file is not valid JSON.", sem_hub: "No connection to the InovaSTEM server.",
     carregando: "Loading…", lendo: "Reading…", baixado: "File downloaded.", tirar: "Remove", acao: "Action", nome: "Name", tamanho: "Size", volume: "Volume", triangulos: "Triangles",
     malha: "Mesh", fechada: "closed", aberta: "with open or non-manifold edges (check in 3D parts)", baixar_svg: "Download SVG", baixar_dxf: "Download DXF", baixar_stl: "Download STL",
@@ -538,6 +543,7 @@ function projetoValido(o) {
   if (o.montagem && typeof o.montagem === "object" && Array.isArray(o.montagem.itens)) p.montagem = o.montagem;
   ["pecas", "resultados"].forEach(k => { p[k] = Array.isArray(o[k]) ? o[k].filter(x => x && typeof x === "object").slice(0, 200) : []; });
   p.arquivos = Array.isArray(o.arquivos) ? o.arquivos.filter(x => x && typeof x === "object").slice(-200) : [];
+  if (o.gemeo && typeof o.gemeo === "object" && o.gemeo.esquema === "inovastem-gemeo/1") p.gemeo = o.gemeo;
   p.passos = Array.isArray(o.passos) ? o.passos.filter(x => x && typeof x === "object" && typeof x.passo === "string").slice(-200) : [];
   return p;
 }
@@ -608,7 +614,7 @@ const ehEquipe = i => !!(i && (i.papel === "operador" || i.papel === "administra
 /* ════════ fluxo e passos do projeto ════════ */
 function registrarPasso(passo, detalhe) { proj.passos.push({ passo, detalhe: String(detalhe || "").slice(0, 200), quando: agora() }); if (proj.passos.length > 200) proj.passos.splice(0, proj.passos.length - 200); }
 function ultimoPasso(nomes) { for (let i = proj.passos.length - 1; i >= 0; i--) if (nomes.indexOf(proj.passos[i].passo) >= 0) return proj.passos[i]; return null; }
-const NOMES_FLUXO = { arquivo: ["arquivo"], lugar: ["lugar", "edificacao"], montagem: ["montagem"], pecas: ["pecas", "fila"], simulacao: ["simulacao"], galeria: ["galeria"] };
+const NOMES_FLUXO = { arquivo: ["arquivo"], lugar: ["lugar", "edificacao"], montagem: ["montagem"], pecas: ["pecas", "fila"], simulacao: ["simulacao"], galeria: ["galeria"], gemeo: ["gemeo"] };
 function fluxoHtml() {
   return `<nav aria-label="${escL(t("fluxo_rot"))}"><ol class="lab-fluxo">${t("fluxo").map(([k, nome, quandoUsar], i) => {
     const nomes = NOMES_FLUXO[k], u = ultimoPasso(nomes), atual = nomes.indexOf(abaLab) >= 0, cur = a => abaLab === a ? ' aria-current="step"' : "";
@@ -1593,8 +1599,31 @@ function telaGaleria() {
   }).join("");
 }
 
+/* ════════ 8. Gêmeo digital (26/11/2026): o projeto comum (lugar, BIM, montagem, peças) vira um gêmeo digital em JSON,
+   com pontos de medição sugeridos (a confirmar) para ligar sensores depois. Roda no navegador; nada sai daqui. ════════ */
+function gemeoMontar() {
+  const ed = proj.edificacao, obj = ed && Array.isArray(ed.objetos) ? ed.objetos : [], tipos = {};
+  obj.forEach(o => { const k = String(o.tipo || o.type || "objeto"); tipos[k] = (tipos[k] || 0) + 1; });
+  const pontos = [];
+  if (proj.lugar) pontos.push({ onde: "lugar", grandeza: "chuva (mm)", situacao: "a confirmar" }, { onde: "lugar", grandeza: "temperatura do ar (°C)", situacao: "a confirmar" });
+  if (ed) pontos.push({ onde: "edificação", grandeza: "temperatura e umidade por ambiente", situacao: "a confirmar" }, { onde: "edificação", grandeza: "energia elétrica (kWh)", situacao: "a confirmar" });
+  if (proj.montagem && proj.montagem.itens) proj.montagem.itens.slice(0, 50).forEach(m => pontos.push({ onde: "montagem: " + String(m.nome || m.id || "item").slice(0, 60), grandeza: "estado/vibração", situacao: "a confirmar" }));
+  (proj.pecas || []).slice(0, 50).forEach(pc => pontos.push({ onde: "peça: " + String(pc.nome || pc.id || "peça").slice(0, 60), grandeza: "desgaste/temperatura", situacao: "a confirmar" }));
+  return { esquema: "inovastem-gemeo/1", gerado_em: agora(), origem: "InovaSTEM · Modelagem Physis 3D", aviso: "Gêmeo preliminar: pontos de medição sugeridos, a confirmar.",
+    lugar: proj.lugar ? { origem: proj.lugar.origem, arquivo: proj.lugar.arquivo } : null,
+    edificacao: ed ? { origem: ed.origem, arquivo: ed.arquivo, resumo: ed.resumo || null, objetos_por_tipo: tipos } : null,
+    montagem: proj.montagem ? { itens: (proj.montagem.itens || []).length } : null, pecas: (proj.pecas || []).length, pontos_de_medicao: pontos };
+}
+function telaGemeo() {
+  const tem = [["Lugar (GIS)", !!proj.lugar], ["Modelo BIM", !!proj.edificacao], ["Montagem", !!(proj.montagem && (proj.montagem.itens || []).length)], ["Peças", (proj.pecas || []).length > 0]];
+  const g = proj.gemeo;
+  return `<h2>Gêmeo digital</h2><p class="t2">Junta o que este projeto já tem (lugar, modelo BIM, montagem e peças) num gêmeo digital: a cópia digital do objeto, com os pontos onde medir para comparar o real com o modelo.</p>
+  <section class="cartao" aria-labelledby="h-gm-o"><h2 id="h-gm-o">O que entra</h2><ul>${tem.map(([n, s]) => `<li>${escL(n)}: ${s ? "sim" : "ainda não (use as subabas anteriores)"}</li>`).join("")}</ul>
+  <div class="acoes"><button class="botao" type="button" id="gm-gerar" data-lab="gemeo-gerar"${tem.some(x => x[1]) ? "" : " disabled"}>Gerar gêmeo digital</button>${g ? ` <button class="botao sec" type="button" id="gm-baixar" data-lab="gemeo-baixar">Baixar o gêmeo (JSON)</button>` : ""}</div></section>
+  ${g ? `<section class="cartao" aria-labelledby="h-gm-r"><h2 id="h-gm-r">Gêmeo gerado em ${escL(g.gerado_em)}</h2><p class="t2">${escL(g.aviso)}</p><div class="rolagem"><table><caption>Pontos de medição sugeridos</caption><thead><tr><th scope="col">Onde</th><th scope="col">Grandeza</th><th scope="col">Situação</th></tr></thead><tbody>${g.pontos_de_medicao.map(x => `<tr><td>${escL(x.onde)}</td><td>${escL(x.grandeza)}</td><td>${escL(x.situacao)}</td></tr>`).join("")}</tbody></table></div></section>` : ""}`;
+}
 /* ════════ desenho, idioma, subabas e eventos ════════ */
-const TELAS = { arquivo: telaArquivo, lugar: telaLugar, edificacao: telaBim, montagem: telaMontagem, pecas: telaImpressao, simulacao: telaSimulacaoBlocos, galeria: telaGaleria };
+const TELAS = { gemeo: telaGemeo, arquivo: telaArquivo, lugar: telaLugar, edificacao: telaBim, montagem: telaMontagem, pecas: telaImpressao, simulacao: telaSimulacaoBlocos, galeria: telaGaleria };
 function telaImpressao() { return telaPecas() + telaFila(); }
 /* ════════ motores em inglês: dicionário aplicado sobre o texto que os motores escrevem (o cálculo não muda) ════════
    PHYSIS3D_I18N (+ _RX) e SIMULACAO_I18N vêm dos motores; MOTOR_EN completa o que faltava; CASOS_EN traduz os casos da simulação. */
@@ -1649,6 +1678,7 @@ function aplicarIdioma() {
   document.querySelectorAll("[data-t]").forEach(el => { const v = t(el.getAttribute("data-t")); if (typeof v === "string") el.textContent = v; });
   document.querySelectorAll("[data-t-rot]").forEach(el => { const v = t(el.getAttribute("data-t-rot")); if (typeof v === "string") el.setAttribute("aria-label", v); });
   SUBABAS.forEach(([k], i) => { const e = document.getElementById("tab-" + k); if (e) e.textContent = (i + 1) + ". " + t("abas")[k]; });
+  document.querySelectorAll(".lab-grupo[data-g]").forEach(e => { const g = t("grupos"); if (g && g[e.dataset.g]) e.textContent = g[e.dataset.g]; });
 }
 function desenhar() {
   aplicarIdioma();
@@ -1704,6 +1734,8 @@ document.getElementById("lab-abas").addEventListener("keydown", ev => {
 });
 async function acao(a, b) {
   const fen = FEN.filter(f => f.id === b.getAttribute("data-fen"))[0];
+  if (a === "gemeo-gerar") { proj.gemeo = gemeoMontar(); gravarProjeto("Gêmeo digital gerado.", true); return; }
+  if (a === "gemeo-baixar" && proj.gemeo) { baixar("inovastem-gemeo-" + agora().slice(0, 10) + ".json", JSON.stringify(proj.gemeo, null, 1), "application/json"); return "fica"; }
   if (a === "proj-exportar") { baixar("inovastem-projeto-" + agora().slice(0, 10) + ".json", JSON.stringify(proj, null, 1), "application/json"); lab.proj = { texto: t("proj_baixado") }; return; }
   if (a === "proj-limpar") {
     if (!lab.limpar) { lab.limpar = true; lab.proj = { texto: t("proj_confirmar_msg") }; return; }
@@ -1902,7 +1934,8 @@ def montar() -> str:
     casca = (CASCA_JS.replace("__CORES__", json.dumps(CORES)).replace("__MOTOR_EN__", json.dumps(MOTOR_EN, ensure_ascii=False, indent=0))
              .replace("__MOTOR_EN_RX__", json.dumps(MOTOR_EN_RX, ensure_ascii=False)).replace("__CASOS_EN__", json.dumps(CASOS_EN, ensure_ascii=False, indent=0)).replace("__ESQ_PROJETO__", ESQUEMA_PROJETO)
              .replace("__SUBABAS__", json.dumps([list(s) for s in SUBABAS], ensure_ascii=False)))
-    abas = "\n    ".join(f'<a role="tab" id="tab-{k}" href="#{k}" aria-controls="lab" aria-selected="{"true" if i == 0 else "false"}" '
+    grupo = lambda k: (f'<span class="lab-grupo" data-g="{GRUPOS_LAB[k][0]}" aria-hidden="true">{GRUPOS_LAB[k][1]}</span>' if k in GRUPOS_LAB else "")
+    abas = "\n    ".join(grupo(k) + f'<a role="tab" id="tab-{k}" href="#{k}" aria-controls="lab" aria-selected="{"true" if i == 0 else "false"}" '
                          f'tabindex="{0 if i == 0 else -1}">{i + 1}. {n}</a>' for i, (k, n) in enumerate(SUBABAS))
     return f"""<!doctype html>
 <html lang="pt-BR">
