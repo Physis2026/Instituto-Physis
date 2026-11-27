@@ -259,7 +259,7 @@ class TestOrdemNosRobos(Base):
 
     def test_ordem_padrao_do_ambiente(self):
         with mock.patch.dict(os.environ, {"PHYSIS_CLAUDE_CHAVE": CHAVE, "PHYSIS_IA_URL": "http://localhost:8000",
-                                          "PHYSIS_CLAUDE_CONSUMO": str(self.consumo)}):
+                                          "PHYSIS_CLAUDE_CONSUMO": str(self.consumo), "PHYSIS_CLAUDE_PERMITIDO": "1"}):
             c = robos.ia_do_ambiente()
         self.assertEqual(c.tipo, "claude → openai → regras")
         self.assertNotIn(CHAVE, repr(c.provedores[0]))
